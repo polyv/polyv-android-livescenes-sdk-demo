@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="24dp"
+    android:background="@drawable/plvec_bulletin_bg">
+
+    <TextView
+        android:id="@+id/bulletin_ic"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="12dp"
+        android:drawableLeft="@drawable/plvec_gonggao"
+        android:drawablePadding="3dp"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:text="公告："
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVMarqueeTextView
+        android:id="@+id/bulletin_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="12dp"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:text="12312321312312323231213213"
+        android:textColor="#ffffff"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:scroll_first_delay="0"
+        app:scroll_interval="4000"
+        app:scroll_mode="mode_once" />
+</LinearLayout>

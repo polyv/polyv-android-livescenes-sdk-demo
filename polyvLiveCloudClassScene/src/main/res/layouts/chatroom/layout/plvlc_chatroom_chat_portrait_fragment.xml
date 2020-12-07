@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#202127">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout
+        android:id="@+id/swipe_load_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:layout_marginBottom="8dp">
+
+        <!--add child chatMessageList-->
+    </com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout>
+
+    <FrameLayout
+        android:id="@+id/bulletin_ly"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#59000000"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTextView
+            android:id="@+id/bulletin_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:visibility="invisible"
+            app:scroll_first_delay="100"
+            app:scroll_interval="6000"
+            app:scroll_mode="mode_forever" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bulletin_ly"
+        android:layout_margin="8dp"
+        android:background="@drawable/plvlc_chatroom_greeting_bg"
+        android:padding="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView
+            android:id="@+id/greeting_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            app:scroll_first_delay="100"
+            app:scroll_interval="6000"
+            app:scroll_mode="mode_once" />
+    </FrameLayout>
+
+    <!--marginTop/(like_iv height) unreadView outOfSight or immerse&fitsSystemWindows cover-->
+    <com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:fillViewport="true">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <LinearLayout
+                android:id="@+id/likes_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="18dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView
+                    android:id="@+id/likes_view"
+                    android:layout_width="78dp"
+                    android:layout_height="180dp" />
+
+                <TextView
+                    android:id="@+id/likes_count_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:background="#CC202127"
+                    android:textColor="#ADADC0"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <com.easefun.polyv.livecommon.ui.widget.pressedview.PLVPressedBgTextView
+                android:id="@+id/unread_msg_tv"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom"
+                android:background="#d04a90e2"
+                android:gravity="center"
+                android:text="有更多新消息，点击查看"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView>
+
+    <FrameLayout
+        android:id="@+id/bottom_parent_ly"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/bottom_input_ly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/input_ly"
+                layout="@layout/plvlc_chatroom_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+
+            <include
+                android:id="@+id/emoji_ly"
+                layout="@layout/plvlc_chatroom_emoji_layout"
+                android:layout_width="match_parent"
+                android:layout_height="236dp" />
+
+            <include
+                android:id="@+id/more_ly"
+                layout="@layout/plvlc_chatroom_more_layout"
+                android:layout_width="match_parent"
+                android:layout_height="116dp" />
+        </LinearLayout>
+    </FrameLayout>
+</RelativeLayout>

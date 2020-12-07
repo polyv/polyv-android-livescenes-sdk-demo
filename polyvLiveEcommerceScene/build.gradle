@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        consumerProguardFiles "proguard-rules.pro"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+    sourceSets {
+        main {
+            res.srcDirs (
+                    'src/main/res',
+                    'src/main/res/layouts/chatroom',
+                    'src/main/res/layouts/player',
+                    'src/main/res/layouts/commodity',
+                    'src/main/res/layouts/reward',
+                    'src/main/res/layouts/more',
+                    'src/main/res/layouts/page',
+                    'src/main/res/layouts/widget'
+            )
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    api project(':polyvLiveCommonModul')
+    //下拉刷新&上拉加载更多控件
+    api 'me.dkzwm.widget.srl:core:1.6.6.4'
+    api 'me.dkzwm.widget.srl:ext-util:1.6.6.4'
+    api 'me.dkzwm.widget.srl:ext-material:1.6.6.4'
+    api 'me.dkzwm.widget.srl:ext-horizontal:1.6.6.4'
+    api 'me.dkzwm.widget.srl:ext-classics:1.6.6.4'
+    api 'me.dkzwm.widget.srl:ext-two-level:1.6.6.4'
+}

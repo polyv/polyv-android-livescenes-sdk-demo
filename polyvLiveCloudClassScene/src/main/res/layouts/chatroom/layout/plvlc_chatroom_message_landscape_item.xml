@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chat_landscape_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/plvlc_chatroom_message_bg"
+    android:minHeight="20dp"
+    android:orientation="vertical"
+    android:paddingLeft="12dp"
+    android:paddingTop="4dp"
+    android:paddingRight="12dp"
+    android:paddingBottom="4dp">
+
+    <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+        android:id="@+id/chat_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="2dp"
+        android:text="121321312312132131231231231213213123123123123123"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:visibility="visible"
+        tools:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--240-120-24-2=92-->
+        <TextView
+            android:id="@+id/chat_nick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="1312111111113121111111111111111111111111111111111111111111113："
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/img_message_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#D3D3D3"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVCircleProgressView
+                android:id="@+id/img_loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:max="100"
+                android:progress="0"
+                android:visibility="gone"
+                app:cpv_innerPadding="2dp"
+                app:cpv_outerColor="#E5ffffff"
+                app:cpv_outerSize="1dp"
+                app:cpv_progressNormalColor="#00000000"
+                app:cpv_progressReachColor="#E5ffffff"
+                app:cpv_progressStyle="FillInnerArc"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!--分割线-->
+    <View
+        android:id="@+id/quote_split_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="#1Affffff"
+        android:visibility="gone" />
+
+    <!--显示被回复人发送的文本信息-->
+    <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+        android:id="@+id/quote_chat_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="2"
+        android:text="121321312312132131231231231213213123123123123123"
+        android:textColor="#999999"
+        android:textSize="14sp"
+        android:visibility="visible"
+        tools:visibility="gone" />
+
+    <!--显示被回复人发送的图片信息-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--240-60-24-2=92-->
+        <TextView
+            android:id="@+id/quote_chat_nick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="13121111111131211113："
+            android:textColor="#999999"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/quote_img_message_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#D3D3D3"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

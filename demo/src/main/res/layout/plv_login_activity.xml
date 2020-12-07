@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.easefun.polyv.livecommon.ui.widget.PLVSoftView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plv_login_soft_listener_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/plv_login_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dm_60"
+            android:src="@drawable/plv_login_logo" />
+
+        <TextView
+            android:id="@+id/plv_login_logo_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/plv_login_head_info"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/dm_30"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/plv_login_top_select"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dm_42"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:id="@+id/plv_login_live_group_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/plv_login_tv_group_live"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="3dp"
+                        android:text="直播"
+                        android:textColor="@drawable/plv_color_topic_tab_text_selector"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:layout_width="32dp"
+                        android:layout_height="3dp"
+                        android:layout_below="@id/plv_login_tv_group_live"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/plv_color_topic_tab_bottom_selector" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/plv_login_playback_group_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/plv_login_tv_personal_playback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginBottom="3dp"
+                        android:gravity="center"
+                        android:text="回放"
+                        android:textColor="@drawable/plv_color_topic_tab_text_selector"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:layout_width="32dp"
+                        android:layout_height="3dp"
+                        android:layout_below="@id/plv_login_tv_personal_playback"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/plv_color_topic_tab_bottom_selector" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plv_login_live_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/dm_20"
+                android:layout_marginRight="@dimen/dm_20"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/plv_login_live_user_id"
+                    style="@style/plv_login_edit_text_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dm_42"
+                    android:layout_margin="@dimen/dm_10"
+                    android:hint="@string/plv_login_userId" />
+
+                <EditText
+                    android:id="@+id/plv_login_live_channel_id"
+                    style="@style/plv_login_edit_text_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dm_42"
+                    android:layout_margin="@dimen/dm_10"
+                    android:hint="@string/plv_login_channelId" />
+
+                <EditText
+                    android:id="@+id/plv_login_live_app_id"
+                    style="@style/plv_login_edit_text_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dm_42"
+                    android:layout_margin="@dimen/dm_10"
+                    android:hint="@string/plv_login_appId" />
+
+                <EditText
+                    android:id="@+id/plv_login_live_app_secert"
+                    style="@style/plv_login_edit_text_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dm_42"
+                    android:layout_margin="@dimen/dm_10"
+                    android:hint="@string/plv_login_appSecert" />
+
+
+            </LinearLayout>
+
+            <include layout="@layout/plv_login_playback_layout" />
+
+            <TextView
+                android:id="@+id/plv_login_tv_login"
+                android:layout_width="@dimen/dm_307"
+                android:layout_height="@dimen/dm_48"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/dm_20"
+                android:background="@drawable/plv_login_selector"
+                android:enabled="false"
+                android:gravity="center"
+                android:text="@string/plv_login"
+                android:textColor="@drawable/plv_login_text_selector"
+                android:textSize="18sp" />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp">
+
+                <RadioGroup
+                    android:id="@+id/plv_login_rg_scene"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/plv_login_rb_cloudclass_scene"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="云课堂场景"
+                        app:buttonTint="@drawable/plv_login_radio_button_color" />
+
+                    <android.support.v7.widget.AppCompatRadioButton
+                        android:id="@+id/plv_login_rb_ecommerce_scene"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="直播带货场景"
+                        app:buttonTint="@drawable/plv_login_radio_button_color" />
+                </RadioGroup>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/plv_login_playback_vodlist_sw"
+                    android:theme="@style/plv_login_switch_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/dm_30"
+                    android:layout_marginTop="3dp"
+                    android:text="点播列表"
+                    android:visibility="visible"
+                    app:layout_constraintLeft_toRightOf="@id/plv_login_rg_scene"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/plv_login_tv_copyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dm_10"
+        android:layout_marginBottom="@dimen/dm_30"
+        android:gravity="bottom"
+        android:text="@string/plv_login_copyright" />
+
+</com.easefun.polyv.livecommon.ui.widget.PLVSoftView>

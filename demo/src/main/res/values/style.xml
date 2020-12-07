@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="plv_login_edit_text_style">
+        <item name="backgroundTint">@color/dodgerBlue</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:textColorHint">@color/place_holder_color</item>
+    </style>
+
+    <style name="plv_login_switch_style" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="trackTint">@drawable/plv_login_radio_button_color</item>
+        <item name="thumbTint">#F2F2F2</item>
+    </style>
+</resources>

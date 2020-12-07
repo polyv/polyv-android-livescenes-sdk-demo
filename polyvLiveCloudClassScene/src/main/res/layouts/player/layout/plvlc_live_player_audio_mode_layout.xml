@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView
+        android:id="@+id/plvlc_live_placeholder_audio_mode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView>
+</merge>

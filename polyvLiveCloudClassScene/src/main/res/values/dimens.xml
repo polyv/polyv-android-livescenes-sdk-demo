@@ -1,0 +1,32 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="videoview_height_port">240dp</dimen>
+    <dimen name="ppt_width">150dp</dimen>
+    <dimen name="ppt_height">85dp</dimen>
+    <dimen name="controller_margin">15dp</dimen>
+    <dimen name="dm_1">1dp</dimen>
+    <dimen name="dm_3">3dp</dimen>
+    <dimen name="dm_5">5dp</dimen>
+    <dimen name="dm_10">10dp</dimen>
+    <dimen name="dm_12">12dp</dimen>
+    <dimen name="dm_20">20dp</dimen>
+    <dimen name="dm_30">30dp</dimen>
+    <dimen name="dm_32">32dp</dimen>
+    <dimen name="dm_36">36dp</dimen>
+    <dimen name="dm_40">40dp</dimen>
+    <dimen name="dm_42">42dp</dimen>
+    <dimen name="dm_48">48dp</dimen>
+    <dimen name="dm_60">60dp</dimen>
+    <dimen name="dm_75">75dp</dimen>
+    <dimen name="dm_92">92dp</dimen>
+    <dimen name="dm_100">100dp</dimen>
+    <dimen name="dm_118">118dp</dimen>
+    <dimen name="dm_150">150dp</dimen>
+    <dimen name="dm_134">134dp</dimen>
+    <dimen name="dm_200">200dp</dimen>
+    <dimen name="dm_224">224dp</dimen>
+    <dimen name="dm_307">307dp</dimen>
+</resources>

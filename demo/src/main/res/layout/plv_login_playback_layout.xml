@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playback_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/dm_20"
+    android:layout_marginRight="@dimen/dm_20"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <EditText
+        android:id="@+id/plv_login_playback_channel_id"
+        style="@style/plv_login_edit_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dm_42"
+        android:layout_margin="@dimen/dm_10"
+        android:hint="@string/plv_login_channelId" />
+
+    <EditText
+        android:id="@+id/plv_login_playback_user_id"
+        style="@style/plv_login_edit_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dm_42"
+        android:layout_margin="@dimen/dm_10"
+        android:hint="@string/plv_login_userId" />
+
+    <EditText
+        android:id="@+id/plv_login_playback_app_id"
+        style="@style/plv_login_edit_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dm_42"
+        android:layout_margin="@dimen/dm_10"
+        android:hint="@string/plv_login_appId" />
+
+    <EditText
+        android:id="@+id/plv_login_playback_app_secret"
+        style="@style/plv_login_edit_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dm_42"
+        android:layout_margin="@dimen/dm_10"
+        android:hint="@string/plv_login_appSecert" />
+
+    <EditText
+        android:id="@+id/plv_login_playback_video_id"
+        style="@style/plv_login_edit_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dm_42"
+        android:layout_margin="@dimen/dm_10"
+        android:hint="@string/plv_login_vid" />
+
+
+</LinearLayout>

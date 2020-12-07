@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--回放播放器布局-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--播放器的父控件，也为浮窗显示的内容-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 回放播放器 -->
+        <com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView
+            android:id="@+id/plvec_playback_video_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!--浮窗关闭按钮-->
+        <ImageView
+            android:id="@+id/close_floating_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="right"
+            android:padding="8dp"
+            android:src="@drawable/plvec_commodity_push_close"
+            android:visibility="gone" />
+    </FrameLayout>
+</FrameLayout>

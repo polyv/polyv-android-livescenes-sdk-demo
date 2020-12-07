@@ -1,0 +1,61 @@
+<resources>
+    <!--播放器-->
+    <string name="plv_player_toast_no_live">暂无直播</string>
+    <string name="plv_player_toast_live_end">直播结束</string>
+    <string name="plv_player_audio_play_mode">仅听声音</string>
+    <string name="plv_player_video_play_mode">播放画面</string>
+    <string name="plv_player_video_live_no_stream">当前暂无直播</string>
+    <string name="plv_player_video_playback_no_stream">回放视频加载错误，请重试</string>
+    <string name="plv_player_video_audio_mode_now">当前为音频模式</string>
+    <string name="plv_player_controller_reopen_floating_view">可从此处重新打开浮窗</string>
+    <!--聊天室-->
+    <string name="plv_chat_toast_reconnecting">聊天室重连中</string>
+    <string name="plv_chat_toast_logging">聊天室登录中</string>
+    <string name="plv_chat_toast_reconnect_success">聊天室重连成功</string>
+    <string name="plv_chat_toast_login_success">聊天室登录成功</string>
+    <string name="plv_chat_toast_login_failed">聊天室连接失败</string>
+    <string name="plv_chat_toast_been_kicked">您已被管理员踢出聊天室！</string>
+    <string name="plv_chat_toast_account_login_elsewhere">该账号已在其他设备登录！</string>
+    <string name="plv_chat_toast_send_msg_success">发言成功</string>
+    <string name="plv_chat_toast_post_msg_success">提交成功</string>
+    <string name="plv_chat_toast_send_msg_failed">发言失败</string>
+    <string name="plv_chat_toast_send_quiz_success">提问成功</string>
+    <string name="plv_chat_toast_send_quiz_failed">提问失败</string>
+    <string name="plv_chat_toast_send_text_empty">发送内容不能为空！</string>
+    <string name="plv_chat_toast_history_all_loaded">历史记录已全部加载完成！</string>
+    <string name="plv_chat_toast_history_load_failed">历史记录加载失败</string>
+    <string name="plv_chat_view_all_message">查看全部</string>
+    <string name="plv_chat_view_special_message">只看讲师</string>
+    <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
+    <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
+    <!--商品-->
+    <string name="plv_commodity_toast_empty_link">暂不支持移动端购买</string>
+
+    <!--连麦-->
+    <string name="plv_linkmic_toast_error">连麦错误</string>
+    <string name="plv_linkmic_toast_invalid_channel_format">频道号格式有误</string>
+    <string name="plv_linkmic_tip_request_link_mic">申请连麦</string>
+    <string name="plv_linkmic_tip_requesting_link_mic">请求中…</string>
+    <string name="plv_linkmic_tip_try_scroll_left">向左滑动试试</string>
+    <string name="plv_linkmic_dialog_hang_off_confirm_ask">确认挂断连麦吗?</string>
+    <string name="plv_linkmic_dialog_hang_off">挂断</string>
+    <string name="plv_linkmic_error_tip_permission_denied">通话所需的相机权限和麦克风权限被拒绝，请到应用设置的权限管理中恢复</string>
+    <string name="plv_linkmic_error_tip_permission_cancel">权限不足，申请发言失败</string>
+
+    <!--PPT-->
+    <string name="plv_ppt_no_document">暂无相关文档</string>
+
+    <!--直播间-->
+    <string name="plv_live_room_dialog_exit_confirm_ask">确认退出直播间</string>
+    <!--回放-->
+    <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
+
+    <!--通用-->
+    <string name="plv_common_dialog_click_wrong">按错了</string>
+    <string name="plv_common_dialog_exit">退出</string>
+    <string name="plv_common_dialog_tip">提示</string>
+    <string name="plv_common_dialog_cancel">取消</string>
+    <string name="plv_common_dialog_confirm">确认</string>
+
+
+</resources>

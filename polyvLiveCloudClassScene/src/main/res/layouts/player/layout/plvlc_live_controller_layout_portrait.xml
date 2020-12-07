@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/video_controller_port_ly"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/gradient_bar_port_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/gradient_bar_top_port_view"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/plvlc_controller_video_top_portrait_gradient" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_gravity="bottom"
+            android:scaleType="fitXY"
+            android:src="@drawable/plvlc_controller_video_bottom_portrait_gradient" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/video_name_port_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/back_port_iv"
+        android:layout_alignBottom="@+id/back_port_iv"
+        android:layout_marginLeft="-6dp"
+        android:layout_toRightOf="@+id/back_port_iv"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxEms="8"
+        android:singleLine="true"
+        android:text=""
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/video_viewer_count_port_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/video_name_port_tv"
+        android:layout_alignLeft="@+id/video_name_port_tv"
+        android:layout_marginTop="-4dp"
+        android:background="@drawable/plvlc_controller_viewer_count_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="6dp"
+        android:paddingTop="2dp"
+        android:paddingRight="6dp"
+        android:paddingBottom="2dp"
+        android:text="2.3w次播放"
+        android:textColor="#D0D0D0"
+        android:textSize="10sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/back_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="0dp"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_back" />
+
+    <ImageView
+        android:id="@+id/video_pause_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginBottom="4dp"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_play_and_pause_selector" />
+
+    <ImageView
+        android:id="@+id/video_refresh_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="4dp"
+        android:layout_toRightOf="@id/video_pause_port_iv"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_refresh_video" />
+
+    <ImageView
+        android:id="@+id/video_ppt_switch_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="4dp"
+        android:layout_toLeftOf="@id/video_screen_switch_port_iv"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_ppt_sub_selector" />
+
+    <ImageView
+        android:id="@+id/video_screen_switch_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_fullscreen" />
+
+    <ImageView
+        android:id="@+id/more_port_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="0dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_controller_more" />
+
+    <TextView
+        android:id="@+id/plvlc_live_player_controller_tv_reopen_floating_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/plvlc_bg_player_controller_reopen_floating"
+        android:gravity="center"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="@string/plv_player_controller_reopen_floating_view"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</RelativeLayout>

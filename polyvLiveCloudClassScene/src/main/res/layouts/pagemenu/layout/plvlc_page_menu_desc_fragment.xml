@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#202127">
+
+    <RelativeLayout
+        android:id="@+id/parent_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/top_ly"
+            android:layout_width="match_parent"
+            android:layout_height="98dp"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/live_cover_iv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/plvlc_img_avatar_default" />
+
+            <TextView
+                android:id="@+id/title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/live_cover_iv"
+                android:layout_toLeftOf="@+id/status_tv"
+                android:ellipsize="end"
+                android:gravity="top"
+                android:singleLine="true"
+                android:text="直播标题"
+                android:maxEms="12"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/start_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/title_tv"
+                android:layout_alignLeft="@id/title_tv"
+                android:layout_alignBottom="@+id/live_cover_iv"
+                android:gravity="bottom"
+                android:singleLine="true"
+                android:text="直播时间：无"
+                android:textColor="#ADADC0"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/status_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/plvlc_live_status_live"
+                android:paddingLeft="@dimen/dm_5"
+                android:paddingTop="@dimen/dm_3"
+                android:paddingRight="@dimen/dm_5"
+                android:paddingBottom="@dimen/dm_3"
+                android:text="暂无直播"
+                android:textColor="@color/red"
+                android:textSize="14sp" />
+
+            <View
+                android:id="@+id/split_view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/live_cover_iv"
+                android:layout_marginTop="16dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/publisher_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/split_view"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:drawableLeft="@drawable/plvlc_icon_publisher"
+                android:drawablePadding="4dp"
+                android:ellipsize="end"
+                android:maxEms="12"
+                android:singleLine="true"
+                android:textColor="#ADADC0"
+                android:textSize="12sp"
+                tools:text="主持人主持人主持人主持人主持人主持人" />
+
+            <TextView
+                android:id="@+id/likes_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/publisher_tv"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center"
+                android:layout_marginRight="16dp"
+                android:drawableLeft="@drawable/plvlc_icon_praise"
+                android:drawablePadding="4dp"
+                android:text="12"
+                android:textColor="#ADADC0"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/viewer_count_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/likes_tv"
+                android:layout_marginRight="16dp"
+                android:layout_toLeftOf="@+id/likes_tv"
+                android:drawableLeft="@drawable/plvlc_icon_viewer"
+                android:drawablePadding="4dp"
+                android:visibility="gone"
+                android:text="12"
+                android:textColor="#ADADC0"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="16dp"
+                android:background="#000000" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

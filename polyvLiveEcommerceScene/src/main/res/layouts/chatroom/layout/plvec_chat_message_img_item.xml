@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/plvec_chat_msg_corner_bg"
+    android:minHeight="20dp"
+    android:paddingBottom="4dp"
+    android:paddingLeft="7.4dp"
+    android:paddingRight="8dp"
+    android:paddingTop="4dp">
+
+    <!--244-64-16-2=162-->
+    <TextView
+        android:id="@+id/chat_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="2dp"
+        android:layout_marginRight="2dp"
+        android:maxWidth="160dp"
+        android:text="1312111111113123："
+        android:translationY="-2dp"
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+        android:id="@+id/chat_img_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#00000000"
+        android:scaleType="centerCrop"
+        app:radius_iv="6dp"
+        android:src="@drawable/plvec_img_site" />
+</LinearLayout>

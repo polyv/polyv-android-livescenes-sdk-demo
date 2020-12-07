@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/greet_tv"
+        android:layout_width="258dp"
+        android:layout_height="22dp"
+        android:background="@drawable/plvec_greet_bg"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/plvec_margin_common"
+        android:paddingRight="3dp"
+        android:singleLine="true"
+        android:text="欢迎 xx 进入直播间"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:visibility="visible"
+        tools:visibility="visible" />
+</merge>

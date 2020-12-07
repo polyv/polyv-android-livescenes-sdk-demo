@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView
+        android:id="@+id/plvlc_ppt_floating_view"
+        android:layout_width="@dimen/ppt_width"
+        android:layout_height="@dimen/ppt_height">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            app:mode="all"
+            app:radius="8dp">
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+                android:id="@+id/plvlc_ppt_switch_view_anchor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.easefun.polyv.livecloudclass.modules.ppt.PLVLCPPTView
+                    android:id="@+id/plvlc_ppt_ppt_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+            <!--上下渐变阴影-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignParentTop="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/plvlc_controller_video_top_portrait_gradient" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/plvlc_controller_video_bottom_portrait_gradient" />
+
+            <!--麦克风图标-->
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"
+                android:src="@drawable/plvlc_linkmic_iv_mic_open" />
+            <!--讲师昵称-->
+            <TextView
+                android:id="@+id/plvlc_ppt_teacher_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                tools:text="讲师-李文" />
+
+            <ImageView
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:id="@+id/plvlc_ppt_iv_close"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/plv_icon_close" />
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView>
+
+
+</merge>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 子播放器，用于播放广告及暖场 -->
+    <com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview
+        android:id="@+id/sub_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+    </com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview>
+</FrameLayout>

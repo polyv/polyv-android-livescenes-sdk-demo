@@ -1,0 +1,15 @@
+<resources>
+
+    <string name="plv_app_name">POLYV多场景</string>
+
+    <string name="plv_login">登录</string>
+    <string name="plv_login_head_info">POLYV&#160;&#160;云课堂</string>
+    <string name="plv_login_userId">用户ID</string>
+    <string name="plv_login_vid">视频ID</string>
+    <string name="plv_login_channelId">频道ID</string>
+    <string name="plv_login_appId">APP ID</string>
+    <string name="plv_login_appSecert">APP Secert</string>
+    <string name="plv_login_waiting">正在登录中，请稍等…</string>
+    <string name="plv_login_copyright">2013 – 2020 广州易方信息科技股份有限公司 版权所有</string>
+
+</resources>

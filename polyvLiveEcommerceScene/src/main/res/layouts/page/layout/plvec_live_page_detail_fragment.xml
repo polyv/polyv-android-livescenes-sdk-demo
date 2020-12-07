@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/plvec_margin_common"
+    android:paddingLeft="@dimen/plvec_margin_common"
+    android:paddingRight="@dimen/plvec_margin_common">
+
+    <ScrollView
+        android:id="@+id/detail_sv"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_gravity="bottom"
+        android:fadingEdge="none"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/solid_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="60dp" />
+
+            <!--公告布局-->
+            <LinearLayout
+                android:id="@+id/bulletin_ly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/plvec_bulletin_detail_corner_bg"
+                android:orientation="vertical"
+                android:paddingBottom="20dp"
+                android:paddingLeft="@dimen/plvec_margin_common"
+                android:paddingRight="@dimen/plvec_margin_common"
+                android:paddingTop="@dimen/plvec_margin_common"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/plvec_detail_gonggao"
+                    android:drawablePadding="8dp"
+                    android:text="公告"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/bulletin_msg_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/plvec_margin_common"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!--直播介绍布局-->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:id="@+id/intro_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/plvec_bulletin_detail_corner_bg"
+                    android:minHeight="216dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp"
+                    android:paddingLeft="@dimen/plvec_margin_common"
+                    android:paddingRight="@dimen/plvec_margin_common"
+                    android:paddingTop="@dimen/plvec_margin_common">
+
+                    <TextView
+                        android:id="@+id/intro_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/plvec_intro"
+                        android:drawablePadding="8dp"
+                        android:text="直播介绍"
+                        android:textColor="#333333"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/intro_emt_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="暂无直播介绍~"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:visibility="invisible"
+                    tools:visibility="visible" />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

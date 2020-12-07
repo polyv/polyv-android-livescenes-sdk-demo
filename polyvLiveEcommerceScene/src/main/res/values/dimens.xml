@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="plvec_margin_top_l">32dp</dimen>
+    <dimen name="plvec_margin_top">30dp</dimen>
+    <dimen name="plvec_margin_common">16dp</dimen>
+</resources>

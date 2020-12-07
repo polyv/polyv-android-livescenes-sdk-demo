@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/plvec_reward_gift_bg" android:state_selected="true" />
+    <item android:drawable="@drawable/plvec_empty_bg" />
+</selector>

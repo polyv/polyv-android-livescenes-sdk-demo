@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/plvlc_controller_btn_hide_chatroom" android:state_selected="true" />
+    <item android:drawable="@drawable/plvlc_controller_btn_show_chatroom" />
+</selector>

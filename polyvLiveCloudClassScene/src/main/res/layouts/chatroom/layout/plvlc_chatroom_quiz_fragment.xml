@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#202127">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+        android:id="@+id/chat_msg_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:overScrollMode="never"
+        android:paddingBottom="6dp" />
+
+    <FrameLayout
+        android:id="@+id/bottom_parent_ly"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/bottom_input_ly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/input_ly"
+                layout="@layout/plvlc_chatroom_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+
+            <include
+                android:id="@+id/emoji_ly"
+                layout="@layout/plvlc_chatroom_emoji_layout"
+                android:layout_width="match_parent"
+                android:layout_height="236dp" />
+        </LinearLayout>
+    </FrameLayout>
+</RelativeLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout
+        android:id="@+id/swipe_load_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--add child chatMessageList-->
+    </com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/unread_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/plvlc_chatroom_view_more_bg"
+        android:drawableRight="@drawable/plvlc_chatroom_ic_down_view_more"
+        android:drawablePadding="2dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="x条新信息"
+        android:textColor="#FF786D"
+        android:textSize="12sp"
+        android:visibility="gone" />
+</merge>

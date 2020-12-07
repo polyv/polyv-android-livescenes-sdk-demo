@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView
+        android:id="@+id/plvlc_linkmic_controller_floating_view_portrait_root"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="right"
+        android:visibility="invisible"
+        tools:visibility="visible">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvlc_linkmic_bg_controlbar_portrait"
+            android:orientation="horizontal">
+
+            <com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicRingButton
+                android:id="@+id/plvlc_linkmic_controlBar_btn_ring_action"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/plvlc_linkmic_iv_ring_off"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/plvlc_linkmic_controlBar_tv_request_tip"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plvlc_linkmic_controlBar_tv_request_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="16dp"
+                android:text="@string/plv_linkmic_tip_request_link_mic"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/plvlc_linkmic_controlBar_btn_ring_action"
+                app:layout_constraintTop_toTopOf="parent" />
+            <!--            3个功能按钮和一个隐藏-->
+            <LinearLayout
+                android:id="@+id/plvlc_linkmic_controlBar_ll_4_btn_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="@+id/plvlc_linkmic_controlBar_tv_request_tip"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton
+                    android:id="@+id/plvlc_linkmic_controlBar_btn_camera_open"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/plvlc_linkmic_iv_camera_open" />
+
+                <com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton
+                    android:id="@+id/plvlc_linkmic_controlBar_btn_camera_front_back"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/plvlc_linkmic_iv_camera_front_back_enabled" />
+
+                <com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton
+                    android:id="@+id/plvlc_linkmic_controlBar_btn_microphone_open"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/plvlc_linkmic_iv_microphone_open" />
+
+                <com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton
+                    android:id="@+id/plvlc_linkmic_controlBar_btn_collapse"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/plvlc_linkmic_iv_hide_setting" />
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView>
+
+    <LinearLayout
+        android:id="@+id/plvlc_linkmic_controlBar_ll_landscape_root"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:background="@drawable/plvlc_linkmic_bg_controlbar_landscape"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:visibility="invisible"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/plvlc_linkmic_controlBar_ll_function_btn_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/plvlc_linkmic_controlBar_btn_microphone_open_landscape"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/plvlc_linkmic_iv_microphone_open" />
+
+            <Button
+                android:id="@+id/plvlc_linkmic_controlBar_btn_camera_open_landscape"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/plvlc_linkmic_iv_camera_open" />
+
+            <Button
+                android:id="@+id/plvlc_linkmic_controlBar_btn_camera_front_back_landscape"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/plvlc_linkmic_iv_camera_front_back_enabled" />
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/plvlc_linkmic_controlBar_btn_setting_landscape"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/plvlc_linkmic_iv_ring_off" />
+
+        <TextView
+            android:id="@+id/plvlc_linkmic_controlBar_tv_request_tip_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:text="@string/plv_linkmic_tip_request_link_mic"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+</merge>

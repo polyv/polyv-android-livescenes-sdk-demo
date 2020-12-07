@@ -1,0 +1,9 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- 内部颜色 -->
+    <solid android:color="#66000000" />
+    <!-- 边缘线条颜色 -->
+    <size
+        android:width="60dp"
+        android:height="60dp" />
+</shape>

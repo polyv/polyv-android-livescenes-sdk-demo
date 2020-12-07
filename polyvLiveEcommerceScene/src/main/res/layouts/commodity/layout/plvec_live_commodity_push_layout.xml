@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="86dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/plvec_commodity_ly_bg">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:id="@+id/commodity_cover_ly"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            app:radius="10dp">
+
+            <ImageView
+                android:id="@+id/commodity_cover_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/plvec_gift_flower" />
+
+            <TextView
+                android:id="@+id/commodity_number_tv"
+                android:layout_width="27dp"
+                android:layout_height="16dp"
+                android:background="#59000000"
+                android:gravity="center"
+                android:text="3"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+        <TextView
+            android:id="@+id/commodity_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginRight="22dp"
+            android:layout_toRightOf="@+id/commodity_cover_ly"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="这是一个商品名称" />
+
+        <TextView
+            android:id="@+id/commodity_real_price_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_alignLeft="@+id/commodity_name_tv"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:text="¥50"
+            android:textColor="#FF473A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/commodity_src_price_tv"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="12dp"
+            android:layout_toLeftOf="@+id/enter_iv"
+            android:layout_toRightOf="@+id/commodity_real_price_tv"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="¥500"
+            android:textColor="#ADADC0"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/close_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:padding="8dp"
+            android:src="@drawable/plvec_commodity_push_close" />
+
+        <ImageView
+            android:id="@+id/enter_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignBottom="@+id/commodity_cover_ly"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="22dp"
+            android:src="@drawable/plvec_commodity_enter" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="28dp"
+        android:background="@drawable/plvec_commodity_v_bg" />
+</LinearLayout>

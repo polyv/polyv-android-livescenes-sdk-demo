@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="72dp"
+    android:layout_height="96dp"
+    android:clipChildren="false"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/gift_ly"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/plvec_reward_gift_bg_sel"
+        android:gravity="center_horizontal"
+        android:clipChildren="false"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/gift_iv"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/plvec_like_1"
+            tools:src="@drawable/plvec_like_1" />
+
+        <TextView
+            android:id="@+id/gift_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:ellipsize="end"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:singleLine="true"
+            android:text="鲜花"
+            android:textColor="#D0D0D0"
+            android:textSize="12sp"
+            android:translationY="6dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/reward_tv"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:background="@drawable/plvec_reward_gift_tv_bg"
+        android:gravity="center"
+        android:text="打赏"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>

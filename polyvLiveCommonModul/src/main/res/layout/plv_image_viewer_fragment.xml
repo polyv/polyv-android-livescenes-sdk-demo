@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewer xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/image_viewer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A1B1F">
+
+</com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewer>

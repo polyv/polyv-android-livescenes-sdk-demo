@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="118dp"
+    android:layout_height="36dp"
+    android:background="@drawable/plvec_watch_info_corner_bg">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/avatar_iv"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="4dp" />
+
+    <TextView
+        android:id="@+id/nick_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="1dp"
+        android:layout_toRightOf="@+id/avatar_iv"
+        android:singleLine="true"
+        android:text="昵称"
+        android:textColor="#ffffff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/watch_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/nick_tv"
+        android:layout_below="@+id/nick_tv"
+        android:drawableLeft="@drawable/plvec_watch"
+        android:drawablePadding="3dp"
+        android:singleLine="true"
+        android:text=""
+        android:textColor="#ffffff"
+        android:textSize="10sp" />
+</RelativeLayout>
