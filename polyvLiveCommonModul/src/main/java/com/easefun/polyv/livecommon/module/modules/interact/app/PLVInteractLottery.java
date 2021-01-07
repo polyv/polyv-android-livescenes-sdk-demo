@@ -106,6 +106,8 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                     }
                 });
                 break;
+            default:
+                break;
         }
     }
     // </editor-fold>

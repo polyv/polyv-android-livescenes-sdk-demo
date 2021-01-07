@@ -13,6 +13,7 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 
 import io.reactivex.disposables.Disposable;
@@ -38,6 +39,7 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
     private IPLVPPTContract.IPLVPPTView view;
 
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
+    private PLVSocketMessageObserver.OnMessageListener followTeacherPptVideoLocationListener;
 
     //Disposable
     private Disposable delaySendLoginEventDisposable;
@@ -107,6 +109,29 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                     }
                 }
         );
+
+        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(
+                followTeacherPptVideoLocationListener = new PLVSocketMessageObserver.OnMessageListener() {
+                    @Override
+                    public void onMessage(String listenEvent, String event, String message) {
+                        if (PLVOnSliceIDEvent.EVENT.equals(event)) {
+                            PLVOnSliceIDEvent eventVo = PLVEventHelper.toMessageEventModel(message, PLVOnSliceIDEvent.class);
+                            if (eventVo == null) {
+                                return;
+                            }
+                            PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(this);
+                            if (!eventVo.isInClass()) {
+                                // 非正在直播状态，不同步主副屏
+                                return;
+                            }
+                            // pptAndVideoPosition 0表示讲师端目前ppt在主屏 1表示讲师端目前播放器在主屏
+                            if (view != null) {
+                                view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
+                            }
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -130,6 +155,7 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
     @Override
     public void destroy() {
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
+        PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(followTeacherPptVideoLocationListener);
         dispose(delaySendLoginEventDisposable);
         view = null;
     }

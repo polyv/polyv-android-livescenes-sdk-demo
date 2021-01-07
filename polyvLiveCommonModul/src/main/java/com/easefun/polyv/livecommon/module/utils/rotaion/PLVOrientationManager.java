@@ -43,10 +43,10 @@ public class PLVOrientationManager {
             observer.setOrientationListener(new PLVOrientationListener.OrientationListener() {
                 @Override
                 public void onOrientationChanged(PLVOrientationListener.Orientation orientation) {
-                    if (orientation.isLandscape) {
-                        setLandscape(observer.getContext(), orientation.isReverse);
+                    if (orientation.isLandscape()) {
+                        setLandscape(observer.getContext(), orientation.isReverse());
                     } else {
-                        setPortrait(observer.getContext(), orientation.isReverse);
+                        setPortrait(observer.getContext(), orientation.isReverse());
                     }
                 }
             });

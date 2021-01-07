@@ -4,10 +4,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 
 /**
@@ -33,6 +36,12 @@ public interface IPLVPlaybackPlayerContract {
          * 获取主播放器view
          */
         PolyvPlaybackVideoView getPlaybackVideoView();
+
+        /**
+         * 获取 辅助播放器view
+         * @return
+         */
+        PolyvAuxiliaryVideoview getSubVideoView();
 
         /**
          * 获取播放器缓冲视图
@@ -63,6 +72,22 @@ public interface IPLVPlaybackPlayerContract {
          * @param isFirst 每次加载完成后是否是第一次start播放
          */
         void onVideoPlay(boolean isFirst);
+
+        /**
+         * 子播放器倒数回调
+         * @param isOpenAdHead
+         * @param totalTime
+         * @param remainTime
+         * @param adStage
+         */
+        void onSubVideoViewCountDown(boolean isOpenAdHead,int totalTime, int remainTime, int adStage);
+
+        /**
+         * 子播放器是否可见回调
+         * @param isOpenAdHead
+         * @param isShow
+         */
+        void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow);
 
         /**
          * 播放器暂停方法回调
@@ -134,6 +159,31 @@ public interface IPLVPlaybackPlayerContract {
          * @param visible {@link View#VISIBLE}
          */
         void onShowPPTView(int visible);
+
+        /**
+         * 子播放器开始播放回调
+         *
+         * @param isFirst 每次加载完成后是否是第一次start播放
+         */
+        void onSubVideoViewPlay(boolean isFirst);
+
+        /**
+         * 添加logo
+         * @param logoParam
+         */
+        void addLogo(PLVPlayerLogoView.LogoParam logoParam);
+
+        /**
+         * 控制logo是否显示
+         * @param visible
+         */
+        void setLogoVisibility(int visible);
+
+        /**
+         * 更新播放信息
+         * @param playInfoVO
+         */
+        void updatePlayInfo(PLVPlayInfoVO playInfoVO);
     }
     // </editor-fold>
 
@@ -157,6 +207,12 @@ public interface IPLVPlaybackPlayerContract {
          * 初始化播放器配置
          */
         void init();
+
+        /**
+         * 设置是否打开片头广告
+         * @param isAllowOpenAdHead
+         */
+        void setAllowOpenAdHead(boolean isAllowOpenAdHead);
 
         /**
          * 开始播放
@@ -201,9 +257,21 @@ public interface IPLVPlaybackPlayerContract {
         void seekTo(int progress, int max);
 
         /**
-         * 是否在播放中
+         * 视频是否在播放中
          */
         boolean isPlaying();
+
+        /**
+         * 视频是否已经在准备状态中
+         * @return
+         */
+        boolean isInPlaybackState();
+
+        /**
+         * 视频是否在播放中
+         * @return
+         */
+        boolean isSubVideoViewShow();
 
         /**
          * 设置播放速度
@@ -244,6 +312,12 @@ public interface IPLVPlaybackPlayerContract {
          * @param pptView pptView
          */
         void bindPPTView(IPolyvPPTView pptView);
+
+        /**
+         * 获取片头广告或暖场链接
+         * @return
+         */
+        String getSubVideoViewHerf();
 
         /**
          * 获取回放播放器数据

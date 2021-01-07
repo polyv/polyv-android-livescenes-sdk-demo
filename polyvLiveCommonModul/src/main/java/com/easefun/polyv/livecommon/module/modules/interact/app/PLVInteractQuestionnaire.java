@@ -73,6 +73,8 @@ public class PLVInteractQuestionnaire extends PLVInteractAppAbs {
                     }
                 });
                 break;
+            default:
+                break;
         }
     }
     // </editor-fold>

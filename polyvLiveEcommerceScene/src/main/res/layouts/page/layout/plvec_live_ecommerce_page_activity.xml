@@ -3,13 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/plvec_player_bg">
-
     <!-- 底层的播放器layout -->
     <FrameLayout
         android:id="@+id/plvec_fl_video_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
     <!-- 上层的viewpager布局 -->
     <android.support.v4.view.ViewPager
         android:id="@+id/watch_info_vp"
@@ -24,7 +22,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="right"
-        android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_marginTop="@dimen/plvec_margin_top_l"
+        android:layout_marginRight="@dimen/plvec_margin_common"
         android:src="@drawable/plvec_close" />
 </FrameLayout>

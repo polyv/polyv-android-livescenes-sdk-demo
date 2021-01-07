@@ -15,17 +15,21 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
+import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
@@ -53,14 +57,17 @@ import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -89,8 +96,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PolyvLiveVideoView videoView;
     //子播放器渲染视图view
     private PolyvAuxiliaryVideoview subVideoView;
+
+    private TextView tvCountDown;
+    private LinearLayout llAuxiliaryCountDown;
+
     //音频模式view
     private PLVLCLiveAudioModeView audioModeView;
+    // Logo
+    private PLVPlayerLogoView logoView;
     //主播放器控制栏
     private IPLVLCLiveMediaController mediaController;
 
@@ -130,8 +143,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     //直播开始时间
     private String liveStartTime;
 
-    //当加入连麦的时候播放器的音量
-    private int videoVolumeWhenJoinSuccess = -1;
     //横屏时为连麦预留的右偏移量
     private int landscapeMarginRightForLinkMicLayout;
     //是否加入了连麦
@@ -169,7 +180,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         videoView = findViewById(R.id.live_video_view);
         playerView = videoView.findViewById(PolyvBaseVideoView.IJK_VIDEO_ID);
         subVideoView = findViewById(R.id.sub_video_view);
+        tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
+        llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
+        llAuxiliaryCountDown.setVisibility(GONE);
         audioModeView = findViewById(R.id.audio_mode_ly);
+        logoView = findViewById(R.id.live_logo_view);
         loadingView = findViewById(R.id.video_loading_view);
         noStreamView = findViewById(R.id.no_stream_ly);
         stopStreamView = findViewById(R.id.stop_stream_ly);
@@ -320,6 +335,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.removeView(playerView);
                     videoView.removeView(screenshotIV);
                     videoView.removeView(audioModeView);
+                    videoView.removeView(logoView);
                     videoView.removeView(loadingView);
                     videoView.removeView(noStreamView);
                     videoView.removeView(stopStreamView);
@@ -327,6 +343,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     flLivePlayerSwitchView.addView(playerView);
                     flLivePlayerSwitchView.addView(screenshotIV);
                     flLivePlayerSwitchView.addView(audioModeView);
+                    flLivePlayerSwitchView.addView(logoView);
                     flLivePlayerSwitchView.addView(loadingView);
                     flLivePlayerSwitchView.addView(noStreamView);
                     flLivePlayerSwitchView.addView(stopStreamView);
@@ -350,6 +367,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.addView(playerView, 0);
                     videoView.addView(screenshotIV);
                     videoView.addView(audioModeView);
+                    videoView.addView(logoView);
                     videoView.addView(loadingView);
                     videoView.addView(noStreamView);
                     videoView.addView(stopStreamView);
@@ -370,6 +388,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             }
         });
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的common方法">
@@ -488,6 +507,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             landscapeMessageSender.dismiss();
         }
 
+        if (logoView != null) {
+            logoView.removeAllViews();
+        }
+
         stopLiveCountDown();
     }
     // </editor-fold>
@@ -508,13 +531,18 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     public void updateWhenJoinLinkMic(int linkMicLayoutLandscapeWidth) {
         isJoinLinkMic = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
-        videoVolumeWhenJoinSuccess = getVolume();
 
+        mediaController.updateWhenJoinLinkMic(liveRoomDataManager.isSupportRTC());
+
+        if (liveRoomDataManager.isSupportRTC()) {
+            //如果支持RTC，连麦时停止播放器播放，使用rtc视频流+rtc音频流
+            stop();
+        } else {
+            //如果不支持RTC，连麦时静音播放器，使用播放器的cdn视频流+rtc音频流
+            livePlayerPresenter.setPlayerVolume(0);
+        }
+        //禁用播放器手势
         livePlayerPresenter.setNeedGestureDetector(false);
-        mediaController.updateWhenJoinLinkMic();
-
-        stop();
-        setVolume(0);
 
         mediaController.show();
 
@@ -526,17 +554,19 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updateWhenLeaveLinkMic(boolean shouldStartPlay) {
+    public void updateWhenLeaveLinkMic() {
         isJoinLinkMic = false;
         landscapeMarginRightForLinkMicLayout = 0;
 
-        livePlayerPresenter.setNeedGestureDetector(true);
         mediaController.updateWhenLeaveLinkMic();
-        //如果在下课的情况下，收到了这个回调，那么就不要再播放视频了。
-        if (shouldStartPlay) {
+
+        if (liveRoomDataManager.isSupportRTC()) {
             startPlay();
         }
-        setVolume(videoVolumeWhenJoinSuccess);
+        //恢复播放器手势
+        livePlayerPresenter.setNeedGestureDetector(true);
+        //恢复播放器音量
+        livePlayerPresenter.setPlayerVolume(100);
 
         if (PLVScreenUtils.isPortrait(getContext())) {
             setPortrait();
@@ -613,6 +643,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public void onSubVideoViewClick(boolean mainPlayerIsPlaying) {
             super.onSubVideoViewClick(mainPlayerIsPlaying);
+
             if (!mainPlayerIsPlaying) {
                 mediaController.updateWhenSubVideoViewClick();
                 if (mediaController.isShowing()) {
@@ -620,6 +651,25 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 } else {
                     mediaController.show();
                 }
+            }
+        }
+
+        @Override
+        public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
+            if (isOpenAdHead) {
+                llAuxiliaryCountDown.setVisibility(VISIBLE);
+                tvCountDown.setText("广告：" + remainTime + "s");
+            }
+        }
+
+        @Override
+        public void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow) {
+            if (isOpenAdHead) {
+                if (!isShow) {
+                    llAuxiliaryCountDown.setVisibility(GONE);
+                }
+            } else {
+                llAuxiliaryCountDown.setVisibility(GONE);
             }
         }
 
@@ -647,7 +697,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onPrepared(mediaPlayMode);
             hideScreenShotView();
             stopLiveCountDown();
-            mediaController.updateWhenVideoViewPrepared();
+            if (!isJoinLinkMic) {
+                mediaController.updateWhenVideoViewPrepared();
+            }
             mediaController.show();
         }
 
@@ -680,9 +732,29 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         @Override
+        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
+            if (logoView != null) {
+                logoView.addLogo(logoParam);
+            }
+        }
+
+        @Override
+        public void setLogoVisibility(int visibility) {
+            if (logoView != null) {
+                logoView.setVisibility(visibility);
+            }
+        }
+
+        @Override
         public void onServerDanmuOpen(boolean isServerDanmuOpen) {
             super.onServerDanmuOpen(isServerDanmuOpen);
             danmuWrapper.setOnServerDanmuOpen(isServerDanmuOpen);
+        }
+
+        @Override
+        public void onShowPPTView(int visible) {
+            super.onShowPPTView(visible);
+            mediaController.setServerEnablePPT(visible == View.VISIBLE);
         }
 
         @Override
@@ -849,6 +921,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                         //送花/点赞开关
                         case PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED:
                             mediaController.setOnLikesSwitchEnabled(isSwitchEnabled);
+                            break;
+                        default:
                             break;
                     }
                 }

@@ -15,7 +15,6 @@
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
-
     <!--公告布局-->
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView
         android:id="@+id/bulletin_ly"
@@ -145,7 +144,6 @@
         android:src="@drawable/plvec_more"
         android:visibility="visible"
         tools:visibility="visible" />
-
     <!--点赞布局-->
     <LinearLayout
         android:id="@+id/more_ly"

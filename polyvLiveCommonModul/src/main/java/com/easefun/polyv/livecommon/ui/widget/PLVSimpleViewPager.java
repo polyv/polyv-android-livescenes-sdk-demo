@@ -21,6 +21,7 @@ public class PLVSimpleViewPager extends ViewPager {
         try {
             return super.onTouchEvent(ev);
         } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
         }
         return false;
     }
@@ -30,6 +31,7 @@ public class PLVSimpleViewPager extends ViewPager {
         try {
             return super.onInterceptTouchEvent(ev);
         } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
         }
         return false;
     }

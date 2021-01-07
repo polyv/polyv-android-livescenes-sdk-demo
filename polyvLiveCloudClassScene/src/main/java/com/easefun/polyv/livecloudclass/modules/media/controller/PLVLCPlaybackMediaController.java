@@ -82,6 +82,9 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     //player presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter;
 
+    //服务端的PPT开关
+    private boolean isServerEnablePPT;
+
     //Listener
     private OnViewActionListener onViewActionListener;
 
@@ -233,6 +236,13 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
         ivLikesLand.setVisibility(isSwitchEnabled ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void setServerEnablePPT(boolean enable) {
+        this.isServerEnablePPT = enable;
+        ivSubviewShowPort.setVisibility(enable ? View.VISIBLE : View.GONE);
+        ivSubviewShowLand.setVisibility(enable ? View.VISIBLE : View.GONE);
     }
 
     @Override

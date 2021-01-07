@@ -20,6 +20,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -31,6 +33,8 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
+import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
+import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.IPLVECVideoLayout;
@@ -46,7 +50,6 @@ import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECPalybackHomeFragmen
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
@@ -93,6 +96,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private FloatingWindowReceiver floatingWindowReceiver;
     //是否用户手动关闭了浮窗
     private boolean isUserCloseFloatingWindow;
+    //布局的手势操作
+    protected GestureDetector gestureScanner;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -104,20 +109,22 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param channelId  频道号
      * @param viewerId   观众ID
      * @param viewerName 观众昵称
-     * @return true表示启动成功，false表示启动失败
+     * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
-    public static boolean launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName) {
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName) {
+        if (activity == null) {
+            return PLVLaunchResult.error("activity 为空，启动直播带货直播页失败！");
+        }
         if (TextUtils.isEmpty(channelId)) {
-            PLVCommonLog.exception(new Throwable("channelId 为空，启动直播带货直播页失败"));
-            return false;
+            return PLVLaunchResult.error("channelId 为空，启动直播带货直播页失败");
         }
         if (TextUtils.isEmpty(viewerId)) {
-            PLVCommonLog.exception(new Throwable("viewerId 为空，启动直播带货直播页失败"));
-            return false;
+            return PLVLaunchResult.error("viewerId 为空，启动直播带货直播页失败");
         }
         if (TextUtils.isEmpty(viewerName)) {
-            PLVCommonLog.exception(new Throwable("viewerName 为空，启动直播带货直播页失败"));
-            return false;
+            return PLVLaunchResult.error("viewerName 为空，启动直播带货直播页失败");
         }
         Intent intent = new Intent(activity, PLVECLiveEcommerceActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
@@ -125,7 +132,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_IS_LIVE, true);
         activity.startActivity(intent);
-        return true;
+        return PLVLaunchResult.success();
     }
 
     /**
@@ -137,24 +144,25 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType}
-     * @return true表示启动成功，false表示启动失败
+     * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
-    public static boolean launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, int videoListType) {
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, int videoListType) {
+        if (activity == null) {
+            return PLVLaunchResult.error("activity 为空，启动直播带货回放页失败！");
+        }
         if (TextUtils.isEmpty(channelId)) {
-            PLVCommonLog.exception(new Throwable("channelId 为空，启动直播带货回放页失败"));
-            return false;
+            return PLVLaunchResult.error("channelId 为空，启动直播带货回放页失败");
         }
         if (TextUtils.isEmpty(vid)) {
-            PLVCommonLog.exception(new Throwable("vid 为空，启动直播带货回放页失败"));
-            return false;
+            return PLVLaunchResult.error("vid 为空，启动直播带货回放页失败");
         }
         if (TextUtils.isEmpty(viewerId)) {
-            PLVCommonLog.exception(new Throwable("viewerId 为空，启动直播带货回放页失败"));
-            return false;
+            return PLVLaunchResult.error("viewerId 为空，启动直播带货回放页失败");
         }
         if (TextUtils.isEmpty(viewerName)) {
-            PLVCommonLog.exception(new Throwable("viewerName 为空，启动直播带货回放页失败"));
-            return false;
+            return PLVLaunchResult.error("viewerName 为空，启动直播带货回放页失败");
         }
         Intent intent = new Intent(activity, PLVECLiveEcommerceActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
@@ -164,7 +172,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
-        return true;
+        return PLVLaunchResult.success();
     }
     // </editor-fold>
 
@@ -202,9 +210,22 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if (liveRoomDataManager != null) {
             liveRoomDataManager.destroy();
         }
+
         PLVECFloatingWindowService.unbindService(this, floatingWindowConnection);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(floatingWindowReceiver);
     }
+
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        super.onWindowFocusChanged(hasFocus);
+//        if (videoLayout.isSubVideoViewShow()) {
+//            if (hasFocus) {
+//                videoResume();
+//            } else {
+//                videoPause();
+//            }
+//        }
+//    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
@@ -293,8 +314,85 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 videoLayout.setPlayerVolume(0);
                 isUserCloseFloatingWindow = true;
             }
+
         });
+        //当前activity 可以手势操作暂停和播放
+        initGesture();
         videoLayout.startPlay();
+    }
+
+    //设置布局可单次点击或者多次点击
+    private void initGesture() {
+        gestureScanner = new GestureDetector(PLVECLiveEcommerceActivity.this, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return false;
+            }
+        });
+        gestureScanner.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                if (videoLayout.isSubVideoViewShow()) {
+                    if (!videoLayout.isSubVideoViewShow()) {
+                        videoPause();
+                    }
+                    if (!videoLayout.getSubVideoViewHerf().isEmpty()) {
+                        PLVWebUtils.openWebLink(videoLayout.getSubVideoViewHerf(), PLVECLiveEcommerceActivity.this);
+                    }
+                } else {
+                    if (!videoLayout.isSubVideoViewShow()) {
+                        videoResume();
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if (!videoLayout.isSubVideoViewShow()) {
+                    if (videoLayout.isPlaying()) {
+                        videoPause();
+                    } else {
+                        videoResume();
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+                return true;
+            }
+        });
+        viewPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureScanner.onTouchEvent(event);
+            }
+        });
     }
 
     private void initEmptyFragment() {
@@ -347,7 +445,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="内部工具方法">
+    // <editor-fold defaultstate="collapsed" desc="悬浮小窗 - 显示/隐藏控制">
     private boolean showFloatingWindowVideoView(boolean isResetLocation) {
         if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
             return false;
@@ -402,6 +500,12 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 commonHomeFragment.setPlayerState(state);
             }
         });
+//        videoLayout.getLivePlayInfoVO().observe(this,
+//                new Observer<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO>() {
+//                    @Override
+//                    public void onChanged(@Nullable com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO playInfoVO) {
+//                    }
+//                });
     }
 
     private void observerDataToPlaybackHomeFragment() {
@@ -413,17 +517,26 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
         });
 
-        // 当前页面 监听 播放器数据对象中的播放信息变化
-        videoLayout.getPlayInfoVO().observe(this, new Observer<PLVPlayInfoVO>() {
-            @Override
-            public void onChanged(@Nullable PLVPlayInfoVO playInfoVO) {
-                commonHomeFragment.setPlaybackPlayInfo(playInfoVO);
-            }
-        });
+        // 当前页面 监听 回放播放器数据对象中的播放信息变化
+        if (videoLayout.getPlaybackPlayInfoVO() != null)
+            videoLayout.getPlaybackPlayInfoVO().observe(this, new Observer<PLVPlayInfoVO>() {
+                @Override
+                public void onChanged(@Nullable PLVPlayInfoVO playInfoVO) {
+                    commonHomeFragment.setPlaybackPlayInfo(playInfoVO);
+                }
+            });
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="匿名内部类 - view交互事件监听器">
+    private void videoResume() {
+        videoLayout.resume();
+    }
+
+    private void videoPause() {
+        videoLayout.pause();
+    }
+
     private PLVECLiveDetailFragment.OnViewActionListener liveDetailViewActionListener = new PLVECLiveDetailFragment.OnViewActionListener() {
         @Override
         public void onViewCreated() {
@@ -486,13 +599,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private PLVECPalybackHomeFragment.OnViewActionListener playbackHomeViewActionListener = new PLVECPalybackHomeFragment.OnViewActionListener() {
         @Override
         public boolean onPauseOrResumeClick(View view) {
-            if (videoLayout.isPlaying()) {
-                videoLayout.pause();
-                return false;
-            } else {
-                videoLayout.resume();
-                return true;
+            if (!videoLayout.isSubVideoViewShow()) {
+                if (videoLayout.isPlaying()) {
+                    videoPause();
+                    return false;
+                } else {
+                    videoResume();
+                    return true;
+                }
             }
+            return false;
         }
 
         @Override
@@ -531,9 +647,12 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 if (intent.getBooleanExtra(EXTRA_IS_SHOW_FLOATING_WINDOW, true)) {
                     if (!isUserCloseFloatingWindow) {//如果没有手动关闭过浮窗才显示
                         showFloatingWindowVideoView(intent.getBooleanExtra(EXTRA_IS_RESET_FLOATING_WINDOW_LOCATION, true));
+                        videoResume();
+                        videoLayout.setFloatingWindow(true);
                     }
                 } else {
                     hideFloatingWindowVideoView();
+                    videoLayout.setFloatingWindow(false);
                 }
             }
         }

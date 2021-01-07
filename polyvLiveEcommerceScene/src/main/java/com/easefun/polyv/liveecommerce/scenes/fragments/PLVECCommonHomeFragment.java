@@ -40,6 +40,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVSocketLoginManager socketLoginManager;
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -119,7 +120,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     }
 
-    //设置播放信息
+    //设置回放播放信息
     public void setPlaybackPlayInfo(PLVPlayInfoVO playInfoVO) {
     }
 

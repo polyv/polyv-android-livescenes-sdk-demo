@@ -206,7 +206,7 @@ public class PLVECMorePopupView {
                 view.setSelected(false);
                 if (i <= listIntegerPair.first.size() - 1) {
                     if (view instanceof TextView) {
-                        ((TextView) view).setText(listIntegerPair.first.get(i).definition);
+                        ((TextView) view).setText(listIntegerPair.first.get(i).getDefinition());
                     }
                     view.setVisibility(View.VISIBLE);
                     if (i == listIntegerPair.second) {

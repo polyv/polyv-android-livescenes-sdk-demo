@@ -10,12 +10,14 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveStatusVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.easefun.polyv.livescenes.net.PolyvApiManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.net.PLVResponseBean;
 import com.plv.foundationsdk.net.PLVResponseExcutor;
 import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.sign.PLVSignCreator;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 
 import java.util.Map;
 
@@ -54,6 +56,7 @@ public class PLVLiveRoomDataRequester {
             try {
                 errorMessage = ((HttpException) t).response().errorBody().string();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return errorMessage;
@@ -81,7 +84,7 @@ public class PLVLiveRoomDataRequester {
         paramMap.put("times", String.valueOf(times));
         String sign = PLVSignCreator.createSign(appSecret, paramMap);
         pageViewerDisposable = PLVResponseExcutor.excuteDataBean(
-                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(Integer.valueOf(channelId), appId, ts, sign, times),
+                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, times),
                 Integer.class, new PLVrResponseCallback<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {

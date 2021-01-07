@@ -8,12 +8,14 @@ public class PLVPlayInfoVO {
     private int totalTime;
     private int bufPercent;
     private boolean isPlaying;
+    private boolean isSubVideoViewPlaying;
 
     private PLVPlayInfoVO(Builder builder) {
         position = builder.position;
         totalTime = builder.totalTime;
         bufPercent = builder.bufPercent;
         isPlaying = builder.isPlaying;
+        isSubVideoViewPlaying = builder.isSubVideoViewPlaying;
     }
 
     public int getPosition() {
@@ -32,11 +34,16 @@ public class PLVPlayInfoVO {
         return isPlaying;
     }
 
+    public boolean isSubVideoViewPlaying() {
+        return isSubVideoViewPlaying;
+    }
+
     public static final class Builder {
         private int position;
         private int totalTime;
         private int bufPercent;
         private boolean isPlaying;
+        private boolean isSubVideoViewPlaying;
 
         public Builder() {
         }
@@ -58,6 +65,11 @@ public class PLVPlayInfoVO {
 
         public Builder isPlaying(boolean val) {
             isPlaying = val;
+            return this;
+        }
+
+        public Builder isSubViewPlaying(boolean subViewPlaying) {
+            isSubVideoViewPlaying = subViewPlaying;
             return this;
         }
 

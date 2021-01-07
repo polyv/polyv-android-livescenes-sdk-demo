@@ -132,6 +132,8 @@ public class PLVRoundRectLayout extends RelativeLayout {
                         new float[]{0, 0, 0, 0, mRadius, mRadius, mRadius, mRadius},
                         Path.Direction.CW);
                 break;
+            default:
+                break;
         }
 
     }

@@ -31,7 +31,18 @@
 
         <!-- 播放失败显示的view -->
         <include layout="@layout/plvlc_live_player_nostream_layout" />
+        <!-- 显示的logo -->
+        <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+            android:id="@+id/playback_logo_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView>
+    <!--子播放器view-->
+    <include
+        layout="@layout/plvlc_playback_player_sub_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout

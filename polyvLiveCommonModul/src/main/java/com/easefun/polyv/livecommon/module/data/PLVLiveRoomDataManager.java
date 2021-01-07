@@ -35,6 +35,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
+    //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
+    private boolean isSupportRTC;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -91,6 +93,19 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public String getSessionId() {
         return sessionId;
+    }
+
+    @Override
+    public void setSupportRTC(boolean supportRTC) {
+        isSupportRTC = supportRTC;
+    }
+
+    @Override
+    public boolean isSupportRTC() {
+        if (getConfig().isPPTChannelType()) {
+            return true;//三分屏频道类型一定支持RTC
+        }
+        return isSupportRTC;
     }
     // </editor-fold>
 

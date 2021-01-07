@@ -81,9 +81,9 @@ public class PLVECRewardGiftAnimView extends FrameLayout {
                     @Override
                     public void accept(Integer integer) throws Exception {
                         setVisibility(View.VISIBLE);
-                        rewardUserNameTv.setText(rewardGiftInfo.userName);
-                        rewardGiftNameTv.setText("赠送    " + rewardGiftInfo.giftName);
-                        rewardGiftPicIv.setImageResource(rewardGiftInfo.giftDrawableId);
+                        rewardUserNameTv.setText(rewardGiftInfo.getUserName());
+                        rewardGiftNameTv.setText("赠送    " + rewardGiftInfo.getGiftName());
+                        rewardGiftPicIv.setImageResource(rewardGiftInfo.getGiftDrawableId());
                         TranslateAnimation animation = new TranslateAnimation(-getWidth(), 0f, 0f, 0f);
                         animation.setDuration(400);
                         startAnimation(animation);
@@ -121,14 +121,26 @@ public class PLVECRewardGiftAnimView extends FrameLayout {
     }
 
     public static class RewardGiftInfo {
-        public String userName;//送礼物的用户昵称
-        public String giftName;//礼物名称
-        public int giftDrawableId;//礼物图片Id
+        private String userName;//送礼物的用户昵称
+        private String giftName;//礼物名称
+        private int giftDrawableId;//礼物图片Id
 
         public RewardGiftInfo(String userName, String giftName, int giftDrawableId) {
             this.userName = userName;
             this.giftName = giftName;
             this.giftDrawableId = giftDrawableId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getGiftName() {
+            return giftName;
+        }
+
+        public int getGiftDrawableId() {
+            return giftDrawableId;
         }
     }
 }

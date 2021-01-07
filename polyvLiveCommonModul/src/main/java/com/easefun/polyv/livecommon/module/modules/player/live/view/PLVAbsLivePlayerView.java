@@ -7,6 +7,8 @@ import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
+import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 
 /**
@@ -45,6 +47,15 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
 
     @Override
     public void onSubVideoViewClick(boolean mainPlayerIsPlaying) {
+
+    }
+
+    @Override
+    public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
+
+    }
+
+    public void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow) {
 
     }
 
@@ -97,6 +108,15 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     public boolean onVolumeChanged(int changeValue, boolean isEnd) {
         return false;
     }
+
+    @Override
+    public void addLogo(PLVPlayerLogoView.LogoParam logoParam) { }
+
+    @Override
+    public void setLogoVisibility(int visibility) { }
+
+    @Override
+    public void updatePlayInfo(PLVPlayInfoVO playInfoVO) { }
 
     @Override
     public void onServerDanmuOpen(boolean isServerDanmuOpen) {

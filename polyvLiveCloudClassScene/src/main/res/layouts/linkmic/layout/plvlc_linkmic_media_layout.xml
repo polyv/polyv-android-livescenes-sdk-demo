@@ -6,7 +6,7 @@
     tools:parentTag="android.widget.FrameLayout">
 
     <FrameLayout
-        android:id="@+id/plvlc_linkmic_fl_ppt_linkmic_root"
+        android:id="@+id/plvlc_linkmic_fl_media_linkmic_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorVulcan"

@@ -97,7 +97,7 @@ public class PLVLCLiveMoreLayout {
         });
         //监听屏幕方向
         llMoreVertical = (PLVOrientationSensibleLinearLayout) root.findViewById(R.id.ll_more_vertical);
-        llMoreVertical.onLandscape = new Runnable() {
+        llMoreVertical.setOnLandscape(new Runnable() {
             @Override
             public void run() {
                 if (popupWindow != null && popupWindow.isShowing()) {
@@ -106,8 +106,8 @@ public class PLVLCLiveMoreLayout {
                 }
                 onLandscape();
             }
-        };
-        llMoreVertical.onPortrait = new Runnable() {
+        });
+        llMoreVertical.setOnPortrait(new Runnable() {
             @Override
             public void run() {
                 if (portraitHeight == 0) {
@@ -120,7 +120,7 @@ public class PLVLCLiveMoreLayout {
                 }
                 onPortrait();
             }
-        };
+        });
 
         //码率列表
         rvBitrate = root.findViewById(R.id.rv_more_bitrate);
@@ -386,7 +386,7 @@ public class PLVLCLiveMoreLayout {
 
         @Override
         public void onBindViewHolder(@NonNull final RvMoreViewHolder holder, int position) {
-            String defenition = bitrateVO.get(position).definition;
+            String defenition = bitrateVO.get(position).getDefinition();
             holder.tvBitrate.setText(defenition);
 
             if (position == curSelectPos) {

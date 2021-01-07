@@ -57,13 +57,13 @@ public class PLVTriangularPagerIndicator extends View implements IPLVPagerIndica
         }
         mPath.reset();
         if (mReverse) {
-            mPath.moveTo(mAnchorX - mTriangleWidth / 2, getHeight() - mYOffset - mTriangleHeight);
+            mPath.moveTo(mAnchorX - ((float) (mTriangleWidth)) / 2, getHeight() - mYOffset - mTriangleHeight);
             mPath.lineTo(mAnchorX, getHeight() - mYOffset);
-            mPath.lineTo(mAnchorX + mTriangleWidth / 2, getHeight() - mYOffset - mTriangleHeight);
+            mPath.lineTo(mAnchorX + ((float) (mTriangleWidth)) / 2, getHeight() - mYOffset - mTriangleHeight);
         } else {
-            mPath.moveTo(mAnchorX - mTriangleWidth / 2, getHeight() - mYOffset);
+            mPath.moveTo(mAnchorX - ((float) (mTriangleWidth)) / 2, getHeight() - mYOffset);
             mPath.lineTo(mAnchorX, getHeight() - mTriangleHeight - mYOffset);
-            mPath.lineTo(mAnchorX + mTriangleWidth / 2, getHeight() - mYOffset);
+            mPath.lineTo(mAnchorX + ((float) (mTriangleWidth)) / 2, getHeight() - mYOffset);
         }
         mPath.close();
         canvas.drawPath(mPath, mPaint);
@@ -79,8 +79,8 @@ public class PLVTriangularPagerIndicator extends View implements IPLVPagerIndica
         PLVPositionData current = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position);
         PLVPositionData next = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position + 1);
 
-        float leftX = current.mLeft + (current.mRight - current.mLeft) / 2;
-        float rightX = next.mLeft + (next.mRight - next.mLeft) / 2;
+        float leftX = current.getLeft() + ((float) (current.getRight() - current.getLeft())) / 2;
+        float rightX = next.getLeft() + ((float) (next.getRight() - next.getLeft())) / 2;
 
         mAnchorX = leftX + (rightX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
 

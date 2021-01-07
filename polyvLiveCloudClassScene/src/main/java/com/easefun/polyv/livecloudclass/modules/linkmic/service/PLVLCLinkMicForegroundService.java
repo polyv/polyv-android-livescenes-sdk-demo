@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -38,9 +39,14 @@ public class PLVLCLinkMicForegroundService extends Service {
      */
     public static void startForegroundService(Class<? extends Activity> activityToJump) {
         PLVLCLinkMicForegroundService.activityToJump = activityToJump;
-        Context context = Utils.getApp();
-        Intent serviceIntent = new Intent(context, PLVLCLinkMicForegroundService.class);
-        ContextCompat.startForegroundService(context, serviceIntent);
+        final Context context = Utils.getApp();
+        final Intent serviceIntent = new Intent(context, PLVLCLinkMicForegroundService.class);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ContextCompat.startForegroundService(context, serviceIntent);
+            }
+        },500);
     }
 
     /**

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 
@@ -13,6 +14,7 @@ import java.io.FileOutputStream;
 
 
 public class PLVImageUtils {
+    private static final String TAG = "PLVImageUtils";
     private static final int allowLength = 2 * 1024 * 1024;
     public static Bitmap compressImage(String filePath) throws Exception {
         File file = new File(filePath);
@@ -47,7 +49,9 @@ public class PLVImageUtils {
             if (!outputFile.exists()) {
                 outputFile.getParentFile().mkdirs();
             } else {
-                outputFile.delete();
+                 if (!outputFile.delete()) {
+                     PLVCommonLog.d(TAG,"fail to delete outputFile ");
+                 }
             }
             out = new FileOutputStream(outputFile);
             boolean result = bm.compress(Bitmap.CompressFormat.JPEG, quality, out);//可以为0
@@ -122,8 +126,11 @@ public class PLVImageUtils {
                 case ExifInterface.ORIENTATION_ROTATE_270:
                     degree = 270;
                     break;
+                default:
+                    break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return degree;
     }

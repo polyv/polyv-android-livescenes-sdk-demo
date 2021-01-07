@@ -86,20 +86,20 @@ public class PLVLinePagerIndicator extends View implements IPLVPagerIndicator {
         float rightX;
         float nextRightX;
         if (mMode == MODE_MATCH_EDGE) {
-            leftX = current.mLeft + mXOffset;
-            nextLeftX = next.mLeft + mXOffset;
-            rightX = current.mRight - mXOffset;
-            nextRightX = next.mRight - mXOffset;
+            leftX = current.getLeft() + mXOffset;
+            nextLeftX = next.getLeft() + mXOffset;
+            rightX = current.getRight() - mXOffset;
+            nextRightX = next.getRight() - mXOffset;
         } else if (mMode == MODE_WRAP_CONTENT) {
-            leftX = current.mContentLeft + mXOffset;
-            nextLeftX = next.mContentLeft + mXOffset;
-            rightX = current.mContentRight - mXOffset;
-            nextRightX = next.mContentRight - mXOffset;
+            leftX = current.getContentLeft() + mXOffset;
+            nextLeftX = next.getContentLeft()  + mXOffset;
+            rightX = current.getContentRight() - mXOffset;
+            nextRightX = next.getContentRight() - mXOffset;
         } else {    // MODE_EXACTLY
-            leftX = current.mLeft + (current.width() - mLineWidth) / 2;
-            nextLeftX = next.mLeft + (next.width() - mLineWidth) / 2;
-            rightX = current.mLeft + (current.width() + mLineWidth) / 2;
-            nextRightX = next.mLeft + (next.width() + mLineWidth) / 2;
+            leftX = current.getLeft() + (current.width() - mLineWidth) / 2;
+            nextLeftX = next.getLeft() + (next.width() - mLineWidth) / 2;
+            rightX = current.getLeft() + (current.width() + mLineWidth) / 2;
+            nextRightX = next.getLeft() + (next.width() + mLineWidth) / 2;
         }
 
         mLineRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(positionOffset);

@@ -190,21 +190,21 @@ public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigato
             PLVPositionData data = new PLVPositionData();
             View v = mTitleContainer.getChildAt(i);
             if (v != null) {
-                data.mLeft = v.getLeft();
-                data.mTop = v.getTop();
-                data.mRight = v.getRight();
-                data.mBottom = v.getBottom();
+                data.setLeft(v.getLeft());
+                data.setTop(v.getTop());
+                data.setRight(v.getRight());
+                data.setBottom(v.getBottom());
                 if (v instanceof IPLVMeasurablePagerTitleView) {
                     IPLVMeasurablePagerTitleView view = (IPLVMeasurablePagerTitleView) v;
-                    data.mContentLeft = view.getContentLeft();
-                    data.mContentTop = view.getContentTop();
-                    data.mContentRight = view.getContentRight();
-                    data.mContentBottom = view.getContentBottom();
+                    data.setContentLeft(view.getContentLeft());
+                    data.setContentTop(view.getContentTop());
+                    data.setContentRight(view.getContentRight());
+                    data.setContentBottom(view.getContentBottom());
                 } else {
-                    data.mContentLeft = data.mLeft;
-                    data.mContentTop = data.mTop;
-                    data.mContentRight = data.mRight;
-                    data.mContentBottom = data.mBottom;
+                    data.setContentLeft(data.getLeft());
+                    data.setContentTop(data.getTop());
+                    data.setContentRight(data.getRight());
+                    data.setContentBottom(data.getBottom());
                 }
             }
             mPositionDataList.add(data);
@@ -354,17 +354,17 @@ public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigato
                 }
             } else {
                 // 如果当前项被部分遮挡，则滚动显示完全
-                if (mScrollView.getScrollX() > current.mLeft) {
+                if (mScrollView.getScrollX() > current.getLeft()) {
                     if (mSmoothScroll) {
-                        mScrollView.smoothScrollTo(current.mLeft, 0);
+                        mScrollView.smoothScrollTo(current.getLeft(), 0);
                     } else {
-                        mScrollView.scrollTo(current.mLeft, 0);
+                        mScrollView.scrollTo(current.getLeft(), 0);
                     }
-                } else if (mScrollView.getScrollX() + getWidth() < current.mRight) {
+                } else if (mScrollView.getScrollX() + getWidth() < current.getRight()) {
                     if (mSmoothScroll) {
-                        mScrollView.smoothScrollTo(current.mRight - getWidth(), 0);
+                        mScrollView.smoothScrollTo(current.getRight() - getWidth(), 0);
                     } else {
-                        mScrollView.scrollTo(current.mRight - getWidth(), 0);
+                        mScrollView.scrollTo(current.getRight() - getWidth(), 0);
                     }
                 }
             }

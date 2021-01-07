@@ -1,4 +1,13 @@
 <resources>
+    <!--场景登录-->
+    <string name="plv_scene_login_toast_cloudclass_no_support_type">云课堂场景仅支持三分屏和纯视频频道类型</string>
+    <string name="plv_scene_login_toast_cloudclass_login_live_failed">启动云课堂直播失败</string>
+    <string name="plv_scene_login_toast_cloudclass_login_playback_failed">启动云课堂回放失败</string>
+
+    <string name="plv_scene_login_toast_liveecommerce_no_support_type">直播带货场景仅支持纯视频频道类型</string>
+    <string name="plv_scene_login_toast_liveecommerce_login_live_failed">启动直播带货直播失败</string>
+    <string name="plv_scene_login_toast_liveecommerce_login_playback_failed">启动直播带货回放失败</string>
+
     <!--播放器-->
     <string name="plv_player_toast_no_live">暂无直播</string>
     <string name="plv_player_toast_live_end">直播结束</string>

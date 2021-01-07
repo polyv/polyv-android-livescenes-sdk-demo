@@ -74,6 +74,8 @@ public class PLVInteractBulletin extends PLVInteractAppAbs {
                     }
                 });
                 break;
+            default:
+                break;
         }
     }
     // </editor-fold>

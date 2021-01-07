@@ -125,6 +125,8 @@ public class PLVRoundImageView extends AppCompatImageView {
                         new float[]{0, 0, 0, 0, mRadius, mRadius, mRadius, mRadius},
                         Path.Direction.CW);
                 break;
+            default:
+                break;
         }
     }
 

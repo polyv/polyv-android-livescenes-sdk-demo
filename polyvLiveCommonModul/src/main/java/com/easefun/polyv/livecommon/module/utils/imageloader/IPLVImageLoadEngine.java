@@ -18,6 +18,8 @@ import java.util.concurrent.ExecutionException;
 public interface IPLVImageLoadEngine {
     void loadImage(Context context, String url, ImageView imageView);
 
+    void loadImage(Context context, @DrawableRes int resId, ImageView imageView);
+
     @WorkerThread
     File saveImageAsFile(Context context, String url) throws ExecutionException, InterruptedException;
 

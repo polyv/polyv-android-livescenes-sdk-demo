@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,7 +39,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 import java.util.List;
-import java.util.Locale;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -119,6 +119,9 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean hasShowReopenFloatingViewTip = false;
     //延迟隐藏"可从此处重新打开浮窗"
     private Disposable reopenFloatingDelay;
+
+    //服务端的PPT开关
+    private boolean isServerEnablePPT;
 
     //view动作监听器
     private OnViewActionListener onViewActionListener;
@@ -298,6 +301,13 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void setServerEnablePPT(boolean enable) {
+        this.isServerEnablePPT = enable;
+        videoPptSwitchPortIv.setVisibility(enable ? View.VISIBLE : View.GONE);
+        videoPptSwitchLandIv.setVisibility(enable ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
@@ -331,8 +341,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoPauseLandIv.setVisibility(VISIBLE);
         videoRefreshPortIv.setVisibility(VISIBLE);
         videoRefreshLandIv.setVisibility(VISIBLE);
-        videoPptSwitchPortIv.setVisibility(VISIBLE);
-        videoPptSwitchLandIv.setVisibility(VISIBLE);
+        if (isServerEnablePPT) {
+            videoPptSwitchPortIv.setVisibility(VISIBLE);
+            videoPptSwitchLandIv.setVisibility(VISIBLE);
+        }
         morePortIv.setVisibility(View.VISIBLE);
         moreLandIv.setVisibility(View.VISIBLE);
         //还原信息发送控件的宽度
@@ -354,13 +366,15 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
-    public void updateWhenJoinLinkMic() {
+    public void updateWhenJoinLinkMic(boolean isHideRefreshButton) {
         moreLayout.hide();
 
         videoPausePortIv.setVisibility(GONE);
         videoPauseLandIv.setVisibility(GONE);
-        videoRefreshPortIv.setVisibility(GONE);
-        videoRefreshLandIv.setVisibility(GONE);
+        if (isHideRefreshButton) {
+            videoRefreshPortIv.setVisibility(GONE);
+            videoRefreshLandIv.setVisibility(GONE);
+        }
         morePortIv.setVisibility(View.GONE);
         moreLandIv.setVisibility(View.GONE);
         //由于控件隐藏，因此需要调整信息发送控件的宽度
@@ -467,7 +481,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         TextView definition = (TextView) child.findViewById(R.id.live_bitrate_popup_definition_tv);
 
         PolyvDefinitionVO definitionVO = definitionVOS.get(Math.max(0, currentBitratePos + 1));//超清，高清，标清
-        definition.setText(definitionVO.definition);
+        definition.setText(definitionVO.getDefinition());
 
         definition.setOnClickListener(new OnClickListener() {
             @Override

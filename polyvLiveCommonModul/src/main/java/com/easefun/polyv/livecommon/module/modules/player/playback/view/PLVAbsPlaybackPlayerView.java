@@ -3,9 +3,12 @@ package com.easefun.polyv.livecommon.module.modules.player.playback.view;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 
 /**
@@ -19,6 +22,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public PolyvPlaybackVideoView getPlaybackVideoView() {
+        return null;
+    }
+
+    @Override
+    public PolyvAuxiliaryVideoview getSubVideoView() {
         return null;
     }
 
@@ -49,6 +57,21 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public void onVideoPause() {
+
+    }
+
+    @Override
+    public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
+
+    }
+
+    @Override
+    public void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow) {
+
+    }
+
+    @Override
+    public void onSubVideoViewPlay(boolean isFirst) {
 
     }
 
@@ -94,6 +117,21 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public void onShowPPTView(int visible) {
+
+    }
+
+    @Override
+    public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
+
+    }
+
+    @Override
+    public void setLogoVisibility(int visible) {
+
+    }
+
+    @Override
+    public void updatePlayInfo(PLVPlayInfoVO playInfoVO) {
 
     }
 }

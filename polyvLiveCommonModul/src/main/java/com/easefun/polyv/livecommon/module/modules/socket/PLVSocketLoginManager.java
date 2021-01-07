@@ -118,13 +118,15 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                     onSocketEventListener.handleLoginSuccess(true);
                 }
                 break;
+            default:
+                break;
         }
     }
 
     private void acceptSocketMessage(PLVSocketMessage socketMessage) {
-        String event = socketMessage.event;
-        String message = socketMessage.message;
-        String listenEvent = socketMessage.listenEvent;
+        String event = socketMessage.getEvent();
+        String message = socketMessage.getMessage();
+        String listenEvent = socketMessage.getListenEvent();
 
         if (PLVEventConstant.MESSAGE_EVENT.equals(listenEvent)) {
             switch (event) {
@@ -159,6 +161,8 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                             }
                         }
                     }
+                    break;
+                default:
                     break;
             }
         }

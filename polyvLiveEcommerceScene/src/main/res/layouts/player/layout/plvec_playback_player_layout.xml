@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--回放播放器布局-->
+<?xml version="1.0" encoding="utf-8"?><!--回放播放器布局-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -15,6 +14,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!--子播放器view-->
+        <include
+            layout="@layout/plvec_playback_player_sub_video_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <!--浮窗关闭按钮-->
         <ImageView
             android:id="@+id/close_floating_iv"
@@ -25,4 +30,20 @@
             android:src="@drawable/plvec_commodity_push_close"
             android:visibility="gone" />
     </FrameLayout>
+    <!--logo 显示 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+        android:id="@+id/logo_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp" />
+    <!--视频暂停和继续播放的按钮 -->
+    <ImageView
+        android:id="@+id/play_center"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:src="@drawable/plvec_play_center" />
 </FrameLayout>

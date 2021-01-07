@@ -26,7 +26,6 @@
         android:layout_marginTop="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
-
     <!--播放控制按钮-->
     <ImageView
         android:id="@+id/play_control_iv"

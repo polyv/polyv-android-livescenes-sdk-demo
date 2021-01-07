@@ -38,7 +38,6 @@ public class PLVLinkMicMsgHandler {
 
     //Listener
     private OnLinkMicDataListener onLinkMicDataListener;
-    private OnLinkMicSocketSender socketSender;
     private PLVSocketMessageObserver.OnMessageListener onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
         @Override
         public void onMessage(String listenEvent, String event, String message) {
@@ -48,8 +47,7 @@ public class PLVLinkMicMsgHandler {
 // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLinkMicMsgHandler(String linkMicId, OnLinkMicSocketSender socketSender, @NotNull OnLinkMicDataListener onLinkMicDataListener) {
-        this.socketSender = socketSender;
+    public PLVLinkMicMsgHandler(String linkMicId, @NotNull OnLinkMicDataListener onLinkMicDataListener) {
         this.linkMicId = linkMicId;
         this.onLinkMicDataListener = onLinkMicDataListener;
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener,
@@ -184,23 +182,17 @@ public class PLVLinkMicMsgHandler {
                     onLinkMicDataListener.onSwitchPPTViewLocation(true);
                 }
                 break;
-            //云课堂下课事件
+            //下课事件
             case PLVEventConstant.Class.FINISH_CLASS:
                 onLinkMicDataListener.onFinishClass();
                 break;
-            //云课堂上课事件
-            case PLVEventConstant.Ppt.ON_SLICE_START_EVENT:
-                onLinkMicDataListener.onStartClass();
+            default:
                 break;
         }
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="接口定义">
-    public interface OnLinkMicSocketSender {
-        void sendJoinSuccessMsg();
-    }
-
     public interface OnLinkMicDataListener {
         /**
          * 讲师收到了我发送的连麦请求
@@ -275,11 +267,6 @@ public class PLVLinkMicMsgHandler {
          * 讲师下课
          */
         void onFinishClass();
-
-        /**
-         * 讲师上课
-         */
-        void onStartClass();
     }
     // </editor-fold>
 }

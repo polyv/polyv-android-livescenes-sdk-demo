@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.utils;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
+
 import java.lang.reflect.Field;
 
 public class PLVReflectionUtils {
@@ -11,6 +13,7 @@ public class PLVReflectionUtils {
                 field.setAccessible(true);
                 field.set(object, null);
             } catch (Throwable t) {
+                PLVCommonLog.d("PLVReflectionUtils",t.getMessage());
             }
         }
     }

@@ -100,7 +100,7 @@ public class PLVLCPlaybackMoreLayout {
         });
         //监听屏幕方向
         llMoreVertical = (PLVOrientationSensibleLinearLayout) root.findViewById(R.id.ll_more_vertical);
-        llMoreVertical.onLandscape = new Runnable() {
+        llMoreVertical.setOnLandscape(new Runnable() {
             @Override
             public void run() {
                 if (popupWindow != null && popupWindow.isShowing()) {
@@ -109,8 +109,8 @@ public class PLVLCPlaybackMoreLayout {
                 }
                 onLandscape();
             }
-        };
-        llMoreVertical.onPortrait = new Runnable() {
+        });
+        llMoreVertical.setOnPortrait(new Runnable() {
             @Override
             public void run() {
                 if (portraitHeight == 0) {
@@ -123,7 +123,7 @@ public class PLVLCPlaybackMoreLayout {
                 }
                 onPortrait();
             }
-        };
+        });
 
         //倍速列表
         rvSpeed = root.findViewById(R.id.rv_more_speed);
@@ -256,22 +256,22 @@ public class PLVLCPlaybackMoreLayout {
         if (speedTipsLy == null && anchor != null) {
             speedTipsLy = LayoutInflater.from(anchor.getContext()).inflate(R.layout.plvlc_tips_view_speed, null, false);
             speedTipsContainerLy = speedTipsLy.findViewById(R.id.speed_tips_container_ly);
-            speedTipsContainerLy.onLandscape = new Runnable() {
+            speedTipsContainerLy.setOnLandscape(new Runnable() {
                 @Override
                 public void run() {
                     FrameLayout.LayoutParams speedLyFlp = (FrameLayout.LayoutParams) speedTipsContainerLy.getLayoutParams();
                     speedLyFlp.height = -1;
                     speedTipsContainerLy.setLayoutParams(speedLyFlp);
                 }
-            };
-            speedTipsContainerLy.onPortrait = new Runnable() {
+            });
+            speedTipsContainerLy.setOnPortrait(new Runnable() {
                 @Override
                 public void run() {
                     FrameLayout.LayoutParams speedLyFlp = (FrameLayout.LayoutParams) speedTipsContainerLy.getLayoutParams();
                     speedLyFlp.height = portraitHeight;
                     speedTipsContainerLy.setLayoutParams(speedLyFlp);
                 }
-            };
+            });
             speedTipsContainerLy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

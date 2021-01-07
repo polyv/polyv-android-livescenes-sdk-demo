@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -30,6 +32,7 @@ import java.util.List;
 
 //need android:windowSoftInputMode="stateHidden|adjustResize"
 public abstract class PLVInputWindow extends PLVBaseActivity {
+    private static final String TAG = "PLVInputWindow";
     private static final int ALLOW_SHOW_INTERVAL = 1200;
     private static long lastStartTime;
     private static SpannableStringBuilder lastInputText;//editText CharSequence 持有activity引用
@@ -128,8 +131,10 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     //send enabled true
+                    PLVCommonLog.d(TAG, "onTextChanged: enabled true");
                 } else {
                     //send enabled false
+                    PLVCommonLog.d(TAG, "onTextChanged: enabled false");
                 }
             }
 

@@ -98,7 +98,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         }
         PolyvELogSender.send(PolyvPPTElog.class, PolyvPPTElog.PPTEvent.PPT_LOAD_START, "load start :");
         //加载ppt的webView
-        pptWebView.loadWeb();//"file:///android_asset/startForMobile.html"
+        if (pptWebView != null) {
+            pptWebView.loadWeb();//"file:///android_asset/startForMobile.html"
+        }
     }
     // </editor-fold>
 

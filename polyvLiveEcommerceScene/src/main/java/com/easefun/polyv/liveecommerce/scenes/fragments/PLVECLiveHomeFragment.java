@@ -11,8 +11,11 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.util.Pair;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,8 +29,10 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.span.PLVRelativeImageSpan;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
 import com.easefun.polyv.liveecommerce.R;
@@ -74,6 +79,7 @@ import java.util.Random;
  * 直播首页：主持人信息、聊天室、点赞、更多、商品、打赏
  */
 public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements View.OnClickListener {
+    private static final String TAG = "PLVECLiveHomeFragment";
     // <editor-fold defaultstate="collapsed" desc="变量">
     //观看信息布局
     private PLVECWatchInfoView watchInfoLy;
@@ -107,6 +113,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private String lastJumpBuyCommodityLink;
     //打赏
     private ImageView rewardIv;
+
     private PLVECRewardPopupView rewardPopupView;
     private PLVECRewardGiftAnimView rewardGiftAnimView;
     //监听器
@@ -128,10 +135,10 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         if (onViewActionListener != null) {
             onViewActionListener.onViewCreated();
         }
-
         calculateLiveVideoViewRect();
         startLikeAnimationTask(5000);
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -170,12 +177,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         rewardIv = findViewById(R.id.reward_iv);
         rewardIv.setOnClickListener(this);
         rewardGiftAnimView = findViewById(R.id.reward_ly);
-
         morePopupView = new PLVECMorePopupView();
         commodityPopupView = new PLVECCommodityPopupView();
         rewardPopupView = new PLVECRewardPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
@@ -315,6 +322,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
         });
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - MVP模式的view层实现">
@@ -505,7 +513,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             public void run() {
                 int randomLikeCount = new Random().nextInt(5) + 1;
                 startAddLoveIconTask(200, randomLikeCount);
-                startLikeAnimationTask((new Random().nextInt(6) + 5) * 1000);
+                startLikeAnimationTask((new Random().nextInt(6) + 5) * 1000L);
             }
         }, ts);
     }

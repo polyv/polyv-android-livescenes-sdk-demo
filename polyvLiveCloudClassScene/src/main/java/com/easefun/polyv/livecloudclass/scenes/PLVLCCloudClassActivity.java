@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewStub;
@@ -30,12 +31,13 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
+import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -43,8 +45,8 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
  * date: 2020/10/12
  * author: HWilliamgo
  * 云课堂场景下定义的 直播模式、回放模式 的 共用界面。
- * 直播支持的功能有：播放器、页面菜单、悬浮PPT、连麦、互动应用。
- * 回放支持的功能有：播放器、页面菜单、悬浮PPT。
+ * 直播支持的功能有：播放器、页面菜单、悬浮PPT(三分屏频道独有)、连麦、互动应用。
+ * 回放支持的功能有：播放器、页面菜单、悬浮PPT(三分屏频道独有)。
  */
 public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
@@ -56,6 +58,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private static final String EXTRA_VID = "vid";//回放视频Id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
+    private static final String EXTRA_CHANNEL_TYPE = "channel_type";//频道类型
 
     // 直播间数据管理器，每个业务初始化所需的参数
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -83,36 +86,44 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     /**
      * 启动直播页
      *
-     * @param activity   上下文Activity
-     * @param channelId  频道号
-     * @param viewerId   观众ID
-     * @param viewerName 观众昵称
-     * @return true表示启动成功，false表示启动失败
+     * @param activity    上下文Activity
+     * @param channelId   频道号
+     * @param channelType 频道类型
+     * @param viewerId    观众ID
+     * @param viewerName  观众昵称
+     * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
-    public static boolean launchLive(@NonNull Activity activity,
-                                     @NonNull String channelId,
-                                     @NonNull String viewerId,
-                                     @NonNull String viewerName) {
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static PLVLaunchResult launchLive(@NonNull Activity activity,
+                                             @NonNull String channelId,
+                                             @NonNull PolyvLiveChannelType channelType,
+                                             @NonNull String viewerId,
+                                             @NonNull String viewerName) {
+        if (activity == null) {
+            return PLVLaunchResult.error("activity 为空，启动云课堂直播页失败！");
+        }
         if (TextUtils.isEmpty(channelId)) {
-            PLVCommonLog.exception(new Throwable("channelId 为空，启动云课堂直播页失败！"));
-            return false;
+            return PLVLaunchResult.error("channelId 为空，启动云课堂直播页失败！");
+        }
+        if (channelType == null) {
+            return PLVLaunchResult.error("channelType 为空，启动云课堂直播页失败！");
         }
         if (TextUtils.isEmpty(viewerId)) {
-            PLVCommonLog.exception(new Throwable("viewerId 为空，启动云课堂直播页失败！"));
-            return false;
+            return PLVLaunchResult.error("viewerId 为空，启动云课堂直播页失败！");
         }
         if (TextUtils.isEmpty(viewerName)) {
-            PLVCommonLog.exception(new Throwable("viewerName 为空，启动云课堂直播页失败！"));
-            return false;
+            return PLVLaunchResult.error("viewerName 为空，启动云课堂直播页失败！");
         }
 
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
+        intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_IS_LIVE, true);
         activity.startActivity(intent);
-        return true;
+        return PLVLaunchResult.success();
     }
 
     /**
@@ -120,44 +131,51 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
+     * @param channelType   频道类型
      * @param vid           视频ID
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType}
-     * @return true表示启动成功，false表示启动失败
+     * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
-    public static boolean launchPlayback(@NonNull Activity activity,
-                                         @NonNull String channelId,
-                                         @NonNull String vid,
-                                         @NonNull String viewerId,
-                                         @NonNull String viewerName,
-                                         int videoListType) {
+    @SuppressWarnings("ConstantConditions")
+    @NonNull
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity,
+                                                 @NonNull String channelId,
+                                                 @NonNull PolyvLiveChannelType channelType,
+                                                 @NonNull String vid,
+                                                 @NonNull String viewerId,
+                                                 @NonNull String viewerName,
+                                                 int videoListType) {
+        if (activity == null) {
+            return PLVLaunchResult.error("activity 为空，启动云课堂回放页失败！");
+        }
         if (TextUtils.isEmpty(channelId)) {
-            PLVCommonLog.exception(new Throwable("channelId 为空，启动云课堂回放页失败！"));
-            return false;
+            return PLVLaunchResult.error("channelId 为空，启动云课堂回放页失败！");
+        }
+        if (channelType == null) {
+            return PLVLaunchResult.error("channelType 为空，启动云课堂回放页失败！");
         }
         if (TextUtils.isEmpty(vid)) {
-            PLVCommonLog.exception(new Throwable("vid 为空，启动云课堂回放页失败！"));
-            return false;
+            return PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");
         }
         if (TextUtils.isEmpty(viewerId)) {
-            PLVCommonLog.exception(new Throwable("viewerId 为空，启动云课堂回放页失败！"));
-            return false;
+            return PLVLaunchResult.error("viewerId 为空，启动云课堂回放页失败！");
         }
         if (TextUtils.isEmpty(viewerName)) {
-            PLVCommonLog.exception(new Throwable("viewerName 为空，启动云课堂回放页失败！"));
-            return false;
+            return PLVLaunchResult.error("viewerName 为空，启动云课堂回放页失败！");
         }
 
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
+        intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_VID, vid);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
-        return true;
+        return PLVLaunchResult.success();
     }
     // </editor-fold>
 
@@ -203,9 +221,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     public void onBackPressed() {
         if (interactLayout != null && interactLayout.onBackPress()) {
             return;
-        } else if (mediaLayout.onBackPressed()) {
+        } else if (mediaLayout != null && mediaLayout.onBackPressed()) {
             return;
-        } else if (livePageMenuLayout.onBackPressed()) {
+        } else if (livePageMenuLayout != null && livePageMenuLayout.onBackPressed()) {
             return;
         }
 
@@ -234,12 +252,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         // 获取输入数据
         Intent intent = getIntent();
         boolean isLive = intent.getBooleanExtra(EXTRA_IS_LIVE, true);
+        PolyvLiveChannelType channelType = (PolyvLiveChannelType) intent.getSerializableExtra(EXTRA_CHANNEL_TYPE);
         String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
         String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
         String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
+        PLVLiveChannelConfigFiller.setChannelType(channelType);
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
@@ -419,28 +439,28 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     //处理直播播放状态
                     switch (playerState) {
                         case Prepared:
-                            livePageMenuLayout.updateLiveStatusWithLive();
                             floatingPPTLayout.show();
+                            livePageMenuLayout.updateLiveStatusWithLive();
                             if (linkMicLayout != null) {
                                 linkMicLayout.showAll();
-                            }
-                            //直播开始，将PPT切换到主窗口，将播放器切换到小窗
-                            if (floatingPPTLayout.isPPTInFloatingLayout()) {
-                                pptViewSwitcher.switchView();
                             }
                             break;
                         case LiveStop:
                         case NoLive:
                         case LiveEnd:
-                            //直播结束，将PPT和播放器各自切回到各自的位置
-                            if (!floatingPPTLayout.isPPTInFloatingLayout()) {
-                                pptViewSwitcher.switchView();
+                            if (liveRoomDataManager.getConfig().isPPTChannelType()) {
+                                //对于三分屏频道，直播结束，将PPT和播放器各自切回到各自的位置
+                                if (!floatingPPTLayout.isPPTInFloatingLayout()) {
+                                    pptViewSwitcher.switchView();
+                                }
                             }
-                            livePageMenuLayout.updateLiveStatusWithNoLive();
                             floatingPPTLayout.hide();
+                            livePageMenuLayout.updateLiveStatusWithNoLive();
                             if (linkMicLayout != null) {
                                 linkMicLayout.hideAll();
                             }
+                            break;
+                        default:
                             break;
                     }
                 } else {
@@ -452,7 +472,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         case Idle:
                             floatingPPTLayout.hide();
                             break;
-
+                        default:
+                            break;
                     }
                 }
             }
@@ -554,6 +575,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
                 @Override
                 public void onLiveSwitchPPTViewLocation(boolean toMainScreen) {
+                    if (!liveRoomDataManager.getConfig().isPPTChannelType()) {
+                        return;
+                    }
                     if (linkMicLayout == null || !linkMicLayout.isJoinLinkMic()) {
                         if (toMainScreen) {
                             if (!pptViewSwitcher.isViewSwitched()) {
@@ -623,9 +647,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         linkMicLayout.setOnPLVLinkMicLayoutListener(new IPLVLCLinkMicLayout.OnPLVLinkMicLayoutListener() {
             @Override
             public void onJoinChannelSuccess() {
-                //如果PPT此时还在悬浮窗，则将PPT从悬浮窗切到主屏幕，将播放器从主屏幕切到悬浮窗
-                if (floatingPPTLayout.isPPTInFloatingLayout()) {
-                    pptViewSwitcher.switchView();
+                if (liveRoomDataManager.getConfig().isPPTChannelType()) {
+                    //对于三分屏频道，如果PPT此时还在悬浮窗，则将PPT从悬浮窗切到主屏幕，将播放器从主屏幕切到悬浮窗
+                    if (floatingPPTLayout.isPPTInFloatingLayout()) {
+                        pptViewSwitcher.switchView();
+                    }
                 }
                 //隐藏悬浮窗
                 floatingPPTLayout.hide();
@@ -636,29 +662,31 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onLeaveChannel(boolean shouldStartPlay) {
-                //如果PPT此时还在连麦列表，则将PPT从连麦列表切回到主屏幕
-                if (linkMicLayout.isPPTShowInLinkMicList()) {
-                    linkMicItemSwitcher.switchView();
-                }
+            public void onLeaveChannel() {
                 //显示悬浮窗
                 floatingPPTLayout.show();
                 //重置PPT延迟时间
                 floatingPPTLayout.getPPTView().recoverDelayTime();
                 //更新播放器布局
-                mediaLayout.updateWhenLeaveLinkMic(shouldStartPlay);
+                mediaLayout.updateWhenLeaveLinkMic();
             }
 
             @Override
-            public void onClickSwitchWithPPTOnce(PLVSwitchViewAnchorLayout switchView) {
+            public void onChangeTeacherLocation(PLVViewSwitcher viewSwitcher, PLVSwitchViewAnchorLayout switchView) {
+                viewSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
+                viewSwitcher.switchView();
+            }
+
+            @Override
+            public void onClickSwitchWithMediaOnce(PLVSwitchViewAnchorLayout switchView) {
                 linkMicItemSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
             }
 
             @Override
-            public void onClickSwitchWithPPTTwice(PLVSwitchViewAnchorLayout switchViewHasPPT, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
+            public void onClickSwitchWithMediaTwice(PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
                 //先将PPT从连麦列表切到主屏幕
-                linkMicItemSwitcher.registerSwitchVew(switchViewHasPPT, mediaLayout.getPlayerSwitchView());
+                linkMicItemSwitcher.registerSwitchVew(switchViewHasMedia, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
 
                 //再将要切到主屏幕的item和PPT交换位置

@@ -39,6 +39,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void setOnLikesSwitchEnabled(boolean isSwitchEnabled);
 
     /**
+     * 设置服务端的PPT开关
+     *
+     * @param enable true表示打开PPT，false表示关闭PPT
+     */
+    void setServerEnablePPT(boolean enable);
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器
@@ -65,14 +72,16 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateWhenSubVideoViewClick();
 
     /**
-     * 当主播放器准备完成后，更新布局
+     * 当主播放器准备完成后，更新布局，对应{@link #updateWhenSubVideoViewClick()}的更新
      */
     void updateWhenVideoViewPrepared();
 
     /**
      * 当加入连麦时，更新布局
+     *
+     * @param isHideRefreshButton 是否要隐藏刷新按钮，频道支持RTC时，由于使用的是rtc视频流+rtc音频流，非cdn视频流不能刷新，因此需要隐藏
      */
-    void updateWhenJoinLinkMic();
+    void updateWhenJoinLinkMic(boolean isHideRefreshButton);
 
     /**
      * 当离开连麦时，更新布局

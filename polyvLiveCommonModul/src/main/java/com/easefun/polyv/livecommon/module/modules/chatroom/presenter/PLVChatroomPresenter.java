@@ -213,6 +213,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             requestChatHistory(requestHistoryViewIndex);
                         }
                         break;
+                    default:
+                        break;
                 }
             }
         });
@@ -512,9 +514,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         final List<PLVBaseViewData> chatMessageDataList = new ArrayList<>();
         for (PLVSocketMessage chatroomMessage : socketMessages) {
-            String message = chatroomMessage.message;
-            String event = chatroomMessage.event;
-            String listenEvent = chatroomMessage.listenEvent;
+            String message = chatroomMessage.getMessage();
+            String event = chatroomMessage.getEvent();
+            String listenEvent = chatroomMessage.getListenEvent();
 
             Object chatMessage = null;
             int itemType = PLVChatMessageItemType.ITEMTYPE_UNDEFINED;
@@ -541,6 +543,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 });
                             }
                         }
+                        break;
+                    default:
                         break;
                 }
             } else if (PLVEventConstant.MESSAGE_EVENT.equals(listenEvent)) {
@@ -759,6 +763,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 }
                             });
                         }
+                        break;
+                    default:
+                        break;
                 }
                 if (chatMessage != null) {
                     chatMessageDataList.add(new PLVBaseViewData<>(chatMessage, itemType, isSpecialType ? new PLVSpecialTypeTag() : null));

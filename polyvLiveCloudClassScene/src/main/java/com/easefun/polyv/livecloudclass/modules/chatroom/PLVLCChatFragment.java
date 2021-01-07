@@ -731,6 +731,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         case PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED:
                             likesLy.setVisibility(isSwitchEnabled ? View.VISIBLE : View.GONE);
                             break;
+                        default:
+                            break;
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 /**
@@ -79,11 +80,11 @@ public interface IPLVLCLinkMicLayout {
     boolean isJoinLinkMic();
 
     /**
-     * PPT是否被切换到连麦列表了
+     * Media是否被切换到连麦列表了
      *
-     * @return true表示PPT在连麦列表，false表示PPT不在连麦列表
+     * @return true表示media在连麦列表，false表示media不在连麦列表
      */
-    boolean isPPTShowInLinkMicList();
+    boolean isMediaShowInLinkMicList();
 
     /**
      * 设置连麦布局监听器
@@ -128,32 +129,38 @@ public interface IPLVLCLinkMicLayout {
 
         /**
          * 离开连麦
-         *
-         * @param shouldStartPlay 是否应该在离开连麦后播放视频
          */
-        void onLeaveChannel(boolean shouldStartPlay);
+        void onLeaveChannel();
         // </editor-fold>
 
         // <editor-fold defaultstate="collapsed" desc="点击事件监听器">
 
         /**
-         * 点击连麦Item与PPT切换，只切换一次。
-         * 当点击连麦列表item时，PPT在主屏幕，或刚好点击的item就是PPT，那么此时只发生一次切换，即PPT和连麦Item切换。
+         * 切换连麦连麦中讲师的位置，因为纯视频的频道连麦时，讲师默认在主屏
+         *
+         * @param viewSwitcher switchView的切换器
+         * @param switchView   讲师连麦Item的switch view
+         */
+        void onChangeTeacherLocation(PLVViewSwitcher viewSwitcher, PLVSwitchViewAnchorLayout switchView);
+
+        /**
+         * 点击连麦Item与media切换，只切换一次。
+         * 当点击连麦列表item时，media在主屏幕，或刚好点击的item就是media，那么此时只发生一次切换，即media和连麦Item切换。
          *
          * @param switchView 连麦Item的switch view
          */
-        void onClickSwitchWithPPTOnce(PLVSwitchViewAnchorLayout switchView);
+        void onClickSwitchWithMediaOnce(PLVSwitchViewAnchorLayout switchView);
 
         /**
-         * 点击连麦Item与PPT切换，切换两次。
-         * 当点击连麦列表item时，PPT在连麦列表中的其他item，那么要发生两次切换：
-         * 1. 先将ppt和此时主屏幕的那个连麦item进行切换，回到初始默认的位置。
-         * 2. 再将此次点击的连麦item与主屏幕的ppt进行切换。
+         * 点击连麦Item与media切换，切换两次。
+         * 当点击连麦列表item时，media在连麦列表中的其他item，那么要发生两次切换：
+         * 1. 先将media和此时主屏幕的那个连麦item进行切换，回到初始默认的位置。
+         * 2. 再将此次点击的连麦item与主屏幕的media进行切换。
          *
-         * @param switchViewHasPPT       连麦列表的上有ppt的那个switch view
+         * @param switchViewHasMedia     连麦列表的上有media的那个switch view
          * @param switchViewGoMainScreen 被点击的item的switch view，对应将会被切换到主屏幕的连麦item
          */
-        void onClickSwitchWithPPTTwice(PLVSwitchViewAnchorLayout switchViewHasPPT, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
+        void onClickSwitchWithMediaTwice(PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
         // </editor-fold>
 
     }

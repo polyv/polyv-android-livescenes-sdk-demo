@@ -20,12 +20,18 @@ public class PLVLiveSDKConfig {
         PolyvLiveSDKClient liveSDKClient = PolyvLiveSDKClient.getInstance();
         liveSDKClient.initContext(parameter.application);
         liveSDKClient.enableHttpDns(parameter.isEnableHttpDns);
+        liveSDKClient.enableIPV6(parameter.isEnableIPV6);
+        if (parameter.isEnableBugly) {
+            liveSDKClient.initCrashReport(parameter.application);
+        }
     }
 
     public static class Parameter {
         private Application application;
         private boolean isOpenDebugLog = true;
         private boolean isEnableHttpDns = false;
+        private boolean isEnableIPV6 = false;
+        private boolean isEnableBugly = false;
 
         public Parameter(Application application) {
             this.application = application;
@@ -38,6 +44,16 @@ public class PLVLiveSDKConfig {
 
         public Parameter isEnableHttpDns(boolean isEnableHttpDns) {
             this.isEnableHttpDns = isEnableHttpDns;
+            return this;
+        }
+
+        public Parameter setEnableIPV6(boolean enableIPV6) {
+            isEnableIPV6 = enableIPV6;
+            return this;
+        }
+
+        public Parameter setEnableBugly(boolean enableBugly) {
+            isEnableBugly = enableBugly;
             return this;
         }
     }

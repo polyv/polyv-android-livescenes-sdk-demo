@@ -29,11 +29,13 @@ import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PL
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -46,9 +48,14 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLivePlayerPresenter.class.getSimpleName();
     private static final int WHAT_PLAY_PROGRESS = 1;
+    //设置是否要开启片头广告
+    private boolean isAllowOpenAdHead = false;
+
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVLivePlayerData livePlayerData;
     private WeakReference<IPLVLivePlayerContract.ILivePlayerView> vWeakReference;
+    //当前子播放器片头广告或者暖场的超链接
+    private String subVideoViewHerf = "";
 
     private PolyvLiveVideoView videoView;
     private PolyvAuxiliaryVideoview subVideoView;
@@ -91,6 +98,11 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     }
 
     @Override
+    public void setAllowOpenAdHead(boolean isAllowOpenAdHead) {
+        this.isAllowOpenAdHead = isAllowOpenAdHead;
+    }
+
+    @Override
     public void startPlay() {
         PolyvLiveVideoParams liveVideoParams = new PolyvLiveVideoParams(
                 getConfig().getChannelId(),
@@ -98,6 +110,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 getConfig().getUser().getViewerId()
         );
         liveVideoParams.buildOptions(PolyvBaseVideoParams.WAIT_AD, true)
+                .buildOptions(PolyvBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
                 .buildOptions(PolyvBaseVideoParams.MARQUEE, true)
                 .buildOptions(PolyvBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName());
         if (videoView != null) {
@@ -118,6 +131,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     public void pause() {
         if (videoView != null) {
             videoView.pause();
+            updatePlayInfo();
         }
     }
 
@@ -125,6 +139,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     public void resume() {
         if (videoView != null) {
             videoView.start();
+            updatePlayInfo();
         }
     }
 
@@ -139,6 +154,22 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     public boolean isPlaying() {
         if (videoView != null) {
             return videoView.isPlaying();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isInPlaybackState() {
+        if (videoView != null) {
+            return videoView.isInPlaybackState();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSubVideoViewShow() {
+        if (subVideoView != null) {
+            return subVideoView.isShow();
         }
         return false;
     }
@@ -252,6 +283,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         }
     }
 
+    @Override
+    public String getSubVideoViewHerf() {
+        if (subVideoView.isShow()) {
+            return subVideoViewHerf;
+        } else {
+            return "";
+        }
+    }
+
     @NonNull
     @Override
     public PLVLivePlayerData getData() {
@@ -283,8 +323,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             subVideoView.setOnGestureClickListener(onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
                 @Override
                 public void callback(boolean start, boolean end) {
+                    boolean mainPlayerIsPlaying = videoView != null && videoView.isPlaying();
+                    if (subVideoView != null && subVideoView.isPlaying()) {
+                        mainPlayerIsPlaying = false;
+                    }
                     if (getView() != null) {
-                        getView().onSubVideoViewClick(videoView == null || videoView.isPlaying());
+                        getView().onSubVideoViewClick(mainPlayerIsPlaying);
+                    }
+                    if (!TextUtils.isEmpty(subVideoViewHerf)) {
+                        PLVWebUtils.openWebLink(subVideoViewHerf, subVideoView.getContext());
                     }
                 }
             });
@@ -292,6 +339,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void onLoad(String imageUrl, final ImageView imageView, final String coverHref) {
                     PLVImageLoader.getInstance().loadImage(subVideoView.getContext(), imageUrl, imageView);
+                    subVideoViewHerf = coverHref;
                     if (!TextUtils.isEmpty(coverHref)) {
                         imageView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -299,6 +347,28 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                                 PLVWebUtils.openWebLink(coverHref, subVideoView.getContext());
                             }
                         });
+                    }
+                }
+            });
+            subVideoView.setOnSubVideoViewCountdownListener(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewCountdownListener() {
+                @Override
+                public void onCountdown(int totalTime, int remainTime, int adStage) {
+                    boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
+                    if (getView() != null) {
+                        getView().onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
+                        if (isOpenAdHead) {
+                            getView().setLogoVisibility(View.VISIBLE);
+                        } else {
+                            getView().setLogoVisibility(View.GONE);
+                        }
+                    }
+                }
+
+                @Override
+                public void onVisibilityChange(boolean isShow) {
+                    boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
+                    if (getView() != null) {
+                        getView().onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
                     }
                 }
             });
@@ -323,6 +393,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                             "-" + error.playStage + ")\n" + error.playPath;
                     if (getView() != null) {
                         getView().onPlayError(error, tips);
+                        getView().setLogoVisibility(View.GONE);
                     }
                 }
             });
@@ -334,6 +405,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postNoLive();
                     if (getView() != null) {
                         getView().onNoLiveAtPresent();
+                        getView().setLogoVisibility(View.GONE);
                     }
                 }
 
@@ -343,6 +415,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLiveEnd();
                     if (getView() != null) {
                         getView().onLiveEnd();
+                        getView().setLogoVisibility(View.GONE);
                     }
                 }
 
@@ -352,6 +425,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLiveStop();
                     if (getView() != null) {
                         getView().onLiveStop();
+                        getView().setLogoVisibility(View.GONE);
                     }
                 }
             });
@@ -366,6 +440,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     if (getView() != null) {
                         getView().onPrepared(videoView.getMediaPlayMode());
+                        getView().setLogoVisibility(View.VISIBLE);
                     }
                 }
 
@@ -378,6 +453,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLinesChange(linesPos);
                     if (getView() != null) {
                         getView().onLinesChanged(linesPos);
+                        getView().setLogoVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -474,10 +550,16 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                 }
             });
+            videoView.setOnSupportRTCListener(new IPolyvLiveListenerEvent.OnSupportRTCListener() {
+                @Override
+                public void onSupportRTC(boolean isSupportRTC) {
+                    liveRoomDataManager.setSupportRTC(isSupportRTC);
+                }
+            });
             videoView.setOnSEIRefreshListener(new IPolyvVideoViewListenerEvent.OnSEIRefreshListener() {
                 @Override
                 public void onSEIRefresh(int seiType, byte[] seiData) {
-                    long ts = Long.parseLong(new String(seiData));
+                    long ts = PLVFormatUtils.parseLong(new String(seiData));
                     PLVCommonLog.v(TAG, "sei ts = " + ts);
                     livePlayerData.postSeiData(ts);
                 }
@@ -485,7 +567,6 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.setOnNetworkStateListener(new IPolyvVideoViewListenerEvent.OnNetworkStateListener() {
                 @Override
                 public boolean onNetworkRecover() {
-                    PLVCommonLog.d(TAG, "PLVLivePlayerPresenter.onNetworkRecover");
                     if (getView() != null) {
                         return getView().onNetworkRecover();
                     }
@@ -494,8 +575,21 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
                 @Override
                 public boolean onNetworkError() {
-                    PLVCommonLog.d(TAG, "PLVLivePlayerPresenter.onNetworkError");
                     return false;
+                }
+            });
+            videoView.setOnGetLogoListener(new IPolyvVideoViewListenerEvent.OnGetLogoListener() {
+                @Override
+                public void onLogo(String logoImage, int logoAlpha, int logoPosition, String logoHref) {
+                    if (TextUtils.isEmpty(logoImage)) {
+                        return;
+                    }
+                    PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
+                            .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage);
+                    if (getView() != null) {
+                        getView().addLogo(logoParam);
+                        getView().setLogoVisibility(View.GONE);
+                    }
                 }
             });
         }
@@ -524,20 +618,28 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     private void startPlayProgressTimer() {
         stopPlayProgressTimer();
-        if (videoView != null) {
-            livePlayerData.postPlayInfoVO(
-                    new PLVPlayInfoVO.Builder()
-                            .isPlaying(videoView.isPlaying())
-                            .build()
-            );
-            selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000);
-        } else {
-            selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000);
-        }
+        updatePlayInfo();
+        selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000);
     }
 
     private void stopPlayProgressTimer() {
         selfHandler.removeMessages(WHAT_PLAY_PROGRESS);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 获取播放信息">
+    private void updatePlayInfo() {
+        if (videoView != null) {
+            PLVPlayInfoVO.Builder builder = new PLVPlayInfoVO.Builder();
+            builder.isPlaying(videoView.isPlaying());
+            if (subVideoView != null) {
+                builder.isSubVideoViewPlaying(subVideoView.isPlaying());
+            }
+            livePlayerData.postPlayInfoVO(builder.build());
+            if (getView()!=null) {
+                getView().updatePlayInfo(builder.build());
+            }
+        }
     }
     // </editor-fold>
 

@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.common.player.IPolyvBaseVideoView;
-import com.easefun.polyv.businesssdk.vodplayer.PolyvPlayType;
+import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayType;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;

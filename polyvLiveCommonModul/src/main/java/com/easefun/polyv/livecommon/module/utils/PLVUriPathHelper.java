@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.thirdpart.blankj.utilcode.util.CloseUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -52,15 +54,17 @@ public class PLVUriPathHelper {
     }
 
     public static void copyFile(Context context, Uri srcUri, File dstFile) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
-            InputStream inputStream = context.getContentResolver().openInputStream(srcUri);
+            inputStream = context.getContentResolver().openInputStream(srcUri);
             if (inputStream == null) return;
-            OutputStream outputStream = new FileOutputStream(dstFile);
+            outputStream = new FileOutputStream(dstFile);
             copyStream(inputStream, outputStream);
-            inputStream.close();
-            outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            CloseUtils.closeIO(inputStream,outputStream);
         }
     }
 
@@ -77,14 +81,7 @@ public class PLVUriPathHelper {
             }
             out.flush();
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-            }
-            try {
-                in.close();
-            } catch (IOException e) {
-            }
+           CloseUtils.closeIO(in,out);
         }
         return count;
     }
@@ -104,9 +101,11 @@ public class PLVUriPathHelper {
         String name = (returnCursor.getString(nameIndex));
         String size = (Long.toString(returnCursor.getLong(sizeIndex)));
         File file = new File(context.getFilesDir(), name);
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
         try {
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            FileOutputStream outputStream = new FileOutputStream(file);
+            inputStream = context.getContentResolver().openInputStream(uri);
+            outputStream = new FileOutputStream(file);
             int read = 0;
             int maxBufferSize = 1 * 1024 * 1024;
             int bytesAvailable = inputStream.available();
@@ -118,18 +117,18 @@ public class PLVUriPathHelper {
             while ((read = inputStream.read(buffers)) != -1) {
                 outputStream.write(buffers, 0, read);
             }
-            Log.e("File Size", "Size " + file.length());
-            inputStream.close();
-            outputStream.close();
-            Log.e("File Path", "Path " + file.getPath());
-            Log.e("File Size", "Size " + file.length());
+
         } catch (Exception e) {
             Log.e("Exception", e.getMessage());
+        } finally {
+           CloseUtils.closeIO(inputStream,outputStream);
         }
         return file.getPath();
     }
 
-    /** * 专为Android4.4设计的从Uri获取文件绝对路径，以前的方法已不好使 need external storage permission */
+    /**
+     * 专为Android4.4设计的从Uri获取文件绝对路径，以前的方法已不好使 need external storage permission
+     */
     public static String getPath(final Context context, final Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         // DocumentProvider
@@ -148,7 +147,7 @@ public class PLVUriPathHelper {
             else if (isDownloadsDocument(uri)) {
                 final String id = DocumentsContract.getDocumentId(uri);
                 final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
-                        Long.valueOf(id));
+                        PLVFormatUtils.parseLong(id));
                 return getDataColumn(context, contentUri, null, null);
             }
             // MediaProvider
@@ -165,7 +164,7 @@ public class PLVUriPathHelper {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] { split[1] };
+                final String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         }
@@ -191,7 +190,7 @@ public class PLVUriPathHelper {
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = "_data";
-        final String[] projection = { column };
+        final String[] projection = {column};
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
@@ -274,19 +273,17 @@ public class PLVUriPathHelper {
         final File primaryDir = context.getExternalFilesDir(null);
         PLVCommonLog.e("uri", "compressImage:" + primaryDir);
         File file = new File(primaryDir.getAbsolutePath(), filename + ".png");
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            try {
-                fos.write(baos.toByteArray());
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-
-                e.printStackTrace();
-            }
+            fos = new FileOutputStream(file);
+            fos.write(baos.toByteArray());
+            fos.flush();
         } catch (FileNotFoundException e) {
-
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+           CloseUtils.closeIO(fos);
         }
 
         // recycleBitmap(bitmap);

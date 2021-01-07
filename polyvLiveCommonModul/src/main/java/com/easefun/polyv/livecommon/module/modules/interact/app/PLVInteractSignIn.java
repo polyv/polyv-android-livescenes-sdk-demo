@@ -63,6 +63,8 @@ public class PLVInteractSignIn extends PLVInteractAppAbs {
                     }
                 });
                 break;
+            default:
+                break;
         }
     }
     // </editor-fold>

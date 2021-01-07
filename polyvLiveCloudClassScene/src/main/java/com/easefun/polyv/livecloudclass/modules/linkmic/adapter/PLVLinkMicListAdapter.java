@@ -55,11 +55,15 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private boolean showRoundRect = false;
     //是否要隐藏所有渲染器
     private boolean shouldHideAllRenderView = false;
+    //在列表中不可见item的连麦Id
+    private String invisibleItemLinkMicId;
+    //media在连麦列表中对应item的连麦id
+    private String mediaInLinkMicListLinkMicId;
 
     /**** View ****/
-    //保存ppt的switch View，不为null时，内部保存的是ppt，为null时，表示ppt不在连麦列表，或者调用了[releaseView]方法释放了引用。
+    //保存ppt(三分屏)/video(纯视频不支持RTC)/renderView(纯视频支持RTC)的switch View，不为null时，内部保存的是ppt/video/renderView，为null时，表示ppt/video/renderView不在连麦列表，或者调用了[releaseView]方法释放了引用。
     @Nullable
-    private PLVSwitchViewAnchorLayout switchViewHashPPT;
+    private PLVSwitchViewAnchorLayout switchViewHasMedia;
     private RecyclerView rv;
     // </editor-fold>
 
@@ -98,7 +102,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         int screenWidth = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         return screenWidth / HORIZONTAL_VISIBLE_COUNT;
     }
-// </editor-fold>
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 第一画面">
     //获取第一画面的切换View
@@ -114,34 +118,48 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         return null;
     }
 
+    //获取指定索引的switchView
+    public PLVSwitchViewAnchorLayout getSwitchView(int index) {
+        LinkMicItemViewHolder viewHolder = (LinkMicItemViewHolder) rv.findViewHolderForAdapterPosition(index);
+        if (viewHolder != null) {
+            return viewHolder.switchViewAnchorLayout;
+        }
+        return null;
+    }
+
     //设置第一画面连麦Id
     public void setFirstScreenLinkMicId(String firstScreenLinkMicId) {
         this.firstScreenLinkMicId = firstScreenLinkMicId;
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="API - ppt">
+    // <editor-fold defaultstate="collapsed" desc="API - media">
 
-    //设置有ppt的switchView
-    public void setSwitchViewHashPPT(@Nullable PLVSwitchViewAnchorLayout switchViewHashPPT) {
-        this.switchViewHashPPT = switchViewHashPPT;
+    //设置有media的switchView
+    public void setSwitchViewHasMedia(@Nullable PLVSwitchViewAnchorLayout switchViewHasMedia) {
+        this.switchViewHasMedia = switchViewHasMedia;
     }
 
-    //获取含有ppt的switchview
+    //设置media在连麦列表中对应item的连麦id
+    public void setMediaInLinkMicListLinkMicId(String mediaInLinkMicListLinkMicId) {
+        this.mediaInLinkMicListLinkMicId = mediaInLinkMicListLinkMicId;
+    }
+
+    //获取含有media的switchview
     @Nullable
-    public PLVSwitchViewAnchorLayout getSwitchViewHashPPT() {
-        return switchViewHashPPT;
+    public PLVSwitchViewAnchorLayout getSwitchViewHasMedia() {
+        return switchViewHasMedia;
     }
 
-    //获取PPT Item的位置
-    public int getPPTViewIndexInLinkMicList() {
-        if (switchViewHashPPT == null) {
+    //获取media Item的位置
+    public int getMediaViewIndexInLinkMicList() {
+        if (switchViewHasMedia == null) {
             return -1;
         }
         for (int i = 0; i < dataList.size(); i++) {
             LinkMicItemViewHolder viewHolder = (LinkMicItemViewHolder) rv.findViewHolderForAdapterPosition(i);
             if (viewHolder != null) {
-                if (viewHolder.switchViewAnchorLayout == switchViewHashPPT) {
+                if (viewHolder.switchViewAnchorLayout == switchViewHasMedia) {
                     return i;
                 }
             }
@@ -153,8 +171,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     // <editor-fold defaultstate="collapsed" desc="API - 操作渲染器">
     //释放View
     public void releaseView() {
-        //释放切换View。当连麦结束的时候，请调用该方法，释放掉之前记录的含有ppt的itemView。否则该ItemView会保留到下个连麦场次。
-        switchViewHashPPT = null;
+        //释放切换View。当连麦结束的时候，请调用该方法，释放掉之前记录的含有media的itemView。否则该ItemView会保留到下个连麦场次。
+        switchViewHasMedia = null;
     }
 
     //隐藏本地渲染器。在SurfaceView互相重叠时，只隐藏SurfaceView的父布局是无效的，需要隐藏SurfaceView本身。
@@ -187,11 +205,17 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         notifyDataSetChanged();
     }
 
+    //指定linkMicId更新为不可见的item
+    public void updateInvisibleItem(String linkMicId) {
+        this.invisibleItemLinkMicId = linkMicId;
+        notifyDataSetChanged();
+    }
+
     //更新奖杯
     public void updateCup(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_CUP);
     }
-// </editor-fold>
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="RecyclerView.Adapter方法实现">
     @NonNull
@@ -238,6 +262,22 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         boolean isGuest = itemDataBean.isGuest();
         String actor = itemDataBean.getActor();
 
+        //调整item的宽高
+        ViewGroup.LayoutParams vlp = holder.itemView.getLayoutParams();
+        if (invisibleItemLinkMicId != null && invisibleItemLinkMicId.equals(linkMicId)) {
+            if (vlp != null) {
+                vlp.width = 0;
+                vlp.height = 0;
+            }
+        } else {
+            if (vlp != null) {
+                vlp.width = getItemWidth();
+                vlp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+        }
+
+        //设置标记
+        holder.switchViewAnchorLayout.setTag(R.id.tag_link_mic_id, linkMicId);
 
         //圆角
         if (showRoundRect) {
@@ -249,7 +289,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         //昵称
         StringBuilder nickString = new StringBuilder();
         if (!TextUtils.isEmpty(actor)) {
-            nickString.append(actor);
+            nickString.append(actor).append("-");
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
@@ -258,8 +298,9 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         holder.tvNick.setText(nickString.toString());
 
         //设置昵称可见性
-        if (holder.switchViewAnchorLayout.isViewSwitched()) {
-            //如果View切换到别出去了，说明该item此时是PPT。PPT在这里时，不要显示昵称
+        boolean isViewSwitched = mediaInLinkMicListLinkMicId != null && mediaInLinkMicListLinkMicId.equals(linkMicId);
+        if (isViewSwitched) {
+            //如果View切换到别出去了，说明该item此时是media。media在这里时，不要显示昵称
             holder.tvNick.setVisibility(View.GONE);
         } else {
             holder.tvNick.setVisibility(View.VISIBLE);
@@ -291,17 +332,18 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //itemView里面如果存在渲染器容器，那么说明待会这个渲染器会切到主屏，且主屏的PPT会切到这个ItemView。
-                //itemView里面如果没有渲染器容器，则这里的是PPT，待会ppt将回到主屏幕
-                boolean thisViewWillChangeToMainLater = holder.itemView.findViewById(R.id.plvlc_link_mic_fl_render_view_container) != null;
+                //如果点击的itemView的索引不为media在连麦列表的索引，则这里的是渲染器容器，那么说明待会这个渲染器会切到主屏，且主屏的media会切到这个ItemView
+                boolean thisViewWillChangeToMainLater = holder.getAdapterPosition() != getMediaViewIndexInLinkMicList();
                 if (adapterCallback != null) {
-                    adapterCallback.onClickItemListener(holder.getAdapterPosition(), switchViewHashPPT, holder.switchViewAnchorLayout);
+                    adapterCallback.onClickItemListener(holder.getAdapterPosition(), switchViewHasMedia, holder.switchViewAnchorLayout);
                 }
+                //如果点击的索引不是media所在的索引
                 if (thisViewWillChangeToMainLater) {
-                    switchViewHashPPT = holder.switchViewAnchorLayout;
+                    switchViewHasMedia = holder.switchViewAnchorLayout;
                 } else {
-                    switchViewHashPPT = null;
+                    switchViewHasMedia = null;
                 }
+                updateAllItem();//如果有切换一次/切换多次，更新昵称的显示/隐藏
             }
         });
 
@@ -380,6 +422,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                     } else {
                         holder.llCupLayout.setVisibility(View.GONE);
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -488,13 +532,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         void setupRenderView(SurfaceView surfaceView, String linkMicId);
 
         /**
-         * 点击Item,准备和主屏的PPT切换位置
+         * 点击Item,准备和主屏的media切换位置
          *
          * @param pos                    位置
-         * @param switchViewHasPPT       此前有PPT的item，如果不为空，则要先将这个有PPT的item切回到主屏幕，然后再将PPT和[switchViewGoMainScreen]切换
+         * @param switchViewHasMedia     此前有media的item，如果不为空，则要先将这个有media的item切回到主屏幕，然后再将media和[switchViewGoMainScreen]切换
          * @param switchViewGoMainScreen 将要到主屏幕的switchView
          */
-        void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasPPT, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
+        void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
     }
 // </editor-fold>
 

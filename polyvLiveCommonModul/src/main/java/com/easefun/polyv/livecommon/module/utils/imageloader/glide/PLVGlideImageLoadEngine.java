@@ -19,12 +19,12 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.signature.ObjectKey;
 import com.easefun.polyv.livecommon.module.utils.imageloader.IPLVImageLoadEngine;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressListener;
-import com.bumptech.glide.signature.ObjectKey;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVOnProgressListener;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -43,6 +43,11 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
         Glide.with(context)
                 .load(url)
                 .into(imageView);
+    }
+
+    @Override
+    public void loadImage(Context context, int resId, ImageView imageView) {
+        Glide.with(context).load(resId).into(imageView);
     }
 
     @Override

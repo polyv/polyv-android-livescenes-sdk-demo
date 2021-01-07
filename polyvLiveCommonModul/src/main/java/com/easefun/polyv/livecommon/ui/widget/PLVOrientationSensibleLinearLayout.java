@@ -13,8 +13,8 @@ import android.widget.LinearLayout;
  * description 能收到方向回调的LinearLayout
  */
 public class PLVOrientationSensibleLinearLayout extends LinearLayout {
-    public Runnable onPortrait;
-    public Runnable onLandscape;
+    private Runnable onPortrait;
+    private Runnable onLandscape;
 
     public PLVOrientationSensibleLinearLayout(Context context) {
         super(context);
@@ -39,5 +39,13 @@ public class PLVOrientationSensibleLinearLayout extends LinearLayout {
                 onLandscape.run();
             }
         }
+    }
+
+    public void setOnPortrait(Runnable onPortrait) {
+        this.onPortrait = onPortrait;
+    }
+
+    public void setOnLandscape(Runnable onLandscape) {
+        this.onLandscape = onLandscape;
     }
 }

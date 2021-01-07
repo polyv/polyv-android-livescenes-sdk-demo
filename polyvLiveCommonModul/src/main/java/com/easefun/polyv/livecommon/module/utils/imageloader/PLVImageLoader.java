@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
-
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVGlideImageLoadEngine;
 
 import java.io.File;
@@ -24,7 +23,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class PLVImageLoader {
     // <editor-fold defaultstate="collapsed" desc="单例">
-    private static PLVImageLoader INSTANCE;
+    private volatile static PLVImageLoader INSTANCE;
 
     private PLVImageLoader() {/**/}
 
@@ -53,11 +52,19 @@ public class PLVImageLoader {
     public void loadImage(String url, ImageView imageView) {
         loadEngine.loadImage(imageView.getContext(), url, imageView);
     }
+
     /**
      * 加载图片
      */
     public void loadImage(Context context, String url, ImageView imageView) {
         loadEngine.loadImage(context, url, imageView);
+    }
+
+    /**
+     * 加载图片，使用resource id
+     */
+    public void loadImage(Context context, @DrawableRes int resId, ImageView imageView) {
+        loadEngine.loadImage(context, resId, imageView);
     }
 
     /**

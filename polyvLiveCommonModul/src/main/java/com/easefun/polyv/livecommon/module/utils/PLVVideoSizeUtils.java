@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.utils;
 
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 

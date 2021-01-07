@@ -46,6 +46,8 @@ public class PLVCustomGiftBean {
             case GIFTTYPE_ROCKET:
                 giftName = "火箭";
                 break;
+            default:
+                break;
         }
         return giftName;
     }

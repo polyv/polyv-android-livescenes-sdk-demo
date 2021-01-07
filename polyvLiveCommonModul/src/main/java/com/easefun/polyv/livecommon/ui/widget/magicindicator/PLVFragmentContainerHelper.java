@@ -78,14 +78,14 @@ public class PLVFragmentContainerHelper {
                 offset = index - positionDataList.size() + 1;
                 referenceData = positionDataList.get(positionDataList.size() - 1);
             }
-            result.mLeft = referenceData.mLeft + offset * referenceData.width();
-            result.mTop = referenceData.mTop;
-            result.mRight = referenceData.mRight + offset * referenceData.width();
-            result.mBottom = referenceData.mBottom;
-            result.mContentLeft = referenceData.mContentLeft + offset * referenceData.width();
-            result.mContentTop = referenceData.mContentTop;
-            result.mContentRight = referenceData.mContentRight + offset * referenceData.width();
-            result.mContentBottom = referenceData.mContentBottom;
+            result.setLeft(referenceData.getLeft() + offset * referenceData.width());
+            result.setTop(referenceData.getTop());
+            result.setRight(referenceData.getRight() + offset * referenceData.width());
+            result.setBottom(referenceData.getBottom());
+            result.setContentLeft(referenceData.getContentLeft() + offset * referenceData.width());
+            result.setContentTop(referenceData.getContentTop());
+            result.setContentRight(referenceData.getContentRight() + offset * referenceData.width());
+            result.setContentBottom(referenceData.getContentBottom());
             return result;
         }
     }

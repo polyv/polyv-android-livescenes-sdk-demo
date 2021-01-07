@@ -142,7 +142,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
                 }
             }
         } else if (messageData instanceof PLVCustomGiftEvent) {//自定义打赏礼物信息
-            speakMsg = ((PLVCustomGiftEvent) messageData).span;
+            speakMsg = ((PLVCustomGiftEvent) messageData).getSpan();
         }
     }
 

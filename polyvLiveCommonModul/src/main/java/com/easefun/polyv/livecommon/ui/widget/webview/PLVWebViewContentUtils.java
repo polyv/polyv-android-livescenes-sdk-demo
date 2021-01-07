@@ -17,6 +17,7 @@ public class PLVWebViewContentUtils {
         String colorStyle = "color:" + color + ";";
         content = content.replaceAll("img src=\"//", "img src=\\\"https://");
         content = content.replace("<img ", "<img " + style + " ");
+        content = content.replaceAll("<li>", "<li style=\"" + colorStyle + "\">");
         content = content.replaceAll("<p>", "<p style=\"" + breakStyle + colorStyle + "\">");
         content = content.replaceAll("<div>", "<div style=\"" + breakStyle + colorStyle + "\">");
         content = content.replaceAll("<table>", "<table border='1' rules=all style=\"" + colorStyle + "\">");

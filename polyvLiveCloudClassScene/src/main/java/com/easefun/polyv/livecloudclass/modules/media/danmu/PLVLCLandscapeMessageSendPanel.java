@@ -157,12 +157,12 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
                 return false;
             }
         });
-        llSendMessage.onPortrait = new Runnable() {
+        llSendMessage.setOnPortrait(new Runnable() {
             @Override
             public void run() {
                 PLVLCLandscapeMessageSendPanel.this.hide();
             }
-        };
+        });
     }
 
     private void onClick(View view) {

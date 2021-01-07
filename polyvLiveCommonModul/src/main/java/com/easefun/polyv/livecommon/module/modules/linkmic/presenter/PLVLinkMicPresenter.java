@@ -60,15 +60,18 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     //每20s轮询连麦列表
     private static final int INTERVAL_TO_GET_LINK_MIC_LIST = 20 * 1000;
 
-    //View
+    /**** View ****/
     @Nullable
     private IPLVLinkMicContract.IPLVLinkMicView linkMicView;
-    //Model
+
+    /**** Model ****/
     private IPolyvLinkMicManager linkMicManager;
     private PLVLinkMicMsgHandler linkMicMsgHandler;
     //账号数据
     private IPLVLiveRoomDataManager liveRoomDataManager;
-    //连麦状态
+
+    /**** 连麦状态数据 ****/
+    //连麦初始化状态
     private int linkMicInitState = LINK_MIC_UNINITIATED;
     private boolean isJoinLinkMic = false;
     private String myLinkMicId = "";
@@ -76,22 +79,23 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private boolean isTeacherOpenLinkMic;
     //是否已经初始化过第一画面用户
     private boolean hasInitFirstScreenUser = false;
-    //是否已经下课了
-    private boolean isClassOff = false;
+    //纯视频频道类型连麦时，是否已经初始化完成连麦布局讲师的位置
+    private boolean hasInitFirstTeacherLocation = false;
+    //纯视频频道类型连麦时，主屏的讲师连麦Id
+    private String mainTeacherLinkMicId;
     //连麦列表
     private List<PLVLinkMicItemDataBean> linkMicList = new LinkedList<>();
-    //Disposable
+
+    /**** Disposable ****/
     private Disposable getLinkMicListDelay;
     private Disposable getLinkMicListTimer;
     private Disposable linkJoinTimer;
 
+    /**** Listener ****/
     //rtc事件监听器
     private PolyvLinkMicEventListener eventListener = new PolyvLinkMicEventListenerImpl();
     //连麦socket事件监听
     private PLVLinkMicMsgHandler.OnLinkMicDataListener onLinkMicDataListener = new PolyvLinkMicSocketEventListener();
-
-//    private PLVLinkMicLiveData linkMicLiveData = new PLVLinkMicLiveData();
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -111,15 +115,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             }
             return;
         }
-        //socket发送器
-        PLVLinkMicMsgHandler.OnLinkMicSocketSender socketSender = new PLVLinkMicMsgHandler.OnLinkMicSocketSender() {
-            @Override
-            public void sendJoinSuccessMsg() {
-                linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId(), myLinkMicId);
-            }
-        };
         //构造连麦消息处理器
-        linkMicMsgHandler = new PLVLinkMicMsgHandler(myLinkMicId, socketSender, onLinkMicDataListener);
+        linkMicMsgHandler = new PLVLinkMicMsgHandler(myLinkMicId, onLinkMicDataListener);
     }
     // </editor-fold>
 
@@ -178,6 +175,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             //已经初始化
             case LINK_MIC_INITIATED:
                 linkMicManager.sendJoinRequestMsg(myLinkMicId);
+                break;
+            default:
                 break;
         }
     }
@@ -277,9 +276,23 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         return isTeacherOpenLinkMic;
     }
 
+    @Override
+    public boolean isAloneChannelTypeSupportRTC() {
+        return liveRoomDataManager.getConfig().isAloneChannelType() && liveRoomDataManager.isSupportRTC();
+    }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="请求http">
+    // <editor-fold defaultstate="collapsed" desc="http请求">
+
+    /**
+     * 请求连麦列表，该请求在加入连麦后就定时轮询，保证本地连麦列表和server连麦列表的数据同步。
+     * 请求成功后，做了以下操作：
+     * 1. 遍历每一个server返回的连麦列表中的用户，将连麦列表中不存在的用户添加到列表中
+     * 2. 设置初始化的第一画面用户ID
+     * 3. 将新添加的用户回调出去
+     * 4. 纯视频频道类型，如果列表列表添加了讲师，则调整讲师的位置
+     * 5. 遍历本地的连麦列表用户，与服务端数据比对，如果出现了不在服务端连麦列表的用户，则踢出连麦列表。
+     */
     private void requestLinkMicListFromServer() {
         linkMicManager.getLinkStatus(liveRoomDataManager.getSessionId(), new PLVLinkMicDataRepository.IPLVLinkMicDataRepoListener<PLVLinkMicJoinStatus>() {
             @Override
@@ -287,7 +300,12 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 PLVCommonLog.d(TAG, "PLVLinkMicPresenter.requestLinkMicListFromServer.onSuccess->\n" + data.toString());
                 List<String> newJoinUserList = new ArrayList<>();
 
-                //遍历每一个server返回的连麦列表中的用户，将连麦列表中不存在的用户添加到列表中
+                //是否从连麦列表中添加了老师
+                boolean isAddedTeacherLinkMicId = false;
+                //老师连麦Id
+                String teacherLinkMicId = "";
+
+                //1. 遍历每一个server返回的连麦列表中的用户，将连麦列表中不存在的用户添加到列表中
                 for (PLVJoinInfoEvent plvJoinInfoEvent : data.getJoinList()) {
                     //列表中是否存在该用户
                     boolean isThisUserExistInLinkMicList = false;
@@ -303,6 +321,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         PLVLinkMicItemDataBean itemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(plvJoinInfoEvent);
                         if (itemDataBean.isTeacher()) {
                             linkMicList.add(0, itemDataBean);//从连麦列表中添加老师
+                            isAddedTeacherLinkMicId = true;
+                            teacherLinkMicId = itemDataBean.getLinkMicId();
                         } else {
                             linkMicList.add(itemDataBean);//从连麦列表中添加观众
                         }
@@ -310,7 +330,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     }
                 }
 
-                //设置初始化的第一画面用户ID
+                //2. 设置初始化的第一画面用户ID
                 String firstScreenLinkMicId = data.getMaster();
                 if (isJoinLinkMic && !hasInitFirstScreenUser && !TextUtils.isEmpty(firstScreenLinkMicId)) {
                     hasInitFirstScreenUser = true;
@@ -331,14 +351,31 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     }
                 }
 
-                //将新添加的用户回调出去
+                //3. 将新添加的用户回调出去
                 if (!newJoinUserList.isEmpty()) {
                     if (linkMicView != null) {
                         linkMicView.onUsersJoin(newJoinUserList);
                     }
                 }
 
-                //遍历本地的连麦列表用户，与服务端数据比对，如果出现了不在服务端连麦列表的用户，则踢出连麦列表。
+                //4. 纯视频频道类型，如果列表列表添加了讲师，则调整讲师的位置
+                if (liveRoomDataManager.getConfig().isAloneChannelType()
+                        && isAddedTeacherLinkMicId
+                        && !hasInitFirstTeacherLocation) {
+                    hasInitFirstTeacherLocation = true;
+                    mainTeacherLinkMicId = teacherLinkMicId;
+                    if (linkMicView != null) {
+                        for (int i = 0; i < linkMicList.size(); i++) {
+                            PLVLinkMicItemDataBean plvLinkMicItemDataBean = linkMicList.get(i);
+                            if (teacherLinkMicId.equals(plvLinkMicItemDataBean.getLinkMicId())) {
+                                linkMicView.onAdjustTeacherLocation(teacherLinkMicId, i, liveRoomDataManager.isSupportRTC());
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                //5. 遍历本地的连麦列表用户，与服务端数据比对，如果出现了不在服务端连麦列表的用户，则踢出连麦列表。
                 List<String> usersToRemove = new ArrayList<>();
                 Iterator<PLVLinkMicItemDataBean> itemDataBeanIterator = linkMicList.iterator();
                 while (itemDataBeanIterator.hasNext()) {
@@ -382,7 +419,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="连麦socket事件处理">
+    // <editor-fold defaultstate="collapsed" desc="socket事件处理">
     private void handleTeacherAllowJoin(boolean isAudioLinkMic) {
         //在加入连麦前的回调
         if (linkMicView != null) {
@@ -439,18 +476,21 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="连麦方法封装">
     //当主动离开频道的时候，可能因为断网的原因，收不到rtc引擎的onLeaveChannel()回调，因此要主动执行离开频道的逻辑
     private void leaveChannel() {
         if (isJoinLinkMic) {
             isJoinLinkMic = false;
             hasInitFirstScreenUser = false;
+            hasInitFirstTeacherLocation = false;
             dispose(getLinkMicListTimer);
             linkMicList.clear();
             if (linkMicView != null) {
-                linkMicView.onLeaveChannel(!isClassOff);
+                linkMicView.onLeaveChannel();
             }
         }
     }
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
     private void dispose(Disposable disposable) {
@@ -551,8 +591,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onLocalAudioVolumeIndication(PLVAudioVolumeInfo speaker) {
             for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : linkMicList) {
-                if (plvLinkMicItemDataBean.getLinkMicId().equals(speaker.uid)) {
-                    plvLinkMicItemDataBean.setCurVolume(speaker.volume);
+                if (plvLinkMicItemDataBean.getLinkMicId().equals(speaker.getUid())) {
+                    plvLinkMicItemDataBean.setCurVolume(speaker.getVolume());
                     break;
                 }
             }
@@ -571,10 +611,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
                 boolean hitInVolumeInfoList = false;
                 for (PLVAudioVolumeInfo speaker : speakers) {
-                    if (plvLinkMicItemDataBean.getLinkMicId().equals(String.valueOf(speaker.uid))) {
+                    if (plvLinkMicItemDataBean.getLinkMicId().equals(String.valueOf(speaker.getUid()))) {
                         hitInVolumeInfoList = true;
                         //如果总音量不为0，那么设置当前音量，以PLVLinkMicItemDataBean.MAX_VOLUME作为最大值
-                        plvLinkMicItemDataBean.setCurVolume(speaker.volume);
+                        plvLinkMicItemDataBean.setCurVolume(speaker.getVolume());
                         break;
                     }
                 }
@@ -712,42 +752,69 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 return;
             }
 
-            PLVLinkMicItemDataBean itemToBeFirst = linkMicList.get(0);
-            //遍历找到target
-            for (PLVLinkMicItemDataBean itemDataBean : linkMicList) {
-                if (itemDataBean.getLinkMicId().equals(linkMicId)) {
-                    itemToBeFirst = itemDataBean;
+            if (liveRoomDataManager.getConfig().isAloneChannelType()) {
+                int firstScreenInLinkMicListIndex = -1;
+                for (int i = 0; i < linkMicList.size(); i++) {
+                    PLVLinkMicItemDataBean plvLinkMicItemDataBean = linkMicList.get(i);
+                    if (linkMicId != null && linkMicId.equals(plvLinkMicItemDataBean.getLinkMicId())) {
+                        firstScreenInLinkMicListIndex = i;
+                        break;
+                    }
                 }
-            }
-            //如果target已经在第一画面，则不再做处理
-            final int indexOfTarget = linkMicList.indexOf(itemToBeFirst);
-            if (indexOfTarget == 0) {
-                return;
-            }
+                //如果切换的第一画面的位置正好在media的位置，说明第一画面已经在主屏，则不再处理
+                if (firstScreenInLinkMicListIndex != -1 && firstScreenInLinkMicListIndex == view.getMediaViewIndexInLinkMicList()) {
+                    return;
+                }
+                //如果切换的第一画面为讲师
+                if (mainTeacherLinkMicId != null && mainTeacherLinkMicId.equals(linkMicId)) {
+                    //1. 如果Media在连麦列表，则将media切换到主屏幕即可
+                    if (view.isMediaShowInLinkMicList()) {
+                        view.performClickInLinkMicListItem(view.getMediaViewIndexInLinkMicList());
+                    }
+                } else if (firstScreenInLinkMicListIndex != -1) {//切换的第一画面不为讲师，并且在列表中能找到
+                    //1. 将第一画面和主屏幕的位置进行切换
+                    view.performClickInLinkMicListItem(firstScreenInLinkMicListIndex);
+                }
 
-            //1. 如果PPT在连麦列表，则先将ppt切换到主屏幕
-            boolean pptNeedToGoBackToLinkMicList = false;
-            int pptIndexInLinkMicList = -1;
-            if (view.isPPTShowInLinkMicList()) {
-                pptIndexInLinkMicList = view.getPPTViewIndexInLinkMicList();
-                pptNeedToGoBackToLinkMicList = true;
-                view.onSwitchPPTViewLocation(true);
+                view.setFirstScreenLinkMicId(linkMicId);
+            } else {
+                PLVLinkMicItemDataBean itemToBeFirst = linkMicList.get(0);
+                //遍历找到target
+                for (PLVLinkMicItemDataBean itemDataBean : linkMicList) {
+                    if (itemDataBean.getLinkMicId().equals(linkMicId)) {
+                        itemToBeFirst = itemDataBean;
+                    }
+                }
+                //如果target已经在第一画面，则不再做处理
+                final int indexOfTarget = linkMicList.indexOf(itemToBeFirst);
+                if (indexOfTarget == 0) {
+                    return;
+                }
+
+                //1. 如果PPT在连麦列表，则先将ppt切换到主屏幕
+                boolean pptNeedToGoBackToLinkMicList = false;
+                int pptIndexInLinkMicList = -1;
+                if (view.isMediaShowInLinkMicList()) {
+                    pptIndexInLinkMicList = view.getMediaViewIndexInLinkMicList();
+                    pptNeedToGoBackToLinkMicList = true;
+                    view.onSwitchPPTViewLocation(true);
+                }
+
+                //2. 将原先的第一画面和新的第一画面的位置进行切换
+                PLVLinkMicItemDataBean oldFirst = linkMicList.get(0);
+                linkMicList.remove(oldFirst);
+                linkMicList.remove(itemToBeFirst);
+                linkMicList.add(0, itemToBeFirst);
+                linkMicList.add(indexOfTarget, oldFirst);
+                view.onSwitchFirstScreen(linkMicId);
+
+                //3. 将原先在连麦列表的PPT恢复到原先的位置
+                if (pptNeedToGoBackToLinkMicList) {
+                    view.performClickInLinkMicListItem(pptIndexInLinkMicList);
+                }
+
+                view.setFirstScreenLinkMicId(linkMicId);
             }
-
-            //2. 将原先的第一画面和新的第一画面的位置进行切换
-            PLVLinkMicItemDataBean oldFirst = linkMicList.get(0);
-            linkMicList.remove(oldFirst);
-            linkMicList.remove(itemToBeFirst);
-            linkMicList.add(0, itemToBeFirst);
-            linkMicList.add(indexOfTarget, oldFirst);
-            view.onSwitchFirstScreen(linkMicId);
-
-            //3. 将原先在连麦列表的PPT恢复到原先的位置
-            if (pptNeedToGoBackToLinkMicList) {
-                view.performClickInLinkMicListItem(pptIndexInLinkMicList);
-            }
-
-            view.setFirstScreenLinkMicId(linkMicId);
         }
 
         @Override
@@ -764,13 +831,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         public void onFinishClass() {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onFinishClass");
             handleTeacherCloseLinkMic();
-            isClassOff = true;
-        }
-
-        @Override
-        public void onStartClass() {
-            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onStartClass");
-            isClassOff = false;
         }
     }
     // </editor-fold>

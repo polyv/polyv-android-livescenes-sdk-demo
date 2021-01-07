@@ -125,6 +125,7 @@ public class PLVChatImageViewer extends FrameLayout {
                                             return file;
                                         }
                                     } catch (Exception e) {
+                                        e.printStackTrace();
                                     }
                                     File file = PLVImageLoader.getInstance().saveImageAsFile(getContext(), imgUrl, PLVChatImageContainerWidget.LOADIMG_MOUDLE_TAG + imgUrlTags.get(currentPosition));
                                     return file;

@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,6 +39,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     private boolean isPlaySbDragging;
     //更多
     private ImageView moreIv;
+    private Rect videoViewRect;
     private PLVECMorePopupView morePopupView;
     //监听器
     private OnViewActionListener onViewActionListener;
@@ -59,6 +61,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             onViewActionListener.onViewCreated();
         }
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -76,6 +79,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
         morePopupView = new PLVECMorePopupView();
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
@@ -117,20 +121,31 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         int totalTime = playInfoVO.getTotalTime();
         int bufPercent = playInfoVO.getBufPercent();
         boolean isPlaying = playInfoVO.isPlaying();
-        //在拖动进度条的时候，这里不更新
-        if (!isPlaySbDragging) {
-            playTimeTv.setText(PLVTimeUtils.generateTime(position, true));
-            if (totalTime > 0) {
-                playProgressSb.setProgress((int) ((long) playProgressSb.getMax() * position / totalTime));
-            } else {
-                playProgressSb.setProgress(0);
-            }
-        }
-        playProgressSb.setSecondaryProgress(playProgressSb.getMax() * bufPercent / 100);
-        if (isPlaying) {
-            playControlIv.setSelected(true);
-        } else {
+        boolean isSubViewPlaying = playInfoVO.isSubVideoViewPlaying();
+        if (isSubViewPlaying) {
             playControlIv.setSelected(false);
+            playProgressSb.setProgress(0);
+            moreIv.setClickable(false);
+            morePopupView.hide();
+        } else {
+            playControlIv.setClickable(true);
+            playProgressSb.setClickable(true);
+            moreIv.setClickable(true);
+            //在拖动进度条的时候，这里不更新
+            if (!isPlaySbDragging) {
+                playTimeTv.setText(PLVTimeUtils.generateTime(position, true));
+                if (totalTime > 0) {
+                    playProgressSb.setProgress((int) ((long) playProgressSb.getMax() * position / totalTime));
+                } else {
+                    playProgressSb.setProgress(0);
+                }
+            }
+            playProgressSb.setSecondaryProgress(playProgressSb.getMax() * bufPercent / 100);
+            if (isPlaying) {
+                playControlIv.setSelected(true);
+            } else {
+                playControlIv.setSelected(false);
+            }
         }
     }
 

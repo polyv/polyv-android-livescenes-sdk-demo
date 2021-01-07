@@ -57,10 +57,8 @@ public interface IPLVLinkMicContract {
 
         /**
          * 响应离开连麦频道
-         *
-         * @param shouldStartPlay 是否应该在离开连麦后播放视频
          */
-        void onLeaveChannel(boolean shouldStartPlay);
+        void onLeaveChannel();
 
         /**
          * 响应用户加入连麦频道
@@ -124,7 +122,16 @@ public interface IPLVLinkMicContract {
         void setFirstScreenLinkMicId(String linkMicId);
 
         /**
-         * 切换PPT View的位置
+         * 隐藏连麦列表中的讲师item，并根据isNeedSwitchToMain参数决定是否要把该item的view切换到主屏
+         *
+         * @param linkMicId          讲师的连麦id
+         * @param teacherPos         讲师item在当前连麦列表中的索引
+         * @param isNeedSwitchToMain 是否要切换到主屏
+         */
+        void onAdjustTeacherLocation(String linkMicId, int teacherPos, boolean isNeedSwitchToMain);
+
+        /**
+         * 切换PPT View和第一画面的位置
          *
          * @param toMainScreen true表示切换到主屏幕，false表示切回到悬浮窗
          */
@@ -135,14 +142,14 @@ public interface IPLVLinkMicContract {
          *
          * @return true表示PPT在连麦列表，false表示PPT不在连麦列表
          */
-        boolean isPPTShowInLinkMicList();
+        boolean isMediaShowInLinkMicList();
 
         /**
          * 获取PPTView在连麦列表中的位置index
          *
          * @return ppt在连麦列表中的位置
          */
-        int getPPTViewIndexInLinkMicList();
+        int getMediaViewIndexInLinkMicList();
 
         /**
          * 点击连麦列表[index]位置上的画面
@@ -246,5 +253,12 @@ public interface IPLVLinkMicContract {
          * @return true表示讲师打开连麦，false表示讲师关闭连麦
          */
         boolean isTeacherOpenLinkMic();
+
+        /**
+         * 当前连麦的频道是否是纯视频频道类型并且其支持RTC
+         *
+         * @return true表示是纯视频频道类型并且其支持RTC，false表示是纯视频频道类型且不支持RTC或者是其他的频道类型
+         */
+        boolean isAloneChannelTypeSupportRTC();
     }
 }

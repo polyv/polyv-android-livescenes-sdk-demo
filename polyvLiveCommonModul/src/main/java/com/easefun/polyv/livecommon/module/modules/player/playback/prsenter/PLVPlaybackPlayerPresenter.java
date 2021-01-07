@@ -5,8 +5,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.easefun.polyv.businesssdk.api.auxiliary.IPolyvAuxiliaryVideoViewListenerEvent;
+import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
@@ -18,6 +22,9 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
+import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.model.PolyvPlaybackVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.config.PLVPlayOption;
@@ -36,11 +43,17 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVPlaybackPlayerData playbackPlayerData;
     private WeakReference<IPLVPlaybackPlayerContract.IPlaybackPlayerView> vWeakReference;
-
+    //当前子播放器片头广告或者暖场的超链接
+    private String subVideoViewHerf = "";
+    //设置是否启动片头广告
+    private boolean isAllowOpenAdHead = false;
     private PolyvPlaybackVideoView videoView;
+    private PolyvAuxiliaryVideoview subVideoView;
 
     //手势滑动进度
     private int fastForwardPos;
+
+    private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -72,7 +85,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         }
         //init data
         videoView = getView().getPlaybackVideoView();
+        subVideoView = getView().getSubVideoView();
         initVideoViewListener();
+        initSubVideoViewListener();
+    }
+
+    @Override
+    public void setAllowOpenAdHead(boolean isAllowOpenAdHead) {
+        this.isAllowOpenAdHead = isAllowOpenAdHead;
     }
 
     @Override
@@ -84,6 +104,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 getConfig().getUser().getViewerId()
         );
         playbackVideoParams.buildOptions(PolyvBaseVideoParams.MARQUEE, true)
+                .buildOptions(PolyvBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
                 .buildOptions(PolyvBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
                 .buildOptions(PolyvPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
                 .buildOptions(PolyvPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType());
@@ -97,6 +118,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     public void pause() {
         if (videoView != null) {
             videoView.pause();
+            updatePlayInfo();
         }
     }
 
@@ -104,6 +126,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     public void resume() {
         if (videoView != null) {
             videoView.start();
+            updatePlayInfo();
         }
     }
 
@@ -119,6 +142,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null) {
             return videoView.getDuration();
         }
+
         return 0;
     }
 
@@ -146,6 +170,22 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     public boolean isPlaying() {
         if (videoView != null) {
             return videoView.isPlaying();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isInPlaybackState() {
+        if (videoView != null) {
+            return videoView.isInPlaybackState();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSubVideoViewShow() {
+        if (subVideoView != null) {
+            return subVideoView.isShow();
         }
         return false;
     }
@@ -182,6 +222,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null) {
             videoView.setPlayerVolume(volume);
         }
+        if (subVideoView != null) {
+            subVideoView.setPlayerVolume(volume);
+        }
     }
 
     @Override
@@ -189,6 +232,16 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null) {
             videoView.bindPPTView(pptView);
         }
+    }
+
+    @Override
+    public String getSubVideoViewHerf() {
+        if (subVideoView.isShow()) {
+            return subVideoViewHerf;
+        } else {
+            return "";
+        }
+
     }
 
     @NonNull
@@ -215,9 +268,65 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.destroy();
         }
         videoView = null;
+        subVideoView = null;
         stopPlayProgressTimer();
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 初始化subVideo, videoView的监听器配置">
+    private void initSubVideoViewListener() {
+        if (subVideoView != null) {
+            subVideoView.setOnVideoPlayListener(new IPolyvVideoViewListenerEvent.OnVideoPlayListener() {
+                @Override
+                public void onPlay(boolean isFirst) {
+                    if (getView() != null) {
+                        getView().onSubVideoViewPlay(isFirst);
+                    }
+                }
+            });
+            subVideoView.setOnGestureClickListener(onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
+                @Override
+                public void callback(boolean start, boolean end) {
+                    if (!TextUtils.isEmpty(subVideoViewHerf)) {
+                        PLVWebUtils.openWebLink(subVideoViewHerf, subVideoView.getContext());
+                    }
+                }
+            });
+            subVideoView.setOnSubVideoViewLoadImage(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewLoadImage() {
+                @Override
+                public void onLoad(String imageUrl, final ImageView imageView, final String coverHref) {
+                    if (!TextUtils.isEmpty(coverHref)) {
+                        PLVImageLoader.getInstance().loadImage(subVideoView.getContext(), imageUrl, imageView);
+                    }
+                    subVideoViewHerf = coverHref;
+                    if (!TextUtils.isEmpty(coverHref)) {
+                        imageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                PLVWebUtils.openWebLink(coverHref, subVideoView.getContext());
+                            }
+                        });
+                    }
+                }
+            });
+            subVideoView.setOnSubVideoViewCountdownListener(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewCountdownListener() {
+                @Override
+                public void onCountdown(int totalTime, int remainTime, int adStage) {
+                    boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
+                    if (getView() != null)
+                        getView().onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
+                }
+
+                @Override
+                public void onVisibilityChange(boolean isShow) {
+                    boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
+                    if (getView() != null) {
+                        getView().onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
+                    }
+                }
+            });
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 初始化videoView的监听器配置">
     private void initVideoViewListener() {
@@ -249,6 +358,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     tips += "播放异常\n" + error.errorDescribe + "(" + error.errorCode + "-" + error.playStage + ")\n" + error.playPath;
                     if (getView() != null) {
                         getView().onPlayError(error, tips);
+                        getView().setLogoVisibility(View.GONE);
                     }
                 }
             });
@@ -271,14 +381,6 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         if (getView() != null) {
                             getView().onBufferEnd();
                         }
-                    }
-                }
-            });
-            videoView.setOnPPTShowListener(new IPolyvVideoViewListenerEvent.OnPPTShowListener() {
-                @Override
-                public void showPPTView(int visible) {
-                    if (getView() != null) {
-                        getView().onShowPPTView(visible);
                     }
                 }
             });
@@ -459,6 +561,18 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                 }
             });
+            videoView.setOnGetLogoListener(new IPolyvVideoViewListenerEvent.OnGetLogoListener() {
+                @Override
+                public void onLogo(String logoImage, int logoAlpha, int logoPosition, String logoHref) {
+                    if (TextUtils.isEmpty(logoImage)) {
+                        return;
+                    }
+                    if (getView() != null) {
+                        getView().addLogo(new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
+                                .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage));
+                    }
+                }
+            });
         }
     }
     // </editor-fold>
@@ -476,19 +590,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private void startPlayProgressTimer() {
         stopPlayProgressTimer();
         if (videoView != null) {
-            // 单位：毫秒
-            int position = videoView.getCurrentPosition();
-            int totalTime = videoView.getDuration() / 1000 * 1000;
-            if (videoView.isCompletedState() || position > totalTime) {
-                position = totalTime;
-            }
-            int bufPercent = videoView.getBufferPercentage();
-            playbackPlayerData.postPlayInfoVO(
-                    new PLVPlayInfoVO.Builder()
-                            .position(position).totalTime(totalTime)
-                            .bufPercent(bufPercent).isPlaying(videoView.isPlaying())
-                            .build()
-            );
+            int position = updatePlayInfo();
+
             selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000 - (position % 1000));
         } else {
             selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000);
@@ -497,6 +600,30 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     private void stopPlayProgressTimer() {
         selfHandler.removeMessages(WHAT_PLAY_PROGRESS);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 获取播放信息">
+    private int updatePlayInfo() {
+        // 单位：毫秒
+        int position = videoView.getCurrentPosition();
+        int totalTime = videoView.getDuration() / 1000 * 1000;
+        if (videoView.isCompletedState() || position > totalTime) {
+            position = totalTime;
+        }
+        int bufPercent = videoView.getBufferPercentage();
+        PLVPlayInfoVO.Builder builder = new PLVPlayInfoVO.Builder()
+                .position(position).totalTime(totalTime)
+                .bufPercent(bufPercent).isPlaying(videoView.isPlaying());
+        if (subVideoView != null) {
+            builder.isSubViewPlaying(subVideoView.isPlaying());
+        }
+        playbackPlayerData.postPlayInfoVO(builder.build());
+
+        if (getView()!=null) {
+            getView().updatePlayInfo(builder.build());
+        }
+        return position;
     }
     // </editor-fold>
 

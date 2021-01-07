@@ -47,6 +47,7 @@ public class PLVCompressTransformation implements Transformation<Bitmap> {
                     return BitmapResource.obtain(bitmap, mBitmapPool);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return resource;

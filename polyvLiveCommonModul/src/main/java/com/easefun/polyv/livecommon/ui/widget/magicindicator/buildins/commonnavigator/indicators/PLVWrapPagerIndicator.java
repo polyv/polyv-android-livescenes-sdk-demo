@@ -64,10 +64,10 @@ public class PLVWrapPagerIndicator extends View implements IPLVPagerIndicator {
         PLVPositionData current = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position);
         PLVPositionData next = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position + 1);
 
-        mRect.left = current.mContentLeft - mHorizontalPadding + (next.mContentLeft - current.mContentLeft) * mEndInterpolator.getInterpolation(positionOffset);
-        mRect.top = current.mContentTop - mVerticalPadding;
-        mRect.right = current.mContentRight + mHorizontalPadding + (next.mContentRight - current.mContentRight) * mStartInterpolator.getInterpolation(positionOffset);
-        mRect.bottom = current.mContentBottom + mVerticalPadding;
+        mRect.left = current.getContentLeft() - mHorizontalPadding + (next.getContentLeft() - current.getContentLeft()) * mEndInterpolator.getInterpolation(positionOffset);
+        mRect.top = current.getContentTop() - mVerticalPadding;
+        mRect.right = current.getContentRight() + mHorizontalPadding + (next.getContentRight() - current.getContentRight()) * mStartInterpolator.getInterpolation(positionOffset);
+        mRect.bottom = current.getContentBottom() + mVerticalPadding;
 
         if (!mRoundRadiusSet) {
             mRoundRadius = mRect.height() / 2;

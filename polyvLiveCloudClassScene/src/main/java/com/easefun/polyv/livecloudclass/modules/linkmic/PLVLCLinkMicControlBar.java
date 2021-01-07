@@ -319,11 +319,11 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     }
 
     private void animateMoveToShowMiddleWidth() {
-        animateMove(biggestStateWidthPortrait - middleStateWidthPortrait);
+        animateMove((float) (biggestStateWidthPortrait - middleStateWidthPortrait));
     }
 
     private void animateMoveToShowSmallestWidth() {
-        animateMove(biggestStateWidthPortrait - smallStateWidthPortrait);
+        animateMove((float) (biggestStateWidthPortrait - smallStateWidthPortrait));
     }
 
     private void animateMoveToHide() {
@@ -383,6 +383,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                     case STATE_JOIN_LINK_MIC_SUCCESS:
                         state = PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS_COLLAPSE;
                         btnRingActionPortrait.setRingSettingState();
+                        break;
+                    default:
                         break;
                 }
             }
@@ -459,6 +461,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         animateMoveToShowMiddleWidth();
                         tipGradientShowOrHide(true, DURATION_MS_LINK_MIC_OPEN_OFF);
                         PLVCommonLog.d(TAG, "btnSetting.onClickRingUp->STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE");
+                        break;
+                    default:
                         break;
                 }
                 state = PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC;

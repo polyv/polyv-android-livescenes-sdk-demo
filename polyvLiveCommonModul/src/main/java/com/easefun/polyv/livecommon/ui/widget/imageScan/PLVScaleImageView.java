@@ -369,6 +369,8 @@ public class PLVScaleImageView extends AppCompatImageView {
                 lastX = 0;
                 lastY = 0;
                 break;
+            default:
+                break;
         }
         return super.onTouchEvent(event);
     }

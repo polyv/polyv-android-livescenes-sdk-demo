@@ -58,15 +58,15 @@ public class PLVTestPagerIndicator extends View implements IPLVPagerIndicator {
         PLVPositionData current = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position);
         PLVPositionData next = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position + 1);
 
-        mOutRect.left = current.mLeft + (next.mLeft - current.mLeft) * positionOffset;
-        mOutRect.top = current.mTop + (next.mTop - current.mTop) * positionOffset;
-        mOutRect.right = current.mRight + (next.mRight - current.mRight) * positionOffset;
-        mOutRect.bottom = current.mBottom + (next.mBottom - current.mBottom) * positionOffset;
+        mOutRect.left = current.getLeft() + (next.getLeft() - current.getLeft()) * positionOffset;
+        mOutRect.top = current.getTop() + (next.getTop() - current.getTop()) * positionOffset;
+        mOutRect.right = current.getRight() + (next.getRight() - current.getRight()) * positionOffset;
+        mOutRect.bottom = current.getBottom() + (next.getBottom() - current.getBottom()) * positionOffset;
 
-        mInnerRect.left = current.mContentLeft + (next.mContentLeft - current.mContentLeft) * positionOffset;
-        mInnerRect.top = current.mContentTop + (next.mContentTop - current.mContentTop) * positionOffset;
-        mInnerRect.right = current.mContentRight + (next.mContentRight - current.mContentRight) * positionOffset;
-        mInnerRect.bottom = current.mContentBottom + (next.mContentBottom - current.mContentBottom) * positionOffset;
+        mInnerRect.left = current.getContentLeft() + (next.getContentLeft() - current.getContentLeft()) * positionOffset;
+        mInnerRect.top = current.getContentTop() + (next.getContentTop() - current.getContentTop()) * positionOffset;
+        mInnerRect.right = current.getContentRight() + (next.getContentRight() - current.getContentRight()) * positionOffset;
+        mInnerRect.bottom = current.getContentBottom() + (next.getContentBottom() - current.getContentBottom()) * positionOffset;
 
         invalidate();
     }

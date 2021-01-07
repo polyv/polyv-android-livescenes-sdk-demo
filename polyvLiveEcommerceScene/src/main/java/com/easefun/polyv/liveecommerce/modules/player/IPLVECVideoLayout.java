@@ -9,6 +9,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 
 import java.util.List;
 
@@ -45,11 +46,26 @@ public interface IPLVECVideoLayout {
     void resume();
 
     /**
-     * 是否在播放中
+     * 主播放器或子播放器否已经正式可播放
+     */
+    boolean isInPlaybackState();
+
+    /**
+     * 视频是否在播放中
      *
      * @return true：播放中，false：非播放中。
      */
     boolean isPlaying();
+
+    /**
+     * 子播放器是否正在显示
+     */
+    boolean isSubVideoViewShow();
+
+    /**
+     * 返回当前片头广告或者暖场广告的地址
+     */
+    String getSubVideoViewHerf();
 
     /**
      * 设置播放器音量
@@ -71,6 +87,12 @@ public interface IPLVECVideoLayout {
      * @param listener 监听器
      */
     void setOnViewActionListener(OnViewActionListener listener);
+
+    /**
+     * view 是否设置为浮窗显示
+     * @param isFloating
+     */
+    void setFloatingWindow(boolean isFloating);
 
     /**
      * videoView父控件从videoLayout中分离出来
@@ -156,6 +178,13 @@ public interface IPLVECVideoLayout {
      * @param mediaPlayMode 播放模式
      */
     void changeMediaPlayMode(@PolyvMediaPlayMode.Mode int mediaPlayMode);
+
+    /**
+     * 获取直播播放器数据中的播放信息
+     *
+     * @return 播放信息数据
+     */
+    LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -176,13 +205,6 @@ public interface IPLVECVideoLayout {
     void seekTo(int progress, int max);
 
     /**
-     * 获取播放速度
-     *
-     * @return 播放速度
-     */
-    float getSpeed();
-
-    /**
      * 设置播放速度
      *
      * @param speed 播放速度，建议为[0,2]
@@ -190,11 +212,19 @@ public interface IPLVECVideoLayout {
     void setSpeed(float speed);
 
     /**
-     * 获取播放器数据中的播放信息
+     * 获取播放速度
+     *
+     * @return 播放速度
+     */
+    float getSpeed();
+
+    /**
+     * 获取回放播放器数据中的播放信息
      *
      * @return 播放信息数据
      */
-    LiveData<PLVPlayInfoVO> getPlayInfoVO();
+    LiveData<PLVPlayInfoVO> getPlaybackPlayInfoVO();
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">

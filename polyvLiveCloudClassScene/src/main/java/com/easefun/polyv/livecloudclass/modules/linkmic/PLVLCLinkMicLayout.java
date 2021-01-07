@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicC
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
+import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
@@ -71,7 +72,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     //View
     private IPLVLCLinkMicControlBar linkMicControlBar;
-    private FrameLayout flPPTLinkMicRoot;
+    private FrameLayout flMediaLinkMicRoot;
     private RecyclerView rvLinkMicList;
     private LinearLayout llTryScrollTip;
     private LinearLayout llSpeakingUsers;
@@ -80,12 +81,19 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private PLVLinkMicListAdapter linkMicListAdapter;
     private PLVLinkMicRvLandscapeItemDecoration landscapeItemDecoration = new PLVLinkMicRvLandscapeItemDecoration();
 
+    //纯视频频道连麦时，讲师的位置切换器
+    private PLVViewSwitcher teacherLocationViewSwitcher;
+
     //Listener
     private OnPLVLinkMicLayoutListener onPLVLinkMicLayoutListener;
     private RecyclerView.OnScrollListener onScrollTryScrollTipListener;
 
     //状态数据
-    private boolean isPPTShowInLinkMicList = false;
+    //media区是否显示在连麦列表
+    private boolean isMediaShowInLinkMicList = false;
+    //media在连麦列表中对应item的连麦id
+    @Nullable
+    private String mediaInLinkMicListLinkMicId;
     //当前滑动提示状态
     @TryScrollViewStateType
     private int curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
@@ -113,8 +121,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     // <editor-fold defaultstate="collapsed" desc="初始化View">
     private void initView() {
-        LayoutInflater.from(getContext()).inflate(R.layout.plvlc_link_mic_layout_ppt, this, true);
-        flPPTLinkMicRoot = findViewById(R.id.plvlc_linkmic_fl_ppt_linkmic_root);
+        LayoutInflater.from(getContext()).inflate(R.layout.plvlc_linkmic_media_layout, this, true);
+        flMediaLinkMicRoot = findViewById(R.id.plvlc_linkmic_fl_media_linkmic_root);
         rvLinkMicList = findViewById(R.id.plvlc_link_mic_rv_linkmic_list);
         llTryScrollTip = findViewById(R.id.plvlc_link_mic_ll_try_scroll_tip);
         llSpeakingUsers = findViewById(R.id.plvlc_linkmic_ll_speaking_users);
@@ -148,25 +156,27 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             }
 
             @Override
-            public void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasPPT, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
+            public void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
                 if (onPLVLinkMicLayoutListener != null) {
-                    if (switchViewHasPPT == null) {
-                        //连麦列表没有PPT，那么切换一次就够了
-                        onPLVLinkMicLayoutListener.onClickSwitchWithPPTOnce(switchViewGoMainScreen);
-                    } else if (switchViewHasPPT == switchViewGoMainScreen) {
-                        //连麦列表有PPT，但是刚好点击的就是PPT的item，因此还是切换一次就够了
-                        onPLVLinkMicLayoutListener.onClickSwitchWithPPTOnce(switchViewGoMainScreen);
+                    if (switchViewHasMedia == null) {
+                        //连麦列表没有media，那么切换一次就够了
+                        onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(switchViewGoMainScreen);
+                    } else if (switchViewHasMedia == switchViewGoMainScreen) {
+                        //连麦列表有media，但是刚好点击的就是PPT的item，因此还是切换一次就够了
+                        onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(switchViewGoMainScreen);
                     } else {
-                        //连麦列表有PPT，且点击的不是PPT的item，那么就需要切两次
-                        onPLVLinkMicLayoutListener.onClickSwitchWithPPTTwice(switchViewHasPPT, switchViewGoMainScreen);
+                        //连麦列表有media，且点击的不是media的item，那么就需要切两次
+                        onPLVLinkMicLayoutListener.onClickSwitchWithMediaTwice(switchViewHasMedia, switchViewGoMainScreen);
                     }
                 }
-                if (switchViewHasPPT == switchViewGoMainScreen) {
-                    //ppt被切回到主屏幕
-                    isPPTShowInLinkMicList = false;
+                if (switchViewHasMedia == switchViewGoMainScreen) {
+                    //media被切回到主屏幕
+                    isMediaShowInLinkMicList = false;
+                    setMediaInLinkMicListLinkMicId(null);
                 } else {
-                    //ppt切到连麦
-                    isPPTShowInLinkMicList = true;
+                    //media切到连麦
+                    isMediaShowInLinkMicList = true;
+                    setMediaInLinkMicListLinkMicId(String.valueOf(switchViewGoMainScreen.getTag(R.id.tag_link_mic_id)));
                 }
             }
         });
@@ -302,13 +312,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
 
     @Override
-    public boolean isPPTShowInLinkMicList() {
-        return isPPTShowInLinkMicList;
+    public boolean isMediaShowInLinkMicList() {
+        return isMediaShowInLinkMicList;
     }
 
     @Override
-    public int getPPTViewIndexInLinkMicList() {
-        return linkMicListAdapter.getPPTViewIndexInLinkMicList();
+    public int getMediaViewIndexInLinkMicList() {
+        return linkMicListAdapter.getMediaViewIndexInLinkMicList();
     }
 
     @Override
@@ -317,10 +327,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             @Override
             public void run() {
                 RecyclerView.ViewHolder viewHolder = rvLinkMicList.findViewHolderForAdapterPosition(index);
-                if (viewHolder != null) {
+                if (viewHolder != null) {//连续多次提交时，由于adapter的item的onclick里触发了notifyDataSetChanged，可能会导致后面获取到的viewHolder为null
                     viewHolder.itemView.performClick();
                 }
-                updateAllLinkMicList();
             }
         });
     }
@@ -427,8 +436,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
         //显示连麦根布局
-        flPPTLinkMicRoot.setKeepScreenOn(true);
-        flPPTLinkMicRoot.setVisibility(VISIBLE);
+        flMediaLinkMicRoot.setKeepScreenOn(true);
+        flMediaLinkMicRoot.setVisibility(VISIBLE);
         //上麦后，摄像头关闭，麦克风打开
         linkMicPresenter.muteVideo(true);
         linkMicPresenter.muteAudio(false);
@@ -443,32 +452,59 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinChannelSuccess();
         }
-        isPPTShowInLinkMicList = false;
+        isMediaShowInLinkMicList = false;
     }
 
     @Override
-    public void onLeaveChannel(boolean shouldStartPlay) {
+    public void onLeaveChannel() {
         //我，离开频道
 
-        //连麦列表清空了
+        //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
+        //这里实际存在3种情况：
+        //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
+        //2. 纯视频且不支持RTC：将连麦列表的media区域的播放器切回到主屏幕。
+        //3. 三分屏：将连麦列表的media区域的PPT切回到主屏幕。
+        if (linkMicPresenter.isAloneChannelTypeSupportRTC()) {
+            //如果是纯视频并且支持RTC的频道
+
+            //把之前切换到连麦列表讲师位置的media(video)切回主屏
+            if (teacherLocationViewSwitcher != null) {
+                teacherLocationViewSwitcher.switchView();
+            } else {
+                PLVCommonLog.exception(new Exception("teacherLocationViewSwitcher should not be null"));
+            }
+        } else {
+            //如果是：1. 三分屏频道；2. 纯视频且不支持RTC的频道
+
+            //如果media此时还在连麦列表，则将media从连麦列表切回到主屏幕
+            if (isMediaShowInLinkMicList && linkMicListAdapter.getSwitchViewHasMedia() != null) {
+                if (onPLVLinkMicLayoutListener != null) {
+                    onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(linkMicListAdapter.getSwitchViewHasMedia());
+                }
+            }
+        }
+
+        //连麦列表清空
         linkMicListAdapter.updateAllItem();
         linkMicListAdapter.releaseView();
         rvLinkMicList.removeAllViews();
         //隐藏连麦根布局
-        flPPTLinkMicRoot.setVisibility(GONE);
-        flPPTLinkMicRoot.setKeepScreenOn(false);
+        flMediaLinkMicRoot.setVisibility(GONE);
+        flMediaLinkMicRoot.setKeepScreenOn(false);
         //更新连麦控制器
         linkMicControlBar.setLeaveLinkMic();
         //隐藏向左滑动试试
         llTryScrollTip.setVisibility(GONE);
-
+        //清空连麦场次状态数据
+        isMediaShowInLinkMicList = false;
+        teacherLocationViewSwitcher = null;
+        setMediaInLinkMicListLinkMicId(null);
         //停止前台服务
         PLVLCLinkMicForegroundService.stopForegroundService();
-
+        //回调离开连麦
         if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onLeaveChannel(shouldStartPlay);
+            onPLVLinkMicLayoutListener.onLeaveChannel();
         }
-        isPPTShowInLinkMicList = false;
     }
 
     @Override
@@ -504,6 +540,17 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onUsersLeave(List<String> uids) {
+        //如果media还在连麦列表，连麦列表的用户离开后
+        if (isMediaShowInLinkMicList && getMediaViewIndexInLinkMicList() != -1) {
+            for (String uid : uids) {
+                if (mediaInLinkMicListLinkMicId != null && mediaInLinkMicListLinkMicId.equals(uid)) {
+                    //如果用户离开的位置刚好在media的位置，则将media切回主屏
+                    performClickInLinkMicListItem(getMediaViewIndexInLinkMicList());
+                    break;
+                }
+            }
+        }
+
         linkMicListAdapter.updateAllItem();
 
         if (curTryScrollViewState == TRY_SCROLL_VIEW_STATE_VISIBLE
@@ -601,51 +648,79 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onAdjustTeacherLocation(final String linkMicId, final int teacherPos, boolean isNeedSwitchToMain) {
+        if (isNeedSwitchToMain) {
+            rvLinkMicList.post(new Runnable() {
+                @Override
+                public void run() {
+                    PLVSwitchViewAnchorLayout teacherSwitchView = linkMicListAdapter.getSwitchView(teacherPos);
+                    if (teacherSwitchView != null) {
+                        if (onPLVLinkMicLayoutListener != null) {
+                            teacherLocationViewSwitcher = new PLVViewSwitcher();
+                            onPLVLinkMicLayoutListener.onChangeTeacherLocation(teacherLocationViewSwitcher, teacherSwitchView);
+                        }
+                        linkMicListAdapter.updateInvisibleItem(linkMicId);
+                    }
+                }
+            });
+        } else {
+            linkMicListAdapter.updateInvisibleItem(linkMicId);
+        }
+    }
+
+    @Override
     public void onSwitchPPTViewLocation(boolean toMainScreen) {
         PLVSwitchViewAnchorLayout firstScreenSwitchView = linkMicListAdapter.getFirstScreenSwitchView();
         //如果当前连麦列表为空，则返回
         if (firstScreenSwitchView == null) {
             return;
         }
-
-        if (isPPTShowInLinkMicList && linkMicListAdapter.getSwitchViewHashPPT() != null) {
+        if (isMediaShowInLinkMicList && linkMicListAdapter.getSwitchViewHasMedia() != null) {
             //ppt此时在连麦列表
 
-            if (linkMicListAdapter.getSwitchViewHashPPT() == firstScreenSwitchView) {
+            if (linkMicListAdapter.getSwitchViewHasMedia() == firstScreenSwitchView) {
                 //当ppt在第一画面
-
                 if (!toMainScreen) {
                     return;
                 }
                 if (onPLVLinkMicLayoutListener != null) {
-                    onPLVLinkMicLayoutListener.onClickSwitchWithPPTOnce(linkMicListAdapter.getSwitchViewHashPPT());
-                    linkMicListAdapter.setSwitchViewHashPPT(null);
+                    onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(linkMicListAdapter.getSwitchViewHasMedia());
+                    linkMicListAdapter.setSwitchViewHasMedia(null);
                 }
             } else {
                 //当ppt不在第一画面
                 if (onPLVLinkMicLayoutListener != null) {
-                    onPLVLinkMicLayoutListener.onClickSwitchWithPPTTwice(linkMicListAdapter.getSwitchViewHashPPT(), firstScreenSwitchView);
-                    linkMicListAdapter.setSwitchViewHashPPT(firstScreenSwitchView);
+                    onPLVLinkMicLayoutListener.onClickSwitchWithMediaTwice(linkMicListAdapter.getSwitchViewHasMedia(), firstScreenSwitchView);
+                    linkMicListAdapter.setSwitchViewHasMedia(firstScreenSwitchView);
                 }
             }
 
         } else {
             //ppt此时在主屏幕
-
             //如果PPT要切换到主屏幕，返回。
             if (toMainScreen) {
                 return;
             }
             //将ppt和连麦列表第一画面切换
             if (onPLVLinkMicLayoutListener != null) {
-                onPLVLinkMicLayoutListener.onClickSwitchWithPPTOnce(firstScreenSwitchView);
-                linkMicListAdapter.setSwitchViewHashPPT(firstScreenSwitchView);
+                onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(firstScreenSwitchView);
+                linkMicListAdapter.setSwitchViewHasMedia(firstScreenSwitchView);
             }
         }
 
-        isPPTShowInLinkMicList = !toMainScreen;
+        isMediaShowInLinkMicList = !toMainScreen;
+        setMediaInLinkMicListLinkMicId(isMediaShowInLinkMicList ? String.valueOf(firstScreenSwitchView.getTag(R.id.tag_link_mic_id)) : null);
     }
 
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="set、get">
+    private void setMediaInLinkMicListLinkMicId(String linkMicId) {
+        this.mediaInLinkMicListLinkMicId = linkMicId;
+        if (linkMicListAdapter != null) {
+            linkMicListAdapter.setMediaInLinkMicListLinkMicId(linkMicId);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="横竖屏切换">
@@ -683,11 +758,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         setLayoutParams(lpOfRoot);
 
         //rvRoot
-        LayoutParams lpOfRvRoot = (LayoutParams) flPPTLinkMicRoot.getLayoutParams();
+        LayoutParams lpOfRvRoot = (LayoutParams) flMediaLinkMicRoot.getLayoutParams();
         lpOfRvRoot.width = landscapeWidth;
         lpOfRvRoot.height = ViewGroup.LayoutParams.MATCH_PARENT;
         lpOfRvRoot.gravity = Gravity.RIGHT;
-        flPPTLinkMicRoot.setLayoutParams(lpOfRvRoot);
+        flMediaLinkMicRoot.setLayoutParams(lpOfRvRoot);
 
         //rv
         FrameLayout.LayoutParams lpOfRv = (LayoutParams) rvLinkMicList.getLayoutParams();
@@ -725,11 +800,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         setLayoutParams(lpOfRoot);
 
         //rvRoot
-        LayoutParams lpOfRvRoot = (LayoutParams) flPPTLinkMicRoot.getLayoutParams();
+        LayoutParams lpOfRvRoot = (LayoutParams) flMediaLinkMicRoot.getLayoutParams();
         lpOfRvRoot.width = ViewGroup.LayoutParams.MATCH_PARENT;
         lpOfRvRoot.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         lpOfRvRoot.gravity = Gravity.LEFT;
-        flPPTLinkMicRoot.setLayoutParams(lpOfRvRoot);
+        flMediaLinkMicRoot.setLayoutParams(lpOfRvRoot);
 
         //rv
         FrameLayout.LayoutParams lpOfRv = (LayoutParams) rvLinkMicList.getLayoutParams();

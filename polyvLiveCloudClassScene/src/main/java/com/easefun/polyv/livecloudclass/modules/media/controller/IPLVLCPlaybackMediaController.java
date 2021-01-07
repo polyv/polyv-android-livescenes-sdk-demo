@@ -37,6 +37,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     void setOnLikesSwitchEnabled(boolean isSwitchEnabled);
 
     /**
+     * 设置服务端的PPT开关
+     *
+     * @param enable true表示打开PPT，false表示关闭PPT
+     */
+    void setServerEnablePPT(boolean enable);
+
+    /**
      * 设置view交互事件监听器
      *
      * @param onViewActionListener 监听器

@@ -155,10 +155,8 @@ public interface IPLVLCMediaLayout {
 
     /**
      * 当离开连麦时，更新布局
-     *
-     * @param shouldStartPlay 是否应该在离开连麦后播放视频
      */
-    void updateWhenLeaveLinkMic(boolean shouldStartPlay);
+    void updateWhenLeaveLinkMic();
 
     /**
      * 添加连麦是否开启状态的监听器

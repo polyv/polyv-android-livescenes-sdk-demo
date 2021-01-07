@@ -80,12 +80,20 @@ public class PLVOrientationListener extends OrientationEventListener {
     }
 
     public class Orientation {
-        public boolean isLandscape;
-        public boolean isReverse;
+        private boolean isLandscape;
+        private boolean isReverse;
 
         public Orientation(boolean isLandscape, boolean isReverse) {
             this.isLandscape = isLandscape;
             this.isReverse = isReverse;
+        }
+
+        public boolean isLandscape() {
+            return isLandscape;
+        }
+
+        public boolean isReverse() {
+            return isReverse;
         }
     }
 }

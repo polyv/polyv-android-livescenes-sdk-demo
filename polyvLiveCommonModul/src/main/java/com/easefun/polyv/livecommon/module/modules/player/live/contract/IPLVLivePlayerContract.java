@@ -12,6 +12,8 @@ import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
+import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 
 import java.util.List;
@@ -68,6 +70,22 @@ public interface IPLVLivePlayerContract {
          * @param mainPlayerIsPlaying 主播放器是否在播放中
          */
         void onSubVideoViewClick(boolean mainPlayerIsPlaying);
+
+        /**
+         * 子播放器倒数回调
+         * @param isOpenAdHead
+         * @param totalTime
+         * @param remainTime
+         * @param adStage
+         */
+        void onSubVideoViewCountDown(boolean isOpenAdHead,int totalTime, int remainTime, int adStage);
+
+        /**
+         * 子播放器是否可见回调
+         * @param isOpenAdHead
+         * @param isShow
+         */
+        void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow);
 
         /**
          * 主播放器播放失败回调
@@ -138,6 +156,24 @@ public interface IPLVLivePlayerContract {
         boolean onVolumeChanged(int changeValue, boolean isEnd);
 
         /**
+         * 添加logo
+         * @param logoParam
+         */
+        void addLogo(PLVPlayerLogoView.LogoParam logoParam);
+
+        /**
+         * 控制logo是否显示
+         * @param visible
+         */
+        void setLogoVisibility(int visible);
+
+        /**
+         * 更新播放信息
+         * @param playInfoVO
+         */
+        void updatePlayInfo(PLVPlayInfoVO playInfoVO);
+
+        /**
          * 该频道直播的服务端弹幕开关
          *
          * @param isServerDanmuOpen true：开启了弹幕，false：关闭了弹幕
@@ -182,6 +218,12 @@ public interface IPLVLivePlayerContract {
         void init();
 
         /**
+         * 设置是否打开片头广告
+         * @param isAllowOpenAdHead
+         */
+        void setAllowOpenAdHead(boolean isAllowOpenAdHead);
+
+        /**
          * 开始播放
          */
         void startPlay();
@@ -210,6 +252,17 @@ public interface IPLVLivePlayerContract {
          * 是否在播放中
          */
         boolean isPlaying();
+
+        /**
+         * 是否已经可以播放视频了
+         */
+        boolean isInPlaybackState();
+
+        /**
+         * 辅助视频是否正在显示（包括暖场视频和片头广告）
+         * @return
+         */
+        boolean isSubVideoViewShow();
 
         /**
          * 获取可以切换的线路数量
@@ -301,6 +354,11 @@ public interface IPLVLivePlayerContract {
         void setNeedGestureDetector(boolean need);
 
         /**
+         * 返回当前片头广告或者暖场广告的地址
+         */
+        String getSubVideoViewHerf();
+
+        /**
          * 获取直播播放器数据
          */
         @NonNull
@@ -310,6 +368,7 @@ public interface IPLVLivePlayerContract {
          * 销毁，包括销毁播放器、解除view
          */
         void destroy();
+
     }
     // </editor-fold>
 }

@@ -3,8 +3,7 @@ package com.easefun.polyv.livecommon.module.config;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.easefun.polyv.businesssdk.vodplayer.PolyvVodSDKClient;
-import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
+import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -39,6 +38,11 @@ public class PLVLiveChannelConfig implements Cloneable {
      */
     private boolean isLive;
 
+    /**
+     * 频道类型
+     */
+    private PolyvLiveChannelType channelType;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
@@ -57,9 +61,6 @@ public class PLVLiveChannelConfig implements Cloneable {
         account.userId = userId;
         account.appId = appId;
         account.appSecret = appSecret;
-        //sdk参数配置
-        PolyvLiveSDKClient.getInstance().setAppIdSecret(userId, appId, appSecret);
-        PolyvVodSDKClient.getInstance().initConfig(appId, appSecret);
     }
 
     /**
@@ -83,8 +84,6 @@ public class PLVLiveChannelConfig implements Cloneable {
      */
     public void setupChannelId(String channelId) {
         this.channelId = channelId;
-
-        PolyvLiveSDKClient.getInstance().setChannelId(channelId);
     }
 
     /**
@@ -94,6 +93,9 @@ public class PLVLiveChannelConfig implements Cloneable {
         this.vid = vid;
     }
 
+    /**
+     * 配置回放视频所在的列表的类型
+     */
     public void setupVideoListType(int videoListType) {
         this.videoListType = videoListType;
     }
@@ -107,6 +109,12 @@ public class PLVLiveChannelConfig implements Cloneable {
         this.isLive = isLive;
     }
 
+    /**
+     * 设置频道类型
+     */
+    public void setChannelType(PolyvLiveChannelType channelType) {
+        this.channelType = channelType;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -134,6 +142,20 @@ public class PLVLiveChannelConfig implements Cloneable {
         return isLive;
     }
 
+    //获取频道类型
+    public PolyvLiveChannelType getChannelType() {
+        return channelType;
+    }
+
+    //是否是三分屏频道类型
+    public boolean isPPTChannelType() {
+        return channelType == PolyvLiveChannelType.PPT;
+    }
+
+    //是否是纯视频频道类型
+    public boolean isAloneChannelType() {
+        return channelType == PolyvLiveChannelType.ALONE;
+    }
     // </editor-fold>
 
     @Override

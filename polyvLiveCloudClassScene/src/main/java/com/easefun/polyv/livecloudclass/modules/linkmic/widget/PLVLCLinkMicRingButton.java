@@ -55,6 +55,8 @@ public class PLVLCLinkMicRingButton extends PLVNoConsumeTouchEventButton {
                         case STATE_RING_SETTING:
                             onPLVLCLinkMicRingButtonClickListener.onClickRingSetting();
                             break;
+                        default:
+                            break;
                     }
                 }
             }

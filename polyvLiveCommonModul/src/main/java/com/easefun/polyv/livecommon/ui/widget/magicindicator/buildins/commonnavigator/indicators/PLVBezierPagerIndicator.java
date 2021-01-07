@@ -98,8 +98,8 @@ public class PLVBezierPagerIndicator extends View implements IPLVPagerIndicator 
         PLVPositionData current = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position);
         PLVPositionData next = PLVFragmentContainerHelper.getImitativePositionData(mPositionDataList, position + 1);
 
-        float leftX = current.mLeft + (current.mRight - current.mLeft) / 2;
-        float rightX = next.mLeft + (next.mRight - next.mLeft) / 2;
+        float leftX = current.getLeft() + ((float) (current.getRight() - current.getLeft()) / 2);
+        float rightX = next.getLeft() + ((float) (next.getRight() - next.getLeft()) / 2);
 
         mLeftCircleX = leftX + (rightX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
         mRightCircleX = leftX + (rightX - leftX) * mEndInterpolator.getInterpolation(positionOffset);

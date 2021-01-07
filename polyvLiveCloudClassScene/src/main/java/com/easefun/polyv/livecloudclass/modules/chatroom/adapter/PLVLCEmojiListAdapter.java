@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class PLVLCEmojiListAdapter extends RecyclerView.Adapter<PLVLCEmojiListAdapter.EmojiItemViewHolder> {
     // <editor-fold defaultstate="collapsed" desc="变量">
-    public List<String> emoLists;
+    private List<String> emoLists;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -61,11 +61,11 @@ public class PLVLCEmojiListAdapter extends RecyclerView.Adapter<PLVLCEmojiListAd
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - EmojiItemViewHolder">
-    public class EmojiItemViewHolder extends RecyclerView.ViewHolder {
+    class EmojiItemViewHolder extends RecyclerView.ViewHolder {
         private ImageView emo;
         private String item;
 
-        public EmojiItemViewHolder(View itemView) {
+        EmojiItemViewHolder(View itemView) {
             super(itemView);
             emo = itemView.findViewById(R.id.emoji_iv);
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +78,7 @@ public class PLVLCEmojiListAdapter extends RecyclerView.Adapter<PLVLCEmojiListAd
             });
         }
 
-        protected int getVHPosition() {
+        int getVHPosition() {
             int position = 0;//item 移动时 position 需更新
             for (int i = 0; i < emoLists.size(); i++) {
                 Object obj = emoLists.get(i);
@@ -90,7 +90,7 @@ public class PLVLCEmojiListAdapter extends RecyclerView.Adapter<PLVLCEmojiListAd
             return position;
         }
 
-        public void processData(String item, int position) {
+        void processData(String item, int position) {
             this.item = item;
             EmojiItemViewHolder emoItemViewHolder = this;
             int id = PLVFaceManager.getInstance().getFaceId(item);

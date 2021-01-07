@@ -68,6 +68,16 @@ public interface IPLVLiveRoomDataManager {
      * 获取sessionId
      */
     String getSessionId();
+
+    /**
+     * 设置是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
+     */
+    void setSupportRTC(boolean isSupportRTC);
+
+    /**
+     * 获取是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
+     */
+    boolean isSupportRTC();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

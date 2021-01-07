@@ -296,7 +296,7 @@ public class PLVTouchFloatingView extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="inner class">
     class RotateTask implements Runnable {
-        public Configuration newConfig;
+        private Configuration newConfig;
 
         public void buildConfig(Configuration configuration) {
             newConfig = configuration;

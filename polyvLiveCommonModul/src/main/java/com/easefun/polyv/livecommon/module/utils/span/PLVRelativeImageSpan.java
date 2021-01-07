@@ -55,6 +55,8 @@ public class PLVRelativeImageSpan extends ImageSpan {
 				transY = bottom - b.getBounds().bottom;
 				transY -= paint.getFontMetricsInt().descent - bottom / 4;
 				break;
+			default:
+				break;
 		}
 		// 偏移画布后开始绘制
 		canvas.translate(x/* + 3*scale*/, transY);

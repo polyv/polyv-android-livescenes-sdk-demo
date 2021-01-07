@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--直播播放器布局-->
+<?xml version="1.0" encoding="utf-8"?><!--直播播放器布局-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/video_ly"
     android:layout_width="match_parent"
@@ -30,13 +29,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="gone" />
-
             <!--暂无直播显示的view-->
             <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView
                 android:id="@+id/nostream_ly"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />
+
         </com.easefun.polyv.livescenes.video.PolyvLiveVideoView>
 
         <!--子播放器view-->
@@ -55,4 +54,20 @@
             android:src="@drawable/plvec_commodity_push_close"
             android:visibility="gone" />
     </FrameLayout>
+    <!--logo 显示 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+        android:id="@+id/logo_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp" />
+    <!--视频暂停和继续播放的按钮 -->
+    <ImageView
+        android:id="@+id/play_center"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:src="@drawable/plvec_play_center" />
 </FrameLayout>

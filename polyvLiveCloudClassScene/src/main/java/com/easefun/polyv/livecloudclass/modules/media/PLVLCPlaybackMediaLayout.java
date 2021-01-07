@@ -10,15 +10,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
+import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeItem;
@@ -47,6 +53,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
@@ -63,7 +70,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCPlaybackMediaLayout.class.getSimpleName();
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
-
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
@@ -77,6 +83,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //Switch View
     private FrameLayout flPlayerSwitchViewParent;
     private PLVSwitchViewAnchorLayout switchAnchorPlayer;
+    //子播放器渲染视图view
+    private PolyvAuxiliaryVideoview subVideoView;
+    //倒计时
+    private LinearLayout llAuxiliaryCountDown;
+    private TextView tvCountDown;
+    // Logo
+    private PLVPlayerLogoView logoView;
     //载入状态指示器
     private PLVLCVideoLoadingLayout loadingLayout;
     // tips view
@@ -101,6 +114,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
+    //listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
     // </editor-fold>
 
@@ -123,9 +137,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_playback_player_layout, this, true);
         videoView = findViewById(R.id.plvlc_playback_video_view);
+        subVideoView = findViewById(R.id.sub_video_view);
         playerView = videoView.findViewById(PolyvBaseVideoView.IJK_VIDEO_ID);
         mediaController = findViewById(R.id.plvlc_playback_media_controller);
         noStreamView = findViewById(R.id.no_stream_ly);
+        logoView = findViewById(R.id.playback_logo_view);
         loadingLayout = findViewById(R.id.plvlc_playback_loading_layout);
         lightTipsView = findViewById(R.id.plvlc_playback_tipsview_light);
         volumeTipsView = findViewById(R.id.plvlc_playback_tipsview_volume);
@@ -134,6 +150,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
         flPlayerSwitchViewParent = findViewById(R.id.plvlc_playback_fl_player_switch_view_parent);
         switchAnchorPlayer = findViewById(R.id.plvlc_playback_switch_anchor_player);
+
+        tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
+        llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
+        llAuxiliaryCountDown.setVisibility(GONE);
 
         initVideoView();
         initDanmuView();
@@ -148,6 +168,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         noStreamView.setPlaceHolderImg(R.drawable.plvlc_bg_player_no_stream);
         noStreamView.setPlaceHolderText(getResources().getString(R.string.plv_player_video_playback_no_stream));
 
+        videoView.setSubVideoView(subVideoView);
         videoView.setMediaController(mediaController);
         videoView.setNoStreamIndicator(noStreamView);
         videoView.setPlayerBufferingIndicator(loadingLayout);
@@ -220,8 +241,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 View childOfAnchor = switchAnchorPlayer.getChildAt(0);
                 if (childOfAnchor == flPlayerSwitchViewParent) {
                     videoView.removeView(playerView);
+                    videoView.removeView(logoView);
 
                     flPlayerSwitchViewParent.addView(playerView);
+                    flPlayerSwitchViewParent.addView(logoView);
                 }
             }
 
@@ -232,6 +255,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 if (childOfAnchor == flPlayerSwitchViewParent) {
                     flPlayerSwitchViewParent.removeAllViews();
                     videoView.addView(playerView, 0);
+                    videoView.addView(logoView);
                 }
             }
         });
@@ -261,7 +285,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter = new PLVPlaybackPlayerPresenter(liveRoomDataManager);
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
-
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
     }
 
@@ -369,6 +392,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         if (landscapeMessageSender != null) {
             landscapeMessageSender.dismiss();
         }
+
+        if (logoView != null) {
+            logoView.removeAllViews();
+        }
     }
     // </editor-fold>
 
@@ -389,7 +416,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void updateWhenLeaveLinkMic(boolean shouldStartPlay) {
+    public void updateWhenLeaveLinkMic() {
 
     }
 
@@ -451,6 +478,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
+        public PolyvAuxiliaryVideoview getSubVideoView() {
+            return subVideoView;
+        }
+
+        @Override
         public View getBufferingIndicator() {
             return super.getBufferingIndicator();
         }
@@ -467,6 +499,25 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             super.onPlayError(error, tips);
             ToastUtils.showLong(tips);
             PLVCommonLog.e(TAG, tips);
+        }
+
+        @Override
+        public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
+            if (isOpenAdHead) {
+                llAuxiliaryCountDown.setVisibility(VISIBLE);
+                tvCountDown.setText("广告：" + remainTime + "s");
+            }
+        }
+
+        @Override
+        public void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow) {
+            if (isOpenAdHead) {
+                if (!isShow) {
+                    llAuxiliaryCountDown.setVisibility(GONE);
+                }
+            } else {
+                llAuxiliaryCountDown.setVisibility(GONE);
+            }
         }
 
         @Override
@@ -519,6 +570,26 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onServerDanmuOpen(boolean isServerDanmuOpen) {
             super.onServerDanmuOpen(isServerDanmuOpen);
             danmuWrapper.setOnServerDanmuOpen(isServerDanmuOpen);
+        }
+
+        @Override
+        public void onShowPPTView(int visible) {
+            super.onShowPPTView(visible);
+            mediaController.setServerEnablePPT(visible == View.VISIBLE);
+        }
+
+        @Override
+        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
+            if (logoView!=null) {
+                logoView.addLogo(logoParam);
+            }
+        }
+
+        @Override
+        public void setLogoVisibility(int visible) {
+            if (logoView!=null) {
+                logoView.setVisibility(visible);
+            }
         }
     };
     // </editor-fold>
@@ -576,6 +647,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                         //送花/点赞开关
                         case PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED:
                             mediaController.setOnLikesSwitchEnabled(isSwitchEnabled);
+                            break;
+                        default:
                             break;
                     }
                 }
