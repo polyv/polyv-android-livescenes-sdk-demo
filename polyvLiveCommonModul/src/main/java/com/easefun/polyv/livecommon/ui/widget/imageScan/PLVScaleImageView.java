@@ -16,7 +16,10 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
+
 public class PLVScaleImageView extends AppCompatImageView {
+    private static final String TAG = "PLVScaleImageView";
     private ScaleGestureDetector scaleGestureDetector;//缩放
     private GestureDetector gestureDetector;//双击
     private Matrix scaleMatrix;//当前的平移、缩放
@@ -107,6 +110,7 @@ public class PLVScaleImageView extends AppCompatImageView {
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
+                PLVCommonLog.d(TAG," onScaleEnd");
             }
         });
         addOnLayoutChangeListener(new OnLayoutChangeListener() {
@@ -184,7 +188,8 @@ public class PLVScaleImageView extends AppCompatImageView {
         isDrawablePrepared = true;
         super.setImageDrawable(drawable);//outside can display wh error
         getViewTreeObserver().removeOnGlobalLayoutListener(runnable);
-        getViewTreeObserver().addOnGlobalLayoutListener(runnable = new ViewTreeObserver.OnGlobalLayoutListener() {
+        getViewTreeObserver().addOnGlobalLayoutListener(runnable
+                = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 if (getWidth() != 0 && getHeight() != 0) {//can 0

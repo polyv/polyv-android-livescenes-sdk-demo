@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVLiveFloating
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVLiveFloatingPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
+import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -146,7 +147,7 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
     @Override
     public void show() {
         PLVCommonLog.d(TAG, "show");
-        if (isServerEnablePPT) {
+        if (isServerEnablePPT && !PolyvLinkMicConfig.getInstance().isPureRtcWatchEnabled()) {
             setVisibility(VISIBLE);
         }
     }

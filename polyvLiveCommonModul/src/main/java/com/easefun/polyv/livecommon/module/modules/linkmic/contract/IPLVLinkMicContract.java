@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 
 import java.util.List;
 
@@ -39,26 +40,43 @@ public interface IPLVLinkMicContract {
         /**
          * 响应加入连麦频道超时
          */
-        void onAllowButJoinTimeout();
+        void onJoinChannelTimeout();
 
         /**
-         * 响应在加入频道之前，View层应创建连麦适配器和初始化连麦布局
+         * 准备连麦列表
          *
-         * @param linkMicUid  我的连麦Id
-         * @param isAudio     是否是音频连麦
-         * @param linkMicList 连麦列表。在实现中，要用该列表去渲染
+         * @param linkMicUid          我的连麦Id
+         * @param linkMicListShowMode 列表显示模式
+         * @param linkMicList         连麦列表。在实现中，要用该列表去渲染
          */
-        void onBeforeJoinChannel(String linkMicUid, boolean isAudio, List<PLVLinkMicItemDataBean> linkMicList);
+        void onPrepareLinkMicList(String linkMicUid, PLVLinkMicListShowMode linkMicListShowMode, List<PLVLinkMicItemDataBean> linkMicList);
 
         /**
-         * 响应加入连麦频道成功
+         * 开始渲染连麦列表
          */
-        void onJoinChannelSuccess();
+        void onShowLinkMicList();
 
         /**
-         * 响应离开连麦频道
+         * 释放连麦列表
          */
-        void onLeaveChannel();
+        void onReleaseLinkMicList();
+
+        /**
+         * 改变连麦列表显示模式
+         *
+         * @param linkMicListShowMode 列表显示模式
+         */
+        void onChangeListShowMode(PLVLinkMicListShowMode linkMicListShowMode);
+
+        /**
+         * 加入连麦
+         */
+        void onJoinLinkMic();
+
+        /**
+         * 离开连麦
+         */
+        void onLeaveLinkMic();
 
         /**
          * 响应用户加入连麦频道
@@ -115,20 +133,14 @@ public interface IPLVLinkMicContract {
         void onSwitchFirstScreen(String linkMicId);
 
         /**
-         * 设置第一画面的连麦ID
-         *
-         * @param linkMicId 新的第一画面的连麦Id
-         */
-        void setFirstScreenLinkMicId(String linkMicId);
-
-        /**
          * 隐藏连麦列表中的讲师item，并根据isNeedSwitchToMain参数决定是否要把该item的view切换到主屏
          *
          * @param linkMicId          讲师的连麦id
          * @param teacherPos         讲师item在当前连麦列表中的索引
          * @param isNeedSwitchToMain 是否要切换到主屏
+         * @param onAdjustFinished   位置调整完成回调
          */
-        void onAdjustTeacherLocation(String linkMicId, int teacherPos, boolean isNeedSwitchToMain);
+        void onAdjustTeacherLocation(String linkMicId, int teacherPos, boolean isNeedSwitchToMain, Runnable onAdjustFinished);
 
         /**
          * 切换PPT View和第一画面的位置
@@ -162,6 +174,20 @@ public interface IPLVLinkMicContract {
          * 更新所有整个连麦列表
          */
         void updateAllLinkMicList();
+
+        /**
+         * RTC订阅成功回调
+         */
+        void onRTCPrepared();
+
+        /**
+         * 更新第一画面
+         *
+         * @param firstScreenLinkMicId 第一画面连麦ID
+         * @param oldPos               旧的第一画面的位置，正常情况下是0
+         * @param newPos               新的第一画面的位置
+         */
+        void updateFirstScreenChanged(String firstScreenLinkMicId, int oldPos, int newPos);
     }
 
     interface IPLVLinkMicPresenter {
@@ -229,9 +255,21 @@ public interface IPLVLinkMicContract {
         void setupRenderView(SurfaceView renderView, String linkMicId);
 
         /**
+         * 释放渲染器
+         *
+         * @param renderView 渲染器
+         */
+        void releaseRenderView(SurfaceView renderView);
+
+        /**
          * 是否加入连麦
          */
         boolean isJoinLinkMic();
+
+        /**
+         * 是否加入rtc频道
+         */
+        boolean isJoinChannel();
 
         /**
          * 设置当前是音频连麦还是视频连麦
@@ -239,6 +277,13 @@ public interface IPLVLinkMicContract {
          * @param isAudioLinkMic true表示是音频连麦，false表示是视频连麦
          */
         void setIsAudioLinkMic(boolean isAudioLinkMic);
+
+        /**
+         * 获取当前是音频连麦还是视频连麦
+         *
+         * @return true表示是音频连麦，false表示是视频连麦
+         */
+        boolean getIsAudioLinkMic();
 
         /**
          * 设置讲师否是打开连麦
@@ -260,5 +305,15 @@ public interface IPLVLinkMicContract {
          * @return true表示是纯视频频道类型并且其支持RTC，false表示是纯视频频道类型且不支持RTC或者是其他的频道类型
          */
         boolean isAloneChannelTypeSupportRTC();
+
+        /**
+         * 设置直播开始
+         */
+        void setLiveStart();
+
+        /**
+         * 设置直播结束
+         */
+        void setLiveEnd();
     }
 }

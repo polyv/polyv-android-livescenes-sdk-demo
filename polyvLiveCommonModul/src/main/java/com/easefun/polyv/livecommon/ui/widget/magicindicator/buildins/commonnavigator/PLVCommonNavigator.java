@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.IPLVPagerTitleView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.PLVCommonNavigatorAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.model.PLVPositionData;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  * Created by hackware on 2016/6/26.
  */
 public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigator, PLVNavigatorHelper.OnNavigatorScrollListener {
+    private static final String TAG = "PLVCommonNavigator";
     private HorizontalScrollView mScrollView;
     private LinearLayout mTitleContainer;
     private LinearLayout mIndicatorContainer;
@@ -221,7 +223,7 @@ public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigato
             }
 
             // 手指跟随滚动
-            if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
+            if (mScrollView != null && !mPositionDataList.isEmpty() && position >= 0 && position < mPositionDataList.size()) {
                 if (mFollowTouch) {
                     int currentPosition = Math.min(mPositionDataList.size() - 1, position);
                     int nextPosition = Math.min(mPositionDataList.size() - 1, position + 1);
@@ -272,6 +274,7 @@ public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigato
 
     @Override
     public void onDetachFromMagicIndicator() {
+        PLVCommonLog.d(TAG,"onDetachFromMagicIndicator");
     }
 
     public IPLVPagerIndicator getPagerIndicator() {
@@ -342,7 +345,7 @@ public class PLVCommonNavigator extends FrameLayout implements IPLVPagerNavigato
         if (v instanceof IPLVPagerTitleView) {
             ((IPLVPagerTitleView) v).onSelected(index, totalCount);
         }
-        if (!mAdjustMode && !mFollowTouch && mScrollView != null && mPositionDataList.size() > 0) {
+        if (!mAdjustMode && !mFollowTouch && mScrollView != null && !mPositionDataList.isEmpty()) {
             int currentIndex = Math.min(mPositionDataList.size() - 1, index);
             PLVPositionData current = mPositionDataList.get(currentIndex);
             if (mEnablePivotScroll) {

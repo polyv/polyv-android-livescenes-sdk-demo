@@ -31,6 +31,7 @@ import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLands
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -137,10 +138,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         rvLinkMicList.getItemAnimator().setMoveDuration(0);
         rvLinkMicList.getItemAnimator().setRemoveDuration(0);
         RecyclerView.ItemAnimator rvAnimator = rvLinkMicList.getItemAnimator();
-        if (rvAnimator != null) {
-            if (rvAnimator instanceof SimpleItemAnimator) {
-                ((SimpleItemAnimator) rvAnimator).setSupportsChangeAnimations(false);
-            }
+        if (rvAnimator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) rvAnimator).setSupportsChangeAnimations(false);
         }
 
         //init adapter
@@ -153,6 +152,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             @Override
             public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
                 linkMicPresenter.setupRenderView(surfaceView, linkMicId);
+            }
+
+            @Override
+            public void releaseRenderView(SurfaceView surfaceView) {
+                linkMicPresenter.releaseRenderView(surfaceView);
             }
 
             @Override
@@ -306,10 +310,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public boolean isJoinLinkMic() {
-        return linkMicPresenter.isJoinLinkMic();
+    public boolean isJoinChannel() {
+        return linkMicPresenter.isJoinChannel();
     }
-
 
     @Override
     public boolean isMediaShowInLinkMicList() {
@@ -349,7 +352,34 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public int getLandscapeWidth() {
         return landscapeWidth;
     }
-// </editor-fold>
+
+    @Override
+    public void setLiveStart() {
+        linkMicPresenter.setLiveStart();
+    }
+
+    @Override
+    public void setLiveEnd() {
+        linkMicPresenter.setLiveEnd();
+    }
+
+    @Override
+    public void onRTCPrepared() {
+        onPLVLinkMicLayoutListener.onRTCPrepared();
+    }
+
+    @Override
+    public void updateFirstScreenChanged(String firstScreenLinkMicId, int oldPos, int newPos) {
+        linkMicListAdapter.setFirstScreenLinkMicId(firstScreenLinkMicId);
+        if (oldPos>0){
+            linkMicListAdapter.updateUserMuteVideo(oldPos);
+        }
+        if (newPos > 0) {
+            linkMicListAdapter.updateUserMuteVideo(newPos);
+        }
+    }
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="IPLVLinkMicContract.IPLVLinkMicView实现">
 
@@ -394,19 +424,19 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onAllowButJoinTimeout() {
-        linkMicControlBar.setLeaveLinkMic();
+    public void onJoinChannelTimeout() {
+        ToastUtils.showShort("加入频道超时，请重试");
     }
 
     @Override
-    public void onBeforeJoinChannel(String linkMicUid, boolean isAudio, List<PLVLinkMicItemDataBean> linkMicList) {
+    public void onPrepareLinkMicList(String linkMicUid, PLVLinkMicListShowMode linkMicListShowMode, List<PLVLinkMicItemDataBean> linkMicList) {
         PLVCommonLog.d(TAG, "PLVLinkMicLayout.onBeforeJoinChannel");
         //初始化连麦适配器，准备添加连麦观众
         linkMicListAdapter.setDataList(linkMicList);
         if (!linkMicListAdapter.hasObservers() && !linkMicListAdapter.hasStableIds()) {
             linkMicListAdapter.setHasStableIds(true);
         }
-        linkMicListAdapter.setIsAudio(isAudio);
+        linkMicListAdapter.setListShowMode(linkMicListShowMode);
         linkMicListAdapter.setMyLinkMicId(linkMicUid);
 
         rvLinkMicList.setAdapter(linkMicListAdapter);
@@ -425,30 +455,21 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfSpeakingUsers.rightMargin = landscapeWidth + PLVScreenUtils.dip2px(DP_LAND_SPEAKING_USER_VIEW_MARGIN_RIGHT_TO_LINK_MIC_LIST);
         llSpeakingUsers.setLayoutParams(lpOfSpeakingUsers);
 
-        linkMicControlBar.setIsAudio(isAudio);
+        linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
     }
 
     @Override
-    public void onJoinChannelSuccess() {
-        //我，加入频道成功
-        PLVCommonLog.d(TAG, "onJoinChannelSuccess");
-        ToastUtils.showShort("上麦成功");
-
+    public void onShowLinkMicList() {
         curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
         //显示连麦根布局
         flMediaLinkMicRoot.setKeepScreenOn(true);
         flMediaLinkMicRoot.setVisibility(VISIBLE);
-        //上麦后，摄像头关闭，麦克风打开
-        linkMicPresenter.muteVideo(true);
-        linkMicPresenter.muteAudio(false);
         //更新连麦列表
         linkMicListAdapter.updateAllItem();
         //启动前台服务
         Activity activity = (Activity) getContext();
         PLVLCLinkMicForegroundService.startForegroundService(activity.getClass());
 
-        //更新连麦控制器
-        linkMicControlBar.setJoinLinkMicSuccess();
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinChannelSuccess();
         }
@@ -456,9 +477,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onLeaveChannel() {
-        //我，离开频道
-
+    public void onReleaseLinkMicList() {
         //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
         //这里实际存在3种情况：
         //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
@@ -491,8 +510,6 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //隐藏连麦根布局
         flMediaLinkMicRoot.setVisibility(GONE);
         flMediaLinkMicRoot.setKeepScreenOn(false);
-        //更新连麦控制器
-        linkMicControlBar.setLeaveLinkMic();
         //隐藏向左滑动试试
         llTryScrollTip.setVisibility(GONE);
         //清空连麦场次状态数据
@@ -505,6 +522,28 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onLeaveChannel();
         }
+    }
+
+    @Override
+    public void onChangeListShowMode(PLVLinkMicListShowMode linkMicListShowMode) {
+        linkMicListAdapter.setListShowMode(linkMicListShowMode);
+    }
+
+    @Override
+    public void onJoinLinkMic() {
+        //我，加入频道成功
+        PLVCommonLog.d(TAG, "onJoinLinkMic");
+        ToastUtils.showShort("上麦成功");
+        //更新连麦控制器
+        linkMicControlBar.setJoinLinkMicSuccess();
+    }
+
+    @Override
+    public void onLeaveLinkMic() {
+        //我，离开频道
+
+        //更新连麦控制器
+        linkMicControlBar.setLeaveLinkMic();
     }
 
     @Override
@@ -643,28 +682,27 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void setFirstScreenLinkMicId(String linkMicId) {
-        linkMicListAdapter.setFirstScreenLinkMicId(linkMicId);
-    }
-
-    @Override
-    public void onAdjustTeacherLocation(final String linkMicId, final int teacherPos, boolean isNeedSwitchToMain) {
+    public void onAdjustTeacherLocation(final String linkMicId, final int teacherPos, boolean isNeedSwitchToMain, final Runnable onAdjustFinished) {
         if (isNeedSwitchToMain) {
-            rvLinkMicList.post(new Runnable() {
+            linkMicListAdapter.setTeacherViewHolderBindListener(new PLVLinkMicListAdapter.OnTeacherSwitchViewBindListener() {
                 @Override
-                public void run() {
-                    PLVSwitchViewAnchorLayout teacherSwitchView = linkMicListAdapter.getSwitchView(teacherPos);
-                    if (teacherSwitchView != null) {
-                        if (onPLVLinkMicLayoutListener != null) {
-                            teacherLocationViewSwitcher = new PLVViewSwitcher();
-                            onPLVLinkMicLayoutListener.onChangeTeacherLocation(teacherLocationViewSwitcher, teacherSwitchView);
-                        }
-                        linkMicListAdapter.updateInvisibleItem(linkMicId);
+                public void onTeacherSwitchViewBind(PLVSwitchViewAnchorLayout teacherSwitchView) {
+                    if (onPLVLinkMicLayoutListener != null) {
+                        teacherLocationViewSwitcher = new PLVViewSwitcher();
+                        onPLVLinkMicLayoutListener.onChangeTeacherLocation(teacherLocationViewSwitcher, teacherSwitchView);
+                        onAdjustFinished.run();
                     }
+                    rvLinkMicList.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            linkMicListAdapter.updateInvisibleItem(linkMicId);
+                        }
+                    });
                 }
             });
         } else {
             linkMicListAdapter.updateInvisibleItem(linkMicId);
+            onAdjustFinished.run();
         }
     }
 
@@ -780,7 +818,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         llTryScrollTip.setVisibility(GONE);
 
         //正在发言
-        if (isJoinLinkMic()) {
+        if (isJoinChannel()) {
             llSpeakingUsers.setVisibility(VISIBLE);
         } else {
             llSpeakingUsers.setVisibility(GONE);

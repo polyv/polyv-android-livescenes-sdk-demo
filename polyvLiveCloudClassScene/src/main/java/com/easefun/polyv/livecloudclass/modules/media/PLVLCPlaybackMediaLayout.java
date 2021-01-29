@@ -57,6 +57,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -177,7 +178,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             @Override
             public void run() {
                 marqueeView = ((Activity) getContext()).findViewById(R.id.plvlc_marquee_view);//after videoLayout add, post find
-                videoView.setMarqueeView(marqueeView, marqueeItem = new PolyvMarqueeItem());
+                marqueeItem = new PolyvMarqueeItem();
+                videoView.setMarqueeView(marqueeView, marqueeItem);
             }
         });
     }
@@ -392,10 +394,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         if (landscapeMessageSender != null) {
             landscapeMessageSender.dismiss();
         }
-
-        if (logoView != null) {
-            logoView.removeAllViews();
-        }
     }
     // </editor-fold>
 
@@ -420,6 +418,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     }
 
+    @Override
+    public void notifyRTCPrepared() {
+
+    }
+
 
     @Override
     public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
@@ -428,6 +431,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     @Override
     public void addOnSeiDataListener(IPLVOnDataChangedListener<Long> listener) {
+
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
 
     }
     // </editor-fold>
@@ -485,6 +493,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public View getBufferingIndicator() {
             return super.getBufferingIndicator();
+        }
+
+        @Override
+        public PLVPlayerLogoView getLogo(){
+            return logoView;
         }
 
         @Override
@@ -576,20 +589,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onShowPPTView(int visible) {
             super.onShowPPTView(visible);
             mediaController.setServerEnablePPT(visible == View.VISIBLE);
-        }
-
-        @Override
-        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
-            if (logoView!=null) {
-                logoView.addLogo(logoParam);
-            }
-        }
-
-        @Override
-        public void setLogoVisibility(int visible) {
-            if (logoView!=null) {
-                logoView.setVisibility(visible);
-            }
         }
     };
     // </editor-fold>

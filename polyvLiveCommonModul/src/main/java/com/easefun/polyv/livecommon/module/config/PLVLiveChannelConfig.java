@@ -1,11 +1,12 @@
 package com.easefun.polyv.livecommon.module.config;
 
-import android.os.Build;
 import android.text.TextUtils;
 
+import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 /**
  * 直播频道相关信息配置类
@@ -72,8 +73,8 @@ public class PLVLiveChannelConfig implements Cloneable {
      * @param viewerType   用户的类型，用于登录socket，需要为指定的类型，例如：{@link PLVSocketUserConstant#USERTYPE_STUDENT}， {@link PLVSocketUserConstant#USERTYPE_SLICE}
      */
     public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType) {
-        user.viewerId = TextUtils.isEmpty(viewerId) ? Build.SERIAL + "" : viewerId;
-        user.viewerName = TextUtils.isEmpty(viewerName) ? "观众" + Build.SERIAL : viewerName;
+        user.viewerId = TextUtils.isEmpty(viewerId) ? PLVSystemUtils.getAndroidId(Utils.getApp()) + "" : viewerId;
+        user.viewerName = TextUtils.isEmpty(viewerName) ? "观众" + PLVSystemUtils.getAndroidId(Utils.getApp()) : viewerName;
         user.viewerAvatar = TextUtils.isEmpty(viewerAvatar) ? PLVSocketUserConstant.STUDENT_AVATAR_URL : viewerAvatar;
         user.viewerType = TextUtils.isEmpty(viewerType) ? PLVSocketUserConstant.USERTYPE_STUDENT : viewerType;
     }

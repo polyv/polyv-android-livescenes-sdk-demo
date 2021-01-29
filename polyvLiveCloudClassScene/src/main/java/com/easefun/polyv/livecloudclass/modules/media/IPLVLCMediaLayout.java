@@ -11,6 +11,7 @@ import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -158,6 +159,8 @@ public interface IPLVLCMediaLayout {
      */
     void updateWhenLeaveLinkMic();
 
+    void notifyRTCPrepared();
+
     /**
      * 添加连麦是否开启状态的监听器
      *
@@ -171,6 +174,8 @@ public interface IPLVLCMediaLayout {
      * @param listener 监听器
      */
     void addOnSeiDataListener(IPLVOnDataChangedListener<Long> listener);
+
+    void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">

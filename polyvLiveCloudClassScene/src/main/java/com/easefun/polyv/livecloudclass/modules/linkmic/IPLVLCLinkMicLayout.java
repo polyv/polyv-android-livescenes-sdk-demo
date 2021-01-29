@@ -72,12 +72,13 @@ public interface IPLVLCLinkMicLayout {
      */
     void setIsAudio(boolean isAudioLinkMic);
 
+
     /**
-     * 是否已经加入连麦
+     * 是否已经加入RTC频道
      *
-     * @return true表示已经加入了连麦，false表示没有加入连麦
+     * @return true表示已经加入了RTC频道，false表示没有加入
      */
-    boolean isJoinLinkMic();
+    boolean isJoinChannel();
 
     /**
      * Media是否被切换到连麦列表了
@@ -99,6 +100,16 @@ public interface IPLVLCLinkMicLayout {
      * @return 横屏宽
      */
     int getLandscapeWidth();
+
+    /**
+     * 设置直播开始
+     */
+    void setLiveStart();
+
+    /**
+     * 设置直播结束
+     */
+    void setLiveEnd();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2. 需要外部响应的事件监听器">
@@ -161,6 +172,10 @@ public interface IPLVLCLinkMicLayout {
          * @param switchViewGoMainScreen 被点击的item的switch view，对应将会被切换到主屏幕的连麦item
          */
         void onClickSwitchWithMediaTwice(PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
+        // </editor-fold>
+
+        // <editor-fold defaultstate="collapsed" desc="RTC播放事件监听器">
+        void onRTCPrepared();
         // </editor-fold>
 
     }

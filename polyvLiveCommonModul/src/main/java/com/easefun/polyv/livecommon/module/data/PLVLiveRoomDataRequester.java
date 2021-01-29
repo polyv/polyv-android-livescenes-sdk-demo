@@ -31,6 +31,7 @@ import retrofit2.HttpException;
  */
 public class PLVLiveRoomDataRequester {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = "PLVLiveRoomDataRequeste";
     //每次请求商品的数量
     public static final int GET_COMMODITY_COUNT = 20;
 
@@ -112,6 +113,7 @@ public class PLVLiveRoomDataRequester {
 
                     @Override
                     public void onFinish() {
+                        PLVCommonLog.d(TAG,"increasePageViewer onFinish");
                     }
                 });
     }
@@ -286,6 +288,7 @@ public class PLVLiveRoomDataRequester {
 
                     @Override
                     public void onFinish() {
+                        PLVCommonLog.d(TAG,"getLiveStatusJson2 onFinish");
                     }
                 });
     }

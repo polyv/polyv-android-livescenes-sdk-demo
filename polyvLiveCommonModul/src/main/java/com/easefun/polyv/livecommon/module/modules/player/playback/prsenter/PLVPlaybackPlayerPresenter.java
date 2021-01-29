@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.model.PolyvPlaybackVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.config.PLVPlayOption;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
 
 import java.lang.ref.WeakReference;
@@ -39,6 +40,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
  */
 public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = "PLVPlaybackPlayerPresen";
     private static final int WHAT_PLAY_PROGRESS = 1;
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVPlaybackPlayerData playbackPlayerData;
@@ -49,6 +51,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private boolean isAllowOpenAdHead = false;
     private PolyvPlaybackVideoView videoView;
     private PolyvAuxiliaryVideoview subVideoView;
+    //显示的logo
+    private PLVPlayerLogoView logoView;
 
     //手势滑动进度
     private int fastForwardPos;
@@ -264,12 +268,30 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     @Override
     public void destroy() {
         unregisterView();
+        if (logoView != null) {
+            logoView.removeAllViews();
+            logoView = null;
+        }
+
+        if (subVideoView != null) {
+            subVideoView.destroy();
+            subVideoView = null;
+        }
+
         if (videoView != null) {
             videoView.destroy();
+            videoView = null;
         }
-        videoView = null;
-        subVideoView = null;
+
         stopPlayProgressTimer();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - logo 显示的控制">
+    private void setLogoVisibility(int visible) {
+        if (logoView != null) {
+            logoView.setVisibility(visible);
+        }
     }
     // </editor-fold>
 
@@ -284,7 +306,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                 }
             });
-            subVideoView.setOnGestureClickListener(onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
+            subVideoView.setOnGestureClickListener(onSubGestureClickListener
+                    = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
                 @Override
                 public void callback(boolean start, boolean end) {
                     if (!TextUtils.isEmpty(subVideoViewHerf)) {
@@ -338,27 +361,48 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     if (getView() != null) {
                         getView().onPrepared();
                     }
+                    setLogoVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onPreparing() {
+                    PLVCommonLog.d(TAG,"onPreparing");
                 }
             });
             videoView.setOnErrorListener(new IPolyvVideoViewListenerEvent.OnErrorListener() {
                 @Override
                 public void onError(int what, int extra) {
+                    PLVCommonLog.d(TAG,"onError:"+what);
                 }
 
                 @Override
                 public void onError(PolyvPlayError error) {
-                    String tips = error.playStage == PolyvPlayError.PLAY_STAGE_HEADAD ? "片头广告"
-                            : error.playStage == PolyvPlayError.PLAY_STAGE_TAILAD ? "片尾广告"
-                            : error.playStage == PolyvPlayError.PLAY_STAGE_TEASER ? "暖场视频"
-                            : error.isMainStage() ? "主视频" : "";
-                    tips += "播放异常\n" + error.errorDescribe + "(" + error.errorCode + "-" + error.playStage + ")\n" + error.playPath;
+                    String tips;
+                    switch (error.playStage) {
+                        case PolyvPlayError.PLAY_STAGE_HEADAD:
+                            tips = "片头广告";
+                            break;
+                        case PolyvPlayError.PLAY_STAGE_TAILAD:
+                            tips = "片尾广告";
+                            break;
+                        case PolyvPlayError.PLAY_STAGE_TEASER:
+                            tips = "暖场视频";
+                            break;
+                        default:
+                            if (error.isMainStage()) {
+                                tips = "主视频";
+                            } else {
+                                tips = "";
+                            }
+                            break;
+                    }
+                    tips += "播放异常\n" +
+                            error.errorDescribe +
+                            "(" + error.errorCode + "-" + error.playStage + ")\n" +
+                            error.playPath;
+
                     if (getView() != null) {
-                        getView().onPlayError(error, tips);
-                        getView().setLogoVisibility(View.GONE);
+                        setLogoVisibility(View.GONE);
                     }
                 }
             });
@@ -568,13 +612,19 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         return;
                     }
                     if (getView() != null) {
-                        getView().addLogo(new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
-                                .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage));
+                        logoView = getView().getLogo();
+                        if (logoView != null) {
+                            logoView.removeAllLogo();
+                            logoView.addLogo(new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
+                                    .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage));
+                        }
                     }
                 }
             });
         }
     }
+
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 定时获取播放信息任务">
@@ -620,7 +670,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         }
         playbackPlayerData.postPlayInfoVO(builder.build());
 
-        if (getView()!=null) {
+        if (getView() != null) {
             getView().updatePlayInfo(builder.build());
         }
         return position;

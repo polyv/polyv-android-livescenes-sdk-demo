@@ -17,6 +17,7 @@
             android:id="@+id/plvlc_link_mic_rv_linkmic_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/colorVulcan"
             android:overScrollMode="never" />
         <!--向左滑动试试，外层Layout有渐变背景-->
         <LinearLayout

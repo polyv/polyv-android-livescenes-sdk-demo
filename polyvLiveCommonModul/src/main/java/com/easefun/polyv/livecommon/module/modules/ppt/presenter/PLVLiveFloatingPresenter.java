@@ -32,7 +32,8 @@ public class PLVLiveFloatingPresenter implements IPLVLiveFloatingContract.IPLVLi
     @Override
     public void init(final IPLVLiveFloatingContract.IPLVLiveFloatingView view) {
         this.view = view;
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
+        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener
+                = new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
                 PLVSocketUserBean teacherUser = null;

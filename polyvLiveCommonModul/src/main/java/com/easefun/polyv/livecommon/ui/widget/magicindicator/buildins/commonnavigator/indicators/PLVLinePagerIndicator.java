@@ -14,6 +14,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVArgbEva
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.IPLVPagerIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.model.PLVPositionData;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
  * Created by hackware on 2016/6/26.
  */
 public class PLVLinePagerIndicator extends View implements IPLVPagerIndicator {
+    private static final String TAG = "PLVLinePagerIndicator";
     public static final int MODE_MATCH_EDGE = 0;   // 直线宽度 == title宽度 - 2 * mXOffset
     public static final int MODE_WRAP_CONTENT = 1;    // 直线宽度 == title内容宽度 - 2 * mXOffset
     public static final int MODE_EXACTLY = 2;  // 直线宽度 == mLineWidth
@@ -70,7 +72,7 @@ public class PLVLinePagerIndicator extends View implements IPLVPagerIndicator {
         }
 
         // 计算颜色
-        if (mColors != null && mColors.size() > 0) {
+        if (mColors != null && !mColors.isEmpty()) {
             int currentColor = mColors.get(Math.abs(position) % mColors.size());
             int nextColor = mColors.get(Math.abs(position + 1) % mColors.size());
             int color = PLVArgbEvaluatorHolder.eval(positionOffset, currentColor, nextColor);
@@ -112,10 +114,12 @@ public class PLVLinePagerIndicator extends View implements IPLVPagerIndicator {
 
     @Override
     public void onPageSelected(int position) {
+        PLVCommonLog.d(TAG,"onPageSelected:"+position);
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        PLVCommonLog.d(TAG,"onPageScrollStateChanged:"+state);
     }
 
     @Override

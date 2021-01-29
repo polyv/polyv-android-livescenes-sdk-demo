@@ -154,11 +154,11 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                 //用户重新登录事件
                 case PLVEventConstant.MESSAGE_EVENT_RELOGIN:
                     PLVReloginEvent reloginEvent = PLVEventHelper.toMessageEventModel(message, PLVReloginEvent.class);
-                    if (reloginEvent != null) {
-                        if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(reloginEvent.getUser().getUserId())) {
-                            if (onSocketEventListener != null) {
-                                onSocketEventListener.onReloginEvent(reloginEvent);
-                            }
+                    if (reloginEvent != null &&
+                            PolyvSocketWrapper.getInstance().getLoginVO().getUserId()
+                                    .equals(reloginEvent.getUser().getUserId())) {
+                        if (onSocketEventListener != null) {
+                            onSocketEventListener.onReloginEvent(reloginEvent);
                         }
                     }
                     break;

@@ -15,12 +15,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +27,6 @@ import android.widget.TextView;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
-import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
@@ -57,7 +54,6 @@ import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
-import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -65,9 +61,9 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -220,7 +216,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             @Override
             public void run() {
                 marqueeView = ((Activity) getContext()).findViewById(R.id.plvlc_marquee_view);//after videoLayout add, post find
-                videoView.setMarqueeView(marqueeView, marqueeItem = new PolyvMarqueeItem());
+                marqueeItem = new PolyvMarqueeItem();
+                videoView.setMarqueeView(marqueeView, marqueeItem);
             }
         });
     }
@@ -507,10 +504,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             landscapeMessageSender.dismiss();
         }
 
-        if (logoView != null) {
-            logoView.removeAllViews();
-        }
-
         stopLiveCountDown();
     }
     // </editor-fold>
@@ -576,6 +569,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public void notifyRTCPrepared() {
+        videoView.rtcPrepared();
+    }
+
+    @Override
     public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
         livePlayerPresenter.getData().getLinkMicState().observe((LifecycleOwner) getContext(), listener);
     }
@@ -583,6 +581,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void addOnSeiDataListener(IPLVOnDataChangedListener<Long> listener) {
         livePlayerPresenter.getData().getSeiData().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+        videoView.setOnRTCPlayEventListener(listener);
     }
     // </editor-fold>
 
@@ -638,6 +641,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public View getNoStreamIndicator() {
             return noStreamView;
+        }
+
+        @Override
+        public PLVPlayerLogoView  getLogo() {
+            return logoView;
         }
 
         @Override
@@ -729,20 +737,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         public boolean onVolumeChanged(int changeValue, boolean isEnd) {
             volumeTipsView.setVolumePercent(changeValue, isEnd);
             return true;
-        }
-
-        @Override
-        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
-            if (logoView != null) {
-                logoView.addLogo(logoParam);
-            }
-        }
-
-        @Override
-        public void setLogoVisibility(int visibility) {
-            if (logoView != null) {
-                logoView.setVisibility(visibility);
-            }
         }
 
         @Override

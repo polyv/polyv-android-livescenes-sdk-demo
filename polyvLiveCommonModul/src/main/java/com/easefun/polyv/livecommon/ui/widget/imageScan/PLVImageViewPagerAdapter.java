@@ -36,7 +36,7 @@ public class PLVImageViewPagerAdapter<D extends PLVUrlTag, V extends PLVChatImag
         //第二次更新datas时调用notify方法，会先触发instantiateItem再触发destroyItem，这时currentView的宽高会为0(如果第二次更新datas前没有触发过destroyItem，需要在getViewTreeObserver里面获取宽高/不能用post)
         //第二次更新datas时调用setAdapter方法，会先触发destroyItem再触发instantiateItem，这时currentVIew的宽高会为0(对比上面只有当前显示的item宽高为0，相邻的正常，同上)
         PLVChatImageContainerWidget currentView;
-        if (recycledViews.size() > 0) {
+        if (!recycledViews.isEmpty()) {
             currentView = recycledViews.removeFirst();
         } else {
             currentView = new PLVChatImageContainerWidget(context);

@@ -87,7 +87,7 @@ public class PLVBezierPagerIndicator extends View implements IPLVPagerIndicator 
         }
 
         // 计算颜色
-        if (mColors != null && mColors.size() > 0) {
+        if (mColors != null && !mColors.isEmpty()) {
             int currentColor = mColors.get(Math.abs(position) % mColors.size());
             int nextColor = mColors.get(Math.abs(position + 1) % mColors.size());
             int color = PLVArgbEvaluatorHolder.eval(positionOffset, currentColor, nextColor);

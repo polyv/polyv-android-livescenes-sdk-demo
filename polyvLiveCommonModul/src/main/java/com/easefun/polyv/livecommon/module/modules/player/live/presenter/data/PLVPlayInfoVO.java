@@ -24,8 +24,7 @@ public class PLVPlayInfoVO {
         private boolean isPlaying = false;
         private boolean isSubVideoViewPlaying =false;
 
-        public Builder() {
-        }
+        public Builder() { }
 
         public Builder isPlaying(boolean val) {
             isPlaying = val;

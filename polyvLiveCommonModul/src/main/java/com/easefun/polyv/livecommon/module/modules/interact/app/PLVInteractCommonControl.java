@@ -41,7 +41,7 @@ public class PLVInteractCommonControl extends PLVInteractAppAbs implements IPLVI
     // <editor-fold defaultstate="collapsed" desc="接收socket消息">
     @Override
     protected void processSocketMsg(String msg, String event) {/**/}
-    // </editor-fold>{/**/}
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
     public void setOnInteractCommonControlListener(OnInteractCommonControlListener onInteractCommonControlListener) {

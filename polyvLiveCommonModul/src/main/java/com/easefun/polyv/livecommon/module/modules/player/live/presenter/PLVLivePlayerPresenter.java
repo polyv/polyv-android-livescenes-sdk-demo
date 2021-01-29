@@ -59,6 +59,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     private PolyvLiveVideoView videoView;
     private PolyvAuxiliaryVideoview subVideoView;
+    //logo对象
+    private PLVPlayerLogoView logoView;
 
     private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
     // </editor-fold>
@@ -300,12 +302,22 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     @Override
     public void destroy() {
+        stopPlayProgressTimer();
         unregisterView();
+        if (logoView != null) {
+            logoView.removeAllViews();
+            logoView = null;
+        }
+
+        if (subVideoView != null) {
+            subVideoView.destroy();
+            subVideoView = null;
+        }
+
         if (videoView != null) {
             videoView.destroy();
+            videoView = null;
         }
-        videoView = null;
-        subVideoView = null;
     }
     // </editor-fold>
 
@@ -357,9 +369,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     if (getView() != null) {
                         getView().onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
                         if (isOpenAdHead) {
-                            getView().setLogoVisibility(View.VISIBLE);
+                            setLogoVisibility(View.VISIBLE);
                         } else {
-                            getView().setLogoVisibility(View.GONE);
+                            setLogoVisibility(View.GONE);
                         }
                     }
                 }
@@ -384,17 +396,32 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void onError(PolyvPlayError error) {
                     setDefaultViewStatus();
+                    String tips;
+                    switch (error.playStage) {
+                        case PolyvPlayError.PLAY_STAGE_HEADAD:
+                            tips = "片头广告";
+                            break;
+                        case PolyvPlayError.PLAY_STAGE_TAILAD:
+                            tips = "片尾广告";
+                            break;
+                        case PolyvPlayError.PLAY_STAGE_TEASER:
+                            tips = "暖场视频";
+                            break;
+                        default:
+                            if (error.isMainStage()) {
+                                tips = "主视频";
+                            } else {
+                                tips = "";
+                            }
+                            break;
+                    }
 
-                    String tips = error.playStage == PolyvPlayError.PLAY_STAGE_HEADAD ? "片头广告"
-                            : error.playStage == PolyvPlayError.PLAY_STAGE_TAILAD ? "片尾广告"
-                            : error.playStage == PolyvPlayError.PLAY_STAGE_TEASER ? "暖场视频"
-                            : error.isMainStage() ? "主视频" : "";
                     tips += "播放异常\n" + error.errorDescribe + " (errorCode:" + error.errorCode +
                             "-" + error.playStage + ")\n" + error.playPath;
                     if (getView() != null) {
                         getView().onPlayError(error, tips);
-                        getView().setLogoVisibility(View.GONE);
                     }
+                    setLogoVisibility(View.GONE);
                 }
             });
             videoView.setOnNoLiveAtPresentListener(new IPolyvLiveListenerEvent.OnNoLiveAtPresentListener() {
@@ -405,8 +432,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postNoLive();
                     if (getView() != null) {
                         getView().onNoLiveAtPresent();
-                        getView().setLogoVisibility(View.GONE);
                     }
+                    setLogoVisibility(View.GONE);
                 }
 
                 @Override
@@ -415,8 +442,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLiveEnd();
                     if (getView() != null) {
                         getView().onLiveEnd();
-                        getView().setLogoVisibility(View.GONE);
                     }
+                    setLogoVisibility(View.GONE);
                 }
 
                 @Override
@@ -425,8 +452,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLiveStop();
                     if (getView() != null) {
                         getView().onLiveStop();
-                        getView().setLogoVisibility(View.GONE);
                     }
+                    setLogoVisibility(View.GONE);
                 }
             });
             videoView.setOnPreparedListener(new IPolyvVideoViewListenerEvent.OnPreparedListener() {
@@ -437,15 +464,19 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     liveRoomDataManager.setSessionId(videoView.getModleVO() != null ? videoView.getModleVO().getChannelSessionId() : null);
                     if (videoView.getMediaPlayMode() == PolyvMediaPlayMode.MODE_AUDIO) {
                         videoView.removeRenderView();//need clear&unregister
+                        setLogoVisibility(View.GONE);
+                    } else if (videoView.getMediaPlayMode() == PolyvMediaPlayMode.MODE_VIDEO) {
+                        setLogoVisibility(View.VISIBLE);
                     }
                     if (getView() != null) {
                         getView().onPrepared(videoView.getMediaPlayMode());
-                        getView().setLogoVisibility(View.VISIBLE);
                     }
                 }
 
                 @Override
-                public void onPreparing() {/**/}
+                public void onPreparing() {
+                    PLVCommonLog.d(TAG,"onPreparing");
+                }
             });
             videoView.setOnLinesChangedListener(new IPolyvLiveListenerEvent.OnLinesChangedListener() {
                 @Override
@@ -453,7 +484,6 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     livePlayerData.postLinesChange(linesPos);
                     if (getView() != null) {
                         getView().onLinesChanged(linesPos);
-                        getView().setLogoVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -587,8 +617,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
                             .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage);
                     if (getView() != null) {
-                        getView().addLogo(logoParam);
-                        getView().setLogoVisibility(View.GONE);
+                        logoView = getView().getLogo();
+                        if (logoView != null) {
+                            logoView.removeAllLogo();
+                            logoView.addLogo(logoParam);
+                            logoView.setVisibility(View.GONE);
+                        }
                     }
                 }
             });
@@ -636,9 +670,17 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 builder.isSubVideoViewPlaying(subVideoView.isPlaying());
             }
             livePlayerData.postPlayInfoVO(builder.build());
-            if (getView()!=null) {
+            if (getView() != null) {
                 getView().updatePlayInfo(builder.build());
             }
+        }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - logo显示控制">
+    private void setLogoVisibility(int visible) {
+        if (logoView != null) {
+            logoView.setVisibility(visible);
         }
     }
     // </editor-fold>

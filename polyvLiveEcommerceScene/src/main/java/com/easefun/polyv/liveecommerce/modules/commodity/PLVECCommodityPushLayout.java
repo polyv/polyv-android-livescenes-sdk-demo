@@ -104,7 +104,7 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
 
     // <editor-fold defaultstate="collapsed" desc="内部工具方法">
     private String trimZero(String s) {
-        if (s != null && s.indexOf(".") > 0) {
+        if (s != null && s.indexOf('.') > 0) {
             // 去掉多余的0
             s = s.replaceAll("0+?$", "");
             // 如最后一位是.则去掉

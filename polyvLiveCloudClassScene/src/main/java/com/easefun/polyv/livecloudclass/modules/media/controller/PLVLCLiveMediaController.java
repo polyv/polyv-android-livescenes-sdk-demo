@@ -606,8 +606,6 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             } else {
                 livePlayerPresenter.restartPlay();
             }
-            videoPausePortIv.setSelected(!isPlaying);
-            videoPauseLandIv.setSelected(!isPlaying);
         } else if (id == R.id.video_screen_switch_port_iv) {
             PLVOrientationManager.getInstance().setLandscape((Activity) getContext());
         } else if (id == R.id.video_refresh_port_iv || id == R.id.video_refresh_land_iv) {

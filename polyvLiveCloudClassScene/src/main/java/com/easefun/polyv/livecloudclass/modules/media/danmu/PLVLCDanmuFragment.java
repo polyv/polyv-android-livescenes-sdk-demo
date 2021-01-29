@@ -30,8 +30,8 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
  * 弹幕Fragment
  */
 public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuController {
-    private static boolean status_canauto_resume = true;
-    private static boolean status_pause_fromuser = true;
+    private boolean status_canauto_resume = true;
+    private boolean status_pause_fromuser = true;
     // danmuLayoutView
     private View view;
     private IDanmakuView mDanmakuView;
@@ -127,10 +127,11 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
     }
 
     public void pause(boolean fromuser) {
-        if (!fromuser)
+        if (!fromuser) {
             status_pause_fromuser = false;
-        else
+        } else {
             status_canauto_resume = false;
+        }
         if (mDanmakuView != null && mDanmakuView.isPrepared()) {
             mDanmakuView.pause();
         }

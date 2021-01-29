@@ -41,6 +41,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     }
 
     @Override
+    public PLVPlayerLogoView getLogo() {
+        return null;
+    }
+
+    @Override
     public void onSubVideoViewPlay(boolean isFirst) {
 
     }
@@ -108,12 +113,6 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     public boolean onVolumeChanged(int changeValue, boolean isEnd) {
         return false;
     }
-
-    @Override
-    public void addLogo(PLVPlayerLogoView.LogoParam logoParam) { }
-
-    @Override
-    public void setLogoVisibility(int visibility) { }
 
     @Override
     public void updatePlayInfo(PLVPlayInfoVO playInfoVO) { }

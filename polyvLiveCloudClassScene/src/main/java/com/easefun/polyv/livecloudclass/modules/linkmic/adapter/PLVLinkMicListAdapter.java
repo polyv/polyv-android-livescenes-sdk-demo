@@ -15,11 +15,14 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -42,7 +45,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private List<PLVLinkMicItemDataBean> dataList;
 
     /**** listener ****/
+    @NotNull
     private OnPLVLinkMicAdapterCallback adapterCallback;
+    @Nullable
+    private OnTeacherSwitchViewBindListener onTeacherSwitchViewBindListener;
 
     /**** status ****/
     //是否是音频连麦
@@ -59,16 +65,24 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private String invisibleItemLinkMicId;
     //media在连麦列表中对应item的连麦id
     private String mediaInLinkMicListLinkMicId;
+    //列表显示模式
+    private PLVLinkMicListShowMode listShowMode = PLVLinkMicListShowMode.SHOW_ALL;
+
+
+    private boolean hasNotifyTeacherViewHolderBind = false;
+
 
     /**** View ****/
     //保存ppt(三分屏)/video(纯视频不支持RTC)/renderView(纯视频支持RTC)的switch View，不为null时，内部保存的是ppt/video/renderView，为null时，表示ppt/video/renderView不在连麦列表，或者调用了[releaseView]方法释放了引用。
     @Nullable
     private PLVSwitchViewAnchorLayout switchViewHasMedia;
     private RecyclerView rv;
+    @Nullable
+    private LinkMicItemViewHolder teacherViewHolder;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLinkMicListAdapter(RecyclerView rv, OnPLVLinkMicAdapterCallback adapterCallback) {
+    public PLVLinkMicListAdapter(RecyclerView rv, @NotNull OnPLVLinkMicAdapterCallback adapterCallback) {
         this.rv = rv;
         this.adapterCallback = adapterCallback;
     }
@@ -80,10 +94,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         this.dataList = dataList;
     }
 
-    //设置是否是音频连麦
-    public void setIsAudio(boolean isAudioLinkMic) {
-        this.isAudio = isAudioLinkMic;
-    }
 
     //设置item是否显示圆角
     public void setShowRoundRect(boolean showRoundRect) {
@@ -94,6 +104,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //设置当前用户连麦id
     public void setMyLinkMicId(String myLinkMicId) {
         this.myLinkMicId = myLinkMicId;
+    }
+
+    //设置讲师ViewHolder绑定监听器
+    public void setTeacherViewHolderBindListener(@Nullable OnTeacherSwitchViewBindListener teacherViewHolderBindListener) {
+        this.onTeacherSwitchViewBindListener = teacherViewHolderBindListener;
     }
 
     //获取Item的宽度
@@ -158,10 +173,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
         for (int i = 0; i < dataList.size(); i++) {
             LinkMicItemViewHolder viewHolder = (LinkMicItemViewHolder) rv.findViewHolderForAdapterPosition(i);
-            if (viewHolder != null) {
-                if (viewHolder.switchViewAnchorLayout == switchViewHasMedia) {
-                    return i;
-                }
+            if (viewHolder != null && viewHolder.switchViewAnchorLayout == switchViewHasMedia) {
+                return i;
             }
         }
         return -1;
@@ -173,6 +186,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     public void releaseView() {
         //释放切换View。当连麦结束的时候，请调用该方法，释放掉之前记录的含有media的itemView。否则该ItemView会保留到下个连麦场次。
         switchViewHasMedia = null;
+        teacherViewHolder = null;
+        hasNotifyTeacherViewHolderBind = false;
     }
 
     //隐藏本地渲染器。在SurfaceView互相重叠时，只隐藏SurfaceView的父布局是无效的，需要隐藏SurfaceView本身。
@@ -190,8 +205,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     // <editor-fold defaultstate="collapsed" desc="API - 更新列表">
     //更新关闭视频
-    public void updateUserMuteVideo(int pos) {
-        notifyItemChanged(pos, PAYLOAD_UPDATE_VIDEO_MUTE);
+    public void updateUserMuteVideo(final int pos) {
+        rv.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyItemChanged(pos, PAYLOAD_UPDATE_VIDEO_MUTE);
+            }
+        });
     }
 
     //更新连麦列表的音量变化
@@ -209,6 +229,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     public void updateInvisibleItem(String linkMicId) {
         this.invisibleItemLinkMicId = linkMicId;
         notifyDataSetChanged();
+    }
+
+    //设置列表显示模式
+    public void setListShowMode(PLVLinkMicListShowMode listShowMode) {
+        PLVCommonLog.d(TAG, "PLVLinkMicListAdapter.setListShowMode");
+        this.listShowMode = listShowMode;
+        updateAllItem();
     }
 
     //更新奖杯
@@ -258,9 +285,19 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         boolean isMuteVideo = itemDataBean.isMuteVideo();
         boolean isMuteAudio = itemDataBean.isMuteAudio();
         int curVolume = itemDataBean.getCurVolume();
+        String actor = itemDataBean.getActor();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        String actor = itemDataBean.getActor();
+        boolean isFirstScreen = firstScreenLinkMicId.equals(linkMicId);
+        boolean isSelf = myLinkMicId.equals(linkMicId);
+
+        if (isTeacher) {
+            teacherViewHolder = holder;
+            if (onTeacherSwitchViewBindListener != null && !hasNotifyTeacherViewHolderBind) {
+                hasNotifyTeacherViewHolderBind = true;
+                onTeacherSwitchViewBindListener.onTeacherSwitchViewBind(holder.switchViewAnchorLayout);
+            }
+        }
 
         //调整item的宽高
         ViewGroup.LayoutParams vlp = holder.itemView.getLayoutParams();
@@ -269,11 +306,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 vlp.width = 0;
                 vlp.height = 0;
             }
+            holder.itemView.setVisibility(View.GONE);
         } else {
             if (vlp != null) {
                 vlp.width = getItemWidth();
                 vlp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             }
+            holder.itemView.setVisibility(View.VISIBLE);
         }
 
         //设置标记
@@ -306,24 +345,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             holder.tvNick.setVisibility(View.VISIBLE);
         }
 
-        if (!isAudio) {
-            //如果是视频连麦，则渲染所有用户类型
-            if (holder.renderView != null && !holder.isRenderViewSetup) {
-                adapterCallback.setupRenderView(holder.renderView, linkMicId);
-                holder.isRenderViewSetup = true;
-            }
-        } else {
-            //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
-            if (isTeacher || isGuest) {
-                if (holder.renderView != null && !holder.isRenderViewSetup) {
-                    adapterCallback.setupRenderView(holder.renderView, linkMicId);
-                    holder.isRenderViewSetup = true;
-                }
-            } else {
-                holder.flRenderViewContainer.setVisibility(View.GONE);
-                isMuteVideo = true;
-            }
-        }
+        isMuteVideo = resolveListShowMode(holder, position);
 
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
@@ -334,9 +356,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             public void onClick(View v) {
                 //如果点击的itemView的索引不为media在连麦列表的索引，则这里的是渲染器容器，那么说明待会这个渲染器会切到主屏，且主屏的media会切到这个ItemView
                 boolean thisViewWillChangeToMainLater = holder.getAdapterPosition() != getMediaViewIndexInLinkMicList();
-                if (adapterCallback != null) {
-                    adapterCallback.onClickItemListener(holder.getAdapterPosition(), switchViewHasMedia, holder.switchViewAnchorLayout);
-                }
+                adapterCallback.onClickItemListener(holder.getAdapterPosition(), switchViewHasMedia, holder.switchViewAnchorLayout);
                 //如果点击的索引不是media所在的索引
                 if (thisViewWillChangeToMainLater) {
                     switchViewHasMedia = holder.switchViewAnchorLayout;
@@ -357,6 +377,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
     }
 
+    private void trySetupRenderView(final LinkMicItemViewHolder holder, String linkMicId) {
+        if (holder.renderView != null && !holder.isRenderViewSetup) {
+            adapterCallback.setupRenderView(holder.renderView, linkMicId);
+            holder.isRenderViewSetup = true;
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull LinkMicItemViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) {
@@ -372,11 +399,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
+        boolean isFirstScreen = firstScreenLinkMicId.equals(linkMicId);
+        boolean isSelf = myLinkMicId.equals(linkMicId);
 
-        //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
-        if (isAudio && !isTeacher && !isGuest) {
-            isMuteVideo = true;
-        }
+        isMuteVideo = resolveListShowMode(holder, position);
 
         for (Object payload : payloads) {
             switch (payload.toString()) {
@@ -438,6 +464,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (holder.renderView != null && !holder.switchViewAnchorLayout.isViewSwitched()) {
             holder.isViewRecycled = true;
             holder.flRenderViewContainer.removeView(holder.renderView);
+            adapterCallback.releaseRenderView(holder.renderView);
             holder.renderView = null;
         }
         PLVCommonLog.d(TAG, "onViewRecycled pos=" + holder.getAdapterPosition() + " holder=" + holder.toString());
@@ -472,6 +499,60 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 holder.flRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             }
         }
+    }
+
+    /**
+     * 处理连麦列表的渲染模式
+     *
+     * @param holder   viewholder
+     * @param position 位置
+     * @return isMuteVideo
+     */
+    private boolean resolveListShowMode(LinkMicItemViewHolder holder, int position) {
+        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        String linkMicId = itemDataBean.getLinkMicId();
+        String nick = itemDataBean.getNick();
+        int cupNum = itemDataBean.getCupNum();
+        boolean isMuteVideo = itemDataBean.isMuteVideo();
+        boolean isMuteAudio = itemDataBean.isMuteAudio();
+        int curVolume = itemDataBean.getCurVolume();
+        boolean isTeacher = itemDataBean.isTeacher();
+        boolean isGuest = itemDataBean.isGuest();
+        boolean isFirstScreen = firstScreenLinkMicId.equals(linkMicId);
+        boolean isSelf = myLinkMicId.equals(linkMicId);
+
+        switch (listShowMode) {
+            case SHOW_ALL:
+                //如果是视频连麦，则渲染所有用户类型
+                trySetupRenderView(holder, linkMicId);
+                break;
+            case SHOW_TEACHER_AND_GUEST:
+                //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
+                if (isTeacher || isGuest) {
+                    trySetupRenderView(holder, linkMicId);
+                } else {
+                    holder.flRenderViewContainer.setVisibility(View.GONE);
+                    isMuteVideo = true;
+                }
+                break;
+            case SHOW_FIRST_SCREEN_AND_SELF:
+                if (isFirstScreen || isSelf) {
+                    trySetupRenderView(holder, linkMicId);
+                } else {
+                    holder.flRenderViewContainer.setVisibility(View.GONE);
+                    isMuteVideo = true;
+                }
+                break;
+            case SHOW_FIRST_SCREEN:
+                if (isFirstScreen) {
+                    trySetupRenderView(holder, linkMicId);
+                } else {
+                    holder.flRenderViewContainer.setVisibility(View.GONE);
+                    isMuteVideo = true;
+                }
+                break;
+        }
+        return isMuteVideo;
     }
     // </editor-fold>
 
@@ -532,6 +613,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         void setupRenderView(SurfaceView surfaceView, String linkMicId);
 
         /**
+         * 释放渲染器
+         *
+         * @param surfaceView 渲染器
+         */
+        void releaseRenderView(SurfaceView surfaceView);
+
+        /**
          * 点击Item,准备和主屏的media切换位置
          *
          * @param pos                    位置
@@ -540,6 +628,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
          */
         void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
     }
-// </editor-fold>
 
+    public interface OnTeacherSwitchViewBindListener {
+        void onTeacherSwitchViewBind(PLVSwitchViewAnchorLayout viewAnchorLayout);
+    }
+
+
+// </editor-fold>
 }

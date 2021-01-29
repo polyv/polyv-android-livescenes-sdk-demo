@@ -26,13 +26,13 @@ public class PLVECRewardGiftViewHolder extends PLVBaseViewHolder<PLVBaseViewData
             public void onClick(View v) {
                 if (adapter.getLastSelectView() != null && adapter.getLastSelectView() != v) {
                     adapter.getLastSelectView().setSelected(false);
-                    View rewardTv = adapter.getLastSelectView().findViewById(R.id.reward_tv);
-                    View giftTv = adapter.getLastSelectView().findViewById(R.id.gift_tv);
-                    if (rewardTv != null) {
-                        rewardTv.setVisibility(View.GONE);
+                    View rewardView = adapter.getLastSelectView().findViewById(R.id.reward_tv);
+                    View giftView = adapter.getLastSelectView().findViewById(R.id.gift_tv);
+                    if (rewardView != null) {
+                        rewardView.setVisibility(View.GONE);
                     }
-                    if (giftTv != null) {
-                        giftTv.setTranslationY(ConvertUtils.dp2px(6));
+                    if (giftView != null) {
+                        giftView.setTranslationY(ConvertUtils.dp2px(6));
                     }
                 }
                 if (v.isSelected()) {

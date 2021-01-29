@@ -82,7 +82,8 @@ public class PLVECFloatingWindowBinder extends Binder {
         }
 
         if (floatLy != null) {
-            floatLy.addView(addedView = view);
+            addedView = view;
+            floatLy.addView(addedView);
         }
 
         if (isResetLocation) {

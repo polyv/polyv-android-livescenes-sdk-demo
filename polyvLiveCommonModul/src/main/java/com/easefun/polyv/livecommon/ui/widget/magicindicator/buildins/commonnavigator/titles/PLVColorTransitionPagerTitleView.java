@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnav
 import android.content.Context;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVArgbEvaluatorHolder;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 
 /**
@@ -11,6 +12,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVArgbEva
  * Created by hackware on 2016/6/26.
  */
 public class PLVColorTransitionPagerTitleView extends PLVSimplePagerTitleView {
+    private static final String TAG = "PLVColorTransitionPager";
 
     public PLVColorTransitionPagerTitleView(Context context) {
         super(context);
@@ -30,9 +32,11 @@ public class PLVColorTransitionPagerTitleView extends PLVSimplePagerTitleView {
 
     @Override
     public void onSelected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onSelected index:"+index+ " totalCount:"+totalCount);
     }
 
     @Override
     public void onDeselected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onDeselected index:"+index+ " totalCount:"+totalCount);
     }
 }

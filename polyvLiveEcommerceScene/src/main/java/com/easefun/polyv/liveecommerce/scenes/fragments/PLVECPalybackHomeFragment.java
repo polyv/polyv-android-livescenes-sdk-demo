@@ -39,7 +39,6 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     private boolean isPlaySbDragging;
     //更多
     private ImageView moreIv;
-    private Rect videoViewRect;
     private PLVECMorePopupView morePopupView;
     //监听器
     private OnViewActionListener onViewActionListener;
@@ -104,7 +103,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //设置播放状态
     @Override
     public void setPlayerState(PLVPlayerState state) {
-        if (state == PLVPlayerState.Prepared) {
+        if (state == PLVPlayerState.PREPARED) {
             if (onViewActionListener != null) {
                 totalTimeTv.setText(PLVTimeUtils.generateTime(onViewActionListener.onGetDurationAction(), true));
             }

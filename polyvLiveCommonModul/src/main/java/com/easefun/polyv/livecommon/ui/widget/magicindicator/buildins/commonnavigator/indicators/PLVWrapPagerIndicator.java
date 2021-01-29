@@ -13,6 +13,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVFragmentContaine
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.IPLVPagerIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.model.PLVPositionData;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
  * Created by hackware on 2016/6/26.
  */
 public class PLVWrapPagerIndicator extends View implements IPLVPagerIndicator {
+    private static final String TAG = "PLVWrapPagerIndicator";
     private int mVerticalPadding;
     private int mHorizontalPadding;
     private int mFillColor;
@@ -78,10 +80,12 @@ public class PLVWrapPagerIndicator extends View implements IPLVPagerIndicator {
 
     @Override
     public void onPageSelected(int position) {
+        PLVCommonLog.d(TAG,"onPageSelected:"+position);
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        PLVCommonLog.d(TAG,"onPageScrollStateChanged:"+state);
     }
 
     @Override

@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
+import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
 
@@ -47,7 +49,7 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     @NonNull
     @Override
     public PLVBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        PLVLCMessageViewHolder viewHolder;
+        PLVChatMessageBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> viewHolder;
         switch (viewType) {
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG:
             case PLVChatMessageItemType.ITEMTYPE_SEND_IMG:
@@ -59,7 +61,10 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                         LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_message_landscape_item : R.layout.plvlc_chatroom_message_portrait_item, parent, false), this);
                 break;
             default:
-                throw new RuntimeException("itemType error");
+                PLVCommonLog.exception(new RuntimeException("itemType error"));
+                viewHolder = new PLVChatMessageBaseViewHolder<>(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plv_horizontal_linear_layout, parent, false), this);
+                break;
         }
         viewHolder.setMsgIndex(msgIndex);
         return viewHolder;

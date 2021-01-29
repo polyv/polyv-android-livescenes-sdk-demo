@@ -191,7 +191,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
 
                     @Override
                     public void onFinish() {
-
+                        PLVCommonLog.d(TAG,"postLotteryWinnerInfoNew onFinish");
                     }
                 });
     }
@@ -227,7 +227,9 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                     }
 
                     @Override
-                    public void onFinish() {/**/}
+                    public void onFinish() {
+                        PLVCommonLog.d(TAG,"postLotteryAbandon onFinish");
+                    }
                 });
     }
     // </editor-fold>

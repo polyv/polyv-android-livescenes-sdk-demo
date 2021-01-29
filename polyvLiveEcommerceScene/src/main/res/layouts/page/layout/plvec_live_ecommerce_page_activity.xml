@@ -25,4 +25,18 @@
         android:layout_marginTop="@dimen/plvec_margin_top_l"
         android:layout_marginRight="@dimen/plvec_margin_common"
         android:src="@drawable/plvec_close" />
+
+    <!-- 可以在全屏下根据键盘弹起的布局-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+        <!-- 互动应用 -->
+        <ViewStub
+            android:id="@+id/plvec_ppt_interact_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inflatedId="@+id/plvec_ppt_interact_layout"
+            android:layout="@layout/plv_interact_layout_view_stub" />
+    </FrameLayout>
 </FrameLayout>

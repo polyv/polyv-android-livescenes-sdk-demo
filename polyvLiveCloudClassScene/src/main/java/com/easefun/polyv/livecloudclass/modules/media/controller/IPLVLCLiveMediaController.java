@@ -2,7 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.media.controller;
 
 import android.support.annotation.NonNull;
 
-import com.easefun.polyv.businesssdk.api.common.meidaControl.IPolyvMediaController;
+import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;

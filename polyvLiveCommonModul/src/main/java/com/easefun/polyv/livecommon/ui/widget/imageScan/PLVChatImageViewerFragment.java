@@ -143,21 +143,24 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
                 if (((PLVChatImgHistoryEvent) baseEvent).getObj2() instanceof PLVUrlTag) {
                     urlTag = (PLVUrlTag) ((PLVChatImgHistoryEvent) baseEvent).getObj2();
                 } else {
-                    ((PLVChatImgHistoryEvent) baseEvent).setObj2(urlTag = new PLVUrlTag(imgUrl, baseEvent));
+                    urlTag = new PLVUrlTag(imgUrl, baseEvent);
+                    ((PLVChatImgHistoryEvent) baseEvent).setObj2(urlTag);
                 }
             } else if (baseEvent instanceof PLVChatImgEvent) {
                 imgUrl = ((PLVChatImgEvent) baseEvent).getValues().get(0).getUploadImgUrl();
                 if (((PLVChatImgEvent) baseEvent).getObj2() instanceof PLVUrlTag) {
                     urlTag = (PLVUrlTag) ((PLVChatImgEvent) baseEvent).getObj2();
                 } else {
-                    ((PLVChatImgEvent) baseEvent).setObj2(urlTag = new PLVUrlTag(imgUrl, baseEvent));
+                    urlTag = new PLVUrlTag(imgUrl, baseEvent);
+                    ((PLVChatImgEvent) baseEvent).setObj2(urlTag);
                 }
             } else if (baseEvent instanceof PolyvSendLocalImgEvent) {
                 imgUrl = ((PolyvSendLocalImgEvent) baseEvent).getImageFilePath();
                 if (((PolyvSendLocalImgEvent) baseEvent).getObj2() instanceof PLVUrlTag) {
                     urlTag = (PLVUrlTag) ((PolyvSendLocalImgEvent) baseEvent).getObj2();
                 } else {
-                    ((PolyvSendLocalImgEvent) baseEvent).setObj2(urlTag = new PLVUrlTag(imgUrl, baseEvent));
+                    urlTag = new PLVUrlTag(imgUrl, baseEvent);
+                    ((PolyvSendLocalImgEvent) baseEvent).setObj2(urlTag);
                 }
             } else {
                 continue;

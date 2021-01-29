@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVUrlTag;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
@@ -36,6 +37,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class PLVChatImageViewer extends FrameLayout {
+    private static final String TAG = "PLVChatImageViewer";
     private View view;
     private TextView tvPage;
     private ImageView ivDownload;
@@ -78,8 +80,10 @@ public class PLVChatImageViewer extends FrameLayout {
                             }
 
                             @Override
-                            public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
-                                if (deniedForeverP.size() > 0) {
+                            public void onPartialGranted(ArrayList<String> grantedPermissions,
+                                                         ArrayList<String> deniedPermissions,
+                                                         ArrayList<String> deniedForeverP) {
+                                if (deniedForeverP!=null && !deniedForeverP.isEmpty()) {
                                     new AlertDialog.Builder(getContext()).setTitle("提示")
                                             .setMessage("保存图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复")
                                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -91,6 +95,7 @@ public class PLVChatImageViewer extends FrameLayout {
                                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
+                                                    PLVCommonLog.d(TAG, "cancel");
                                                 }
                                             }).setCancelable(false).show();
                                 } else {
@@ -109,7 +114,7 @@ public class PLVChatImageViewer extends FrameLayout {
                 toast("图片保存失败(null)");
                 return;
             }
-            final String fileName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+            final String fileName = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
             final String savePath = PLVSDCardUtils.createPath(getContext(), "PLVChatImg");
             if (compositeDisposable == null) {
                 compositeDisposable = new CompositeDisposable();
@@ -191,7 +196,7 @@ public class PLVChatImageViewer extends FrameLayout {
     }
 
     public void setDataList(final List<PLVUrlTag> dataList, int curPosition) {
-        if (dataList != null && dataList.size() > 0) {
+        if (dataList != null && !dataList.isEmpty()) {
             imgUrlTags = dataList;
             if (pagerAdapter == null) {
                 pagerAdapter = new PLVImageViewPagerAdapter<>(getContext());
@@ -209,6 +214,9 @@ public class PLVChatImageViewer extends FrameLayout {
                 vpImageViewer.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        PLVCommonLog.d(TAG, "onPageScrolled position:" + position
+                                + " positionOffset:" + positionOffset
+                                + " positionOffsetPixels:" + positionOffsetPixels);
                     }
 
                     @Override
@@ -219,6 +227,7 @@ public class PLVChatImageViewer extends FrameLayout {
 
                     @Override
                     public void onPageScrollStateChanged(int state) {
+                        PLVCommonLog.d(TAG,"onPageScrollStateChanged:"+state);
                     }
                 });
             } else {

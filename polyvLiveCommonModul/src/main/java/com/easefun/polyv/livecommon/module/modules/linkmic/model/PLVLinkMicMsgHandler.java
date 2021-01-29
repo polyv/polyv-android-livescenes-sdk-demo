@@ -15,7 +15,8 @@ import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.chat.PLVSendCupEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.socket.client.Socket;
 
@@ -37,19 +38,18 @@ public class PLVLinkMicMsgHandler {
     private String linkMicId;
 
     //Listener
-    private OnLinkMicDataListener onLinkMicDataListener;
     private PLVSocketMessageObserver.OnMessageListener onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
         @Override
         public void onMessage(String listenEvent, String event, String message) {
             processLinkMicSocketMessage(message, event);
         }
     };
+    private List<OnLinkMicDataListener> onLinkMicDataListeners = new ArrayList<>();
 // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLinkMicMsgHandler(String linkMicId, @NotNull OnLinkMicDataListener onLinkMicDataListener) {
+    public PLVLinkMicMsgHandler(String linkMicId) {
         this.linkMicId = linkMicId;
-        this.onLinkMicDataListener = onLinkMicDataListener;
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener,
                 PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT,
                 PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT,
@@ -61,7 +61,12 @@ public class PLVLinkMicMsgHandler {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
+    public void addLinkMicMsgListener(OnLinkMicDataListener onLinkMicDataListener) {
+        onLinkMicDataListeners.add(onLinkMicDataListener);
+    }
+
     public void destroy() {
+        onLinkMicDataListeners.clear();
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
     }
 
@@ -84,22 +89,31 @@ public class PLVLinkMicMsgHandler {
                     //当userId字段为空时，表示讲师开启或关闭连麦。否则表示讲师让某个观众下麦。
                     boolean isTeacherOpenOrCloseLinkMic = TextUtils.isEmpty(userId);
                     boolean isAudioLinkMic = LINK_MIC_TYPE_AUDIO.equals(type);
-                    onLinkMicDataListener.onUpdateLinkMicType(isAudioLinkMic);
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onUpdateLinkMicType(isAudioLinkMic);
+                    }
+
 
                     if (LINK_MIC_STATE_OPEN.equals(linkMicState) && isTeacherOpenOrCloseLinkMic) {
                         //讲师打开连麦
-                        onLinkMicDataListener.onTeacherOpenLinkMic();
+                        for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                            onLinkMicDataListener.onTeacherOpenLinkMic();
+                        }
                     } else {
                         if (isTeacherOpenOrCloseLinkMic) {
                             //讲师关闭连麦
-                            onLinkMicDataListener.onTeacherCloseLinkMic();
+                            for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                                onLinkMicDataListener.onTeacherCloseLinkMic();
+                            }
                         } else {
                             //讲师挂断学员
 
                             boolean isTeacherHangUpMe = linkMicId.equals(userId);
                             //讲师挂断我
                             if (isTeacherHangUpMe) {
-                                onLinkMicDataListener.onTeacherHangupMe();
+                                for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                                    onLinkMicDataListener.onTeacherHangupMe();
+                                }
                             }
                         }
                     }
@@ -112,7 +126,9 @@ public class PLVLinkMicMsgHandler {
                 PLVJoinRequestSEvent joinRequestSEvent = PLVGsonUtil.fromJson(PLVJoinRequestSEvent.class, message);
                 if (joinRequestSEvent != null && joinRequestSEvent.getUser() != null) {
                     if (linkMicId.equals(joinRequestSEvent.getUser().getUserId())) {
-                        onLinkMicDataListener.onTeacherReceiveJoinRequest();
+                        for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                            onLinkMicDataListener.onTeacherReceiveJoinRequest();
+                        }
                     }
                 }
                 break;
@@ -121,13 +137,17 @@ public class PLVLinkMicMsgHandler {
                 PLVCommonLog.d(TAG, message);
                 PLVLinkMicJoinSuccess joinSuccess = PLVGsonUtil.fromJson(PLVLinkMicJoinSuccess.class, message);
                 if (joinSuccess != null) {
-                    onLinkMicDataListener.onUserJoinSuccess(PLVLinkMicDataMapper.map2LinkMicItemData(joinSuccess));
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onUserJoinSuccess(PLVLinkMicDataMapper.map2LinkMicItemData(joinSuccess));
+                    }
                 }
                 break;
             //讲师允许加入连麦
             case PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT:
                 PLVCommonLog.d(TAG, message);
-                onLinkMicDataListener.onTeacherAllowMeToJoin();
+                for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                    onLinkMicDataListener.onTeacherAllowMeToJoin();
+                }
                 break;
             //离开连麦
             case PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT:
@@ -146,7 +166,9 @@ public class PLVLinkMicMsgHandler {
                 if (micMedia != null) {
                     boolean isMute = micMedia.isMute();
                     boolean isAudio = LINK_MIC_TYPE_AUDIO.equals(micMedia.getType());
-                    onLinkMicDataListener.onTeacherMuteMedia(isMute, isAudio);
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onTeacherMuteMedia(isMute, isAudio);
+                    }
                 }
                 break;
             //客户端讲师设置相关权限。这里用于接收参与者上麦消息
@@ -157,14 +179,18 @@ public class PLVLinkMicMsgHandler {
                 PLVCommonLog.d(TAG, message);
                 PLVSendCupEvent sendCupEvent = PLVGsonUtil.fromJson(PLVSendCupEvent.class, message);
                 if (sendCupEvent != null && sendCupEvent.getOwner() != null && sendCupEvent.getOwner().getUserId() != null) {
-                    onLinkMicDataListener.onTeacherSendCup(sendCupEvent.getOwner().getUserId(), sendCupEvent.getOwner().getNum());
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onTeacherSendCup(sendCupEvent.getOwner().getUserId(), sendCupEvent.getOwner().getNum());
+                    }
                 }
                 break;
             case PLVEventConstant.Class.SE_SWITCH_MESSAGE:
                 PLVCommonLog.d(TAG, message);
                 PLVLinkMicSwitchViewEvent switchViewEvent = PLVGsonUtil.fromJson(PLVLinkMicSwitchViewEvent.class, message);
                 if (switchViewEvent != null) {
-                    onLinkMicDataListener.onSwitchFirstScreen(switchViewEvent.getUserId());
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onSwitchFirstScreen(switchViewEvent.getUserId());
+                    }
                 }
                 break;
 
@@ -177,14 +203,20 @@ public class PLVLinkMicMsgHandler {
                 }
                 String status = pptAuthentic.getStatus();
                 if (PolyvPPTAuthentic.PermissionStatus.OK.equals(status)) {
-                    onLinkMicDataListener.onSwitchPPTViewLocation(false);
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onSwitchPPTViewLocation(false);
+                    }
                 } else {
-                    onLinkMicDataListener.onSwitchPPTViewLocation(true);
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onSwitchPPTViewLocation(true);
+                    }
                 }
                 break;
             //下课事件
             case PLVEventConstant.Class.FINISH_CLASS:
-                onLinkMicDataListener.onFinishClass();
+                for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                    onLinkMicDataListener.onFinishClass();
+                }
                 break;
             default:
                 break;
@@ -192,7 +224,7 @@ public class PLVLinkMicMsgHandler {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="接口定义">
+    // <editor-fold defaultstate="collapsed" desc="接口定义 - OnLinkMicDataListener">
     public interface OnLinkMicDataListener {
         /**
          * 讲师收到了我发送的连麦请求
@@ -267,6 +299,70 @@ public class PLVLinkMicMsgHandler {
          * 讲师下课
          */
         void onFinishClass();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="接口定义 - SimpleOnLinkMicDataListener">
+    public static abstract class SimpleOnLinkMicDataListener implements OnLinkMicDataListener {
+        @Override
+        public void onTeacherReceiveJoinRequest() {
+
+        }
+
+        @Override
+        public void onTeacherAllowMeToJoin() {
+
+        }
+
+        @Override
+        public void onTeacherHangupMe() {
+
+        }
+
+        @Override
+        public void onTeacherOpenLinkMic() {
+
+        }
+
+        @Override
+        public void onTeacherCloseLinkMic() {
+
+        }
+
+        @Override
+        public void onTeacherMuteMedia(boolean isMute, boolean isAudio) {
+
+        }
+
+        @Override
+        public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean) {
+
+        }
+
+        @Override
+        public void onTeacherSendCup(String linkMicId, int cupNum) {
+
+        }
+
+        @Override
+        public void onUpdateLinkMicType(boolean isAudio) {
+
+        }
+
+        @Override
+        public void onSwitchFirstScreen(String linkMicId) {
+
+        }
+
+        @Override
+        public void onSwitchPPTViewLocation(boolean toMainScreen) {
+
+        }
+
+        @Override
+        public void onFinishClass() {
+
+        }
     }
     // </editor-fold>
 }

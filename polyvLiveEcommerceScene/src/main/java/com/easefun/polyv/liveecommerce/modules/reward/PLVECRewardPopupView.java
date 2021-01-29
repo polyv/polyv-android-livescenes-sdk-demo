@@ -71,11 +71,11 @@ public class PLVECRewardPopupView {
                     PLVCustomGiftBean.GIFTTYPE_SPORTSCAR,
                     PLVCustomGiftBean.GIFTTYPE_ROCKET
             };
-            List<PLVCustomGiftBean> giftBeanList = new ArrayList<>();
+            List<PLVCustomGiftBean> giftBeanTempList = new ArrayList<>();
             for (String giftType : giftTypes) {
-                giftBeanList.add(new PLVCustomGiftBean(giftType, PLVCustomGiftBean.getGiftName(giftType), 1));
+                giftBeanTempList.add(new PLVCustomGiftBean(giftType, PLVCustomGiftBean.getGiftName(giftType), 1));
             }
-            this.giftBeanList = giftBeanList;
+            this.giftBeanList = giftBeanTempList;
         }
     }
 

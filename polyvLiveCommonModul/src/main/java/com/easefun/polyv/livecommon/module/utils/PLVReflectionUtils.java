@@ -12,8 +12,8 @@ public class PLVReflectionUtils {
             try {
                 field.setAccessible(true);
                 field.set(object, null);
-            } catch (Throwable t) {
-                PLVCommonLog.d("PLVReflectionUtils",t.getMessage());
+            } catch (IllegalAccessException e) {
+                PLVCommonLog.d("PLVReflectionUtils", e.getMessage());
             }
         }
     }

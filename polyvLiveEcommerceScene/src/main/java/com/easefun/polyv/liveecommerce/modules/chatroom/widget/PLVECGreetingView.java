@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.login.PLVLoginEvent;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 public class PLVECGreetingView extends FrameLayout {
+    private static final String TAG = "PLVECGreetingView";
     private TextView greetTv;
     private List<PLVLoginEvent> loginEventList = new ArrayList<>();
     private boolean isStart;
@@ -56,7 +58,7 @@ public class PLVECGreetingView extends FrameLayout {
     }
 
     private void showGreetingText() {
-        if (loginEventList.size() < 1) {
+        if (loginEventList.isEmpty()) {
             setVisibility(View.INVISIBLE);
             TranslateAnimation animation = new TranslateAnimation(0f, -getWidth(), 0f, 0f);
             animation.setDuration(500);
@@ -71,14 +73,16 @@ public class PLVECGreetingView extends FrameLayout {
             int lf = 0, ls = 0;
             for (int i = 0; i <= 2; i++) {
                 PLVLoginEvent loginEvent = loginEventList.get(i);
-                if (i != 2)
+                if (i != 2) {
                     stringBuilder.append(loginEvent.getUser().getNick()).append("、");
-                else
+                } else {
                     stringBuilder.append(loginEvent.getUser().getNick());
-                if (i == 0)
+                }
+                if (i == 0) {
                     lf = stringBuilder.toString().length() - 1;
-                else if (i == 1)
+                } else if (i == 1) {
                     ls = stringBuilder.toString().length() - lf - 2;
+                }
             }
             span = new SpannableStringBuilder("欢迎 " + stringBuilder.toString() + " 等" + loginEventList.size() + "人进入直播间");
 //            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -114,6 +118,7 @@ public class PLVECGreetingView extends FrameLayout {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.d(TAG,"accept throwable:"+throwable.toString());
                     }
                 });
     }

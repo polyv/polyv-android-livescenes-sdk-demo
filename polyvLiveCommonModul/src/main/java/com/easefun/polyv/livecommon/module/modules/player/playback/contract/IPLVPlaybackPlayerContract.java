@@ -49,6 +49,11 @@ public interface IPLVPlaybackPlayerContract {
         View getBufferingIndicator();
 
         /**
+         * 获取logo
+         */
+        PLVPlayerLogoView getLogo();
+
+        /**
          * 播放器准备完成回调
          */
         void onPrepared();
@@ -166,18 +171,6 @@ public interface IPLVPlaybackPlayerContract {
          * @param isFirst 每次加载完成后是否是第一次start播放
          */
         void onSubVideoViewPlay(boolean isFirst);
-
-        /**
-         * 添加logo
-         * @param logoParam
-         */
-        void addLogo(PLVPlayerLogoView.LogoParam logoParam);
-
-        /**
-         * 控制logo是否显示
-         * @param visible
-         */
-        void setLogoVisibility(int visible);
 
         /**
          * 更新播放信息

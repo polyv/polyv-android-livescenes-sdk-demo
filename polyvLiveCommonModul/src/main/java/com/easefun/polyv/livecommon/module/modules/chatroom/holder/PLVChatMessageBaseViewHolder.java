@@ -26,7 +26,8 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 /**
  * 聊天信息基础viewHolder
  */
-public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter extends PLVBaseAdapter> extends PLVBaseViewHolder<Data, Adapter> {
+public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter extends PLVBaseAdapter>
+        extends PLVBaseViewHolder<Data, Adapter> {
     private int msgIndex;//信息索引
 
     protected Object messageData;//信息数据

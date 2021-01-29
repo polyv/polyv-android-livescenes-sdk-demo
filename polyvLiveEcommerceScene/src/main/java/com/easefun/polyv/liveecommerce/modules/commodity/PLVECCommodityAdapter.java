@@ -32,7 +32,7 @@ public class PLVECCommodityAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBa
 
     public void setDataList(List<PLVBaseViewData> dataList) {
         this.dataList = dataList;
-        if (this.dataList.size() > 0) {
+        if (!this.dataList.isEmpty()) {
             lastExistedRank = ((PLVProductContentBean) this.dataList.get(this.dataList.size() - 1).getData()).getRank();
         } else {
             lastExistedRank = -1;

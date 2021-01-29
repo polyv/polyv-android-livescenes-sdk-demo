@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -124,7 +125,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     public void destroy() {
         if (interactWebView != null) {
             interactWebView.removeAllViews();
-            removeView(interactWebView);
+            ViewParent viewParent=interactWebView.getParent();
+            if (viewParent instanceof ViewGroup){
+                ViewGroup viewGroup= (ViewGroup) viewParent;
+                viewGroup.removeView(interactWebView);
+            }
             interactWebView.destroy();
             interactWebView = null;
         }

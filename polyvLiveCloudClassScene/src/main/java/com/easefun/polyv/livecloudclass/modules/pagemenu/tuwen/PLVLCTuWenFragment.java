@@ -33,6 +33,7 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     //socket监听器
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
+    private final static String REPLACEMENT = "\\\\u0027";
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -96,13 +97,13 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
                 if (PLVEventConstant.TuWen.EVENT_CREATE_IMAGE_TEXT.equals(event)) {//创建图文
-                    tuWenWebView.callCreate(message.replaceAll("'", "\\\\u0027"));
+                    tuWenWebView.callCreate(message.replaceAll("'", REPLACEMENT));
                 } else if (PLVEventConstant.TuWen.EVENT_DELETE_IMAGE_TEXT.equals(event)) {//删除图文
-                    tuWenWebView.callDelete(message.replaceAll("'", "\\\\u0027"));
+                    tuWenWebView.callDelete(message.replaceAll("'", REPLACEMENT));
                 } else if (PLVEventConstant.TuWen.EVENT_SET_TOP_IMAGE_TEXT.equals(event)) {//置顶图文
-                    tuWenWebView.callSetTop(message.replaceAll("'", "\\\\u0027"));
+                    tuWenWebView.callSetTop(message.replaceAll("'", REPLACEMENT));
                 } else if (PLVEventConstant.TuWen.EVENT_SET_IMAGE_TEXT_MSG.equals(event)) {//更新图文
-                    tuWenWebView.callUpdate(message.replaceAll("'", "\\\\u0027"));
+                    tuWenWebView.callUpdate(message.replaceAll("'", REPLACEMENT));
                 }
             }
         };

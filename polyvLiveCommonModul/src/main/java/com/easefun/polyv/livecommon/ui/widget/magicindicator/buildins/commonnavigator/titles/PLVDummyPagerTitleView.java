@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.IPLVPagerTitleView;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 
 /**
@@ -12,6 +13,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
  * Created by hackware on 2016/6/26.
  */
 public class PLVDummyPagerTitleView extends View implements IPLVPagerTitleView {
+    private static final String TAG = "PLVDummyPagerTitleView";
 
     public PLVDummyPagerTitleView(Context context) {
         super(context);
@@ -19,10 +21,12 @@ public class PLVDummyPagerTitleView extends View implements IPLVPagerTitleView {
 
     @Override
     public void onSelected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onSelected index:"+index+ " totalCount:"+totalCount);
     }
 
     @Override
     public void onDeselected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onDeselected index:"+index+ " totalCount:"+totalCount);
     }
 
     @Override

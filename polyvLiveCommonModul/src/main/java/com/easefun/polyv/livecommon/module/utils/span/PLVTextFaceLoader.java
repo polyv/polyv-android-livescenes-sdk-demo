@@ -61,7 +61,7 @@ public class PLVTextFaceLoader {
         return spanArr;
     }
 
-    private static void setSpan(Context context, String group, SpannableStringBuilder span, int size, int start, int end) throws Exception {
+    private static void setSpan(Context context, String group, SpannableStringBuilder span, int size, int start, int end) {
         Drawable drawable = context.getResources().getDrawable(PLVFaceManager.getInstance().getFaceId(group));
         ImageSpan imageSpan = new PLVRelativeImageSpan(drawable, PLVRelativeImageSpan.ALIGN_CENTER);
         drawable.setBounds(0, 0, (int) (size * 1.5), (int) (size * 1.5));

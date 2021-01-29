@@ -36,35 +36,28 @@ public class PLVOrientationListener extends OrientationEventListener {
     @Override
     public void onOrientationChanged(int orientation) {
         int clips = Math.abs(this.orientation - orientation);
-        if (context == null || clips < 30 || clips > 330) {
+        if (listener == null || context == null || clips < 30 || clips > 330) {
             return;
         }
         this.orientation = orientation;
         int screenOrientation = context.getRequestedOrientation();
         PLVCommonLog.d(TAG, "onOrientationChanged:" + orientation);
         if (((orientation >= 0) && (orientation < 45)) || (orientation > 315)) {    //设置竖屏
-            if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT && orientation != ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
-                if (listener != null) {
-                    listener.onOrientationChanged(new Orientation(false, false));
-                }
+            if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    && orientation != ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+                listener.onOrientationChanged(new Orientation(false, false));
             }
         } else if (orientation > 225 && orientation < 315) { //设置横屏
             if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-                if (listener != null) {
-                    listener.onOrientationChanged(new Orientation(true, false));
-                }
+                listener.onOrientationChanged(new Orientation(true, false));
             }
         } else if (orientation > 45 && orientation < 135) {// 设置反向横屏
             if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
-                if (listener != null) {
-                    listener.onOrientationChanged(new Orientation(true, true));
-                }
+                listener.onOrientationChanged(new Orientation(true, true));
             }
         } else if (orientation > 135 && orientation < 225) { //反向竖屏
             if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
-                if (listener != null) {
-                    listener.onOrientationChanged(new Orientation(false, true));
-                }
+                listener.onOrientationChanged(new Orientation(false, true));
             }
         }
     }

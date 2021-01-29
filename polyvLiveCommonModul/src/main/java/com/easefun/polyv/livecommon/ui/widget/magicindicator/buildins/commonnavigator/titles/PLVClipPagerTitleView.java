@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.abs.IPLVMeasurablePagerTitleView;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 
 /**
@@ -16,6 +17,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
  * Created by hackware on 2016/6/26.
  */
 public class PLVClipPagerTitleView extends View implements IPLVMeasurablePagerTitleView {
+    private static final String TAG = "PLVClipPagerTitleView";
     private String mText;
     private int mTextColor;
     private int mClipColor;
@@ -104,10 +106,12 @@ public class PLVClipPagerTitleView extends View implements IPLVMeasurablePagerTi
 
     @Override
     public void onSelected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onSelected index:"+index+ " totalCount:"+totalCount);
     }
 
     @Override
     public void onDeselected(int index, int totalCount) {
+        PLVCommonLog.d(TAG,"onDeselected index:"+index+ " totalCount:"+totalCount);
     }
 
     @Override

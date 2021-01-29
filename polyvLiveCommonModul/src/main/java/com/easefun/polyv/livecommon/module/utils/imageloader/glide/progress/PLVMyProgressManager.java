@@ -114,11 +114,9 @@ public class PLVMyProgressManager {
 
     public static void removeListener(String moduleTag, Object urlTag) {
         Map<Object, PLVOnProgressListener> objectList = getProgressListenerList(moduleTag);
-        if (objectList != null) {
-            if (objectList.containsKey(urlTag)) {
-                objectList.get(urlTag).transListener(null);
-                objectList.remove(urlTag);
-            }
+        if (objectList != null && objectList.containsKey(urlTag)) {
+            objectList.get(urlTag).transListener(null);
+            objectList.remove(urlTag);
         }
     }
 
@@ -150,15 +148,13 @@ public class PLVMyProgressManager {
                 }
             }
         }
-        return onProgressListenerList.size() > 0 ? onProgressListenerList : null;
+        return (!onProgressListenerList.isEmpty()) ? onProgressListenerList : null;
     }
 
     public static PLVOnProgressListener getProgressListener(String moduleTag, Object urlTag) {
         Map<Object, PLVOnProgressListener> objectList = getProgressListenerList(moduleTag);
-        if (objectList != null) {
-            if (objectList.containsKey(urlTag)) {
-                return objectList.get(urlTag).getTransListener();
-            }
+        if (objectList != null && objectList.containsKey(urlTag)) {
+            return objectList.get(urlTag).getTransListener();
         }
         return null;
     }

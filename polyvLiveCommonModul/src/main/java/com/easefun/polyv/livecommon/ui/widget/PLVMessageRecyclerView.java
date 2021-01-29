@@ -174,7 +174,8 @@ public class PLVMessageRecyclerView extends RecyclerView {
 
     private void processStackFromEnd() {
         if (canScrollVertically(1) || canScrollVertically(-1)) {
-            if (getLayoutManager() instanceof LinearLayoutManager && ((LinearLayoutManager) getLayoutManager()).getStackFromEnd()) {
+            if (getLayoutManager() instanceof LinearLayoutManager
+                    && ((LinearLayoutManager) getLayoutManager()).getStackFromEnd()) {
                 ((LinearLayoutManager) getLayoutManager()).setStackFromEnd(false);
                 unreadCount = 0;
                 if (unreadViews != null) {

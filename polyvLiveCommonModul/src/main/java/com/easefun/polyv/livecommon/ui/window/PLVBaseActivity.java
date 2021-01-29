@@ -36,7 +36,7 @@ public class PLVBaseActivity extends AppCompatActivity {
         resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         resolveIntent.setPackage(getPackageName());
         List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(resolveIntent, 0);
-        if (resolveInfos != null && resolveInfos.size() > 0) {
+        if (resolveInfos != null && !resolveInfos.isEmpty()) {
             return resolveInfos.get(0).activityInfo.name;
         }
         return null;
@@ -49,7 +49,7 @@ public class PLVBaseActivity extends AppCompatActivity {
         try {
             // getBusinessProtocol the info from the currently running task
             List<ActivityManager.RunningTaskInfo> taskInfos = am.getRunningTasks(1);
-            if (taskInfos != null && taskInfos.size() > 0) {
+            if (taskInfos != null && !taskInfos.isEmpty()) {
                 return taskInfos.get(0).numActivities;
             }
         } catch (Exception e) {

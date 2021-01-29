@@ -20,7 +20,7 @@ public class PLVPlaybackPlayerData {
 
     // <editor-fold defaultstate="collapsed" desc="播放状态">
     public void postPrepared() {
-        playerState.postValue(PLVPlayerState.Prepared);
+        playerState.postValue(PLVPlayerState.PREPARED);
     }
 
     public LiveData<PLVPlayerState> getPlayerState() {

@@ -9,7 +9,6 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
-import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 
 import java.util.List;
 

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewStub;
@@ -38,6 +37,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -363,7 +363,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     if (linkMicLayout == null) {
                         return;
                     }
-                    if (linkMicLayout.isJoinLinkMic()) {
+                    if (linkMicLayout.isJoinChannel()) {
                         if (toShow) {
                             linkMicLayout.showAll();
                         } else {
@@ -438,16 +438,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (liveRoomDataManager.getConfig().isLive()) {
                     //处理直播播放状态
                     switch (playerState) {
-                        case Prepared:
+                        case PREPARED:
                             floatingPPTLayout.show();
                             livePageMenuLayout.updateLiveStatusWithLive();
                             if (linkMicLayout != null) {
                                 linkMicLayout.showAll();
                             }
                             break;
-                        case LiveStop:
-                        case NoLive:
-                        case LiveEnd:
+                        case LIVE_STOP:
+                        case NO_LIVE:
+                        case LIVE_END:
                             if (liveRoomDataManager.getConfig().isPPTChannelType()) {
                                 //对于三分屏频道，直播结束，将PPT和播放器各自切回到各自的位置
                                 if (!floatingPPTLayout.isPPTInFloatingLayout()) {
@@ -457,6 +457,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                             floatingPPTLayout.hide();
                             livePageMenuLayout.updateLiveStatusWithNoLive();
                             if (linkMicLayout != null) {
+                                linkMicLayout.setLiveEnd();
                                 linkMicLayout.hideAll();
                             }
                             break;
@@ -466,10 +467,10 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 } else {
                     //处理回放播放状态
                     switch (playerState) {
-                        case Prepared:
+                        case PREPARED:
                             floatingPPTLayout.show();
                             break;
-                        case Idle:
+                        case IDLE:
                             floatingPPTLayout.hide();
                             break;
                         default:
@@ -505,6 +506,21 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         return;
                     }
                     floatingPPTLayout.getPPTView().sendSEIData(aLong);
+                }
+            });
+            mediaLayout.setOnRTCPlayEventListener(new IPolyvLiveListenerEvent.OnRTCPlayEventListener() {
+                @Override
+                public void onRTCLiveStart() {
+                    if (linkMicLayout != null) {
+                        linkMicLayout.setLiveStart();
+                    }
+                }
+
+                @Override
+                public void onRTCLiveEnd() {
+                    if (linkMicLayout != null) {
+                        linkMicLayout.setLiveEnd();
+                    }
                 }
             });
         } else {
@@ -578,7 +594,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     if (!liveRoomDataManager.getConfig().isPPTChannelType()) {
                         return;
                     }
-                    if (linkMicLayout == null || !linkMicLayout.isJoinLinkMic()) {
+                    if (linkMicLayout == null || !linkMicLayout.isJoinChannel()) {
                         if (toMainScreen) {
                             if (!pptViewSwitcher.isViewSwitched()) {
                                 pptViewSwitcher.switchView();
@@ -692,6 +708,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //再将要切到主屏幕的item和PPT交换位置
                 linkMicItemSwitcher.registerSwitchVew(switchViewGoMainScreen, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
+            }
+
+            @Override
+            public void onRTCPrepared() {
+                mediaLayout.notifyRTCPrepared();
             }
         });
     }

@@ -20,7 +20,6 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatu
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
-import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
@@ -32,7 +31,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 /**
  * 聊天室通用聊天信息的viewHolder
  */
-public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder {
+public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> {
     // <editor-fold defaultstate="collapsed" desc="变量">
     public static final String LOADIMG_MOUDLE_TAG = "PLVLCMessageViewHolder";
 
@@ -72,7 +71,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLCMessageViewHolder(View itemView, final PLVBaseAdapter adapter) {
+    public PLVLCMessageViewHolder(View itemView, final PLVLCMessageAdapter adapter) {
         super(itemView, adapter);
         isLandscapeLayout = itemView.getId() == R.id.chat_landscape_item;
         //port item
@@ -217,27 +216,25 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder {
         //是否是特殊身份类型
         boolean isSpecialType = PLVEventHelper.isSpecialType(userType);//管理员、讲师、助教、嘉宾都视为特殊身份类型
         //设置头像
-        if (avatar != null) {
-            if (avatarIv != null) {
-                int defaultAvatar;
-                //根据用户类型使用不同的占位图
-                if (PLVSocketUserConstant.USERTYPE_MANAGER.equals(userType) || PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType)) {
-                    defaultAvatar = R.drawable.plvlc_chatroom_ic_teacher;
-                } else if (PLVSocketUserConstant.USERTYPE_ASSISTANT.equals(userType)) {
-                    defaultAvatar = R.drawable.plvlc_chatroom_ic_assistant;
-                } else if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
-                    defaultAvatar = R.drawable.plvlc_chatroom_ic_guest;
-                } else {
-                    defaultAvatar = R.drawable.plvlc_chatroom_ic_viewer;
-                }
-                PLVImageLoader.getInstance().loadImageNoDiskCache(
-                        itemView.getContext(),
-                        avatar,
-                        defaultAvatar,
-                        defaultAvatar,
-                        avatarIv
-                );
+        if (avatar != null && avatarIv != null) {
+            int defaultAvatar;
+            //根据用户类型使用不同的占位图
+            if (PLVSocketUserConstant.USERTYPE_MANAGER.equals(userType) || PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType)) {
+                defaultAvatar = R.drawable.plvlc_chatroom_ic_teacher;
+            } else if (PLVSocketUserConstant.USERTYPE_ASSISTANT.equals(userType)) {
+                defaultAvatar = R.drawable.plvlc_chatroom_ic_assistant;
+            } else if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
+                defaultAvatar = R.drawable.plvlc_chatroom_ic_guest;
+            } else {
+                defaultAvatar = R.drawable.plvlc_chatroom_ic_viewer;
             }
+            PLVImageLoader.getInstance().loadImageNoDiskCache(
+                    itemView.getContext(),
+                    avatar,
+                    defaultAvatar,
+                    defaultAvatar,
+                    avatarIv
+            );
         }
         //设置昵称
         if (nickName != null) {
@@ -302,12 +299,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder {
                     quoteChatNickTv.setVisibility(View.VISIBLE);
                     quoteChatNickTv.setText(nickName + ": ");
                 }
-                if (chatQuoteVO.getImage() != null) {
-                    if (quoteImgMessageIv != null) {
-                        quoteImgMessageIv.setVisibility(View.VISIBLE);
-                        fitChatImgWH((int) chatQuoteVO.getImage().getWidth(), (int) chatQuoteVO.getImage().getHeight(), quoteImgMessageIv, 60, 40);//适配图片视图的宽高
-                        PLVImageLoader.getInstance().loadImage(chatQuoteVO.getImage().getUrl(), quoteImgMessageIv);
-                    }
+                if (quoteImgMessageIv != null && chatQuoteVO.getImage() != null) {
+                    quoteImgMessageIv.setVisibility(View.VISIBLE);
+                    fitChatImgWH((int) chatQuoteVO.getImage().getWidth(), (int) chatQuoteVO.getImage().getHeight(), quoteImgMessageIv, 60, 40);//适配图片视图的宽高
+                    PLVImageLoader.getInstance().loadImage(chatQuoteVO.getImage().getUrl(), quoteImgMessageIv);
                 }
             }
         }
@@ -369,21 +364,19 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder {
 
     // <editor-fold defaultstate="collapsed" desc="数据交互 - 设置图片信息">
     private void setImgMessage() {
-        if (chatImgUrl != null) {
-            if (imgMessageIv != null) {
-                imgMessageIv.setVisibility(View.VISIBLE);
-                fitChatImgWH(chatImgWidth, chatImgHeight, imgMessageIv, 120, 80);//适配图片视图的宽高
-                if (isLocalChatImg) {
-                    PLVImageLoader.getInstance().loadImage(chatImgUrl, imgMessageIv);
-                } else {
-                    PLVImageLoader.getInstance().loadImage(
-                            itemView.getContext(),
-                            LOADIMG_MOUDLE_TAG,
-                            LOADIMG_MOUDLE_TAG + messageData,
-                            R.drawable.plvlc_image_load_err,
-                            createStatusListener(chatImgUrl),
-                            imgMessageIv);
-                }
+        if (chatImgUrl != null && imgMessageIv != null) {
+            imgMessageIv.setVisibility(View.VISIBLE);
+            fitChatImgWH(chatImgWidth, chatImgHeight, imgMessageIv, 120, 80);//适配图片视图的宽高
+            if (isLocalChatImg) {
+                PLVImageLoader.getInstance().loadImage(chatImgUrl, imgMessageIv);
+            } else {
+                PLVImageLoader.getInstance().loadImage(
+                        itemView.getContext(),
+                        LOADIMG_MOUDLE_TAG,
+                        LOADIMG_MOUDLE_TAG + messageData,
+                        R.drawable.plvlc_image_load_err,
+                        createStatusListener(chatImgUrl),
+                        imgMessageIv);
             }
         }
     }

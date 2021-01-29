@@ -58,6 +58,11 @@ public interface IPLVLivePlayerContract {
         View getNoStreamIndicator();
 
         /**
+         * 获取logo
+         */
+        PLVPlayerLogoView getLogo();
+
+        /**
          * 子播放器开始播放回调
          *
          * @param isFirst 每次加载完成后是否是第一次start播放
@@ -154,18 +159,6 @@ public interface IPLVLivePlayerContract {
          * @return 是否要改变音量
          */
         boolean onVolumeChanged(int changeValue, boolean isEnd);
-
-        /**
-         * 添加logo
-         * @param logoParam
-         */
-        void addLogo(PLVPlayerLogoView.LogoParam logoParam);
-
-        /**
-         * 控制logo是否显示
-         * @param visible
-         */
-        void setLogoVisibility(int visible);
 
         /**
          * 更新播放信息

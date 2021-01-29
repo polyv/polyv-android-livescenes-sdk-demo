@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
@@ -133,8 +135,12 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         PLVCommonLog.d(TAG, "destroy ppt view");
         presenter.destroy();
         if (pptWebView != null) {
+            ViewParent viewParent = pptWebView.getParent();
+            if (viewParent instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) viewParent;
+                viewGroup.removeView(pptWebView);
+            }
             pptWebView.removeAllViews();
-            removeView(pptWebView);
             pptWebView.destroy();
         }
         pptWebView = null;

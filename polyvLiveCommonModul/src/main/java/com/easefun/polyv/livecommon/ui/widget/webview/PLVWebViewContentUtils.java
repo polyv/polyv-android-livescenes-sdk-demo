@@ -30,7 +30,7 @@ public class PLVWebViewContentUtils {
                 "        <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n" +
                 "        <title>Document</title>\n" +
                 "</head>\n" +
-                "<body>" +
+                "<body style=\" color:"+color+";\">" +
                 content + "</body>\n" +
                 "</html>";
         return content;

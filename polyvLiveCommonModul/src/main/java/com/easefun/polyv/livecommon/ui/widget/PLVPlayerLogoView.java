@@ -218,7 +218,7 @@ public class PLVPlayerLogoView extends FrameLayout {
             post(new Runnable() {
                 @Override
                 public void run() {
-                    if (logoParams.size() > 0) {
+                    if (!logoParams.isEmpty()) {
                         PLVPlayerLogoView.super.removeAllViews();
                         for (LogoParam logoParam : logoParams) {
                             addLogo(logoParam);

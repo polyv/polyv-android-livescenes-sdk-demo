@@ -4,5 +4,5 @@ package com.easefun.polyv.livecommon.module.modules.player;
  * 播放状态
  */
 public enum PLVPlayerState {
-    Idle, Prepared, LiveStop, NoLive, LiveEnd
+    IDLE, PREPARED, LIVE_STOP, NO_LIVE, LIVE_END
 }

@@ -1,16 +1,12 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +19,6 @@ import android.widget.TextView;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
-import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -138,7 +133,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
                     float y = subVideoView.getY();
 
                     int viewHeight = PLVVideoSizeUtils.getVideoWH(subVideoView)[1];
-                    int viewWidth = PLVVideoSizeUtils.getVideoWH(subVideoView)[0];
                     if (subVideoView.getAspectRatio() == PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT) {
                         int surHeight = subVideoView.getHeight();
                         y = y + (float) ((surHeight - viewHeight) >> 1);
@@ -215,6 +209,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void setFloatingWindow(boolean b) {
+        PLVCommonLog.i(TAG, "setFloatingWindow: "+b);
     }
 
     @Override
@@ -257,9 +252,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void destroy() {
-        if (logoView != null) {
-            logoView.removeAllViews();
-        }
         if (playbackPlayerPresenter != null) {
             playbackPlayerPresenter.destroy();
         }
@@ -270,7 +262,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void setVideoViewRect(Rect videoViewRect) {
-
+        PLVCommonLog.d(TAG,"直播带货回放场景 暂无调整视频区域布局");
     }
 
     @Override
@@ -285,7 +277,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeLines(int linesPos) {
-
+        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换线路");
     }
 
     @Override
@@ -300,7 +292,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeBitRate(int bitratePos) {
-
+        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换码率功能");
     }
 
     @Override
@@ -310,7 +302,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeMediaPlayMode(int mediaPlayMode) {
-
+        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换音视频模式的功能");
     }
 
     @Override
@@ -370,6 +362,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         }
 
         @Override
+        public PLVPlayerLogoView getLogo(){
+            return logoView;
+        }
+
+        @Override
         public void onPrepared() {
             super.onPrepared();
             fitMode = PLVECFitMode.FIT_VIDEO_RATIO_VIDEOVIEW;
@@ -425,21 +422,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onBufferEnd() {
             super.onBufferEnd();
             PLVCommonLog.i(TAG, "缓冲结束");
-        }
-
-        @Override
-        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
-            if (logoView != null) {
-                logoView.removeAllViews();
-                logoView.addLogo(logoParam);
-            }
-        }
-
-        @Override
-        public void setLogoVisibility(int visible) {
-            if (logoView != null) {
-                logoView.setVisibility(visible);
-            }
         }
 
         @Override

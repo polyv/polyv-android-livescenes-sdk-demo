@@ -14,12 +14,14 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * 暂无直播view
  */
 public class PLVECLiveNoStreamView extends FrameLayout {
+    private static final String TAG = "PLVECLiveNoStreamView";
     private ViewGroup parentLy;
     private ImageView nostreamIv;
     private TextView nostreamTv;

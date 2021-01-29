@@ -17,7 +17,8 @@ public class PLVEmptyFragment extends PLVBaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return view = inflater.inflate(R.layout.plv_horizontal_linear_layout, null);
+        view = inflater.inflate(R.layout.plv_horizontal_linear_layout, null);
+        return view;
     }
 
     @Override

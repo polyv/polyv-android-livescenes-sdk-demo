@@ -1,15 +1,12 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
-import com.easefun.polyv.businesssdk.api.common.meidaControl.IPolyvMediaController;
+import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
@@ -38,6 +35,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -168,7 +166,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                 } else {
                     float y = subVideoView.getY();
                     int viewHeight = PLVVideoSizeUtils.getVideoWH(subVideoView)[1];
-                    int viewWidth = PLVVideoSizeUtils.getVideoWH(subVideoView)[0];
                     if (subVideoView.getAspectRatio() == PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT) {
                         int surHeight = subVideoView.getHeight();
                         if (viewHeight == 0 || surHeight == 0) return;
@@ -292,9 +289,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         if (audioModeView != null) {
             audioModeView.onHide();
         }
-        if (logoView != null) {
-            logoView.removeAllViews();
-        }
         if (livePlayerPresenter != null) {
             livePlayerPresenter.destroy();
         }
@@ -365,12 +359,12 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public void seekTo(int progress, int max) {
-
+        PLVCommonLog.d(TAG,"live video cannot seek");
     }
 
     @Override
     public void setSpeed(float speed) {
-
+        PLVCommonLog.d(TAG,"live video cannot set Speed");
     }
 
     @Override
@@ -411,6 +405,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public View getNoStreamIndicator() {
             return nostreamView;
+        }
+
+        @Override
+        public PLVPlayerLogoView getLogo() {
+            return logoView;
         }
 
         @Override
@@ -506,21 +505,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public void onLinesChanged(int linesPos) {
             super.onLinesChanged(linesPos);
-        }
-
-        @Override
-        public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
-            if (logoView != null) {
-                logoView.removeAllViews();
-                logoView.addLogo(logoParam);
-            }
-        }
-
-        @Override
-        public void setLogoVisibility(int visibility) {
-            if (logoView != null) {
-                logoView.setVisibility(visibility);
-            }
         }
 
         @Override

@@ -23,6 +23,7 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
@@ -30,6 +31,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
@@ -50,17 +52,19 @@ import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECPalybackHomeFragmen
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
 
 /**
  * 直播带货场景下定义的 直播模式、回放模式 的 共用界面。
- * 直播支持的功能有：播放器、聊天室、商品、打赏。
+ * 直播支持的功能有：播放器、聊天室、商品、打赏、互动应用。
  * 回放支持的功能有：播放器。
  */
 public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = "PLVECLiveEcommerceActiv";
     private static final int REQUEST_CODE_MANAGE_OVERLAY_PERMISSION = 1;
     public static final String ACTION_FLOATING_WINDOW = "floatingWindow";
     public static final String EXTRA_IS_SHOW_FLOATING_WINDOW = "isShowFloatingWindow";
@@ -87,6 +91,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private PLVECCommonHomeFragment commonHomeFragment;
     // 位于右边的 空白页 fragment （该fragment用于清空左右信息，只看底层的视频）
     private PLVECEmptyFragment emptyFragment;
+    //互动应用View
+    private IPLVInteractLayout interactLayout;
 
     //悬浮小窗服务连接
     private ServiceConnection floatingWindowConnection;
@@ -203,6 +209,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         super.onDestroy();
         if (floatingWindowBinder != null) {
             floatingWindowBinder.destroy();
+        }
+        if(interactLayout != null){
+            interactLayout.destroy();
         }
         if (videoLayout != null) {
             videoLayout.destroy();
@@ -331,6 +340,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public void onShowPress(MotionEvent e) {
+                PLVCommonLog.d(TAG,"onShowPress");
             }
 
             @Override
@@ -340,11 +350,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                PLVCommonLog.d(TAG,"onScroll");
                 return false;
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
+                PLVCommonLog.d(TAG,"onLongPress");
             }
 
             @Override
@@ -422,6 +434,17 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     }
 
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化 - 互动应用">
+    private void setupInteractLayout(){
+        if(interactLayout == null) {
+            // 互动应用布局
+            ViewStub interactLayoutViewStub = findViewById(R.id.plvec_ppt_interact_layout);
+            interactLayout = (IPLVInteractLayout) interactLayoutViewStub.inflate();
+            interactLayout.init();
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 悬浮小窗配置">
     private void initFloatingWindowSetting() {
@@ -593,6 +616,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onViewCreated() {
             observerDataToLiveHomeFragment();
+            setupInteractLayout();
         }
     };
 

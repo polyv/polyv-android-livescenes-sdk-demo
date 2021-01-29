@@ -231,17 +231,17 @@ public class PLVECLikeIconView extends RelativeLayout {
     private static class AnimatorListener extends AnimatorListenerAdapter {
 
         private WeakReference<View> iv;
-        private WeakReference<ViewGroup> parent;
+        private WeakReference<ViewGroup> parentReference;
 
         AnimatorListener(View iv, ViewGroup parent) {
             this.iv = new WeakReference<>(iv);
-            this.parent = new WeakReference<>(parent);
+            this.parentReference = new WeakReference<>(parent);
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             View view = iv.get();
-            ViewGroup parent = this.parent.get();
+            ViewGroup parent = this.parentReference.get();
             if (null != view
                     && null != parent) {
                 parent.removeView(view);

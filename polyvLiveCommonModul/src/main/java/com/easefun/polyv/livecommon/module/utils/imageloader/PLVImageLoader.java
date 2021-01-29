@@ -23,19 +23,19 @@ import java.util.concurrent.ExecutionException;
  */
 public class PLVImageLoader {
     // <editor-fold defaultstate="collapsed" desc="单例">
-    private volatile static PLVImageLoader INSTANCE;
+    private volatile static PLVImageLoader instance;
 
     private PLVImageLoader() {/**/}
 
     public static PLVImageLoader getInstance() {
-        if (INSTANCE == null) {
+        if (instance == null) {
             synchronized (PLVImageLoader.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new PLVImageLoader();
+                if (instance == null) {
+                    instance = new PLVImageLoader();
                 }
             }
         }
-        return INSTANCE;
+        return instance;
     }
     // </editor-fold>
 

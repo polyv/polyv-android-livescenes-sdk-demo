@@ -36,6 +36,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     }
 
     @Override
+    public PLVPlayerLogoView getLogo(){
+        return null;
+    }
+
+    @Override
     public void onPrepared() {
 
     }
@@ -117,16 +122,6 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public void onShowPPTView(int visible) {
-
-    }
-
-    @Override
-    public void addLogo(PLVPlayerLogoView.LogoParam logoParam) {
-
-    }
-
-    @Override
-    public void setLogoVisibility(int visible) {
 
     }
 

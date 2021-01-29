@@ -16,15 +16,28 @@ import java.io.FileOutputStream;
 public class PLVImageUtils {
     private static final String TAG = "PLVImageUtils";
     private static final int allowLength = 2 * 1024 * 1024;
+
     public static Bitmap compressImage(String filePath) throws Exception {
         File file = new File(filePath);
         if (!file.isFile() || file.length() < allowLength / 2)
             return null;
         //13.4m-80-5.3m，60-3.3m，40-2.3m，20-1.1m
         long rate = file.length() / (1024 * 1024);
-        final int startQuality = rate > 20 ? 20 : (rate > 15 ? 30 : (rate > 10 ? 40 : (rate > 5 ? 55 : 70)));
+        final int startQuality;
+        if (rate > 20) {
+            startQuality = 20;
+        } else if (rate > 15) {
+            startQuality = 30;
+        } else if (rate > 10) {
+            startQuality = 40;
+        } else if (rate > 5) {
+            startQuality = 55;
+        } else {
+            startQuality = 70;
+        }
         String tmpFilePath;
-        compressImage(filePath, tmpFilePath = createTmpFile(file).getAbsolutePath(), startQuality, true);
+        tmpFilePath = createTmpFile(file).getAbsolutePath();
+        compressImage(filePath, tmpFilePath, startQuality, true);
         return BitmapFactory.decodeFile(tmpFilePath);
     }
 
@@ -37,7 +50,8 @@ public class PLVImageUtils {
         return tmpImageFile;
     }
 
-    public static String compressImage(String filePath, String targetPath, int quality, boolean isSampleSize) throws Exception {
+    public static String compressImage(String filePath, String targetPath, int quality, boolean isSampleSize)
+            throws Exception {
         Bitmap bm = isSampleSize ? getSmallBitmap(filePath) : BitmapFactory.decodeFile(filePath);
 //        int degree = readPictureDegree(filePath);//获取相片拍摄角度
 //        if (degree != 0) {//旋转照片角度，防止头像横着显示
@@ -49,9 +63,10 @@ public class PLVImageUtils {
             if (!outputFile.exists()) {
                 outputFile.getParentFile().mkdirs();
             } else {
-                 if (!outputFile.delete()) {
-                     PLVCommonLog.d(TAG,"fail to delete outputFile ");
-                 }
+                if (!outputFile.delete()) {
+                    PLVCommonLog.d(TAG, "fail to delete outputFile ");
+                    throw new Exception("delete fail");
+                }
             }
             out = new FileOutputStream(outputFile);
             boolean result = bm.compress(Bitmap.CompressFormat.JPEG, quality, out);//可以为0
@@ -59,7 +74,8 @@ public class PLVImageUtils {
                 throw new Exception("compress fail");
         } catch (Exception e) {
             throw e;
-        } finally {
+        }
+        finally {
             if (out != null)
                 out.close();
         }

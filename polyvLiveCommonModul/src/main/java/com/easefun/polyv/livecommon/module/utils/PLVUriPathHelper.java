@@ -61,14 +61,14 @@ public class PLVUriPathHelper {
             if (inputStream == null) return;
             outputStream = new FileOutputStream(dstFile);
             copyStream(inputStream, outputStream);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             CloseUtils.closeIO(inputStream,outputStream);
         }
     }
 
-    public static int copyStream(InputStream input, OutputStream output) throws Exception, IOException {
+    public static int copyStream(InputStream input, OutputStream output) throws IOException {
         final int BUFFER_SIZE = 1024 * 2;
         byte[] buffer = new byte[BUFFER_SIZE];
         BufferedInputStream in = new BufferedInputStream(input, BUFFER_SIZE);

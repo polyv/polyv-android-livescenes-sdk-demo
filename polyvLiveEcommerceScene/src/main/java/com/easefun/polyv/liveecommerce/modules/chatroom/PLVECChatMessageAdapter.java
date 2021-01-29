@@ -11,6 +11,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
 
@@ -21,6 +22,7 @@ import java.util.List;
  * 聊天信息adapter
  */
 public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBaseViewHolder<PLVBaseViewData, PLVECChatMessageAdapter>> {
+    private static final String TAG = "PLVECChatMessageAdapter";
     private List<PLVBaseViewData> dataList;
 
     private int msgIndex;
@@ -118,7 +120,11 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                 );
                 break;
             default:
-                throw new RuntimeException("itemType error");
+                PLVCommonLog.exception(new RuntimeException("itemType error"));
+                viewHolder = new PLVECChatMessageCommonViewHolder<>(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plv_horizontal_linear_layout, parent, false),
+                        this);
+                break;
         }
         viewHolder.setMsgIndex(msgIndex);
         return viewHolder;

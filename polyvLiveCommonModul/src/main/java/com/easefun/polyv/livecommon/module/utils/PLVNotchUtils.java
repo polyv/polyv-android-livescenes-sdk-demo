@@ -3,6 +3,9 @@ package com.easefun.polyv.livecommon.module.utils;
 import android.app.Activity;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,6 +16,8 @@ import java.lang.reflect.Method;
  * description: 刘海屏工具类
  */
 public class PLVNotchUtils {
+    private static final String TAG = PLVNotchUtils.class.getSimpleName();
+
     /**
      * 是否有刘海屏
      *
@@ -51,7 +56,7 @@ public class PLVNotchUtils {
             Method get = c.getMethod("isFeatureSupport", int.class);
             return (boolean) (get.invoke(c, 0x20));
         } catch (Exception e) {
-            e.printStackTrace();
+            PLVCommonLog.i(TAG, Log.getStackTraceString(e));
             return false;
         }
     }

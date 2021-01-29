@@ -34,11 +34,9 @@ public class PLVNavigatorHelper {
             }
             int nextPosition = position + 1;
             boolean normalDispatch = true;
-            if (positionOffset == 0.0f) {
-                if (leftToRight) {
-                    nextPosition = position - 1;
-                    normalDispatch = false;
-                }
+            if (positionOffset == 0.0f && leftToRight) {
+                nextPosition = position - 1;
+                normalDispatch = false;
             }
             for (int i = 0; i < mTotalCount; i++) {
                 if (i == position || i == nextPosition) {

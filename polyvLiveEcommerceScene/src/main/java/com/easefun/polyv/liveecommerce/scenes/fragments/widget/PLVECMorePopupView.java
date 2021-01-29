@@ -248,10 +248,9 @@ public class PLVECMorePopupView {
     //音频模式时隐藏切换清晰度的按钮
     public void updatePlayModeView(int visibility) {
         this.playModeViewVisibility = visibility;
-        if (liveMorePopupWindow != null) {
-            if (visibility != View.VISIBLE) {//根据视频是否支持多码率切换来显示
-                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(visibility);
-            }
+        if (liveMorePopupWindow != null && visibility != View.VISIBLE) {
+            //根据视频是否支持多码率切换来显示
+            ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(visibility);
         }
     }
     // </editor-fold>
@@ -358,7 +357,7 @@ public class PLVECMorePopupView {
         int[] onShowLinesClick(View view);
 
         //切换线路
-        void onLinesChangeClick(View view, int LinesPos);
+        void onLinesChangeClick(View view, int linesPos);
 
         //[清晰度信息，清晰度索引]
         Pair<List<PolyvDefinitionVO>, Integer> onShowDefinitionClick(View view);

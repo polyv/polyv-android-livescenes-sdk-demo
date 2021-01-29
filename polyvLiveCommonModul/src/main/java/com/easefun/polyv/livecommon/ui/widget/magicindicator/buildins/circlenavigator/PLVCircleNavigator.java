@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.abs.IPLVPagerNavigator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
  * Created by hackware on 2016/6/26.
  */
 public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
+    private static final String TAG = "PLVCircleNavigator";
     private int mRadius;
     private int mCircleColor;
     private int mStrokeWidth;
@@ -32,7 +34,7 @@ public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
     private Interpolator mStartInterpolator = new LinearInterpolator();
 
     private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private List<PointF> mCirclePoints = new ArrayList<PointF>();
+    private List<PointF> mCirclePoints = new ArrayList<>();
     private float mIndicatorX;
 
     // 事件回调
@@ -115,7 +117,7 @@ public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
 
     private void drawIndicator(Canvas canvas) {
         mPaint.setStyle(Paint.Style.FILL);
-        if (mCirclePoints.size() > 0) {
+        if (!mCirclePoints.isEmpty()) {
             canvas.drawCircle(mIndicatorX, (int) (getHeight() / 2.0f + 0.5f), mRadius, mPaint);
         }
     }
@@ -199,6 +201,7 @@ public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        PLVCommonLog.d(TAG,"onPageScrollStateChanged:"+state);
     }
 
     @Override
@@ -208,6 +211,7 @@ public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
 
     @Override
     public void onAttachToMagicIndicator() {
+        PLVCommonLog.d(TAG,"onAttachToMagicIndicator:");
     }
 
     @Override
@@ -218,6 +222,7 @@ public class PLVCircleNavigator extends View implements IPLVPagerNavigator {
 
     @Override
     public void onDetachFromMagicIndicator() {
+        PLVCommonLog.d(TAG,"onDetachFromMagicIndicator:");
     }
 
     public int getRadius() {

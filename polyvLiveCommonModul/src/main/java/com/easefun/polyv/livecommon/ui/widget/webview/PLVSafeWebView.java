@@ -58,21 +58,20 @@ public class PLVSafeWebView extends WebView {
     }
 
     public static void disableAccessibility(Context context) {
-        if (Build.VERSION.SDK_INT == 17/*4.2 (Build.VERSION_CODES.JELLY_BEAN_MR1)*/) {
-            if (context != null) {
-                try {
-                    AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-                    if (!am.isEnabled()) {
-                        //Not need to disable accessibility
-                        return;
-                    }
-
-                    Method setState = am.getClass().getDeclaredMethod("setState", int.class);
-                    setState.setAccessible(true);
-                    setState.invoke(am, 0);/**{@link AccessibilityManager#STATE_FLAG_ACCESSIBILITY_ENABLED}*/
-                } catch (Exception ignored) {
-                    ignored.printStackTrace();
+        if (context != null &&
+                Build.VERSION.SDK_INT == 17/*4.2 (Build.VERSION_CODES.JELLY_BEAN_MR1)*/) {
+            try {
+                AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+                if (!am.isEnabled()) {
+                    //Not need to disable accessibility
+                    return;
                 }
+
+                Method setState = am.getClass().getDeclaredMethod("setState", int.class);
+                setState.setAccessible(true);
+                setState.invoke(am, 0);/**{@link AccessibilityManager#STATE_FLAG_ACCESSIBILITY_ENABLED}*/
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
             }
         }
     }

@@ -64,7 +64,7 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                                 view.hideLoading();
                             }
                             if (delayTime > 0) {
-                                int lastPos = message.lastIndexOf("}");
+                                int lastPos = message.lastIndexOf('}');
                                 message = message.substring(0, lastPos) + ",\"delayTime\":" + delayTime + "}";
                             }
 
@@ -76,18 +76,18 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         } else if (PLVEventConstant.MESSAGE_EVENT_LOGIN.equals(event)) {
                             //发送login事件到ppt
                             final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
-                            if (loginEvent != null) {
-                                if (loginEvent.getUser().getUserId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId())) {
-                                    dispose(delaySendLoginEventDisposable);
-                                    delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
-                                        @Override
-                                        public void accept(Object o) throws Exception {
-                                            if (view != null) {
-                                                view.sendMsgToWebView(CHAT_LOGIN, loginEvent.getUser().toString());
-                                            }
+                            if (loginEvent != null &&
+                                    loginEvent.getUser().getUserId().
+                                            equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId())) {
+                                dispose(delaySendLoginEventDisposable);
+                                delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
+                                    @Override
+                                    public void accept(Object o) throws Exception {
+                                        if (view != null) {
+                                            view.sendMsgToWebView(CHAT_LOGIN, loginEvent.getUser().toString());
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
                         } else if (PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE.equals(event)) {
                             //PPT和主屏幕切换位置

@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecommon.ui.window;
+    package com.easefun.polyv.livecommon.ui.window;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -64,11 +64,9 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                 if (heightDifference > (usableHeightNow / 4)) {
                     // keyboard probably just became visible
                     isShowKeyBoard = true;
-                    if (willShowKeyBoard) {
-                        if (isHideStatusBar()) {
-                            hideStatusBar();
-                            viewBg.setVisibility(View.VISIBLE);
-                        }
+                    if (willShowKeyBoard && isHideStatusBar()) {
+                        hideStatusBar();
+                        viewBg.setVisibility(View.VISIBLE);
                     }
                     willShowKeyBoard = false;
                     if (viewBg.getTag() == null || (((int) viewBg.getTag()) != heightDifference)) {
@@ -125,6 +123,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         inputView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                PLVCommonLog.d(TAG," beforeTextChanged:"+s.toString());
             }
 
             @Override
@@ -140,6 +139,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                PLVCommonLog.d(TAG," beforeTextChanged:");
             }
         });
         inputView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

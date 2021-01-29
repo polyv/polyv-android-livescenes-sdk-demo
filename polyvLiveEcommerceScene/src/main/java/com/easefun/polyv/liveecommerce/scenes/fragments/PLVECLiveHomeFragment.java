@@ -11,11 +11,8 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.util.Pair;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,10 +26,8 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
-import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.span.PLVRelativeImageSpan;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
-import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
 import com.easefun.polyv.liveecommerce.R;
@@ -149,7 +144,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         chatMsgRv = findViewById(R.id.chat_msg_rv);
         PLVMessageRecyclerView.setLayoutManager(chatMsgRv).setStackFromEnd(true);
         chatMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(4)));
-        chatMsgRv.setAdapter(chatMessageAdapter = new PLVECChatMessageAdapter());
+        chatMessageAdapter = new PLVECChatMessageAdapter();
+        chatMsgRv.setAdapter(chatMessageAdapter);
         chatMessageAdapter.setOnViewActionListener(onChatMsgViewActionListener);
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
@@ -230,7 +226,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     //设置播放状态
     @Override
     public void setPlayerState(PLVPlayerState state) {
-        if (state == PLVPlayerState.Prepared) {
+        if (state == PLVPlayerState.PREPARED) {
             morePopupView.updatePlayStateView(View.VISIBLE);
 
             if (onViewActionListener != null) {
@@ -241,7 +237,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
             morePopupView.updateLinesView(new int[]{onViewActionListener == null ? 1 : onViewActionListener.onGetLinesCountAction(), currentLinesPos});
             morePopupView.updateDefinitionView(onViewActionListener == null ? new Pair<List<PolyvDefinitionVO>, Integer>(null, 0) : onViewActionListener.onShowDefinitionClick(view));
-        } else if (state == PLVPlayerState.NoLive || state == PLVPlayerState.LiveEnd) {
+        } else if (state == PLVPlayerState.NO_LIVE || state == PLVPlayerState.LIVE_END) {
             morePopupView.hide();
             morePopupView.updatePlayStateView(View.GONE);
         }
@@ -394,7 +390,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             super.onProductMenuSwitchEvent(productMenuSwitchEvent);
             if (productMenuSwitchEvent.getContent() != null) {
                 //商品库开关
-                boolean isEnabled = productMenuSwitchEvent.getContent().isEnabled();
+                //boolean isEnabled = productMenuSwitchEvent.getContent().isEnabled();
             }
         }
 
@@ -681,11 +677,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
-            public void onLinesChangeClick(View view, int LinesPos) {
-                if (currentLinesPos != LinesPos) {
-                    currentLinesPos = LinesPos;
+            public void onLinesChangeClick(View view, int linesPos) {
+                if (currentLinesPos != linesPos) {
+                    currentLinesPos = linesPos;
                     if (onViewActionListener != null) {
-                        onViewActionListener.onChangeLinesClick(view, LinesPos);
+                        onViewActionListener.onChangeLinesClick(view, linesPos);
                     }
                 }
             }

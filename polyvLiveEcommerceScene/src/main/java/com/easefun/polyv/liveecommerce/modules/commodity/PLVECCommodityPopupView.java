@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -35,6 +36,7 @@ import me.dkzwm.widget.srl.indicator.IIndicator;
  * 商品弹层view
  */
 public class PLVECCommodityPopupView {
+    private static final String TAG = "PLVECCommodityPopupView";
     // <editor-fold defaultstate="collapsed" desc="变量">
     private PopupWindow popupWindow;
     private ViewGroup emptyCommodityLy;
@@ -75,6 +77,7 @@ public class PLVECCommodityPopupView {
             smoothRefreshLy.setOnRefreshListener(new SmoothRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefreshing() {
+                    PLVCommonLog.d(TAG,"smoothRefreshLy onRefreshing");
                 }
 
                 @Override
