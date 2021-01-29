@@ -257,16 +257,16 @@ public class PLVLoginActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="设置测试数据">
     private void setTestData() {
-        etLiveAppId.setText("fhtw392viy");
-        etLiveAppSecert.setText("d255c756d527492fade5f8b7a55a873d");
-        etLiveUserId.setText("417cfa5cc1");
-        etLiveChannelId.setText("420890");
+        etLiveAppId.setText("");
+        etLiveAppSecert.setText("");
+        etLiveUserId.setText("");
+        etLiveChannelId.setText("");
 
-        etPlaybackAppId.setText("fhtw392viy");
-        etPlaybackAppSecret.setText("d255c756d527492fade5f8b7a55a873d");
-        etPlaybackUserId.setText("417cfa5cc1");
-        etPlaybackChannelId.setText("420890");
-        etPlaybackVideoId.setText("417cfa5cc1cfb94d4dd4bb9faf7346c5_4");
+        etPlaybackAppId.setText("");
+        etPlaybackAppSecret.setText("");
+        etPlaybackUserId.setText("");
+        etPlaybackChannelId.setText("");
+        etPlaybackVideoId.setText("");
     }
     // </editor-fold>
 
