@@ -10,3 +10,7 @@ polyv-android-livescenes-sdk-demo
 
 1.1.0版API文档请看[v1.1.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.1.0/index.html)</br>
 1.0.1版API文档请看[v1.0.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.0.1/index.html)
+
+## 体验 Demo
+
+地址：https://www.pgyer.com/Mb6m 密码：polyv
