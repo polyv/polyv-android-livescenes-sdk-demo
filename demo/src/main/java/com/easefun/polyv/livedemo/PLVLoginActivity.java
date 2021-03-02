@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
+import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
@@ -29,7 +30,6 @@ import com.easefun.polyv.livescenes.feature.login.PLVSceneLoginManager;
 import com.easefun.polyv.livescenes.feature.login.PolyvLiveLoginResult;
 import com.easefun.polyv.livescenes.feature.login.PolyvPlaybackLoginResult;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
-import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 /**
@@ -223,6 +223,8 @@ public class PLVLoginActivity extends PLVBaseActivity {
                     case R.id.plv_login_rb_ecommerce_scene:
                         curScene = PLVLiveScene.ECOMMERCE;
                         break;
+                    default:
+                        break;
                 }
             }
         });
@@ -305,6 +307,8 @@ public class PLVLoginActivity extends PLVBaseActivity {
                             ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
                         }
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -359,6 +363,8 @@ public class PLVLoginActivity extends PLVBaseActivity {
                             ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
                         }
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -376,7 +382,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
 
     private String getViewerId() {
         //todo 请务必在这里替换为你的学员(用户)ID，设置学员(用户)ID的意义详细可以查看：https://github.com/polyv/polyv-android-cloudClass-sdk-demo/wiki/6-%E8%AE%BE%E7%BD%AE%E5%AD%A6%E5%91%98%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%9A%84%E6%84%8F%E4%B9%89
-        return PLVUtils.getAndroidId(this) + "";
+        return PLVSystemUtils.getAndroidId(this) + "";
     }
 
     private String getViewerName() {
