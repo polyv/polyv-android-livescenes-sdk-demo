@@ -141,10 +141,12 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     //横屏时为连麦预留的右偏移量
     private int landscapeMarginRightForLinkMicLayout;
-    //是否加入了连麦
-    private boolean isJoinLinkMic;
+    //是否加入了RTC
+    private boolean isJoinRTC;
     //ppt或连麦在点击右下角的显示按钮后的显示状态，默认ppt或者连麦是显示的
     private boolean isClickShowSubTab = true;
+    private boolean isShowLandscapeRTCLayout = false;
+    private boolean isLandscape;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
@@ -256,21 +258,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             public void onClickShowOrHideSubTab(boolean toShow) {
                 isClickShowSubTab = toShow;
                 //如果加入连麦，并且是横屏状态，则在显示和隐藏连麦布局时，播放器布局的尺寸也要变化。
-                if (isJoinLinkMic && PLVScreenUtils.isLandscape(getContext())) {
+                if (isJoinRTC && PLVScreenUtils.isLandscape(getContext())) {
                     if (toShow) {
                         //switch anchor
-                        MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
-                        switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                        switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                        switchAnchorLp.rightMargin = landscapeMarginRightForLinkMicLayout;
-                        playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+                        showLandscapeRTCLayout(true);
                     } else {
                         //switch anchor
-                        MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
-                        switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                        switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                        switchAnchorLp.rightMargin = 0;
-                        playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+                        showLandscapeRTCLayout(false);
                     }
                 }
                 if (onViewActionListener != null) {
@@ -521,8 +515,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updateWhenJoinLinkMic(int linkMicLayoutLandscapeWidth) {
-        isJoinLinkMic = true;
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+        isJoinRTC = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
 
         mediaController.updateWhenJoinLinkMic(liveRoomDataManager.isSupportRTC());
@@ -547,8 +541,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updateWhenLeaveLinkMic() {
-        isJoinLinkMic = false;
+    public void updateWhenLeaveRTC() {
+        isJoinRTC = false;
         landscapeMarginRightForLinkMicLayout = 0;
 
         mediaController.updateWhenLeaveLinkMic();
@@ -586,6 +580,30 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
         videoView.setOnRTCPlayEventListener(listener);
+    }
+
+    @Override
+    public void setShowLandscapeRTCLayout() {
+        isShowLandscapeRTCLayout = true;
+        if (isLandscape) {
+            //如果此时就是横屏，那么显示RTC layout
+            showLandscapeRTCLayout(true);
+        } else {
+            //如果此时是竖屏，那么不做操作，等到旋转到横屏的时候再预留右边距
+            PLVCommonLog.d(TAG, "PLVLCLiveMediaLayout.setShowLandscapeRTCLayout-->isLandscape=false. We'll wait for portrait to show landscape rtc layout");
+        }
+    }
+
+    @Override
+    public void setHideLandscapeRTCLayout() {
+        isShowLandscapeRTCLayout = false;
+        if (isLandscape) {
+            //如果此时是横屏，那么隐藏RTC layout
+            showLandscapeRTCLayout(false);
+        } else {
+            //如果此时是竖屏，右边距已经是0了，那么不做操作。
+            PLVCommonLog.d(TAG, "PLVLCLiveMediaLayout.setHideLandscapeRTCLayout-->isLandscape=false. We do noting when it is portrait");
+        }
     }
     // </editor-fold>
 
@@ -644,7 +662,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         @Override
-        public PLVPlayerLogoView  getLogo() {
+        public PLVPlayerLogoView getLogo() {
             return logoView;
         }
 
@@ -705,7 +723,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onPrepared(mediaPlayMode);
             hideScreenShotView();
             stopLiveCountDown();
-            if (!isJoinLinkMic) {
+            if (!isJoinRTC) {
                 mediaController.updateWhenVideoViewPrepared();
             }
             mediaController.show();
@@ -754,7 +772,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public boolean onNetworkRecover() {
             //如果加入了连麦，那么断网重连后，不让播放器内部自动拉流播放
-            return isJoinLinkMic;
+            return isJoinRTC;
         }
     };
     // </editor-fold>
@@ -768,6 +786,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         Bitmap screenshot = livePlayerPresenter.screenshot();
         screenshotIV.setImageBitmap(screenshot);
         screenshotIV.setVisibility(VISIBLE);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 横屏RTC布局显示、隐藏---通过控制播放器右边距">
+    private void showLandscapeRTCLayout(boolean show) {
+        MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
+        switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        switchAnchorLp.rightMargin = show ? landscapeMarginRightForLinkMicLayout : 0;
+        playerSwitchAnchor.setLayoutParams(switchAnchorLp);
     }
     // </editor-fold>
 
@@ -818,8 +846,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     protected void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setLandscape();
+            isLandscape = true;
         } else {
             setPortrait();
+            isLandscape = false;
         }
     }
 
@@ -830,20 +860,12 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         vlp.height = ViewGroup.LayoutParams.MATCH_PARENT;
         setLayoutParams(vlp);
         //switch anchor
-        if (isJoinLinkMic && isClickShowSubTab) {
+        if (isJoinRTC && isClickShowSubTab && isShowLandscapeRTCLayout) {
             //如果加入连麦，并且右下角点击的是显示连麦，那么给连麦布局预留右边距
-            MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
-            switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            switchAnchorLp.rightMargin = landscapeMarginRightForLinkMicLayout;
-            playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+            showLandscapeRTCLayout(true);
         } else {
             //否则不预留右边距
-            MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
-            switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            switchAnchorLp.rightMargin = 0;
-            playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+            showLandscapeRTCLayout(false);
         }
     }
 

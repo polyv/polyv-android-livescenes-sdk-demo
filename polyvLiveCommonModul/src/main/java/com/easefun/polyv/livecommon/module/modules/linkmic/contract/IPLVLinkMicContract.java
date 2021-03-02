@@ -315,5 +315,12 @@ public interface IPLVLinkMicContract {
          * 设置直播结束
          */
         void setLiveEnd();
+
+        /**
+         * 获取RTC列表的大小
+         *
+         * @return size
+         */
+        int getRTCListSize();
     }
 }

@@ -436,6 +436,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     public void setLiveEnd() {
         rtcInvokeStrategy.setLiveEnd();
     }
+
+    @Override
+    public int getRTCListSize() {
+        return linkMicList.size();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="http请求">

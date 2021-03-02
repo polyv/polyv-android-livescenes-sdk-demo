@@ -142,6 +142,11 @@ public interface IPLVLCLinkMicLayout {
          * 离开连麦
          */
         void onLeaveChannel();
+
+        /**
+         * 是否要显示RTC布局
+         */
+        void onShowLandscapeRTCLayout(boolean show);
         // </editor-fold>
 
         // <editor-fold defaultstate="collapsed" desc="点击事件监听器">

@@ -674,7 +674,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //更新PPT的延迟时间为0
                 floatingPPTLayout.getPPTView().removeDelayTime();
                 //更新播放器布局
-                mediaLayout.updateWhenJoinLinkMic(linkMicLayout.getLandscapeWidth());
+                mediaLayout.updateWhenJoinRTC(linkMicLayout.getLandscapeWidth());
             }
 
             @Override
@@ -684,7 +684,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //重置PPT延迟时间
                 floatingPPTLayout.getPPTView().recoverDelayTime();
                 //更新播放器布局
-                mediaLayout.updateWhenLeaveLinkMic();
+                mediaLayout.updateWhenLeaveRTC();
+            }
+
+            @Override
+            public void onShowLandscapeRTCLayout(boolean show) {
+                if (show) {
+                    mediaLayout.setShowLandscapeRTCLayout();
+                } else {
+                    mediaLayout.setHideLandscapeRTCLayout();
+                }
             }
 
             @Override

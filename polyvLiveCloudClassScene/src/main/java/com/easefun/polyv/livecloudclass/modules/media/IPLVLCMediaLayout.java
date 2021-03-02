@@ -148,16 +148,16 @@ public interface IPLVLCMediaLayout {
     void updateViewerCount(long viewerCount);
 
     /**
-     * 当加入连麦时，更新布局
+     * 当加入RTC时，更新布局
      *
      * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度
      */
-    void updateWhenJoinLinkMic(int linkMicLayoutLandscapeWidth);
+    void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth);
 
     /**
-     * 当离开连麦时，更新布局
+     * 当离开RTC时，更新布局
      */
-    void updateWhenLeaveLinkMic();
+    void updateWhenLeaveRTC();
 
     void notifyRTCPrepared();
 
@@ -176,6 +176,16 @@ public interface IPLVLCMediaLayout {
     void addOnSeiDataListener(IPLVOnDataChangedListener<Long> listener);
 
     void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener);
+
+    /**
+     * 显示横屏RTC布局。
+     */
+    void setShowLandscapeRTCLayout();
+
+    /**
+     * 隐藏横屏RTC布局。
+     */
+    void setHideLandscapeRTCLayout();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">

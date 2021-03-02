@@ -10,9 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +22,6 @@ import android.widget.TextView;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
-import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeItem;
@@ -409,12 +406,12 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void updateWhenJoinLinkMic(int linkMicLayoutLandscapeWidth) {
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
 
     }
 
     @Override
-    public void updateWhenLeaveLinkMic() {
+    public void updateWhenLeaveRTC() {
 
     }
 
@@ -436,6 +433,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     @Override
     public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+
+    }
+
+    @Override
+    public void setShowLandscapeRTCLayout() {
+
+    }
+
+    @Override
+    public void setHideLandscapeRTCLayout() {
 
     }
     // </editor-fold>
@@ -496,7 +503,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
-        public PLVPlayerLogoView getLogo(){
+        public PLVPlayerLogoView getLogo() {
             return logoView;
         }
 
