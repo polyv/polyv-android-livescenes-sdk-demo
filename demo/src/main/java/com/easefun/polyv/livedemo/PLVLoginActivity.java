@@ -259,10 +259,10 @@ public class PLVLoginActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="设置测试数据">
     private void setTestData() {
-        etLiveAppId.setText("");
-        etLiveAppSecert.setText("");
-        etLiveUserId.setText("");
-        etLiveChannelId.setText("");
+        etLiveAppId.setText("f9syxhkrbn");
+        etLiveAppSecert.setText("10fa85ce82e34988906c4b1250c0ebd5");
+        etLiveUserId.setText("14da40e138");
+        etLiveChannelId.setText("2200798");
 
         etPlaybackAppId.setText("");
         etPlaybackAppSecret.setText("");

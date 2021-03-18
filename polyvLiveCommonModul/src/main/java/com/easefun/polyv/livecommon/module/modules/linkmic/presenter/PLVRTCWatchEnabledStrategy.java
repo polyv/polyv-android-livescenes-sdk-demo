@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
+import android.app.Activity;
+import android.media.AudioManager;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -9,6 +11,7 @@ import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
  * date: 2020/12/23
@@ -106,6 +109,10 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
      */
     @Override
     public void setLiveStart() {
+        Activity topActivity= ActivityUtils.getTopActivity();
+        if (topActivity!=null){
+            topActivity.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        }
         if (!isJoinChannel) {
             onBeforeJoinChannelListener.onBeforeJoinChannel(PLVLinkMicListShowModeGetter.getLeavedMicShowMode());
             linkMicManager.joinChannel();

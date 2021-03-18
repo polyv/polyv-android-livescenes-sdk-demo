@@ -287,6 +287,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     // <editor-fold defaultstate="collapsed" desc="API-presenter接口实现">
     @Override
     public void destroy() {
+        leaveChannel();
         dispose(getLinkMicListDelay);
         dispose(getLinkMicListTimer);
         linkMicList.clear();

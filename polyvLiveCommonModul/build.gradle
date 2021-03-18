@@ -25,7 +25,7 @@ android {
 
 dependencies {
     implementation 'com.android.support:design:27.1.1'
-    api 'com.easefun.polyv:polyvSDKLiveScenes:1.2.0'
+    api 'com.easefun.polyv:polyvSDKLiveScenes:1.2.2'
 
     //glide
     api ("com.github.bumptech.glide:okhttp3-integration:4.7.1"){
