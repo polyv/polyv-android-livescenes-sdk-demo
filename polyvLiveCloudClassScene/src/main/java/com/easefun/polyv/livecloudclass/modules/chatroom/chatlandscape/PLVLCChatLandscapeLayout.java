@@ -84,6 +84,9 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(PLVLCChatCommonMessageList chatCommonMessageList) {
         this.chatCommonMessageList = chatCommonMessageList;
+        if (chatCommonMessageList == null) {
+            return;
+        }
         chatCommonMessageList.addUnreadView(unreadMsgTv);
         chatCommonMessageList.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
@@ -142,7 +145,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         public void setPresenter(@NonNull IPLVChatroomContract.IChatroomPresenter presenter) {
             super.setPresenter(presenter);
             chatroomPresenter = presenter;
-            if (chatroomPresenter.getChatHistoryTime() == 0 && chatCommonMessageList.isLandscapeLayout()) {
+            if (chatroomPresenter.getChatHistoryTime() == 0 && chatCommonMessageList != null && chatCommonMessageList.isLandscapeLayout()) {
                 chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
             }
         }
@@ -185,7 +188,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onCloseRoomEvent(@NonNull final PLVCloseRoomEvent closeRoomEvent) {
             super.onCloseRoomEvent(closeRoomEvent);
-            if (!chatCommonMessageList.isLandscapeLayout()) {
+            if (chatCommonMessageList == null || !chatCommonMessageList.isLandscapeLayout()) {
                 return;
             }
             handler.post(new Runnable() {
@@ -270,19 +273,26 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                chatCommonMessageList.addChatMessageToList(chatMessageDataList, isScrollEnd, true);
+                if (chatCommonMessageList != null) {
+                    chatCommonMessageList.addChatMessageToList(chatMessageDataList, isScrollEnd, true);
+                }
             }
         });
     }
 
     private void addChatHistoryToList(final List<PLVBaseViewData<PLVBaseEvent>> chatMessageDataList, final boolean isScrollEnd) {
-        chatCommonMessageList.addChatHistoryToList(chatMessageDataList, isScrollEnd, true);
+        if (chatCommonMessageList != null) {
+            chatCommonMessageList.addChatHistoryToList(chatMessageDataList, isScrollEnd, true);
+        }
     }
 
     private void removeChatMessageToList(final String id, final boolean isRemoveAll) {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                if (chatCommonMessageList == null) {
+                    return;
+                }
                 if (isRemoveAll) {
                     chatCommonMessageList.removeAllChatMessage(true);
                 } else {

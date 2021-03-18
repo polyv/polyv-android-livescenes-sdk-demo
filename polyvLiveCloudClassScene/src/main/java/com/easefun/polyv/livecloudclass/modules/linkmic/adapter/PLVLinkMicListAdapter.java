@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -256,7 +257,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
         LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
         viewHolder.renderView = renderView;
-        viewHolder.flRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        viewHolder.flRenderViewContainer.addView(renderView, getRenderViewLayoutParam());
         return viewHolder;
     }
 
@@ -275,7 +276,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (holder.isViewRecycled) {
             holder.isViewRecycled = false;
             holder.renderView = adapterCallback.createLinkMicRenderView();
-            holder.flRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            holder.flRenderViewContainer.addView(holder.renderView,getRenderViewLayoutParam());
             holder.isRenderViewSetup = false;
         }
         PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
@@ -496,7 +497,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             }
             //将渲染器从View 添加到view tree中
             if (holder.renderView != null && holder.renderView.getParent() == null) {
-                holder.flRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                holder.flRenderViewContainer.addView(holder.renderView, getRenderViewLayoutParam());
             }
         }
     }
@@ -560,6 +561,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //判断value是否在左开右闭区间：(left, right]
     private boolean intBetween(int value, int left, int right) {
         return value > left && value <= right;
+    }
+
+    //获取渲染器的布局参数
+    private FrameLayout.LayoutParams getRenderViewLayoutParam() {
+        return new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
     }
     // </editor-fold>
 

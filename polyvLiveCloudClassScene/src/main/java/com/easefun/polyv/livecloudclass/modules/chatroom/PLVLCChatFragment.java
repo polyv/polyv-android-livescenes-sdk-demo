@@ -182,6 +182,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
+        if (chatCommonMessageList == null || chatroomPresenter == null) {
+            return;
+        }
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
         chatCommonMessageList.addUnreadView(unreadMsgTv);
@@ -210,6 +213,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         swipeLoadView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if (chatroomPresenter == null) {
+                    return;
+                }
                 chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
             }
         });
