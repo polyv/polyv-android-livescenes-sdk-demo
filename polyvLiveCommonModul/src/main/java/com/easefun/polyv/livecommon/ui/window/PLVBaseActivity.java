@@ -13,6 +13,7 @@ import android.view.View;
 
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVRotationObserver;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.List;
 
@@ -21,8 +22,9 @@ import java.util.List;
  */
 public class PLVBaseActivity extends AppCompatActivity {
     // <editor-fold defaultstate="collapsed" desc="成员变量">
-    private final static int APP_STATUS_KILLED = 0; // 表示应用是被杀死后在启动的
-    private final static int APP_STATUS_RUNNING = 1; // 表示应用时正常的启动流程
+    private  static final String TAG = "PLVBaseActivity";
+    private  static final int APP_STATUS_KILLED = 0; // 表示应用是被杀死后在启动的
+    private  static final int APP_STATUS_RUNNING = 1; // 表示应用时正常的启动流程
     private static int APP_STATUS = APP_STATUS_KILLED; // 记录App的启动状态
     protected boolean isCreateSuccess;
     // 页面方向管理器
@@ -53,7 +55,7 @@ public class PLVBaseActivity extends AppCompatActivity {
                 return taskInfos.get(0).numActivities;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG, "getTaskActivityCount:" + e.getMessage());
         }
         return -1;
     }
@@ -66,7 +68,7 @@ public class PLVBaseActivity extends AppCompatActivity {
             finish();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG, "restartApp:" + e.getMessage());
         }
         return false;
     }
@@ -84,8 +86,8 @@ public class PLVBaseActivity extends AppCompatActivity {
         boolean launchActivityItBaseActivity = false;
         try {
             launchActivityItBaseActivity = getLaunchActivityName() != null && PLVBaseActivity.class.isAssignableFrom(Class.forName(getLaunchActivityName()));//父/等
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            PLVCommonLog.e(TAG, "isAssignableFrom:" + e.getMessage());
         }
         if (!launchActivityItBaseActivity || (getClass().getName().equals(getLaunchActivityName()) && getTaskActivityCount() < 2)) {
             APP_STATUS = APP_STATUS_RUNNING;

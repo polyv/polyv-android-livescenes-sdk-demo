@@ -15,7 +15,7 @@ import com.easefun.polyv.livecloudclass.R;
 public class PLVLCVolumeTipsView extends FrameLayout {
     //volumeView
     private View view;
-    private TextView tv_percent;
+    private TextView tvPercent;
 
     public PLVLCVolumeTipsView(Context context) {
         this(context, null);
@@ -33,7 +33,7 @@ public class PLVLCVolumeTipsView extends FrameLayout {
 
     private void initView() {
         hide();
-        tv_percent = (TextView) view.findViewById(R.id.tv_percent);
+        tvPercent = (TextView) view.findViewById(R.id.tv_percent);
     }
 
     public void hide() {
@@ -54,7 +54,7 @@ public class PLVLCVolumeTipsView extends FrameLayout {
             handler.sendEmptyMessageDelayed(View.GONE, 300);
         } else {
             setVisibility(View.VISIBLE);
-            tv_percent.setText(volume + "%");
+            tvPercent.setText(volume + "%");
         }
     }
 }

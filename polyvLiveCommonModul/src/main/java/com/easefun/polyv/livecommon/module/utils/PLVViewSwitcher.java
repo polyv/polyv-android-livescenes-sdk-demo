@@ -19,6 +19,7 @@ public class PLVViewSwitcher {
 
     // <editor-fold defaultstate="collapsed" desc="静态变量">
     private static final String TAG = PLVViewSwitcher.class.getSimpleName();
+    private static final String SWITCH_VIEW = "switchView:";
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="实例变量">
     private PLVSwitchViewAnchorLayout switchViewA;
@@ -60,7 +61,7 @@ public class PLVViewSwitcher {
                 viewA = switchViewB.getSwitchView();
                 viewB = switchViewA.getSwitchView();
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                PLVCommonLog.e(TAG, SWITCH_VIEW +e.getMessage());
                 return;
             }
 
@@ -71,7 +72,7 @@ public class PLVViewSwitcher {
             try {
                 exchangeView(viewACurParent, viewA, viewBCurParent, viewB);
             } catch (Exception e) {
-                e.printStackTrace();
+                PLVCommonLog.e(TAG,SWITCH_VIEW+e.getMessage());
                 return;
             }
 
@@ -89,7 +90,7 @@ public class PLVViewSwitcher {
                 viewA = switchViewA.getSwitchView();
                 viewB = switchViewB.getSwitchView();
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                PLVCommonLog.e(TAG,SWITCH_VIEW+e.getMessage());
                 return;
             }
 
@@ -100,7 +101,7 @@ public class PLVViewSwitcher {
             try {
                 exchangeView(viewACurParent, viewA, viewBCurParent, viewB);
             } catch (Exception e) {
-                e.printStackTrace();
+                PLVCommonLog.e(TAG,SWITCH_VIEW+e.getMessage());
                 return;
             }
 

@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
-import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
@@ -30,6 +29,8 @@ import com.easefun.polyv.livescenes.feature.login.PLVSceneLoginManager;
 import com.easefun.polyv.livescenes.feature.login.PolyvLiveLoginResult;
 import com.easefun.polyv.livescenes.feature.login.PolyvPlaybackLoginResult;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
+import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 /**
@@ -40,7 +41,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 public class PLVLoginActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="实例变量">
-
+    private static final String TAG = "PLVLoginActivity";
     //manager
     private IPLVSceneLoginManager loginManager;
 
@@ -288,7 +289,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
                     //进入云课堂场景
                     case CLOUDCLASS:
                         if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchLive(PLVLoginActivity.this, channelId, channelType, getViewerId(), getViewerName());
+                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchLive(PLVLoginActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar());
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -299,7 +300,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
                     //进入直播带货场景
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginActivity.this, channelId, getViewerId(), getViewerName());
+                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginActivity.this, channelId, getViewerId(), getViewerName(),getViewerAvatar());
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -316,7 +317,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
             public void onLoginFailed(String msg, Throwable throwable) {
                 loginProgressDialog.dismiss();
                 ToastUtils.showShort(msg);
-                throwable.printStackTrace();
+                PLVCommonLog.e(TAG,"loginLive onLoginFailed:"+throwable.getMessage());
             }
         });
     }
@@ -340,7 +341,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
                     case CLOUDCLASS:
                         if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(PLVLoginActivity.this, channelId, channelType,
-                                    vid, getViewerId(), getViewerName(),
+                                    vid, getViewerId(), getViewerName(),getViewerAvatar(),
                                     swtichPlaybackVodlistSw.isChecked() ? PolyvPlaybackListType.VOD : PolyvPlaybackListType.PLAYBACK
                             );
                             if (!launchResult.isSuccess()) {
@@ -354,7 +355,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginActivity.this, channelId,
-                                    vid, getViewerId(), getViewerName(),
+                                    vid, getViewerId(), getViewerName(),getViewerAvatar(),
                                     swtichPlaybackVodlistSw.isChecked() ? PolyvPlaybackListType.VOD : PolyvPlaybackListType.PLAYBACK);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -372,7 +373,7 @@ public class PLVLoginActivity extends PLVBaseActivity {
             public void onLoginFailed(String msg, Throwable throwable) {
                 loginProgressDialog.dismiss();
                 ToastUtils.showShort(msg);
-                throwable.printStackTrace();
+                PLVCommonLog.e(TAG,"loginPlayback onLoginFailed:"+throwable.getMessage());
             }
         });
     }
@@ -381,13 +382,22 @@ public class PLVLoginActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="获取登录参数">
 
     private String getViewerId() {
-        //todo 请务必在这里替换为你的学员(用户)ID，设置学员(用户)ID的意义详细可以查看：https://github.com/polyv/polyv-android-cloudClass-sdk-demo/wiki/6-%E8%AE%BE%E7%BD%AE%E5%AD%A6%E5%91%98%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%9A%84%E6%84%8F%E4%B9%89
-        return PLVSystemUtils.getAndroidId(this) + "";
+        /**
+         *  todo 请务必在这里替换为你的学员(用户)ID，设置学员(用户)ID的意义详细可以查看：https://github.com/polyv/polyv-android-cloudClass-sdk-demo/wiki/6-%E8%AE%BE%E7%BD%AE%E5%AD%A6%E5%91%98%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%9A%84%E6%84%8F%E4%B9%89
+         */
+        return PLVUtils.getAndroidId(this) + "";
     }
 
     private String getViewerName() {
-        //todo 请务必在这里替换为你的学员(用户)昵称
+        /**
+         * todo 请务必在这里替换为你的学员(用户)昵称
+         */
         return "观众" + getViewerId();
+    }
+
+    private String getViewerAvatar(){
+        //todo 在这里可替换为你的学员(用户)头像地址
+        return "";
     }
     // </editor-fold>
 

@@ -7,7 +7,10 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
+
 public class PLVSimpleViewPager extends ViewPager {
+    private static final String TAG = "PLVSimpleViewPager";
     public PLVSimpleViewPager(@NonNull Context context) {
         super(context);
     }
@@ -21,7 +24,7 @@ public class PLVSimpleViewPager extends ViewPager {
         try {
             return super.onTouchEvent(ev);
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            PLVCommonLog.e(TAG,"onTouchEvent:"+ex.getMessage());
         }
         return false;
     }
@@ -31,7 +34,7 @@ public class PLVSimpleViewPager extends ViewPager {
         try {
             return super.onInterceptTouchEvent(ev);
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            PLVCommonLog.e(TAG,"onInterceptTouchEvent:"+ex.getMessage());
         }
         return false;
     }

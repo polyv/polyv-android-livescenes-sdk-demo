@@ -57,7 +57,7 @@ public class PLVLiveRoomDataRequester {
             try {
                 errorMessage = ((HttpException) t).response().errorBody().string();
             } catch (Exception e) {
-                e.printStackTrace();
+                PLVCommonLog.d(TAG, "getErrorMessage："+e.getMessage());
             }
         }
         return errorMessage;

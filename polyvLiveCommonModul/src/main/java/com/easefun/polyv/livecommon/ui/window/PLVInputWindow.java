@@ -1,4 +1,4 @@
-    package com.easefun.polyv.livecommon.ui.window;
+package com.easefun.polyv.livecommon.ui.window;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +35,8 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     private static final int ALLOW_SHOW_INTERVAL = 1200;
     private static long lastStartTime;
     private static SpannableStringBuilder lastInputText;//editText CharSequence 持有activity引用
-    private boolean isShowKeyBoard, willShowKeyBoard;
+    private boolean isShowKeyBoard;
+    private boolean willShowKeyBoard;
     private View viewBg;
     private EditText inputView;
 
@@ -123,7 +123,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         inputView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                PLVCommonLog.d(TAG," beforeTextChanged:"+s.toString());
+                PLVCommonLog.d(TAG, " beforeTextChanged:" + s.toString());
             }
 
             @Override
@@ -139,7 +139,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                PLVCommonLog.d(TAG," beforeTextChanged:");
+                PLVCommonLog.d(TAG, " beforeTextChanged:");
             }
         });
         inputView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -249,7 +249,6 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         }
         inputListener = null;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        setVisible(false);
         super.finish();
         overridePendingTransition(0, 0);//after finish
     }

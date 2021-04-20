@@ -49,10 +49,13 @@ import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECEmptyFragment;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECLiveDetailFragment;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECLiveHomeFragment;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECPalybackHomeFragment;
+import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
@@ -73,6 +76,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private static final String EXTRA_CHANNEL_ID = "channelId";   // 频道号
     private static final String EXTRA_VIEWER_ID = "viewerId";   // 观看者Id
     private static final String EXTRA_VIEWER_NAME = "viewerName";   // 观看者昵称
+    private static final String EXTRA_VIEWER_AVATAR = "viewerAvatar";//观看者头像地址
     private static final String EXTRA_VID = "vid";//视频Id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
@@ -119,7 +123,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName) {
+    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName,@NonNull String viewerAvatar) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动直播带货直播页失败！");
         }
@@ -136,6 +140,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
+        intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
         intent.putExtra(EXTRA_IS_LIVE, true);
         activity.startActivity(intent);
         return PLVLaunchResult.success();
@@ -154,7 +159,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, int videoListType) {
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar,int videoListType) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动直播带货回放页失败！");
         }
@@ -175,6 +180,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VID, vid);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
+        intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
@@ -223,18 +229,6 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         PLVECFloatingWindowService.unbindService(this, floatingWindowConnection);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(floatingWindowReceiver);
     }
-
-//    @Override
-//    public void onWindowFocusChanged(boolean hasFocus) {
-//        super.onWindowFocusChanged(hasFocus);
-//        if (videoLayout.isSubVideoViewShow()) {
-//            if (hasFocus) {
-//                videoResume();
-//            } else {
-//                videoPause();
-//            }
-//        }
-//    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
@@ -245,10 +239,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
         String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
         String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
+        String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
-        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName);
+        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, viewerAvatar,
+                PolyvLinkMicConfig.getInstance().getLiveChannelType() == PolyvLiveChannelType.PPT
+                        ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
         // 根据不同模式，设置对应参数
@@ -523,12 +520,6 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 commonHomeFragment.setPlayerState(state);
             }
         });
-//        videoLayout.getLivePlayInfoVO().observe(this,
-//                new Observer<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO>() {
-//                    @Override
-//                    public void onChanged(@Nullable com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO playInfoVO) {
-//                    }
-//                });
     }
 
     private void observerDataToPlaybackHomeFragment() {

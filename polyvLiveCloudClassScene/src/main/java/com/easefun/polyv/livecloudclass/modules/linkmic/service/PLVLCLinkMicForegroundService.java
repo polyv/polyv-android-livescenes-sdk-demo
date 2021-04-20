@@ -81,8 +81,10 @@ public class PLVLCLinkMicForegroundService extends Service {
                 .build();
         startForeground(1, notification);
         LogUtils.d("onStartCommand");
-        //do heavy work on a background thread
-        //stopSelf();
+        /***
+         * do heavy work on a background thread
+         * stopSelf();
+         */
         return START_NOT_STICKY;
     }
 

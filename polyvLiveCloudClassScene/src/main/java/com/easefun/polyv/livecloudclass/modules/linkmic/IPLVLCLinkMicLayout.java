@@ -121,6 +121,8 @@ public interface IPLVLCLinkMicLayout {
         //todo 未来将支持画笔事件
 
         // <editor-fold defaultstate="collapsed" desc="画笔事件监听">
+        /***
+         /// 暂时保留，以后需要时再使用
         //        //点击擦除PPT画笔
         //        void onUpdateEraseStatus(boolean toErase);
         //
@@ -130,6 +132,7 @@ public interface IPLVLCLinkMicLayout {
         //        //更新画笔状态
         //        boolean onUpdateBrushStatus(boolean unSelected);
         //        // </editor-fold>
+         **/
 
         // <editor-fold defaultstate="collapsed" desc="连麦事件监听">
 

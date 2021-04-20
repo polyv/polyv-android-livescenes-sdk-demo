@@ -34,8 +34,10 @@ import static com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeI
 
 public class PLVECLikeIconView extends RelativeLayout {
 
-    private int width, height;
-    private int iconWidth, iconHeight;
+    private int width;
+    private int height;
+    private int iconWidth;
+    private int iconHeight;
 
     private Interpolator[] interpolators;
     private Random random = new Random();
@@ -116,10 +118,12 @@ public class PLVECLikeIconView extends RelativeLayout {
 
     private void initInterpolator() {
         interpolators = new Interpolator[]{
-                new LinearInterpolator()/*,
+                new LinearInterpolator()
+                ///暂时保留，以后可以替换使用
+                /**
                 new AccelerateDecelerateInterpolator(),
                 new AccelerateInterpolator(),
-                new DecelerateInterpolator(),*/
+                new DecelerateInterpolator(),**/
         };
     }
 
@@ -169,21 +173,11 @@ public class PLVECLikeIconView extends RelativeLayout {
         animator.start();
     }
 
-//    public void addLoveIcon(int resId) {
-//        if (height <= 0 || width <= 0)
-//            return;
-//        ImageView view = new ImageView(getContext());
-//        view.setImageResource(resId);
-//        iconWidth = view.getDrawable().getIntrinsicWidth();
-//        iconHeight = view.getDrawable().getIntrinsicHeight();
-//
-//        addView(view);
-//        startAnimator(view);
-//    }
-
-//    private int[] color = new int[]{0xFF9D86D2, 0xFFF25268, 0xFF5890FF, 0xFFFCBC71};
-
-    private int[] srcs = new int[]{R.drawable.plvec_like_1, R.drawable.plvec_like_2, R.drawable.plvec_like_3, R.drawable.plvec_like_4};
+    private int[] srcs = new int[]{
+            R.drawable.plvec_like_1,
+            R.drawable.plvec_like_2,
+            R.drawable.plvec_like_3,
+            R.drawable.plvec_like_4};
 
     public void addLoveIcon(final int count) {
         if (height <= 0 || width <= 0)

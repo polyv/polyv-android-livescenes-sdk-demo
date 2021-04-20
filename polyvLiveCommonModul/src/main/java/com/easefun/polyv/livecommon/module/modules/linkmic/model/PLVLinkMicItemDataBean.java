@@ -108,4 +108,18 @@ public class PLVLinkMicItemDataBean {
     public boolean isGuest() {
         return PLVSocketUserConstant.USERTYPE_GUEST.equals(userType);
     }
+
+    @Override
+    public String toString() {
+        return "PLVLinkMicItemDataBean{" +
+                "nick='" + nick + '\'' +
+                ", linkMicId='" + linkMicId + '\'' +
+                ", muteVideo=" + muteVideo +
+                ", muteAudio=" + muteAudio +
+                ", cupNum=" + cupNum +
+                ", userType='" + userType + '\'' +
+                ", actor='" + actor + '\'' +
+                ", curVolume=" + curVolume +
+                '}';
+    }
 }

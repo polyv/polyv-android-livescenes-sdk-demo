@@ -84,12 +84,13 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
     public void show() {
         setVisibility(View.VISIBLE);
         removeCallbacks(runnable);
-        postDelayed(runnable = new Runnable() {
+        runnable = new Runnable() {
             @Override
             public void run() {
                 setVisibility(View.GONE);
             }
-        }, 5000);
+        };
+        postDelayed(runnable, 5000);
     }
 
     public void hide() {

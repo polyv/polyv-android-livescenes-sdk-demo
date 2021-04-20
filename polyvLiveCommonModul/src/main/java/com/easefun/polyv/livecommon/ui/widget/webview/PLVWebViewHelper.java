@@ -72,7 +72,7 @@ public class PLVWebViewHelper {
         // 允许加载本地 html 文件/false
         webSettings.setAllowFileAccess(true);
 
-//        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+
         // 允许通过 file url 加载的 Javascript 读取其他的本地文件,Android 4.1 之前默认是true，在 Android 4.1 及以后默认是false,也就是禁止
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             webSettings.setAllowFileAccessFromFileURLs(false);
@@ -83,8 +83,13 @@ public class PLVWebViewHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             webSettings.setAllowUniversalAccessFromFileURLs(false);
         }
-        //设置默认编码，无效 loadDataWithBaseURL刷新(goBack)会白屏
-//        webSettings.setDefaultTextEncodingName("utf-8");
+        /**
+         * ///暂时保留该代码
+         *  webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+         * //设置默认编码，无效 loadDataWithBaseURL刷新(goBack)会白屏
+         * webSettings.setDefaultTextEncodingName("utf-8");
+         */
+
         /**
          *  关于缓存目录:
          *
@@ -126,7 +131,6 @@ public class PLVWebViewHelper {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (!isUseActionView) {
                 return false;
-//                view.loadUrl(url);
             } else {
                 if (url.startsWith("yy://")) {
                     view.loadUrl(url);

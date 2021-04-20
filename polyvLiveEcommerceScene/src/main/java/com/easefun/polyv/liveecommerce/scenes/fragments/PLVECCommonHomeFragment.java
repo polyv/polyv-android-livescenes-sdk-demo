@@ -237,11 +237,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvCommodityVO> commodityVO) {
                 if (commodityVO != null && commodityVO.isSuccess()) {
-                    if (liveRoomDataManager.getCommodityRank() <= -1) {
-                        acceptCommodityVO(commodityVO.getData(), false);
-                    } else {
-                        acceptCommodityVO(commodityVO.getData(), true);
-                    }
+                    boolean isAddOrSet = liveRoomDataManager.getCommodityRank() <= -1;
+                    acceptCommodityVO(commodityVO.getData(), !isAddOrSet);
                 }
             }
         });

@@ -67,7 +67,7 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
     }
 
     private void showGreetingText() {
-        if (loginEventList.size() < 1) {
+        if (loginEventList.isEmpty()) {
             stopScroll();
             setVisibility(View.INVISIBLE);
             ((ViewGroup) getParent()).setVisibility(View.GONE);
@@ -85,7 +85,8 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
         SpannableStringBuilder span;
         if (loginEventList.size() >= 10) {
             StringBuilder stringBuilder = new StringBuilder();
-            int lf = 0, ls = 0;
+            int lf = 0;
+            int ls = 0;
             for (int i = 0; i <= 2; i++) {
                 PLVLoginEvent loginEvent = loginEventList.get(i);
                 if (i != 2)
@@ -155,18 +156,20 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
             if (getWidth() > 0) {
                 showGreetingText();
             } else {
-                post(runnable = new Runnable() {
+                runnable = new Runnable() {
                     @Override
                     public void run() {
                         ((ViewGroup) getParent()).setVisibility(View.VISIBLE);//先显示父控件才能获取到宽
-                        post(runnable = new Runnable() {
+                        runnable = new Runnable() {
                             @Override
                             public void run() {
                                 showGreetingText();
                             }
-                        });
+                        };
+                        post(runnable);
                     }
-                });
+                };
+                post(runnable);
             }
         }
     }

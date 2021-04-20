@@ -133,8 +133,8 @@ public class PLVLCVideoLoadingLayout extends FrameLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="格式化速度">
-    private static String formatedSpeed(long bytes, long elapsed_milli) {
-        if (elapsed_milli <= 0) {
+    private static String formatedSpeed(long bytes, long elapsedMilli) {
+        if (elapsedMilli <= 0) {
             return "0 B/S";
         }
 
@@ -142,13 +142,13 @@ public class PLVLCVideoLoadingLayout extends FrameLayout {
             return "0 B/S";
         }
 
-        float bytes_per_sec = ((float) bytes) * 1000.f / elapsed_milli;
-        if (bytes_per_sec >= 1000 * 1000) {
-            return String.format(Locale.US, "%.2f MB/S", ((float) bytes_per_sec) / 1000 / 1000);
-        } else if (bytes_per_sec >= 1000) {
-            return String.format(Locale.US, "%.2f KB/S", ((float) bytes_per_sec) / 1000);
+        float bytesPerSec = ((float) bytes) * 1000.f / elapsedMilli;
+        if (bytesPerSec >= 1000 * 1000) {
+            return String.format(Locale.US, "%.2f MB/S", bytesPerSec / 1000 / 1000);
+        } else if (bytesPerSec >= 1000) {
+            return String.format(Locale.US, "%.2f KB/S", bytesPerSec / 1000);
         } else {
-            return String.format(Locale.US, "%d B/S", (long) bytes_per_sec);
+            return String.format(Locale.US, "%d B/S", (long) bytesPerSec);
         }
     }
     // </editor-fold>

@@ -41,7 +41,9 @@
                 <FrameLayout
                     android:id="@+id/plvlc_link_mic_fl_render_view_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:background="@color/black"
+                    tools:visibility="invisible" />
 
                 <!--底部渐变背景-->
                 <View

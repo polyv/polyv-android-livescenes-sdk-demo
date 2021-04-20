@@ -3,10 +3,19 @@ package com.easefun.polyv.livecloudclass.modules.linkmic;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.arch.lifecycle.GenericLifecycleObserver;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -86,6 +96,27 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     //Disposable
     private Disposable autoHideDisposable;
 
+    //网络连接广播接收器
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action)) {
+                return;
+            }
+            if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                return;
+            }
+
+            if (PLVNetworkUtils.isConnected(context)) {
+                PLVCommonLog.d(TAG, "net work connected");
+            } else {
+                PLVCommonLog.d(TAG, "net work disconnected");
+                onNetworkDisconnected();
+            }
+        }
+    };
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -100,6 +131,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     public PLVLCLinkMicControlBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
+        initBroadcastReceiver(context);
     }
     // </editor-fold>
 
@@ -161,6 +193,25 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         //设置屏幕方向
         isPortrait = PLVScreenUtils.isPortrait(getContext());
         setOrientation(isPortrait);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化广播监听器">
+    private void initBroadcastReceiver(final Context context) {
+        context.registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        if (context instanceof AppCompatActivity) {
+            AppCompatActivity activity = (AppCompatActivity) context;
+            activity.getLifecycle().addObserver(new GenericLifecycleObserver() {
+                @Override
+                public void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+                    if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                        context.unregisterReceiver(receiver);
+                    }
+                }
+            });
+        } else {
+            PLVCommonLog.e(TAG, "context not instance of AppCompatActivity, in danger of leak broadcast receiver");
+        }
     }
     // </editor-fold>
 
@@ -447,6 +498,10 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         btnRingActionPortrait.setOnLinkMicRingButtonClickListener(new PLVLCLinkMicRingButton.OnPLVLCLinkMicRingButtonClickListener() {
             @Override
             public void onClickRingUp() {
+                if (!PLVNetworkUtils.isConnected(getContext())) {
+                    PLVCommonLog.w(TAG, "net work not available");
+                    return;
+                }
                 btnRingActionPortrait.setRingOffState();
                 tvRequestTip.setText(R.string.plv_linkmic_tip_requesting_link_mic);
 
@@ -481,13 +536,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                setLeaveLinkMic();
-                                btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_up);
-                                if (onPLCLinkMicControlBarListener != null) {
-                                    onPLCLinkMicControlBarListener.onClickRingOffLinkMic();
-                                }
-                                startAutoHideCountDown();
-
+                                handleRingOff();
                                 dialog.dismiss();
                             }
                         }
@@ -604,6 +653,25 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             }
         });
     }
+
+    //处理点击事件：挂断
+    private void handleRingOff() {
+        setLeaveLinkMic();
+        btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_up);
+        if (onPLCLinkMicControlBarListener != null) {
+            onPLCLinkMicControlBarListener.onClickRingOffLinkMic();
+        }
+        startAutoHideCountDown();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="处理断网">
+    private void onNetworkDisconnected() {
+        //如果断网时正在请求连麦，那么取消当前请求
+        if (state == PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC) {
+            handleRingOff();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - 连麦控制条状态">
@@ -644,5 +712,4 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     }
 
     // </editor-fold>
-
 }

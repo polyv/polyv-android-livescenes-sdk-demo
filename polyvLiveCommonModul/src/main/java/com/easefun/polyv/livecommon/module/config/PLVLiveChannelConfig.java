@@ -4,14 +4,13 @@ import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 /**
  * 直播频道相关信息配置类
  */
-public class PLVLiveChannelConfig implements Cloneable {
+public class PLVLiveChannelConfig {
     /**
      * 保利威账号信息
      */
@@ -47,6 +46,16 @@ public class PLVLiveChannelConfig implements Cloneable {
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
+    }
+
+    public PLVLiveChannelConfig(PLVLiveChannelConfig old) {
+        account = new Account(old.account);
+        user = new User(old.user);
+        channelId = old.channelId;
+        vid = old.vid;
+        videoListType = old.videoListType;
+        isLive = old.isLive;
+        channelType = old.channelType;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -159,23 +168,20 @@ public class PLVLiveChannelConfig implements Cloneable {
     }
     // </editor-fold>
 
-    @Override
-    protected Object clone() {
-        PLVLiveChannelConfig channelConfig = null;
-        try {
-            channelConfig = (PLVLiveChannelConfig) super.clone();
-            channelConfig.account = (Account) account.clone();
-            channelConfig.user = (User) user.clone();
-        } catch (CloneNotSupportedException e) {
-            PLVCommonLog.exception(e);
-        }
-        return channelConfig;
-    }
-
     /**
      * 保利威直播账号信息
      */
-    public static class Account implements Cloneable {
+    public static class Account {
+
+        Account() {
+        }
+
+        Account(Account old) {
+            userId = old.getUserId();
+            appId = old.getAppId();
+            appSecret = old.getAppSecret();
+        }
+
         /**
          * 直播账号userId
          */
@@ -200,17 +206,23 @@ public class PLVLiveChannelConfig implements Cloneable {
         public String getAppSecret() {
             return appSecret;
         }
-
-        @Override
-        protected Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
     }
 
     /**
      * 用户(观众)信息
      */
-    public static class User implements Cloneable {
+    public static class User {
+
+        User() {
+        }
+
+        User(User old) {
+            viewerId = old.viewerId;
+            viewerName = old.viewerName;
+            viewerAvatar = old.viewerAvatar;
+            viewerType = old.viewerType;
+        }
+
         /**
          * 用户Id，用于登录socket、发送日志<br>
          * 注意{@link #viewerId}不能和{@link Account#userId}一致)
@@ -245,9 +257,5 @@ public class PLVLiveChannelConfig implements Cloneable {
             return viewerType;
         }
 
-        @Override
-        protected Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
     }
 }

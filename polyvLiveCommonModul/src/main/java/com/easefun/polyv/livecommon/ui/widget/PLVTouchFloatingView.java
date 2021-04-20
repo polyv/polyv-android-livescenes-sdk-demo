@@ -24,7 +24,8 @@ public class PLVTouchFloatingView extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="实例变量">
     // 点击的位置
-    private float lastX, lastY;
+    private float lastX;
+    private float lastY;
 
     //初始竖屏位置
     private int originPortraitLeft = 0;

@@ -150,7 +150,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
             JSONObject jsonObject = new JSONObject(data);
             receiveInfo = jsonObject.getString("receiveInfo");
         } catch (JSONException e) {
-            e.printStackTrace();
+            PLVCommonLog.d(TAG, "sendWinLotteryToServer：" + e.getMessage());
         }
 
         PLVResponseExcutor.excuteDataBean(PolyvApiManager.getPolyvApichatApi()
@@ -176,7 +176,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                                     PLVCommonLog.e(TAG, errorBody.string());
                                 }
                             } catch (IOException e1) {
-                                e1.printStackTrace();
+                                PLVCommonLog.d(TAG, "postLotteryWinnerInfoNew: " + e.getMessage());
                             }
                         }
                     }
@@ -191,7 +191,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
 
                     @Override
                     public void onFinish() {
-                        PLVCommonLog.d(TAG,"postLotteryWinnerInfoNew onFinish");
+                        PLVCommonLog.d(TAG, "postLotteryWinnerInfoNew onFinish");
                     }
                 });
     }
@@ -221,14 +221,14 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                                     LogUtils.e(errorBody.string());
                                 }
                             } catch (IOException e1) {
-                                e1.printStackTrace();
+                                PLVCommonLog.d(TAG,"postLotteryAbandon:"+e1.getMessage());
                             }
                         }
                     }
 
                     @Override
                     public void onFinish() {
-                        PLVCommonLog.d(TAG,"postLotteryAbandon onFinish");
+                        PLVCommonLog.d(TAG, "postLotteryAbandon onFinish");
                     }
                 });
     }

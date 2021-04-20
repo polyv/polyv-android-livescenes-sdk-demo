@@ -37,7 +37,9 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
     private ViewGroup.LayoutParams inputLayoutParams;
     private EditText inputView;
 
-    private boolean isShowKeyBoard, willShowKeyBoard, willShowPopupLayout;
+    private boolean isShowKeyBoard;
+    private boolean willShowKeyBoard;
+    private boolean willShowPopupLayout;
 
     private List<View> popupButtonList = new ArrayList<>();
     private List<ViewGroup> popupLayoutList = new ArrayList<>();
@@ -103,8 +105,6 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
                 if (heightDifference > (usableHeightNow / 4)) {
                     // keyboard probably just became visible
                     isShowKeyBoard = true;
-//                    if (willShowKeyBoard) {
-//                    }
                     willShowKeyBoard = false;
                 } else {
                     isShowKeyBoard = false;

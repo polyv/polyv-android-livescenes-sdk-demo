@@ -36,9 +36,11 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 /**
@@ -55,6 +57,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private static final String EXTRA_CHANNEL_ID = "channelId";   // 频道号
     private static final String EXTRA_VIEWER_ID = "viewerId";   // 观看者Id
     private static final String EXTRA_VIEWER_NAME = "viewerName";   // 观看者昵称
+    private static final String EXTRA_VIEWER_AVATAR = "viewerAvatar";//观看者头像地址
     private static final String EXTRA_VID = "vid";//回放视频Id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
@@ -99,7 +102,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                              @NonNull String channelId,
                                              @NonNull PolyvLiveChannelType channelType,
                                              @NonNull String viewerId,
-                                             @NonNull String viewerName) {
+                                             @NonNull String viewerName,
+                                             @NonNull String viewerAvatar) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动云课堂直播页失败！");
         }
@@ -121,6 +125,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
+        intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
         intent.putExtra(EXTRA_IS_LIVE, true);
         activity.startActivity(intent);
         return PLVLaunchResult.success();
@@ -146,6 +151,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                                  @NonNull String vid,
                                                  @NonNull String viewerId,
                                                  @NonNull String viewerName,
+                                                 @NonNull String viewerAvatar,
                                                  int videoListType) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动云课堂回放页失败！");
@@ -171,6 +177,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
+        intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
         intent.putExtra(EXTRA_VID, vid);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
         intent.putExtra(EXTRA_IS_LIVE, false);
@@ -256,11 +263,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
         String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
         String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
+        String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
         PLVLiveChannelConfigFiller.setChannelType(channelType);
-        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName);
+        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, viewerAvatar,
+                PolyvLinkMicConfig.getInstance().getLiveChannelType() == PolyvLiveChannelType.PPT
+                        ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
         // 根据不同模式，设置对应参数
@@ -277,7 +287,6 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private void initLiveRoomManager() {
         // 使用PLVLiveChannelConfigFiller配置好直播参数后，用其创建直播间数据管理器实例
         liveRoomDataManager = new PLVLiveRoomDataManager(PLVLiveChannelConfigFiller.generateNewChannelConfig());
-
         // 进行网络请求，获取上报观看热度
         liveRoomDataManager.requestPageViewer();
 

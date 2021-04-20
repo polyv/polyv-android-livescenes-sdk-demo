@@ -29,9 +29,12 @@ public class PLVMyProgressManager {
                             for (PLVOnProgressListener onProgressListener : onProgressListenerList)
                                 onProgressListener.onProgress(url, isComplete, percentage, bytesRead, totalBytes);
                         }
-//                        if (isComplete) {
-//                            removeListener(url);
-//                        }
+                        /***
+                         * 暂时保留该代码
+                         *if (isComplete) {
+                         *    removeListener(url);
+                         *}
+                         */
                     }
                 }
             };

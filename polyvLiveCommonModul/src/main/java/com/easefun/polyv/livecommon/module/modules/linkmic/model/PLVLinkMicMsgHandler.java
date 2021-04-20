@@ -152,12 +152,16 @@ public class PLVLinkMicMsgHandler {
             //离开连麦
             case PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT:
                 PLVCommonLog.d(TAG, message);
-//                PLVJoinLeaveSEvent PLVJoinLeaveSEvent = PolyvGsonUtil.fromJson(PLVJoinLeaveSEvent.class, message);
-//                if (PLVJoinLeaveSEvent != null && PLVJoinLeaveSEvent.getUser() != null) {
-//                    if (linkMicId.equals(PLVJoinLeaveSEvent.getUser().getUserId())) {
-//                        onLinkMicDataListener.onTeacherHangupMe();
-//                    }
-//                }
+                /**
+                 * ///通过注释代码来保留代码
+                 *  PLVJoinLeaveSEvent PLVJoinLeaveSEvent = PolyvGsonUtil.fromJson(PLVJoinLeaveSEvent.class, message);
+                 *  if (PLVJoinLeaveSEvent != null && PLVJoinLeaveSEvent.getUser() != null) {
+                 *      if (linkMicId.equals(PLVJoinLeaveSEvent.getUser().getUserId())) {
+                 *          onLinkMicDataListener.onTeacherHangupMe();
+                 *      }
+                 *  }
+                 */
+
                 break;
             //讲师禁用观众视频或麦克风
             case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
@@ -303,7 +307,7 @@ public class PLVLinkMicMsgHandler {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="接口定义 - SimpleOnLinkMicDataListener">
-    public static abstract class SimpleOnLinkMicDataListener implements OnLinkMicDataListener {
+    public abstract static class SimpleOnLinkMicDataListener implements OnLinkMicDataListener {
         @Override
         public void onTeacherReceiveJoinRequest() {
 

@@ -8,6 +8,7 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapResource;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ImageUtils;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.security.MessageDigest;
  */
 public class PLVCompressTransformation implements Transformation<Bitmap> {
 
+    private static final String TAG = "PLVCompressTransformati";
     private static final int VERSION = 1;
     private static final String ID = "PLVCompressTransformation." + VERSION;
     private static final byte[] ID_BYTES = ID.getBytes(CHARSET);
@@ -47,7 +49,7 @@ public class PLVCompressTransformation implements Transformation<Bitmap> {
                     return BitmapResource.obtain(bitmap, mBitmapPool);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                PLVCommonLog.d(TAG,"transform："+e.getMessage());
             }
         }
         return resource;

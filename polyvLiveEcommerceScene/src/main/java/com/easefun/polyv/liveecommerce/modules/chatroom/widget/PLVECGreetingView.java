@@ -70,7 +70,8 @@ public class PLVECGreetingView extends FrameLayout {
         SpannableStringBuilder span;
         if (loginEventList.size() >= 10) {
             StringBuilder stringBuilder = new StringBuilder();
-            int lf = 0, ls = 0;
+            int lf = 0;
+            int ls = 0;
             for (int i = 0; i <= 2; i++) {
                 PLVLoginEvent loginEvent = loginEventList.get(i);
                 if (i != 2) {
@@ -85,15 +86,23 @@ public class PLVECGreetingView extends FrameLayout {
                 }
             }
             span = new SpannableStringBuilder("欢迎 " + stringBuilder.toString() + " 等" + loginEventList.size() + "人进入直播间");
-//            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1, 3 + lf + 1 + ls, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1 + ls + 1, span.length() - 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            /**
+             * ///暂时保留该代码
+             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1, 3 + lf + 1 + ls, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1 + ls + 1, span.length() - 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+             *
+             */
             loginEventList.clear();
         } else {
             PLVLoginEvent loginEvent = loginEventList.remove(0);
             span = new SpannableStringBuilder("欢迎 " + loginEvent.getUser().getNick() + " 进入直播间");
-//            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, span.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
+
+            /**
+             * ///暂时保留该代码
+             * span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, span.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+             */
+         }
         final SpannableStringBuilder finalSpan = span;
 
         acceptLoginDisposable = Observable.just(1)
@@ -118,7 +127,7 @@ public class PLVECGreetingView extends FrameLayout {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        PLVCommonLog.d(TAG,"accept throwable:"+throwable.toString());
+                        PLVCommonLog.e(TAG, "accept throwable:" + throwable.toString());
                     }
                 });
     }

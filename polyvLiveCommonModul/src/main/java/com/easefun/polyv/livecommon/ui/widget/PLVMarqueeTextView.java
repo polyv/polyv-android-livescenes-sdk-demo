@@ -132,16 +132,22 @@ public class PLVMarqueeTextView extends AppCompatTextView {
             mScroller = new Scroller(this.getContext(), new LinearInterpolator(getContext(), null));
             setScroller(mScroller);
         }
-//        if (getWidth() > 0) {//parent can invalidate
-//            scroll();
-//        } else {
-            post(runnable = new Runnable() {
-                @Override
-                public void run() {
-                    scroll();
-                }
-            });
-//        }
+        /**
+         * ///暂时保留
+         * if (getWidth() > 0) {//parent can invalidate
+         *     scroll();
+         * } else {
+         */
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                scroll();
+            }
+        };
+        post(runnable);
+        /**
+         * }
+         */
     }
 
     private void scroll() {
@@ -176,7 +182,7 @@ public class PLVMarqueeTextView extends AppCompatTextView {
         }
         if (mFirst) {
             callOnFirstGetRollDuration(rollDuration);
-            postDelayed(runnable = new Runnable() {
+            runnable = new Runnable() {
                 @Override
                 public void run() {
                     setVisibility(View.VISIBLE);//gone不能获取宽高，需使用invisible
@@ -184,7 +190,8 @@ public class PLVMarqueeTextView extends AppCompatTextView {
                     invalidate();
                     mPaused = false;
                 }
-            }, mFirstScrollDelay);
+            };
+            postDelayed(runnable, mFirstScrollDelay);
         } else {
             callOnFirstGetRollDuration(rollDuration);
             mScroller.startScroll(mXPaused, 0, distance, 0, rollDuration);
@@ -229,8 +236,6 @@ public class PLVMarqueeTextView extends AppCompatTextView {
             mScroller.startScroll(0, 0, 0, 0, 0);//src
         }
         mXPaused = 0;
-//        mXPaused = -1 * getWidth();
-//        mScroller.startScroll(mXPaused, 0, mXPaused, 0, 0);
     }
 
     /**

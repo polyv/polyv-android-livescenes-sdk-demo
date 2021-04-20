@@ -74,7 +74,6 @@ import java.util.Random;
  * 直播首页：主持人信息、聊天室、点赞、更多、商品、打赏
  */
 public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements View.OnClickListener {
-    private static final String TAG = "PLVECLiveHomeFragment";
     // <editor-fold defaultstate="collapsed" desc="变量">
     //观看信息布局
     private PLVECWatchInfoView watchInfoLy;
@@ -236,7 +235,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 morePopupView.updatePlayModeView(isPlayModeViewVisibility);
             }
             morePopupView.updateLinesView(new int[]{onViewActionListener == null ? 1 : onViewActionListener.onGetLinesCountAction(), currentLinesPos});
-            morePopupView.updateDefinitionView(onViewActionListener == null ? new Pair<List<PolyvDefinitionVO>, Integer>(null, 0) : onViewActionListener.onShowDefinitionClick(view));
+            morePopupView.updateDefinitionView(onViewActionListener == null ?
+                    new Pair<List<PolyvDefinitionVO>, Integer>(null, 0) :
+                    onViewActionListener.onShowDefinitionClick(view));
         } else if (state == PLVPlayerState.NO_LIVE || state == PLVPlayerState.LIVE_END) {
             morePopupView.hide();
             morePopupView.updatePlayStateView(View.GONE);
@@ -388,10 +389,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         @Override
         public void onProductMenuSwitchEvent(@NonNull PLVProductMenuSwitchEvent productMenuSwitchEvent) {
             super.onProductMenuSwitchEvent(productMenuSwitchEvent);
-            if (productMenuSwitchEvent.getContent() != null) {
-                //商品库开关
-                //boolean isEnabled = productMenuSwitchEvent.getContent().isEnabled();
-            }
+
+                /** ///暂时保留，主要是商品库开关
+                 *   if (productMenuSwitchEvent.getContent() != null) {
+                 *  boolean isEnabled = productMenuSwitchEvent.getContent().isEnabled();
+                 *   }
+                 */
         }
 
         @Override
@@ -442,7 +445,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 swipeLoadView.setRefreshing(false);
                 swipeLoadView.setEnabled(true);
             }
-            if (chatMessageDataList.size() > 0) {
+            if (!chatMessageDataList.isEmpty()) {
                 addChatHistoryToList(chatMessageDataList, requestSuccessTime == 1);
             }
             if (isNoMoreHistory) {
@@ -688,7 +691,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public Pair<List<PolyvDefinitionVO>, Integer> onShowDefinitionClick(View view) {
-                return onViewActionListener == null ? new Pair<List<PolyvDefinitionVO>, Integer>(null, 0) : onViewActionListener.onShowDefinitionClick(view);
+                return onViewActionListener == null ? new Pair<List<PolyvDefinitionVO>, Integer>(null, 0)
+                        : onViewActionListener.onShowDefinitionClick(view);
             }
 
             @Override

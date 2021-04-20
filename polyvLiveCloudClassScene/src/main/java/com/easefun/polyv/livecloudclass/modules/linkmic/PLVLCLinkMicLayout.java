@@ -437,9 +437,6 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVCommonLog.d(TAG, "PLVLinkMicLayout.onBeforeJoinChannel");
         //初始化连麦适配器，准备添加连麦观众
         linkMicListAdapter.setDataList(linkMicList);
-        if (!linkMicListAdapter.hasObservers() && !linkMicListAdapter.hasStableIds()) {
-            linkMicListAdapter.setHasStableIds(true);
-        }
         linkMicListAdapter.setListShowMode(linkMicListShowMode);
         linkMicListAdapter.setMyLinkMicId(linkMicUid);
 

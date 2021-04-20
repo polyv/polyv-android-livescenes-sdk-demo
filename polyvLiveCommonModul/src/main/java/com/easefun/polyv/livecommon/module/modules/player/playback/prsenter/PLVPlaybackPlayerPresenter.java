@@ -84,12 +84,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void init() {
-        if (getView() == null) {
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        if (view == null) {
             return;
         }
         //init data
-        videoView = getView().getPlaybackVideoView();
-        subVideoView = getView().getSubVideoView();
+        videoView = view.getPlaybackVideoView();
+        subVideoView = view.getSubVideoView();
         initVideoViewListener();
         initSubVideoViewListener();
     }
@@ -301,20 +302,21 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             subVideoView.setOnVideoPlayListener(new IPolyvVideoViewListenerEvent.OnVideoPlayListener() {
                 @Override
                 public void onPlay(boolean isFirst) {
-                    if (getView() != null) {
-                        getView().onSubVideoViewPlay(isFirst);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewPlay(isFirst);
                     }
                 }
             });
-            subVideoView.setOnGestureClickListener(onSubGestureClickListener
-                    = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
+            onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
                 @Override
                 public void callback(boolean start, boolean end) {
                     if (!TextUtils.isEmpty(subVideoViewHerf)) {
                         PLVWebUtils.openWebLink(subVideoViewHerf, subVideoView.getContext());
                     }
                 }
-            });
+            };
+            subVideoView.setOnGestureClickListener(onSubGestureClickListener);
             subVideoView.setOnSubVideoViewLoadImage(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewLoadImage() {
                 @Override
                 public void onLoad(String imageUrl, final ImageView imageView, final String coverHref) {
@@ -336,15 +338,17 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public void onCountdown(int totalTime, int remainTime, int adStage) {
                     boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
-                    if (getView() != null)
-                        getView().onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null)
+                        view.onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
                 }
 
                 @Override
                 public void onVisibilityChange(boolean isShow) {
                     boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
-                    if (getView() != null) {
-                        getView().onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
                     }
                 }
             });
@@ -358,21 +362,22 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public void onPrepared() {
                     playbackPlayerData.postPrepared();
-                    if (getView() != null) {
-                        getView().onPrepared();
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onPrepared();
                     }
                     setLogoVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onPreparing() {
-                    PLVCommonLog.d(TAG,"onPreparing");
+                    PLVCommonLog.d(TAG, "onPreparing");
                 }
             });
             videoView.setOnErrorListener(new IPolyvVideoViewListenerEvent.OnErrorListener() {
                 @Override
                 public void onError(int what, int extra) {
-                    PLVCommonLog.d(TAG,"onError:"+what);
+                    PLVCommonLog.d(TAG, "onError:" + what);
                 }
 
                 @Override
@@ -401,16 +406,15 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             "(" + error.errorCode + "-" + error.playStage + ")\n" +
                             error.playPath;
 
-                    if (getView() != null) {
-                        setLogoVisibility(View.GONE);
-                    }
+                    setLogoVisibility(View.GONE);
                 }
             });
             videoView.setOnCompletionListener(new IPolyvVideoViewListenerEvent.OnCompletionListener() {
                 @Override
                 public void onCompletion() {
-                    if (getView() != null) {
-                        getView().onCompletion();
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onCompletion();
                     }
                 }
             });
@@ -418,12 +422,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public void onInfo(int what, int extra) {
                     if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
-                        if (getView() != null) {
-                            getView().onBufferStart();
+                        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                        if (view != null) {
+                            view.onBufferStart();
                         }
                     } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_END) {
-                        if (getView() != null) {
-                            getView().onBufferEnd();
+                        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                        if (view != null) {
+                            view.onBufferEnd();
                         }
                     }
                 }
@@ -431,16 +437,18 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnVideoPlayListener(new IPolyvVideoViewListenerEvent.OnVideoPlayListener() {
                 @Override
                 public void onPlay(boolean isFirst) {
-                    if (getView() != null) {
-                        getView().onVideoPlay(isFirst);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onVideoPlay(isFirst);
                     }
                 }
             });
             videoView.setOnVideoPauseListener(new IPolyvVideoViewListenerEvent.OnVideoPauseListener() {
                 @Override
                 public void onPause() {
-                    if (getView() != null) {
-                        getView().onVideoPause();
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onVideoPause();
                     }
                 }
             });
@@ -449,8 +457,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 public void callback(boolean start, boolean end) {
                     int brightness = videoView.getBrightness((Activity) videoView.getContext()) - 8;
                     brightness = Math.max(0, brightness);
-                    if (getView() != null) {
-                        boolean result = getView().onLightChanged(brightness, end);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onLightChanged(brightness, end);
                         if (start && result) {
                             videoView.setBrightness((Activity) videoView.getContext(), brightness);
                         }
@@ -462,8 +471,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 public void callback(boolean start, boolean end) {
                     int brightness = videoView.getBrightness((Activity) videoView.getContext()) + 8;
                     brightness = Math.min(100, brightness);
-                    if (getView() != null) {
-                        boolean result = getView().onLightChanged(brightness, end);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onLightChanged(brightness, end);
                         if (start && result) {
                             videoView.setBrightness((Activity) videoView.getContext(), brightness);
                         }
@@ -475,8 +485,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 public void callback(boolean start, boolean end) {
                     int volume = videoView.getVolume() - PLVControlUtils.getVolumeValidProgress(videoView.getContext(), 8);
                     volume = Math.max(0, volume);
-                    if (getView() != null) {
-                        boolean result = getView().onVolumeChanged(volume, end);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onVolumeChanged(volume, end);
                         if (start && result) {
                             videoView.setVolume(volume);
                         }
@@ -488,8 +499,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 public void callback(boolean start, boolean end) {
                     int volume = videoView.getVolume() + PLVControlUtils.getVolumeValidProgress(videoView.getContext(), 8);
                     volume = Math.min(100, volume);
-                    if (getView() != null) {
-                        boolean result = getView().onVolumeChanged(volume, end);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onVolumeChanged(volume, end);
                         if (start && result) {
                             videoView.setVolume(volume);
                         }
@@ -500,8 +512,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public void callback() {
                     if (videoView.isInPlaybackStateEx()) {
-                        if (getView() != null) {
-                            getView().onDoubleClick();
+                        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                        if (view != null) {
+                            view.onDoubleClick();
                         }
                     }
                 }
@@ -509,6 +522,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeLeftListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeLeftListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
                             fastForwardPos = videoView.getCurrentPosition();
@@ -519,8 +533,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         }
                         if (end) {
                             fastForwardPos = Math.max(0, fastForwardPos);
-                            if (getView() != null) {
-                                boolean result = getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
+                            if (view != null) {
+                                boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
                                 if (result) {
                                     videoView.seekTo(fastForwardPos);
                                     if (videoView.isCompletedState()) {
@@ -531,13 +545,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             fastForwardPos = 0;
                             return;
                         }
-                        if (getView() != null) {
-                            getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
+                        if (view != null) {
+                            view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
                         }
                     } else if (end) {
                         fastForwardPos = 0;
-                        if (getView() != null) {
-                            getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
+                        if (view != null) {
+                            view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
                         }
                     }
                 }
@@ -545,6 +559,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeRightListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeRightListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
                             fastForwardPos = videoView.getCurrentPosition();
@@ -554,8 +569,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             fastForwardPos = videoView.getDuration();
                         }
                         if (end) {
-                            if (getView() != null) {
-                                boolean result = getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
+                            if (view != null) {
+                                boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
                                 if (result) {
                                     if (!videoView.isCompletedState()) {
                                         videoView.seekTo(fastForwardPos);
@@ -567,13 +582,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             }
                             fastForwardPos = 0;
                         }
-                        if (getView() != null) {
-                            getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
+                        if (view != null) {
+                            view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
                         }
                     } else if (end) {
                         fastForwardPos = 0;
-                        if (getView() != null) {
-                            getView().onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
+                        if (view != null) {
+                            view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
                         }
                     }
                 }
@@ -583,16 +598,18 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGetMarqueeVoListener(new IPolyvVideoViewListenerEvent.OnGetMarqueeVoListener() {
                 @Override
                 public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo) {
-                    if (getView() != null) {
-                        getView().onGetMarqueeVo(marqueeVo, getConfig().getUser().getViewerName());
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onGetMarqueeVo(marqueeVo, getConfig().getUser().getViewerName());
                     }
                 }
             });
             videoView.setOnDanmuServerOpenListener(new IPolyvVideoViewListenerEvent.OnDanmuServerOpenListener() {
                 @Override
                 public void onDanmuServerOpenListener(boolean isServerDanmuOpen) {
-                    if (getView() != null) {
-                        getView().onServerDanmuOpen(isServerDanmuOpen);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuOpen(isServerDanmuOpen);
                     }
                 }
             });
@@ -600,8 +617,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public void showPPTView(int visible) {
                     playbackPlayerData.postPPTShowState(visible == View.VISIBLE);
-                    if (getView() != null) {
-                        getView().onShowPPTView(visible);
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onShowPPTView(visible);
                     }
                 }
             });
@@ -611,8 +629,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     if (TextUtils.isEmpty(logoImage)) {
                         return;
                     }
-                    if (getView() != null) {
-                        logoView = getView().getLogo();
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        logoView = view.getLogo();
                         if (logoView != null) {
                             logoView.removeAllLogo();
                             logoView.addLogo(new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
@@ -670,8 +689,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         }
         playbackPlayerData.postPlayInfoVO(builder.build());
 
-        if (getView() != null) {
-            getView().updatePlayInfo(builder.build());
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        if (view != null) {
+            view.updatePlayInfo(builder.build());
         }
         return position;
     }

@@ -7,7 +7,6 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVOTeacherInfoEvent;
-import com.plv.socket.event.chat.PLVTeacherInfoEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -32,8 +31,7 @@ public class PLVLiveFloatingPresenter implements IPLVLiveFloatingContract.IPLVLi
     @Override
     public void init(final IPLVLiveFloatingContract.IPLVLiveFloatingView view) {
         this.view = view;
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener
-                = new PLVSocketMessageObserver.OnMessageListener() {
+        onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
                 PLVSocketUserBean teacherUser = null;
@@ -62,7 +60,8 @@ public class PLVLiveFloatingPresenter implements IPLVLiveFloatingContract.IPLVLi
                     }
                 }
             }
-        });
+        };
+        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
     }
 
     // </editor-fold>

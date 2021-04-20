@@ -30,8 +30,8 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
  * 弹幕Fragment
  */
 public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuController {
-    private boolean status_canauto_resume = true;
-    private boolean status_pause_fromuser = true;
+    private boolean statusCanautoResume = true;
+    private boolean statusPauseFromUser = true;
     // danmuLayoutView
     private View view;
     private IDanmakuView mDanmakuView;
@@ -97,12 +97,13 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
 
             }
         });
-        mDanmakuView.prepare(mParser = new BaseDanmakuParser() {
+        mParser = new BaseDanmakuParser() {
             @Override
             protected IDanmakus parse() {
                 return new Danmakus();
             }
-        }, mContext);
+        };
+        mDanmakuView.prepare(mParser, mContext);
     }
 
     //隐藏
@@ -128,9 +129,9 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
 
     public void pause(boolean fromuser) {
         if (!fromuser) {
-            status_pause_fromuser = false;
+            statusPauseFromUser = false;
         } else {
-            status_canauto_resume = false;
+            statusCanautoResume = false;
         }
         if (mDanmakuView != null && mDanmakuView.isPrepared()) {
             mDanmakuView.pause();
@@ -143,14 +144,14 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
     }
 
     public void resume(boolean fromuser) {
-        if (status_pause_fromuser && fromuser || (!status_pause_fromuser && !fromuser)) {
+        if (statusPauseFromUser && fromuser || (!statusPauseFromUser && !fromuser)) {
             if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
-                if (!status_pause_fromuser) {
-                    status_pause_fromuser = true;
-                    if (status_canauto_resume)
+                if (!statusPauseFromUser) {
+                    statusPauseFromUser = true;
+                    if (statusCanautoResume)
                         mDanmakuView.resume();
                 } else {
-                    status_canauto_resume = true;
+                    statusCanautoResume = true;
                     mDanmakuView.resume();
                 }
             }
@@ -167,13 +168,19 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
         danmaku.text = message;
         danmaku.padding = 0;
         danmaku.priority = 1; // 一定会显示, 一般用于本机发送的弹幕
-//        danmaku.isLive = islive;
+
         danmaku.setTime(mDanmakuView.getCurrentTime() + 100);
-//        18f * (mParser.getDisplayer().getDensity() - 0.6f)
-        danmaku.textSize = ConvertUtils.dp2px(14);
+
         danmaku.textColor = Color.WHITE;
         danmaku.textShadowColor = Color.parseColor("#333333"); // 重要：如果有图文混排，最好不要设置描边(设textShadowColor=0)，否则会进行两次复杂的绘制导致运行效率降低
-//        danmaku.underlineColor = Color.GREEN;
+        /**
+         * ///暂时保留代码
+         * danmaku.isLive = islive;
+         * danmaku.underlineColor = Color.GREEN;
+         *
+         * 18f * (mParser.getDisplayer().getDensity() - 0.6f)
+         */
+        danmaku.textSize = ConvertUtils.dp2px(14);
         mDanmakuView.addDanmaku(danmaku);
     }
 

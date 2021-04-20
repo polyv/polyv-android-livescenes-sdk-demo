@@ -9,7 +9,8 @@ import android.graphics.PointF;
 
 public class PLVBezierEvaluator implements TypeEvaluator<PointF> {
 
-    private PointF point1, point2;
+    private PointF point1;
+    private PointF point2;
     private PointF point;
 
     public PLVBezierEvaluator(PointF point1, PointF point2) {

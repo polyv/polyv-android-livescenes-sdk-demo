@@ -33,7 +33,7 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     //socket监听器
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
-    private final static String REPLACEMENT = "\\\\u0027";
+    private static final String REPLACEMENT = "\\\\u0027";
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">

@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
 import android.webkit.WebView;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
+
 import java.lang.reflect.Method;
 
 public class PLVSafeWebView extends WebView {
+    private static final String TAG = "PLVSafeWebView";
 
     public PLVSafeWebView(Context context) {
         super(context);
@@ -71,19 +74,13 @@ public class PLVSafeWebView extends WebView {
                 setState.setAccessible(true);
                 setState.invoke(am, 0);/**{@link AccessibilityManager#STATE_FLAG_ACCESSIBILITY_ENABLED}*/
             } catch (Exception ignored) {
-                ignored.printStackTrace();
+                PLVCommonLog.e(TAG, "disableAccessibility:" + ignored.getMessage());
             }
         }
     }
 
     @Override
     public void setOverScrollMode(int mode) {
-//        try {
-//            super.setOverScrollMode(mode);
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
-
         try {
             super.setOverScrollMode(mode);
         } catch (Throwable e) {
@@ -91,7 +88,7 @@ public class PLVSafeWebView extends WebView {
             if (trace.contains("android.content.pm.PackageManager$NameNotFoundException")
                     || trace.contains("java.lang.RuntimeException: Cannot load WebView")
                     || trace.contains("android.webkit.WebViewFactory$MissingWebViewPackageException: Failed to load WebView provider: No WebView installed")) {
-                e.printStackTrace();
+                PLVCommonLog.e(TAG, "setOverScrollMode:" + e.getMessage());
             } else {
                 throw e;
             }

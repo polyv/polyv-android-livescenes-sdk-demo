@@ -44,7 +44,7 @@ public class PLVLiveChannelConfigFiller {
      * @param viewerAvatar 用户的头像url，用于登录socket、发送日志
      */
     public static void setupUser(String viewerId, String viewerName, String viewerAvatar) {
-        channelConfig.setupUser(viewerId, viewerName, viewerAvatar, PLVSocketUserConstant.USERTYPE_STUDENT);
+        channelConfig.setupUser(viewerId, viewerName, viewerAvatar, PLVSocketUserConstant.USERTYPE_SLICE);
     }
 
     /**
@@ -104,6 +104,6 @@ public class PLVLiveChannelConfigFiller {
      * @return PLVLiveChannelConfig
      */
     public static PLVLiveChannelConfig generateNewChannelConfig() {
-        return (PLVLiveChannelConfig) channelConfig.clone();
+        return new PLVLiveChannelConfig(channelConfig);
     }
 }

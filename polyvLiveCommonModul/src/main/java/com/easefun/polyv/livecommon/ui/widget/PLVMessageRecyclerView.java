@@ -132,12 +132,16 @@ public class PLVMessageRecyclerView extends RecyclerView {
                 lastVerticalScrollOffset = computeVerticalScrollOffset();
                 setIsScrolledEnd(!canScrollVertically(1));//1.原本为false，键盘弹出不超出列表高度，会改为true，并且更多view出现在顶部//2.非键盘弹出，更多view不会出现，并且出现的位置在底部并被覆盖
                 if (unreadCount >= 2 && getAdapter() != null) {
-                    int temp_unreadCount = getAdapter().getItemCount() - 1 - ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
-                    if (temp_unreadCount < unreadCount) {
-                        unreadCount = temp_unreadCount;
-//                            if (unreadView != null) {
-//                                unreadView.setText("有" + unreadCount + "条新信息，点击查看");
-//                            }
+                    int tempUnreadCount = getAdapter().getItemCount() - 1 - ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
+                    if (tempUnreadCount < unreadCount) {
+                        unreadCount = tempUnreadCount;
+                        /**
+                         * ///暂时保留该代码
+                         * if (unreadView != null) {
+                         *     unreadView.setText("有" + unreadCount + "条新信息，点击查看");
+                         * }
+                         */
+
                         if (unreadCount == 0) {
                             if (unreadViews != null) {
                                 for (View unreadView : unreadViews) {
@@ -192,7 +196,6 @@ public class PLVMessageRecyclerView extends RecyclerView {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-//        processStackFromEnd();
         if (t >= b/*input > recyclerHeight, input sh to top*/) {
             heightZero = true;
         } else {
@@ -237,7 +240,10 @@ public class PLVMessageRecyclerView extends RecyclerView {
         if (unreadViews != null) {
             for (View unreadView : unreadViews) {
                 unreadView.setVisibility(View.VISIBLE);
-                //            unreadView.setText("有" + unreadCount + "条新信息，点击查看");
+                /**
+                 * ///暂时保留该代码
+                 * unreadView.setText("有" + unreadCount + "条新信息，点击查看");
+                 */
             }
         } else {
             super.scrollToPosition(getAdapter().getItemCount() - 1);

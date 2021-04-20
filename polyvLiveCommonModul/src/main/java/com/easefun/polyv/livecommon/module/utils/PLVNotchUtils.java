@@ -7,7 +7,10 @@ import android.util.Log;
 
 import com.plv.foundationsdk.log.PLVCommonLog;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -17,6 +20,29 @@ import java.lang.reflect.Method;
  */
 public class PLVNotchUtils {
     private static final String TAG = PLVNotchUtils.class.getSimpleName();
+    private static final String HUAWEI = "HUAWEI";
+    private static final String XIAOMI = "xiaomi";
+    private static final String OPPO = "oppo";
+    private static final String VIVO = "vivo";
+    private static final String MEIZU = "meizu";
+
+    private static final String GET_INT = "getInt";
+
+    private static final String ANDROID_UTIL_FT_FEATURE = "android.util.FtFeature";
+    private static final String ANDROID_OS_SYSTEM_PROPERTIES = "android.os.SystemProperties";
+    private static final String COM_HUAWEI_ANDROID_UTIL_HW_NOTCH_SIZE_UTIL = "com.huawei.android.util.HwNotchSizeUtil";
+    public static final String COM_OPPO_FEATURE_SCREEN_HETEROMORPHISM = "com.oppo.feature.screen.heteromorphism";
+    private static final String FLYME_CONFIG_FLYME_FEATURE = "flyme.config.FlymeFeature";
+
+    private static final String HAS_NOTCH_IN_SCREEN = "hasNotchInScreen";
+    private static final String HAS_NOTCH_HW = "hasNotchHw:";
+    private static final String HAS_NOTCH_XIAO_MI = "hasNotchXiaoMi:";
+    private static final String HAS_NOTCH_MEIZU = "hasNotchMeizu:";
+    private static final String RO_MIUI_NOTCH = "ro.miui.notch";
+    private static final String HAS_NOTCH_VIVO = "hasNotchVIVO:";
+
+    private static final String IS_FRINGE_DEVICE = "IS_FRINGE_DEVICE";
+    private static final String IS_FEATURE_SUPPORT = "isFeatureSupport";
 
     /**
      * 是否有刘海屏
@@ -28,15 +54,15 @@ public class PLVNotchUtils {
         String manufacturer = Build.MANUFACTURER;
         if (TextUtils.isEmpty(manufacturer)) {
             return false;
-        } else if (manufacturer.equalsIgnoreCase("HUAWEI")) {
+        } else if (manufacturer.equalsIgnoreCase(HUAWEI)) {
             return hasNotchHw(activity);
-        } else if (manufacturer.equalsIgnoreCase("xiaomi")) {
+        } else if (manufacturer.equalsIgnoreCase(XIAOMI)) {
             return hasNotchXiaoMi(activity);
-        } else if (manufacturer.equalsIgnoreCase("oppo")) {
+        } else if (manufacturer.equalsIgnoreCase(OPPO)) {
             return hasNotchOPPO(activity);
-        } else if (manufacturer.equalsIgnoreCase("vivo")) {
+        } else if (manufacturer.equalsIgnoreCase(VIVO)) {
             return hasNotchVIVO(activity);
-        } else if (manufacturer.equalsIgnoreCase("meizu")) {
+        } else if (manufacturer.equalsIgnoreCase(MEIZU)) {
             return hasNotchMeizu(activity);
         } else {
             return false;
@@ -52,13 +78,19 @@ public class PLVNotchUtils {
      */
     private static boolean hasNotchVIVO(Activity activity) {
         try {
-            Class<?> c = Class.forName("android.util.FtFeature");
-            Method get = c.getMethod("isFeatureSupport", int.class);
+            Class<?> c = Class.forName(ANDROID_UTIL_FT_FEATURE);
+            Method get = c.getMethod(IS_FEATURE_SUPPORT, int.class);
             return (boolean) (get.invoke(c, 0x20));
-        } catch (Exception e) {
-            PLVCommonLog.i(TAG, Log.getStackTraceString(e));
-            return false;
+        } catch (InvocationTargetException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_VIVO + e.getMessage());
+        } catch (NoSuchMethodException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_VIVO + e.getMessage());
+        } catch (IllegalAccessException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_VIVO + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_VIVO + e.getMessage());
         }
+        return false;
     }
 
     /**
@@ -69,7 +101,7 @@ public class PLVNotchUtils {
      * @return
      */
     private static boolean hasNotchOPPO(Activity activity) {
-        return activity.getPackageManager().hasSystemFeature("com.oppo.feature.screen.heteromorphism");
+        return activity.getPackageManager().hasSystemFeature(COM_OPPO_FEATURE_SCREEN_HETEROMORPHISM);
     }
 
     /**
@@ -81,13 +113,19 @@ public class PLVNotchUtils {
      */
     private static boolean hasNotchXiaoMi(Activity activity) {
         try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("getInt", String.class, int.class);
-            return (int) (get.invoke(c, "ro.miui.notch", 0)) == 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            Class<?> c = Class.forName(ANDROID_OS_SYSTEM_PROPERTIES);
+            Method get = c.getMethod(GET_INT, String.class, int.class);
+            return (int) (get.invoke(c, RO_MIUI_NOTCH, 0)) == 1;
+        } catch (InvocationTargetException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_XIAO_MI + e.getMessage());
+        } catch (NoSuchMethodException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_XIAO_MI + e.getMessage());
+        } catch (IllegalAccessException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_XIAO_MI + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_XIAO_MI + e.getMessage());
         }
+        return false;
     }
 
     /**
@@ -101,10 +139,11 @@ public class PLVNotchUtils {
 
         try {
             ClassLoader cl = activity.getClassLoader();
-            Class HwNotchSizeUtil = cl.loadClass("com.huawei.android.util.HwNotchSizeUtil");
-            Method get = HwNotchSizeUtil.getMethod("hasNotchInScreen");
+            Class HwNotchSizeUtil = cl.loadClass(COM_HUAWEI_ANDROID_UTIL_HW_NOTCH_SIZE_UTIL);
+            Method get = HwNotchSizeUtil.getMethod(HAS_NOTCH_IN_SCREEN);
             return (boolean) get.invoke(HwNotchSizeUtil);
         } catch (Exception e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_HW + e.getMessage());
             return false;
         }
     }
@@ -112,11 +151,15 @@ public class PLVNotchUtils {
     private static boolean hasNotchMeizu(Activity activity) {
         boolean fringeDevice = false;
         try {
-            Class clazz = Class.forName("flyme.config.FlymeFeature");
-            Field field = clazz.getDeclaredField("IS_FRINGE_DEVICE");
+            Class clazz = Class.forName(FLYME_CONFIG_FLYME_FEATURE);
+            Field field = clazz.getDeclaredField(IS_FRINGE_DEVICE);
             fringeDevice = (boolean) field.get(null);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_MEIZU + e.getMessage());
+        } catch (NoSuchFieldException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_MEIZU + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            PLVCommonLog.d(TAG, HAS_NOTCH_MEIZU + e.getMessage());
         }
         return fringeDevice;
     }

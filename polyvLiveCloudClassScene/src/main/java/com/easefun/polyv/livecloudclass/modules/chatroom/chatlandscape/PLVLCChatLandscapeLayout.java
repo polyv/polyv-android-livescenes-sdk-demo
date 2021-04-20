@@ -243,7 +243,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
             super.onHistoryDataList(chatMessageDataList, requestSuccessTime, isNoMoreHistory, viewIndex);
             swipeLoadView.setRefreshing(false);
             swipeLoadView.setEnabled(true);
-            if (chatMessageDataList.size() > 0) {
+            if (!chatMessageDataList.isEmpty()) {
                 addChatHistoryToList(chatMessageDataList, requestSuccessTime == 1);
             }
             if (isNoMoreHistory) {

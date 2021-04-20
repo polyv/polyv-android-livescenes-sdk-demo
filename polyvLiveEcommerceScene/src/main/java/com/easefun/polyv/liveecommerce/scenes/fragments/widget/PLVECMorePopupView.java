@@ -54,6 +54,17 @@ public class PLVECMorePopupView {
     private boolean isHasDefinitionVO;
     //是否有多线路信息
     private boolean isHasLinesInfo;
+
+    private SparseArray<Float> speedArray;
+
+    public PLVECMorePopupView() {
+        speedArray = new SparseArray<>();
+        speedArray.put(0, 0.5f);
+        speedArray.put(1, 1f);
+        speedArray.put(2, 1.25f);
+        speedArray.put(3, 1.5f);
+        speedArray.put(4, 2.0f);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 直播更多布局控制">
@@ -291,16 +302,6 @@ public class PLVECMorePopupView {
             }
         }
     }
-
-    private SparseArray<Float> speedArray = new SparseArray<Float>() {
-        {
-            put(0, 0.5f);
-            put(1, 1f);
-            put(2, 1.25f);
-            put(3, 1.5f);
-            put(4, 2.0f);
-        }
-    };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 弹窗控制">

@@ -38,9 +38,9 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private static final String TAG = PLVLinkMicListAdapter.class.getSimpleName();
     public static final int HORIZONTAL_VISIBLE_COUNT = 3;
 
-    public static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
-    public static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
-    public static final String PAYLOAD_UPDATE_CUP = "updateCup";
+    private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
+    private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
+    private static final String PAYLOAD_UPDATE_CUP = "updateCup";
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -262,11 +262,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     }
 
     @Override
-    public long getItemId(int position) {
-        return dataList.get(position).getLinkMicId().hashCode();
-    }
-
-    @Override
     public int getItemViewType(int position) {
         return dataList.get(position).getLinkMicId().hashCode();
     }
@@ -276,7 +271,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (holder.isViewRecycled) {
             holder.isViewRecycled = false;
             holder.renderView = adapterCallback.createLinkMicRenderView();
-            holder.flRenderViewContainer.addView(holder.renderView,getRenderViewLayoutParam());
+            holder.flRenderViewContainer.addView(holder.renderView, getRenderViewLayoutParam());
             holder.isRenderViewSetup = false;
         }
         PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
@@ -348,6 +343,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
         isMuteVideo = resolveListShowMode(holder, position);
 
+        //设置麦克风状态
+        setMicrophoneVolumeIcon(curVolume, isMuteAudio, holder);
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
 
@@ -409,33 +406,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             switch (payload.toString()) {
                 case PAYLOAD_UPDATE_VOLUME:
                     //设置麦克风状态
-                    if (isMuteAudio) {
-                        holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_iv_mic_close);
-                    } else {
-                        if (intBetween(curVolume, 0, 5) || curVolume == 0) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_iv_mic_open);
-                        } else if (intBetween(curVolume, 5, 15)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_10);
-                        } else if (intBetween(curVolume, 15, 25)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_20);
-                        } else if (intBetween(curVolume, 25, 35)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_30);
-                        } else if (intBetween(curVolume, 35, 45)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_40);
-                        } else if (intBetween(curVolume, 45, 55)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_50);
-                        } else if (intBetween(curVolume, 55, 65)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_60);
-                        } else if (intBetween(curVolume, 65, 75)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_70);
-                        } else if (intBetween(curVolume, 75, 85)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_80);
-                        } else if (intBetween(curVolume, 85, 95)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_90);
-                        } else if (intBetween(curVolume, 95, 100)) {
-                            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_100);
-                        }
-                    }
+                    setMicrophoneVolumeIcon(curVolume, isMuteAudio, holder);
                     break;
                 case PAYLOAD_UPDATE_VIDEO_MUTE:
                     //是否关闭摄像头
@@ -554,6 +525,43 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 break;
         }
         return isMuteVideo;
+    }
+
+    /**
+     * 设置麦克风音量图片
+     *
+     * @param curVolume   当前音量
+     * @param isMuteAudio 是否mute音频
+     * @param holder      ViewHolder
+     */
+    private void setMicrophoneVolumeIcon(int curVolume, boolean isMuteAudio, @NonNull LinkMicItemViewHolder holder) {
+        if (isMuteAudio) {
+            holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_iv_mic_close);
+        } else {
+            if (intBetween(curVolume, 0, 5) || curVolume == 0) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_iv_mic_open);
+            } else if (intBetween(curVolume, 5, 15)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_10);
+            } else if (intBetween(curVolume, 15, 25)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_20);
+            } else if (intBetween(curVolume, 25, 35)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_30);
+            } else if (intBetween(curVolume, 35, 45)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_40);
+            } else if (intBetween(curVolume, 45, 55)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_50);
+            } else if (intBetween(curVolume, 55, 65)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_60);
+            } else if (intBetween(curVolume, 65, 75)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_70);
+            } else if (intBetween(curVolume, 75, 85)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_80);
+            } else if (intBetween(curVolume, 85, 95)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_90);
+            } else if (intBetween(curVolume, 95, 100)) {
+                holder.ivMicState.setImageResource(R.drawable.plvlc_linkmic_mic_volume_100);
+            }
+        }
     }
     // </editor-fold>
 

@@ -51,87 +51,85 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
     @Override
     public void init(final IPLVPPTContract.IPLVPPTView view) {
         this.view = view;
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(
-                onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
-                    @Override
-                    public void onMessage(String listenEvent, String event, String message) {
-                        if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event) ||
-                                PLVEventConstant.Ppt.ON_SLICE_DRAW_EVENT.equals(event) ||
-                                PLVEventConstant.Ppt.ON_SLICE_CONTROL_EVENT.equals(event) ||
-                                PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
-                                PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
-                            if (view != null) {
-                                view.hideLoading();
-                            }
-                            if (delayTime > 0) {
-                                int lastPos = message.lastIndexOf('}');
-                                message = message.substring(0, lastPos) + ",\"delayTime\":" + delayTime + "}";
-                            }
+        onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
+            @Override
+            public void onMessage(String listenEvent, String event, String message) {
+                if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_DRAW_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_CONTROL_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
+                    if (view != null) {
+                        view.hideLoading();
+                    }
+                    if (delayTime > 0) {
+                        int lastPos = message.lastIndexOf('}');
+                        message = message.substring(0, lastPos) + ",\"delayTime\":" + delayTime + "}";
+                    }
 
-                            PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
+                    PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
 
-                            if (view != null) {
-                                view.sendMsgToWebView(message);
-                            }
-                        } else if (PLVEventConstant.MESSAGE_EVENT_LOGIN.equals(event)) {
-                            //发送login事件到ppt
-                            final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
-                            if (loginEvent != null &&
-                                    loginEvent.getUser().getUserId().
-                                            equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId())) {
-                                dispose(delaySendLoginEventDisposable);
-                                delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
-                                    @Override
-                                    public void accept(Object o) throws Exception {
-                                        if (view != null) {
-                                            view.sendMsgToWebView(CHAT_LOGIN, loginEvent.getUser().toString());
-                                        }
-                                    }
-                                });
-                            }
-                        } else if (PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE.equals(event)) {
-                            //PPT和主屏幕切换位置
-                            PolyvPPTAuthentic pptAuthentic = PLVGsonUtil.fromJson(PolyvPPTAuthentic.class, message);
-                            if (pptAuthentic == null) {
-                                return;
-                            }
-                            String status = pptAuthentic.getStatus();
-                            if (PolyvPPTAuthentic.PermissionStatus.OK.equals(status)) {
+                    if (view != null) {
+                        view.sendMsgToWebView(message);
+                    }
+                } else if (PLVEventConstant.MESSAGE_EVENT_LOGIN.equals(event)) {
+                    //发送login事件到ppt
+                    final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
+                    if (loginEvent != null &&
+                            loginEvent.getUser().getUserId().
+                                    equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId())) {
+                        dispose(delaySendLoginEventDisposable);
+                        delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
+                            @Override
+                            public void accept(Object o) throws Exception {
                                 if (view != null) {
-                                    view.switchPPTViewLocation(false);
-                                }
-                            } else {
-                                if (view != null) {
-                                    view.switchPPTViewLocation(true);
+                                    view.sendMsgToWebView(CHAT_LOGIN, loginEvent.getUser().toString());
                                 }
                             }
+                        });
+                    }
+                } else if (PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE.equals(event)) {
+                    //PPT和主屏幕切换位置
+                    PolyvPPTAuthentic pptAuthentic = PLVGsonUtil.fromJson(PolyvPPTAuthentic.class, message);
+                    if (pptAuthentic == null) {
+                        return;
+                    }
+                    String status = pptAuthentic.getStatus();
+                    if (PolyvPPTAuthentic.PermissionStatus.OK.equals(status)) {
+                        if (view != null) {
+                            view.switchPPTViewLocation(false);
+                        }
+                    } else {
+                        if (view != null) {
+                            view.switchPPTViewLocation(true);
                         }
                     }
                 }
-        );
+            }
+        };
+        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
 
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(
-                followTeacherPptVideoLocationListener = new PLVSocketMessageObserver.OnMessageListener() {
-                    @Override
-                    public void onMessage(String listenEvent, String event, String message) {
-                        if (PLVOnSliceIDEvent.EVENT.equals(event)) {
-                            PLVOnSliceIDEvent eventVo = PLVEventHelper.toMessageEventModel(message, PLVOnSliceIDEvent.class);
-                            if (eventVo == null) {
-                                return;
-                            }
-                            PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(this);
-                            if (!eventVo.isInClass()) {
-                                // 非正在直播状态，不同步主副屏
-                                return;
-                            }
-                            // pptAndVideoPosition 0表示讲师端目前ppt在主屏 1表示讲师端目前播放器在主屏
-                            if (view != null) {
-                                view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
-                            }
-                        }
+        followTeacherPptVideoLocationListener = new PLVSocketMessageObserver.OnMessageListener() {
+            @Override
+            public void onMessage(String listenEvent, String event, String message) {
+                if (PLVOnSliceIDEvent.EVENT.equals(event)) {
+                    PLVOnSliceIDEvent eventVo = PLVEventHelper.toMessageEventModel(message, PLVOnSliceIDEvent.class);
+                    if (eventVo == null) {
+                        return;
+                    }
+                    PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(this);
+                    if (!eventVo.isInClass()) {
+                        // 非正在直播状态，不同步主副屏
+                        return;
+                    }
+                    // pptAndVideoPosition 0表示讲师端目前ppt在主屏 1表示讲师端目前播放器在主屏
+                    if (view != null) {
+                        view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
                     }
                 }
-        );
+            }
+        };
+        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(followTeacherPptVideoLocationListener);
     }
 
     @Override

@@ -41,12 +41,14 @@ public class PLVLCLiveMoreLayout {
     private View anchor;
     private ViewGroup containerLy;
     private PLVOrientationSensibleLinearLayout llMoreVertical;
-    private RecyclerView rvBitrate, rvLines;
+    private RecyclerView rvBitrate;
+    private RecyclerView rvLines;
     private RvBitrateAdapter rvAdapter;
     private RvLinesAdapter linesAdapter;
     private TextView tvPlayVideoSwitch;
     private TextView tvOnlyAudioSwitch;
-    private FrameLayout llBitrate, linesContainer;
+    private FrameLayout llBitrate;
+    private FrameLayout linesContainer;
 
     private TextView portraitModeTv;
     private TextView portraitBitrateTv;
@@ -101,7 +103,10 @@ public class PLVLCLiveMoreLayout {
             @Override
             public void run() {
                 if (popupWindow != null && popupWindow.isShowing()) {
-//                    popupWindow.setClippingEnabled(true);
+                    /**
+                     * ///暂时保留代码
+                     *popupWindow.setClippingEnabled(true);
+                     */
                     popupWindow.update();
                 }
                 onLandscape();
@@ -115,7 +120,10 @@ public class PLVLCLiveMoreLayout {
                     return;
                 }
                 if (popupWindow != null && popupWindow.isShowing()) {
-//                    popupWindow.setClippingEnabled(false);
+                    /**
+                     *  ///暂时保留代码
+                     *popupWindow.setClippingEnabled(false);
+                     */
                     popupWindow.update();
                 }
                 onPortrait();
@@ -336,7 +344,10 @@ public class PLVLCLiveMoreLayout {
     // <editor-fold defaultstate="collapsed" desc="控制UI显示">
     private void show(boolean isPort) {
         if (popupWindow != null) {
-//            popupWindow.setClippingEnabled(!isPort);
+            /**
+             *  ///暂时保留代码
+             *popupWindow.setClippingEnabled(!isPort);
+             */
             popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, 0, 0);
         }
     }
@@ -389,11 +400,8 @@ public class PLVLCLiveMoreLayout {
             String defenition = bitrateVO.get(position).getDefinition();
             holder.tvBitrate.setText(defenition);
 
-            if (position == curSelectPos) {
-                holder.tvBitrate.setSelected(true);
-            } else {
-                holder.tvBitrate.setSelected(false);
-            }
+            boolean isSelect = position == curSelectPos;
+            holder.tvBitrate.setSelected(isSelect);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

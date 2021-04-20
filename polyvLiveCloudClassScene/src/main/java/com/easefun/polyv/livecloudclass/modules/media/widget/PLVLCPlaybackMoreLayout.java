@@ -58,14 +58,7 @@ public class PLVLCPlaybackMoreLayout {
     private TextView speedTipsTv;
 
     //倍速列表数据
-    private List<Float> speedVO = new ArrayList<Float>() {
-        {
-            add(0.5f);
-            add(1.0f);
-            add(1.5f);
-            add(2.0f);
-        }
-    };
+    private List<Float> speedVO = new ArrayList<>();
 
     private Handler handler = new Handler(Looper.getMainLooper());
     // </editor-fold>
@@ -73,6 +66,12 @@ public class PLVLCPlaybackMoreLayout {
     // <editor-fold defaultstate="collapsed" desc="构造方法">
     public PLVLCPlaybackMoreLayout(View anchor) {
         this.anchor = anchor;
+
+        speedVO.add(0.5f);
+        speedVO.add(1.0f);
+        speedVO.add(1.5f);
+        speedVO.add(2.0f);
+
         if (popupWindow == null) {
             popupWindow = new PopupWindow(anchor.getContext());
 
@@ -104,7 +103,10 @@ public class PLVLCPlaybackMoreLayout {
             @Override
             public void run() {
                 if (popupWindow != null && popupWindow.isShowing()) {
-//                    popupWindow.setClippingEnabled(true);
+                    /**
+                     * ///暂时先保留代码
+                     * popupWindow.setClippingEnabled(true);
+                     */
                     popupWindow.update();
                 }
                 onLandscape();
@@ -118,7 +120,10 @@ public class PLVLCPlaybackMoreLayout {
                     return;
                 }
                 if (popupWindow != null && popupWindow.isShowing()) {
-//                    popupWindow.setClippingEnabled(false);
+                    /**
+                     * ///暂时先保留代码
+                     * popupWindow.setClippingEnabled(false);
+                     */
                     popupWindow.update();
                 }
                 onPortrait();
@@ -247,7 +252,10 @@ public class PLVLCPlaybackMoreLayout {
                 hide();
             }
             popupWindow.setContentView(contentView);
-//            popupWindow.setClippingEnabled(!isPort);
+            /**
+             * ///暂时先保留代码
+             * popupWindow.setClippingEnabled(!isPort);
+             */
             popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, 0, 0);
         }
     }
@@ -338,11 +346,8 @@ public class PLVLCPlaybackMoreLayout {
             final String speed = speedVO.get(position) + "x";
             holder.tvSpeed.setText(speed);
 
-            if (position == curSelectPos) {
-                holder.tvSpeed.setSelected(true);
-            } else {
-                holder.tvSpeed.setSelected(false);
-            }
+            boolean isSelect = position == curSelectPos;
+            holder.tvSpeed.setSelected(isSelect);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

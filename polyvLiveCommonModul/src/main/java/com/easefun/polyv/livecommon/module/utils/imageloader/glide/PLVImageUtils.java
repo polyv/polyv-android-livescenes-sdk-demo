@@ -15,11 +15,11 @@ import java.io.FileOutputStream;
 
 public class PLVImageUtils {
     private static final String TAG = "PLVImageUtils";
-    private static final int allowLength = 2 * 1024 * 1024;
+    private static final int ALLOW_LENGTH = 2 * 1024 * 1024;
 
     public static Bitmap compressImage(String filePath) throws Exception {
         File file = new File(filePath);
-        if (!file.isFile() || file.length() < allowLength / 2)
+        if (!file.isFile() || file.length() < ALLOW_LENGTH / 2)
             return null;
         //13.4m-80-5.3m，60-3.3m，40-2.3m，20-1.1m
         long rate = file.length() / (1024 * 1024);
@@ -53,10 +53,14 @@ public class PLVImageUtils {
     public static String compressImage(String filePath, String targetPath, int quality, boolean isSampleSize)
             throws Exception {
         Bitmap bm = isSampleSize ? getSmallBitmap(filePath) : BitmapFactory.decodeFile(filePath);
-//        int degree = readPictureDegree(filePath);//获取相片拍摄角度
-//        if (degree != 0) {//旋转照片角度，防止头像横着显示
-//            bm = rotateBitmap(bm, degree);
-//        }
+        /**
+         * ///暂时保留该代码
+         * int degree = readPictureDegree(filePath);//获取相片拍摄角度
+         * if (degree != 0) {//旋转照片角度，防止头像横着显示
+         *     bm = rotateBitmap(bm, degree);
+         * }
+         */
+
         File outputFile = new File(targetPath);
         FileOutputStream out = null;
         try {
@@ -64,7 +68,7 @@ public class PLVImageUtils {
                 outputFile.getParentFile().mkdirs();
             } else {
                 if (!outputFile.delete()) {
-                    PLVCommonLog.d(TAG, "fail to delete outputFile ");
+                    PLVCommonLog.e(TAG, "fail to delete outputFile ");
                     throw new Exception("delete fail");
                 }
             }
@@ -111,11 +115,15 @@ public class PLVImageUtils {
                                             int reqWidth, int reqHeight) {
         int height = options.outHeight;
         int width = options.outWidth;
-//        int degree = readPictureDegree(filePath);
-//        if (degree == 270 || degree == 90) {
-//            height = options.outWidth;
-//            width = options.outHeight;
-//        }
+        /**
+         * ///暂时保留该代码
+         * int degree = readPictureDegree(filePath);
+         * if (degree == 270 || degree == 90) {
+         *     height = options.outWidth;
+         *     width = options.outHeight;
+         * }
+         */
+
         int inSampleSize = 1;
         if (height > reqHeight || width > reqWidth) {
             final int heightRatio = Math.round((float) height / (float) reqHeight);
@@ -146,7 +154,7 @@ public class PLVImageUtils {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG,"readPictureDegree:"+e.getMessage());
         }
         return degree;
     }
@@ -157,11 +165,15 @@ public class PLVImageUtils {
         BitmapFactory.decodeFile(imgFilePath, options);//返回null
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
-//        int degree = readPictureDegree(imgFilePath);
-//        if (degree == 270 || degree == 90) {
-//            imageHeight = options.outWidth;
-//            imageWidth = options.outHeight;
-//        }
+        /**
+         * ///暂时保留该代码
+         * int degree = readPictureDegree(imgFilePath);
+         * if (degree == 270 || degree == 90) {
+         *     imageHeight = options.outWidth;
+         *     imageWidth = options.outHeight;
+         * }
+         */
+
         return new int[]{imageWidth, imageHeight};
     }
 }

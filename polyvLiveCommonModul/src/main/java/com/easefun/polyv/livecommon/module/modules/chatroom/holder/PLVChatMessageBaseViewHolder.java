@@ -41,7 +41,8 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
     protected CharSequence speakMsg;//文本发言信息
 
     protected String chatImgUrl;//图片发言信息的url //vh self cache
-    protected int chatImgWidth, chatImgHeight;//图片的宽、高
+    protected int chatImgWidth;
+    protected int chatImgHeight;//图片的宽、高
     protected boolean isLocalChatImg;//是否是本地的图片发言信息
     protected int localImgProgress;//本地图片发送进度，不能重置
     protected int localImgStatus;//本地图片发送状态，不能重置

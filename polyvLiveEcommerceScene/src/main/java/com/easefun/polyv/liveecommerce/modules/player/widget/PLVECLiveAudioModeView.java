@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import io.reactivex.Observable;
@@ -30,7 +29,6 @@ import io.reactivex.schedulers.Schedulers;
  * 音频模式view
  */
 public class PLVECLiveAudioModeView extends FrameLayout implements IPolyvLiveAudioModeView {
-    private static final String TAG = "PLVECLiveAudioModeView";
     private AnimationDrawable animationDrawable;
     private Disposable animationDisposable;
     private ViewGroup parentLy;

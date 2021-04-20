@@ -47,9 +47,6 @@ public abstract class PLVAbsProgressStatusListener extends PLVAbsProgressListene
 
     @Override
     public void onResourceReady(Drawable drawable) {
-//        if (status == STATUS_FAILED) {
-//            return;
-//        }
         status = STATUS_READY;
         onResourceReadyStatus(drawable);
     }

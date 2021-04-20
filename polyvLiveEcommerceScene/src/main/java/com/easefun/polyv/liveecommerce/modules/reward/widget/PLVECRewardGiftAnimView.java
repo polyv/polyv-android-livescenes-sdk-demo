@@ -64,7 +64,7 @@ public class PLVECRewardGiftAnimView extends FrameLayout {
     }
 
     private void showRewardLayout() {
-        if (rewardGiftInfoList.size() < 1) {
+        if (rewardGiftInfoList.isEmpty()) {
             setVisibility(View.INVISIBLE);
             TranslateAnimation animation = new TranslateAnimation(0f, -getWidth(), 0f, 0f);
             animation.setDuration(400);

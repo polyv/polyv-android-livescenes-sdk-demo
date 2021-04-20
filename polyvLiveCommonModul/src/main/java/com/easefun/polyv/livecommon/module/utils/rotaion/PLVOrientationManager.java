@@ -15,6 +15,7 @@ public class PLVOrientationManager {
     private static volatile PLVOrientationManager singleton = null;
     // 重力感应旋转观察者
     private List<PLVRotationObserver> rotationObservers;
+    private PLVRotationObserver lastRotationObserver;
     // 即将要请求页面方向的监听器
     private List<OnRequestedOrientationListener> orientationListeners;
     // 页面方向改变之后的监听器
@@ -51,18 +52,26 @@ public class PLVOrientationManager {
                 }
             });
             rotationObservers.add(observer);
+            updateLastRationObserver();
         }
     }
 
     // 移除重力感应旋转观察者，离开页面时，需要移除RotationObserver
     public void removeRotationObserver(PLVRotationObserver observer) {
         rotationObservers.remove(observer);
+        updateLastRationObserver();
+    }
+
+    private void updateLastRationObserver() {
+        if (!rotationObservers.isEmpty()) {
+            lastRotationObserver = rotationObservers.get(rotationObservers.size() - 1);
+        }
     }
 
     // 开启重力感应旋屏
     public void start() {
-        if (getLastObserver() != null) {
-            getLastObserver().start();
+        if (lastRotationObserver != null) {
+            lastRotationObserver.start();
         }
     }
 
@@ -73,22 +82,22 @@ public class PLVOrientationManager {
 
     // 停止重力感应旋屏
     public void stop(boolean isLifecycleStop) {
-        if (getLastObserver() != null) {
-            getLastObserver().stop(isLifecycleStop);
+        if (lastRotationObserver != null) {
+            lastRotationObserver.stop(isLifecycleStop);
         }
     }
 
     // 锁定屏幕旋转
     public void lockOrientation() {
-        if (getLastObserver() != null) {
-            getLastObserver().lockOrientation();
+        if (lastRotationObserver != null) {
+            lastRotationObserver.lockOrientation();
         }
     }
 
     // 解锁屏幕旋转
     public void unlockOrientation() {
-        if (getLastObserver() != null) {
-            getLastObserver().unlockOrientation();
+        if (lastRotationObserver != null) {
+            lastRotationObserver.unlockOrientation();
         }
     }
 
@@ -99,7 +108,7 @@ public class PLVOrientationManager {
 
     // 设置竖屏
     public void setPortrait(Activity activity, boolean isReverse) {
-        if (getLastObserver() != null && getLastObserver().isLockOrientation()) {
+        if (lastRotationObserver != null && lastRotationObserver.isLockOrientation()) {
             return;
         }
         activity.setRequestedOrientation(isReverse ? ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -117,7 +126,7 @@ public class PLVOrientationManager {
 
     // 设置横屏
     public void setLandscape(Activity activity, boolean isReverse) {
-        if (getLastObserver() != null && getLastObserver().isLockOrientation()) {
+        if (lastRotationObserver != null && lastRotationObserver.isLockOrientation()) {
             return;
         }
         activity.setRequestedOrientation(isReverse ? ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
@@ -132,7 +141,8 @@ public class PLVOrientationManager {
     public void notifyConfigurationChanged(Activity activity, Configuration newConfig) {
         if (configurationChangedListeners != null) {
             for (OnConfigurationChangedListener configurationChangedListener : configurationChangedListeners) {
-                configurationChangedListener.onCall(activity, newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE);
+                configurationChangedListener.onCall(activity, newConfig.orientation
+                        == Configuration.ORIENTATION_LANDSCAPE);
             }
         }
     }
@@ -159,13 +169,6 @@ public class PLVOrientationManager {
     // 移除页面方向改变之后的监听器
     public void removeOnConfigurationChangedListener(OnConfigurationChangedListener listener) {
         configurationChangedListeners.remove(listener);
-    }
-
-    private PLVRotationObserver getLastObserver() {
-        if (!rotationObservers.isEmpty()) {
-            return rotationObservers.get(rotationObservers.size() - 1);
-        }
-        return null;
     }
 
     // 即将要请求页面方向的监听器

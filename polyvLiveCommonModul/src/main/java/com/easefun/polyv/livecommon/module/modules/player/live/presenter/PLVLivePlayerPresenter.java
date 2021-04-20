@@ -89,12 +89,13 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     @Override
     public void init() {
-        if (getView() == null) {
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        if (view == null) {
             return;
         }
         //init data
-        videoView = getView().getLiveVideoView();
-        subVideoView = getView().getSubVideoView();
+        videoView = view.getLiveVideoView();
+        subVideoView = view.getSubVideoView();
         initSubVideoViewListener();
         initVideoViewListener();
     }
@@ -123,8 +124,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     @Override
     public void restartPlay() {
-        if (getView() != null) {
-            getView().onRestartPlay();
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        if (view != null) {
+            view.onRestartPlay();
         }
         startPlay();
     }
@@ -327,26 +329,29 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             subVideoView.setOnVideoPlayListener(new IPolyvVideoViewListenerEvent.OnVideoPlayListener() {
                 @Override
                 public void onPlay(boolean isFirst) {
-                    if (getView() != null) {
-                        getView().onSubVideoViewPlay(isFirst);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewPlay(isFirst);
                     }
                 }
             });
-            subVideoView.setOnGestureClickListener(onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
+            onSubGestureClickListener = new IPolyvVideoViewListenerEvent.OnGestureClickListener() {
                 @Override
                 public void callback(boolean start, boolean end) {
                     boolean mainPlayerIsPlaying = videoView != null && videoView.isPlaying();
                     if (subVideoView != null && subVideoView.isPlaying()) {
                         mainPlayerIsPlaying = false;
                     }
-                    if (getView() != null) {
-                        getView().onSubVideoViewClick(mainPlayerIsPlaying);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewClick(mainPlayerIsPlaying);
                     }
                     if (!TextUtils.isEmpty(subVideoViewHerf)) {
                         PLVWebUtils.openWebLink(subVideoViewHerf, subVideoView.getContext());
                     }
                 }
-            });
+            };
+            subVideoView.setOnGestureClickListener(onSubGestureClickListener);
             subVideoView.setOnSubVideoViewLoadImage(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewLoadImage() {
                 @Override
                 public void onLoad(String imageUrl, final ImageView imageView, final String coverHref) {
@@ -366,8 +371,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void onCountdown(int totalTime, int remainTime, int adStage) {
                     boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
-                    if (getView() != null) {
-                        getView().onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewCountDown(isOpenAdHead, totalTime, remainTime, adStage);
                         if (isOpenAdHead) {
                             setLogoVisibility(View.VISIBLE);
                         } else {
@@ -379,8 +385,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void onVisibilityChange(boolean isShow) {
                     boolean isOpenAdHead = subVideoView != null && subVideoView.isOpenHeadAd();
-                    if (getView() != null) {
-                        getView().onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
                     }
                 }
             });
@@ -418,8 +425,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
                     tips += "播放异常\n" + error.errorDescribe + " (errorCode:" + error.errorCode +
                             "-" + error.playStage + ")\n" + error.playPath;
-                    if (getView() != null) {
-                        getView().onPlayError(error, tips);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onPlayError(error, tips);
                     }
                     setLogoVisibility(View.GONE);
                 }
@@ -430,8 +438,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     PLVCommonLog.d(TAG, "onNoLiveAtPresent");
                     videoView.removeRenderView();
                     livePlayerData.postNoLive();
-                    if (getView() != null) {
-                        getView().onNoLiveAtPresent();
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onNoLiveAtPresent();
                     }
                     setLogoVisibility(View.GONE);
                 }
@@ -440,8 +449,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void onLiveEnd() {
                     PLVCommonLog.d(TAG, "onLiveEnd");
                     livePlayerData.postLiveEnd();
-                    if (getView() != null) {
-                        getView().onLiveEnd();
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLiveEnd();
                     }
                     setLogoVisibility(View.GONE);
                 }
@@ -450,8 +460,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void onLiveStop() {
                     PLVCommonLog.d(TAG, "onLiveStop");
                     livePlayerData.postLiveStop();
-                    if (getView() != null) {
-                        getView().onLiveStop();
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLiveStop();
                     }
                     setLogoVisibility(View.GONE);
                 }
@@ -468,30 +479,33 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     } else if (videoView.getMediaPlayMode() == PolyvMediaPlayMode.MODE_VIDEO) {
                         setLogoVisibility(View.VISIBLE);
                     }
-                    if (getView() != null) {
-                        getView().onPrepared(videoView.getMediaPlayMode());
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onPrepared(videoView.getMediaPlayMode());
                     }
                 }
 
                 @Override
                 public void onPreparing() {
-                    PLVCommonLog.d(TAG,"onPreparing");
+                    PLVCommonLog.d(TAG, "onPreparing");
                 }
             });
             videoView.setOnLinesChangedListener(new IPolyvLiveListenerEvent.OnLinesChangedListener() {
                 @Override
-                public void OnLinesChanged(int linesPos) {
+                public void onLinesChanged(final int linesPos) {
                     livePlayerData.postLinesChange(linesPos);
-                    if (getView() != null) {
-                        getView().onLinesChanged(linesPos);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLinesChanged(linesPos);
                     }
                 }
             });
             videoView.setOnGetMarqueeVoListener(new IPolyvVideoViewListenerEvent.OnGetMarqueeVoListener() {
                 @Override
                 public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo) {
-                    if (getView() != null) {
-                        getView().onGetMarqueeVo(marqueeVo, getConfig().getUser().getViewerName());
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onGetMarqueeVo(marqueeVo, getConfig().getUser().getViewerName());
                     }
                 }
             });
@@ -509,8 +523,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void callback(boolean start, boolean end) {
                     int brightness = videoView.getBrightness((Activity) videoView.getContext()) - 8;
                     brightness = Math.max(0, brightness);
-                    if (getView() != null) {
-                        boolean result = getView().onLightChanged(brightness, end);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onLightChanged(brightness, end);
                         if (start && result) {
                             videoView.setBrightness((Activity) videoView.getContext(), brightness);
                         }
@@ -522,8 +537,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void callback(boolean start, boolean end) {
                     int brightness = videoView.getBrightness((Activity) videoView.getContext()) + 8;
                     brightness = Math.min(100, brightness);
-                    if (getView() != null) {
-                        boolean result = getView().onLightChanged(brightness, end);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onLightChanged(brightness, end);
                         if (start && result) {
                             videoView.setBrightness((Activity) videoView.getContext(), brightness);
                         }
@@ -535,8 +551,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void callback(boolean start, boolean end) {
                     int volume = videoView.getVolume() - PLVControlUtils.getVolumeValidProgress(videoView.getContext(), 8);
                     volume = Math.max(0, volume);
-                    if (getView() != null) {
-                        boolean result = getView().onVolumeChanged(volume, end);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onVolumeChanged(volume, end);
                         if (start && result) {
                             videoView.setVolume(volume);
                         }
@@ -548,8 +565,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 public void callback(boolean start, boolean end) {
                     int volume = videoView.getVolume() + PLVControlUtils.getVolumeValidProgress(videoView.getContext(), 8);
                     volume = Math.min(100, volume);
-                    if (getView() != null) {
-                        boolean result = getView().onVolumeChanged(volume, end);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        boolean result = view.onVolumeChanged(volume, end);
                         if (start && result) {
                             videoView.setVolume(volume);
                         }
@@ -559,8 +577,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.setOnDanmuServerOpenListener(new IPolyvLiveListenerEvent.OnDanmuServerOpenListener() {
                 @Override
                 public void onDanmuServerOpenListener(boolean isServerDanmuOpen) {
-                    if (getView() != null) {
-                        getView().onServerDanmuOpen(isServerDanmuOpen);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuOpen(isServerDanmuOpen);
                     }
                 }
             });
@@ -575,8 +594,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void showPPTView(int visible) {
                     livePlayerData.postPPTShowState(visible == View.VISIBLE);
-                    if (getView() != null) {
-                        getView().onShowPPTView(visible);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onShowPPTView(visible);
                     }
                 }
             });
@@ -597,8 +617,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.setOnNetworkStateListener(new IPolyvVideoViewListenerEvent.OnNetworkStateListener() {
                 @Override
                 public boolean onNetworkRecover() {
-                    if (getView() != null) {
-                        return getView().onNetworkRecover();
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        return view.onNetworkRecover();
                     }
                     return false;
                 }
@@ -616,8 +637,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
                             .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage);
-                    if (getView() != null) {
-                        logoView = getView().getLogo();
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        logoView = view.getLogo();
                         if (logoView != null) {
                             logoView.removeAllLogo();
                             logoView.addLogo(logoParam);
@@ -631,11 +653,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     private void setDefaultViewStatus() {
         videoView.removeRenderView();
-        if (getView() != null && getView().getBufferingIndicator() != null) {
-            getView().getBufferingIndicator().setVisibility(View.GONE);
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        if (view != null && view.getBufferingIndicator() != null) {
+            view.getBufferingIndicator().setVisibility(View.GONE);
         }
-        if (getView() != null && getView().getNoStreamIndicator() != null) {
-            getView().getNoStreamIndicator().setVisibility(View.VISIBLE);
+        if (view != null && view.getNoStreamIndicator() != null) {
+            view.getNoStreamIndicator().setVisibility(View.VISIBLE);
         }
     }
     // </editor-fold>
@@ -670,8 +693,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 builder.isSubVideoViewPlaying(subVideoView.isPlaying());
             }
             livePlayerData.postPlayInfoVO(builder.build());
-            if (getView() != null) {
-                getView().updatePlayInfo(builder.build());
+            IPLVLivePlayerContract.ILivePlayerView view = getView();
+            if (view != null) {
+                view.updatePlayInfo(builder.build());
             }
         }
     }

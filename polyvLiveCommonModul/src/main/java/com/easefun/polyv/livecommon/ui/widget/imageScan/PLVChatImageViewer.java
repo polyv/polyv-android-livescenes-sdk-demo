@@ -83,7 +83,7 @@ public class PLVChatImageViewer extends FrameLayout {
                             public void onPartialGranted(ArrayList<String> grantedPermissions,
                                                          ArrayList<String> deniedPermissions,
                                                          ArrayList<String> deniedForeverP) {
-                                if (deniedForeverP!=null && !deniedForeverP.isEmpty()) {
+                                if (deniedForeverP != null && !deniedForeverP.isEmpty()) {
                                     new AlertDialog.Builder(getContext()).setTitle("提示")
                                             .setMessage("保存图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复")
                                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -130,7 +130,7 @@ public class PLVChatImageViewer extends FrameLayout {
                                             return file;
                                         }
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        PLVCommonLog.e(TAG, "downloadImg：" + e.getMessage());
                                     }
                                     File file = PLVImageLoader.getInstance().saveImageAsFile(getContext(), imgUrl, PLVChatImageContainerWidget.LOADIMG_MOUDLE_TAG + imgUrlTags.get(currentPosition));
                                     return file;
@@ -227,7 +227,7 @@ public class PLVChatImageViewer extends FrameLayout {
 
                     @Override
                     public void onPageScrollStateChanged(int state) {
-                        PLVCommonLog.d(TAG,"onPageScrollStateChanged:"+state);
+                        PLVCommonLog.d(TAG, "onPageScrollStateChanged:" + state);
                     }
                 });
             } else {

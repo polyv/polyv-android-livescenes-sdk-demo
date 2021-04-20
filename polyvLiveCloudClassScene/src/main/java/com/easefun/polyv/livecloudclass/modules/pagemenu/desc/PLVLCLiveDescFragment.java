@@ -120,18 +120,21 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             startTimeTv.setText(liveStartTime);
             //设置点赞数
             if (likesCount == 0) {
-                long likesCount = classDetailVO.getData().getLikes();
-                updateLikesCount(likesCount);
+                long newLikeCount = classDetailVO.getData().getLikes();
+                updateLikesCount(newLikeCount);
             } else {
                 updateLikesCount(0);
             }
-            //设置观看热度
-//            if (viewerCount == 0) {
-//                int viewerCount = classDetailVO.getData().getPageView();
-//                updateViewerCount(viewerCount);
-//            } else {
-//                updateViewerCount(0);
-//            }
+/**
+ *  设置观看热度
+ *             if (viewerCount == 0) {
+ *                 int viewerCount = classDetailVO.getData().getPageView();
+ *                 updateViewerCount(viewerCount);
+ *             } else {
+ *                 updateViewerCount(0);
+ *             }
+ */
+
             //设置介绍内容
             setDescContent();
         }

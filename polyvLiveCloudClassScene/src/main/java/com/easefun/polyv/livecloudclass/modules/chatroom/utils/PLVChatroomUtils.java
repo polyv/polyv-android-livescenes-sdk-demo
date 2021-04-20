@@ -55,8 +55,8 @@ public class PLVChatroomUtils {
     //判断是否是表情
     private static boolean isEmo(int end, EditText inputEt) {
         String preMsg = inputEt.getText().subSequence(0, end).toString();
-        int regEnd = preMsg.lastIndexOf("]");
-        int regStart = preMsg.lastIndexOf("[");
+        int regEnd = preMsg.lastIndexOf(']');
+        int regStart = preMsg.lastIndexOf('[');
         if (regEnd == end - 1 && regEnd - regStart >= 2) {
             String regex = preMsg.substring(regStart);
             emojiLength = regex.length();

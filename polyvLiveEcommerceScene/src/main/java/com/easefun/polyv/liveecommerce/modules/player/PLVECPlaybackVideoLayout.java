@@ -209,7 +209,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void setFloatingWindow(boolean b) {
-        PLVCommonLog.i(TAG, "setFloatingWindow: "+b);
+        PLVCommonLog.d(TAG, "setFloatingWindow: " + b);
     }
 
     @Override
@@ -262,7 +262,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void setVideoViewRect(Rect videoViewRect) {
-        PLVCommonLog.d(TAG,"直播带货回放场景 暂无调整视频区域布局");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无调整视频区域布局");
     }
 
     @Override
@@ -277,7 +277,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeLines(int linesPos) {
-        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换线路");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换线路");
     }
 
     @Override
@@ -292,7 +292,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeBitRate(int bitratePos) {
-        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换码率功能");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换码率功能");
     }
 
     @Override
@@ -302,7 +302,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeMediaPlayMode(int mediaPlayMode) {
-        PLVCommonLog.d(TAG,"直播带货回放场景 暂无切换音视频模式的功能");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换音视频模式的功能");
     }
 
     @Override
@@ -334,7 +334,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public LiveData<PLVPlayInfoVO> getPlaybackPlayInfoVO() {
-        return  playbackPlayerPresenter.getData().getPlayInfoVO();
+        return playbackPlayerPresenter.getData().getPlayInfoVO();
     }
     // </editor-fold>
 
@@ -362,7 +362,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         }
 
         @Override
-        public PLVPlayerLogoView getLogo(){
+        public PLVPlayerLogoView getLogo() {
             return logoView;
         }
 

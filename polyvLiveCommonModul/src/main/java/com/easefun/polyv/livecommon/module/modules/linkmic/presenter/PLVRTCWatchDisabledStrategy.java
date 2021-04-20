@@ -49,7 +49,7 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
             public void run() {
                 linkMicManager.addEventHandler(new PolyvLinkMicEventListener() {
                     @Override
-                    public void onJoinChannelSuccess(String channel, String uid) {
+                    public void onJoinChannelSuccess(String uid) {
                         isJoinLinkMic = true;
                         linkMicManager.switchRoleToBroadcaster();
                         linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());

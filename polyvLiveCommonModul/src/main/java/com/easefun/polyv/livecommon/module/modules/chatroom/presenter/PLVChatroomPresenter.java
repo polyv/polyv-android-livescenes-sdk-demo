@@ -207,14 +207,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnConnectStatusListener(new PLVSocketIOObservable.OnConnectStatusListener() {
             @Override
             public void onStatus(PLVSocketStatus status) {
-                switch (status.getStatus()) {
-                    case PLVSocketStatus.STATUS_LOGINSUCCESS:
-                        if (hasRequestHistoryEvent) {//登录成功后可以获取到分房间id，如果之前存在请求历史的事件，则请求历史记录
-                            requestChatHistory(requestHistoryViewIndex);
-                        }
-                        break;
-                    default:
-                        break;
+                if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS) {
+                    if (hasRequestHistoryEvent) {//登录成功后可以获取到分房间id，如果之前存在请求历史的事件，则请求历史记录
+                        requestChatHistory(requestHistoryViewIndex);
+                    }
                 }
             }
         });
@@ -229,12 +225,15 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 if (args == null || args.length == 0 || args[0] == null) {
                     return;
                 }
-                //触发严禁词也认为发送成功，但不会广播给其他用户
-//                if ("".equals(args[0])) {
-//                    // 触发严禁词时，args[0]为""
-//                    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
-//                    return;
-//                }
+                /**
+                 * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
+                 *if ("".equals(args[0])) {
+                 *    // 触发严禁词时，args[0]为""
+                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
+                 *    return;
+                 *}
+                 */
+
                 acceptLocalChatMessage(textMessage, String.valueOf(args[0]));
             }
         });
@@ -844,8 +843,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 观察直播间的数据">
     private void observeLiveRoomData() {
         //观察直播间的聊天室开关数据
-        liveRoomDataManager.getFunctionSwitchVO().observeForever(functionSwitchObserver
-                = new Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>>() {
+        functionSwitchObserver = new Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>>() {
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvChatFunctionSwitchVO> chatFunctionSwitchStateData) {
                 liveRoomDataManager.getFunctionSwitchVO().removeObserver(this);
@@ -862,10 +860,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 }
                 chatroomData.postFunctionSwitchData(dataBeanList);
             }
-        });
+        };
+        liveRoomDataManager.getFunctionSwitchVO().observeForever(functionSwitchObserver);
         //观察直播间的直播详情数据
-        liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver
-                = new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+        classDetailVOObserver = new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> classDetailVOStateData) {
                 liveRoomDataManager.getClassDetailVO().removeObserver(this);
@@ -881,7 +879,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 chatroomData.postLikesCountData(likesCount);
                 chatroomData.postViewerCountData(viewerCount);
             }
-        });
+        };
+        liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);
     }
     // </editor-fold>
 

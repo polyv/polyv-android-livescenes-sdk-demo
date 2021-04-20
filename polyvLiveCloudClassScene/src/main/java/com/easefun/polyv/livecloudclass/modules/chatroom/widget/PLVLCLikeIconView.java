@@ -27,8 +27,10 @@ import java.util.Random;
 
 public class PLVLCLikeIconView extends RelativeLayout {
 
-    private int width, height;
-    private int iconWidth, iconHeight;
+    private int width;
+    private int height;
+    private int iconWidth;
+    private int iconHeight;
 
     private Interpolator[] interpolators;
     private Random random = new Random();
@@ -72,8 +74,12 @@ public class PLVLCLikeIconView extends RelativeLayout {
         LayoutParams bgLp = new LayoutParams((int) d, (int) d);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//        bgLp.addRule(Gravity.CENTER);
-//        bgLp.bottomMargin = PolyvScreenUtils.dip2px(getContext(), 3);
+        /**
+         * ///暂时保留，以后有必要时再使用
+         *  bgLp.addRule(Gravity.CENTER);
+         *  bgLp.bottomMargin = PolyvScreenUtils.dip2px(getContext(), 3);
+         */
+
         bgLp.rightMargin = PLVScreenUtils.dip2px(getContext(), 16);
         bg.setLayoutParams(bgLp);
         bg.setOnClickListener(new OnClickListener() {
@@ -93,10 +99,13 @@ public class PLVLCLikeIconView extends RelativeLayout {
 
     private void initInterpolator() {
         interpolators = new Interpolator[]{
-                new LinearInterpolator()/*,
+                /**
+                 * 暂时保留，以后有必要时再使用
                 new AccelerateDecelerateInterpolator(),
                 new AccelerateInterpolator(),
-                new DecelerateInterpolator(),*/
+                new DecelerateInterpolator(),**/
+                new LinearInterpolator()
+
         };
     }
 
@@ -143,29 +152,17 @@ public class PLVLCLikeIconView extends RelativeLayout {
         animator.start();
     }
 
-//    public void addLoveIcon(int resId) {
-//        if (height <= 0 || width <= 0)
-//            return;
-//        ImageView view = new ImageView(getContext());
-//        view.setImageResource(resId);
-//        iconWidth = view.getDrawable().getIntrinsicWidth();
-//        iconHeight = view.getDrawable().getIntrinsicHeight();
-//
-//        addView(view);
-//        startAnimator(view);
-//    }
 
-//    private int[] color = new int[]{0xFF9D86D2, 0xFFF25268, 0xFF5890FF, 0xFFFCBC71};
     private int[] imageId = new int[]{
-        R.drawable.plvlc_chatroom_btn_like_1,
-        R.drawable.plvlc_chatroom_btn_like_2,
-        R.drawable.plvlc_chatroom_btn_like_3,
-        R.drawable.plvlc_chatroom_btn_like_4,
-        R.drawable.plvlc_chatroom_btn_like_5,
-        R.drawable.plvlc_chatroom_btn_like_6,
-        R.drawable.plvlc_chatroom_btn_like_7,
-        R.drawable.plvlc_chatroom_btn_like_8,
-        R.drawable.plvlc_chatroom_btn_like_9
+            R.drawable.plvlc_chatroom_btn_like_1,
+            R.drawable.plvlc_chatroom_btn_like_2,
+            R.drawable.plvlc_chatroom_btn_like_3,
+            R.drawable.plvlc_chatroom_btn_like_4,
+            R.drawable.plvlc_chatroom_btn_like_5,
+            R.drawable.plvlc_chatroom_btn_like_6,
+            R.drawable.plvlc_chatroom_btn_like_7,
+            R.drawable.plvlc_chatroom_btn_like_8,
+            R.drawable.plvlc_chatroom_btn_like_9
     };
     private Random randomColor = new Random();
 
@@ -181,12 +178,8 @@ public class PLVLCLikeIconView extends RelativeLayout {
                 int scale = random.nextInt(4) + 7;
                 iconWidth = view.getDrawable().getIntrinsicWidth() * scale / 10;
                 iconHeight = view.getDrawable().getIntrinsicHeight() * scale / 10;
-//                float d = srcWH;
-                LayoutParams bgLp = new LayoutParams((int) iconWidth, (int) iconHeight);
+                LayoutParams bgLp = new LayoutParams(iconWidth, iconHeight);
                 view.setLayoutParams(bgLp);
-//                view.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
-//                iconWidth = (int) d;
-//                iconHeight = (int) d;
 
                 addView(view);
                 startAnimator(view);

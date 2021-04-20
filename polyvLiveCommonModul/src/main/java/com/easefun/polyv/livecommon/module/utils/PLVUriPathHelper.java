@@ -30,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PLVUriPathHelper {
+    private static final String TAG = "PLVUriPathHelper";
+    public static final String COMPRESS_IMAGE = "compressImage:";
 
     public static String getFilePathFromURI(Context context, Uri contentUri) {
         File rootDataDir = context.getFilesDir();
@@ -62,7 +64,7 @@ public class PLVUriPathHelper {
             outputStream = new FileOutputStream(dstFile);
             copyStream(inputStream, outputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+           PLVCommonLog.e(TAG,"copyFile:"+e.getMessage());
         } finally {
             CloseUtils.closeIO(inputStream,outputStream);
         }
@@ -73,7 +75,8 @@ public class PLVUriPathHelper {
         byte[] buffer = new byte[BUFFER_SIZE];
         BufferedInputStream in = new BufferedInputStream(input, BUFFER_SIZE);
         BufferedOutputStream out = new BufferedOutputStream(output, BUFFER_SIZE);
-        int count = 0, n = 0;
+        int count = 0;
+        int n = 0;
         try {
             while ((n = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
                 out.write(buffer, 0, n);
@@ -110,7 +113,6 @@ public class PLVUriPathHelper {
             int maxBufferSize = 1 * 1024 * 1024;
             int bytesAvailable = inputStream.available();
 
-            //int bufferSize = 1024;
             int bufferSize = Math.min(bytesAvailable, maxBufferSize);
 
             final byte[] buffers = new byte[bufferSize];
@@ -243,7 +245,7 @@ public class PLVUriPathHelper {
             File file = compressImage(context, bitmap);
             return file.getAbsolutePath();
         } catch (IOException e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG,"getPrivatePath:"+e.getMessage());
         }
         return "";
     }
@@ -271,7 +273,7 @@ public class PLVUriPathHelper {
         }
 
         final File primaryDir = context.getExternalFilesDir(null);
-        PLVCommonLog.e("uri", "compressImage:" + primaryDir);
+        PLVCommonLog.e("uri", COMPRESS_IMAGE + primaryDir);
         File file = new File(primaryDir.getAbsolutePath(), filename + ".png");
         FileOutputStream fos = null;
         try {
@@ -279,14 +281,13 @@ public class PLVUriPathHelper {
             fos.write(baos.toByteArray());
             fos.flush();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG, COMPRESS_IMAGE +e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            PLVCommonLog.e(TAG,COMPRESS_IMAGE+e.getMessage());
         } finally {
            CloseUtils.closeIO(fos);
         }
 
-        // recycleBitmap(bitmap);
         return file;
     }
 }

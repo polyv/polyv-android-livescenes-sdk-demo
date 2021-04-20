@@ -140,11 +140,8 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (TextUtils.isEmpty(etSendMessage.getText())) {
-                    tvSendMessage.setEnabled(false);
-                } else {
-                    tvSendMessage.setEnabled(true);
-                }
+                boolean enable = TextUtils.isEmpty(etSendMessage.getText());
+                tvSendMessage.setEnabled(!enable);
             }
         });
         etSendMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {

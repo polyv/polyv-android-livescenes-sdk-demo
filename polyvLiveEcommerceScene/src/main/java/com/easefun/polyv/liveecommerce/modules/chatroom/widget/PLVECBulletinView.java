@@ -16,9 +16,10 @@ import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVMarqueeTextView;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -28,9 +29,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 public class PLVECBulletinView extends FrameLayout {
+    private static final String TAG = "PLVECBulletinView";
     private PLVMarqueeTextView gonggaoTv;
     private TextView gonggaoIc;
-    private int gonggaoLyWidth, gonggaoTvWidth;
+    private int gonggaoLyWidth;
+    private int gonggaoTvWidth;
 
     private Disposable gonggaoCdDisposable;
 
@@ -124,7 +127,7 @@ public class PLVECBulletinView extends FrameLayout {
         int flags = clickableHtmlBuilder.getSpanFlags(urlSpan);
         ClickableSpan clickableSpan = new ClickableSpan() {
             public void onClick(View view) {
-//                Log.d("PLVECGonggaoView", "clickableSpan click: " + urlSpan.getURL());
+                PLVCommonLog.d(TAG, "clickableSpan click: " + urlSpan.getURL());
             }
         };
         clickableHtmlBuilder.setSpan(clickableSpan, start, end, flags);

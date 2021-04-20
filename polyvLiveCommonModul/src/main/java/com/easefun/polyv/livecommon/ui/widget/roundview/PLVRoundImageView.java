@@ -67,7 +67,10 @@ public class PLVRoundImageView extends AppCompatImageView {
     }
 
     private void init() {
-//        setBackgroundDrawable(new ColorDrawable(0x33ff0000));
+        /**
+         * ///暂时保留该代码
+         * setBackgroundDrawable(new ColorDrawable(0x33ff0000));
+         */
         mPath = new Path();
         mPath.setFillType(Path.FillType.EVEN_ODD);
     }

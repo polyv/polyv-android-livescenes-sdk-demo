@@ -27,13 +27,17 @@ public class PLVScaleImageView extends AppCompatImageView {
     private boolean isDrawablePrepared;
     private ViewTreeObserver.OnGlobalLayoutListener runnable;
     private float scaleX = 1;
-    private float minScaleX, midScaleX, maxScaleX;
+    private float minScaleX;
+    private float midScaleX;
+    private float maxScaleX;
 
     private int lastPointerCount;
     private float lastX;
     private float lastY;
     private int touchSlop;//系统默认缩放
-    private boolean isCanDrag, isInterceptDrag, isDraged;
+    private boolean isCanDrag;
+    private boolean isInterceptDrag;
+    private boolean isDraged;
 
     private OnClickListener onClickListener;
 
@@ -110,7 +114,7 @@ public class PLVScaleImageView extends AppCompatImageView {
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
-                PLVCommonLog.d(TAG," onScaleEnd");
+                PLVCommonLog.d(TAG, " onScaleEnd");
             }
         });
         addOnLayoutChangeListener(new OnLayoutChangeListener() {
@@ -176,7 +180,7 @@ public class PLVScaleImageView extends AppCompatImageView {
     }
 
     private boolean canScale() {
-        return isDrawablePrepared && getVisibility() == View.VISIBLE  && (getWidth() != 0 && getHeight() != 0);
+        return isDrawablePrepared && getVisibility() == View.VISIBLE && (getWidth() != 0 && getHeight() != 0);
     }
 
     public void drawablePrepared(final Drawable drawable) {
@@ -188,14 +192,11 @@ public class PLVScaleImageView extends AppCompatImageView {
         isDrawablePrepared = true;
         super.setImageDrawable(drawable);//outside can display wh error
         getViewTreeObserver().removeOnGlobalLayoutListener(runnable);
-        getViewTreeObserver().addOnGlobalLayoutListener(runnable
-                = new ViewTreeObserver.OnGlobalLayoutListener() {
+        runnable = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 if (getWidth() != 0 && getHeight() != 0) {//can 0
                     getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                    isDrawablePrepared = true;
-//                    PLVSScaleImageView.super.setImageDrawable(drawable);//outside can display wh error
                     if (getDrawable() == null) {
                         return;
                     }
@@ -204,7 +205,8 @@ public class PLVScaleImageView extends AppCompatImageView {
                     setVisibility(View.VISIBLE);
                 }
             }
-        });
+        };
+        getViewTreeObserver().addOnGlobalLayoutListener(runnable);
     }
 
     @Override
@@ -328,7 +330,9 @@ public class PLVScaleImageView extends AppCompatImageView {
                     isCanDrag = isMoveAction(dx, dy);
                 }
                 if (isCanDrag && !isInterceptDrag) {
-                    boolean isCheckLeftAndRight, isCheckTopAndBottom;
+                    boolean isCheckLeftAndRight;
+                    boolean isCheckTopAndBottom;
+
                     isCheckLeftAndRight = isCheckTopAndBottom = true;
                     float tempX = dx;
                     float tempY = dy;

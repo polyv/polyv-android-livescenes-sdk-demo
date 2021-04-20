@@ -137,7 +137,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
             @Override
             public IPLVPagerTitleView getTitleView(Context context, final int index) {
-                if (pageMenuTabTitleList.size() == 0 || pageMenuTabTitleList.size() < index + 1) {
+                if (pageMenuTabTitleList.isEmpty() || pageMenuTabTitleList.size() < index + 1) {
                     return null;
                 }
                 PLVSimplePagerTitleView simplePagerTitleView = new PLVColorTransitionPagerTitleView(context);

@@ -40,10 +40,10 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
-import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
@@ -68,7 +68,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 互动聊天tab页
@@ -425,7 +424,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 swipeLoadView.setRefreshing(false);
                 swipeLoadView.setEnabled(true);
             }
-            if (chatMessageDataList.size() > 0) {
+            if (!chatMessageDataList.isEmpty()) {
                 addChatHistoryToList(chatMessageDataList, requestSuccessTime == 1);
             }
             if (isNoMoreHistory) {
@@ -541,7 +540,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
-                        if (deniedForeverP.size() > 0) {
+                        if (!deniedForeverP.isEmpty()) {
                             showRequestPermissionDialog("发送图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复");
                         } else {
                             ToastUtils.showShort("请允许存储权限后再发送图片");
@@ -571,7 +570,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
-                        if (deniedForeverP.size() > 0) {
+                        if (!deniedForeverP.isEmpty()) {
                             showRequestPermissionDialog("拍摄所需的存储或相机权限被拒绝，请到应用设置的权限管理中恢复");
                         } else {
                             ToastUtils.showShort("请允许存储和相机权限后再拍摄");

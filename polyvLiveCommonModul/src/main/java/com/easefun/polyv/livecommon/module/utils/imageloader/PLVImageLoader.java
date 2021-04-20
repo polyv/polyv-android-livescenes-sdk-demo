@@ -22,10 +22,16 @@ import java.util.concurrent.ExecutionException;
  * 并在下方代码块中实例化，来快速替换图片加载库。
  */
 public class PLVImageLoader {
-    // <editor-fold defaultstate="collapsed" desc="单例">
-    private volatile static PLVImageLoader instance;
+    //<editor-fold desc="成员变量">
+    private IPLVImageLoadEngine loadEngine;
+    //</editor-fold>
 
-    private PLVImageLoader() {/**/}
+    // <editor-fold defaultstate="collapsed" desc="单例">
+    private static volatile PLVImageLoader instance;
+
+    private PLVImageLoader() {
+        loadEngine = new PLVGlideImageLoadEngine();
+    }
 
     public static PLVImageLoader getInstance() {
         if (instance == null) {
@@ -38,14 +44,6 @@ public class PLVImageLoader {
         return instance;
     }
     // </editor-fold>
-
-
-    private IPLVImageLoadEngine loadEngine;
-
-    {
-        loadEngine = new PLVGlideImageLoadEngine();
-    }
-
     /**
      * 加载图片
      */

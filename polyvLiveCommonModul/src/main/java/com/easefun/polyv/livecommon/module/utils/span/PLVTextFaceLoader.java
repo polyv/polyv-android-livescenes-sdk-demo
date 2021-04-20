@@ -29,12 +29,15 @@ public class PLVTextFaceLoader {
     }
 
     public static CharSequence[] messageToSpan(CharSequence charSequence, int[] sizes, Context context, List<int[]> spanIndexs) {
-//        if (sizes.length > 2) {
-//            throw new RuntimeException("sizes length is incorrect");
-//        }
-//        if (charSequence instanceof String) {
-//            charSequence = Html.fromHtml((String) charSequence);//html转义，send no transfer，eg: <> -> ""
-//        }
+    /**
+     * ///暂时保留该代码
+     * if (sizes.length > 2) {
+     *     throw new RuntimeException("sizes length is incorrect");
+     * }
+     * if (charSequence instanceof String) {
+     *     charSequence = Html.fromHtml((String) charSequence);//html转义，send no transfer，eg: <> -> ""
+     * }
+     */
         SpannableStringBuilder[] spanArr = new SpannableStringBuilder[sizes.length];
         for (int i = 0; i < sizes.length; i++) {
             spanArr[i] = new SpannableStringBuilder(charSequence);

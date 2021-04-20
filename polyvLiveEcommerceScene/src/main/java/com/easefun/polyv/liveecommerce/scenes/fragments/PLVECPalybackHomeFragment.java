@@ -1,6 +1,5 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -140,11 +139,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }
             }
             playProgressSb.setSecondaryProgress(playProgressSb.getMax() * bufPercent / 100);
-            if (isPlaying) {
-                playControlIv.setSelected(true);
-            } else {
-                playControlIv.setSelected(false);
-            }
+            playControlIv.setSelected(isPlaying);
         }
     }
 

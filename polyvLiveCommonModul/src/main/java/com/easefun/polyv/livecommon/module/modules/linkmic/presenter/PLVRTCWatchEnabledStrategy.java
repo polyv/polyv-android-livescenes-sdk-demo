@@ -58,7 +58,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
             public void run() {
                 linkMicManager.addEventHandler(new PolyvLinkMicEventListener() {
                     @Override
-                    public void onJoinChannelSuccess(String channel, String uid) {
+                    public void onJoinChannelSuccess(String uid) {
                         isJoinChannel = true;
                         linkMicManager.switchRoleToAudience();
                         onJoinRTCChannelWatchListener.onJoinRTCChannelWatch();
