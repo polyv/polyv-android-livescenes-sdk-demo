@@ -47,7 +47,7 @@
         android:visibility="invisible"
         tools:visibility="visible" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_load_view"
         android:layout_width="244dp"
         android:layout_height="152dp"
@@ -64,7 +64,7 @@
             android:overScrollMode="never"
             android:requiresFadingEdge="vertical"
             app:fastScrollEnabled="false" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/unread_msg_tv"

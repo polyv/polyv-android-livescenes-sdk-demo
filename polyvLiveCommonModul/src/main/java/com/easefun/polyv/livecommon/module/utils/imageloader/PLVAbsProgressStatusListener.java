@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.utils.imageloader;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * 图片加载进度状态监听，避免相同url+position的图片加载，会影响到另外一张已经加载完成/失败的图片，以及进度冲突

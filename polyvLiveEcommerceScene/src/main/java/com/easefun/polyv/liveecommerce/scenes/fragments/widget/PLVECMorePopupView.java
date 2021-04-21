@@ -1,7 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments.widget;
 
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.LayoutRes;
+import androidx.annotation.LayoutRes;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Gravity;

@@ -105,12 +105,12 @@
                     android:textSize="12sp"
                     android:visibility="gone" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_more_bitrate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="0dp"
-                    android:layout_marginTop="1dp"></android.support.v7.widget.RecyclerView>
+                    android:layout_marginTop="1dp"></androidx.recyclerview.widget.RecyclerView>
             </FrameLayout>
 
             <TextView
@@ -145,12 +145,12 @@
                     android:textSize="12sp"
                     android:visibility="gone" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_more_lines"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="0dp"
-                    android:layout_marginTop="1dp"></android.support.v7.widget.RecyclerView>
+                    android:layout_marginTop="1dp"></androidx.recyclerview.widget.RecyclerView>
             </FrameLayout>
         </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
     </FrameLayout>

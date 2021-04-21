@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;

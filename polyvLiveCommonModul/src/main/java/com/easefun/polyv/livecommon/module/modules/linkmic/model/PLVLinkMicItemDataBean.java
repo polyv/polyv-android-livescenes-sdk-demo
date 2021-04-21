@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
-import android.support.annotation.IntRange;
+import androidx.annotation.IntRange;
 
 import com.plv.socket.user.PLVSocketUserConstant;
 

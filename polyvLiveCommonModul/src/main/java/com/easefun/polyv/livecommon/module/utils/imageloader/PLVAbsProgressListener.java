@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.utils.imageloader;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVOnProgressListener;
 

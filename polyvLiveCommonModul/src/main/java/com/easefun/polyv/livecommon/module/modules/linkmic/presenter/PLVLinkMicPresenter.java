@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;

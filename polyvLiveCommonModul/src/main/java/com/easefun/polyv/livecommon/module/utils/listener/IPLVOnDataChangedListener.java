@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.utils.listener;
 
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.Observer;
 
 /**
  * 数据改变监听器

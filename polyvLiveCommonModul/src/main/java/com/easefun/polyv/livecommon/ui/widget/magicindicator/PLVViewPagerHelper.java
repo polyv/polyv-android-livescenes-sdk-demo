@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.ui.widget.magicindicator;
 
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * 简化和ViewPager绑定

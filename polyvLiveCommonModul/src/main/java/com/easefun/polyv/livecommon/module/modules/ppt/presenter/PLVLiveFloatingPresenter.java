@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.ppt.presenter;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVLiveFloatingContract;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;

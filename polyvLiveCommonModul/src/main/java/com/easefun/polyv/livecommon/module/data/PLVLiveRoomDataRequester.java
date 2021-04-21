@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.data;
 
-import android.support.v4.util.ArrayMap;
+import androidx.collection.ArrayMap;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatApiRequestHelper;

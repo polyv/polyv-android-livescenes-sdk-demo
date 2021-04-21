@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.player.live.view;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;

@@ -2,7 +2,7 @@ package com.easefun.polyv.livecommon.ui.widget.blurview;
 
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 //Used in edit mode and in case if no BlurController was set
 class NoOpController implements BlurController {

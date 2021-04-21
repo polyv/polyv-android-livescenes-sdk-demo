@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public abstract class PLVOnProgressListener {
     private PLVOnProgressListener listener;

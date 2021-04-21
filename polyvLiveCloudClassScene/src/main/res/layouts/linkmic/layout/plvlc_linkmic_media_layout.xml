@@ -13,7 +13,7 @@
         android:visibility="gone"
         tools:visibility="visible">
         <!-- 连麦列表-->
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/plvlc_link_mic_rv_linkmic_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

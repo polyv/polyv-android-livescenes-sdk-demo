@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.view;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;

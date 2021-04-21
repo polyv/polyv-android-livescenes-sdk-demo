@@ -1,6 +1,6 @@
 package com.easefun.polyv.livedemo;
 
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveSDKConfig;
 

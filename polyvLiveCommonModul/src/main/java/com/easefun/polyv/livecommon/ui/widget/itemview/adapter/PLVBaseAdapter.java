@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.ui.widget.itemview.adapter;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;

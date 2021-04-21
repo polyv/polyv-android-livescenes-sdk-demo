@@ -1,8 +1,8 @@
 package com.easefun.polyv.livecommon.ui.widget.blurview;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
 
 public interface BlurViewFacade {
 

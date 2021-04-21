@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.danmu;
 
 import android.graphics.Rect;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;

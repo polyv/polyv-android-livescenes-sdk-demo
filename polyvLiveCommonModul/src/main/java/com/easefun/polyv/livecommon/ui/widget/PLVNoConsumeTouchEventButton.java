@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.ui.widget;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -12,7 +12,7 @@ import android.view.View;
  * author: HWilliamgo
  * description: 不消费touch event，但是依然可以接收点击事件的按钮
  */
-public class PLVNoConsumeTouchEventButton extends android.support.v7.widget.AppCompatButton {
+public class PLVNoConsumeTouchEventButton extends androidx.appcompat.widget.AppCompatButton {
 
     // <editor-fold defaultstate="collapsed" desc="属性">
     private GestureDetector gestureDetector;

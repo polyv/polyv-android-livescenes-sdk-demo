@@ -1,6 +1,6 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
 import android.view.View;
 

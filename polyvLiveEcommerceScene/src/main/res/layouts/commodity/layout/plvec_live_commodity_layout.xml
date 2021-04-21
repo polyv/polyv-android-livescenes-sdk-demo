@@ -43,7 +43,7 @@
             android:layout_marginBottom="@dimen/plvec_margin_common"
             app:sr_enableLoadMore="true">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/commodity_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

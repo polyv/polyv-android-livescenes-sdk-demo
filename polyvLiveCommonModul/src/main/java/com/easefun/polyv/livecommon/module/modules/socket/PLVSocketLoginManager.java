@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.socket;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;

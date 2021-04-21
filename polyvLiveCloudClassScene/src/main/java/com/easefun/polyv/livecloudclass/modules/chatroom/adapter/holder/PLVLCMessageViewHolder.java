@@ -2,7 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;

@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.socket;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;

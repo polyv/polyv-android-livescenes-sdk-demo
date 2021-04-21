@@ -2,7 +2,7 @@ package com.easefun.polyv.livecommon.ui.window;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.View;
 
 /**

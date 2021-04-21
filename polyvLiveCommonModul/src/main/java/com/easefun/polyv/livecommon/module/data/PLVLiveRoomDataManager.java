@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.data;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;

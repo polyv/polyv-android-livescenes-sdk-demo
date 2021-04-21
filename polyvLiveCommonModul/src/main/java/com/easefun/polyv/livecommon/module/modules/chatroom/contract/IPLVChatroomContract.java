@@ -1,11 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.contract;
 
-import android.support.annotation.AnyThread;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.Size;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.AnyThread;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+import androidx.annotation.WorkerThread;
 import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
