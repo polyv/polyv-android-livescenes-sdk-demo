@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#666666">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#BF1B202D" />
+
+    <TextView
+        android:id="@+id/plvls_member_list_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginLeft="16dp"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        android:text="成员列表"
+        android:textColor="#F0F1F5"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/plvls_member_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plvls_member_list_tv"
+        android:layout_alignBottom="@id/plvls_member_list_tv"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/plvls_member_list_tv"
+        android:gravity="center"
+        tools:text="(共12人)"
+        android:textColor="#CFD1D6"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/plvls_member_list_link_mic_down_all_tv"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plvls_member_list_tv"
+        android:layout_alignBottom="@+id/plvls_member_list_tv"
+        android:layout_marginRight="12dp"
+        android:layout_toLeftOf="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
+        android:background="@drawable/plvls_member_linkmic_control_bg_shape"
+        android:gravity="center"
+        android:text="全体下麦"
+        android:textColor="#4399FF"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plvls_member_list_tv"
+        android:layout_alignBottom="@+id/plvls_member_list_tv"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/plvls_member_linkmic_control_bg_shape"
+        android:gravity="center"
+        android:text="全体静音"
+        android:textColor="#4399FF"
+        android:textSize="12sp" />
+
+    <View
+        android:id="@+id/plvls_member_split_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/plvls_member_list_tv"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="16dp"
+        android:background="#14F0F1F5" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/plvls_member_list_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/plvls_member_split_view"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:overScrollMode="never" />
+</RelativeLayout>

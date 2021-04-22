@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1B202D">
+
+    <!--状态栏布局-->
+    <com.easefun.polyv.livestreamer.modules.statusbar.PLVLSStatusBarLayout
+        android:id="@+id/plvls_status_bar_ly"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--文档布局-->
+    <com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout
+        android:id="@+id/plvls_document_ly"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_status_bar_ly" />
+
+    <!--推流和连麦布局-->
+    <com.easefun.polyv.livestreamer.modules.streamer.PLVLSStreamerLayout
+        android:id="@+id/plvls_streamer_ly"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/plvls_document_ly"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
+
+    <!--聊天室区域-->
+    <com.easefun.polyv.livestreamer.modules.chatroom.PLVLSChatroomLayout
+        android:id="@+id/plvls_chatroom_ly"
+        android:layout_width="300dp"
+        android:layout_height="202dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvls_document_ly"
+        app:layout_constraintLeft_toLeftOf="@+id/plvls_document_ly" />
+
+    <!--直播间弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvls_live_room_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</android.support.constraint.ConstraintLayout>

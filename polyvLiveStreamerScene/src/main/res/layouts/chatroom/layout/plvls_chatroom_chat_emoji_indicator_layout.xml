@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="6dp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/one_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/plvls_chatroom_emoji_indicator_selector" />
+
+    <TextView
+        android:id="@+id/two_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/plvls_chatroom_emoji_indicator_selector" />
+
+    <TextView
+        android:id="@+id/three_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/plvls_chatroom_emoji_indicator_selector" />
+</LinearLayout>

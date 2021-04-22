@@ -162,13 +162,13 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
             introWebView.setLayoutParams(lp);
             introBlurLy.addView(introWebView);
             PLVWebViewHelper.initWebView(getContext(), introWebView);
-            introWebView.loadData(content, "text/html; charset=UTF-8", null);
+            introWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         } else {
             if (introWebView.getParent() != null) {
                 ((ViewGroup) introWebView.getParent()).removeView(introWebView);
             }
             introBlurLy.addView(introWebView);
-            introWebView.loadData(content, "text/html; charset=UTF-8", null);
+            introWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         }
     }
     // </editor-fold>

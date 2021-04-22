@@ -222,7 +222,7 @@ public class PLVChatImageViewer extends FrameLayout {
                     @Override
                     public void onPageSelected(int position) {
                         currentPosition = position;
-                        tvPage.setText(position + 1 + " / " + imgUrlTags.size());
+                        tvPage.setText(position + 1 + "/" + imgUrlTags.size());
                     }
 
                     @Override
@@ -237,7 +237,7 @@ public class PLVChatImageViewer extends FrameLayout {
             vpImageViewer.setCurrentItem(curPosition, false);
 
             currentPosition = curPosition;
-            tvPage.setText(curPosition + 1 + " / " + imgUrlTags.size());
+            tvPage.setText(curPosition + 1 + "/" + imgUrlTags.size());
         }
     }
 }

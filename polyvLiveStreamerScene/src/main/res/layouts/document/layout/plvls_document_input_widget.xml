@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:background="#c8000000">
+
+    <RelativeLayout
+        android:id="@+id/input_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#1A1B1F"
+        android:paddingLeft="50dp"
+        android:paddingTop="5dp"
+        android:paddingRight="50dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/input_cancle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:textColor="#999999"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/input_sure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:text="确定"
+            android:textColor="#999999"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <EditText
+        android:maxLength="100"
+        android:id="@+id/input_content"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:imeOptions="flagNoExtractUi"
+        android:paddingLeft="86dp"
+        android:paddingRight="86dp"
+        android:scrollbars="vertical"
+        android:textColor="#FF5B5B"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_btn" />
+</android.support.constraint.ConstraintLayout>

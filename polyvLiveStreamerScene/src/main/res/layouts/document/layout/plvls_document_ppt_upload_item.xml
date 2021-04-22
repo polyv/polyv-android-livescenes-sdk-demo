@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="16dp"
+    tools:background="#BF1B202D"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/plvls_document_ppt_item_iv"
+        android:layout_width="144dp"
+        android:layout_height="80dp"
+        android:src="@drawable/plvls_document_upload"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:id="@+id/plvls_document_ppt_item_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/plvls_document_ppt_item_iv"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/plvls_document_ppt_upload_tips" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:text="上传须知"
+            android:textColor="#CFD1D6" />
+
+    </LinearLayout>
+
+</RelativeLayout>

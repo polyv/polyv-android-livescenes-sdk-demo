@@ -27,6 +27,10 @@ public class PLVStatefulData<T> {
         return new PLVStatefulData<>(PLVStatefulData.SUCCESS, data, null, null);
     }
 
+    public static <T> PLVStatefulData<T> error(String errorMsg) {
+        return new PLVStatefulData<>(PLVStatefulData.ERROR, null, errorMsg, new Throwable(errorMsg));
+    }
+
     public static <T> PLVStatefulData<T> error(String errorMsg, Throwable throwable) {
         return new PLVStatefulData<>(PLVStatefulData.ERROR, null, errorMsg, throwable);
     }

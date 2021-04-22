@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livescenes.document.PLVSDocumentWebView
+        android:id="@+id/plvls_document_web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout
+        android:id="@+id/plvls_document_controller_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/plvls_document_no_select_ppt_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#313540"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_gravity="center"
+            android:src="@drawable/plvls_document_no_select_ppt" />
+
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--webView加载进度条-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    &lt;!&ndash; 总进度的颜色 &ndash;&gt;-->
+<!--    <item android:id="@android:id/background">-->
+<!--        <shape>-->
+<!--            <solid android:color="" />-->
+<!--        </shape>-->
+<!--    </item>-->
+
+<!--    &lt;!&ndash; 缓存的颜色 &ndash;&gt;-->
+<!--    <item android:id="@android:id/secondaryProgress">-->
+<!--        <clip>-->
+<!--            <shape>-->
+<!--                <solid android:color="" />-->
+<!--            </shape>-->
+<!--        </clip>-->
+<!--    </item>-->
+
+    <!-- 当前进度的颜色 -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <solid android:color="#000000" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

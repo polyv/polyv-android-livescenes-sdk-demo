@@ -168,6 +168,24 @@ public class PLVWebViewHelper {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+            addImageClickListner(view);
+        }
+
+        /**
+         * WebView与JS交互
+         **/
+        // 注入js函数监听
+        @android.webkit.JavascriptInterface
+        public void addImageClickListner(WebView webView) {
+            // 这段js函数的功能就是，遍历所有的img标签，并添加onclick函数，在还是执行的时候调用本地接口传递url过去
+            webView.loadUrl("javascript:(function(){" +
+                    "var objs = document.getElementsByTagName(\"img\"); "
+                    + "for(var i=0;i<objs.length;i++)  " +
+                    "{" + "    " +
+                    "objs[i].onclick=function()  " + "    " +
+                    "{  "
+                    + "        window.imagelistner.openImage(this.src);  " + "   " +
+                    " }  " + "}" + "})()");
         }
 
         /**

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><!--使用include的id find，不然为null-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="209dp"
+    android:background="#2B2C35"
+    android:clickable="true"
+    android:paddingLeft="56dp"
+    android:paddingTop="15dp"
+    android:paddingRight="56dp"
+    android:paddingBottom="8dp"
+    tools:visibility="visible">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/plvls_chatroom_emoji_vp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="12dp"
+        android:layout_toLeftOf="@+id/plvls_chatroom_msg_delete_iv" />
+
+    <com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSEmojiIndicatorView
+        android:id="@+id/plvls_chatroom_emoji_indicator_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/plvls_chatroom_emoji_vp"
+        android:layout_alignRight="@+id/plvls_chatroom_emoji_vp"
+        android:layout_alignParentBottom="true" />
+
+    <ImageView
+        android:id="@+id/plvls_chatroom_msg_delete_iv"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/plvls_chatroom_emoji_iv_press_selector"
+        android:scaleType="center"
+        android:src="@drawable/plvls_chatroom_delete_emoji" />
+
+    <TextView
+        android:id="@+id/plvls_chatroom_msg_send_tv"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:layout_below="@id/plvls_chatroom_msg_delete_iv"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/plvls_chatroom_emoji_iv_press_selector"
+        android:gravity="center"
+        android:text="发送"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+</RelativeLayout>

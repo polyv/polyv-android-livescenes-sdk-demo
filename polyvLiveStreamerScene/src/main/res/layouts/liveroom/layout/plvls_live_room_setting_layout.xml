@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#1B202D">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#BF1B202D" />
+
+    <TextView
+        android:id="@+id/plvls_setting_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="14dp"
+        android:text="设置"
+        android:textColor="#F0F1F5"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvls_setting_bit_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="48dp"
+        android:text="清晰度"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_setting_tv" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/plvls_setting_bit_rv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="26dp"
+        android:translationY="-1.5dp"
+        app:layout_constraintLeft_toRightOf="@+id/plvls_setting_bit_tv"
+        app:layout_constraintTop_toTopOf="@+id/plvls_setting_bit_tv" />
+
+    <TextView
+        android:id="@+id/plvls_setting_exit_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:drawableLeft="@drawable/plvls_setting_exit"
+        android:drawablePadding="6dp"
+        android:padding="6dp"
+        android:text="退出登录"
+        android:textColor="#FF6363"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+</android.support.constraint.ConstraintLayout>

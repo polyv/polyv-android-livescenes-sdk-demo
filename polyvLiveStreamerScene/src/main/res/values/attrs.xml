@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PLVLSDocumentControllerExpandMenu">
+        <attr name="backgroundColor" format="color"></attr>
+        <attr name="strokeSize" format="dimension"></attr>
+        <attr name="strokeColor" format="color"></attr>
+        <attr name="cornerRadius" format="dimension"></attr>
+        <attr name="btnStyle">
+            <enum name="right" value="0" />
+            <enum name="left" value="1" />
+        </attr>
+        <attr name="buttonIconSize" format="dimension"></attr>
+        <attr name="buttonIconStrokeWidth" format="dimension"></attr>
+        <attr name="buttonIconColor" format="color"></attr>
+        <attr name="expandTime" format="integer"></attr>
+        <attr name="leftIconId" format="reference"></attr>
+        <attr name="leftIconExpandId" format="reference"></attr>
+        <attr name="rightIconId" format="reference"></attr>
+        <attr name="rightIconExpandId" format="reference"></attr>
+    </declare-styleable>
+</resources>

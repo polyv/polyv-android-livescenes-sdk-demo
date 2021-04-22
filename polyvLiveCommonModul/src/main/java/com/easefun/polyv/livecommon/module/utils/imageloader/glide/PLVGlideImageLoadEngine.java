@@ -71,7 +71,7 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
     }
 
     @Override
-    public void loadImage(Context context, final String moduleTag, final Object urlTag, @DrawableRes int errorRes, @NonNull PLVAbsProgressListener listener, final ImageView view) {
+    public void loadImage(Context context, final String moduleTag, @NonNull final Object urlTag, @DrawableRes int errorRes, @NonNull PLVAbsProgressListener listener, final ImageView view) {
         final String url = listener.getUrl();
         PLVCommonLog.i(TAG, "moduleTag：" + moduleTag + "**urlTag：" + urlTag + "**url：" + url);
         PLVMyProgressManager.addListener(moduleTag, urlTag, new PLVOnProgressListener(listener.getUrl()) {

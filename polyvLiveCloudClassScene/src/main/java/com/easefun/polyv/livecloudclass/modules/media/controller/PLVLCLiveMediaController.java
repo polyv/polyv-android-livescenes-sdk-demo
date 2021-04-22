@@ -620,6 +620,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             hide();
             moreLayout.showWhenLandscape();
         } else if (id == R.id.start_send_message_land_tv) {
+            hide();
             if (onViewActionListener != null) {
                 onViewActionListener.onStartSendMessageAction();
             }

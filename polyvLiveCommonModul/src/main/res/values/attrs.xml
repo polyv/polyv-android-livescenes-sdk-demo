@@ -29,15 +29,25 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="PLVRoundBorderColorView">
+
+        <attr name="placeholder" format="reference|color" />
+        <attr name="mainColor" format="color" />
+        <attr name="innerBorderColor" format="color" />
+        <attr name="innerBorderWidth" format="dimension" />
+        <attr name="outerBorderColor" format="color" />
+        <attr name="outerBorderWidth" format="dimension" />
+    </declare-styleable>
+
     <declare-styleable name="CircleProgressView">
-        <attr name="cpv_progressNormalColor" format="color"/>
-        <attr name="cpv_progressReachColor" format="color"/>
-        <attr name="cpv_progressTextColor" format="color"/>
-        <attr name="cpv_progressTextSize" format="dimension"/>
-        <attr name="cpv_progressTextOffset" format="dimension"/>
-        <attr name="cpv_progressNormalSize" format="dimension"/>
-        <attr name="cpv_progressReachSize" format="dimension"/>
-        <attr name="cpv_radius" format="dimension"/>
+        <attr name="cpv_progressNormalColor" format="color" />
+        <attr name="cpv_progressReachColor" format="color" />
+        <attr name="cpv_progressTextColor" format="color" />
+        <attr name="cpv_progressTextSize" format="dimension" />
+        <attr name="cpv_progressTextOffset" format="dimension" />
+        <attr name="cpv_progressNormalSize" format="dimension" />
+        <attr name="cpv_progressReachSize" format="dimension" />
+        <attr name="cpv_radius" format="dimension" />
         <attr name="cpv_progressTextVisible" format="boolean"/>
         <attr name="cpv_progressStartArc" format="integer"/>
         <attr name="cpv_progressTextSkewX" format="dimension"/>
@@ -55,4 +65,118 @@
         <attr name="cpv_outerSize" format="dimension"/>
         <attr name="cpv_reachCapRound" format="boolean"/>
     </declare-styleable>
+
+    <!-- Reference to a style for the menu drawer. -->
+    <attr name="menuDrawerStyle" format="reference" />
+
+    <!-- Styleables used for styling the menu drawer. -->
+    <declare-styleable name="PLVMenuDrawer">
+
+        <!-- Drawable to use for the background of the content. -->
+        <attr name="mdContentBackground" format="reference" />
+
+        <!-- Drawable to use for the background of the menu. -->
+        <attr name="mdMenuBackground" format="reference" />
+
+        <!-- The size of the menu. -->
+        <attr name="mdMenuSize" format="dimension" />
+
+        <!-- Drawable used as indicator for the active view. -->
+        <attr name="mdActiveIndicator" format="reference" />
+
+        <!-- Defines whether the content will have a dropshadow onto the menu. Default is true. -->
+        <attr name="mdDropShadowEnabled" format="boolean" />
+
+        <!-- The size of the drop shadow. Default is 6dp -->
+        <attr name="mdDropShadowSize" format="dimension" />
+
+        <!-- The color of the drop shadow. Default is #FF000000. -->
+        <attr name="mdDropShadowColor" format="color" />
+
+        <!-- Drawable used for the drop shadow. -->
+        <attr name="mdDropShadow" format="reference" />
+
+        <!-- The touch bezel size. -->
+        <attr name="mdTouchBezelSize" format="dimension" />
+
+        <!-- Whether the indicator should be animated between active views. -->
+        <attr name="mdAllowIndicatorAnimation" format="boolean" />
+
+        <!-- The maximum animation duration -->
+        <attr name="mdMaxAnimationDuration" format="integer" />
+
+        <!-- Drawable that replaces the up indicator -->
+        <attr name="mdSlideDrawable" format="reference" />
+
+        <!-- String to use as the up indicators content description when the drawer is open -->
+        <attr name="mdDrawerOpenUpContentDescription" format="string" />
+
+        <!-- String to use as the up indicators content description when the drawer is closed -->
+        <attr name="mdDrawerClosedUpContentDescription" format="string" />
+
+        <!-- Whether an overlay should be drawn as the drawer is opened and closed -->
+        <attr name="mdDrawOverlay" format="boolean" />
+
+        <!-- The position of the drawer -->
+        <attr name="mdPosition" format="enum">
+            <enum name="left" value="0" />
+            <enum name="top" value="1" />
+            <enum name="right" value="2" />
+            <enum name="bottom" value="3" />
+            <enum name="start" value="4" />
+            <enum name="end" value="5" />
+        </attr>
+    </declare-styleable>
+
+    <!--注意这里的name要和自定义View的名称一致，不然在xml布局中无法引用-->
+    <declare-styleable name="PLVHorizontalExpandMenu">
+        <attr name="back_color" format="color"></attr>
+        <attr name="stroke_size" format="dimension"></attr>
+        <attr name="stroke_color" format="color"></attr>
+        <attr name="corner_radius" format="dimension"></attr>
+        <attr name="button_style">
+            <enum name="right" value="0"/>
+            <enum name="left" value="1"/>
+        </attr>
+        <attr name="button_icon_size" format="dimension"></attr>
+        <attr name="button_icon_stroke_width" format="dimension"></attr>
+        <attr name="button_icon_color" format="color"></attr>
+        <attr name="expand_time" format="integer"></attr>
+        <attr name="left_icon_id" format="reference"></attr>
+    </declare-styleable>
+
+    <declare-styleable name="PLVSwipeLayout">
+        <attr name="drag_edge">
+            <flag name="left" value="1" />
+            <flag name="right" value="2" />
+            <flag name="top" value="4" />
+            <flag name="bottom" value="8" />
+        </attr>
+        <attr name="leftEdgeSwipeOffset" format="dimension" />
+        <attr name="rightEdgeSwipeOffset" format="dimension" />
+        <attr name="topEdgeSwipeOffset" format="dimension" />
+        <attr name="bottomEdgeSwipeOffset" format="dimension" />
+        <attr name="show_mode" format="enum">
+            <enum name="lay_down" value="0" />
+            <enum name="pull_out" value="1" />
+        </attr>
+        <attr name="clickToClose" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVTriangleIndicateTextView">
+        <attr name="triangleWidth" format="dimension" />
+        <attr name="triangleHeight" format="dimension" />
+        <attr name="triangleMargin" format="dimension" />
+        <attr name="trianglePosition" format="enum">
+            <enum name="top" value="0" />
+            <enum name="bottom" value="1" />
+        </attr>
+        <attr name="triangleMarginType" format="enum">
+            <enum name="left" value="0" />
+            <enum name="right" value="1" />
+        </attr>
+        <attr name="indicateColor" format="color" />
+        <attr name="rectRadius" format="dimension" />
+    </declare-styleable>
+
 </resources>

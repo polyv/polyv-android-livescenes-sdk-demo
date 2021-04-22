@@ -63,5 +63,6 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation project(':polyvLiveEcommerceScene')
     implementation project(':polyvLiveCloudClassScene')
+    implementation project(':polyvLiveStreamerScene')
 }
 

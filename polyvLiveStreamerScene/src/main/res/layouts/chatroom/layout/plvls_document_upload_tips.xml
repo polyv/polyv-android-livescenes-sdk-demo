@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="0.8"
+    android:background="#000000">
+
+    <TextView
+        android:id="@+id/tv_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="8dp"
+        android:maxWidth="400dp"
+        android:text="@string/document_upload_tips"
+        android:textColor="#C0C0C0"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="25dp"
+        android:src="@drawable/plvls_document_upload_tips_close"
+        app:layout_constraintBottom_toTopOf="@+id/tv_tips"
+        app:layout_constraintLeft_toRightOf="@+id/tv_tips" />
+</android.support.constraint.ConstraintLayout>

@@ -43,7 +43,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     private List<View> popupButtonList = new ArrayList<>();
     private List<ViewGroup> popupLayoutList = new ArrayList<>();
 
-    private static InputListener inputListener;
+    protected static InputListener inputListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

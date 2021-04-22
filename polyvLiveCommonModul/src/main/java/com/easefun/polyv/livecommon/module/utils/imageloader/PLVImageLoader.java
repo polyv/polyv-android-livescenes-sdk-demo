@@ -68,7 +68,7 @@ public class PLVImageLoader {
     /**
      * 加载图片：带有进度监听。
      */
-    public void loadImage(Context context, final String moduleTag, final Object urlTag, @DrawableRes int errorRes, @NonNull final PLVAbsProgressListener listener, final ImageView view) {
+    public void loadImage(Context context, final String moduleTag, @NonNull final Object urlTag, @DrawableRes int errorRes, @NonNull final PLVAbsProgressListener listener, final ImageView view) {
         loadEngine.loadImage(context, moduleTag, urlTag, errorRes, listener, view);
     }
 

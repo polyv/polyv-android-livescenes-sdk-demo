@@ -292,7 +292,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 }
                 if (quoteChatMsgTv != null) {
                     quoteChatMsgTv.setVisibility(View.VISIBLE);
-                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append("：").append(quoteSpeakMsg));
+                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(quoteSpeakMsg));
                 }
             } else {
                 if (quoteChatNickTv != null) {

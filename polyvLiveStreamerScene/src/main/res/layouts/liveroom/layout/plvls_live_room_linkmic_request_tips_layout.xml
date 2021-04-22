@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/plvls_oriented_view"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_gravity="center|right"
+        android:layout_marginRight="12dp"
+        android:background="@drawable/plvls_linkmic_request_tips_view_bg_layer" />
+
+    <LinearLayout
+        android:layout_width="138dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/plvls_linkmic_request_tips_view_bg_shape"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/plvls_linkmic_video_type_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="收到新的连麦申请"
+            android:textColor="#F0F1F5"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>
