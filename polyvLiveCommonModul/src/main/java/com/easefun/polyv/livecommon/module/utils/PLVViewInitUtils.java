@@ -5,6 +5,7 @@ import androidx.annotation.LayoutRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,5 +56,20 @@ public class PLVViewInitUtils {
         ViewGroup.LayoutParams viewLp = view.getLayoutParams();
         viewLp.height = ConvertUtils.dp2px(defaultViewHeightDp) + Math.max(statusBarHeight, ConvertUtils.dp2px(defaultStatusBarHeightDp));
         view.setLayoutParams(viewLp);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends View> T get(View view, int id) {
+        SparseArray<View> viewHolder = (SparseArray<View>) view.getTag();
+        if (viewHolder == null) {
+            viewHolder = new SparseArray<View>();
+            view.setTag(viewHolder);
+        }
+        View childView = viewHolder.get(id);
+        if (childView == null) {
+            childView = view.findViewById(id);
+            viewHolder.put(id, childView);
+        }
+        return (T) childView;
     }
 }

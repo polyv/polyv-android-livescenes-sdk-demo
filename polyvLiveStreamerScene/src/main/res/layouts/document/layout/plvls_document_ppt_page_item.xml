@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="12dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+        android:id="@+id/plvls_document_ppt_item_iv"
+        android:layout_width="144dp"
+        android:layout_height="80dp"
+        app:radius_iv="4dp"
+        tools:src="@drawable/plvls_document_last_page_selector"
+        tools:background="@color/colorAccent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/plvls_document_ppt_index_tv"
+        android:layout_width="24dp"
+        android:layout_height="16dp"
+        android:textSize="10sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        tools:text="1"
+        android:background="@drawable/plvls_document_ppt_lt_radius_solid_rect_selector"
+        android:layout_alignBottom="@id/plvls_document_ppt_item_iv"
+        android:layout_alignRight="@id/plvls_document_ppt_item_iv"
+        android:layout_alignEnd="@id/plvls_document_ppt_item_iv" />
+
+    <View
+        android:id="@+id/plvls_document_ppt_selected_mask"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/plvls_document_ppt_radius_rect"
+        tools:visibility="visible"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginRight="-1dp"
+        android:layout_marginTop="-1dp"
+        android:layout_marginBottom="-1dp"
+        android:layout_alignTop="@id/plvls_document_ppt_item_iv"
+        android:layout_alignBottom="@id/plvls_document_ppt_item_iv"
+        android:layout_alignLeft="@id/plvls_document_ppt_item_iv"
+        android:layout_alignRight="@id/plvls_document_ppt_item_iv"
+        android:layout_alignStart="@id/plvls_document_ppt_item_iv"
+        android:layout_alignEnd="@id/plvls_document_ppt_item_iv" />
+
+</RelativeLayout>

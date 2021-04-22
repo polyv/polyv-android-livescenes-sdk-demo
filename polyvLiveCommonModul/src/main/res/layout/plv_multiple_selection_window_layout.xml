@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/plv_multiple_selection_mask_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#CC000000"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/plv_multiple_selection_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <View
+        android:id="@+id/plv_multiple_selection_separator_line"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#1A1B1F" />
+
+    <TextView
+        android:id="@+id/plv_multiple_selection_cancel_tv"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="取消"
+        android:textSize="18sp"
+        android:textColor="#ADADC0"
+        android:gravity="center"
+        android:background="#2B2C35" />
+
+</LinearLayout>

@@ -460,6 +460,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 onViewActionListener.onSendLikesAction();
             }
         } else if (id == R.id.plvlc_playback_controller_land_tv_start_send_message) {
+            hide();
             if (onViewActionListener != null) {
                 onViewActionListener.onStartSendMessageAction();
             }

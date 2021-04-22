@@ -11,6 +11,7 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,10 +22,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
-import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
@@ -36,6 +37,8 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
+import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVViewPagerAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVViewPagerHelper;
@@ -46,8 +49,6 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.indicators.PLVLinePagerIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVColorTransitionPagerTitleView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVSimplePagerTitleView;
-import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
-import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
@@ -169,7 +170,87 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         PLVViewPagerHelper.bind(pageMenuTabIndicator, pageMenuTabViewPager);
 
         chatCommonMessageList = new PLVLCChatCommonMessageList(getContext());
+        restoreChatTabForMessageList(chatCommonMessageList);
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理 - 重建时的初始化逻辑">
+
+    /**
+     * 重建 chatFragment 的 chatCommonMessageList
+     *
+     * @param messageList
+     * @see #addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean)
+     */
+    private void restoreChatTabForMessageList(PLVLCChatCommonMessageList messageList) {
+        if (chatFragment == null) {
+            chatFragment = tryGetRestoreFragment(PLVLCChatFragment.class);
+        }
+        if (chatFragment == null || messageList == null) {
+            return;
+        }
+        chatFragment.init(messageList);
+    }
+
+    /**
+     * 重建 chatFragment 的 chatroomPresenter
+     *
+     * @param presenter
+     * @see #addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean)
+     */
+    private void restoreChatTabForPresenter(IPLVChatroomContract.IChatroomPresenter presenter) {
+        if (chatFragment == null) {
+            chatFragment = tryGetRestoreFragment(PLVLCChatFragment.class);
+        }
+        if (chatFragment == null || presenter == null) {
+            return;
+        }
+        presenter.registerView(chatFragment.getChatroomView());
+    }
+
+    /**
+     * 重建 quizFragment 的 chatroomPresenter
+     *
+     * @param presenter
+     * @see #addQuizTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean)
+     */
+    private void restoreQuizTabForPresenter(IPLVChatroomContract.IChatroomPresenter presenter) {
+        if (quizFragment == null) {
+            quizFragment = tryGetRestoreFragment(PLVLCQuizFragment.class);
+        }
+        if (quizFragment == null || presenter == null) {
+            return;
+        }
+        presenter.registerView(quizFragment.getChatroomView());
+    }
+
+    /**
+     * 尝试从FragmentManager中取出需要恢复状态的Fragment
+     *
+     * @param expectedClass
+     * @param <T>           should be a {@link Fragment}
+     * @return expected fragment if found, otherwise null
+     */
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private <T extends Fragment> T tryGetRestoreFragment(@NonNull Class<T> expectedClass) {
+        if (!(getContext() instanceof FragmentActivity)) {
+            return null;
+        }
+        try {
+            List<Fragment> fragments = ((FragmentActivity) getContext()).getSupportFragmentManager().getFragments();
+            for (Fragment fragment : fragments) {
+                if (expectedClass.equals(fragment.getClass())) {
+                    return (T) fragment;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLivePageMenuLayout定义的方法">
@@ -179,6 +260,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.init();
+        restoreChatTabForPresenter(chatroomPresenter);
+        restoreQuizTabForPresenter(chatroomPresenter);
 
         observeClassDetailVO();
 
@@ -283,15 +366,20 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
     private void addQuizTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
-        quizFragment = new PLVLCQuizFragment();
-        chatroomPresenter.registerView(quizFragment.getChatroomView());
+        if (quizFragment == null) {
+            quizFragment = new PLVLCQuizFragment();
+            chatroomPresenter.registerView(quizFragment.getChatroomView());
+        }
         pageMenuTabFragmentList.add(quizFragment);
     }
 
     private void addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
-        chatFragment = new PLVLCChatFragment();
-        chatFragment.init(chatCommonMessageList);
+        if (chatFragment == null) {
+            chatFragment = new PLVLCChatFragment();
+            chatFragment.init(chatCommonMessageList);
+            chatroomPresenter.registerView(chatFragment.getChatroomView());
+        }
         chatFragment.setIsLiveType(liveRoomDataManager.getConfig().isLive());
         chatFragment.setOnViewActionListener(new PLVLCChatFragment.OnViewActionListener() {
             @Override
@@ -301,7 +389,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 }
             }
         });
-        chatroomPresenter.registerView(chatFragment.getChatroomView());
         pageMenuTabFragmentList.add(chatFragment);
     }
 

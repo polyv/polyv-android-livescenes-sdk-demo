@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_gravity="center"
+        android:background="@drawable/plvls_linkmic_control_view_bg_layer" />
+
+    <LinearLayout
+        android:layout_width="106dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:background="@drawable/plvls_linkmic_control_view_bg_shape"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/plvls_linkmic_video_type_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/plvls_linkmic_video_type_iv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/plvls_linkmic_control_video_selector" />
+
+            <TextView
+                android:id="@+id/plvls_linkmic_video_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="视频连麦"
+                android:textColor="@color/plvls_linkmic_type_tv_color_selector"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/plvls_linkmic_control_split_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="9dp"
+            android:background="#4D1B202D" />
+
+        <LinearLayout
+            android:id="@+id/plvls_linkmic_audio_type_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/plvls_linkmic_audio_type_iv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/plvls_linkmic_control_audio_selector" />
+
+            <TextView
+                android:id="@+id/plvls_linkmic_audio_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="音频连麦"
+                android:textColor="@color/plvls_linkmic_type_tv_color_selector"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

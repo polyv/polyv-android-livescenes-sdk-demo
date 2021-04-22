@@ -77,6 +77,7 @@ public class PLVVideoSizeUtils {
     public static int getVideoDisplayRectHeight(PolyvBaseVideoView baseVideoView, ViewParent viewParent, Rect rect) {
         //视频显示区域的高度
         int videoDisplayRectHeight = 0;
+        int videoDisplayRectWidth = 0;
         //视频的宽高
         int[] videoSize = PLVVideoSizeUtils.getVideoWH(baseVideoView);
         if (videoSize[0] == 0 || videoSize[1] == 0) {
@@ -97,8 +98,10 @@ public class PLVVideoSizeUtils {
                 //使用较大的比例缩放
                 if (ratioW > ratioH) {
                     videoDisplayRectHeight = (int) (videoSize[1] * 1.0f / ratioW);
+                    videoDisplayRectWidth = videoViewParentWidth;
                 } else {
                     videoDisplayRectHeight = videoViewParentHeight;
+                    videoDisplayRectWidth = (int) (videoSize[0] * 1.0f / ratioH);
                 }
             } else {
                 float ratioW = videoViewParentWidth * 1.0f / videoSize[0];//>=1
@@ -106,8 +109,10 @@ public class PLVVideoSizeUtils {
                 //使用较小的比例缩放
                 if (ratioW > ratioH) {
                     videoDisplayRectHeight = videoViewParentHeight;
+                    videoDisplayRectWidth = (int) (videoSize[0] * 1.0f * ratioH);
                 } else {
                     videoDisplayRectHeight = (int) (videoSize[1] * 1.0f * ratioW);
+                    videoDisplayRectWidth = videoViewParentWidth;
                 }
             }
         } else {//视频的高>视频的宽

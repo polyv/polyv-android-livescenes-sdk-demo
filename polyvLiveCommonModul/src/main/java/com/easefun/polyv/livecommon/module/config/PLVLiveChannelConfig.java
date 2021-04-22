@@ -82,12 +82,25 @@ public class PLVLiveChannelConfig {
      * @param viewerType   用户的类型，用于登录socket，需要为指定的类型，例如：{@link PLVSocketUserConstant#USERTYPE_STUDENT}， {@link PLVSocketUserConstant#USERTYPE_SLICE}
      */
     public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType) {
+        setupUser(viewerId, viewerName, viewerAvatar, viewerType, null);
+    }
+
+    /**
+     * 配置用户参数
+     *
+     * @param viewerId     用户的userId，用于登录socket、发送日志
+     * @param viewerName   用户昵称，用于登录socket、发送日志
+     * @param viewerAvatar 用户的头像url，用于登录socket、发送日志
+     * @param viewerType   用户的类型，用于登录socket，需要为指定的类型，例如：{@link PLVSocketUserConstant#USERTYPE_STUDENT}， {@link PLVSocketUserConstant#USERTYPE_SLICE}
+     * @param actor        用户的头衔，一般观看场景不需填写，开播场景从登录接口获取
+     */
+    public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor) {
         user.viewerId = TextUtils.isEmpty(viewerId) ? PLVSystemUtils.getAndroidId(Utils.getApp()) + "" : viewerId;
         user.viewerName = TextUtils.isEmpty(viewerName) ? "观众" + PLVSystemUtils.getAndroidId(Utils.getApp()) : viewerName;
         user.viewerAvatar = TextUtils.isEmpty(viewerAvatar) ? PLVSocketUserConstant.STUDENT_AVATAR_URL : viewerAvatar;
         user.viewerType = TextUtils.isEmpty(viewerType) ? PLVSocketUserConstant.USERTYPE_STUDENT : viewerType;
+        user.actor = actor;
     }
-
 
     /**
      * 配置频道号
@@ -240,6 +253,10 @@ public class PLVLiveChannelConfig {
          * 用户的类型，用于登录socket
          */
         private String viewerType;
+        /**
+         * 用户的头衔，用于登录socket
+         */
+        private String actor;
 
         public String getViewerId() {
             return viewerId;
@@ -257,5 +274,13 @@ public class PLVLiveChannelConfig {
             return viewerType;
         }
 
+        public String getActor() {
+            return actor;
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
     }
 }

@@ -1,1 +1,1 @@
-include ':demo', ':polyvLiveCommonModul', ':polyvLiveEcommerceScene', ':polyvLiveCloudClassScene'
+include ':demo', ':polyvLiveCommonModul', ':polyvLiveEcommerceScene', ':polyvLiveCloudClassScene', ':polyvLiveStreamerScene'

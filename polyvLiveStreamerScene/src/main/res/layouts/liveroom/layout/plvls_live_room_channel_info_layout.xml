@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#1B202D">
+
+    <include
+        layout="@layout/plvls_widget_blur_top_radius_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/plvls_live_room_indicator_view_shape" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginLeft="44dp"
+            android:layout_marginRight="44dp"
+            android:gravity="center_vertical"
+            android:text="频道信息"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="44dp"
+            android:layout_marginRight="44dp"
+            android:background="#1AF0F1F5" />
+
+        <ScrollView
+            android:id="@+id/plvls_channel_info_sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:paddingLeft="44dp"
+            android:paddingRight="44dp"
+            android:scrollbarSize="2dp"
+            android:scrollbarThumbVertical="@drawable/plvls_live_room_indicator_view_shape"
+            android:scrollbars="vertical">
+
+            <RelativeLayout
+                android:id="@+id/plvls_channel_info_parent_ly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/plvls_channel_info_top_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/plvls_channel_info_channel_name_iv"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@+id/plvls_channel_info_channel_name_tv"
+                        android:layout_alignBottom="@+id/plvls_channel_info_channel_name_tv"
+                        android:src="@drawable/plvls_live_room_channel_name" />
+
+                    <TextView
+                        android:id="@+id/plvls_channel_info_channel_name_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_toRightOf="@+id/plvls_channel_info_channel_name_iv"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="#F0F1F5"
+                        android:textSize="14sp"
+                        tools:text="直播名称" />
+
+                    <ImageView
+                        android:id="@+id/plvls_channel_info_start_time_iv"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@+id/plvls_channel_info_start_time_tv"
+                        android:layout_alignBottom="@+id/plvls_channel_info_start_time_tv"
+                        android:src="@drawable/plvls_live_room_start_time" />
+
+                    <TextView
+                        android:id="@+id/plvls_channel_info_start_time_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/plvls_channel_info_channel_name_iv"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_toRightOf="@+id/plvls_channel_info_start_time_iv"
+                        android:textColor="#F0F1F5"
+                        android:textSize="14sp"
+                        tools:text="2015/05/09 10:00" />
+
+                    <ImageView
+                        android:id="@+id/plvls_channel_info_channel_id_iv"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@+id/plvls_channel_info_channel_id_tv"
+                        android:layout_alignBottom="@+id/plvls_channel_info_channel_id_tv"
+                        android:layout_marginLeft="24dp"
+                        android:layout_toRightOf="@+id/plvls_channel_info_start_time_tv"
+                        android:src="@drawable/plvls_live_room_channel_id" />
+
+                    <TextView
+                        android:id="@+id/plvls_channel_info_channel_id_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/plvls_channel_info_channel_name_iv"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_toRightOf="@+id/plvls_channel_info_channel_id_iv"
+                        android:textColor="#F0F1F5"
+                        android:textSize="14sp"
+                        tools:text="1111111" />
+
+                    <ImageView
+                        android:id="@+id/plvls_channel_info_live_desc_iv"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@+id/plvls_channel_info_live_desc_tv"
+                        android:layout_alignBottom="@+id/plvls_channel_info_live_desc_tv"
+                        android:src="@drawable/plvls_live_room_live_desc" />
+
+                    <TextView
+                        android:id="@+id/plvls_channel_info_live_desc_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/plvls_channel_info_start_time_iv"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_toRightOf="@+id/plvls_channel_info_live_desc_iv"
+                        android:text="直播介绍"
+                        android:textColor="#F0F1F5"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

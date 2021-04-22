@@ -73,6 +73,7 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                 .setNickName(getConfig().getUser().getViewerName())//用户昵称
                 .setAvatarUrl(getConfig().getUser().getViewerAvatar())//用户头像
                 .setUserType(getConfig().getUser().getViewerType())//用户类型
+                .setActor(getConfig().getUser().getActor())//用户头衔
                 .setChannelId(getConfig().getChannelId());//频道号
         //登录socket
         PolyvSocketWrapper.getInstance().login(PLVSocketLoginVO.createFromUserClient());

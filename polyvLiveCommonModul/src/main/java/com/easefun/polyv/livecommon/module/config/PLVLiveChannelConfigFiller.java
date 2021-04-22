@@ -60,6 +60,19 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 配置用户参数
+     *
+     * @param viewerId     用户的userId，用于登录socket、发送日志
+     * @param viewerName   用户昵称，用于登录socket、发送日志
+     * @param viewerAvatar 用户的头像url，用于登录socket、发送日志
+     * @param viewerType   用户的类型，用于登录socket，需要为指定的类型，例如：{@link PLVSocketUserConstant#USERTYPE_STUDENT}， {@link PLVSocketUserConstant#USERTYPE_SLICE}
+     * @param actor        用户的头衔，一般观看场景不需填写，开播场景从登录接口获取
+     */
+    public static void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor) {
+        channelConfig.setupUser(viewerId, viewerName, viewerAvatar, viewerType, actor);
+    }
+
+    /**
      * 配置频道号
      */
     public static void setupChannelId(String channelId) {

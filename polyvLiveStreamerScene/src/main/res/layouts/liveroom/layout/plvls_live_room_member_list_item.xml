@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/plvls_member_split_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#14F0F1F5" />
+
+    <com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu
+        android:id="@+id/plvls_member_swipe_menu"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:translationY="-1dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/plvls_member_avatar_iv"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                tools:src="@drawable/plvls_ic_launcher" />
+
+            <TextView
+                android:id="@+id/plvls_member_user_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="14dp"
+                android:background="@drawable/plvls_member_teacher_tv_bg_shape"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:layout_marginRight="4dp"
+                android:maxEms="6"
+                android:minWidth="26dp"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="讲师"
+                android:textColor="#313540"
+                android:layout_toRightOf="@+id/plvls_member_avatar_iv"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/plvls_member_nick_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/plvls_member_user_type_tv"
+                android:singleLine="true"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp"
+                android:ellipsize="end"
+                android:maxEms="8"
+                tools:text="讲师" />
+
+            <TextView
+                android:id="@+id/plvls_member_ban_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="4dp"
+                android:layout_toRightOf="@+id/plvls_member_nick_tv"
+                android:singleLine="true"
+                android:text="[已禁言]"
+                android:textColor="#F24453"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/plvls_member_mic_iv"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:padding="3dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:layout_toLeftOf="@+id/plvls_member_cam_iv"
+                android:background="@drawable/plvls_member_iv_bg_shape"
+                android:src="@drawable/plvls_member_mic_iv_selector" />
+
+            <ImageView
+                android:id="@+id/plvls_member_cam_iv"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:layout_toLeftOf="@+id/plvls_member_right_side_ly"
+                android:background="@drawable/plvls_member_iv_bg_shape"
+                android:src="@drawable/plvls_chatroom_toolbar_camera_iv_selector" />
+
+            <LinearLayout
+                android:id="@+id/plvls_member_right_side_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/plvls_member_cam_front_iv"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="@drawable/plvls_member_iv_bg_shape"
+                    android:src="@drawable/plvls_chatroom_toolbar_front_iv_selector" />
+
+                <ImageView
+                    android:id="@+id/plvls_member_linkmic_control_iv"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_member_linkmic_control_selector"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/plvls_member_linkmic_connecting_iv"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_member_linkmic_connecting_animation"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="176dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:tag="swipe_right_layout"
+            android:translationY="-1dp">
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/plvls_member_do_ban_tv"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:background="#474B57"
+                android:gravity="center"
+                android:text="禁言"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvls_member_kick_tv"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:background="#FF6363"
+                android:gravity="center"
+                android:text="踢出"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvls_member_ban_confirm_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#474B57"
+                android:gravity="center"
+                android:text="确定禁言"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvls_member_kick_confirm_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FF6363"
+                android:gravity="center"
+                android:text="确定踢出"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu>
+</LinearLayout>

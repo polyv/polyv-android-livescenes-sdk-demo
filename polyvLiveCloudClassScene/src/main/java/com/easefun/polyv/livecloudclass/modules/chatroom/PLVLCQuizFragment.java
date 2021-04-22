@@ -70,6 +70,9 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
+        if (chatroomPresenter == null) {
+            return;
+        }
         quizMsgRv = findViewById(R.id.chat_msg_rv);
         quizMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(16), ConvertUtils.dp2px(16)));
         PLVMessageRecyclerView.setLayoutManager(quizMsgRv);
@@ -205,6 +208,9 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
             return false;
         } else {
             PolyvQuestionMessage questionMessage = new PolyvQuestionMessage(message);
+            if (chatroomPresenter == null) {
+                return false;
+            }
             int sendValue = chatroomPresenter.sendQuestionMessage(questionMessage);
             if (sendValue > 0) {
                 //清空输入框内容并隐藏键盘/弹出的表情布局等

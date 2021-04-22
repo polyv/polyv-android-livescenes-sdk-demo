@@ -8,6 +8,10 @@
     <string name="plv_scene_login_toast_liveecommerce_login_live_failed">启动直播带货直播失败</string>
     <string name="plv_scene_login_toast_liveecommerce_login_playback_failed">启动直播带货回放失败</string>
 
+    <string name="plv_scene_login_toast_login_failed_channelid_or_pwd_empty">登录频道号和密码不能为空</string>
+
+    <string name="plv_scene_login_toast_login_success">登录成功</string>
+
     <!--播放器-->
     <string name="plv_player_toast_no_live">暂无直播</string>
     <string name="plv_player_toast_live_end">直播结束</string>
@@ -37,6 +41,10 @@
     <string name="plv_chat_view_special_message">只看讲师</string>
     <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
     <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
+    <string name="plv_chat_chooser_sel_img">选择图片</string>
+    <string name="plv_chat_send_img_error_tip_permission_denied">发送图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复</string>
+    <string name="plv_chat_send_img_error_tip_permission_cancel">请允许存储权限后再发送图片</string>
+    <string name="plv_chat_cannot_retrieve_selected_image">不能检索到选择的图片</string>
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">暂不支持移动端购买</string>
 
@@ -50,12 +58,23 @@
     <string name="plv_linkmic_dialog_hang_off">挂断</string>
     <string name="plv_linkmic_error_tip_permission_denied">通话所需的相机权限和麦克风权限被拒绝，请到应用设置的权限管理中恢复</string>
     <string name="plv_linkmic_error_tip_permission_cancel">权限不足，申请发言失败</string>
+    <string name="plv_linkmic_dialog_hang_all_off_confirm_ask">确定全体下麦吗?</string>
+    <string name="plv_linkmic_dialog_mute_all_audio_confirm_ask">确定全体静音吗?</string>
+    <string name="plv_linkmic_dialog_reach_the_interact_num_limit">当前连麦人数已达上限</string>
+    <string name="plv_linkmic_error_tip_have_not_opened">尚未开通，请联系管理员</string>
+
+    <!--推流-->
+    <string name="plv_streamer_dialog_stop_class_ask">"点击下课将结束直播，确认下课吗？</string>
+    <string name="plv_streamer_dialog_no_network">网络断开，已停止直播，请更换网络后重试</string>
+    <string name="plv_streamer_toast_can_not_linkmic_before_the_class">上课前无法发起连麦</string>
+    <string name="plv_streamer_toast_please_click_class_first">请先点击上课</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>
 
     <!--直播间-->
     <string name="plv_live_room_dialog_exit_confirm_ask">确认退出直播间</string>
+    <string name="plv_live_room_dialog_steamer_exit_confirm_ask">确认结束直播吗？</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
 
@@ -65,6 +84,7 @@
     <string name="plv_common_dialog_tip">提示</string>
     <string name="plv_common_dialog_cancel">取消</string>
     <string name="plv_common_dialog_confirm">确认</string>
+    <string name="plv_common_dialog_alright">好的</string>
 
 
 </resources>

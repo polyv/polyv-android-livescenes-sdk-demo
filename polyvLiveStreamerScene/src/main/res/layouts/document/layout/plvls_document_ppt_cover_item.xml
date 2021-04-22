@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvls_document_ppt_item_round_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:radius="4dp">
+
+        <ImageView
+            android:id="@+id/plvls_document_ppt_item_iv"
+            android:layout_width="144dp"
+            android:layout_height="80dp"
+            tools:src="@drawable/plvls_document_last_page_selector"
+            tools:background="@color/colorAccent"
+            android:layout_centerHorizontal="true" />
+
+        <View
+            android:id="@+id/plvls_document_ppt_selected_mask"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/plvls_document_ppt_radius_rect"
+            tools:visibility="visible"
+            android:layout_marginLeft="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginTop="-1dp"
+            android:layout_marginBottom="-1dp"
+            android:layout_alignTop="@id/plvls_document_ppt_item_iv"
+            android:layout_alignBottom="@id/plvls_document_ppt_item_iv"
+            android:layout_alignLeft="@id/plvls_document_ppt_item_iv"
+            android:layout_alignRight="@id/plvls_document_ppt_item_iv"
+            android:layout_alignEnd="@id/plvls_document_ppt_item_iv"
+            android:layout_alignStart="@id/plvls_document_ppt_item_iv" />
+
+        <ImageView
+            android:id="@+id/plvls_document_ppt_item_placeholder_iv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/plvls_document_list_ppt_placeholder"
+            android:background="#313540"
+            tools:visibility="gone"
+            android:layout_alignTop="@id/plvls_document_ppt_item_iv"
+            android:layout_alignBottom="@id/plvls_document_ppt_item_iv"
+            android:layout_alignLeft="@id/plvls_document_ppt_item_iv"
+            android:layout_alignRight="@id/plvls_document_ppt_item_iv"
+            android:layout_alignEnd="@id/plvls_document_ppt_item_iv"
+            android:layout_alignStart="@id/plvls_document_ppt_item_iv" />
+
+        <com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSPptUploadProgressView
+            android:id="@+id/plvls_document_ppt_upload_progress_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_alignTop="@id/plvls_document_ppt_item_iv"
+            android:layout_alignBottom="@id/plvls_document_ppt_item_iv"
+            android:layout_alignLeft="@id/plvls_document_ppt_item_iv"
+            android:layout_alignRight="@id/plvls_document_ppt_item_iv"
+            android:layout_alignEnd="@id/plvls_document_ppt_item_iv"
+            android:layout_alignStart="@id/plvls_document_ppt_item_iv" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+
+    <LinearLayout
+        android:id="@+id/plvls_document_ppt_item_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/plvls_document_ppt_item_round_layout"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/plvls_document_ppt_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="上传须知sdsadasdasdasd"
+            android:textColor="@color/plvls_document_ppt_text_selector"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/plvls_document_ppt_suffix_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text=".ppt"
+            android:textColor="@color/plvls_document_ppt_text_selector"
+            android:maxLines="1" />
+
+    </LinearLayout>
+
+</RelativeLayout>

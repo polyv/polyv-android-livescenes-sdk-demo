@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVCh
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livescenes.chatroom.IPolyvOnlineCountListener;
 import com.easefun.polyv.livescenes.chatroom.IPolyvProhibitedWordListener;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
@@ -191,6 +192,14 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         }
                     });
                 }
+            }
+        });
+        //添加在线人数监听器
+        PolyvChatroomManager.getInstance().setOnlineCountListener(new IPolyvOnlineCountListener() {
+            @Override
+            public void onCall(int onlineCount) {
+                PLVChatroomPresenter.this.onlineCount = onlineCount;
+                chatroomData.postOnlineCountData(onlineCount);
             }
         });
         //添加socket信息监听器
@@ -622,8 +631,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 viewerCount++;
                                 chatroomData.postViewerCountData(viewerCount);
                             }
-                            onlineCount = loginEvent.getOnlineUserNumber();
-                            chatroomData.postOnlineCountData(onlineCount);
+
                         }
                         break;
                     //用户登出信息
@@ -636,8 +644,6 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                     view.onLogoutEvent(logoutEvent);
                                 }
                             });
-                            onlineCount = logoutEvent.getOnlineUserNumber();
-                            chatroomData.postOnlineCountData(onlineCount);
                         }
                         break;
                     //发布公告事件

@@ -159,7 +159,7 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="观看热度 - 更新热度view、观察热度变化">
     public void setViewerCount(long viewerCount) {
         this.viewerCount = viewerCount;
-        updateLikesCount(0);
+        updateViewerCount(0);
     }
 
     private void updateViewerCount(long addCount) {
@@ -251,13 +251,13 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             descWebView.setLayoutParams(rlp);
             parentLy.addView(descWebView);
             PLVWebViewHelper.initWebView(getContext(), descWebView);
-            descWebView.loadData(content, "text/html; charset=UTF-8", null);
+            descWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         } else {
             if (descWebView.getParent() != null) {
                 ((ViewGroup) descWebView.getParent()).removeView(descWebView);
             }
             parentLy.addView(descWebView);
-            descWebView.loadData(content, "text/html; charset=UTF-8", null);
+            descWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         }
     }
     // </editor-fold>

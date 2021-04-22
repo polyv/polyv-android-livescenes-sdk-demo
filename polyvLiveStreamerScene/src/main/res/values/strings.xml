@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="plvls_app_name">POLYV手机开播</string>
+
+    <string name="document_upload_tips">
+        1. 18:00-19:00 为上传高峰期，排队时间较长，请错峰上传；
+        \n2. 文档最大支持 500M，不超过 1000页；
+        \n3. 仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式；
+        \n4. wps 或含特殊字体、付费字体的文档请先转为 pdf 再上传
+    </string>
+    <string name="document_upload_choose_convert_type">请选择转码方式</string>
+    <string name="document_upload_choose_convert_type_hint">
+    快速转码：不含PPT动效，速度较快
+    \n动画转码：含PPT动效，速度较慢，仅支持Microsoft Office 保存的PPT
+    </string>
+</resources>
