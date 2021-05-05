@@ -24,7 +24,13 @@ allprojects {
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
-        maven { url 'https://dl.bintray.com/polyv/android' }
+        //mavenCentral 源
+        mavenCentral()
+        //阿里云效关于central的镜像
+        maven{
+            url 'https://maven.aliyun.com/repository/public'
+        }
+
     }
 }
 
@@ -32,8 +38,8 @@ ext {
     compileSdkVersion = 28
     minSdkVersion = 21
     targetSdkVersion = 28
-    versionCode = 140
-    versionName = "1.4.0"
+    versionCode = 141
+    versionName = "1.4.1"
 }
 
 task clean(type: Delete) {
