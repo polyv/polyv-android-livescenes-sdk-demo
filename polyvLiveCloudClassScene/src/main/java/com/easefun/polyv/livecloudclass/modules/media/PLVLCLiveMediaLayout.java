@@ -193,6 +193,12 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
 
+        // 底部占位图
+        PLVLCPlaceHolderView placeHolderView = new PLVLCPlaceHolderView(getContext());
+        placeHolderView.setVisibility(VISIBLE);
+        placeHolderView.setPlaceHolderText("");
+        addView(placeHolderView, 0);
+
         initVideoView();
         initDanmuView();
         initMediaController();
@@ -292,6 +298,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     onViewActionListener.onShowMediaController(show);
                 }
             }
+
         });
     }
 

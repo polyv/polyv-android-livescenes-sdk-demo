@@ -295,10 +295,6 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
 
     @Override
     public void setStreamerStatus(boolean isStartedStatus) {
-        if (isStartedStatus) {
-            // 开始推流时，清空屏幕上的标注画笔数据
-            PLVDocumentPresenter.getInstance().changeMarkToolType(PLVDocumentMarkToolType.CLEAR);
-        }
         PLVDocumentPresenter.getInstance().notifyStreamStatus(isStartedStatus);
     }
 

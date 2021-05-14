@@ -28,6 +28,9 @@ public class PLVLivePlayerData {
     //sei数据
     private MutableLiveData<Long> seiData = new MutableLiveData<>();
 
+    //投屏初始化状态
+    private MutableLiveData<Boolean> castOpen = new MutableLiveData<>();
+
     // <editor-fold defaultstate="collapsed" desc="播放信息">
     public void postPlayInfoVO(PLVPlayInfoVO playInfo) {
         playInfoVO.postValue(playInfo);
@@ -105,4 +108,19 @@ public class PLVLivePlayerData {
         return seiData;
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="投屏是否开启">
+
+    /**
+     * 获取投屏初始化是否成功
+     * @return
+     */
+    public LiveData<Boolean> getCastInitState(){
+        return castOpen;
+    }
+
+    public void postCastInitData(boolean initResult){
+        castOpen.postValue(initResult);
+    }
+    // </editor-fold >
 }

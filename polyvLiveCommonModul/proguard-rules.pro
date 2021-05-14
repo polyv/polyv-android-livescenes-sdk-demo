@@ -105,3 +105,22 @@
 #如果你的 target API 低于 Android API 27，请添加：
 #```pro
 -dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
+
+#投屏sdk
+-keep class com.easefun.polyv.livescenes.screentcast.**{*;}
+###plist
+-keep class com.dd.plist.** { *; }
+-dontwarn com.dd.plist.**
+
+###kxml
+-keep class org.kxml2.** { *; }
+-keep class org.xmlpull.** { *; }
+-dontwarn org.kxml2.**
+-dontwarn org.xmlpull.**
+
+###Lebo
+-keep class com.hpplay.**{*;}
+-keep class com.hpplay.**$*{*;}
+-dontwarn com.hpplay.**
+
+-keep class com.easefun.polyv.livecommon.module.modules.cast.**{*;}

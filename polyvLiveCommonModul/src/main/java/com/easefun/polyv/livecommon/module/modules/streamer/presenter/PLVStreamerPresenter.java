@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -265,11 +266,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         if (!isInitStreamerManager()) {
             return false;
         }
-        if (enable) {
-            streamerManager.adjustRecordingSignalVolume(100);
-        } else {
-            streamerManager.adjustRecordingSignalVolume(0);
-        }
+        streamerManager.enableLocalMicrophone(enable);
         streamerData.postEnableAudio(enable);
         callUserMuteAudio(streamerManager.getLinkMicUid(), !enable);
         return true;
@@ -315,6 +312,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void releaseRenderView(SurfaceView renderView) {
+        streamerManager.releaseRenderView(renderView);
+    }
+
+    @Override
     public void setupRenderView(SurfaceView renderView, String linkMicId) {
         if (isMyLinkMicId(linkMicId)) {
             streamerManager.setupLocalVideo(renderView);
@@ -355,7 +357,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public void controlUserLinkMic(int position, boolean isAllowJoin) {
-        if (position >= memberList.size()) {
+        if (position < 0 || position >= memberList.size()) {
             return;
         }
         final PLVMemberItemDataBean memberItemDataBean = memberList.get(position);
@@ -393,7 +395,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         if (!PLVSLinkMicEventSender.getInstance().isVideoLinkMicType() && isVideoType && !isMute) {
             return;//音频连麦模式，不操作用户打开视频
         }
-        if (position >= memberList.size()) {
+        if (position < 0 || position >= memberList.size()) {
             return;
         }
         PLVMemberItemDataBean memberItemDataBean = memberList.get(position);
@@ -693,6 +695,19 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private void acceptLinkMicJoinStatus(PLVLinkMicJoinStatus data) {
         List<PLVJoinInfoEvent> joinList = data.getJoinList();
         List<PLVLinkMicJoinStatus.WaitListBean> waitList = data.getWaitList();
+
+        //嘉宾可能被挂断连麦后，还一直留在连麦列表里。不过我们可以通过他的voice字段是否=1来区分他是否有上麦。
+        Iterator<PLVJoinInfoEvent> joinInfoEventIterator = joinList.iterator();
+        while (joinInfoEventIterator.hasNext()) {
+            PLVJoinInfoEvent plvJoinInfoEvent = joinInfoEventIterator.next();
+            if (PLVSocketUserConstant.USERTYPE_GUEST.equals(plvJoinInfoEvent.getUserType()) && !plvJoinInfoEvent.getClassStatus().isVoice()) {
+                //没有上麦，就从joinList中移除，添加到waitList。
+                joinInfoEventIterator.remove();
+                waitList.add(PLVLinkMicDataMapper.map2WaitListBean(plvJoinInfoEvent));
+                PLVCommonLog.d(TAG, String.format(Locale.US, "guest user [%s] lies in joinList but not join at all, so we move him to waitList manually.", plvJoinInfoEvent.toString()));
+            }
+        }
+
         boolean hasChangedMemberList;
         //更新成员列表中的连麦状态相关数据
         hasChangedMemberList = updateMemberListLinkMicStatus(joinList, waitList);

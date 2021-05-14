@@ -45,6 +45,8 @@ import java.util.Locale;
 public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBarLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final int WHAT_HIDE_USER_REQUEST_TIPS = 1;
+    //白板的ID
+    private static final int AUTO_ID_WHITE_BOARD = 0;
 
     //view
     private TextView plvlsStatusBarChannelInfoTv;
@@ -285,7 +287,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 if (showMode == PLVDocumentMode.WHITEBOARD) {
                     plvlsStatusBarWhiteboardIv.setSelected(true);
                     plvlsStatusBarDocumentIv.setSelected(false);
-                    lastAutoId = 0;
+                    lastAutoId = AUTO_ID_WHITE_BOARD;
                 } else {
                     plvlsStatusBarWhiteboardIv.setSelected(false);
                     plvlsStatusBarDocumentIv.setSelected(true);
@@ -295,7 +297,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             @Override
             public void onPptPageChange(int autoId, int pageId) {
                 lastAutoId = autoId;
-                if (autoId != 0) {
+                if (autoId != AUTO_ID_WHITE_BOARD) {
                     lastOpenNotWhiteBoardAutoId = autoId;
                     lastOpenNotWhiteBoardPageId = pageId;
                 }
@@ -451,7 +453,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     // <editor-fold defaultstate="collapsed" desc="文档选择处理">
 
     private void processSelectDocument() {
-        if (lastAutoId == 0 && lastOpenNotWhiteBoardAutoId != 0) {
+        if (lastAutoId == AUTO_ID_WHITE_BOARD && lastOpenNotWhiteBoardAutoId != AUTO_ID_WHITE_BOARD) {
             // 如果当前是白板模式，上次已经打开过PPT文档，直接切到上次的PPT文档
             PLVDocumentPresenter.getInstance().changePptPage(lastOpenNotWhiteBoardAutoId, lastOpenNotWhiteBoardPageId);
         } else {

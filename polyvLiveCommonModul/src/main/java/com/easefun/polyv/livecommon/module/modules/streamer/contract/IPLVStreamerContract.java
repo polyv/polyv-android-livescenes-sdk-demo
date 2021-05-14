@@ -245,6 +245,13 @@ public interface IPLVStreamerContract {
         SurfaceView createRenderView(Context context);
 
         /**
+         * 释放渲染器
+         *
+         * @param renderView 渲染器
+         */
+        void releaseRenderView(SurfaceView renderView);
+
+        /**
          * 为特定的连麦ID的用户设置连麦渲染器
          *
          * @param renderView 渲染器

@@ -223,6 +223,15 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         }
     }
 
+    public static void show(Activity packageActivity, Intent intent, InputListener listener) {
+        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
+            lastStartTime = System.currentTimeMillis();
+            inputListener = listener;
+            packageActivity.startActivity(intent);
+            packageActivity.overridePendingTransition(0, 0);
+        }
+    }
+
     public void requestClose() {
         hideSoftInputAndPopupLayout();
         isShowKeyBoard = false;

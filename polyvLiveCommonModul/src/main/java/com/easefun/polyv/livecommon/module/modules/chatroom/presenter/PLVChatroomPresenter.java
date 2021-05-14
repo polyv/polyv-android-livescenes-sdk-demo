@@ -253,6 +253,35 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         return new Pair<>(sendValue > 0 || sendValue == PolyvLocalMessage.SENDVALUE_BANIP, sendValue);
     }
 
+
+    @Override
+    public Pair<Boolean, Integer> sendQuoteMessage(final PolyvLocalMessage textMessage, String quoteId) {
+        int sendValue = PolyvChatroomManager.getInstance().sendQuoteMessage(textMessage, liveRoomDataManager.getSessionId(), true, new Ack() {
+            @Override
+            public void call(Object... args) {
+                PLVCommonLog.d(TAG, "chatroom sendQuoteMessage call: " + Arrays.toString(args));
+                if (args == null || args.length == 0 || args[0] == null) {
+                    return;
+                }
+                /**
+                 * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
+                 *if ("".equals(args[0])) {
+                 *    // 触发严禁词时，args[0]为""
+                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
+                 *    return;
+                 *}
+                 */
+
+                acceptLocalChatMessage(textMessage, String.valueOf(args[0]));
+            }
+        }, quoteId);
+        if (sendValue == PolyvLocalMessage.SENDVALUE_BANIP) {//被禁言也认为发送成功，但不会广播给其他用户
+            acceptLocalChatMessage(textMessage, "");
+        }
+        PLVCommonLog.d(TAG, "chatroom sendQuoteMessage: " + textMessage.getSpeakMessage() + ", sendValue: " + sendValue);
+        return new Pair<>(sendValue > 0 || sendValue == PolyvLocalMessage.SENDVALUE_BANIP, sendValue);
+    }
+
     @Override
     public int sendQuestionMessage(final PolyvQuestionMessage questionMessage) {
         int sendValue = PolyvChatroomManager.getInstance().sendQuestionMessage(questionMessage);

@@ -39,13 +39,13 @@ public class PLVCopyBoardPopupWindow {
         popupWindow.setFocusable(true); // 防止点击事件穿透
         popupWindow.setOutsideTouchable(true); // 设置点击外部时取消
         int[] location = new int[2];
-        anchor.getLocationOnScreen(location);
+        anchor.getLocationInWindow(location);
         popupWindow.showAtLocation(anchor, Gravity.TOP | Gravity.START,
                 location[0] + (isLeft ? anchor.getWidth() / 2 : -anchor.getWidth() / 2), (int) (location[1] + anchor.getHeight() - ConvertUtils.dp2px(8)));
         return popupWindow;
     }
 
-    public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, @Nullable final String copyContent, View.OnClickListener answerViewClickListener) {
+    public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, @Nullable final String copyContent, final View.OnClickListener answerViewClickListener) {
         // 自定义的布局View
         final PopupWindow popupWindow = new PopupWindow();
         View view = LayoutInflater.from(anchor.getContext()).inflate(R.layout.plv_copy_answer_board_popup_layout, null, false);
@@ -58,7 +58,15 @@ public class PLVCopyBoardPopupWindow {
         });
         View splitView = view.findViewById(R.id.split_view);
         View answerTv = view.findViewById(R.id.long_press_answer_tv);
-        answerTv.setOnClickListener(answerViewClickListener);
+        answerTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+                if (answerViewClickListener != null) {
+                    answerViewClickListener.onClick(v);
+                }
+            }
+        });
         if (copyContent == null) {
             copyTv.setVisibility(View.GONE);
             splitView.setVisibility(View.GONE);
@@ -71,9 +79,9 @@ public class PLVCopyBoardPopupWindow {
         popupWindow.setFocusable(true); // 防止点击事件穿透
         popupWindow.setOutsideTouchable(true); // 设置点击外部时取消
         int[] location = new int[2];
-        anchor.getLocationOnScreen(location);
+        anchor.getLocationInWindow(location);
         popupWindow.showAtLocation(anchor, Gravity.TOP | Gravity.START,
-                location[0] + (isLeft ? anchor.getWidth() / 2 : -anchor.getWidth() / 2) - ConvertUtils.dp2px(105) / 2, location[1] - ConvertUtils.dp2px(42) - ConvertUtils.dp2px(8 + 2));
+                location[0] + (isLeft ? anchor.getWidth() / 2 : -anchor.getWidth() / 2) - ConvertUtils.dp2px(105) / 2, location[1] - ConvertUtils.dp2px(42) - ConvertUtils.dp2px(4));
         return popupWindow;
     }
 

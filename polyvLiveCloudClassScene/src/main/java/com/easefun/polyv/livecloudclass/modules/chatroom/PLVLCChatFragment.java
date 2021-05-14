@@ -599,11 +599,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             values.put(MediaStore.Images.Media.DISPLAY_NAME, picName);
             takePictureUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         } else {
+            if (getContext() == null || getContext().getApplicationContext() == null) {
+                return;
+            }
             String savePath = PLVSDCardUtils.createPath(getContext(), "PLVChatImg");
             takePictureFilePath = new File(savePath, picName);
             takePictureUri = FileProvider.getUriForFile(
                     getContext(),
-                    "plvfileprovider",
+                    getContext().getApplicationContext().getPackageName() + ".plvfileprovider",
                     takePictureFilePath);
         }
 

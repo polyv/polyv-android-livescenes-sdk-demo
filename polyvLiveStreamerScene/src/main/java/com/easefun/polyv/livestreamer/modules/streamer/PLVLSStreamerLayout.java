@@ -93,6 +93,11 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
             }
 
             @Override
+            public void releaseLinkMicRenderView(SurfaceView renderView) {
+                streamerPresenter.releaseRenderView(renderView);
+            }
+
+            @Override
             public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
                 streamerPresenter.setupRenderView(surfaceView, linkMicId);
             }
