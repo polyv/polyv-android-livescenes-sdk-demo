@@ -249,6 +249,16 @@ public interface IPLVChatroomContract {
         Pair<Boolean, Integer> sendChatMessage(PolyvLocalMessage textMessage);
 
         /**
+         * 发送回复信息
+         *
+         * @param textMessage 要发送的信息，不能为空
+         * @param quoteId     信息Id
+         * @return true：成功提交，收到{@link IChatroomView#onLocalSpeakMessage(PolyvLocalMessage)}回调时为发送成功，收到{@link IChatroomView#onSendProhibitedWord(String, String, String)}为触发严禁词。<br/>
+         * false：发送失败。
+         */
+        Pair<Boolean, Integer> sendQuoteMessage(PolyvLocalMessage textMessage, String quoteId);
+
+        /**
          * 发送提问信息
          *
          * @param questionMessage 要发送的提问信息，不能为空

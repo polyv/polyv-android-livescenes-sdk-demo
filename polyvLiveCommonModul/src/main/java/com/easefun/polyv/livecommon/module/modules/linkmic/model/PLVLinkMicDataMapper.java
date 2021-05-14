@@ -11,6 +11,8 @@ import com.plv.socket.user.PLVSocketUserBean;
  * description:连麦数据映射器。将服务端返回的数据模型转换成我们业务上需要的数据模型
  */
 public class PLVLinkMicDataMapper {
+
+    // <editor-fold defaultstate="collapsed" desc="转成PLVLinkMicItemDataBean">
     public static PLVLinkMicItemDataBean map2LinkMicItemData(PLVLinkMicJoinSuccess joinSuccess) {
         PLVLinkMicItemDataBean itemDataBean = new PLVLinkMicItemDataBean();
         itemDataBean.setLinkMicId(joinSuccess.getUser().getUserId());
@@ -38,7 +40,9 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setStatus(waitListBean.getStatus());
         return itemDataBean;
     }
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="转成PLVSocketUserBean">
     public static PLVSocketUserBean map2SocketUserBean(PLVJoinInfoEvent joinInfoEvent) {
         PLVSocketUserBean socketUserBean = new PLVSocketUserBean();
         socketUserBean.setBanned(joinInfoEvent.isBanned());
@@ -66,4 +70,24 @@ public class PLVLinkMicDataMapper {
         socketUserBean.setRoomId(waitListBean.getRoomId());
         return socketUserBean;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="转成WaitListBean">
+    public static PLVLinkMicJoinStatus.WaitListBean map2WaitListBean(PLVJoinInfoEvent joinInfoEvent) {
+        PLVLinkMicJoinStatus.WaitListBean waitListBean = new PLVLinkMicJoinStatus.WaitListBean();
+        waitListBean.setLoginId(joinInfoEvent.getLoginId());
+        waitListBean.setActor(joinInfoEvent.getActor());
+        waitListBean.setClientIp(joinInfoEvent.getClientIp());
+        waitListBean.setNick(joinInfoEvent.getNick());
+        waitListBean.setPic(joinInfoEvent.getPic());
+        waitListBean.setRoomId(joinInfoEvent.getRoomId());
+        waitListBean.setSessionId(joinInfoEvent.getSessionId());
+        waitListBean.setStatus(joinInfoEvent.getStatus());
+        waitListBean.setUid(joinInfoEvent.getUid());
+        waitListBean.setUserId(joinInfoEvent.getUserId());
+        waitListBean.setUserType(joinInfoEvent.getUserType());
+        waitListBean.setCupNum(joinInfoEvent.getCupNum());
+        return waitListBean;
+    }
+    // </editor-fold>
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -47,6 +48,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessa
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.login.PLVKickEvent;
@@ -145,6 +147,34 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                     chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) getContext(), chatMessageAdapter.getDataList(), chatMessageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
                 }
             }
+
+            @Override
+            public void onShowAnswerWindow(final PLVChatQuoteVO chatQuoteVO, final String quoteId) {
+                Intent intent = new Intent(getContext(), PLVLSChatMsgInputWindow.class);
+                intent.putExtra(PLVLSChatMsgInputWindow.ANSWER_USER_NAME, chatQuoteVO.getNick());
+                intent.putExtra(PLVLSChatMsgInputWindow.ANSWER_USER_CONTENT, chatQuoteVO.getContent());
+                if (chatQuoteVO.getImage() != null) {
+                    intent.putExtra(PLVLSChatMsgInputWindow.ANSWER_USER_IMG_URL, chatQuoteVO.getImage().getUrl());
+                    intent.putExtra(PLVLSChatMsgInputWindow.ANSWER_USER_IMG_WIDTH, chatQuoteVO.getImage().getWidth());
+                    intent.putExtra(PLVLSChatMsgInputWindow.ANSWER_USER_IMG_HEIGHT, chatQuoteVO.getImage().getHeight());
+                }
+                PLVLSChatMsgInputWindow.show(((Activity) getContext()), intent, new PLVLSChatMsgInputWindow.MessageSendListener() {
+                    @Override
+                    public void onSendImg(PolyvSendLocalImgEvent imgEvent) {
+                        sendChatMessage(imgEvent);
+                    }
+
+                    @Override
+                    public boolean onSendQuoteMsg(String message) {
+                        return sendQuoteMessage(message, chatQuoteVO, quoteId);
+                    }
+
+                    @Override
+                    public boolean onSendMsg(String message) {
+                        return sendChatMessage(message);
+                    }
+                });
+            }
         });
         plvlsChatroomChatMsgRv.setAdapter(chatMessageAdapter);
         plvlsChatroomChatMsgRv.addUnreadView(plvlsChatroomUnreadMsgTv);
@@ -238,6 +268,31 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         } else {
             PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
             Pair<Boolean, Integer> sendResult = chatroomPresenter.sendChatMessage(localMessage);
+            if (sendResult.first) {
+                return true;
+            } else {
+                //发送失败
+                PLVToast.Builder.context(getContext())
+                        .setText(getContext().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second)
+                        .build()
+                        .show();
+                return false;
+            }
+        }
+    }
+
+    private boolean sendQuoteMessage(String message, PLVChatQuoteVO chatQuoteVO, String quoteId) {
+        if (chatQuoteVO.getImage() == null
+                && message.trim().length() == 0) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_chat_toast_send_text_empty)
+                    .build()
+                    .show();
+            return false;
+        } else {
+            PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
+            localMessage.setQuote(chatQuoteVO);
+            Pair<Boolean, Integer> sendResult = chatroomPresenter.sendQuoteMessage(localMessage, quoteId);
             if (sendResult.first) {
                 return true;
             } else {
@@ -397,10 +452,6 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 addChatHistoryToList(chatMessageDataList, requestSuccessTime == 1);
             }
             if (isNoMoreHistory) {
-                PLVToast.Builder.context(getContext())
-                        .setText(R.string.plv_chat_toast_history_all_loaded)
-                        .build()
-                        .show();
                 plvlsChatroomSwipeLoadView.setEnabled(false);
             }
         }
@@ -443,11 +494,6 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                         .setText(R.string.plv_chat_toast_reconnecting)
                         .build()
                         .show();
-            } else {
-                PLVToast.Builder.context(getContext())
-                        .setText(R.string.plv_chat_toast_logging)
-                        .build()
-                        .show();
             }
         }
 
@@ -457,11 +503,6 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             if (isReconnect) {
                 PLVToast.Builder.context(getContext())
                         .setText(R.string.plv_chat_toast_reconnect_success)
-                        .build()
-                        .show();
-            } else {
-                PLVToast.Builder.context(getContext())
-                        .setText(R.string.plv_chat_toast_login_success)
                         .build()
                         .show();
             }
@@ -538,6 +579,11 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 @Override
                 public void onSendImg(PolyvSendLocalImgEvent imgEvent) {
                     sendChatMessage(imgEvent);
+                }
+
+                @Override
+                public boolean onSendQuoteMsg(String message) {
+                    return false;
                 }
 
                 @Override

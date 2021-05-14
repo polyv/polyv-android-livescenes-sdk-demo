@@ -17,6 +17,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessa
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,11 +204,19 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     public interface OnViewActionListener {
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
+
+        void onShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
         if (onViewActionListener != null) {
             onViewActionListener.onChatImgClick(position, view, imgUrl, isQuoteImg);
+        }
+    }
+
+    public void callOnShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowAnswerWindow(chatQuoteVO, quoteId);
         }
     }
     // </editor-fold>

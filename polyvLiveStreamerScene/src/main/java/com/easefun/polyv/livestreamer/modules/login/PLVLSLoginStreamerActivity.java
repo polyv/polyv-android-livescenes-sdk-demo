@@ -190,10 +190,6 @@ public class PLVLSLoginStreamerActivity extends PLVBaseActivity implements View.
         loginManager.loginStreamer(channelId, password, new IPLVSceneLoginManager.OnStringCodeLoginListener<PLVSLoginVO>() {
             @Override
             public void onLoginSuccess(PLVSLoginVO loginVO) {
-                PLVToast.Builder.context(PLVLSLoginStreamerActivity.this)
-                        .setText(R.string.plv_scene_login_toast_login_success)
-                        .build()
-                        .show();
                 updateLoginViewStatus(false);
                 localInfoManager.saveLoginInfo(channelId, password, nick);
 

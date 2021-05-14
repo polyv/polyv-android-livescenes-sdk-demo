@@ -74,6 +74,8 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         chatImgWidth = 0;
         chatImgHeight = 0;
         isLocalChatImg = false;
+        chatQuoteVO = null;
+        quoteSpeakMsg = null;
     }
 
     @Override
@@ -94,6 +96,10 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvLocalMessage) messageData).getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) ((PolyvLocalMessage) messageData).getObjects()[validIndex];
+            chatQuoteVO = ((PolyvLocalMessage) messageData).getQuote();
+            if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+            }
         } else if (messageData instanceof PLVChatImgEvent) {//接收的图片事件信息
             PLVChatImgEvent chatImgEvent = (PLVChatImgEvent) messageData;
             fillFieldFromUser(chatImgEvent.getUser());
@@ -180,7 +186,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         }
     }
 
-    protected void fitChatImgWH(int width, int height, View view, int maxLengthDp, int minLengthDp) {
+    public static void fitChatImgWH(int width, int height, View view, int maxLengthDp, int minLengthDp) {
         int maxLength = ConvertUtils.dp2px(maxLengthDp);
         int minLength = ConvertUtils.dp2px(minLengthDp);
         //计算显示的图片大小

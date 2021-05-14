@@ -162,7 +162,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 }
                 //如果是自动连麦的嘉宾，则把连麦相关的按钮隐藏
-                if (PLVSStreamerInnerDataTransfer.getInstance().isAutoLinkToGuest() && isViewerUserType(socketUserBean.getUserType())) {
+                if (PLVSStreamerInnerDataTransfer.getInstance().isAutoLinkToGuest() && isGuestUserType(socketUserBean.getUserType())) {
                     holder.plvlsMemberLinkmicControlIv.setVisibility(View.GONE);
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 }
@@ -451,12 +451,16 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             plvlsMemberLinkmicControlIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
                     if (onViewActionListener != null) {
-                        onViewActionListener.onControlUserLinkMic(getAdapterPosition(), !v.isSelected());
+                        onViewActionListener.onControlUserLinkMic(pos, !v.isSelected());
                     }
                     if (v.isSelected()) {
                         PLVToast.Builder.context(v.getContext())
-                                .setText("已取消" + dataList.get(getAdapterPosition()).getSocketUserBean().getNick() + "的连麦")
+                                .setText("已取消" + dataList.get(pos).getSocketUserBean().getNick() + "的连麦")
                                 .build()
                                 .show();
                     }
@@ -478,25 +482,37 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             plvlsMemberMicIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
                     if (onViewActionListener != null) {
-                        onViewActionListener.onMicControl(getAdapterPosition(), !v.isSelected());
+                        onViewActionListener.onMicControl(pos, !v.isSelected());
                     }
                 }
             });
             plvlsMemberCamIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
                     if (onViewActionListener != null) {
-                        onViewActionListener.onCameraControl(getAdapterPosition(), !v.isSelected());
+                        onViewActionListener.onCameraControl(pos, !v.isSelected());
                     }
                 }
             });
             plvlsMemberCamFrontIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
                     if (!v.isSelected()) {
                         if (onViewActionListener != null) {
-                            onViewActionListener.onFrontCameraControl(getAdapterPosition(), v.getTag() != null);
+                            onViewActionListener.onFrontCameraControl(pos, v.getTag() != null);
                         }
                     }
                 }

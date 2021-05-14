@@ -26,6 +26,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * date: 2020/7/27
@@ -256,8 +257,12 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         SurfaceView renderView = adapterCallback.createLinkMicRenderView();
 
         LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
-        viewHolder.renderView = renderView;
-        viewHolder.flRenderViewContainer.addView(renderView, getRenderViewLayoutParam());
+        if (renderView != null) {
+            viewHolder.renderView = renderView;
+            viewHolder.flRenderViewContainer.addView(renderView, getRenderViewLayoutParam());
+        } else {
+            PLVCommonLog.e(TAG, "create render view return null");
+        }
         return viewHolder;
     }
 
@@ -271,8 +276,12 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (holder.isViewRecycled) {
             holder.isViewRecycled = false;
             holder.renderView = adapterCallback.createLinkMicRenderView();
-            holder.flRenderViewContainer.addView(holder.renderView, getRenderViewLayoutParam());
-            holder.isRenderViewSetup = false;
+            if (holder.renderView != null) {
+                holder.flRenderViewContainer.addView(holder.renderView, getRenderViewLayoutParam());
+                holder.isRenderViewSetup = false;
+            } else {
+                PLVCommonLog.e(TAG, String.format(Locale.US, "create render view return null at position:%d", position));
+            }
         }
         PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
         String linkMicId = itemDataBean.getLinkMicId();

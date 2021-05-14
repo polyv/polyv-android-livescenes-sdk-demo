@@ -234,6 +234,7 @@ public class PLVLiveChannelConfig {
             viewerName = old.viewerName;
             viewerAvatar = old.viewerAvatar;
             viewerType = old.viewerType;
+            actor = old.actor;
         }
 
         /**

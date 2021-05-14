@@ -57,6 +57,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCLinkMicLayout.class.getSimpleName();
 
+    // 连麦权限请求失败错误码
+    private static final int ERROR_PERMISSION_DENIED = 1060501;
+
     //尺寸
     private static final int DP_LAND_LINK_MIC_LIST_MARGIN_LEFT = 8;
     private static final int DP_LAND_LINK_MIC_LIST_MARGIN_RIGHT = 34;
@@ -390,7 +393,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onLinkMicError(int errorCode, Throwable throwable) {
         PLVCommonLog.exception(throwable);
-        if (errorCode == 1060501) {
+        if (errorCode == ERROR_PERMISSION_DENIED) {
             new AlertDialog.Builder(getContext()).setTitle(R.string.plv_common_dialog_tip)
                     .setMessage(R.string.plv_linkmic_error_tip_permission_denied)
                     .setPositiveButton(R.string.plv_common_dialog_confirm, new DialogInterface.OnClickListener() {

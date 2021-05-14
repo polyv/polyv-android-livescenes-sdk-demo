@@ -18,6 +18,7 @@ import com.easefun.polyv.livestreamer.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 推流和连麦列表适配器
@@ -60,7 +61,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
         StreamerItemViewHolder viewHolder = new StreamerItemViewHolder(itemView);
         viewHolder.renderView = renderView;
-        viewHolder.plvlsStreamerRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        if (renderView != null) {
+            viewHolder.plvlsStreamerRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }else {
+            PLVCommonLog.e(TAG, "create render view return null");
+        }
         return viewHolder;
     }
 
@@ -79,8 +84,12 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         if (holder.isViewRecycled) {
             holder.isViewRecycled = false;
             holder.renderView = adapterCallback.createLinkMicRenderView();
-            holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            holder.isRenderViewSetup = false;
+            if (holder.renderView != null) {
+                holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                holder.isRenderViewSetup = false;
+            } else {
+                PLVCommonLog.d(TAG, String.format(Locale.US, "create render view return null at position:%d", position));
+            }
         }
         PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
         String linkMicId = itemDataBean.getLinkMicId();
@@ -203,6 +212,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         if (holder.renderView != null) {
             holder.isViewRecycled = true;
             holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
+            adapterCallback.releaseLinkMicRenderView(holder.renderView);
             holder.renderView = null;
         }
         PLVCommonLog.d(TAG, "onViewRecycled pos=" + holder.getAdapterPosition() + " holder=" + holder.toString());
@@ -256,7 +266,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 holder.renderView.setVisibility(View.INVISIBLE);
             }
             //将渲染器从View tree中移除（在部分华为机型上发现渲染器的SurfaceView隐藏后还会叠加显示）
-            if (holder.renderView != null && holder.renderView.getParent() == null) {
+            if (holder.renderView != null && holder.renderView.getParent() != null) {
                 holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
             }
         } else {
@@ -313,6 +323,13 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
          * @return 渲染器
          */
         SurfaceView createLinkMicRenderView();
+
+        /**
+         * 释放渲染器
+         *
+         * @param renderView 渲染器
+         */
+        void releaseLinkMicRenderView(SurfaceView renderView);
 
         /**
          * 安装SurfaceView。

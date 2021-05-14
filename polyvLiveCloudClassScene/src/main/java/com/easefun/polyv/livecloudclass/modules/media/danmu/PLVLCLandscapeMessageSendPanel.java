@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -65,7 +66,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
             public void onGlobalLayout() {//all call
                 int usableHeightNow = computeUsableHeight(childOfContent);
                 if (usableHeightPrevious != usableHeightNow) {
-                    FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) llSendMessage.getLayoutParams();
+                    ViewGroup.LayoutParams flp = (ViewGroup.LayoutParams) llSendMessage.getLayoutParams();
                     if (flp == null) {
                         return;
                     }

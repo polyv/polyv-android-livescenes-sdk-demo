@@ -13,6 +13,7 @@ import android.view.View;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -27,7 +28,6 @@ import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.user.PLVSocketUserConstant;
-import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 /**
  * 手机开播场景界面。
@@ -390,7 +390,10 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                     return;
                 }
                 plvlsChatroomLy.setOpenMicViewStatus(aBoolean);
-                ToastUtils.showShort("已" + (aBoolean ? "开启" : "关闭") + "麦克风");
+                PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
+                        .setText("已" + (aBoolean ? "开启" : "关闭") + "麦克风")
+                        .build()
+                        .show();
             }
         });
         plvlsStreamerLy.addOnEnableVideoListener(new IPLVOnDataChangedListener<Boolean>() {
@@ -400,7 +403,10 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                     return;
                 }
                 plvlsChatroomLy.setOpenCameraViewStatus(aBoolean);
-                ToastUtils.showShort("已" + (aBoolean ? "开启" : "关闭") + "摄像头");
+                PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
+                        .setText("已" + (aBoolean ? "开启" : "关闭") + "摄像头")
+                        .build()
+                        .show();
             }
         });
         plvlsStreamerLy.addOnIsFrontCameraListener(new IPLVOnDataChangedListener<Boolean>() {

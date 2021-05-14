@@ -29,6 +29,8 @@ import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVMessageBaseEvent;
+import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
+import com.plv.socket.eventbus.ppt.PLVOnSliceStartEventBus;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserBean;
 
@@ -36,6 +38,11 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * @author suhongtao
@@ -75,6 +82,11 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     private final List<WeakReference<IPLVDocumentContract.View>> viewWeakReferenceList = new ArrayList<>();
 
     /**
+     * rx disposables
+     */
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    /**
      * MVP - Model
      */
     @Nullable
@@ -105,6 +117,8 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         observePptStatus(lifecycleOwner);
         observePptPaintStatus(lifecycleOwner);
         observePptOnDeleteResponse(lifecycleOwner);
+
+        observeOnSliceStartEvent();
 
         isInitialized = true;
     }
@@ -168,9 +182,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         plvDocumentRepository.getRefreshPptMessageLiveData().observe(lifecycleOwner, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String message) {
-                if (isStreamStarted) {
-                    PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
-                }
+                PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
             }
         });
     }
@@ -285,6 +297,24 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                 }
             }
         });
+    }
+
+    /**
+     * 监听sliceStart事件，开播时触发，发送到webview
+     * 会清空屏幕上的画笔数据
+     */
+    private void observeOnSliceStartEvent() {
+        Disposable disposable = PLVOnSliceStartEventBus.get()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<PLVOnSliceStartEvent>() {
+                    @Override
+                    public void accept(PLVOnSliceStartEvent plvOnSliceStartEvent) {
+                        if (plvDocumentRepository != null) {
+                            plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.ONSLICESTART, PLVGsonUtil.toJson(plvOnSliceStartEvent));
+                        }
+                    }
+                });
+        compositeDisposable.add(disposable);
     }
 
     // </editor-fold>
@@ -671,6 +701,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         }
         isInitialized = false;
         viewWeakReferenceList.clear();
+        compositeDisposable.dispose();
         INSTANCE = null;
     }
 

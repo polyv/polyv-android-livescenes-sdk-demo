@@ -13,6 +13,59 @@
     android:paddingRight="12dp"
     android:paddingBottom="2.5dp">
 
+    <!--显示被回复人发送的文本信息-->
+    <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+        android:id="@+id/quote_chat_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="2"
+        android:text="121321312312132131231231231213213123123123123123"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        android:visibility="visible"
+        tools:visibility="gone" />
+
+    <!--显示被回复人发送的图片信息-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--240-60-24-2=92-->
+        <TextView
+            android:id="@+id/quote_chat_nick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="13121111111131211113："
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/quote_img_message_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#D3D3D3"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:visibility="gone" />
+    </LinearLayout>
+
+    <!--分割线-->
+    <View
+        android:id="@+id/quote_split_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="#1Affffff"
+        android:visibility="gone" />
+
     <!--has emoji abutt top-->
     <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
         android:id="@+id/chat_msg_tv"
@@ -74,58 +127,5 @@
                 app:cpv_progressStyle="FillInnerArc"
                 tools:visibility="visible" />
         </FrameLayout>
-    </LinearLayout>
-
-    <!--分割线-->
-    <View
-        android:id="@+id/quote_split_view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:background="#1Affffff"
-        android:visibility="gone" />
-
-    <!--显示被回复人发送的文本信息-->
-    <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
-        android:id="@+id/quote_chat_msg_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:lineSpacingExtra="2dp"
-        android:maxLines="2"
-        android:text="121321312312132131231231231213213123123123123123"
-        android:textColor="#F0F1F5"
-        android:textSize="12sp"
-        android:visibility="visible"
-        tools:visibility="gone" />
-
-    <!--显示被回复人发送的图片信息-->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!--240-60-24-2=92-->
-        <TextView
-            android:id="@+id/quote_chat_nick_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="13121111111131211113："
-            android:textColor="#F0F1F5"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:visibility="gone" />
-
-        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
-            android:id="@+id/quote_img_message_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#D3D3D3"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            tools:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.WindowManager;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
@@ -252,6 +253,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 }
         ).show();
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
@@ -709,6 +711,15 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onChangeTeacherLocation(PLVViewSwitcher viewSwitcher, PLVSwitchViewAnchorLayout switchView) {
                 viewSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
                 viewSwitcher.switchView();
+                mediaLayout.getPlayerSwitchView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mediaLayout != null && mediaLayout.getPlayerSwitchView() != null) {
+                            //兼容 constraint-layout 升级到 2.0.0+ 出现的无延迟黑屏问题
+                            mediaLayout.getPlayerSwitchView().requestLayout();
+                        }
+                    }
+                });
             }
 
             @Override
@@ -747,8 +758,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             PLVScreenUtils.enterLandscape(this);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         } else {
             PLVScreenUtils.enterPortrait(this);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
+                    | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
     }
     // </editor-fold>

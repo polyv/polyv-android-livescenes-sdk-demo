@@ -16,7 +16,7 @@ public class PLVApp extends MultiDexApplication {
         PLVLiveSDKConfig.init(
                 new PLVLiveSDKConfig.Parameter(this)
                         .isOpenDebugLog(true)
-                        .isEnableHttpDns(true)
+                        .isEnableHttpDns(false)
         );
     }
 }

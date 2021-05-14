@@ -423,6 +423,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         dispose(bitPopupWindowTimer);
         dispose(reopenFloatingDelay);
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 重写View定义的方法">
@@ -585,9 +586,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 if (playInfoVO.isPlaying()) {
                     videoPausePortIv.setSelected(true);
                     videoPauseLandIv.setSelected(true);
+
                 } else {
                     videoPausePortIv.setSelected(false);
                     videoPauseLandIv.setSelected(false);
+
                 }
             }
         });
@@ -651,4 +654,5 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         }
     }
     // </editor-fold>
+
 }

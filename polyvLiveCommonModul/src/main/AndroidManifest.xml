@@ -10,7 +10,7 @@
     <application>
         <provider
             android:name="com.easefun.polyv.livecommon.module.utils.PLVFileProvider"
-            android:authorities="plvfileprovider"
+            android:authorities="${applicationId}.plvfileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
