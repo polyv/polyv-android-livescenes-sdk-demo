@@ -207,6 +207,16 @@ public interface IPLVDocumentContract {
         void changePptPage(int autoId, int pageId);
 
         /**
+         * 切换至PPT文档上一步
+         */
+        void changePptToLastStep();
+
+        /**
+         * 切换至PPT文档下一步
+         */
+        void changePptToNextStep();
+
+        /**
          * 改变文本标注工具在webview中的显示内容
          *
          * @param content 文本

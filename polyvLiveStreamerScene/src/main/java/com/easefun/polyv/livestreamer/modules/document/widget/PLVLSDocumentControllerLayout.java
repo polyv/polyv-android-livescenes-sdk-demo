@@ -288,19 +288,19 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             }
         });
 
-        // 切换至上一个白板
+        // 切换至上一步
         plvlsDocumentLastPageIv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                processChangePptPage(currentPageIndex - 1, autoId2PageCountMap.get(autoId, 1));
+                PLVDocumentPresenter.getInstance().changePptToLastStep();
             }
         });
 
-        // 切换至下一个白板
+        // 切换至下一步
         plvlsDocumentNextPageIv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                processChangePptPage(currentPageIndex + 1, autoId2PageCountMap.get(autoId, 1));
+                PLVDocumentPresenter.getInstance().changePptToNextStep();
             }
         });
     }

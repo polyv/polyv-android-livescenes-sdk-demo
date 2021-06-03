@@ -14,7 +14,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -353,6 +352,9 @@ public class PLVLSPptListLayout extends FrameLayout {
             public boolean requestSelectUploadFileConvertType(final Uri fileUri) {
                 if (fileUri == null) {
                     Log.w(TAG, "file uri is null.");
+                    PLVToast.Builder.context(getContext())
+                            .setText("无法访问文件所在路径")
+                            .build().show();
                     return false;
                 }
 
@@ -364,29 +366,13 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
                 if (TextUtils.isEmpty(filePath)) {
                     Log.w(TAG, "file path is empty.");
+                    PLVToast.Builder.context(getContext())
+                            .setText("无法访问文件所在路径")
+                            .build().show();
                     return false;
                 }
 
                 final File uploadFile = new File(filePath);
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-                String fileMimeType = null;
-                if (!TextUtils.isEmpty(fileExtension)) {
-                    fileMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                }
-                // 不支持的上传格式，弹toast取消上传
-                if (TextUtils.isEmpty(fileMimeType)) {
-                    PLVToast.Builder.context(getContext())
-                            .setText("识别文件类型失败，仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式")
-                            .build()
-                            .show();
-                    return false;
-                } else if (!PLVFileChooseUtils.isSupportMimeType(fileMimeType)) {
-                    PLVToast.Builder.context(getContext())
-                            .setText("仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式")
-                            .build()
-                            .show();
-                    return false;
-                }
 
                 // 弹窗提示选择转码方式
                 pptConvertSelectDialog
@@ -609,6 +595,14 @@ public class PLVLSPptListLayout extends FrameLayout {
             @Override
             public void onUploadFailed(@Nullable PLVSPPTInfo.DataBean.ContentsBean documentBean, int errorCode, String msg, Throwable throwable) {
                 Log.i(TAG, "document upload onUploadFailed");
+                String message = msg;
+                if (TextUtils.isEmpty(message)) {
+                    message = throwable.getMessage();
+                }
+                PLVToast.Builder.context(getContext())
+                        .setText(errorCode + "-" + message)
+                        .build().show();
+
                 // 上传失败回调 更新视图显示
                 if (documentBean == null) {
                     return;
