@@ -2,11 +2,12 @@ polyv-android-livescenes-sdk-demo
 ===
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v1.4.2-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.4.2)
+[![GitHub release](https://img.shields.io/badge/release-v1.5.0-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.5.0)
 
 ### ！！！集成请务必参考[wiki](https://github.com/polyv/polyv-android-livescenes-sdk-demo/wiki)文档
 
 ## API 文档
+1.5.0版API文档请看[v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)</br>
 1.4.2版API文档请看[v1.4.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.2/index.html)</br>
 1.4.0版API文档请看[v1.4.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.0/index.html)</br>
 1.3.0版API文档请看[v1.3.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.3.0/index.html)</br>
