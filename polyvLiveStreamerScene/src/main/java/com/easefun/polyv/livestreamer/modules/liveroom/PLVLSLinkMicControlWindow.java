@@ -98,6 +98,9 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
                 @Override
                 public void onCall(Object... args) {
                     updateLinkMicControlView(isVideoType, isOpen);
+                    if (onViewActionListener != null) {
+                        onViewActionListener.updateLinkMicMediaType(isVideoType);
+                    }
                 }
             });
             if (!isOpenLinkMic) {
@@ -158,6 +161,13 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
          * @return true：成功，false：未成功
          */
         boolean isStreamerStartSuccess();
+
+        /**
+         * 更新连麦媒体类型
+         *
+         * @param isVideoLinkMicType true：视频类型，false：音频类型
+         */
+        void updateLinkMicMediaType(boolean isVideoLinkMicType);
     }
     // </editor-fold>
 }

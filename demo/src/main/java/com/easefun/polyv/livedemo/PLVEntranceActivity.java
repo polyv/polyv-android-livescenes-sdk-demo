@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.easefun.polyv.livestreamer.modules.login.PLVLSLoginStreamerActivity;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 /**
@@ -23,8 +22,8 @@ public class PLVEntranceActivity extends AppCompatActivity implements View.OnCli
 
     private static final SparseArray<Class<? extends Activity>> MAP_VIEW_ID_TO_ACTIVITY_CLASS =
             new SparseArray<Class<? extends Activity>>() {{
-                put(R.id.plv_entrance_live_streamer_btn, PLVLSLoginStreamerActivity.class);
-                put(R.id.plv_entrance_live_cloudclass_btn, PLVLoginActivity.class);
+                put(R.id.plv_entrance_live_streamer_btn, PLVLoginStreamerActivity.class);
+                put(R.id.plv_entrance_live_cloudclass_btn, PLVLoginWatcherActivity.class);
             }};
 
     @Override

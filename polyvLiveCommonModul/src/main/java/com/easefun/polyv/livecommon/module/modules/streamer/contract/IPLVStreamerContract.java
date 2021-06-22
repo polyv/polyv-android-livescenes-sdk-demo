@@ -8,6 +8,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.List;
 
@@ -71,16 +72,16 @@ public interface IPLVStreamerContract {
         /**
          * 响应用户加入连麦频道
          *
-         * @param uids
+         * @param dataBeanList
          */
-        void onUsersJoin(List<String> uids);
+        void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList);
 
         /**
          * 响应用户离开连麦频道
          *
-         * @param uids
+         * @param dataBeanList
          */
-        void onUsersLeave(List<String> uids);
+        void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList);
 
         /**
          * 推流网络变化
@@ -230,11 +231,39 @@ public interface IPLVStreamerContract {
         boolean enableLocalVideo(boolean enable);
 
         /**
+         * 开关手电筒，如果前置摄像头没有手电筒，那么前置摄像头是无法打开手电筒的。
+         *
+         * @param enable 开关
+         * @return true表示打开成功，false表示打开失败
+         */
+        boolean enableTorch(boolean enable);
+
+        /**
          * 设置相机方向
          *
          * @param front true：前置，false：后置
          */
         boolean setCameraDirection(boolean front);
+
+        /**
+         * 设置前置摄像头画面镜像
+         *
+         * @param enable true表示镜像，false表示非镜像
+         */
+        void setFrontCameraMirror(boolean enable);
+
+        /**
+         * 设置推流画面类型
+         *
+         * @param type 类型
+         */
+        void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
+
+        /**
+         * 设置混流画面布局类型
+         * @param mixLayoutType 混流布局类型
+         */
+        void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);
 
         /**
          * 创建渲染器
@@ -278,6 +307,14 @@ public interface IPLVStreamerContract {
         void controlUserLinkMic(int position, boolean isAllowJoin);
 
         /**
+         * 控制连麦列表中的用户加入或离开连麦
+         *
+         * @param position    连麦列表中的位置
+         * @param isAllowJoin true：加入，false：离开
+         */
+        void controlUserLinkMicInLinkMicList(int position, boolean isAllowJoin);
+
+        /**
          * 禁/启用用户媒体
          *
          * @param position    成员列表中的位置
@@ -285,6 +322,15 @@ public interface IPLVStreamerContract {
          * @param isMute      true：禁用，false：启用
          */
         void muteUserMedia(int position, boolean isVideoType, boolean isMute);
+
+        /**
+         * 禁/启用用户媒体
+         *
+         * @param position    连麦列表中的位置
+         * @param isVideoType true：视频，false：音频
+         * @param isMute      true：禁用，false：启用
+         */
+        void muteUserMediaInLinkMicList(int position, boolean isVideoType, boolean isMute);
 
         /**
          * 下麦全体连麦用户

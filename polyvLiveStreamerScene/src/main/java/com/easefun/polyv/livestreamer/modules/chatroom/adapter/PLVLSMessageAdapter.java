@@ -12,12 +12,14 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
+import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.chat.PLVProhibitedWordVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.List;
  */
 public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBaseViewHolder<PLVBaseViewData, PLVLSMessageAdapter>> {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    public static final String PAYLOAD_PROHIBITED_CHANGED = "prohibitedChanged";
     private List<PLVBaseViewData> dataList;//adapter使用的数据列表
     private List<PLVBaseViewData> fullDataList;//全部信息的数据列表
     private List<PLVBaseViewData> specialDataList;//只看讲师信息的数据列表(包括我、讲师类型、嘉宾类型、助教类型、管理员类型的信息)
@@ -70,6 +73,17 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     @Override
     public void onBindViewHolder(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVLSMessageAdapter> holder, int position) {
         holder.processData(dataList.get(position), position);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVLSMessageAdapter> holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads);
+            return;
+        }
+        if (holder instanceof PLVLSMessageViewHolder) {
+            ((PLVLSMessageViewHolder) holder).processData(dataList.get(position), position, payloads);
+        }
     }
 
     @Override
@@ -153,6 +167,36 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         return false;
     }
 
+    public void notifyProhibitedChanged(String prohibitedMessage, String hintMsg, String status) {
+        int changedFullDataPosition = -1;
+        for (int i = fullDataList.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = fullDataList.get(i);
+            if (baseViewData.getData() instanceof PolyvLocalMessage) {
+                String speakMsg = ((PolyvLocalMessage) baseViewData.getData()).getSpeakMessage();
+                if (prohibitedMessage != null && speakMsg != null && speakMsg.contains(prohibitedMessage)) {
+                    PLVProhibitedWordVO prohibitedWordVO = new PLVProhibitedWordVO(prohibitedMessage, hintMsg, status);
+                    ((PolyvLocalMessage) baseViewData.getData()).setProhibitedWord(prohibitedWordVO);
+                    changedFullDataPosition = i;
+                    break;
+                }
+            }
+        }
+        int changedSpecialDataPosition = -1;
+        for (int i = specialDataList.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = fullDataList.get(i);
+            if (baseViewData.getData() instanceof PolyvLocalMessage) {
+                String speakMsg = ((PolyvLocalMessage) baseViewData.getData()).getSpeakMessage();
+                if (prohibitedMessage != null && speakMsg != null && speakMsg.contains(prohibitedMessage)) {
+                    PLVProhibitedWordVO prohibitedWordVO = new PLVProhibitedWordVO(prohibitedMessage, hintMsg, status);
+                    ((PolyvLocalMessage) baseViewData.getData()).setProhibitedWord(prohibitedWordVO);
+                    changedSpecialDataPosition = i;
+                    break;
+                }
+            }
+        }
+        notifyItemChanged(isDisplaySpecialType ? changedSpecialDataPosition : changedFullDataPosition, PAYLOAD_PROHIBITED_CHANGED);
+    }
+
     public boolean removeDataChanged(String id) {
         if (TextUtils.isEmpty(id)) {
             return false;
@@ -169,7 +213,7 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         }
         int removeSpecialDataPosition = -1;
         for (PLVBaseViewData baseViewData : specialDataList) {
-            removeFullDataPosition++;
+            removeSpecialDataPosition++;
             if (baseViewData.getData() instanceof IPLVIdEvent
                     && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
                 specialDataList.remove(baseViewData);

@@ -32,10 +32,12 @@ import com.easefun.polyv.livescenes.streamer.listener.IPLVSStreamerOnServerTimeo
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerListener;
 import com.easefun.polyv.livescenes.streamer.manager.PLVSStreamerManagerFactory;
+import com.easefun.polyv.livescenes.streamer.mix.PLVRTCMixUser;
 import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
@@ -109,6 +111,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean curCameraFront = true;
     private boolean curEnableRecordingAudioVolume = true;
     private boolean curEnableLocalVideo = true;
+    private boolean isFrontMirror = true;
+    private int pushPictureResolution = PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE;
 
     //推流状态
     private int streamerStatus = STREAMER_STATUS_STOP;
@@ -199,8 +203,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
                 setBitrate(curBitrate);
                 setCameraDirection(curCameraFront);
+                setPushPictureResolutionType(pushPictureResolution);
                 enableLocalVideo(curEnableLocalVideo);
                 enableRecordingAudioVolume(curEnableRecordingAudioVolume);
+                setFrontCameraMirror(isFrontMirror);
 
                 initStreamerListener();
 
@@ -217,20 +223,15 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     streamerInitState = STREAMER_MIC_UNINITIATED;
                 }
 
-                stopLiveStream();
-                callbackToView(new ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onStatesToStreamEnded();
-                    }
-                });
-
-                callbackToView(new ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onStreamerError(errorCode, throwable);
-                    }
-                });
+                if (streamerStatus != STREAMER_STATUS_STOP) {
+                    stopLiveStream();
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                            view.onStreamerError(errorCode, throwable);
+                        }
+                    });
+                }
             }
         });
     }
@@ -242,22 +243,23 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public void setBitrate(int bitrate) {
-        curBitrate = Math.min(bitrate, streamerManager.getMaxSupportedBitrate());
+        curBitrate = Math.min(bitrate, getMaxBitrate());
         if (!isInitStreamerManager()) {
             return;
         }
-        streamerManager.setBitrate(bitrate);
+        streamerManager.setBitrate(curBitrate);
+        streamerData.postCurBitrate(curBitrate);
         saveBitrate();
     }
 
     @Override
     public int getBitrate() {
-        return Math.min(curBitrate, streamerManager.getMaxSupportedBitrate());
+        return Math.min(curBitrate, getMaxBitrate());
     }
 
     @Override
     public int getMaxBitrate() {
-        return streamerManager.getMaxSupportedBitrate();
+        return PLVSStreamerInnerDataTransfer.getInstance().getSupportedMaxBitrate();
     }
 
     @Override
@@ -285,10 +287,25 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public boolean enableTorch(boolean enable) {
+        if (!isInitStreamerManager()) {
+            return false;
+        }
+        return streamerManager.enableTorch(enable);
+    }
+
+    @Override
     public boolean setCameraDirection(final boolean front) {
         curCameraFront = front;
         if (!isInitStreamerManager()) {
             return false;
+        }
+        if (curCameraFront) {
+            streamerManager.setLocalPreviewMirror(isFrontMirror);
+            streamerManager.setLocalPushMirror(isFrontMirror);
+        } else {
+            streamerManager.setLocalPreviewMirror(false);
+            streamerManager.setLocalPushMirror(false);
         }
         streamerManager.switchCamera(front);
         streamerData.postIsFrontCamera(front);
@@ -304,6 +321,36 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             }
         });
         return true;
+    }
+
+    @Override
+    public void setFrontCameraMirror(boolean enable) {
+        if (!isInitStreamerManager()) {
+            return;
+        }
+        if (curCameraFront) {
+            this.isFrontMirror = enable;
+            streamerData.postIsFrontMirrorMode(isFrontMirror);
+            streamerManager.setLocalPreviewMirror(enable);
+            streamerManager.setLocalPushMirror(enable);
+        }
+    }
+
+    @Override
+    public void setPushPictureResolutionType(int type) {
+        pushPictureResolution = type;
+        if (!isInitStreamerManager()) {
+            return;
+        }
+        streamerManager.setPushPictureResolutionType(pushPictureResolution);
+    }
+
+    @Override
+    public void setMixLayoutType(int mixLayoutType) {
+        if (!isInitStreamerManager()) {
+            return;
+        }
+        streamerManager.setMixLayoutType(mixLayoutType);
     }
 
     @Override
@@ -352,7 +399,14 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerStatus = STREAMER_STATUS_STOP;
         streamerManager.stopLiveStream();
         streamerData.postStreamerStatus(false);
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                view.onStatesToStreamEnded();
+            }
+        });
         PLVSLinkMicEventSender.getInstance().closeLinkMic();
+        PLVSLinkMicEventSender.getInstance().emitFinishClassEvent(streamerManager.getLinkMicUid());
     }
 
     @Override
@@ -391,10 +445,19 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public void muteUserMedia(int position, final boolean isVideoType, final boolean isMute) {
-        if (!PLVSLinkMicEventSender.getInstance().isVideoLinkMicType() && isVideoType && !isMute) {
-            return;//音频连麦模式，不操作用户打开视频
+    public void controlUserLinkMicInLinkMicList(int position, boolean isAllowJoin) {
+        if (position < 0 || position >= streamerList.size()) {
+            return;
         }
+        PLVLinkMicItemDataBean linkMicItemDataBean = streamerList.get(position);
+        Pair<Integer, PLVMemberItemDataBean> item = getMemberItemWithLinkMicId(linkMicItemDataBean.getLinkMicId());
+        if (item != null) {
+            controlUserLinkMic(item.first, isAllowJoin);
+        }
+    }
+
+    @Override
+    public void muteUserMedia(int position, final boolean isVideoType, final boolean isMute) {
         if (position < 0 || position >= memberList.size()) {
             return;
         }
@@ -416,6 +479,18 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 }
             }
         });
+    }
+
+    @Override
+    public void muteUserMediaInLinkMicList(int position, boolean isVideoType, boolean isMute) {
+        if (position < 0 || position >= streamerList.size()) {
+            return;
+        }
+        PLVLinkMicItemDataBean linkMicItemDataBean = streamerList.get(position);
+        Pair<Integer, PLVMemberItemDataBean> item = getMemberItemWithLinkMicId(linkMicItemDataBean.getLinkMicId());
+        if (item != null) {
+            muteUserMedia(item.first, isVideoType, isMute);
+        }
     }
 
     @Override
@@ -547,7 +622,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     callbackToView(new ViewRunnable() {
                         @Override
                         public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                            view.onStatesToStreamEnded();
+                            view.onStreamerError(-1, new Throwable("timeout"));
                         }
                     });
                 }
@@ -796,7 +871,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     boolean updateMemberListLinkMicStatusWithRtcJoinList(PLVMemberItemDataBean item, final String linkMicUid) {
         boolean hasChangedMemberList = false;
-        PLVLinkMicItemDataBean linkMicItemDataBean = item.getLinkMicItemDataBean();
+        final PLVLinkMicItemDataBean linkMicItemDataBean = item.getLinkMicItemDataBean();
         if (linkMicItemDataBean == null) {
             return false;
         }
@@ -811,11 +886,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(linkMicUid);
                 if (linkMicItem == null) {
                     streamerList.add(linkMicItemDataBean);
+                    updateMixLayoutUsers();
                     callbackToView(new ViewRunnable() {
                         @Override
                         public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
                             //更新推流和连麦列表
-                            view.onUsersJoin(Collections.singletonList(linkMicUid));
+                            view.onUsersJoin(Collections.singletonList(linkMicItemDataBean));
                         }
                     });
                 }
@@ -823,6 +899,16 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             }
         }
         return hasChangedMemberList;
+    }
+
+    void updateMixLayoutUsers() {
+        List<PLVRTCMixUser> mixUserList = new ArrayList<>();
+        for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : streamerList) {
+            PLVRTCMixUser mixUser = new PLVRTCMixUser();
+            mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
+            mixUserList.add(mixUser);
+        }
+        streamerManager.updateMixLayoutUsers(mixUserList);
     }
 
     private boolean updateMemberListLinkMicStatus(List<PLVJoinInfoEvent> joinList, List<PLVLinkMicJoinStatus.WaitListBean> waitList) {
@@ -860,7 +946,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     private void removeLinkMicDataNoExistServer(List<PLVJoinInfoEvent> joinList) {
-        final List<String> willRemoveStreamerList = new ArrayList<>();
+        final List<PLVLinkMicItemDataBean> willRemoveStreamerList = new ArrayList<>();
         Iterator<PLVLinkMicItemDataBean> linkMicItemDataBeanIterator = streamerList.iterator();
         while (linkMicItemDataBeanIterator.hasNext()) {
             PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItemDataBeanIterator.next();
@@ -874,10 +960,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             }
             if (!isExistServerList && !isMyLinkMicId(linkMicId)) {
                 linkMicItemDataBeanIterator.remove();
-                willRemoveStreamerList.add(linkMicId);
+                willRemoveStreamerList.add(linkMicItemDataBean);
             }
         }
         if (!willRemoveStreamerList.isEmpty()) {
+            updateMixLayoutUsers();
             callbackToView(new ViewRunnable() {
                 @Override
                 public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -938,7 +1025,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     private int loadBitrate() {
-        return SPUtils.getInstance().getInt("plv_key_bitrate", PLVSStreamerConfig.Bitrate.BITRATE_HIGH);
+        return SPUtils.getInstance().getInt("plv_key_bitrate", PLVSStreamerConfig.Bitrate.BITRATE_SUPER);
     }
     // </editor-fold>
 
@@ -1104,21 +1191,22 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         dispose(timerDisposable);
                         hasShownDuringOneNetBroken = true;
 
-                        //call
-                        streamerData.postShowNetBroken();
-                        callbackToView(new ViewRunnable() {
-                            @Override
-                            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                                view.onShowNetBroken();
-                            }
-                        });
                         //如果还没有推流成功，说明在推流前已经断网了，这时直接变成下课
                         if (!streamerManager.isLiveStreaming()) {
                             stopLiveStream();
                             callbackToView(new ViewRunnable() {
                                 @Override
                                 public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                                    view.onStatesToStreamEnded();
+                                    view.onStreamerError(-1, new Throwable("network disconnect"));
+                                }
+                            });
+                        } else {
+                            //call
+                            streamerData.postShowNetBroken();
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                                    view.onShowNetBroken();
                                 }
                             });
                         }
@@ -1181,10 +1269,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 PLVSocketUserConstant.USERTYPE_GUEST,
                 PLVSocketUserConstant.USERTYPE_VIEWER,
                 PLVSocketUserConstant.USERTYPE_ASSISTANT,
-                REAL_LINK_MIC_RTC_JOIN,
-                REAL_LINK_MIC_JOIN,
-                REAL_LINK_MIC_JOINING,
                 REAL_LINK_MIC_WAIT,
+                REAL_LINK_MIC_JOINING,
+                REAL_LINK_MIC_JOIN,
+                REAL_LINK_MIC_RTC_JOIN,
                 REAL,
                 PLVSocketUserConstant.USERTYPE_DUMMY
         );

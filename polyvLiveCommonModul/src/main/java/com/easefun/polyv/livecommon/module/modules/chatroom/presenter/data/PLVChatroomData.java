@@ -6,6 +6,8 @@ import android.util.Pair;
 
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.login.PLVLoginEvent;
 
 import java.util.List;
 
@@ -25,6 +27,10 @@ public class PLVChatroomData {
     private MutableLiveData<Integer> onlineCountData = new MutableLiveData<>();
     //聊天室收到的文本发言信息(包括自己本地发送的信息)
     private MutableLiveData<Pair<CharSequence, Boolean>> speakMessageData = new MutableLiveData<>();
+    //聊天室登录事件
+    private MutableLiveData<PLVLoginEvent> loginEventData = new MutableLiveData<>();
+    //聊天室打赏事件
+    private MutableLiveData<PLVRewardEvent> rewardEventData = new MutableLiveData<>();
 
     public LiveData<PolyvBulletinVO> getBulletinVO() {
         return bulletinVO;
@@ -74,5 +80,21 @@ public class PLVChatroomData {
     //isSpecialType：是否是特殊类型，包括 我、讲师、助教、管理员、嘉宾
     public void postSpeakMessageData(CharSequence message, boolean isSpecialType) {
         speakMessageData.postValue(new Pair<>(message, isSpecialType));
+    }
+
+    public LiveData<PLVLoginEvent> getLoginEventData() {
+        return loginEventData;
+    }
+
+    public void postLoginEventData(PLVLoginEvent loginEvent) {
+        loginEventData.postValue(loginEvent);
+    }
+
+    public LiveData<PLVRewardEvent> getRewardEvent() {
+        return rewardEventData;
+    }
+
+    public void postRewardEvent(PLVRewardEvent rewardEvent) {
+        rewardEventData.postValue(rewardEvent);
     }
 }

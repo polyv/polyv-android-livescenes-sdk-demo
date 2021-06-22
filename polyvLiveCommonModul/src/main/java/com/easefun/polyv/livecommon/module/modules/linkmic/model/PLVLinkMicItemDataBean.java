@@ -2,6 +2,7 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
 import androidx.annotation.IntRange;
 
+import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -32,6 +33,8 @@ public class PLVLinkMicItemDataBean {
     private String userType;
     //头衔
     private String actor;
+    //头像
+    private String pic;
     //最大值为[MAX_VOLUME]
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
@@ -130,6 +133,14 @@ public class PLVLinkMicItemDataBean {
 
     public void setActor(String actor) {
         this.actor = actor;
+    }
+
+    public String getPic() {
+        return PLVEventHelper.fixChatPic(pic);
+    }
+
+    public void setPic(String pic) {
+        this.pic = pic;
     }
 
     /**

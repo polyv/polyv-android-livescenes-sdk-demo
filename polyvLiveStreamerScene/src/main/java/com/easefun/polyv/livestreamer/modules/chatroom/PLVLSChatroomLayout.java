@@ -437,6 +437,17 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
 
         @Override
+        public void onSendProhibitedWord(@NonNull final String prohibitedMessage, @NonNull final String hintMsg, @NonNull final String status) {
+            super.onSendProhibitedWord(prohibitedMessage, hintMsg, status);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    chatMessageAdapter.notifyProhibitedChanged(prohibitedMessage, hintMsg, status);
+                }
+            });
+        }
+
+        @Override
         public void onSpeakImgDataList(List<PLVBaseViewData> chatMessageDataList) {
             super.onSpeakImgDataList(chatMessageDataList);
             //添加信息至列表

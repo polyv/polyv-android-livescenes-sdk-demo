@@ -103,7 +103,10 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
             }
         });
 
+        //启动前台服务，防止在后台被杀
         PLVLSForegroundService.startService();
+        //防止自动息屏、锁屏
+        setKeepScreenOn(true);
     }
     // </editor-fold>
 
@@ -269,14 +272,14 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onUsersJoin(List<String> uids) {
-            super.onUsersJoin(uids);
+        public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
+            super.onUsersJoin(dataBeanList);
             streamerAdapter.updateAllItem();
         }
 
         @Override
-        public void onUsersLeave(List<String> uids) {
-            super.onUsersLeave(uids);
+        public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
+            super.onUsersLeave(dataBeanList);
             streamerAdapter.updateAllItem();
         }
 

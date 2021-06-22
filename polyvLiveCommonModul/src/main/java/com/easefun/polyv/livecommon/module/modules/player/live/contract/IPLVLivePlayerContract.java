@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
@@ -68,6 +69,14 @@ public interface IPLVLivePlayerContract {
          * @param isFirst 每次加载完成后是否是第一次start播放
          */
         void onSubVideoViewPlay(boolean isFirst);
+
+        /**
+         * 子播放器加载暖场图片回调
+         *
+         * @param imageUrl
+         * @param imageView
+         */
+        void onSubVideoViewLoadImage(String imageUrl, ImageView imageView);
 
         /**
          * 子播放器点击事件

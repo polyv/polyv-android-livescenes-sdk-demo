@@ -182,7 +182,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         plvDocumentRepository.getRefreshPptMessageLiveData().observe(lifecycleOwner, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String message) {
-                PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
+                if (isStreamStarted) {
+                    PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
+                }
             }
         });
     }
@@ -412,6 +414,22 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         }
         PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(autoId, pageId);
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, PLVGsonUtil.toJson(changePptInfo));
+    }
+
+    @Override
+    public void changePptToLastStep() {
+        if (!checkInitialized()) {
+            return;
+        }
+        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoPreviousStep\"}");
+    }
+
+    @Override
+    public void changePptToNextStep() {
+        if (!checkInitialized()) {
+            return;
+        }
+        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoNextStep\"}");
     }
 
     @Override

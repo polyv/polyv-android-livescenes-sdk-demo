@@ -27,7 +27,6 @@ android {
                     'src/main/res/layouts/document',
                     'src/main/res/layouts/streamer',
                     'src/main/res/layouts/liveroom',
-                    'src/main/res/layouts/login',
                     'src/main/res/layouts/statusbar',
                     'src/main/res/layouts/widget'
             ]

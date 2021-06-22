@@ -32,7 +32,7 @@
         android:layout_marginLeft="4dp"
         android:layout_toRightOf="@+id/plvls_member_list_tv"
         android:gravity="center"
-        tools:text="(共12人)"
+        tools:text="(12人)"
         android:textColor="#CFD1D6"
         android:textSize="12sp" />
 
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/plvls_member_list_tv"
         android:layout_alignBottom="@+id/plvls_member_list_tv"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="4dp"
         android:layout_toLeftOf="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
         android:background="@drawable/plvls_member_linkmic_control_bg_shape"
         android:gravity="center"

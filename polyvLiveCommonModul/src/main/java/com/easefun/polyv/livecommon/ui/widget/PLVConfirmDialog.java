@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +29,14 @@ public class PLVConfirmDialog {
     private TextView plvConfirmContent;
     private TextView plvLeftConfirmBtn;
     private TextView plvRightConfirmBtn;
+    @Nullable
     private View plvSplitView;
 
     public PLVConfirmDialog(Context context) {
-        View root = LayoutInflater.from(context).inflate(R.layout.plv_confirm_window_layout, null, false);
+        View root = LayoutInflater.from(context).inflate(layoutId(), null, false);
 
         RelativeLayout dialogWrapper = new RelativeLayout(context);
-        RelativeLayout.LayoutParams rootLp = new RelativeLayout.LayoutParams(DpOrPxUtils.dip2px(context, 228), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams rootLp = new RelativeLayout.LayoutParams(DpOrPxUtils.dip2px(context, dialogWidthInDp()), RelativeLayout.LayoutParams.WRAP_CONTENT);
         rootLp.addRule(RelativeLayout.CENTER_IN_PARENT);
         dialogWrapper.addView(root, rootLp);
 
@@ -48,11 +52,13 @@ public class PLVConfirmDialog {
     }
 
     private void initView(View root) {
-        plvConfirmTitle = (TextView) root.findViewById(R.id.plv_confirm_title);
-        plvConfirmContent = (TextView) root.findViewById(R.id.plv_confirm_content);
-        plvLeftConfirmBtn = (TextView) root.findViewById(R.id.plv_left_confirm_btn);
-        plvRightConfirmBtn = (TextView) root.findViewById(R.id.plv_right_confirm_btn);
-        plvSplitView = root.findViewById(R.id.plv_split_view);
+        plvConfirmTitle = (TextView) root.findViewById(confirmTitleId());
+        plvConfirmContent = (TextView) root.findViewById(confirmContentId());
+        plvLeftConfirmBtn = (TextView) root.findViewById(leftConfirmTextViewId());
+        plvRightConfirmBtn = (TextView) root.findViewById(rightConfirmTextViewId());
+        if (hasSplitView()) {
+            plvSplitView = root.findViewById(splitViewId());
+        }
 
         plvLeftConfirmBtn.setText(R.string.plv_common_dialog_click_wrong);
         plvLeftConfirmBtn.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +68,48 @@ public class PLVConfirmDialog {
             }
         });
     }
+
+    // <editor-fold defaultstate="collapsed" desc="自定义布局 - 继承修改">
+
+    @LayoutRes
+    protected int layoutId() {
+        return R.layout.plv_confirm_window_layout;
+    }
+
+    protected float dialogWidthInDp() {
+        return 228F;
+    }
+
+    @IdRes
+    protected int confirmTitleId() {
+        return R.id.plv_confirm_title;
+    }
+
+    @IdRes
+    protected int confirmContentId() {
+        return R.id.plv_confirm_content;
+    }
+
+    @IdRes
+    protected int leftConfirmTextViewId() {
+        return R.id.plv_left_confirm_btn;
+    }
+
+    @IdRes
+    protected int rightConfirmTextViewId() {
+        return R.id.plv_right_confirm_btn;
+    }
+
+    @IdRes
+    protected int splitViewId() {
+        return R.id.plv_split_view;
+    }
+
+    protected boolean hasSplitView() {
+        return true;
+    }
+
+    // </editor-fold>
 
     public PLVConfirmDialog setTitle(String title) {
         plvConfirmTitle.setText(title);
@@ -142,12 +190,21 @@ public class PLVConfirmDialog {
 
     public PLVConfirmDialog setIsNeedLeftBtn(boolean isNeedRightBtn) {
         if (!isNeedRightBtn) {
-            plvSplitView.setVisibility(View.GONE);
+            if (plvSplitView != null) {
+                plvSplitView.setVisibility(View.GONE);
+            }
             plvLeftConfirmBtn.setVisibility(View.GONE);
         } else {
-            plvSplitView.setVisibility(View.VISIBLE);
+            if (plvSplitView != null) {
+                plvSplitView.setVisibility(View.VISIBLE);
+            }
             plvLeftConfirmBtn.setVisibility(View.VISIBLE);
         }
+        return this;
+    }
+
+    public PLVConfirmDialog setCancelable(boolean cancelable) {
+        dialog.setCancelable(cancelable);
         return this;
     }
 

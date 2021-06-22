@@ -30,7 +30,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
- * 手机开播场景界面。
+ * 手机开播三分屏场景界面。
  * 支持的功能有：推流和连麦、文档、聊天室
  */
 public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
@@ -62,7 +62,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
 
     /**
-     * 启动手机开播页
+     * 启动手机开播三分屏页
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
@@ -87,22 +87,22 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                                                  boolean isOpenCamera,
                                                  boolean isFrontCamera) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("activity 为空，启动手机开播三分屏页失败！");
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("channelId 为空，启动手机开播三分屏页失败！");
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("viewerId 为空，启动手机开播三分屏页失败！");
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("viewerName 为空，启动手机开播三分屏页失败！");
         }
         if (TextUtils.isEmpty(avatarUrl)) {
-            return PLVLaunchResult.error("avatarUrl 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("avatarUrl 为空，启动手机开播三分屏页失败！");
         }
         if (TextUtils.isEmpty(actor)) {
-            return PLVLaunchResult.error("actor 为空，启动手机开播页失败！");
+            return PLVLaunchResult.error("actor 为空，启动手机开播三分屏页失败！");
         }
 
         Intent intent = new Intent(activity, PLVLSLiveStreamerActivity.class);
@@ -272,6 +272,10 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public boolean isStreamerStartSuccess() {
                 return plvlsStreamerLy.isStreamerStartSuccess();
+            }
+
+            @Override
+            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
             }
 
             @Override

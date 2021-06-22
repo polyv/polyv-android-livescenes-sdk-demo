@@ -50,7 +50,7 @@ public class PLVLSForegroundService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("手机开播")
+                .setContentTitle("POLYV开播")
                 .setSmallIcon(R.drawable.plvls_ic_launcher)
                 .setContentIntent(pendingIntent)
                 .build();

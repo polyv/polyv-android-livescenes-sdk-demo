@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
@@ -419,6 +420,15 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             if (!isVideoViewParentDetachVideoLayout) {
                 PLVVideoSizeUtils.fitVideoRatioAndRect(subVideoView, videoView.getParent(), videoViewRect);//传主播放器viewParent
             }
+        }
+
+        @Override
+        public void onSubVideoViewLoadImage(String imageUrl, ImageView imageView) {
+            PLVImageLoader.getInstance().loadImage(subVideoView.getContext(), imageUrl, imageView);
+            ViewGroup.LayoutParams lp = imageView.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            imageView.setLayoutParams(lp);
         }
 
         @Override

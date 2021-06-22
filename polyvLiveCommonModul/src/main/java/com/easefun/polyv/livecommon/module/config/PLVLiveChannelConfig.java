@@ -43,6 +43,11 @@ public class PLVLiveChannelConfig {
      */
     private PolyvLiveChannelType channelType;
 
+    /**
+     * 频道名称
+     */
+    private String channelName;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
@@ -56,6 +61,7 @@ public class PLVLiveChannelConfig {
         videoListType = old.videoListType;
         isLive = old.isLive;
         channelType = old.channelType;
+        channelName = old.channelName;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -110,6 +116,13 @@ public class PLVLiveChannelConfig {
     }
 
     /**
+     * 配置频道名称
+     */
+    public void setupChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    /**
      * 配置vid
      */
     public void setupVid(String vid) {
@@ -151,6 +164,10 @@ public class PLVLiveChannelConfig {
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getChannelName() {
+        return channelName;
     }
 
     public String getVid() {

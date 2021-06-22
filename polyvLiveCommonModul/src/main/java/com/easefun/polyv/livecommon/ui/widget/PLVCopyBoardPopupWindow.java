@@ -46,6 +46,10 @@ public class PLVCopyBoardPopupWindow {
     }
 
     public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, @Nullable final String copyContent, final View.OnClickListener answerViewClickListener) {
+        return showAndAnswer(anchor, isLeft, false, copyContent, answerViewClickListener);
+    }
+
+    public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, boolean onlyShowCopyItem, @Nullable final String copyContent, final View.OnClickListener answerViewClickListener) {
         // 自定义的布局View
         final PopupWindow popupWindow = new PopupWindow();
         View view = LayoutInflater.from(anchor.getContext()).inflate(R.layout.plv_copy_answer_board_popup_layout, null, false);
@@ -69,6 +73,10 @@ public class PLVCopyBoardPopupWindow {
         });
         if (copyContent == null) {
             copyTv.setVisibility(View.GONE);
+            splitView.setVisibility(View.GONE);
+        }
+        if (onlyShowCopyItem) {
+            answerTv.setVisibility(View.GONE);
             splitView.setVisibility(View.GONE);
         }
 

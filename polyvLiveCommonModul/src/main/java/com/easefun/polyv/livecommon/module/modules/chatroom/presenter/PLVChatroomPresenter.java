@@ -11,6 +11,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataRequester;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
+import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -47,6 +48,7 @@ import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRemoveContentEvent;
 import com.plv.socket.event.chat.PLVRemoveHistoryEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
@@ -122,6 +124,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private int requestHistoryViewIndex;
     //获取历史记录的disposable
     private Disposable chatHistoryDisposable;
+    //历史记录是否包含打赏事件
+    private boolean isHistoryContainRewardEvent;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -419,6 +423,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         return getChatHistoryTime;
     }
 
+    @Override
+    public void setHistoryContainRewardEvent(boolean historyContainRewardEvent) {
+        this.isHistoryContainRewardEvent = historyContainRewardEvent;
+    }
+
     @NonNull
     @Override
     public PLVChatroomData getData() {
@@ -463,8 +472,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     continue;
                 }
                 String messageSource = jsonObject.optString("msgSource");
+                JSONObject jsonObject_user = jsonObject.optJSONObject("user");
+                JSONObject jsonObject_content = jsonObject.optJSONObject("content");
                 if (!TextUtils.isEmpty(messageSource)) {
-                    //收/发红包/图片信息，这里仅取图片信息
+                    //收/发红包/图片信息/打赏信息，这里仅取图片信息
                     if (PLVHistoryConstant.MSGSOURCE_CHATIMG.equals(messageSource)) {
                         int itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG;
                         PLVChatImgHistoryEvent chatImgHistory = PLVGsonUtil.fromJson(PLVChatImgHistoryEvent.class, jsonObject.toString());
@@ -477,17 +488,29 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 || PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatImgHistory.getUser().getUserId());
                         PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(chatImgHistory, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag() : null);
                         tempChatItems.add(0, itemData);
+                    } else if (PLVHistoryConstant.MSGSOURCE_REWARD.equals(messageSource)) {
+                        //打赏信息
+                        PLVRewardEvent.ContentBean rewardContentsBean = PolyvEventHelper.gson.fromJson(jsonObject_content.toString(), PLVRewardEvent.ContentBean.class);
+                        PLVRewardEvent rewardEvent = new PLVRewardEvent();
+                        if (rewardContentsBean != null) {
+                            rewardEvent.setContent(rewardContentsBean);
+                            rewardEvent.setRoomId(jsonObject_user.optInt("roomId"));
+
+                            PLVCustomGiftEvent customGiftEvent = PLVCustomGiftEvent.generateCustomGiftEvent(rewardEvent);
+                            PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(customGiftEvent, PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT);
+                            if (isHistoryContainRewardEvent) {
+                                tempChatItems.add(0, itemData);
+                            }
+                        }
                     }
                     continue;
                 }
-                JSONObject jsonObject_user = jsonObject.optJSONObject("user");
                 if (jsonObject_user != null) {
                     String uid = jsonObject_user.optString("uid");
-                    if (PLVHistoryConstant.UID_REWARD.equals(uid) || PLVHistoryConstant.UID_CUSTOMMSG.equals(uid)) {
-                        //打赏/自定义信息，这里过滤掉
+                    if (PLVHistoryConstant.UID_CUSTOMMSG.equals(uid)) {
+                        //自定义信息，这里过滤掉
                         continue;
                     }
-                    JSONObject jsonObject_content = jsonObject.optJSONObject("content");
                     if (jsonObject_content != null) {
                         //content不为字符串的信息，这里过滤掉
                         continue;
@@ -649,6 +672,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     case PLVEventConstant.MESSAGE_EVENT_LOGIN:
                         final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
                         if (loginEvent != null) {
+                            chatroomData.postLoginEventData(loginEvent);
                             callbackToView(new ViewRunnable() {
                                 @Override
                                 public void run(IPLVChatroomContract.IChatroomView view) {
@@ -769,6 +793,19 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 @Override
                                 public void run(IPLVChatroomContract.IChatroomView view) {
                                     view.onAnswerEvent(tAnswerEvent);
+                                }
+                            });
+                        }
+                        break;
+                    //打赏事件
+                    case PLVEventConstant.Chatroom.EVENT_REWARD:
+                        final PLVRewardEvent rewardEvent = PLVEventHelper.toMessageEventModel(message, PLVRewardEvent.class);
+                        if (rewardEvent != null) {
+                            chatroomData.postRewardEvent(rewardEvent);
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    view.onRewardEvent(rewardEvent);
                                 }
                             });
                         }
