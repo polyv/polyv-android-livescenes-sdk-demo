@@ -23,6 +23,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 public class PLVToast {
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    private static Toast lastShowToast = null;
 
     private ToastParam param;
 
@@ -75,7 +76,11 @@ public class PLVToast {
         HANDLER.post(new Runnable() {
             @Override
             public void run() {
+                if (lastShowToast != null) {
+                    lastShowToast.cancel();
+                }
                 toast.show();
+                lastShowToast = toast;
             }
         });
     }
@@ -115,7 +120,7 @@ public class PLVToast {
 
         public static Builder context(@NonNull Context context) {
             Builder toastBuilder = new Builder();
-            toastBuilder.param.context = context;
+            toastBuilder.param.context = context.getApplicationContext();
             return toastBuilder;
         }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#80000000">
+
+    <TextView
+        android:id="@+id/plvsa_live_room_clean_up_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="右滑清屏"
+        android:textColor="#FFF"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvsa_live_room_clean_up_icon_iv"
+        android:layout_width="123dp"
+        android:layout_height="85dp"
+        android:src="@drawable/plvsa_live_room_clean_up_icon"
+        android:layout_marginBottom="24dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        app:layout_constraintBottom_toTopOf="@id/plvsa_live_room_clean_up_label"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/plvsa_live_room_clean_up_confirm_btn"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="我知道了"
+        android:textSize="14dp"
+        android:textColor="#FFF"
+        android:textStyle="bold"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/plvsa_live_room_clean_up_confirm_btn_bg"
+        app:layout_constraintTop_toBottomOf="@id/plvsa_live_room_clean_up_label"
+        app:layout_constraintLeft_toLeftOf="@id/plvsa_live_room_clean_up_label"
+        app:layout_constraintRight_toRightOf="@id/plvsa_live_room_clean_up_label" />
+
+
+</android.support.constraint.ConstraintLayout>

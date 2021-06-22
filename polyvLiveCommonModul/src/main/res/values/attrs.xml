@@ -16,6 +16,7 @@
     <declare-styleable name="PLVRoundRectLayout">
         <attr name="radius" format="dimension" />
         <attr name="mode">
+            <enum name="none" value="0" />
             <enum name="all" value="1" />
             <enum name="top" value="3" />
         </attr>
@@ -177,6 +178,23 @@
         </attr>
         <attr name="indicateColor" format="color" />
         <attr name="rectRadius" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVGradientView">
+        <attr name="plvGradientOrientation" format="enum">
+            <enum name="leftRight" value="0" />
+            <enum name="bottomLeftTopRight" value="1" />
+            <enum name="bottomTop" value="2" />
+            <enum name="bottomRightTopLeft" value="3" />
+            <enum name="rightLeft" value="4" />
+            <enum name="topRightBottomLeft" value="5" />
+            <enum name="topBottom" value="6" />
+            <enum name="topLeftBottomRight" value="7" />
+        </attr>
+        <attr name="plvGradientStartColor" format="color" />
+        <attr name="plvGradientMiddleColor" format="color" />
+        <attr name="plvGradientEndColor" format="color" />
+        <attr name="plvGradientColors" format="string" />
     </declare-styleable>
 
 </resources>

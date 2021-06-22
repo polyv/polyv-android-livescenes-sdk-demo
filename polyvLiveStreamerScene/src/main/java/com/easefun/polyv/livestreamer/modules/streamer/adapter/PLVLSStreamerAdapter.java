@@ -42,6 +42,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     //rv
     private RecyclerView streamerRv;
+    @Nullable
+    private SurfaceView localRenderView;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -63,7 +65,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         viewHolder.renderView = renderView;
         if (renderView != null) {
             viewHolder.plvlsStreamerRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        }else {
+        } else {
             PLVCommonLog.e(TAG, "create render view return null");
         }
         return viewHolder;
@@ -133,6 +135,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
+
+        //设置本地渲染器
+        if (myLinkMicId.equals(linkMicId)) {
+            localRenderView = holder.renderView;
+        }
 
         //设置点击事件监听器
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -209,7 +216,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         super.onViewRecycled(holder);
 
         //标记view重新创建
-        if (holder.renderView != null) {
+        //如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
+        if (holder.renderView != null && holder.renderView != localRenderView) {
             holder.isViewRecycled = true;
             holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
             adapterCallback.releaseLinkMicRenderView(holder.renderView);

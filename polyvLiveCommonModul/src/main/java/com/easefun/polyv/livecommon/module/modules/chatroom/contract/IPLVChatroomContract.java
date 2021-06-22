@@ -21,6 +21,7 @@ import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
@@ -86,6 +87,12 @@ public interface IPLVChatroomContract {
          */
         @WorkerThread
         void onAnswerEvent(@NonNull PLVTAnswerEvent answerEvent);
+
+        /**
+         * 打赏事件
+         */
+        @WorkerThread
+        void onRewardEvent(@NonNull PLVRewardEvent rewardEvent);
 
         /**
          * 用户登录事件
@@ -306,6 +313,11 @@ public interface IPLVChatroomContract {
          * 获取历史记录成功的次数
          */
         int getChatHistoryTime();
+
+        /**
+         * 设置历史记录是否包含打赏事件，该设置会影响{@link IChatroomView#onHistoryDataList(List, int, boolean, int)}返回的数据是否包含打赏事件
+         */
+        void setHistoryContainRewardEvent(boolean historyContainRewardEvent);
 
         /**
          * 获取聊天室的数据

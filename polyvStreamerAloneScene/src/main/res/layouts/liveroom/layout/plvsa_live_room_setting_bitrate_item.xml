@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/plvsa_bitrate_parent_ly"
+    android:layout_width="88dp"
+    android:layout_height="36dp"
+    android:background="@drawable/plvsa_setting_bitrate_item_selector"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/plvsa_bitrate_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="高清"
+        android:textColor="#FFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

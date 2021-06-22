@@ -8,6 +8,8 @@
     <string name="plv_scene_login_toast_liveecommerce_login_live_failed">启动直播带货直播失败</string>
     <string name="plv_scene_login_toast_liveecommerce_login_playback_failed">启动直播带货回放失败</string>
 
+    <string name="plv_scene_login_toast_streamer_no_support_type">手机开播场景仅支持三分屏和纯视频频道类型</string>
+
     <string name="plv_scene_login_toast_login_failed_channelid_or_pwd_empty">登录频道号和密码不能为空</string>
 
     <string name="plv_scene_login_toast_login_success">登录成功</string>
@@ -62,6 +64,8 @@
     <string name="plv_linkmic_dialog_mute_all_audio_confirm_ask">确定全体静音吗?</string>
     <string name="plv_linkmic_dialog_reach_the_interact_num_limit">当前连麦人数已达上限</string>
     <string name="plv_linkmic_error_tip_have_not_opened">尚未开通，请联系管理员</string>
+    <string name="plv_linkmic_video_type_open_success_tip">已开启视频连麦，观众可以申请连麦</string>
+    <string name="plv_linkmic_hang_all_off_tip">已挂断所有连麦</string>
 
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">"点击下课将结束直播，确认下课吗？</string>

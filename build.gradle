@@ -30,6 +30,14 @@ allprojects {
         maven{
             url 'https://maven.aliyun.com/repository/public'
         }
+        //保利威阿里云效
+        maven {
+            credentials {
+                username '609cc5623a10edbf36da9615'
+                password 'EbkbzTNHRJ=P'
+            }
+            url 'https://packages.aliyun.com/maven/repository/2102846-release-8EVsoM/'
+        }
     }
 }
 
@@ -37,8 +45,8 @@ ext {
     compileSdkVersion = 27
     minSdkVersion = 21
     targetSdkVersion = 27
-    versionCode = 142
-    versionName = "1.4.2"
+    versionCode = 150
+    versionName = "1.5.0"
 }
 
 task clean(type: Delete) {

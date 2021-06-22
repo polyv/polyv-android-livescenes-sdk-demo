@@ -2,11 +2,13 @@ package com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,11 +29,14 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
+import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgTipsWindow;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
+
+import java.util.List;
 
 
 /**
@@ -50,6 +55,8 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private GifSpanTextView quoteChatMsgTv;
     //被回复人图片信息的昵称
     private TextView quoteChatNickTv;
+    //严禁词触发的提示图标
+    private ImageView prohibitedWordTipsIv;
 
     //横/竖屏图片信息
     private ImageView imgMessageIv;
@@ -69,6 +76,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         chatNickTv = (TextView) findViewById(R.id.chat_nick_tv);
         quoteChatMsgTv = (GifSpanTextView) findViewById(R.id.quote_chat_msg_tv);
         quoteChatNickTv = (TextView) findViewById(R.id.quote_chat_nick_tv);
+        prohibitedWordTipsIv = findViewById(R.id.prohibited_word_tips_iv);
         //common item
         imgMessageIv = (ImageView) findViewById(R.id.img_message_iv);
         imgLoadingView = (ProgressBar) findViewById(R.id.img_loading_view);
@@ -93,7 +101,8 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             chatMsgTv.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, chatMsgTv.getText().toString(), new View.OnClickListener() {
+                    boolean onlyShowCopyItem = prohibitedWordVO != null;//严禁词的信息不能回复
+                    PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, onlyShowCopyItem, chatMsgTv.getText().toString(), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
@@ -105,6 +114,21 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         }
                     });
                     return true;
+                }
+            });
+        }
+
+        if (prohibitedWordTipsIv != null) {
+            prohibitedWordTipsIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (prohibitedWordVO == null) {
+                        return;
+                    }
+                    String msg = prohibitedWordVO.getMessage() + "：" + prohibitedWordVO.getValue();
+                    int[] location = new int[2];
+                    itemView.getLocationInWindow(location);
+                    new PLVLSChatMsgTipsWindow(v).show(v, msg, location[0], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
                 }
             });
         }
@@ -150,6 +174,9 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     }
 
     private void showAndAnswerWithImg() {
+        if (localImgStatus != PolyvSendLocalImgEvent.SENDSTATUS_SUCCESS) {
+            return;//图片发送成功后才可回复
+        }
         PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, null, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -292,10 +319,42 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="对外API">
+    public void processData(PLVBaseViewData data, int position, @NonNull List<Object> payloads) {
+        for (Object payload : payloads) {
+            switch (payload.toString()) {
+                case PLVLSMessageAdapter.PAYLOAD_PROHIBITED_CHANGED:
+                    super.processData(data, position);
+                    if (chatMsgTv != null) {
+                        if (chatMsgTv.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                            ViewGroup.MarginLayoutParams layoutParams = ((ViewGroup.MarginLayoutParams) chatMsgTv.getLayoutParams());
+                            layoutParams.rightMargin = prohibitedWordVO == null ? 0 : ConvertUtils.dp2px(20);
+                            chatMsgTv.setLayoutParams(layoutParams);
+                        }
+                    }
+                    if (prohibitedWordTipsIv != null) {
+                        prohibitedWordTipsIv.setVisibility(prohibitedWordVO == null ? View.GONE : View.VISIBLE);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="UI - 重置view">
     private void resetView() {
         if (chatMsgTv != null) {
             chatMsgTv.setVisibility(View.GONE);
+            if (chatMsgTv.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams layoutParams = ((ViewGroup.MarginLayoutParams) chatMsgTv.getLayoutParams());
+                layoutParams.rightMargin = prohibitedWordVO == null ? 0 : ConvertUtils.dp2px(20);
+                chatMsgTv.setLayoutParams(layoutParams);
+            }
+        }
+        if (prohibitedWordTipsIv != null) {
+            prohibitedWordTipsIv.setVisibility(prohibitedWordVO == null ? View.GONE : View.VISIBLE);
         }
         if (chatNickTv != null) {
             chatNickTv.setVisibility(View.GONE);

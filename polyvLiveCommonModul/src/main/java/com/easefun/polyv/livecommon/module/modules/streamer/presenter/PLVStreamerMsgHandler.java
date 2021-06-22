@@ -416,16 +416,17 @@ public class PLVStreamerMsgHandler {
             item.second.getLinkMicItemDataBean().setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
             streamerPresenter.callUpdateSortMemberList();
         }
-        Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicUid);
+        final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicUid);
         if (linkMicItem != null) {
             streamerPresenter.streamerList.remove(linkMicItem.second);
             streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                 @Override
                 public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
                     //更新推流和连麦列表
-                    view.onUsersLeave(Collections.singletonList(linkMicUid));
+                    view.onUsersLeave(Collections.singletonList(linkMicItem.second));
                 }
             });
+            streamerPresenter.updateMixLayoutUsers();
         }
     }
 

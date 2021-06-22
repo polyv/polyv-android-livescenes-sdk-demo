@@ -18,12 +18,16 @@ import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.sign.PLVSignCreator;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.thirdpart.blankj.utilcode.util.EncryptUtils;
+
+import org.json.JSONObject;
 
 import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 
 /**
@@ -47,6 +51,7 @@ public class PLVLiveRoomDataRequester {
     private Disposable productListDisposable;
     private Disposable channelSwitchDisposable;
     private Disposable getLiveStatusDisposable;
+    private Disposable updateChannelNameDisposable;
 
     // </editor-fold>
 
@@ -300,6 +305,49 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="更新频道名称 - 请求、取消">
+    void requestUpdateChannelName(final IPLVNetRequestListener<String> listener) {
+        disposeUpdateChannelName();
+        String channelId = getConfig().getChannelId();
+        final String channelName = getConfig().getChannelName();
+        long ptime = System.currentTimeMillis();
+        String sign = EncryptUtils.encryptMD5ToString("APPCHANNELSET" + "channelId=" + channelId + "name=" + channelName + "APPCHANNELSET").toUpperCase();
+        updateChannelNameDisposable = PolyvApiManager.getPolyvLiveStatusApi().updateChannelName(channelId, ptime, channelName, sign)
+                .compose(new PLVRxBaseTransformer<ResponseBody, ResponseBody>())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Exception {
+                        String body = responseBody.string();
+                        JSONObject jsonObject = new JSONObject(body);
+                        String status = jsonObject.optString("status");
+                        if ("success".equals(status)) {
+                            if (listener != null) {
+                                listener.onSuccess(channelName);
+                            }
+                        } else {
+                            if (listener != null) {
+                                String errorMsg = jsonObject.optString("msg");
+                                listener.onFailed(errorMsg, new Throwable(errorMsg));
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposeUpdateChannelName() {
+        if (updateChannelNameDisposable != null) {
+            updateChannelNameDisposable.dispose();
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -307,6 +355,7 @@ public class PLVLiveRoomDataRequester {
         disposeProductList();
         disposeChannelSwitch();
         disposeGetLiveStatus();
+        disposeUpdateChannelName();
     }
     // </editor-fold>
 

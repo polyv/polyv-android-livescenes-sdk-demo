@@ -79,6 +79,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private int linkMicInitState = LINK_MIC_UNINITIATED;
     private String myLinkMicId = "";
     private boolean isAudioLinkMic;
+    //socket消息更新连麦状态的时间
+    private long socketRefreshOpenStatusData = -1;
     private boolean isTeacherOpenLinkMic;
     //是否已经初始化过第一画面用户
     private boolean hasInitFirstScreenUser = false;
@@ -411,6 +413,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     @Override
     public void setIsAudioLinkMic(boolean isAudioLinkMic) {
+        long interval = (System.currentTimeMillis() - socketRefreshOpenStatusData) / 1000;
+        //服务端轮询到的连麦类型，距离上一次socket获取的类型的时间差不足10秒，就不通过轮询更新了
+        if (interval < 10) {
+            return;
+        }
         this.isAudioLinkMic = isAudioLinkMic;//通过服务端轮询接口获取连麦类型
     }
 
@@ -710,7 +717,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     private void cleanLinkMicListData() {
-        PLVCommonLog.d(TAG, "cleanLinkMicListData() called \n"+Log.getStackTraceString(new Throwable()));
+        PLVCommonLog.d(TAG, "cleanLinkMicListData() called \n" + Log.getStackTraceString(new Throwable()));
         hasInitFirstScreenUser = false;
         hasInitFirstTeacherLocation = false;
         linkMicList.clear();
@@ -992,6 +999,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
         @Override
         public void onUpdateLinkMicType(boolean isAudio) {
+            socketRefreshOpenStatusData = System.currentTimeMillis();
             isAudioLinkMic = isAudio;//通过socket消息更新连麦类型
         }
 

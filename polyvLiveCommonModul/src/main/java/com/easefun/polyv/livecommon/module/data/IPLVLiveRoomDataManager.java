@@ -113,6 +113,11 @@ public interface IPLVLiveRoomDataManager {
      * @param rank 不传排序号会返回列表最前面的数据，传rank后返回rank之后的商品列表。传-1时和不传的结果一致。
      */
     void requestProductList(int rank);
+
+    /**
+     * 更新频道名称
+     */
+    void requestUpdateChannelName();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

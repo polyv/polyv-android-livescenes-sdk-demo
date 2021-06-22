@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--聊天信息布局-->
+    <FrameLayout
+        android:id="@+id/plvls_chatroom_chat_msg_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout
+            android:id="@+id/plvls_chatroom_swipe_load_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--聊天信息列表-->
+            <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+                android:id="@+id/plvls_chatroom_chat_msg_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fadingEdgeLength="32dp"
+                android:overScrollMode="never"
+                android:requiresFadingEdge="vertical"
+                app:fastScrollEnabled="false" />
+        </com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/plvls_chatroom_unread_msg_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:background="@drawable/plvsa_chatroom_unread_view_bg_shape"
+            android:drawableRight="@drawable/plvsa_chatroom_read_new_message"
+            android:drawablePadding="2dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="5dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="5dp"
+            android:text="x条新信息"
+            android:textColor="#4399FF"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+</FrameLayout>

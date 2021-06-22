@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clipToPadding="false"
+    android:padding="8dp">
+
+    <!--状态栏布局-->
+    <com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout
+        android:id="@+id/plvsa_status_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--打赏布局-->
+    <com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSARewardGiftAnimView
+        android:id="@+id/plvsa_chatroom_reward_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginBottom="16dp"
+        android:translationX="-8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_chatroom_greet_ly"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:visibility="visible" />
+
+    <!--欢迎语布局-->
+    <com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAGreetingView
+        android:id="@+id/plvsa_chatroom_greet_ly"
+        android:layout_width="258dp"
+        android:layout_height="22dp"
+        android:layout_marginBottom="16dp"
+        android:translationX="-8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_chatroom_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:visibility="visible" />
+
+    <!--聊天室布局-->
+    <com.easefun.polyv.streameralone.modules.chatroom.PLVSAChatroomLayout
+        android:id="@+id/plvsa_chatroom_layout"
+        android:layout_width="244dp"
+        android:layout_height="152dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_tool_bar_call_input_tv"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!--输入框呼出按钮-->
+    <TextView
+        android:id="@+id/plvsa_tool_bar_call_input_tv"
+        android:layout_width="150dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/plvsa_tool_bar_call_input_shape"
+        android:drawableLeft="@drawable/plvsa_chatroom_msg"
+        android:drawablePadding="6dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:text="来聊点什么吧~"
+        android:textColor="#99ffffff"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!--更多按钮-->
+    <ImageView
+        android:id="@+id/plvsa_tool_bar_more_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/plvsa_tool_bar_more"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <!--成员列表按钮-->
+    <ImageView
+        android:id="@+id/plvsa_tool_bar_member_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="12dp"
+        android:src="@drawable/plvsa_tool_bar_member"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_tool_bar_more_iv" />
+
+    <!--成员列表中有用户申请连麦时的提示-->
+    <View
+        android:id="@+id/plvsa_tool_bar_member_linkmic_request_tips_view"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/plvsa_tool_bar_member_view_bg_shape"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_tool_bar_member_iv"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_tool_bar_member_iv" />
+
+    <!--连麦按钮-->
+    <ImageView
+        android:id="@+id/plvsa_tool_bar_linkmic_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="12dp"
+        android:src="@drawable/plvsa_tool_bar_linkmic_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_tool_bar_member_iv" />
+</android.support.constraint.ConstraintLayout>

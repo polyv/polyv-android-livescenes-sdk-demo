@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="56dp">
+
+    <View
+        android:id="@+id/reward_bg_v"
+        android:layout_width="270dp"
+        android:layout_height="40dp"
+        android:background="@drawable/plvsa_chatroom_reward_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/reward_user_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:ellipsize="end"
+        android:maxWidth="124dp"
+        android:singleLine="true"
+        android:text="广州观众11111111111111111111"
+        android:textColor="#FCF2A6"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/reward_gift_name_tv"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/reward_bg_v"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/reward_gift_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="赠送    掌声"
+        android:textColor="#ffffff"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/reward_bg_v"
+        app:layout_constraintLeft_toLeftOf="@+id/reward_user_name_tv"
+        app:layout_constraintTop_toBottomOf="@+id/reward_user_name_tv" />
+
+    <ImageView
+        android:id="@+id/reward_gift_pic_iv"
+        android:layout_width="56dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="150dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:src="@drawable/plv_icon_money" />
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRewardStrokeTextView
+        android:id="@+id/reward_effect_x_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:paddingLeft="4dp"
+        android:paddingRight="2dp"
+        android:text="x"
+        android:textColor="#FFF47E04"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@id/reward_gift_pic_iv"
+        app:layout_constraintLeft_toRightOf="@+id/reward_gift_pic_iv" />
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRewardStrokeTextView
+        android:id="@+id/reward_effect_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:singleLine="true"
+        android:text="666"
+        android:textColor="#FFF47E04"
+        android:textSize="28sp"
+        android:textStyle="italic"
+        android:translationX="-2dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/reward_effect_x_tv"
+        app:layout_constraintLeft_toRightOf="@+id/reward_effect_x_tv"
+        tools:text="666" />
+</android.support.constraint.ConstraintLayout>

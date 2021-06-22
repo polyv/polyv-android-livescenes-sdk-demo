@@ -263,9 +263,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         restoreChatTabForPresenter(chatroomPresenter);
         restoreQuizTabForPresenter(chatroomPresenter);
 
-        observeClassDetailVO();
-
         initSocketLoginManager();
+        observeClassDetailVO();
     }
 
     @Override

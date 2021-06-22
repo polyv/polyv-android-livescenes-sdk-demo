@@ -38,6 +38,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
     public static final String PAYLOAD_UPDATE_CAMERA_DIRECTION = "updateCameraDirection";
     public static final String PAYLOAD_UPDATE_SOCKET_USER_DATA = "updateSocketUserData";
+    public static final String PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE = "updateLinkMicMediaType";
 
     //dataList
     private List<PLVMemberItemDataBean> dataList;
@@ -46,6 +47,8 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     //初始打开连麦列表，当列表中存在非特殊身份用户时，显示左滑菜单，3秒后恢复原位
     private boolean isShowedSwipeMenu;
     private boolean isFirstOpenMemberLayout;
+    //连麦类型(视频/音频)
+    private boolean isVideoLinkMicType = true;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -142,7 +145,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.VISIBLE);
                 } else if (linkMicItemDataBean.isRtcJoinStatus()) {
                     holder.plvlsMemberMicIv.setVisibility(View.VISIBLE);
-                    holder.plvlsMemberCamIv.setVisibility(View.VISIBLE);
+                    if (isVideoLinkMicType || isGuestUserType(socketUserBean.getUserType())) {
+                        holder.plvlsMemberCamIv.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.plvlsMemberCamIv.setVisibility(View.GONE);
+                    }
                     holder.plvlsMemberLinkmicControlIv.setVisibility(View.VISIBLE);
                     holder.plvlsMemberLinkmicControlIv.setSelected(true);
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.GONE);
@@ -315,6 +322,15 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     holder.plvlsMemberNickTv.setText(socketUserBean.getNick());
                     holder.updateShieldView(socketUserBean.isBanned());
                     break;
+                case PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE:
+                    if (holder.plvlsMemberMicIv.getVisibility() == View.VISIBLE && position > 0) {
+                        if (isVideoLinkMicType || isGuestUserType(socketUserBean.getUserType())) {
+                            holder.plvlsMemberCamIv.setVisibility(View.VISIBLE);
+                        } else {
+                            holder.plvlsMemberCamIv.setVisibility(View.GONE);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -364,6 +380,12 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     //更新socket用户数据
     public void updateSocketUserData(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_SOCKET_USER_DATA);
+    }
+
+    //更新连麦媒体类型
+    public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
+        this.isVideoLinkMicType = isVideoLinkMicType;
+        notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE);
     }
 
     //添加用户数据

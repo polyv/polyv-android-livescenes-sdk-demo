@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
@@ -92,6 +93,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * 点击关闭悬浮窗
      */
     void updateOnClickCloseFloatingView();
+
+    /**
+     * 弹幕切换按钮点击回调
+     *
+     * @param v danmuView
+     */
+    void dispatchDanmuSwitchOnClicked(View v);
 
     /**
      * 释放

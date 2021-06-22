@@ -15,5 +15,5 @@ public class PLVChatMessageItemType {
     public static final int ITEMTYPE_SEND_QUIZ = 5;//自己发送的提问信息
     public static final int ITEMTYPE_RECEIVE_QUIZ = 6;//接收的回答信息
 
-    public static final int ITEMTYPE_CUSTOM_GIFT = 100;//自定义打赏礼物信息
+    public static final int ITEMTYPE_CUSTOM_GIFT = 100;//(自定义)打赏礼物信息
 }

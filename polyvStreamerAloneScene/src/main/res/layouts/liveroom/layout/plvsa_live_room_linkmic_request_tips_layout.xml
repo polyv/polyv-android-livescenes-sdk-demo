@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvsa_empty_linkmic_tips_group_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="#66000000"
+        app:radius="20dp"
+        android:paddingLeft="12dp"
+        android:paddingStart="12dp"
+        android:paddingRight="5dp"
+        android:paddingEnd="5dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/plvsa_empty_linkmic_tips_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/plvsa_empty_linkmic_tips_icon_iv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/plvsa_empty_fragment_linkmic_tips_icon" />
+
+            <TextView
+                android:id="@+id/plvsa_empty_linkmic_tips_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="有人正在申请连麦"
+                android:textColor="#F0F1F5"
+                android:textSize="14sp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center_vertical" />
+
+            <Button
+                android:id="@+id/plvsa_empty_linkmic_nav_btn"
+                android:layout_width="50dp"
+                android:layout_height="24dp"
+                android:text="查看"
+                android:textSize="12dp"
+                android:textColor="#FFF"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/plvsa_status_bar_channel_info_copy_btn_bg"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</android.support.constraint.ConstraintLayout>

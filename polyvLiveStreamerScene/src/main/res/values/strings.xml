@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="plvls_app_name">POLYV手机开播</string>
+    <string name="plvls_app_name">POLYV开播</string>
 
     <string name="document_upload_tips">
         1. 18:00-19:00 为上传高峰期，排队时间较长，请错峰上传；

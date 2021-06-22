@@ -288,13 +288,17 @@ public class PLVLSMemberLayout extends FrameLayout {
         if (memberAdapter.getItemCount() == 0) {
             plvlsMemberCountTv.setText("");//列表中没数据时，不显示在线人数
         } else {
-            plvlsMemberCountTv.setText("(共" + Math.max(onlineCount, memberAdapter.getItemCount()) + "人)");
+            plvlsMemberCountTv.setText("(" + Math.max(onlineCount, memberAdapter.getItemCount()) + "人)");
         }
     }
 
     public void setStreamerStatus(boolean isStartedStatus) {
         this.isStartedStatus = isStartedStatus;
         memberAdapter.setStreamerStatus(isStartedStatus);
+    }
+
+    public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
+        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType);
     }
 
     public boolean onBackPressed() {

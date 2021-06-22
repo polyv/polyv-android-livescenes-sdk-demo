@@ -28,7 +28,6 @@ import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
-import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
@@ -355,7 +354,11 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             subVideoView.setOnSubVideoViewLoadImage(new IPolyvAuxiliaryVideoViewListenerEvent.IPolyvOnSubVideoViewLoadImage() {
                 @Override
                 public void onLoad(String imageUrl, final ImageView imageView, final String coverHref) {
-                    PLVImageLoader.getInstance().loadImage(subVideoView.getContext(), imageUrl, imageView);
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onSubVideoViewLoadImage(imageUrl, imageView);
+                    }
+
                     subVideoViewHerf = coverHref;
                     if (!TextUtils.isEmpty(coverHref)) {
                         imageView.setOnClickListener(new View.OnClickListener() {

@@ -42,6 +42,8 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
 
     private List<View> popupButtonList = new ArrayList<>();
     private List<ViewGroup> popupLayoutList = new ArrayList<>();
+    private View willSelectPopupButton;
+    private ViewGroup willShowPopupLayout;
 
     protected static InputListener inputListener;
 
@@ -80,6 +82,12 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                     if (!willShowKeyBoard) {
                         viewBg.setVisibility(View.GONE);
                     }
+                    if (willShowPopupLayout != null) {
+                        willShowPopupLayout.setVisibility(View.VISIBLE);
+                    }
+                    if (willSelectPopupButton != null) {
+                        willSelectPopupButton.setSelected(true);
+                    }
                 }
             }
         });
@@ -90,7 +98,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         }
     }
 
-    private int computeUsableHeight(View view) {
+    public int computeUsableHeight(View view) {
         Rect r = new Rect();
         view.getWindowVisibleDisplayFrame(r);
         //隐藏状态栏情况下才需计算
@@ -301,13 +309,20 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         hideAllPopupLayout();
         KeyboardUtils.hideSoftInput(inputView);
         viewBg.setVisibility(View.GONE);
-        popupLayout.setVisibility(View.VISIBLE);
-        view.setSelected(true);
+        if (isShowKeyBoard) {
+            willShowPopupLayout = popupLayout;
+            willSelectPopupButton = view;
+        } else {
+            popupLayout.setVisibility(View.VISIBLE);
+            view.setSelected(true);
+        }
     }
 
     protected void hidePopupLayout(View view, ViewGroup popupLayout) {
         popupLayout.setVisibility(View.GONE);
         view.setSelected(false);
+        willShowPopupLayout = null;
+        willSelectPopupButton = null;
     }
 
     protected boolean popupLayoutIsVisible() {
@@ -327,6 +342,8 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                 view.setSelected(false);
             }
         }
+        willShowPopupLayout = null;
+        willSelectPopupButton = null;
     }
 
     protected void hideSoftInputAndPopupLayout() {

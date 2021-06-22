@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_status_bar_channel_info_ly_shape">
+
+    <TextView
+        android:id="@+id/plvsa_status_bar_stop_live_tv"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="结束直播"
+        android:textColor="#FF5459"
+        android:textSize="16sp"
+        android:gravity="center" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#1AFFFFFF" />
+
+    <TextView
+        android:id="@+id/plvsa_status_bar_cancel_stop_live_tv"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="取消"
+        android:textColor="#FFF"
+        android:textSize="16sp"
+        android:gravity="center" />
+
+</LinearLayout>

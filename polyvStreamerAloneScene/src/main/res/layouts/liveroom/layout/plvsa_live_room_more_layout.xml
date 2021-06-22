@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_more_ly_shape"
+    android:paddingLeft="25dp"
+    android:paddingTop="32dp"
+    android:paddingRight="25dp">
+
+    <TextView
+        android:id="@+id/plvsa_more_text_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="更多"
+        android:textColor="#FFF0F1F5"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_camera_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_camera_selector"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_text_tv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_mic_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_mic_selector"
+        app:layout_constraintLeft_toRightOf="@+id/plvsa_more_camera_iv"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_more_camera_switch_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_text_tv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_camera_switch_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_camera_switch_selector"
+        app:layout_constraintLeft_toRightOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_more_mirror_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_text_tv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_mirror_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_mirror_selector"
+        app:layout_constraintLeft_toRightOf="@+id/plvsa_more_camera_switch_iv"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_more_flashlight_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_text_tv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_flashlight_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_flashlight_selector"
+        app:layout_constraintLeft_toRightOf="@+id/plvsa_more_mirror_iv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_text_tv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_camera_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="摄像头"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_camera_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_camera_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_camera_iv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_mic_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="麦克风"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_mic_iv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_camera_switch_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="翻转"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_camera_switch_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_camera_switch_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_camera_switch_iv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_mirror_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="镜像"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_mirror_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_mirror_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_mirror_iv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_flashlight_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="闪光灯"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_flashlight_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_flashlight_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_flashlight_iv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_bitrate_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="12dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_bitrate_icon_hd"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_camera_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_camera_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_camera_tv" />
+
+    <ImageView
+        android:id="@+id/plvsa_more_close_room_iv"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="12dp"
+        android:padding="12dp"
+        android:src="@drawable/plvsa_more_close_room_selector"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_mic_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_mic_tv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_bitrate_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="23dp"
+        android:text="高清"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_bitrate_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_bitrate_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_bitrate_iv" />
+
+    <TextView
+        android:id="@+id/plvsa_more_close_room_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="23dp"
+        android:text="开启全体禁言"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/plvsa_more_close_room_iv"
+        app:layout_constraintRight_toRightOf="@+id/plvsa_more_close_room_iv"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_close_room_iv" />
+</android.support.constraint.ConstraintLayout>

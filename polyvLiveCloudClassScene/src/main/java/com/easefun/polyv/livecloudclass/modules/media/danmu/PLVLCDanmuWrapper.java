@@ -54,12 +54,6 @@ public class PLVLCDanmuWrapper {
 
     public void setDanmuSwitchLandView(@NonNull View danmuSwitchLandView) {
         this.danmuSwitchLandView = danmuSwitchLandView;
-        danmuSwitchLandView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleDanmu();
-            }
-        });
         init();
     }
 
@@ -162,5 +156,14 @@ public class PLVLCDanmuWrapper {
                 danmuSwitchLandView.setVisibility(GONE);
             }
         }
+    }
+
+    /**
+     * 弹幕切换按钮点击回调
+     *
+     * @param v danmuView
+     */
+    public void dispatchDanmuSwitchOnClicked(View v) {
+        this.toggleDanmu();
     }
 }

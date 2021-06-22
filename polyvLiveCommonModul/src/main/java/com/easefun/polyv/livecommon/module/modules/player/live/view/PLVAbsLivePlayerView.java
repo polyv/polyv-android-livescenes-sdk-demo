@@ -2,6 +2,7 @@ package com.easefun.polyv.livecommon.module.modules.player.live.view;
 
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
@@ -47,6 +48,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
 
     @Override
     public void onSubVideoViewPlay(boolean isFirst) {
+
+    }
+
+    @Override
+    public void onSubVideoViewLoadImage(String imageUrl, ImageView imageView) {
 
     }
 

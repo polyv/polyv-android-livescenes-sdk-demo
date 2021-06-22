@@ -43,12 +43,12 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onUsersJoin(List<String> uids) {
+    public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
 
     }
 
     @Override
-    public void onUsersLeave(List<String> uids) {
+    public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
 
     }
 

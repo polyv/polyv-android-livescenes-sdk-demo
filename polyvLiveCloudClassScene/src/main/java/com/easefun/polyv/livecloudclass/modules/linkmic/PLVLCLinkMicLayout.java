@@ -136,7 +136,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         tvSpeakingUsersText = findViewById(R.id.plvlc_linkmic_tv_speaking_users_text);
 
         //init RecyclerView
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
+        rvLinkMicList.setLayoutManager(linearLayoutManager);
         rvLinkMicList.addItemDecoration(landscapeItemDecoration);
         //禁用RecyclerView默认动画
         rvLinkMicList.getItemAnimator().setAddDuration(0);
@@ -149,7 +150,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         }
 
         //init adapter
-        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
+        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, linearLayoutManager, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
             @Override
             public SurfaceView createLinkMicRenderView() {
                 return linkMicPresenter.createRenderView(Utils.getApp());
@@ -542,6 +543,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVCommonLog.d(TAG, "onJoinLinkMic");
         ToastUtils.showShort("上麦成功");
         //更新连麦控制器
+        //无延迟观看时，需要在上麦的时候再设置连麦类型
+        linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
         linkMicControlBar.setJoinLinkMicSuccess();
         tryShowOrHideLandscapeRTCLayout(true);
     }
@@ -697,6 +700,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             linkMicListAdapter.setTeacherViewHolderBindListener(new PLVLinkMicListAdapter.OnTeacherSwitchViewBindListener() {
                 @Override
                 public void onTeacherSwitchViewBind(PLVSwitchViewAnchorLayout teacherSwitchView) {
+                    linkMicListAdapter.setInvisibleItemLinkMicId(linkMicId);
                     if (onPLVLinkMicLayoutListener != null) {
                         teacherLocationViewSwitcher = new PLVViewSwitcher();
                         onPLVLinkMicLayoutListener.onChangeTeacherLocation(teacherLocationViewSwitcher, teacherSwitchView);
@@ -814,7 +818,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfRv.leftMargin = PLVScreenUtils.dip2px(DP_LAND_LINK_MIC_LIST_MARGIN_LEFT);
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置vertical排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        rvLinkMicList.setLayoutManager(llm);
+        linkMicListAdapter.setLinearLayoutManager(llm);
         //设置横屏item间隙
         landscapeItemDecoration.setLandscape();
         //设置item显示圆角
@@ -855,11 +861,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfRv.leftMargin = 0;
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置horizontal排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvLinkMicList.setLayoutManager(llm);
+        linkMicListAdapter.setLinearLayoutManager(llm);
         //移除横屏item间隙
         landscapeItemDecoration.setPortrait();
-        //设置horizontal排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         //取消item显示圆角
         linkMicListAdapter.setShowRoundRect(false);
 

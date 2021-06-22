@@ -33,6 +33,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<PolyvCommodityVO>> commodityVO = new MutableLiveData<>();
     //直播状态
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
+    //频道名称
+    private MutableLiveData<PLVStatefulData<String>> channelNameData = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
     //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
@@ -195,6 +197,23 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             @Override
             public void onFailed(String msg, Throwable throwable) {
                 liveStatusData.postValue(PLVStatefulData.<LiveStatus>error(msg, throwable));
+            }
+        });
+    }
+
+    //更新频道名称 - 请求
+
+    @Override
+    public void requestUpdateChannelName() {
+        liveRoomDataRequester.requestUpdateChannelName(new PLVLiveRoomDataRequester.IPLVNetRequestListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                channelNameData.postValue(PLVStatefulData.success(s));
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                channelNameData.postValue(PLVStatefulData.<String>error(msg, throwable));
             }
         });
     }

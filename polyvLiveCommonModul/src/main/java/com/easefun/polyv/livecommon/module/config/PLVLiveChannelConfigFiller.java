@@ -80,6 +80,13 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 配置频道名称
+     */
+    public static void setupChannelName(String channelName) {
+        channelConfig.setupChannelName(channelName);
+    }
+
+    /**
      * 配置vid
      */
     public static void setupVid(String vid) {

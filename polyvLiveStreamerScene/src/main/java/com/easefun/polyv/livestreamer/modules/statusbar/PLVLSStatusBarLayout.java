@@ -187,6 +187,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             public boolean isStreamerStartSuccess() {
                 return onViewActionListener != null && onViewActionListener.isStreamerStartSuccess();
             }
+
+            @Override
+            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
+                memberLayout.updateLinkMicMediaType(isVideoLinkMicType);
+            }
         });
     }
 

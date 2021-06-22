@@ -64,5 +64,6 @@ dependencies {
     implementation project(':polyvLiveEcommerceScene')
     implementation project(':polyvLiveCloudClassScene')
     implementation project(':polyvLiveStreamerScene')
+    implementation project(':polyvStreamerAloneScene')
 }
 

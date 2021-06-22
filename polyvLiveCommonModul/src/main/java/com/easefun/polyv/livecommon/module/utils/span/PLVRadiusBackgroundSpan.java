@@ -108,6 +108,30 @@ public class PLVRadiusBackgroundSpan extends ReplacementSpan {
         return (int) (mBgWidth + mRightMargin);
     }
 
+    public float getmTextSize() {
+        return mTextSize;
+    }
+
+    public void setmTextSize(float mTextSize) {
+        this.mTextSize = mTextSize;
+    }
+
+    public float getmRadius() {
+        return mRadius;
+    }
+
+    public void setmRadius(float mRadius) {
+        this.mRadius = mRadius;
+    }
+
+    public float getmBgHeight() {
+        return mBgHeight;
+    }
+
+    public void setmBgHeight(float mBgHeight) {
+        this.mBgHeight = mBgHeight;
+    }
+
     /**
      * draw
      *

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="214dp"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape">
+
+    <TextView
+        android:id="@+id/plvsa_setting_bitrate_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        android:text="清晰度设置"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/plvsa_setting_bitrate_rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:layout_below="@id/plvsa_setting_bitrate_tv"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

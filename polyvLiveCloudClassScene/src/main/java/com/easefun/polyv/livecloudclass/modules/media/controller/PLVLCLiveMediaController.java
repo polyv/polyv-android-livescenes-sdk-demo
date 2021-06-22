@@ -278,7 +278,6 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         startSendMessageLandIv = landscapeController.getMessageSender();
         startSendMessageLandIv.setOnClickListener(this);
         danmuSwitchLandIv = landscapeController.getDanmuSwitchView();
-        danmuSwitchLandIv.setOnClickListener(this);
         bulletinLandIv = landscapeController.getBulletinView();
         bulletinLandIv.setOnClickListener(this);
         likesLandIv = landscapeController.getLikesView();
@@ -412,6 +411,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 }
             });
         }
+    }
+
+    @Override
+    public void dispatchDanmuSwitchOnClicked(View v) {
+        this.onClick(v);
     }
 
     @Override

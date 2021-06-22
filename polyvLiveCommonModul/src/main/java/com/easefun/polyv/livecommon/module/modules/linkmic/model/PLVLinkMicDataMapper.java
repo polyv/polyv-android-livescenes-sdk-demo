@@ -18,6 +18,7 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setLinkMicId(joinSuccess.getUser().getUserId());
         itemDataBean.setNick(joinSuccess.getUser().getNick());
         itemDataBean.setUserType(joinSuccess.getUser().getUserType());
+        itemDataBean.setPic(joinSuccess.getUser().getPic());
         return itemDataBean;
     }
 
@@ -27,6 +28,7 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setNick(joinInfoEvent.getNick());
         itemDataBean.setUserType(joinInfoEvent.getUserType());
         itemDataBean.setActor(joinInfoEvent.getActor());
+        itemDataBean.setPic(joinInfoEvent.getPic());
         itemDataBean.setStatus(joinInfoEvent.getStatus());
         return itemDataBean;
     }
@@ -37,6 +39,7 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setNick(waitListBean.getNick());
         itemDataBean.setUserType(waitListBean.getUserType());
         itemDataBean.setActor(waitListBean.getActor());
+        itemDataBean.setPic(waitListBean.getPic());
         itemDataBean.setStatus(waitListBean.getStatus());
         return itemDataBean;
     }

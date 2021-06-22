@@ -153,7 +153,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivBackPort.setOnClickListener(this);
         ivLikesLand.setOnButtonClickListener(this);
         tvStartSendMessageLand.setOnClickListener(this);
-        ivDanmuSwitchLand.setOnClickListener(this);
 
         //more layout
         initMoreLayout();
@@ -282,6 +281,11 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 }
             });
         }
+    }
+
+    @Override
+    public void dispatchDanmuSwitchOnClicked(View v) {
+        this.onClick(v);
     }
 
     @Override
