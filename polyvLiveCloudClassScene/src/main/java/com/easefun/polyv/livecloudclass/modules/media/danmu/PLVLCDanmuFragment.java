@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +16,16 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.HashMap;
 
-import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.DanmakuContext;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import net.polyv.danmaku.controller.DrawHandler;
+import net.polyv.danmaku.controller.IDanmakuView;
+import net.polyv.danmaku.danmaku.model.BaseDanmaku;
+import net.polyv.danmaku.danmaku.model.DanmakuTimer;
+import net.polyv.danmaku.danmaku.model.IDanmakus;
+import net.polyv.danmaku.danmaku.model.IDisplayer;
+import net.polyv.danmaku.danmaku.model.android.DanmakuContext;
+import net.polyv.danmaku.danmaku.model.android.Danmakus;
+import net.polyv.danmaku.danmaku.model.android.SpannedCacheStuffer;
+import net.polyv.danmaku.danmaku.parser.BaseDanmakuParser;
 
 /**
  * 弹幕Fragment
@@ -72,6 +73,15 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
                 // 图文混排使用SpannedCacheStuffer
                 .setCacheStuffer(new CustomSpannedCacheStuffer(), null)
                 .setMaximumLines(maxLinesPair).preventOverlapping(overlappingEnablePair);
+
+        if(getActivity() != null) {
+            //修复高帧率下弹幕会重复的问题
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            float refreshRate = display.getRefreshRate();
+            int rate = (int) (1000 / refreshRate);
+            mContext.setFrameUpateRate(rate);
+        }
+
         mDanmakuView.showFPS(false);
 
         mDanmakuView.enableDanmakuDrawingCache(false);

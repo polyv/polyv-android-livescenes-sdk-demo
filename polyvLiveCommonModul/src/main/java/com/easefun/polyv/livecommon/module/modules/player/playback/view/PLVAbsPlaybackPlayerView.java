@@ -36,6 +36,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     }
 
     @Override
+    public View getRetryLayout() {
+        return null;
+    }
+
+    @Override
     public PLVPlayerLogoView getLogo(){
         return null;
     }

@@ -51,6 +51,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPl
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
@@ -68,6 +69,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCPlaybackMediaLayout.class.getSimpleName();
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
+    private static final int MAX_RETRY_COUNT = 3;//断网重连重试次数
+
 
     /**
      * 横屏聊天布局可见性与弹幕开关同步
@@ -97,6 +100,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private PLVPlayerLogoView logoView;
     //载入状态指示器
     private PLVLCVideoLoadingLayout loadingLayout;
+    private PLVPlayerRetryLayout playerRetryLayout;
     // tips view
     private PLVLCLightTipsView lightTipsView;
     private PLVLCVolumeTipsView volumeTipsView;
@@ -148,6 +152,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         noStreamView = findViewById(R.id.no_stream_ly);
         logoView = findViewById(R.id.playback_logo_view);
         loadingLayout = findViewById(R.id.plvlc_playback_loading_layout);
+        playerRetryLayout = findViewById(R.id.plvlc_playback_player_retry_layout);
         lightTipsView = findViewById(R.id.plvlc_playback_tipsview_light);
         volumeTipsView = findViewById(R.id.plvlc_playback_tipsview_volume);
         progressTipsView = findViewById(R.id.plvlc_playback_tipsview_progress);
@@ -164,11 +169,15 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         initDanmuView();
         initMediaController();
         initLoadingView();
+        initRetryView();
         initSwitchView();
         initLayoutWH();
     }
 
     private void initVideoView() {
+        //设置允许断网重连
+        videoView.enableRetry(true);
+        videoView.setMaxRetryCount(MAX_RETRY_COUNT);
         //设置noStreamView
         noStreamView.setPlaceHolderImg(R.drawable.plvlc_bg_player_no_stream);
         noStreamView.setPlaceHolderText(getResources().getString(R.string.plv_player_video_playback_no_stream));
@@ -248,6 +257,17 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     private void initLoadingView() {
         loadingLayout.bindVideoView(videoView);
+    }
+
+    private void initRetryView() {
+        playerRetryLayout.setOnClickPlayerRetryListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(playbackPlayerPresenter != null){
+                    playbackPlayerPresenter.startPlay();
+                }
+            }
+        });
     }
 
     private void initSwitchView() {
@@ -518,6 +538,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public View getBufferingIndicator() {
             return super.getBufferingIndicator();
+        }
+
+        @Override
+        public View getRetryLayout(){
+            return playerRetryLayout;
         }
 
         @Override
