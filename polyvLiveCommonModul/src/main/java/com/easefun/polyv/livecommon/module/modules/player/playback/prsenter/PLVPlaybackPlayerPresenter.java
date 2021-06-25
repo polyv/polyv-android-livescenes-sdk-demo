@@ -25,8 +25,10 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livescenes.model.PolyvPlaybackVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.easefun.polyv.livescenes.playback.video.api.IPolyvPlaybackListenerEvent;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
@@ -296,6 +298,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 重试Layout显示的控制">
+    private void setRetryLayoutVisibility(int visible){
+        if(getView() != null && getView().getRetryLayout() != null){
+            getView().getRetryLayout().setVisibility(visible);
+        }
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="播放器 - 初始化subVideo, videoView的监听器配置">
     private void initSubVideoViewListener() {
         if (subVideoView != null) {
@@ -367,6 +377,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         view.onPrepared();
                     }
                     setLogoVisibility(View.VISIBLE);
+                    setRetryLayoutVisibility(View.GONE);
                 }
 
                 @Override
@@ -407,6 +418,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             error.playPath;
 
                     setLogoVisibility(View.GONE);
+                    setRetryLayoutVisibility(View.VISIBLE);
                 }
             });
             videoView.setOnCompletionListener(new IPolyvVideoViewListenerEvent.OnCompletionListener() {
@@ -638,6 +650,16 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                                     .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage));
                         }
                     }
+                }
+            });
+            videoView.setOnRetryListener(new IPolyvPlaybackListenerEvent.OnRetryListener() {
+                @Override
+                public boolean onRetryFailed() {
+                    if(getView() != null && getView().getRetryLayout() != null){
+                        ((PLVPlayerRetryLayout)getView().getRetryLayout()).onRetryFailed("重试失败");
+                    }
+                    //false表示使用sdk内部逻辑重试，true表示拦截重试逻辑，开发者自己处理
+                    return false;
                 }
             });
         }

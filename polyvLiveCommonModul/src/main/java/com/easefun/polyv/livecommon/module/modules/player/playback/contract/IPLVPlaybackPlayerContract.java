@@ -49,6 +49,12 @@ public interface IPLVPlaybackPlayerContract {
         View getBufferingIndicator();
 
         /**
+         * 获取播放器断网重试视图
+         * @return
+         */
+        View getRetryLayout();
+
+        /**
          * 获取logo
          */
         PLVPlayerLogoView getLogo();
