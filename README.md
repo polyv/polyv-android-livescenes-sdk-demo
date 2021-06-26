@@ -5,25 +5,50 @@ polyv-android-livescenes-sdk-demo
 [![GitHub release](https://img.shields.io/badge/release-v1.5.1-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.5.1)
 
 ### 1 简介
-此项目是保利威 Android 多场景 Demo
+此项目是保利威 Android 多场景 Demo。
 
-### 2 Wiki 文档
-可在 [Wiki 文档](https://github.com/polyv/polyv-android-livescenes-sdk-demo/wiki) 中，了解 **集成方式、项目结构、SDK能力、源码释义** 等内容
+多场景项目的项目架构图如下：
 
-### 3 项目架构图
 ![](https://repo.polyv.net/android/resource/hierarchy.png)
 
-### 4 Demo 目录结构
-![](https://repo.polyv.net/android/resource/demo_structure.png)
+多场景项目的文件目录结构如下：
 
-| 模块名                    | 作用                                                     |
-| ------------------------ | -------------------------------------------------------- |
-| demo                     | 演示如何初始化sdk、以及登录直播/回放及进入不同场景       |
-| polyvLiveCloudClassScene | 云课堂场景模块，包含播放、聊天、连麦、互动等功能的演示   |
-| polyvLiveEcommerceScene  | 直播带货场景模块，包含播放、聊天、商品、打赏等功能的演示 |
-| polyvLiveStreamerScene   | 手机开播三分屏场景模块，包含推流、连麦、聊天、文档等功能的演示 |
-| polyvStreamerAloneScene  | 手机开播纯视频场景模块，包含推流、连麦、聊天等功能的演示 |
-| polyvLiveCommonModul     | 通用模块，提供给各个场景实现所需依赖的基础库、工具类等   |
+```
+|-- demo
+|-- polyvLiveCommonModul （通用业务层）
+|   |-- module
+|   `-- ui
+|-- polyvLiveCloudClassScene （观看端-云课堂场景）
+|   |-- modules
+|   `-- scenes
+|-- polyvLiveEcommerceScene （观看端-直播带货场景）
+|   |-- modules
+|   `-- scenes
+|-- polyvLiveStreamerScene （开播端-手机开播三分屏场景）
+|   |-- modules
+|   `-- scenes
+`-- polyvStreamerAloneScene （开播端-手机开播纯视频场景）
+    |-- modules
+    |-- scenes
+    `-- ui
+```
+
+### 2 体验 Demo
+
+Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
+
+### 3 Wiki 文档
+可在 [Wiki 文档](https://github.com/polyv/polyv-android-livescenes-sdk-demo/wiki) 中，了解 **集成方式、项目结构、SDK能力、源码释义** 等内容
+
+### 4 API 文档
+
+1.5.0版API文档请看[v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)</br>
+1.4.2版API文档请看[v1.4.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.2/index.html)</br>
+1.4.0版API文档请看[v1.4.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.0/index.html)</br>
+1.3.0版API文档请看[v1.3.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.3.0/index.html)</br>
+1.2.2版API文档请看[v1.2.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.2.2/index.html)</br>
+1.1.0版API文档请看[v1.1.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.1.0/index.html)</br>
+1.0.1版API文档请看[v1.0.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.0.1/index.html)
 
 ### 5 Released 版本更新列表
 以下表格反映：
@@ -34,21 +59,8 @@ polyv-android-livescenes-sdk-demo
 | Github仓库Tag | 依赖SDK版本 | Comon层 | 云课堂场景 | 直播带货场景 | 手机开播三分屏场景 |手机开播纯视频场景 |
 | ------------- | ----------- | ------- | ---------- | ------------ | ---------------------- |---------------------- |
 | 1.3.0         | 1.3.0       | ✅       | ✅          | ✅            |                        |                      |
-| 1.4.2         | 1.4.2       | ✅       | ✅          | ✅            | ✅                      |                      |
+| 1.4.0         | 1.4.0       | ✅       | ✅          | ✅            | ✅                      |                      |
 | 1.5.0         | 1.5.0       | ✅       | ✅          | ✅            | ✅                      |✅                      |
 
 更多版本更新详情，可在 [版本更新列表](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases)，了解 **对应版本更新说明**，以及 **下载源码**
 
-API 文档
-
-1.5.0版API文档请看[v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)</br>
-1.4.2版API文档请看[v1.4.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.2/index.html)</br>
-1.4.0版API文档请看[v1.4.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.0/index.html)</br>
-1.3.0版API文档请看[v1.3.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.3.0/index.html)</br>
-1.2.2版API文档请看[v1.2.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.2.2/index.html)</br>
-1.1.0版API文档请看[v1.1.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.1.0/index.html)</br>
-1.0.1版API文档请看[v1.0.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.0.1/index.html)
-
-### 体验 Demo
-地址：https://www.pgyer.com/Mb6m
-密码：polyv
