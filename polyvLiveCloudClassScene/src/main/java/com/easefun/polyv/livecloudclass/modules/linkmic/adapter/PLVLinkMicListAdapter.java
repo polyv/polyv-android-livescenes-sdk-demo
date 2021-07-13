@@ -44,7 +44,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
     private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
     private static final String PAYLOAD_UPDATE_CUP = "updateCup";
-    private static final String PAYLOAD_UPDATE_NICK_NAME_VISIBILITY = "updateNicknameVisibility";
+    private static final String PAYLOAD_UPDATE_NET_QUALITY = "updateNetQuality";
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -70,9 +70,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private String invisibleItemLinkMicId;
     //media在连麦列表中对应item的连麦id
     private String mediaInLinkMicListLinkMicId;
+    //本地网络质量
+    private int netQuality;
     //列表显示模式
     private PLVLinkMicListShowMode listShowMode = PLVLinkMicListShowMode.SHOW_ALL;
-
+    //是否已经回调了绑定老师ViewHolder
     private boolean hasNotifyTeacherViewHolderBind = false;
 
 
@@ -132,8 +134,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     }
 
     //设置rv布局管理器
-    public void setLinearLayoutManager(LinearLayoutManager linearLayoutManager){
-        this.linearLayoutManager=linearLayoutManager;
+    public void setLinearLayoutManager(LinearLayoutManager linearLayoutManager) {
+        this.linearLayoutManager = linearLayoutManager;
     }
 
     // </editor-fold>
@@ -235,7 +237,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     //更新连麦列表的音量变化
     public void updateVolumeChanged() {
-        if (linearLayoutManager==null){
+        if (linearLayoutManager == null) {
             return;
         }
         //只更新可见区域的item的音量变化。
@@ -244,6 +246,14 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         int count = lastVisibleItemPos - firstVisibleItemPos + 1;
         if (firstVisibleItemPos != RecyclerView.NO_POSITION && lastVisibleItemPos != RecyclerView.NO_POSITION && count > 0) {
             notifyItemRangeChanged(firstVisibleItemPos, count, PAYLOAD_UPDATE_VOLUME);
+        }
+        //找到隐藏的view holder，并更新其中的view（虽然view holder的item view隐藏了，但是子view切到别的地方去，还是能显示出来的，这里就是要更新切到别的地方去的子view）
+        if (!TextUtils.isEmpty(invisibleItemLinkMicId)) {
+            for (int i = 0; i < dataList.size(); i++) {
+                if (dataList.get(i).getLinkMicId().equals(invisibleItemLinkMicId)) {
+                    notifyItemChanged(i, PAYLOAD_UPDATE_VOLUME);
+                }
+            }
         }
     }
 
@@ -266,6 +276,21 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         updateAllItem();
     }
 
+    public void updateNetQuality(int quality) {
+        netQuality = quality;
+        //找到我的位置
+        int myPos = 0;
+        for (int i = 0; i < dataList.size(); i++) {
+            PLVLinkMicItemDataBean index = dataList.get(i);
+            if (index.getLinkMicId().equals(myLinkMicId)) {
+                myPos = i;
+                break;
+            }
+        }
+        //仅更新我的网路质量
+        notifyItemChanged(myPos, PAYLOAD_UPDATE_NET_QUALITY);
+    }
+
     //更新奖杯
     public void updateCup(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_CUP);
@@ -282,13 +307,33 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
         SurfaceView renderView = adapterCallback.createLinkMicRenderView();
 
-        LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
+        final LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
         if (renderView != null) {
             viewHolder.renderView = renderView;
             viewHolder.flRenderViewContainer.addView(renderView, getRenderViewLayoutParam());
         } else {
             PLVCommonLog.e(TAG, "create render view return null");
         }
+
+        viewHolder.flRenderViewContainer.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, final int left, int top, final int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                final int newWidth = right - left;
+                //切换到主屏幕的时候，不要显示view holder的昵称和麦克风
+                if (newWidth != getItemWidth()) {
+                    viewHolder.tvNick.setVisibility(View.GONE);
+                    viewHolder.ivMicState.setVisibility(View.GONE);
+                } else {
+                    v.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewHolder.tvNick.setVisibility(View.VISIBLE);
+                            viewHolder.ivMicState.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            }
+        });
         return viewHolder;
     }
 
@@ -357,7 +402,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
 
         //昵称
-        setNickNameVisible(holder, linkMicId, actor, nick);
         StringBuilder nickString = new StringBuilder();
         if (!TextUtils.isEmpty(actor)) {
             nickString.append(actor).append("-");
@@ -405,11 +449,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                     switchViewHasMedia = holder.switchViewAnchorLayout;
                 } else {
                     switchViewHasMedia = null;
-                }
-                //如果有切换一次/切换多次，更新昵称的显示/隐藏（当切换到大屏的时候不显示昵称）
-                updateNickNameVisibility(holderPos);
-                if (posOfMedia != holderPos && posOfMedia != -1) {
-                    updateNickNameVisibility(posOfMedia);
                 }
             }
         });
@@ -464,9 +503,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                         holder.llCupLayout.setVisibility(View.GONE);
                     }
                     break;
-                case PAYLOAD_UPDATE_NICK_NAME_VISIBILITY:
-                    //昵称可见性
-                    setNickNameVisible(holder, linkMicId, actor, nick);
+                case PAYLOAD_UPDATE_NET_QUALITY:
+                    //更新网络质量
+                    if (linkMicId.equals(myLinkMicId)) {
+                        //netQuality
+                    }
                     break;
                 default:
                     break;
@@ -622,28 +663,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             }
         }
     }
-
-    /**
-     * 更新昵称
-     *
-     * @param pos
-     */
-    private void updateNickNameVisibility(int pos) {
-        notifyItemChanged(pos, PAYLOAD_UPDATE_NICK_NAME_VISIBILITY);
-    }
-
-    /**
-     * 设置昵称可见性
-     */
-    private void setNickNameVisible(LinkMicItemViewHolder holder, String linkMicId, String actor, String nick) {
-        boolean isViewSwitched = mediaInLinkMicListLinkMicId != null && mediaInLinkMicListLinkMicId.equals(linkMicId);
-        if (isViewSwitched) {
-            //如果View切换到别出去了，说明该item此时是media。media在这里时，不要显示昵称
-            holder.tvNick.setVisibility(View.GONE);
-        } else {
-            holder.tvNick.setVisibility(View.VISIBLE);
-        }
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -682,8 +701,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             tvCupNumView = itemView.findViewById(R.id.plvlc_link_mic_tv_cup_num_view);
             llCupLayout = itemView.findViewById(R.id.plvlc_link_mic_ll_cup_layout);
             ivMicState = itemView.findViewById(R.id.plvlc_link_mic_iv_mic_state);
-            switchViewAnchorLayout = itemView.findViewById(R.id.plvlc_linkmic_switch_anchor_item);
             roundRectLayout = itemView.findViewById(R.id.plvlc_linkmic_item_round_rect_layout);
+            switchViewAnchorLayout = itemView.findViewById(R.id.plvlc_linkmic_switch_anchor_item);
         }
     }
     // </editor-fold>
@@ -724,7 +743,15 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
     }
 
+    /**
+     * 讲师ViewHolder中的switchView绑定监听器
+     */
     public interface OnTeacherSwitchViewBindListener {
+        /**
+         * 讲师view holder的switch view绑定
+         *
+         * @param viewAnchorLayout 讲师view hodler中的switch view
+         */
         void onTeacherSwitchViewBind(PLVSwitchViewAnchorLayout viewAnchorLayout);
     }
 

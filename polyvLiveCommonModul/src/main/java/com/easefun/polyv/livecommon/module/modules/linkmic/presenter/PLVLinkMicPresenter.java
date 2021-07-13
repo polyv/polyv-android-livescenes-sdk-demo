@@ -883,6 +883,14 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 linkMicView.onRemoteUserVolumeChanged(linkMicList);
             }
         }
+
+        @Override
+        public void onNetworkQuality(int quality) {
+            super.onNetworkQuality(quality);
+            if (linkMicView != null) {
+                linkMicView.onNetQuality(quality);
+            }
+        }
     }
 // </editor-fold>
 

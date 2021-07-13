@@ -146,7 +146,6 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         streamerPresenter.registerView(streamerView);
         streamerPresenter.init();
         streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
-        streamerPresenter.setMixLayoutType(PLVSStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE);
     }
 
     @Override
@@ -244,6 +243,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         @Override
         public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
             super.onStreamerEngineCreatedSuccess(linkMicUid, linkMicList);
+            streamerPresenter.setMixLayoutType(PLVSStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE);
             streamerAdapter.setMyLinkMicId(linkMicUid);
             streamerAdapter.setDataList(linkMicList);
             updateLinkMicListLayout();

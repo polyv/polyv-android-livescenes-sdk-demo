@@ -901,11 +901,18 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         return hasChangedMemberList;
     }
 
+    /**
+     * 更新混流用户状态，需要和以下的调用保持同步：
+     * view.onUserLeave
+     * view.onUsersJoin
+     * view.onUserMuteVideo
+     */
     void updateMixLayoutUsers() {
         List<PLVRTCMixUser> mixUserList = new ArrayList<>();
         for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : streamerList) {
             PLVRTCMixUser mixUser = new PLVRTCMixUser();
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
+            mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
             mixUserList.add(mixUser);
         }
         streamerManager.updateMixLayoutUsers(mixUserList);
@@ -1130,6 +1137,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 view.onUserMuteVideo(linkMicId, isMute, streamerListPos, memberListPos);
             }
         });
+        updateMixLayoutUsers();
     }
     // </editor-fold>
 

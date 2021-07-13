@@ -126,6 +126,12 @@ public interface IPLVLinkMicContract {
         void onRemoteUserVolumeChanged(List<PLVLinkMicItemDataBean> linkMicList);
 
         /**
+         * 更新本地网络质量
+         * @param quality 网络质量
+         */
+        void onNetQuality(int quality);
+
+        /**
          * 切换第一画面
          *
          * @param linkMicId 新的第一画面的连麦Id

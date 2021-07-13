@@ -51,44 +51,45 @@
                     android:layout_height="24dp"
                     android:layout_gravity="bottom"
                     android:background="@drawable/plvlc_linkmic_bg_link_item_bottom_shadow" />
+
+                <!-- 昵称和logo-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/plvlc_link_mic_iv_mic_state"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginBottom="3dp"
+                        android:src="@drawable/plvlc_linkmic_iv_mic_open" />
+
+                    <TextView
+                        android:id="@+id/plvlc_link_mic_tv_nick"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="2dp"
+                        android:drawablePadding="@dimen/dm_3"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:maxWidth="@dimen/dm_134"
+                        android:maxLines="1"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:text="你好你好你好你好你好你好你好你好你好你好" />
+                </LinearLayout>
             </FrameLayout>
         </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 
-        <!-- 昵称和logo-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/plvlc_link_mic_iv_mic_state"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/plvlc_linkmic_iv_mic_open" />
-
-            <TextView
-                android:id="@+id/plvlc_link_mic_tv_nick"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="2dp"
-                android:drawablePadding="@dimen/dm_3"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxWidth="@dimen/dm_134"
-                android:maxLines="1"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="你好你好你好你好你好你好你好你好你好你好" />
-        </LinearLayout>
         <!--奖杯-->
         <LinearLayout
             android:id="@+id/plvlc_link_mic_ll_cup_layout"
