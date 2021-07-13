@@ -46,10 +46,7 @@ public class PLVRewardStrokeTextView extends androidx.appcompat.widget.AppCompat
         }
         //复制原来TextViewg画笔中的一些参数
         TextPaint paint = getPaint();
-        strokePaint.setTextSize(paint.getTextSize());
-        strokePaint.setTypeface(getTypeface());
-        strokePaint.setFlags(paint.getFlags());
-        strokePaint.setAlpha(paint.getAlpha());
+        strokePaint.set(paint);
 
         //自定义描边效果
         strokePaint.setStyle(Paint.Style.STROKE);

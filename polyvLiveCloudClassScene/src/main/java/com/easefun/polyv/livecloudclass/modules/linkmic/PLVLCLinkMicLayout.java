@@ -690,6 +690,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onNetQuality(int quality) {
+        linkMicListAdapter.updateNetQuality(quality);
+    }
+
+    @Override
     public void onSwitchFirstScreen(String linkMicId) {
         linkMicListAdapter.updateAllItem();
     }
