@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:layout_width="200dp">
+
+    <com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvlc_linkmic_item_round_rect_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="H,16:9"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="all"
+        app:radius="0dp">
+
+        <com.plv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+            android:id="@+id/plvlc_linkmic_switch_anchor_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorEbonyClay">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="46dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginRight="46dp"
+                    android:layout_marginBottom="18dp"
+                    android:src="@drawable/plvlc_linkmic_bg_item_mute_video" />
+
+                <FrameLayout
+                    android:id="@+id/plvlc_link_mic_fl_render_view_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black"
+                    tools:visibility="invisible" />
+
+                <!--底部渐变背景-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/plvlc_linkmic_bg_link_item_bottom_shadow" />
+
+                <!-- 昵称和logo-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/plvlc_link_mic_iv_mic_state"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginBottom="3dp"
+                        android:src="@drawable/plvlc_linkmic_iv_mic_open" />
+
+                    <TextView
+                        android:id="@+id/plvlc_link_mic_tv_nick"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="2dp"
+                        android:drawablePadding="@dimen/dm_3"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:maxWidth="@dimen/dm_134"
+                        android:maxLines="1"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:text="你好你好你好你好你好你好你好你好你好你好" />
+                </LinearLayout>
+            </FrameLayout>
+        </com.plv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+        <!--奖杯-->
+        <LinearLayout
+            android:id="@+id/plvlc_link_mic_ll_cup_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/plvlc_linkmic_btn_cup" />
+
+            <TextView
+                android:id="@+id/plvlc_link_mic_tv_cup_num_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</android.support.constraint.ConstraintLayout>

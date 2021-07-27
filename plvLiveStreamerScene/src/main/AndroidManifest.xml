@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.plv.livestreamer">
+
+    <application>
+        <activity
+            android:name="com.plv.livestreamer.scenes.PLVLSLiveStreamerActivity"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name="com.plv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:screenOrientation="behind"
+            android:theme="@style/AppTheme.Translucent" />
+
+        <service android:name="com.plv.livestreamer.modules.streamer.service.PLVLSForegroundService" />
+    </application>
+</manifest>

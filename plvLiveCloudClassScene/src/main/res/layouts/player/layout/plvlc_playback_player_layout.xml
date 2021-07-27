@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.plv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+        android:id="@+id/plvlc_playback_switch_anchor_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/plvlc_playback_fl_player_switch_view_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.plv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <!-- 回放播放器 -->
+    <com.plv.livescenes.playback.video.PLVPlaybackVideoView
+        android:id="@+id/plvlc_playback_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 主播放器载入状态view -->
+        <com.plv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout
+            android:id="@+id/plvlc_playback_loading_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- 播放失败显示的view -->
+        <include layout="@layout/plvlc_live_player_nostream_layout" />
+        <!-- 显示的logo -->
+        <com.plv.livecommon.ui.widget.PLVPlayerLogoView
+            android:id="@+id/playback_logo_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.plv.livescenes.playback.video.PLVPlaybackVideoView>
+    <!--子播放器view-->
+    <include
+        layout="@layout/plvlc_playback_player_sub_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 横屏聊天区 -->
+    <com.plv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
+        android:id="@+id/plvlc_chat_landscape_ly"
+        android:layout_width="240dp"
+        android:layout_height="204dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!-- 弹幕布局 -->
+    <FrameLayout
+        android:id="@+id/plvlc_danmu_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp" />
+
+    <!-- 亮度手势提示 -->
+    <com.plv.livecloudclass.modules.media.widget.PLVLCLightTipsView
+        android:id="@+id/plvlc_playback_tipsview_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 音量手势提示 -->
+    <com.plv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView
+        android:id="@+id/plvlc_playback_tipsview_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 快进/回退提示 -->
+    <com.plv.livecloudclass.modules.media.widget.PLVLCProgressTipsView
+        android:id="@+id/plvlc_playback_tipsview_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--重试按钮-->
+    <com.plv.livecommon.ui.widget.PLVPlayerRetryLayout
+        android:visibility="gone"
+        android:id="@+id/plvlc_playback_player_retry_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 控制栏 -->
+    <com.plv.livecloudclass.modules.media.controller.PLVLCPlaybackMediaController
+        android:id="@+id/plvlc_playback_media_controller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</android.support.constraint.ConstraintLayout>

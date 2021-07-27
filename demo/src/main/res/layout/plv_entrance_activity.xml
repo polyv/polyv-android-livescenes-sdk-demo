@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PLVEntranceActivity">
+    tools:context="com.plv.livedemo.PLVEntranceActivity">
 
     <view
-        class="com.easefun.polyv.livedemo.PLVEntranceActivity$ScaleBgImageView"
+        class="com.plv.livedemo.PLVEntranceActivity$ScaleBgImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/plv_entrance_bg" />

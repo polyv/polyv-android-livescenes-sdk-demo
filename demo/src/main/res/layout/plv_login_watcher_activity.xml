@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.easefun.polyv.livecommon.ui.widget.PLVSoftView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.plv.livecommon.ui.widget.PLVSoftView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/plv_login_soft_listener_layout"
     android:layout_width="match_parent"
@@ -204,14 +204,4 @@
         </LinearLayout>
     </ScrollView>
 
-    <TextView
-        android:id="@+id/plv_login_tv_copyright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/dm_10"
-        android:layout_marginBottom="@dimen/dm_30"
-        android:gravity="bottom"
-        android:text="@string/plv_login_copyright" />
-
-</com.easefun.polyv.livecommon.ui.widget.PLVSoftView>
+</com.plv.livecommon.ui.widget.PLVSoftView>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/plvsa_streamer_page_bg">
+
+    <!--推流和连麦布局-->
+    <com.plv.streameralone.modules.streamer.PLVSAStreamerLayout
+        android:id="@+id/plvsa_streamer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--顶部区域渐变色蒙层遮罩-->
+    <com.plv.livecommon.ui.widget.PLVGradientView
+        android:layout_width="match_parent"
+        android:layout_height="116dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:plvGradientOrientation="topBottom"
+        app:plvGradientColors="#33000000,#00000000" />
+
+    <!--底部区域渐变色蒙层遮罩-->
+    <com.plv.livecommon.ui.widget.PLVGradientView
+        android:layout_width="match_parent"
+        android:layout_height="118dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:plvGradientOrientation="bottomTop"
+        app:plvGradientColors="#80000000,#00000000" />
+
+    <!--上层的viewpager布局-->
+    <com.plv.livecommon.ui.widget.PLVNoInterceptTouchViewPager
+        android:id="@+id/plvsa_top_layer_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadingEdge="none"
+        android:overScrollMode="never"
+        android:visibility="invisible" />
+
+    <!--有人申请连麦时 连麦提示条布局-->
+    <com.plv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout
+        android:id="@+id/plvsa_linkmic_request_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--直播设置布局-->
+    <com.plv.streameralone.modules.liveroom.PLVSASettingLayout
+        android:id="@+id/plvsa_setting_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--成员管理引导弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvsa_control_tips_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--直播间弹层布局容器底层蒙层遮罩-->
+    <View
+        android:id="@+id/plvsa_popup_container_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#802c2c2c"
+        android:visibility="gone" />
+
+    <!--直播间弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvsa_live_room_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--清屏指引布局-->
+    <com.plv.streameralone.modules.liveroom.PLVSACleanUpLayout
+        android:id="@+id/plvsa_clean_up_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!--直播结束布局-->
+    <com.plv.streameralone.modules.streamer.PLVSAStreamerFinishLayout
+        android:id="@+id/plvsa_streamer_finish_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:visibility="gone" />
+
+</android.support.constraint.ConstraintLayout>

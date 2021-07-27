@@ -30,7 +30,7 @@ allprojects {
         maven{
             url 'https://maven.aliyun.com/repository/public'
         }
-        //保利威阿里云效
+        //阿里云效
         maven {
             credentials {
                 username '609cc5623a10edbf36da9615'
@@ -46,7 +46,7 @@ ext {
     minSdkVersion = 21
     targetSdkVersion = 27
     versionCode = 152
-    versionName = "1.5.2"
+    versionName = "1.5.2.01"
 }
 
 task clean(type: Delete) {

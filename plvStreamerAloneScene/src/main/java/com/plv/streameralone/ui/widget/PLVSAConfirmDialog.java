@@ -1,0 +1,57 @@
+package com.plv.streameralone.ui.widget;
+
+import android.content.Context;
+
+import com.plv.livecommon.ui.widget.PLVConfirmDialog;
+import com.plv.streameralone.R;
+
+/**
+ * @author suhongtao
+ */
+public class PLVSAConfirmDialog extends PLVConfirmDialog {
+
+    public PLVSAConfirmDialog(Context context) {
+        super(context);
+    }
+
+    @Override
+    protected int layoutId() {
+        return R.layout.plvsa_widget_confirm_dialog;
+    }
+
+    @Override
+    protected float dialogWidthInDp() {
+        return 260F;
+    }
+
+    @Override
+    protected int confirmTitleId() {
+        return R.id.plvsa_confirm_title;
+    }
+
+    @Override
+    protected int confirmContentId() {
+        return R.id.plvsa_confirm_content;
+    }
+
+    @Override
+    protected int leftConfirmTextViewId() {
+        return R.id.plvsa_left_confirm_btn;
+    }
+
+    @Override
+    protected int rightConfirmTextViewId() {
+        return R.id.plvsa_right_confirm_btn;
+    }
+
+    @Override
+    protected int splitViewId() {
+        return R.id.plvsa_split_view;
+    }
+
+    @Override
+    protected boolean hasSplitView() {
+        return true;
+    }
+
+}
