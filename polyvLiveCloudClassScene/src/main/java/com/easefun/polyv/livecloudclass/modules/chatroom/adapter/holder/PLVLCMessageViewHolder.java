@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView;
+import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
@@ -49,6 +49,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private TextView quoteNickTv;
     //被回复人的文本信息
     private GifSpanTextView quoteTextMessageTv;
+    //回复文本气泡框
+    private View chatLayout;
 
     //横屏item
     //文本信息
@@ -80,6 +82,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         textMessageTv = (GifSpanTextView) findViewById(R.id.text_message_tv);
         quoteNickTv = (TextView) findViewById(R.id.quote_nick_tv);
         quoteTextMessageTv = (GifSpanTextView) findViewById(R.id.quote_text_message_tv);
+        chatLayout = findViewById(R.id.chat_msg_ll);
         //land item
         chatMsgTv = (GifSpanTextView) findViewById(R.id.chat_msg_tv);
         chatNickTv = (TextView) findViewById(R.id.chat_nick_tv);
@@ -202,6 +205,18 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.VISIBLE);
                         imgLoadingView.setProgress((int) (progress * 100));
                     }
+                }
+            }
+
+            @Override
+            public void onCheckFail(PolyvSendLocalImgEvent localImgEvent, Throwable t) {
+                localImgEvent.setSendStatus(PolyvSendLocalImgEvent.SENDSTATUS_FAIL);
+                if (localImgEvent == messageData) {
+                    localImgStatus = localImgEvent.getSendStatus();
+                    if (imgLoadingView != null) {
+                        imgLoadingView.setVisibility(View.GONE);
+                    }
+                    ToastUtils.showLong("发送图片失败: " + t.getMessage());
                 }
             }
         });
@@ -365,6 +380,9 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     // <editor-fold defaultstate="collapsed" desc="数据交互 - 设置图片信息">
     private void setImgMessage() {
         if (chatImgUrl != null && imgMessageIv != null) {
+            if(!isLandscapeLayout) {
+                chatLayout.setVisibility(View.INVISIBLE);
+            }
             imgMessageIv.setVisibility(View.VISIBLE);
             fitChatImgWH(chatImgWidth, chatImgHeight, imgMessageIv, 120, 80);//适配图片视图的宽高
             if (isLocalChatImg) {
@@ -377,6 +395,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         R.drawable.plvlc_image_load_err,
                         createStatusListener(chatImgUrl),
                         imgMessageIv);
+            }
+        } else {
+            if(!isLandscapeLayout) {
+                chatLayout.setVisibility(View.VISIBLE);
             }
         }
     }

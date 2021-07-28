@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.chatroom;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
@@ -41,12 +44,14 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
@@ -167,6 +172,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                     @Override
                     public boolean onSendQuoteMsg(String message) {
                         return sendQuoteMessage(message, chatQuoteVO, quoteId);
+                    }
+
+                    @Override
+                    public boolean onSendEmotion(PLVEmotionImageVO.EmotionImage emotionImage) {
+                        Pair<Boolean, Integer> pair = sendChatEmotion(new PLVChatEmotionEvent(emotionImage.getId()));
+                        return pair.first;
                     }
 
                     @Override
@@ -309,6 +320,10 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     private void sendChatMessage(PolyvSendLocalImgEvent imgEvent) {
         chatroomPresenter.sendChatImage(imgEvent);
     }
+
+    private Pair<Boolean, Integer> sendChatEmotion(PLVChatEmotionEvent emotionEvent){
+        return chatroomPresenter.sendChatEmotionImage(emotionEvent);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 列表数据更新">
@@ -428,6 +443,18 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
 
         @Override
+        public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if(emotionEvent == null){
+                return;
+            }
+            final List<PLVBaseViewData> dataList = new ArrayList<>();
+            dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
+            //添加信息至列表
+            addChatMessageToList(dataList, true);
+        }
+
+        @Override
         public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
             super.onLocalImageMessage(localImgEvent);
             List<PLVBaseViewData> dataList = new ArrayList<>();
@@ -517,6 +544,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                         .build()
                         .show();
             }
+            initChatroomEmotion();
         }
 
         @Override
@@ -598,6 +626,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 }
 
                 @Override
+                public boolean onSendEmotion(PLVEmotionImageVO.EmotionImage emotionImage) {
+                    Pair<Boolean, Integer> pair = sendChatEmotion(new PLVChatEmotionEvent(emotionImage.getId()));
+                    return pair.first;
+                }
+
+                @Override
                 public boolean onSendMsg(String message) {
                     return sendChatMessage(message);
                 }
@@ -605,4 +639,27 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 表情">
+    private void initChatroomEmotion(){
+        if(chatroomPresenter == null){
+            return;
+        }
+        //加载个性表情
+        chatroomPresenter.getChatEmotionImages();
+        chatroomPresenter.getData().getEmotionImages().observe((LifecycleOwner) getContext(), new Observer<List<PLVEmotionImageVO.EmotionImage>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVEmotionImageVO.EmotionImage> emotionImageList) {
+                if (chatroomPresenter != null) {
+                    chatroomPresenter.getData().getEmotionImages().removeObserver(this);
+                }
+                if(emotionImageList != null && !emotionImageList.isEmpty()){
+                    PLVFaceManager.getInstance().initEmotionList(emotionImageList);
+                } else {
+                    Log.e(getClass().getSimpleName(), "emotionImages is null or empty");
+                }
+            }
+        });
+    }
+    // </editor-fold >
 }

@@ -87,6 +87,15 @@
                         android:textSize="12sp"
                         tools:text="你好你好你好你好你好你好你好你好你好你好" />
                 </LinearLayout>
+
+                <!--网络质量-->
+                <com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget
+                    android:id="@+id/plvlc_link_mic_net_quality_view"
+                    android:layout_gravity="right|top"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp" />
             </FrameLayout>
         </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 

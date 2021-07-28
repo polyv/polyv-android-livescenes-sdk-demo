@@ -8,11 +8,15 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.widget.EditText;
 
-import com.easefun.polyv.businesssdk.sub.gif.RelativeImageSpan;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmojiListAdapter;
+import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPersonalListAdapter;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import java.util.List;
 
 /**
  * 聊天室工具类
@@ -35,6 +39,22 @@ public class PLVSAChatroomUtils {
             }
         });
         emojiRv.setAdapter(emojiListAdapter);
+    }
+
+    /**
+     * 初始化个性表情
+     */
+    public static void initEmojiPersonalList(RecyclerView emojiPersonalRv, int spanCount, List<PLVEmotionImageVO.EmotionImage> emotionImages,
+                                             PLVSAEmotionPersonalListAdapter.OnViewActionListener actionListener ) {
+        emojiPersonalRv.setHasFixedSize(true);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(emojiPersonalRv.getContext(), spanCount, GridLayoutManager.VERTICAL, false);
+        emojiPersonalRv.setLayoutManager(gridLayoutManager);
+        PLVSAEmotionPersonalListAdapter emotionListAdapter = new PLVSAEmotionPersonalListAdapter(emotionImages);
+        emojiPersonalRv.addItemDecoration(new PLVSAEmotionPersonalListAdapter.GridSpacingItemDecoration(spanCount, ConvertUtils.dp2px(10), true));
+
+        emotionListAdapter.setOnViewActionListener(actionListener);
+        emojiPersonalRv.setAdapter(emotionListAdapter);
+
     }
 
     // 删除表情

@@ -18,6 +18,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -177,6 +178,11 @@ public interface IPLVChatroomContract {
         void onLocalQuestionMessage(@Nullable PolyvQuestionMessage questionMessage);
 
         /**
+         * 加载个性图片表情消息
+         */
+        void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent);
+
+        /**
          * 自己本地发送的图片信息
          */
         void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent);
@@ -278,6 +284,12 @@ public interface IPLVChatroomContract {
         void sendLikeMessage();
 
         /**
+         * 发送个性图片表情
+         * @param emotionEvent
+         */
+        Pair<Boolean, Integer> sendChatEmotionImage(PLVChatEmotionEvent emotionEvent);
+
+        /**
          * 发送聊天图片信息
          */
         void sendChatImage(PolyvSendLocalImgEvent localImgEvent);
@@ -318,6 +330,11 @@ public interface IPLVChatroomContract {
          * 设置历史记录是否包含打赏事件，该设置会影响{@link IChatroomView#onHistoryDataList(List, int, boolean, int)}返回的数据是否包含打赏事件
          */
         void setHistoryContainRewardEvent(boolean historyContainRewardEvent);
+
+        /**
+         * 获取聊天室个性表情
+         */
+        void getChatEmotionImages();
 
         /**
          * 获取聊天室的数据

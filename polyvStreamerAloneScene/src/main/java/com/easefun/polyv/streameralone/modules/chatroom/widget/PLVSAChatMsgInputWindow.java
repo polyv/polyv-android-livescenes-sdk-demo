@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -27,11 +28,15 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.streameralone.R;
+import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPersonalListAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.utils.PLVSAChatroomUtils;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
@@ -40,6 +45,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 聊天信息输入窗口
@@ -60,6 +66,9 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     private double answerUserImgWidth;
     private double answerUserImgHeight;
 
+    private boolean isInitEmotion = false;
+
+
     //view
     private ImageView plvsaChatroomSelEmojiIv;
     private ImageView plvsaChatroomSelImgIv;
@@ -72,6 +81,13 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     private TextView plvsaChatroomAnswerUserContentTv;
     private ImageView plvsaChatroomAnswerUserImgIv;
     private TextView plvsaChatroomCloseAnswerWindowTv;
+    private ImageView plvsaEmojiTabEmojiIv;
+    private ImageView plvsaEmojiTabPersonalIv;
+    private RecyclerView emojiPersonalRv;
+
+    //个性化表情预览弹窗
+    private PLVImagePreviewPopupWindow emotionPreviewWindow;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="监听器">
@@ -150,8 +166,14 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         plvsaChatroomAnswerUserContentTv = findViewById(R.id.plvsa_chatroom_answer_user_content_tv);
         plvsaChatroomAnswerUserImgIv = findViewById(R.id.plvsa_chatroom_answer_user_img_iv);
         plvsaChatroomCloseAnswerWindowTv = findViewById(R.id.plvsa_chatroom_close_answer_window_tv);
+        plvsaEmojiTabEmojiIv = findViewById(R.id.plvsa_emoji_tab_emoji_iv);
+        plvsaEmojiTabPersonalIv = findViewById(R.id.plvsa_emoji_tab_personal_iv);
+        emojiPersonalRv = findViewById(R.id.emoji_personal_rv);
 
+        emotionPreviewWindow = new PLVImagePreviewPopupWindow(this);
 
+        plvsaEmojiTabEmojiIv.setOnClickListener(this);
+        plvsaEmojiTabPersonalIv.setOnClickListener(this);
         plvsaChatroomSelEmojiIv.setOnClickListener(this);
         plvsaChatroomSelImgIv.setOnClickListener(this);
         plvsaChatroomMsgDeleteIv.setOnClickListener(this);
@@ -315,15 +337,79 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
             selectImg();
         } else if (id == R.id.plvsa_chatroom_close_answer_window_tv) {
             plvsaChatroomAnswerLy.setVisibility(View.GONE);
+        } else if (id == R.id.plvsa_emoji_tab_emoji_iv){
+            changeEmojiTab(true);
+        } else if (id == R.id.plvsa_emoji_tab_personal_iv){
+            changeEmojiTab(false);
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="表情">
+    private void initEmotionTab(){
+        final List<PLVEmotionImageVO.EmotionImage> emotionList = PLVFaceManager.getInstance().getEmotionList();
+        if(isInitEmotion || emotionList.isEmpty()){
+            return;
+        }
+        PLVSAChatroomUtils.initEmojiPersonalList(emojiPersonalRv, 5, emotionList, new PLVSAEmotionPersonalListAdapter.OnViewActionListener() {
+            @Override
+            public void onEmotionViewClick(PLVEmotionImageVO.EmotionImage emotionImage) {
+                //发送图片表情
+                boolean sendResult = true;
+                if(inputListener instanceof MessageSendListener) {
+                    sendResult = ((MessageSendListener) inputListener).onSendEmotion(emotionImage.getId());
+                }
+                if (sendResult) {
+                    requestClose();
+                } else {
+                    ToastUtils.showShort("图片表情发送失败");
+                }
+            }
+
+            @Override
+            public void onEmotionViewLongClick(PLVEmotionImageVO.EmotionImage emotionImage, View view) {
+                emotionPreviewWindow.showInTopCenter(emotionImage.getUrl(), view);
+            }
+        });
+        isInitEmotion = true;
+    }
+
+
+    private void changeEmojiTab(boolean isEmoji){
+        initEmotionTab();
+        plvsaEmojiTabEmojiIv.setSelected(isEmoji);
+        plvsaEmojiTabPersonalIv.setSelected(isEmoji);
+        int selectColor = Color.parseColor("#FF2B2C35");
+        int unSelectColor = Color.parseColor("#FF535353");
+        plvsaEmojiTabEmojiIv.setBackgroundColor(isEmoji ? selectColor : unSelectColor);
+        plvsaEmojiTabPersonalIv.setBackgroundColor(isEmoji ?  unSelectColor : selectColor);
+        //切换rv的表情库
+        if(isEmoji){
+            //显示emoji表情库
+            plvsaChatroomEmojiRv.setVisibility(View.VISIBLE);
+            plvsaChatroomMsgSendTv.setVisibility(View.VISIBLE);
+            plvsaChatroomMsgDeleteIv.setVisibility(View.VISIBLE);
+            emojiPersonalRv.setVisibility(View.INVISIBLE);
+        } else {
+            //显示个性表情包
+            plvsaChatroomEmojiRv.setVisibility(View.INVISIBLE);
+            plvsaChatroomMsgSendTv.setVisibility(View.INVISIBLE);
+            plvsaChatroomMsgDeleteIv.setVisibility(View.INVISIBLE);
+            emojiPersonalRv.setVisibility(View.VISIBLE);
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - 信息发送监听器">
     public interface MessageSendListener extends InputListener {
         void onSendImg(PolyvSendLocalImgEvent imgEvent);
 
         boolean onSendQuoteMsg(String message);
+
+        /**
+         * 发送个性表情
+         */
+        boolean onSendEmotion(String emotionId);
     }
     // </editor-fold>
 }

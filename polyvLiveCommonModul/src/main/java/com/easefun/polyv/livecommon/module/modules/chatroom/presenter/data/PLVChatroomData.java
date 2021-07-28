@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import android.util.Pair;
 
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
@@ -31,6 +32,8 @@ public class PLVChatroomData {
     private MutableLiveData<PLVLoginEvent> loginEventData = new MutableLiveData<>();
     //聊天室打赏事件
     private MutableLiveData<PLVRewardEvent> rewardEventData = new MutableLiveData<>();
+
+    private MutableLiveData<List<PLVEmotionImageVO.EmotionImage>> emotionImagesData = new MutableLiveData<>();
 
     public LiveData<PolyvBulletinVO> getBulletinVO() {
         return bulletinVO;
@@ -96,5 +99,13 @@ public class PLVChatroomData {
 
     public void postRewardEvent(PLVRewardEvent rewardEvent) {
         rewardEventData.postValue(rewardEvent);
+    }
+
+    public LiveData<List<PLVEmotionImageVO.EmotionImage>> getEmotionImages(){
+        return emotionImagesData;
+    }
+
+    public void postEmotionImages(List<PLVEmotionImageVO.EmotionImage> emotionImages){
+        emotionImagesData.postValue(emotionImages);
     }
 }

@@ -2,7 +2,7 @@ polyv-android-livescenes-sdk-demo
 ===
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v1.5.2-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.5.2)
+[![GitHub release](https://img.shields.io/badge/release-v1.5.3-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.5.3)
 
 ### 1 简介
 此项目是保利威 Android 多场景 Demo。
@@ -42,6 +42,7 @@ Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
 ### 4 API 文档
 
+1.5.3版API文档请看[v1.5.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.3/index.html)</br>
 1.5.2版API文档请看[v1.5.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.2/index.html)</br>
 1.5.0版API文档请看[v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)</br>
 1.4.2版API文档请看[v1.4.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.2/index.html)</br>

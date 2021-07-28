@@ -197,4 +197,14 @@
         <attr name="plvGradientColors" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="PLVTriangleIndicateLayout">
+        <attr name="triangleWidth" />
+        <attr name="triangleHeight" />
+        <attr name="triangleMargin" />
+        <attr name="trianglePosition" />
+        <attr name="triangleMarginType" />
+        <attr name="indicateColor" />
+        <attr name="rectRadius" />
+    </declare-styleable>
+
 </resources>

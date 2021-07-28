@@ -8,11 +8,15 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.widget.EditText;
 
-import com.easefun.polyv.businesssdk.sub.gif.RelativeImageSpan;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmojiListAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPersonalListAdapter;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
+
+import java.util.List;
 
 /**
  * 聊天室工具类
@@ -21,7 +25,7 @@ public class PLVChatroomUtils {
     private static int emojiLength;
 
     // <editor-fold defaultstate="collapsed" desc="发送表情相关">
-    //初始化表情列表
+    //初始化emoji表情列表
     public static void initEmojiList(RecyclerView emojiRv, final EditText inputEt) {
         emojiRv.setHasFixedSize(true);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(emojiRv.getContext(), 6, GridLayoutManager.VERTICAL, false);
@@ -35,6 +39,22 @@ public class PLVChatroomUtils {
             }
         });
         emojiRv.setAdapter(emojiListAdapter);
+    }
+
+    /**
+     * 初始化个性表情
+     */
+    public static void initEmojiPersonalList(RecyclerView emojiPersonalRv, int spanCount, List<PLVEmotionImageVO.EmotionImage> emotionImages,
+                                             PLVLCEmotionPersonalListAdapter.OnViewActionListener actionListener ) {
+        emojiPersonalRv.setHasFixedSize(true);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(emojiPersonalRv.getContext(), spanCount, GridLayoutManager.VERTICAL, false);
+        emojiPersonalRv.setLayoutManager(gridLayoutManager);
+        PLVLCEmotionPersonalListAdapter emotionListAdapter = new PLVLCEmotionPersonalListAdapter(emotionImages);
+        emojiPersonalRv.addItemDecoration(new PLVLCEmotionPersonalListAdapter.GridSpacingItemDecoration(spanCount, ConvertUtils.dp2px(10), true));
+
+        emotionListAdapter.setOnViewActionListener(actionListener);
+        emojiPersonalRv.setAdapter(emotionListAdapter);
+
     }
 
     // 删除表情

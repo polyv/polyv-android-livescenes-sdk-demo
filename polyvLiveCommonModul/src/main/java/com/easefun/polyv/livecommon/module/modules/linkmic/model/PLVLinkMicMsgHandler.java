@@ -13,6 +13,7 @@ import com.plv.linkmic.model.PLVLinkMicSwitchViewEvent;
 import com.plv.linkmic.model.PLVMicphoneStatus;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.chat.PLVSendCupEvent;
+import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 
 import java.util.ArrayList;
@@ -222,6 +223,15 @@ public class PLVLinkMicMsgHandler {
                     onLinkMicDataListener.onFinishClass();
                 }
                 break;
+            case PLVEventConstant.Ppt.ON_SLICE_ID_EVENT:
+                PLVOnSliceIDEvent sliceIDEvent = PLVGsonUtil.fromJson(PLVOnSliceIDEvent.class, message);
+                if(sliceIDEvent == null || sliceIDEvent.getData() == null){
+                    break;
+                }
+                for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                    onLinkMicDataListener.onLinkMicConnectMode(sliceIDEvent.getData().getAvConnectMode());
+                }
+                break;
             default:
                 break;
         }
@@ -303,6 +313,11 @@ public class PLVLinkMicMsgHandler {
          * 讲师下课
          */
         void onFinishClass();
+
+        /**
+         * 连麦音视频模式，可实现如全体静音等
+         */
+        void onLinkMicConnectMode(String avConnectMode);
     }
     // </editor-fold>
 
@@ -365,6 +380,11 @@ public class PLVLinkMicMsgHandler {
 
         @Override
         public void onFinishClass() {
+
+        }
+
+        @Override
+        public void onLinkMicConnectMode(String avConnectMode) {
 
         }
     }

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -461,6 +462,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 holder.renderView.setVisibility(View.VISIBLE);
             }
         }
+
+        //网络质量
+        if (linkMicId.equals(myLinkMicId)) {
+            holder.qualityWidget.setVisibility(View.VISIBLE);
+        } else {
+            holder.qualityWidget.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -507,6 +515,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                     //更新网络质量
                     if (linkMicId.equals(myLinkMicId)) {
                         //netQuality
+                        holder.qualityWidget.setNetQuality(netQuality);
                     }
                     break;
                 default:
@@ -689,6 +698,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private SurfaceView renderView;
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         private PLVRoundRectLayout roundRectLayout;
+        private PLVLSNetworkQualityWidget qualityWidget;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -703,6 +713,13 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             ivMicState = itemView.findViewById(R.id.plvlc_link_mic_iv_mic_state);
             roundRectLayout = itemView.findViewById(R.id.plvlc_linkmic_item_round_rect_layout);
             switchViewAnchorLayout = itemView.findViewById(R.id.plvlc_linkmic_switch_anchor_item);
+            qualityWidget = itemView.findViewById(R.id.plvlc_link_mic_net_quality_view);
+            qualityWidget.shouldShowNoNetworkHint(false);
+            qualityWidget.setNetQualityRes(
+                    R.drawable.plv_network_signal_watcher_good,
+                    R.drawable.plv_network_signal_watcher_middle,
+                    R.drawable.plv_network_signal_watcher_poor
+            );
         }
     }
     // </editor-fold>

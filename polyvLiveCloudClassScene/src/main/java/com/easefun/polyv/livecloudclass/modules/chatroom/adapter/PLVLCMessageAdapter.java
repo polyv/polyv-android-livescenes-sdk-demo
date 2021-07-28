@@ -57,6 +57,7 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             case PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK:
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ:
             case PLVChatMessageItemType.ITEMTYPE_SEND_QUIZ:
+            case PLVChatMessageItemType.ITEMTYPE_EMOTION:
                 viewHolder = new PLVLCMessageViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_message_landscape_item : R.layout.plvlc_chatroom_message_portrait_item, parent, false), this);
                 break;
