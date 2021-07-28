@@ -7,7 +7,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -43,6 +46,7 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.enums.PLVLSPptV
 import com.easefun.polyv.livestreamer.modules.document.popuplist.holder.PLVLSPptListViewHolder;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSDocumentDeleteArrow;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -60,7 +64,7 @@ import io.reactivex.functions.Consumer;
 
 /**
  * PPT文档和PPT页面列表选择弹层布局
- * 弹层布局请勿直接在布局文件引入，请通过{@link #open()}方法显示弹层
+ * 弹层布局请勿直接在布局文件引入，请通过{@link #open(boolean)}方法显示弹层
  *
  * @author suhongtao
  */
@@ -83,6 +87,7 @@ public class PLVLSPptListLayout extends FrameLayout {
     private ImageView plvlsDocumentListBackIv;
     private TextView plvlsDocumentNameTv;
     private TextView plvlsDocumentPageTv;
+    private TextView plvlsDocumentRefreshTv;
     private View plvlsDocumentSeparatorView;
     private RecyclerView plvlsDocumentPptRv;
     private PLVTriangleIndicateTextView plvlsDocumentBackIndicator;
@@ -175,6 +180,7 @@ public class PLVLSPptListLayout extends FrameLayout {
         initPptUploadAgainConfirmDialog();
         initDocumentUploadListener();
         initOnClickBackListener();
+        initOnClickRefreshListener();
         PLVBlurUtils.initBlurView(plvlsBlurView);
 
         initMvpView();
@@ -185,6 +191,7 @@ public class PLVLSPptListLayout extends FrameLayout {
         plvlsDocumentListBackIv = (ImageView) rootView.findViewById(R.id.plvls_document_list_back_iv);
         plvlsDocumentNameTv = (TextView) rootView.findViewById(R.id.plvls_document_name_tv);
         plvlsDocumentPageTv = (TextView) rootView.findViewById(R.id.plvls_document_page_tv);
+        plvlsDocumentRefreshTv = (TextView) rootView.findViewById(R.id.plvls_document_refresh_tv);
         plvlsDocumentSeparatorView = (View) rootView.findViewById(R.id.plvls_document_separator_view);
         plvlsDocumentPptRv = (RecyclerView) rootView.findViewById(R.id.plvls_document_ppt_rv);
         plvlsDocumentBackIndicator = (PLVTriangleIndicateTextView) rootView.findViewById(R.id.plvls_document_back_indicator);
@@ -310,6 +317,18 @@ public class PLVLSPptListLayout extends FrameLayout {
                 showViewType = PLVLSPptViewType.COVER;
                 updatePptCoverViewContent();
                 requestUpdateData();
+            }
+        });
+    }
+
+    /**
+     * 初始化刷新按钮点击监听
+     */
+    private void initOnClickRefreshListener() {
+        plvlsDocumentRefreshTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
             }
         });
     }
@@ -676,7 +695,10 @@ public class PLVLSPptListLayout extends FrameLayout {
     /**
      * 打开弹层
      */
-    public void open() {
+    public void open(boolean refresh) {
+        if(refresh){
+            PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
+        }
         final int landscapeHeight = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         if (menuDrawer == null) {
             // 弹层初始化
@@ -785,8 +807,15 @@ public class PLVLSPptListLayout extends FrameLayout {
         showViewType = PLVLSPptViewType.COVER;
         plvlsDocumentListBackIv.setVisibility(GONE);
         plvlsDocumentBackIndicator.setVisibility(GONE);
-        plvlsDocumentNameTv.setText("所有文档");
-        plvlsDocumentPageTv.setText("共" + mergedCoverList.size() + "个");
+        plvlsDocumentPageTv.setVisibility(GONE);
+        plvlsDocumentRefreshTv.setVisibility(VISIBLE);
+
+        String name = String.format("所有文档 共%s个", mergedCoverList.size());
+        SpannableString spannableString = new SpannableString(name);
+        spannableString.setSpan(new AbsoluteSizeSpan(ConvertUtils.sp2px(12f)),
+                name.lastIndexOf("共"), name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        plvlsDocumentNameTv.setText(spannableString);
         pptListAdapter.setCurrentSelectedId(currentAutoId);
         pptListAdapter.updatePptList(mergedCoverList, PLVLSPptViewType.COVER);
         plvlsDocumentPptRv.scrollToPosition(currentAutoId);
@@ -798,6 +827,9 @@ public class PLVLSPptListLayout extends FrameLayout {
     private void updatePptPageViewContent() {
         showViewType = PLVLSPptViewType.PAGE;
         plvlsDocumentListBackIv.setVisibility(VISIBLE);
+        plvlsDocumentPageTv.setVisibility(VISIBLE);
+        plvlsDocumentRefreshTv.setVisibility(GONE);
+
         if (lastPptName == null) {
             plvlsDocumentNameTv.setText("");
         } else {

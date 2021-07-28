@@ -9,11 +9,13 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView;
+import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -58,7 +60,12 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     //严禁词触发的提示图标
     private ImageView prohibitedWordTipsIv;
 
+    //图片发送失败（审核不通过
+    private View failedImageItemLl;
+    private ImageView failedImageTipIv;
+
     //横/竖屏图片信息
+    private View imgMessageItem;
     private ImageView imgMessageIv;
     //横/竖图片加载进度
     private ProgressBar imgLoadingView;
@@ -77,6 +84,9 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         quoteChatMsgTv = (GifSpanTextView) findViewById(R.id.quote_chat_msg_tv);
         quoteChatNickTv = (TextView) findViewById(R.id.quote_chat_nick_tv);
         prohibitedWordTipsIv = findViewById(R.id.prohibited_word_tips_iv);
+        imgMessageItem = findViewById(R.id.chat_image_item_fl);
+        failedImageItemLl = findViewById(R.id.failed_image_ll);
+        failedImageTipIv = findViewById(R.id.failed_image_tips_iv);
         //common item
         imgMessageIv = (ImageView) findViewById(R.id.img_message_iv);
         imgLoadingView = (ProgressBar) findViewById(R.id.img_loading_view);
@@ -129,6 +139,19 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     int[] location = new int[2];
                     itemView.getLocationInWindow(location);
                     new PLVLSChatMsgTipsWindow(v).show(v, msg, location[0], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+                }
+            });
+        }
+        if(failedImageTipIv != null){
+            failedImageTipIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (localImgStatus == PolyvSendLocalImgEvent.SENDSTATUS_FAIL) {
+                        String msg = localImgFailMessage+"";
+                        int[] location = new int[2];
+                        itemView.getLocationInWindow(location);
+                        new PLVLSChatMsgTipsWindow(v).show(v, msg, location[0], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+                    }
                 }
             });
         }
@@ -247,6 +270,27 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.VISIBLE);
                         imgLoadingView.setProgress((int) (progress * 100));
                     }
+                }
+            }
+
+            @Override
+            public void onCheckFail(PolyvSendLocalImgEvent localImgEvent, Throwable t) {
+                //审核不通过
+                localImgEvent.setSendStatus(PolyvSendLocalImgEvent.SENDSTATUS_FAIL);
+                if (localImgEvent == messageData) {
+                    localImgStatus = localImgEvent.getSendStatus();
+                    localImgFailMessage = t.getMessage();
+                    ((PolyvSendLocalImgEvent) messageData).setObj1(localImgFailMessage);
+                    if (imgMessageItem != null) {
+                        imgMessageItem.setVisibility(View.GONE);
+                    }
+                    if(failedImageItemLl != null){
+                        failedImageItemLl.setVisibility(View.VISIBLE);
+                    }
+                    PLVToast.Builder.context(itemView.getContext())
+                            .setText("发送图片失败: " + t.getMessage())
+                            .build()
+                            .show();
                 }
             }
         });
@@ -397,6 +441,15 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
 
     // <editor-fold defaultstate="collapsed" desc="数据交互 - 设置图片信息">
     private void setImgMessage() {
+        if(isLocalChatImg){
+            if(failedImageItemLl != null && imgMessageIv != null){
+                if(localImgStatus == PolyvSendLocalImgEvent.SENDSTATUS_FAIL){
+                    failedImageItemLl.setVisibility(View.VISIBLE);
+                    imgMessageIv.setVisibility(View.GONE);
+                    return;
+                }
+            }
+        }
         if (chatImgUrl != null) {
             if (imgMessageIv != null) {
                 imgMessageIv.setVisibility(View.VISIBLE);

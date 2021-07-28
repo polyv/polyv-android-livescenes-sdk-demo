@@ -11,7 +11,7 @@
     android:paddingRight="16dp"
     android:paddingBottom="8dp">
 
-    <com.easefun.polyv.businesssdk.sub.gif.GifEditText
+    <com.easefun.polyv.livecommon.ui.widget.gif.GifEditText
         android:id="@+id/input_et"
         android:layout_width="0dp"
         android:layout_marginRight="8dp"

@@ -16,7 +16,7 @@
     android:paddingBottom="2.5dp">
 
     <!--显示被回复人发送的文本信息-->
-    <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+    <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
         android:id="@+id/quote_chat_msg_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,7 +52,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="#D3D3D3"
             android:scaleType="centerCrop"
             android:visibility="gone"
             app:radius_iv="4dp"
@@ -75,7 +74,7 @@
         android:layout_marginTop="1.5dp">
 
         <!--has emoji abutt top-->
-        <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+        <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
             android:id="@+id/chat_msg_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -116,6 +115,7 @@
             tools:visibility="visible" />
 
         <FrameLayout
+            android:id="@+id/chat_image_item_fl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp">
@@ -125,7 +125,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:background="#D3D3D3"
                 android:scaleType="centerCrop"
                 android:visibility="gone"
                 app:radius_iv="6dp"
@@ -148,5 +147,30 @@
                 app:cpv_progressStyle="FillInnerArc"
                 tools:visibility="visible" />
         </FrameLayout>
+
+        <!--        发送图片失败 -->
+        <LinearLayout
+            android:id="@+id/failed_image_ll"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/plvsa_chatroom_send_fail_img"/>
+
+            <ImageView
+                android:id="@+id/failed_image_tips_iv"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="right|bottom"
+                android:src="@drawable/plvsa_chatroom_send_fail_icon"
+                android:translationY="1.5dp"
+                android:layout_marginLeft="-8dp" />
+        </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

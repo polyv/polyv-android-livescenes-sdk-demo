@@ -61,6 +61,7 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             case PLVChatMessageItemType.ITEMTYPE_SEND_IMG:
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK:
             case PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK:
+            case PLVChatMessageItemType.ITEMTYPE_EMOTION:
                 viewHolder = new PLVSAMessageViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvsa_chatroom_message_item, parent, false), this);
                 break;

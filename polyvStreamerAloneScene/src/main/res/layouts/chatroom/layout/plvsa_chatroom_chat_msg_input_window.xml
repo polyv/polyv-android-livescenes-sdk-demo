@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/plvsa_chatroom_answer_user_content_tv"
             android:layout_marginTop="4dp"
-            android:background="#D3D3D3"
             android:scaleType="centerCrop"
             android:visibility="gone" />
 

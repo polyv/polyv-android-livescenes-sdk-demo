@@ -28,6 +28,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -260,6 +261,17 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
             if (viewIndex == chatroomPresenter.getViewIndex(chatroomView)) {
                 ToastUtils.showShort(getContext().getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
             }
+        }
+
+        @Override
+        public void onLoadEmotionMessage(@Nullable @org.jetbrains.annotations.Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if(emotionEvent == null){
+                return;
+            }
+            final List<PLVBaseViewData> dataList = new ArrayList<>();
+            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
+            addChatMessageToList(dataList, true);
         }
     };
 

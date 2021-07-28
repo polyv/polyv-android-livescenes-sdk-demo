@@ -30,13 +30,13 @@ android {
 
 dependencies {
     implementation 'com.android.support:design:27.1.1'
-    api 'net.polyv.android:polyvSDKLiveScenes:1.5.2'
+    api 'net.polyv.android:polyvSDKLiveScenes:1.5.3'
 
     //glide
     api ("com.github.bumptech.glide:okhttp3-integration:4.7.1"){
 //        exclude group:'com.github.bumptech.glide',module:'glide'
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-
-
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.23'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }

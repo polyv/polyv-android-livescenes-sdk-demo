@@ -35,7 +35,7 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
-import com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSNetworkQualityWidget;
+import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 
 import java.util.Locale;
 
@@ -463,7 +463,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             PLVDocumentPresenter.getInstance().changePptPage(lastOpenNotWhiteBoardAutoId, lastOpenNotWhiteBoardPageId);
         } else {
             if (pptListLayout != null) {
-                pptListLayout.open();
+                pptListLayout.open(true);
             }
         }
     }

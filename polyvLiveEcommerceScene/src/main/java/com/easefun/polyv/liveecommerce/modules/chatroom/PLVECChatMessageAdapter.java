@@ -108,6 +108,7 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                 break;
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG:
             case PLVChatMessageItemType.ITEMTYPE_SEND_IMG:
+            case PLVChatMessageItemType.ITEMTYPE_EMOTION:
                 viewHolder = new PLVECChatMessageImgViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_img_item, parent, false),
                         this

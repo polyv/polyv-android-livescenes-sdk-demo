@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPersonalListAdapter;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
@@ -41,6 +44,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
+import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
@@ -49,11 +53,13 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -74,6 +80,8 @@ import java.util.List;
  */
 public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private String TAG = getClass().getSimpleName();
+
     private static final int REQUEST_SELECT_IMG = 0x01;//选择图片请求标志
     private static final int REQUEST_OPEN_CAMERA = 0x02;//打开相机请求标志
     //聊天信息列表
@@ -110,8 +118,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private ViewGroup emojiLy;
     private TextView sendMsgTv;
     private ImageView deleteMsgIv;
-    //表情列表
+    //emoji表情列表
     private RecyclerView emojiRv;
+    //emoji表情tab
+    private ImageView tabEmojiIv;
+    private RecyclerView emojiPersonalRv;
+    //个性化表情tab
+    private ImageView tabPersonalIv;
+    //个性化表情预览弹窗
+    private PLVImagePreviewPopupWindow emotionPreviewWindow;
 
     //点赞布局
     private ViewGroup likesLy;
@@ -252,9 +267,22 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         sendMsgTv.setOnClickListener(this);
         deleteMsgIv = findViewById(R.id.delete_msg_iv);
         deleteMsgIv.setOnClickListener(this);
-        //表情列表
+        //emoji表情列表
         emojiRv = findViewById(R.id.emoji_rv);
         PLVChatroomUtils.initEmojiList(emojiRv, inputEt);
+        //个性表情列表
+        emojiPersonalRv = findViewById(R.id.emoji_personal_rv);
+        //获取表情列表
+        chatroomPresenter.getChatEmotionImages();
+        //表情tab
+        tabEmojiIv = findViewById(R.id.plvlc_emoji_tab_emoji_iv);
+        tabEmojiIv.setSelected(true);
+        tabEmojiIv.setOnClickListener(this);
+        tabPersonalIv = findViewById(R.id.plvlc_emoji_tab_personal_iv);
+        tabPersonalIv.setVisibility(View.VISIBLE);
+        tabPersonalIv.setOnClickListener(this);
+        //表情预览弹窗
+        emotionPreviewWindow = new PLVImagePreviewPopupWindow(getContext());
 
         //点赞布局
         likesLy = findViewById(R.id.likes_ly);
@@ -280,6 +308,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
         //观察聊天室功能开关数据
         observeFunctionSwitchData();
+        //观察聊天室个性表情更新
+        observeEmotionImages();
     }
     // </editor-fold>
 
@@ -389,6 +419,26 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
             dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag()));
+            if (!isShowKeyBoard(new OnceHideKeyBoardListener() {
+                @Override
+                public void call() {
+                    //添加信息至列表
+                    addChatMessageToList(dataList, true);//如果键盘还没完全隐藏，则等待键盘隐藏后再添加到列表中，避免出现列表布局动画问题
+                }
+            })) {
+                //添加信息至列表
+                addChatMessageToList(dataList, true);
+            }
+        }
+
+        @Override
+        public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if(emotionEvent == null){
+                return;
+            }
+            final List<PLVBaseViewData> dataList = new ArrayList<>();
+            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
             if (!isShowKeyBoard(new OnceHideKeyBoardListener() {
                 @Override
                 public void call() {
@@ -708,6 +758,31 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="切换表情TAB">
+    private void changeEmojiTab(boolean isEmoji){
+        tabEmojiIv.setSelected(isEmoji);
+        tabPersonalIv.setSelected(isEmoji);
+        int selectColor = Color.parseColor("#FF2B2C35");
+        int unSelectColor = Color.parseColor("#FF202127");
+        tabEmojiIv.setBackgroundColor(isEmoji ? selectColor : unSelectColor);
+        tabPersonalIv.setBackgroundColor(isEmoji ?  unSelectColor : selectColor);
+        //切换rv的表情库
+        if(isEmoji){
+            //显示emoji表情库
+            emojiRv.setVisibility(View.VISIBLE);
+            sendMsgTv.setVisibility(View.VISIBLE);
+            deleteMsgIv.setVisibility(View.VISIBLE);
+            emojiPersonalRv.setVisibility(View.INVISIBLE);
+        } else {
+            //显示个性表情包
+            emojiRv.setVisibility(View.INVISIBLE);
+            sendMsgTv.setVisibility(View.INVISIBLE);
+            deleteMsgIv.setVisibility(View.INVISIBLE);
+            emojiPersonalRv.setVisibility(View.VISIBLE);
+        }
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="旋转处理">
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -768,6 +843,49 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 个性表情">
+    private void observeEmotionImages(){
+        if(chatroomPresenter == null){
+            return;
+        }
+
+        chatroomPresenter.getData().getEmotionImages().observe(this, new Observer<List<PLVEmotionImageVO.EmotionImage>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVEmotionImageVO.EmotionImage> emotionImages) {
+                if (chatroomPresenter != null) {
+                    chatroomPresenter.getData().getEmotionImages().removeObserver(this);
+                }
+                //获取到图片表情，初始化
+                if(emotionImages != null && !emotionImages.isEmpty()){
+                    PLVChatroomUtils.initEmojiPersonalList(emojiPersonalRv, 5,emotionImages, new PLVLCEmotionPersonalListAdapter.OnViewActionListener() {
+                        @Override
+                        public void onEmotionViewClick(PLVEmotionImageVO.EmotionImage emotionImage) {
+                            if(chatroomPresenter != null){
+                                Pair<Boolean, Integer> sendResult = chatroomPresenter.sendChatEmotionImage(new PLVChatEmotionEvent(emotionImage.getId()));
+
+                                if (!sendResult.first) {
+                                    //发送失败
+                                    ToastUtils.showShort(getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second);
+                                } else {
+                                    //发送成功
+                                    hideSoftInputAndPopupLayout();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onEmotionViewLongClick(PLVEmotionImageVO.EmotionImage emotionImage, View view) {
+                            emotionPreviewWindow.showInTopCenter(emotionImage.getUrl(), view);
+                        }
+                    });
+                } else {
+                    Log.e(TAG, "emotionImages is null or empty");
+                }
+            }
+        });
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
@@ -800,6 +918,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 chatroomPresenter.sendLikeMessage();
             }
             acceptLikesMessage(1);
+        } else if(id == R.id.plvlc_emoji_tab_emoji_iv){
+            changeEmojiTab(true);
+        } else if(id == R.id.plvlc_emoji_tab_personal_iv){
+            changeEmojiTab(false);
         }
     }
     // </editor-fold>

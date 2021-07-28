@@ -52,6 +52,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -464,6 +465,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 swipeLoadView.setEnabled(true);
             }
             ToastUtils.showShort(getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
+        }
+
+        @Override
+        public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if (emotionEvent != null) {
+                //添加信息至列表
+                List<PLVBaseViewData> dataList = new ArrayList<>();
+                dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION));
+                addChatMessageToList(dataList, true);
+            }
         }
     };
     // </editor-fold>

@@ -9,6 +9,6 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:scaleType="centerInside"
-        android:src="@drawable/polyv_1" />
+        android:src="@drawable/polyv_101" />
 
 </LinearLayout>
