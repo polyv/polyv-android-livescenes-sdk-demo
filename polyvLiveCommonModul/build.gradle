@@ -26,7 +26,7 @@ android {
 dependencies {
     implementation 'com.android.support:design:27.1.1'
     // 注意1.4.1起依赖的groupId已经变更，请整个依赖复制粘贴修改，勿只修改版本号
-    api ('net.polyv.android:polyvSDKLiveScenes:1.4.1')
+    api ('net.polyv.android:polyvSDKLiveScenes:1.4.1-fix1')
     //glide
     api ("com.github.bumptech.glide:okhttp3-integration:4.7.1"){
 //        exclude group:'com.github.bumptech.glide',module:'glide'
