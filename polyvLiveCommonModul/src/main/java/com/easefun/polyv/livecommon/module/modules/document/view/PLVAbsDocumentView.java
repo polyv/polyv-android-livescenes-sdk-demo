@@ -10,6 +10,7 @@ import com.easefun.polyv.livecommon.module.modules.document.model.vo.PLVPptUploa
 import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 
 import java.util.List;
 
@@ -43,6 +44,11 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
 
     @Override
     public void onPptPageChange(int autoId, int pageId) {
+        // Not implemented.
+    }
+
+    @Override
+    public void onPptStatusChange(PLVSPPTStatus pptStatus) {
         // Not implemented.
     }
 

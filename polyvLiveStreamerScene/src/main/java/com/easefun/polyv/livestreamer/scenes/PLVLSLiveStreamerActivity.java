@@ -27,7 +27,6 @@ import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentContr
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
-import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
  * 手机开播三分屏场景界面。
@@ -37,13 +36,15 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
     // 参数 - 定义进入页面所需参数
-    private static final String EXTRA_CHANNEL_ID = "channelId"; // 频道号
-    private static final String EXTRA_VIEWER_ID = "viewerId";   // 开播者Id
-    private static final String EXTRA_VIEWER_NAME = "viewerName";   // 开播者昵称
-    private static final String EXTRA_AVATAR_URL = "avatarUrl"; // 开播者头像url
-    private static final String EXTRA_ACTOR = "actor";  // 开播者头衔
-    private static final String EXTRA_IS_OPEN_MIC = "isOpenMic";    // 麦克风开关
-    private static final String EXTRA_IS_OPEN_CAMERA = "isOpenCamera";  // 摄像头开关
+    private static final String EXTRA_CHANNEL_ID = "channelId";             // 频道号
+    private static final String EXTRA_VIEWER_ID = "viewerId";               // 开播者Id
+    private static final String EXTRA_VIEWER_NAME = "viewerName";           // 开播者昵称
+    private static final String EXTRA_AVATAR_URL = "avatarUrl";             // 开播者头像url
+    private static final String EXTRA_ACTOR = "actor";                      // 开播者头衔
+    private static final String EXTRA_USERTYPE = "usertype";                // 开播者角色
+    private static final String EXTRA_COLIN_MIC_TYPE = "colinMicType";      // 嘉宾连麦类型
+    private static final String EXTRA_IS_OPEN_MIC = "isOpenMic";            // 麦克风开关
+    private static final String EXTRA_IS_OPEN_CAMERA = "isOpenCamera";      // 摄像头开关
     private static final String EXTRA_IS_FRONT_CAMERA = "isFrontCamera";    // 摄像头方向
 
     // 直播间数据管理器，每个业务初始化所需的参数
@@ -83,6 +84,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                                                  @NonNull String viewerName,
                                                  @NonNull String avatarUrl,
                                                  @NonNull String actor,
+                                                 @NonNull String usertype,
+                                                 @NonNull String colinMicType,
                                                  boolean isOpenMic,
                                                  boolean isOpenCamera,
                                                  boolean isFrontCamera) {
@@ -104,6 +107,12 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if (TextUtils.isEmpty(actor)) {
             return PLVLaunchResult.error("actor 为空，启动手机开播三分屏页失败！");
         }
+        if (TextUtils.isEmpty(usertype)) {
+            return PLVLaunchResult.error("usertype 为空，启动手机开播三分屏页失败！");
+        }
+        if (TextUtils.isEmpty(colinMicType)) {
+            return PLVLaunchResult.error("colinMicType 为空，启动手机开播三分屏页失败！");
+        }
 
         Intent intent = new Intent(activity, PLVLSLiveStreamerActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
@@ -111,6 +120,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_AVATAR_URL, avatarUrl);
         intent.putExtra(EXTRA_ACTOR, actor);
+        intent.putExtra(EXTRA_USERTYPE, usertype);
+        intent.putExtra(EXTRA_COLIN_MIC_TYPE, colinMicType);
         intent.putExtra(EXTRA_IS_OPEN_MIC, isOpenMic);
         intent.putExtra(EXTRA_IS_OPEN_CAMERA, isOpenCamera);
         intent.putExtra(EXTRA_IS_FRONT_CAMERA, isFrontCamera);
@@ -199,10 +210,13 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
         String avatarUrl = intent.getStringExtra(EXTRA_AVATAR_URL);
         String actor = intent.getStringExtra(EXTRA_ACTOR);
+        String role = intent.getStringExtra(EXTRA_USERTYPE);
+        String colinMicType = intent.getStringExtra(EXTRA_COLIN_MIC_TYPE);
 
         // 设置Config数据
-        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, PLVSocketUserConstant.USERTYPE_TEACHER, actor);
+        PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, role, actor);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
+        PLVLiveChannelConfigFiller.setColinMicType(colinMicType);
     }
     // </editor-fold>
 
@@ -245,6 +259,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
         // 初始化文档布局
         plvlsDocumentLy.init(liveRoomDataManager);
+        plvlsStreamerLy.getStreamerPresenter().registerView(plvlsDocumentLy.getDocumentLayoutStreamerView());
 
         // 进入横屏模式
         PLVScreenUtils.enterLandscape(this);

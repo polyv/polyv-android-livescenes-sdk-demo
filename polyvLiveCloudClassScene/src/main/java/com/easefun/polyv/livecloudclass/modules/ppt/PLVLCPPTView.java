@@ -15,7 +15,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTVodProcessor;
 import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView;
 import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
@@ -42,7 +42,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     //View
     @Nullable
     private PolyvPPTWebView pptWebView;
-    private PLVLCPlaceHolderView pptPlaceHolderView;
+    private PLVPlaceHolderView pptPlaceHolderView;
 
     //Listener
     private OnPLVLCLivePPTViewListener onLivePPTViewListener;

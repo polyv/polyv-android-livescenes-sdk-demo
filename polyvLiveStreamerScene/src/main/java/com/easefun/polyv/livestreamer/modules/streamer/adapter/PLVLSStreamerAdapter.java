@@ -27,8 +27,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVLSStreamerAdapter";
 
-    public static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
-    public static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
+    private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
+    private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
+    private static final String PAYLOAD_UPDATE_GUEST_STATUS = "updateGuestStatus";
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -102,6 +103,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
         String actor = itemDataBean.getActor();
+        String status = itemDataBean.getStatus();
 
         //昵称
         StringBuilder nickString = new StringBuilder();
@@ -141,6 +143,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             localRenderView = holder.renderView;
         }
 
+        updateGuestViewStatus(holder, itemDataBean);
+
         //设置点击事件监听器
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +167,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
+        String status = itemDataBean.getStatus();
 
         //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
         if (isAudioLinkMic && !isTeacher && !isGuest) {
@@ -204,6 +209,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 case PAYLOAD_UPDATE_VIDEO_MUTE:
                     //是否关闭摄像头
                     bindVideoMute(holder, isMuteVideo, linkMicId);
+                    break;
+                case PAYLOAD_UPDATE_GUEST_STATUS:
+                    updateGuestViewStatus(holder, itemDataBean);
                     break;
                 default:
                     break;
@@ -258,6 +266,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_VOLUME);
     }
 
+    //更新嘉宾状态
+    public void updateGuestStatus(int pos) {
+        notifyItemChanged(pos, PAYLOAD_UPDATE_GUEST_STATUS);
+    }
+
     //更新所有item
     public void updateAllItem() {
         notifyDataSetChanged();
@@ -289,6 +302,22 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             }
         }
     }
+
+    //更新嘉宾状态
+    private void updateGuestViewStatus(StreamerItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean) {
+        if (itemDataBean.isGuest()&&myLinkMicId.equals(itemDataBean.getLinkMicId())) {
+            holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.VISIBLE);
+            if (PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(itemDataBean.getStatus())) {
+                holder.plvsStreamerGuestLinkStatusTv.setText("连麦中");
+                holder.plvsStreamerGuestLinkStatusTv.setSelected(true);
+            } else {
+                holder.plvsStreamerGuestLinkStatusTv.setText("未连麦");
+                holder.plvsStreamerGuestLinkStatusTv.setSelected(false);
+            }
+        } else {
+            holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.GONE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -307,6 +336,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         @Nullable
         private SurfaceView renderView;
         private PLVRoundRectLayout roundRectLayout;
+        private TextView plvsStreamerGuestLinkStatusTv;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -318,6 +348,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerRenderViewContainer = itemView.findViewById(R.id.plvls_streamer_render_view_container);
             plvlsStreamerMicStateIv = itemView.findViewById(R.id.plvls_streamer_mic_state_iv);
             plvlsStreamerNickTv = itemView.findViewById(R.id.plvls_streamer_nick_tv);
+            plvsStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvls_streamer_guest_link_status_tv);
         }
     }
     // </editor-fold>

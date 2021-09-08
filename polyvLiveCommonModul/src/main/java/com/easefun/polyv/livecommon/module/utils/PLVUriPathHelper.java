@@ -201,8 +201,12 @@ public class PLVUriPathHelper {
                 return cursor.getString(column_index);
             }
         } catch (Exception e) {
-            String path = getFilePathFromURI(context, uri);
-            return !TextUtils.isEmpty(path) ? path : getFilePathForN(uri, context);
+            try {
+                String path = getFilePathFromURI(context, uri);
+                return !TextUtils.isEmpty(path) ? path : getFilePathForN(uri, context);
+            } catch (Exception e2) {
+
+            }
         } finally {
             if (cursor != null)
                 cursor.close();

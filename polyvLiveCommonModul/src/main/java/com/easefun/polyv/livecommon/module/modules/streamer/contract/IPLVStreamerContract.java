@@ -164,6 +164,21 @@ public interface IPLVStreamerContract {
          * @param uid 连麦的id
          */
         void onUserRequest(String uid);
+
+        /**
+         * 直播状态改变
+         */
+        void onStreamLiveStatusChanged(boolean isLive);
+
+        /**
+         * 嘉宾RTC状态改变
+         */
+        void onGuestRTCStatusChanged(int pos);
+
+        /**
+         * 嘉宾多媒体状态改变
+         */
+        void onGuestMediaStatusChanged(int pos);
     }
     // </editor-fold>
 
@@ -261,6 +276,7 @@ public interface IPLVStreamerContract {
 
         /**
          * 设置混流画面布局类型
+         *
          * @param mixLayoutType 混流布局类型
          */
         void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);

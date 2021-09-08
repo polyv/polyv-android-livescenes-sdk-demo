@@ -100,6 +100,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+    private long lastTimeClickFrontCameraControl = 0;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -321,7 +322,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         chatroomPresenter.sendChatImage(imgEvent);
     }
 
-    private Pair<Boolean, Integer> sendChatEmotion(PLVChatEmotionEvent emotionEvent){
+    private Pair<Boolean, Integer> sendChatEmotion(PLVChatEmotionEvent emotionEvent) {
         return chatroomPresenter.sendChatEmotionImage(emotionEvent);
     }
     // </editor-fold>
@@ -445,7 +446,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         @Override
         public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
             super.onLoadEmotionMessage(emotionEvent);
-            if(emotionEvent == null){
+            if (emotionEvent == null) {
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
@@ -609,9 +610,14 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             }
         } else if (id == R.id.plvls_chatroom_toolbar_front_camera_control_iv) {
             if (!v.isSelected()) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onFrontCameraControl(v.getTag() != null);
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastTimeClickFrontCameraControl > 1000) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onFrontCameraControl(v.getTag() != null);
+                    }
+                    lastTimeClickFrontCameraControl = currentTime;
                 }
+
             }
         } else if (id == R.id.plvls_chatroom_toolbar_open_input_window_tv) {
             PLVLSChatMsgInputWindow.show(((Activity) getContext()), PLVLSChatMsgInputWindow.class, new PLVLSChatMsgInputWindow.MessageSendListener() {
@@ -641,8 +647,8 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 表情">
-    private void initChatroomEmotion(){
-        if(chatroomPresenter == null){
+    private void initChatroomEmotion() {
+        if (chatroomPresenter == null) {
             return;
         }
         //加载个性表情
@@ -653,7 +659,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 if (chatroomPresenter != null) {
                     chatroomPresenter.getData().getEmotionImages().removeObserver(this);
                 }
-                if(emotionImageList != null && !emotionImageList.isEmpty()){
+                if (emotionImageList != null && !emotionImageList.isEmpty()) {
                     PLVFaceManager.getInstance().initEmotionList(emotionImageList);
                 } else {
                     Log.e(getClass().getSimpleName(), "emotionImages is null or empty");

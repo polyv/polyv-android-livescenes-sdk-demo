@@ -18,7 +18,6 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
-import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -42,6 +41,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
 
     //data
     private String linkMicUid;
+    private boolean isGuestAutoLinkMic;
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -88,6 +88,12 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="初始化数据">
+    public void init(boolean isGuestAutoLinkMic) {
+        this.isGuestAutoLinkMic = isGuestAutoLinkMic;
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="API">
     public void bindViewData(PLVLinkMicItemDataBean linkMicItemDataBean) {
         if (linkMicItemDataBean == null) {
@@ -126,7 +132,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
         plvsaStreamerCameraIv.setSelected(linkMicItemDataBean.isMuteVideo());
         plvsaStreamerMicIv.setSelected(linkMicItemDataBean.isMuteAudio());
         //下麦按钮
-        if (PLVSStreamerInnerDataTransfer.getInstance().isAutoLinkToGuest() && linkMicItemDataBean.isGuest()) {
+        if (isGuestAutoLinkMic && linkMicItemDataBean.isGuest()) {
             plvsaStreamerDownLinkmicIv.setVisibility(View.GONE);
             plvsaStreamerDownLinkmicTv.setVisibility(View.GONE);
         } else {

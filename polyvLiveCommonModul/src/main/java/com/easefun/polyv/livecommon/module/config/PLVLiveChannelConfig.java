@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.feature.login.model.PLVSLoginVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -48,6 +49,11 @@ public class PLVLiveChannelConfig {
      */
     private String channelName;
 
+    /**
+     * 嘉宾连麦类型
+     */
+    private String colinMicType;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
@@ -62,6 +68,7 @@ public class PLVLiveChannelConfig {
         isLive = old.isLive;
         channelType = old.channelType;
         channelName = old.channelName;
+        colinMicType = old.colinMicType;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -151,6 +158,14 @@ public class PLVLiveChannelConfig {
     public void setChannelType(PolyvLiveChannelType channelType) {
         this.channelType = channelType;
     }
+
+    /**
+     * 设置嘉宾连麦类型
+     * @param colinMicType 嘉宾连麦类型
+     */
+    public void setColinMicType(String colinMicType) {
+        this.colinMicType = colinMicType;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -195,6 +210,11 @@ public class PLVLiveChannelConfig {
     //是否是纯视频频道类型
     public boolean isAloneChannelType() {
         return channelType == PolyvLiveChannelType.ALONE;
+    }
+
+    //嘉宾是否是自动上麦
+    public boolean isAutoLinkToGuest() {
+        return TextUtils.isEmpty(colinMicType) || PLVSLoginVO.COLINMICTYPE_AUTO.equals(colinMicType);
     }
     // </editor-fold>
 

@@ -1,9 +1,16 @@
 package com.easefun.polyv.livecommon.module.utils.document;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.webkit.MimeTypeMap;
+
+import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PLVFileChooseUtils {
 
@@ -23,8 +30,23 @@ public class PLVFileChooseUtils {
         activity.startActivityForResult(intent, requestCode);
     }
 
-    public static void chooseFile(Activity activity, int requestCode) {
-        openDirChooseFile(activity, requestCode, SUPPORT_FILE_MIME_TYPES);
+    public static void chooseFile(final Activity activity, final int requestCode) {
+        List<String> permissions = new ArrayList<>();
+        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        PLVFastPermission.getInstance().start(activity, permissions,
+                new PLVOnPermissionCallback() {
+                    @Override
+                    public void onAllGranted() {
+                        openDirChooseFile(activity, requestCode, SUPPORT_FILE_MIME_TYPES);
+                    }
+
+                    @Override
+                    public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+
+                    }
+                });
     }
 
     public static boolean isSupportMimeType(String mimeType) {

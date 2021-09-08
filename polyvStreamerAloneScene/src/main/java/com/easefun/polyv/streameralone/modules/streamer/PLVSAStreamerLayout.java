@@ -91,8 +91,20 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             ((SimpleItemAnimator) rvAnimator).setSupportsChangeAnimations(false);
         }
 
+        //启动前台服务，防止在后台被杀
+        PLVSAForegroundService.startService();
+        //防止自动息屏、锁屏
+        setKeepScreenOn(true);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSAStreamerLayout定义的方法">
+    @Override
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+
         //init adapter
-        streamerAdapter = new PLVSAStreamerAdapter(plvsaStreamerRv, new PLVSAStreamerAdapter.OnStreamerAdapterCallback() {
+        streamerAdapter = new PLVSAStreamerAdapter(plvsaStreamerRv, liveRoomDataManager, new PLVSAStreamerAdapter.OnStreamerAdapterCallback() {
             @Override
             public SurfaceView createLinkMicRenderView() {
                 return streamerPresenter.createRenderView(Utils.getApp());
@@ -129,18 +141,6 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                 }
             }
         });
-
-        //启动前台服务，防止在后台被杀
-        PLVSAForegroundService.startService();
-        //防止自动息屏、锁屏
-        setKeepScreenOn(true);
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSAStreamerLayout定义的方法">
-    @Override
-    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
-        this.liveRoomDataManager = liveRoomDataManager;
 
         streamerPresenter = new PLVStreamerPresenter(liveRoomDataManager);
         streamerPresenter.registerView(streamerView);

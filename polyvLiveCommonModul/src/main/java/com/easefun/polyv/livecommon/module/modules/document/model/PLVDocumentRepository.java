@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livescenes.document.PLVDocumentDataManager;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
@@ -20,7 +21,14 @@ import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadSDKInitErrorListener;
 import com.easefun.polyv.livescenes.upload.manager.PLVSDocumentUploadManagerFactory;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
+import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.net.PLVrResponseCallback;
+import com.plv.livescenes.document.PLVDocumentWebProcessor;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.impl.PLVSocketMessageObserver;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -41,9 +49,12 @@ public class PLVDocumentRepository {
     // WebProcessor 弱引用
     private WeakReference<PLVSDocumentWebProcessor> documentWebProcessorWeakReference;
 
+    private PLVSocketMessageObserver.OnMessageListener onMessageListener;
+
     // PPT文档上传管理器
     @Nullable
     private IPLVSDocumentUploadManager documentUploadManager;
+    private IPLVLiveRoomDataManager liveRoomDataManager;
 
     // 数据 - PPT文档列表变更
     private final MutableLiveData<PLVStatefulData<PLVSPPTInfo>> plvsPptInfoLiveData = new MutableLiveData<>();
@@ -85,9 +96,34 @@ public class PLVDocumentRepository {
     /**
      * 初始化方法
      */
-    public void init() {
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager=liveRoomDataManager;
+        initMsgListener();
         initWebProcessor();
         initDocumentUploadManager();
+    }
+
+    private void initMsgListener() {
+        //嘉宾要监听讲师端发送过来的ppt的socket消息。后续讲师也要监听其他被授权的嘉宾或者观众操作ppt的socket消息
+        if (liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)){
+            onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
+                @Override
+                public void onMessage(String listenEvent, String event, String message) {
+                    if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event) ||
+                            PLVEventConstant.Ppt.ON_SLICE_DRAW_EVENT.equals(event) ||
+                            PLVEventConstant.Ppt.ON_SLICE_CONTROL_EVENT.equals(event) ||
+                            PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
+                            PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
+                        PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
+                        PLVDocumentWebProcessor webProcessor = documentWebProcessorWeakReference.get();
+                        if (webProcessor != null) {
+                            webProcessor.getWebview().callMessage(PLVLivePPTProcessor.UPDATE_PPT, message);
+                        }
+                    }
+                }
+            };
+            PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
+        }
     }
 
     /**
@@ -158,6 +194,7 @@ public class PLVDocumentRepository {
      * @param message
      */
     public void sendWebMessage(String event, String message) {
+        PLVCommonLog.d(TAG,"event="+event+" msg="+message);
         PLVSDocumentWebProcessor webProcessor = documentWebProcessorWeakReference.get();
         if (webProcessor == null) {
             return;
@@ -233,9 +270,9 @@ public class PLVDocumentRepository {
     /**
      * 上传PPT文档
      *
-     * @param context context
-     * @param file 需要上传的文件
-     * @param type 转码类型 {@link com.easefun.polyv.livescenes.upload.PLVSDocumentUploadConstant.PPTConvertType}
+     * @param context  context
+     * @param file     需要上传的文件
+     * @param type     转码类型 {@link com.easefun.polyv.livescenes.upload.PLVSDocumentUploadConstant.PPTConvertType}
      * @param listener 上传监听回调
      */
     public void uploadPptFile(final Context context, final File file, final String type, final OnPLVSDocumentUploadListener listener) {
@@ -342,6 +379,7 @@ public class PLVDocumentRepository {
      * 销毁方法
      */
     public void destroy() {
+        PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
         if (documentUploadManager != null) {
             documentUploadManager.destroy();
             documentUploadManager = null;

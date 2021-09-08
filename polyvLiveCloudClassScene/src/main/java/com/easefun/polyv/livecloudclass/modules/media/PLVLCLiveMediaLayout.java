@@ -44,7 +44,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeView;
-import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -114,7 +114,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     //播放器缓冲显示的view
     private PLVLCVideoLoadingLayout loadingView;
     //当前没有直播显示的view
-    private PLVLCPlaceHolderView noStreamView;
+    private PLVPlaceHolderView noStreamView;
     //直播停止时显示的view
     private View stopStreamView;
 
@@ -202,7 +202,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
 
         // 底部占位图
-        PLVLCPlaceHolderView placeHolderView = new PLVLCPlaceHolderView(getContext());
+        PLVPlaceHolderView placeHolderView = new PLVPlaceHolderView(getContext());
         placeHolderView.setVisibility(VISIBLE);
         placeHolderView.setPlaceHolderText("");
         addView(placeHolderView, 0);

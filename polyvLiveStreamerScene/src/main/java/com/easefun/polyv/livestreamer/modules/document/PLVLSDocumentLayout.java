@@ -18,16 +18,23 @@ import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocum
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMode;
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
+import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentInputWidget;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 文档布局
@@ -41,6 +48,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     private PLVSDocumentWebView plvlsDocumentWebView;
     private PLVLSDocumentControllerLayout plvlsDocumentControllerLayout;
     private FrameLayout plvlsDocumentNoSelectPptLayout;
+    private PLVPlaceHolderView plvlsPlaceHolderView;
 
     // 标注工具文本输入模式 输入弹窗
     private PLVLSDocumentInputWidget plvlsDocumentInputWidget;
@@ -99,6 +107,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         plvlsDocumentWebView = (PLVSDocumentWebView) rootView.findViewById(R.id.plvls_document_web_view);
         plvlsDocumentControllerLayout = (PLVLSDocumentControllerLayout) rootView.findViewById(R.id.plvls_document_controller_layout);
         plvlsDocumentNoSelectPptLayout = (FrameLayout) rootView.findViewById(R.id.plvls_document_no_select_ppt_layout);
+        plvlsPlaceHolderView = rootView.findViewById(R.id.plvls_document_placeholder_view);
     }
 
     /**
@@ -188,6 +197,14 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         initPresenter();
         initDocumentController();
 
+        //初始化占位图文案
+        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
+            plvlsPlaceHolderView.setPlaceHolderText(getContext().getString(R.string.document_no_live_please_wait));
+            plvlsPlaceHolderView.enableRespondLocationSensor(false);
+            plvlsPlaceHolderView.setVisibility(VISIBLE);
+            plvlsDocumentWebView.setNeedGestureAction(false);
+        }
+
         // 进入时默认是白板状态
         PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
     }
@@ -216,7 +233,11 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         // 初次进入初始化标注工具类型和颜色
         plvlsDocumentControllerLayout.initMarkToolAndColor();
         // 初次进入显示控制栏
-        plvlsDocumentControllerLayout.show();
+        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())){
+            plvlsDocumentControllerLayout.showByGuest();
+        }else {
+            plvlsDocumentControllerLayout.show();
+        }
 
         plvlsDocumentControllerLayout.setOnChangeColorListener(new PLVLSDocumentControllerLayout.OnChangeColorListener() {
             @Override
@@ -259,7 +280,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         plvlsDocumentControllerLayout.setOnChangePptPageListener(new PLVLSDocumentControllerLayout.OnChangePptPageListener() {
             @Override
             public void onChangePage(int pageId) {
-                if (autoId == 0) {
+                if (autoId == AUTO_ID_WHITE_BOARD) {
                     documentPresenter.changeWhiteBoardPage(pageId);
                 } else {
                     documentPresenter.changePptPage(autoId, pageId);
@@ -374,6 +395,19 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     @Override
     public void setOnSwitchFullScreenListener(OnSwitchFullScreenListener onSwitchFullScreenListener) {
         this.onSwitchFullScreenListener = onSwitchFullScreenListener;
+    }
+
+    @Override
+    public IPLVStreamerContract.IStreamerView getDocumentLayoutStreamerView() {
+        return new PLVAbsStreamerView() {
+            @Override
+            public void onStreamLiveStatusChanged(boolean isLive) {
+                String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+                if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
+                    plvlsPlaceHolderView.setVisibility(isLive ? GONE: VISIBLE);
+                }
+            }
+        };
     }
 
     /**

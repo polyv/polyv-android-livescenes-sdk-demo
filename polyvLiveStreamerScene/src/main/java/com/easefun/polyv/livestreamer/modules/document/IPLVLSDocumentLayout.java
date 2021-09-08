@@ -3,6 +3,7 @@ package com.easefun.polyv.livestreamer.modules.document;
 import android.content.Intent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 
 /**
@@ -63,4 +64,11 @@ public interface IPLVLSDocumentLayout {
      * @param onSwitchFullScreenListener
      */
     void setOnSwitchFullScreenListener(PLVLSDocumentLayout.OnSwitchFullScreenListener onSwitchFullScreenListener);
+
+    /**
+     * 获取文档区域中的streamerView
+     *
+     * @return streamerView
+     */
+    IPLVStreamerContract.IStreamerView getDocumentLayoutStreamerView();
 }

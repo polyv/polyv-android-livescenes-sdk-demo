@@ -119,6 +119,15 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 设置嘉宾连麦类型
+     *
+     * @param colinMicType 嘉宾连麦类型
+     */
+    public static void setColinMicType(String colinMicType) {
+        channelConfig.setColinMicType(colinMicType);
+    }
+
+    /**
      * 生成新的config对象
      *
      * @return PLVLiveChannelConfig

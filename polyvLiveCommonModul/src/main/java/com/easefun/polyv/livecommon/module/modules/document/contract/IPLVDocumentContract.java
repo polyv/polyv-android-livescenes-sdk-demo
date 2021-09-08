@@ -16,6 +16,7 @@ import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.easefun.polyv.livescenes.upload.PLVSDocumentUploadConstant;
 
@@ -75,6 +76,12 @@ public interface IPLVDocumentContract {
          * @param pageId 页面ID
          */
         void onPptPageChange(int autoId, int pageId);
+
+        /**
+         * 回调 ppt状态变更
+         * @param pptStatus ppt状态
+         */
+        void onPptStatusChange(PLVSPPTStatus pptStatus);
 
         /**
          * 回调 标注工具输入文本时，当点击文本区域触发

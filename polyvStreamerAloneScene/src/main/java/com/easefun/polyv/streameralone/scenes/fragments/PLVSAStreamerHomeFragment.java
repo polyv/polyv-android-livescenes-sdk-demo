@@ -133,6 +133,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaStatusBarLayout.init(liveRoomDataManager);
         //初始化聊天室布局
         plvsaChatroomLayout.init(liveRoomDataManager);
+        //初始化成员布局
+        memberLayout.init(liveRoomDataManager);
 
         observeChatroomLayout();
         observeStatusBarLayout();

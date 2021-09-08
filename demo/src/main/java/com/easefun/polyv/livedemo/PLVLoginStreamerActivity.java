@@ -184,7 +184,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         }
         updateLoginViewStatus(true);
         final String channelId = plvlsLoginInputChannelEt.getText().toString();
-        final String nick = plvlsLoginInputNickEt.getText().toString();
+        final String nick = plvlsLoginInputNickEt.getText().toString().trim();
         final String password = plvlsLoginInputPwdEt.getText().toString();
 
         if (loginManager == null) {
@@ -209,10 +209,12 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                     PLVLaunchResult launchResult = PLVLSLiveStreamerActivity.launchStreamer(
                             PLVLoginStreamerActivity.this,
                             loginVO.getChannelId(),
-                            loginVO.getAccountId(),
+                            loginVO.getInteractUid(),
                             loginNick,
                             loginVO.getTeacherAvatar(),
                             loginVO.getTeacherActor(),
+                            loginVO.getRole(),
+                            loginVO.getColinMicType(),
                             true,
                             true,
                             true

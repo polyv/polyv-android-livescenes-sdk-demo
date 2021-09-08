@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecloudclass.modules.media.widget;
+package com.easefun.polyv.livecommon.ui.widget;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -8,10 +8,11 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
 
 /**
@@ -19,7 +20,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
  * author: HWilliamgo
  * description: 占位图View
  */
-public class PLVLCPlaceHolderView extends ConstraintLayout {
+public class PLVPlaceHolderView extends ConstraintLayout {
 
     // <editor-fold defaultstate="collapsed" desc="静态变量">
     //图片在横屏主屏中的比例
@@ -39,18 +40,20 @@ public class PLVLCPlaceHolderView extends ConstraintLayout {
 
     //位置监听器
     private PLVViewLocationSensor locationSensor;
+
+    private boolean respondLocationSensor = true;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLCPlaceHolderView(@NonNull Context context) {
+    public PLVPlaceHolderView(@NonNull Context context) {
         this(context, null);
     }
 
-    public PLVLCPlaceHolderView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PLVPlaceHolderView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public PLVLCPlaceHolderView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PLVPlaceHolderView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
         initLocationSensor();
@@ -77,6 +80,14 @@ public class PLVLCPlaceHolderView extends ConstraintLayout {
         tvPlaceholderText.setText(text);
     }
 
+    /**
+     * 设置响应位置监听器状态，默认响应。
+     * @param enable enable
+     */
+    public void enableRespondLocationSensor(boolean enable) {
+        respondLocationSensor = enable;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化View">
@@ -94,22 +105,30 @@ public class PLVLCPlaceHolderView extends ConstraintLayout {
         locationSensor = new PLVViewLocationSensor(this, new PLVViewLocationSensor.OnViewLocationSensorListener() {
             @Override
             public void onLandscapeSmall() {
-                setLandscapeSmall();
+                if (respondLocationSensor) {
+                    setLandscapeSmall();
+                }
             }
 
             @Override
             public void onLandscapeBig() {
-                setLandscapeBig();
+                if (respondLocationSensor) {
+                    setLandscapeBig();
+                }
             }
 
             @Override
             public void onPortraitSmall() {
-                setPortraitSmall();
+                if (respondLocationSensor) {
+                    setPortraitSmall();
+                }
             }
 
             @Override
             public void onPortraitBig() {
-                setPortraitBig();
+                if (respondLocationSensor) {
+                    setPortraitBig();
+                }
             }
         });
     }
@@ -133,28 +152,28 @@ public class PLVLCPlaceHolderView extends ConstraintLayout {
         LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
         lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_PORT;
         ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(VISIBLE);
+        tvPlaceholderText.setVisibility(View.VISIBLE);
     }
 
     private void setPortraitSmall() {
         LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
         lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
         ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(GONE);
+        tvPlaceholderText.setVisibility(View.GONE);
     }
 
     private void setLandscapeBig() {
         LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
         lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_LAND;
         ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(VISIBLE);
+        tvPlaceholderText.setVisibility(View.VISIBLE);
     }
 
     private void setLandscapeSmall() {
         LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
         lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
         ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(GONE);
+        tvPlaceholderText.setVisibility(View.GONE);
     }
 // </editor-fold>
 }
