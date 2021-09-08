@@ -28,4 +28,11 @@
 
     </FrameLayout>
 
+    <!--暂无直播时，嘉宾文档区的展位图-->
+    <com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView
+        android:id="@+id/plvls_document_placeholder_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

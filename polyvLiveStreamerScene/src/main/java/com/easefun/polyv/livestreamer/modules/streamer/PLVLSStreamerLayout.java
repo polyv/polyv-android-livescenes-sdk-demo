@@ -313,6 +313,16 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                         .show();
             }
         }
+
+        @Override
+        public void onGuestRTCStatusChanged(int pos) {
+            streamerAdapter.updateGuestStatus(pos);
+        }
+
+        @Override
+        public void onGuestMediaStatusChanged(int pos) {
+            streamerAdapter.updateGuestStatus(pos);
+        }
     };
     // </editor-fold>
 }

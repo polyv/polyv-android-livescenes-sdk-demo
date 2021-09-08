@@ -27,12 +27,14 @@ import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVMessageBaseEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.eventbus.ppt.PLVOnSliceStartEventBus;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserBean;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -72,10 +74,11 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     // <editor-fold defaultstate="collapsed" desc="变量">
 
     private static final String TAG = PLVDocumentPresenter.class.getSimpleName();
+    //白板auto id
+    public static final int AUTO_ID_WHITE_BOARD = 0;
 
     // 标志位 是否已经经过初始化
     private boolean isInitialized = false;
-
     /**
      * MVP - View 弱引用
      */
@@ -100,6 +103,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
      */
     private boolean isStreamStarted = false;
 
+    //是否是嘉宾
+    private boolean isGuest = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化方法">
@@ -108,6 +114,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     public void init(LifecycleOwner lifecycleOwner,
                      IPLVLiveRoomDataManager liveRoomDataManager,
                      PLVSDocumentWebProcessor documentWebProcessor) {
+        isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
         initRepository(liveRoomDataManager, documentWebProcessor);
         initSocketListener();
 
@@ -132,7 +139,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
      */
     private void initRepository(IPLVLiveRoomDataManager liveRoomDataManager, PLVSDocumentWebProcessor documentWebProcessor) {
         plvDocumentRepository = new PLVDocumentRepository(documentWebProcessor);
-        plvDocumentRepository.init();
+        plvDocumentRepository.init(liveRoomDataManager);
 
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserId(liveRoomDataManager.getConfig().getUser().getViewerId());
@@ -141,7 +148,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETUSER, PLVGsonUtil.toJson(userBean));
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"speaker\"}");
-        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":0,\"isCamClosed\":0}");
+        if (!isGuest) {
+            plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":0,\"isCamClosed\":0}");
+        }
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETPAINTSTATUS, "{\"status\":\"open\"}");
 
         plvPptUploadLocalRepository = new PLVPptUploadLocalRepository();
@@ -183,7 +192,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
             @Override
             public void onChanged(@Nullable String message) {
                 if (isStreamStarted) {
-                    PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
+                    PLVSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
                 }
             }
         });
@@ -252,6 +261,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                     IPLVDocumentContract.View view = viewWeakReference.get();
                     if (view != null) {
                         view.onPptPageChange(plvspptStatus.getAutoId(), plvspptStatus.getPageId());
+                        view.onPptStatusChange(plvspptStatus);
                     }
                 }
             }
@@ -393,7 +403,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
-        PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(0, pageId);
+        PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(AUTO_ID_WHITE_BOARD, pageId);
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, PLVGsonUtil.toJson(changePptInfo));
     }
 

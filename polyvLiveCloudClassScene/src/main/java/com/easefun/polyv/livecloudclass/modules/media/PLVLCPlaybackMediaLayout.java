@@ -37,7 +37,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
-import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
@@ -87,7 +87,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //controller
     private IPLVLCPlaybackMediaController mediaController;
     //播放失败时显示的view
-    private PLVLCPlaceHolderView noStreamView;
+    private PLVPlaceHolderView noStreamView;
     //Switch View
     private FrameLayout flPlayerSwitchViewParent;
     private PLVSwitchViewAnchorLayout switchAnchorPlayer;

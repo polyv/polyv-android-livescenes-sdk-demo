@@ -19,7 +19,7 @@
 
         </com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView>
 
-        <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView
+        <com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView
             android:id="@+id/plvlc_ppt_placeholder"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

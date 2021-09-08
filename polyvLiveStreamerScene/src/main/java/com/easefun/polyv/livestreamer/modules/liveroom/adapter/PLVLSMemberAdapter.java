@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -19,7 +20,6 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
-import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -49,9 +49,19 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     private boolean isFirstOpenMemberLayout;
     //连麦类型(视频/音频)
     private boolean isVideoLinkMicType = true;
+    private boolean isGuestAutoLinkMic;
+    private boolean isGuest = false;
 
     //listener
     private OnViewActionListener onViewActionListener;
+    // </editor-fold>
+
+
+    // <editor-fold defaultstate="collapsed" desc="构造器">
+    public PLVLSMemberAdapter(IPLVLiveRoomDataManager liveRoomDataManager) {
+        isGuestAutoLinkMic = liveRoomDataManager.getConfig().isAutoLinkToGuest();
+        isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 实现RecyclerView.Adapter定义的方法">
@@ -132,7 +142,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         holder.plvlsMemberCamFrontIv.setTag(memberItemDataBean.isFrontCamera() ? null : "back");
         //设置连麦控制按钮状态
         if (linkMicItemDataBean != null && position > 0) {
-            if (!isStartedStatus) {
+            if (!isStartedStatus || isGuest) {
                 holder.plvlsMemberMicIv.setVisibility(View.GONE);
                 holder.plvlsMemberCamIv.setVisibility(View.GONE);
                 holder.plvlsMemberLinkmicControlIv.setVisibility(View.GONE);
@@ -169,14 +179,14 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 }
                 //如果是自动连麦的嘉宾，则把连麦相关的按钮隐藏
-                if (PLVSStreamerInnerDataTransfer.getInstance().isAutoLinkToGuest() && isGuestUserType(socketUserBean.getUserType())) {
+                if (isGuestAutoLinkMic && isGuestUserType(socketUserBean.getUserType())) {
                     holder.plvlsMemberLinkmicControlIv.setVisibility(View.GONE);
                     holder.plvlsMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 }
             }
         }
         //滑动view的设置
-        if (position == 0 || isSpecialType) {
+        if (position == 0 || isSpecialType || isGuest) {
             holder.plvlsMemberSwipeMenu.enabledSwipe(false);
         } else {
             holder.plvlsMemberSwipeMenu.enabledSwipe(true);
@@ -448,6 +458,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         private TextView plvlsMemberKickTv;
         private TextView plvlsMemberBanConfirmTv;
         private TextView plvlsMemberKickConfirmTv;
+        private long lastTimeClickFrontCameraControl = 0;
 
         public MemberViewHolder(View itemView) {
             super(itemView);
@@ -533,8 +544,12 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                         return;
                     }
                     if (!v.isSelected()) {
-                        if (onViewActionListener != null) {
-                            onViewActionListener.onFrontCameraControl(pos, v.getTag() != null);
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastTimeClickFrontCameraControl > 1000) {
+                            if (onViewActionListener != null) {
+                                onViewActionListener.onFrontCameraControl(pos, v.getTag() != null);
+                            }
+                            lastTimeClickFrontCameraControl = currentTime;
                         }
                     }
                 }

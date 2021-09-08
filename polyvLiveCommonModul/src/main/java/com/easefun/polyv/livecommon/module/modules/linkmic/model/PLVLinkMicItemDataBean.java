@@ -23,6 +23,8 @@ public class PLVLinkMicItemDataBean {
     private String nick;
     //连麦Id
     private String linkMicId;
+    //用户Id
+    private String userId;
     //是否mute视频
     private boolean muteVideo;
     //是否mute音频
@@ -177,6 +179,14 @@ public class PLVLinkMicItemDataBean {
         return STATUS_RTC_JOIN.equals(status);
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public static class MuteMedia {
         boolean isMute;
 
@@ -207,17 +217,24 @@ public class PLVLinkMicItemDataBean {
     }
     // </editor-fold>
 
+
     @Override
     public String toString() {
         return "PLVLinkMicItemDataBean{" +
                 "nick='" + nick + '\'' +
                 ", linkMicId='" + linkMicId + '\'' +
+                ", userId='" + userId + '\'' +
                 ", muteVideo=" + muteVideo +
                 ", muteAudio=" + muteAudio +
                 ", cupNum=" + cupNum +
                 ", userType='" + userType + '\'' +
                 ", actor='" + actor + '\'' +
+                ", pic='" + pic + '\'' +
                 ", curVolume=" + curVolume +
+                ", status='" + status + '\'' +
+                ", muteVideoInRtcJoinList=" + muteVideoInRtcJoinList +
+                ", muteAudioInRtcJoinList=" + muteAudioInRtcJoinList +
+                ", statusMethodCallListener=" + statusMethodCallListener +
                 '}';
     }
 }

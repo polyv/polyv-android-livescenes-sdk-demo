@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
@@ -30,7 +31,7 @@ import java.util.Locale;
  */
 public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdapter.StreamerItemViewHolder> {
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private static final String TAG = "PLVLSStreamerAdapter";
+    private static final String TAG = PLVSAStreamerAdapter.class.getSimpleName();
     public static final int ITEM_TYPE_DEFAULT = -1;
     public static final int ITEM_TYPE_ONLY_TEACHER = 1;
     public static final int ITEM_TYPE_ONE_TO_ONE = 2;
@@ -40,6 +41,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
+    //直播间数管理器
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     /**** listener ****/
     private OnStreamerAdapterCallback adapterCallback;
 
@@ -50,8 +53,6 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     //rv
     private RecyclerView streamerRv;
-    @Nullable
-    private SurfaceView localRenderView;
     //window
     private PLVSAStreamerMemberControlTipsLayout controlTipsLayout;
     private PLVSAStreamerMemberControlLayout memberControlLayout;
@@ -64,8 +65,9 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVSAStreamerAdapter(RecyclerView streamerRv, OnStreamerAdapterCallback adapterCallback) {
+    public PLVSAStreamerAdapter(RecyclerView streamerRv, IPLVLiveRoomDataManager liveRoomDataManager, OnStreamerAdapterCallback adapterCallback) {
         this.streamerRv = streamerRv;
+        this.liveRoomDataManager = liveRoomDataManager;
         this.adapterCallback = adapterCallback;
     }
     // </editor-fold>
@@ -200,10 +202,6 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
-        //设置本地渲染器
-        if (myLinkMicId.equals(linkMicId)) {
-            localRenderView = holder.renderView;
-        }
     }
 
     @Override
@@ -275,8 +273,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         super.onViewRecycled(holder);
 
         //标记view重新创建
-        //如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
-        if (holder.renderView != null && holder.renderView != localRenderView) {
+        if (holder.renderView != null) {
             holder.isViewRecycled = true;
             holder.plvsaStreamerRenderViewContainer.removeView(holder.renderView);
             adapterCallback.releaseLinkMicRenderView(holder.renderView);
@@ -354,6 +351,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         PLVLinkMicItemDataBean linkMicItemDataBean = dataList.get(tempViewHolder.getAdapterPosition());
                         if (memberControlLayout == null) {
                             memberControlLayout = new PLVSAStreamerMemberControlLayout(streamerRv.getContext());
+                            memberControlLayout.init(liveRoomDataManager.getConfig().isAutoLinkToGuest());
                         }
                         memberControlLayout.setOnViewActionListener(new PLVSAStreamerMemberControlLayout.OnViewActionListener() {
                             @Override

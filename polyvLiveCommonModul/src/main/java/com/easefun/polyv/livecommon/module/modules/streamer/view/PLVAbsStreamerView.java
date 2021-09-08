@@ -116,4 +116,19 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     public void onUserRequest(String uid) {
 
     }
+
+    @Override
+    public void onStreamLiveStatusChanged(boolean isLive) {
+
+    }
+
+    @Override
+    public void onGuestRTCStatusChanged(int pos) {
+
+    }
+
+    @Override
+    public void onGuestMediaStatusChanged(int pos) {
+
+    }
 }

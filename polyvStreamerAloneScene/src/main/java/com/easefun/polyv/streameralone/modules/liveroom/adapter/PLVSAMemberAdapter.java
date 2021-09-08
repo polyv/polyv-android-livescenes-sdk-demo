@@ -20,7 +20,6 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
-import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
@@ -48,6 +47,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<PLVMemberItemDataBean> dataBeanList;
     //streamerStatus
     private boolean isStartedStatus;
+    private boolean isGuestAutoLinkMic;
 
     private PLVSAMemberControlWindow lastShowControlWindow;
 
@@ -56,7 +56,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVSAMemberAdapter() {
+    public PLVSAMemberAdapter(boolean isGuestAutoLinkMic) {
+        this.isGuestAutoLinkMic = isGuestAutoLinkMic;
         dataBeanList = new ArrayList<>();
     }
     // </editor-fold>
@@ -519,7 +520,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         connectingAnimator.cancel();
                     }
                     //如果是自动连麦的嘉宾，则把连麦相关的按钮隐藏
-                    if (PLVSStreamerInnerDataTransfer.getInstance().isAutoLinkToGuest() && isGuestUserType(socketUserBean.getUserType())) {
+                    if (isGuestAutoLinkMic && isGuestUserType(socketUserBean.getUserType())) {
                         plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
                         plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
                         connectingAnimator.cancel();

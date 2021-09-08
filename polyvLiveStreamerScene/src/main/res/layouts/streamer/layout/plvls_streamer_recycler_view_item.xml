@@ -72,5 +72,17 @@
                 android:textSize="12sp"
                 tools:text="你好你好你好你好你好你好你好你好你好你好" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/plvls_streamer_guest_link_status_tv"
+            android:layout_width="41dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/plvls_linkmic_guest_status_selector"
+            android:gravity="center"
+            android:text="未连麦"
+            android:textColor="#FFF0F1F5"
+            android:textSize="11sp" />
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

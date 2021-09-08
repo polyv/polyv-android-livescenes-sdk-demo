@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -36,6 +37,7 @@ import java.util.List;
  */
 public class PLVSAMemberLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     //view
     private TextView plvsaMemberOnlineCountTv;
     private RecyclerView plvsaMemberListRv;
@@ -73,9 +75,17 @@ public class PLVSAMemberLayout extends FrameLayout {
         plvsaMemberOnlineCountTv = findViewById(R.id.plvsa_member_online_count_tv);
         plvsaMemberListRv = findViewById(R.id.plvsa_member_list_rv);
 
+
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化数据">
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+
         //init memberListRv
         plvsaMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        memberAdapter = new PLVSAMemberAdapter();
+        memberAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
         memberAdapter.setOnViewActionListener(new PLVSAMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
