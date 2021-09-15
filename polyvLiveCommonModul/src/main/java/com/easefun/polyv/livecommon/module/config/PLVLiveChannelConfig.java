@@ -43,6 +43,11 @@ public class PLVLiveChannelConfig {
      */
     private PolyvLiveChannelType channelType;
 
+    /**
+     * 自定义跑马灯code
+     */
+    private String marqueeCode;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
@@ -138,6 +143,11 @@ public class PLVLiveChannelConfig {
     public void setChannelType(PolyvLiveChannelType channelType) {
         this.channelType = channelType;
     }
+
+    public void setMarqueeCode(String marqueeCode) {
+        this.marqueeCode = marqueeCode;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -179,6 +189,11 @@ public class PLVLiveChannelConfig {
     public boolean isAloneChannelType() {
         return channelType == PolyvLiveChannelType.ALONE;
     }
+
+    public String getMarqueeCode() {
+        return marqueeCode;
+    }
+
     // </editor-fold>
 
     /**

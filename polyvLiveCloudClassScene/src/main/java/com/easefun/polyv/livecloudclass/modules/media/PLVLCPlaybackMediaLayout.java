@@ -41,6 +41,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderVie
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -581,9 +582,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             super.onGetMarqueeVo(marqueeVo, viewerName);
             if (marqueeUtils == null) {
                 marqueeUtils = new PolyvMarqueeUtils();
+                marqueeUtils.setUsediyurl(true);
             }
             // 更新为后台设置的跑马灯类型
-            marqueeUtils.updateMarquee((Activity) getContext(), marqueeVo, marqueeItem, viewerName);
+            String code = PLVLiveChannelConfigFiller.generateNewChannelConfig().getMarqueeCode();
+            marqueeUtils.updateMarquee((Activity) getContext(), marqueeVo, marqueeItem, viewerName, code);
         }
 
         @Override
