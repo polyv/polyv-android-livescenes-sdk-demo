@@ -6,8 +6,8 @@ import android.view.ViewParent;
 
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
+import com.easefun.polyv.mediasdk.player.IjkMediaPlayer;
 
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 public class PLVVideoSizeUtils {
 

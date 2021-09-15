@@ -16,6 +16,7 @@
     <application>
         <activity
             android:name=".scenes.PLVLCCloudClassActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:configChanges="orientation|keyboard|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
