@@ -2,7 +2,7 @@ polyv-android-livescenes-sdk-demo
 ===
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v1.6.0-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.6.0)
+[![GitHub release](https://img.shields.io/badge/release-v1.6.0.bugfix1-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.6.0-bugfix1)
 
 ### 1 简介
 此项目是保利威 Android 多场景 Demo。
