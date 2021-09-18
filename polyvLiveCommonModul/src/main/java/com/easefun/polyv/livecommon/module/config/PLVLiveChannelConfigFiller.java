@@ -111,6 +111,10 @@ public class PLVLiveChannelConfigFiller {
         channelConfig.setChannelType(channelType);
     }
 
+    public static void setMarqueeCode(String code){
+        channelConfig.setMarqueeCode(code);
+    }
+
     /**
      * 生成新的config对象
      *

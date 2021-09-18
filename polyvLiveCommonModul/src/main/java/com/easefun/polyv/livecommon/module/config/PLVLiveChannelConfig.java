@@ -61,6 +61,7 @@ public class PLVLiveChannelConfig {
         videoListType = old.videoListType;
         isLive = old.isLive;
         channelType = old.channelType;
+        marqueeCode = old.marqueeCode;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
