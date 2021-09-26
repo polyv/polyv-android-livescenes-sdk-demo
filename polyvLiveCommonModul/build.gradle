@@ -30,7 +30,7 @@ android {
 
 dependencies {
     implementation 'com.google.android.material:material:1.0.0'
-    api 'net.polyv.android:polyvSDKLiveScenes:1.6.0-bugfix'
+    api 'net.polyv.android:polyvSDKLiveScenes:1.6.0-bugfix1'
 
     //glide
     api ("com.github.bumptech.glide:okhttp3-integration:4.7.1"){
