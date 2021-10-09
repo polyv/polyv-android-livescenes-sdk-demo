@@ -66,6 +66,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     void updateOnClickCloseFloatingView();
 
     /**
+     * 弹幕切换按钮点击回调
+     *
+     * @param v danmuView
+     */
+    void dispatchDanmuSwitchOnClicked(View v);
+
+    /**
      * 释放
      */
     void clean();

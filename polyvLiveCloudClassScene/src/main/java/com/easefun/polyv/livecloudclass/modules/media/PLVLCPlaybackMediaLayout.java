@@ -69,6 +69,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCPlaybackMediaLayout.class.getSimpleName();
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
+
+    /**
+     * 横屏聊天布局可见性与弹幕开关同步
+     * true -> 当弹幕关闭时，也隐藏横屏聊天布局
+     */
+    private static final boolean SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU = true;
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
@@ -189,7 +196,18 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
         danmuWrapper = new PLVLCDanmuWrapper(this);
         danmuWrapper.setDanmuController(danmuController);
-        danmuWrapper.setDanmuSwitchLandView(mediaController.getLandscapeDanmuSwitchView());
+        final View danmuSwitchView = mediaController.getLandscapeDanmuSwitchView();
+        danmuSwitchView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                danmuWrapper.dispatchDanmuSwitchOnClicked(v);
+                mediaController.dispatchDanmuSwitchOnClicked(v);
+                if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
+                    chatLandscapeLayout.setVisibility(danmuSwitchView.isSelected() ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+        danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);
 
         landscapeMessageSender = new PLVLCLandscapeMessageSendPanel((AppCompatActivity) getContext(), this);
         landscapeMessageSender.setOnSendMessageListener(new IPLVLCLandscapeMessageSender.OnSendMessageListener() {
