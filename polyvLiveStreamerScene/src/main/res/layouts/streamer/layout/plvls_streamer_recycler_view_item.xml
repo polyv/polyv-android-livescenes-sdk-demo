@@ -30,6 +30,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <ImageView
+            android:id="@+id/plvls_streamer_cover_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:scaleType="fitCenter"/>
+
         <!--底部渐变背景-->
         <View
             android:layout_width="match_parent"

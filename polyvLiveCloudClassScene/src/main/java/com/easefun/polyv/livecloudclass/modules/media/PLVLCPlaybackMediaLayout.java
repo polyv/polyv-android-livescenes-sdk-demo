@@ -5,6 +5,7 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,10 +24,6 @@ import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeItem;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeUtils;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
@@ -37,12 +34,15 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
-import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
@@ -50,6 +50,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -116,10 +117,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
-    //跑马灯控件
-    private PolyvMarqueeView marqueeView;
-    private PolyvMarqueeItem marqueeItem;
-    private PolyvMarqueeUtils marqueeUtils;
+    //跑马灯
+    private PLVMarqueeView marqueeView = null;
 
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
@@ -187,14 +186,27 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.setNoStreamIndicator(noStreamView);
         videoView.setPlayerBufferingIndicator(loadingLayout);
         //设置跑马灯
-        videoView.post(new Runnable() {
-            @Override
-            public void run() {
-                marqueeView = ((Activity) getContext()).findViewById(R.id.plvlc_marquee_view);//after videoLayout add, post find
-                marqueeItem = new PolyvMarqueeItem();
-                videoView.setMarqueeView(marqueeView, marqueeItem);
-            }
-        });
+        marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
+        PLVMarqueeModel plvMarqueeModel = new PLVMarqueeModel()
+                .setUserName("保利威SDK")
+                .setFontAlpha(255)
+                .setFontSize(40)
+                .setFontColor(Color.RED)
+                .setFilter(false)
+                .setFilterAlpha(255)
+                .setFilterColor(Color.BLACK)
+                .setFilterBlurX(2)
+                .setFilterBlurY(2)
+                .setFilterStrength(4)
+                .setSetting(PLVMarqueeAnimationVO.ROLL)
+                .setInterval(3)
+                .setTweenTime(1)
+                .setLifeTime(2)
+                .setSpeed(200)
+                .setAlwaysShowWhenRun(true)
+                .setHiddenWhenPause(false);
+
+        marqueeView.setPLVMarqueeModel(plvMarqueeModel);
     }
 
     private void initDanmuView() {
@@ -551,6 +563,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
+        public IPLVMarqueeView getMarqueeView(){
+            return marqueeView;
+        }
+
+        @Override
         public void onPrepared() {
             super.onPrepared();
             PLVCommonLog.d(TAG, "PLVLCPlaybackMediaLayout.onPreparing");
@@ -617,16 +634,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onDoubleClick() {
             super.onDoubleClick();
             mediaController.playOrPause();
-        }
-
-        @Override
-        public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName) {
-            super.onGetMarqueeVo(marqueeVo, viewerName);
-            if (marqueeUtils == null) {
-                marqueeUtils = new PolyvMarqueeUtils();
-            }
-            // 更新为后台设置的跑马灯类型
-            marqueeUtils.updateMarquee((Activity) getContext(), marqueeVo, marqueeItem, viewerName);
         }
 
         @Override

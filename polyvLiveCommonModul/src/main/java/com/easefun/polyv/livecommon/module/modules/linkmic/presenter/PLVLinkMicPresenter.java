@@ -29,6 +29,7 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -395,6 +396,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Override
     public void setupRenderView(SurfaceView renderView, String linkMicId) {
         if (linkMicManager.getLinkMicUid().equals(linkMicId)) {
+            if(liveRoomDataManager.isOnlyAudio()){
+                linkMicManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
+            }
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
             linkMicManager.setupRemoteVideo(renderView, linkMicId);
@@ -478,6 +482,12 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     public int getRTCListSize() {
         return linkMicList.size();
     }
+
+    @Override
+    public void resetRequestPermissionList(ArrayList<String> permissions) {
+        linkMicManager.resetRequestPermissionList(permissions);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="http请求">

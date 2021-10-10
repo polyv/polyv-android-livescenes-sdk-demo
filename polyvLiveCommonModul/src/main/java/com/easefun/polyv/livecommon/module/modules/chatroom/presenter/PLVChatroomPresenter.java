@@ -353,6 +353,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     public void sendChatImage(final PolyvSendLocalImgEvent localImgEvent) {
         PLVCommonLog.d(TAG, "chatroom sendChatImage: " + localImgEvent.getImageFilePath() + ", sessionId: " + liveRoomDataManager.getSessionId());
         PolyvChatroomManager.getInstance().sendChatImage(localImgEvent, liveRoomDataManager.getSessionId());
+        localImgEvent.setTime(System.currentTimeMillis());
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
@@ -373,6 +374,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         customEvent.setTip(tip);
         customEvent.setEmitMode(PolyvBaseCustomEvent.EMITMODE_ALL);//设置广播方式，EMITMODE_ALL为广播给包括自己的所有用户，EMITMODE_OTHERS为广播给不包括自己的所有用户
         customEvent.setVersion(PolyvCustomEvent.VERSION_1);//设置信息的版本号，对该版本号的信息才进行处理
+        customEvent.setTime(System.currentTimeMillis());
         PLVCommonLog.d(TAG, "chatroom sendCustomGiftMessage: " + customEvent);
         PolyvChatroomManager.getInstance().sendCustomMsg(customEvent);
         return customEvent;
@@ -984,6 +986,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         textMessage.setId(messageId);
         //把带表情的信息解析保存下来
         textMessage.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(textMessage.getSpeakMessage(), getSpeakEmojiSizes(), Utils.getApp()));
+        //生成当前消息的时间
+        textMessage.setTime(System.currentTimeMillis());
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NotNull IPLVChatroomContract.IChatroomView view) {
@@ -995,6 +999,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     private void acceptEmotionMessage(final PLVChatEmotionEvent emotionEvent, String messageId){
         emotionEvent.setMessageId(messageId);
+        emotionEvent.setTime(System.currentTimeMillis());
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NonNull @NotNull IPLVChatroomContract.IChatroomView view) {

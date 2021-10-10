@@ -33,6 +33,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!-- 封面图（仅音频模式时展示）-->
+        <ImageView
+            android:id="@+id/plvlc_cover_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"/>
+
         <!-- 主播放器载入状态view -->
         <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout
             android:id="@+id/video_loading_view"

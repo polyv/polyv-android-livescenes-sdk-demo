@@ -398,6 +398,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void updateWhenOnlyAudio(boolean isOnlyAudio) {
+        moreLayout.updateWhenOnlyAudio(isOnlyAudio);
+    }
+
+    @Override
     public void updateOnClickCloseFloatingView() {
         videoPptSwitchPortIv.performClick();
         if (!hasShowReopenFloatingViewTip) {

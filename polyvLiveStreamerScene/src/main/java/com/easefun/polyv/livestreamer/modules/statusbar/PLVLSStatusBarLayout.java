@@ -94,6 +94,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     //角色
     private String userType;
 
+    /**
+     * 连麦显示类型，0-默认都显示，1-只显示音频连麦；2-只显示视频连麦
+     */
+    private int linkMicShowType = 0;
+
     //handler
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -328,6 +333,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             plvlsStatusBarDocumentIv.setVisibility(GONE);
             plvlsStatusBarWhiteboardIv.setVisibility(GONE);
         }
+        updateLinkMicShowType(liveRoomDataManager.isOnlyAudio());
     }
 
     @Override
@@ -465,6 +471,12 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="音频开播控制">
+    private void updateLinkMicShowType(boolean isOnlyAudio){
+        linkMicShowType = isOnlyAudio ? 1 : 0;
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="文档选择处理">
 
     private void processSelectDocument() {
@@ -524,7 +536,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 return;
             }
             v.setSelected(!v.isSelected());
-            linkMicControlWindow.show(v);
+            linkMicControlWindow.show(v,linkMicShowType);
         } else if (id == R.id.plvls_status_bar_document_iv) {
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
             processSelectDocument();

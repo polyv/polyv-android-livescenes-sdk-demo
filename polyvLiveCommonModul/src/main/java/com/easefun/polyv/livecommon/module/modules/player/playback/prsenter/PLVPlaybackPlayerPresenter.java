@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.IPolyvAuxiliaryVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
@@ -19,6 +20,9 @@ import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvPlaybackVideoParams;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
@@ -32,6 +36,7 @@ import com.easefun.polyv.livescenes.playback.video.api.IPolyvPlaybackListenerEve
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
+import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 
 import java.lang.ref.WeakReference;
 
@@ -55,7 +60,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private PolyvAuxiliaryVideoview subVideoView;
     //显示的logo
     private PLVPlayerLogoView logoView;
-
+    //设置是否允许跑马灯运行
+    private boolean isAllowMarqueeRunning = true;
     //手势滑动进度
     private int fastForwardPos;
 
@@ -270,6 +276,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void destroy() {
+        stopMarqueeView();
         unregisterView();
         if (logoView != null) {
             logoView.removeAllViews();
@@ -378,6 +385,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                     setLogoVisibility(View.VISIBLE);
                     setRetryLayoutVisibility(View.GONE);
+                    setAllowMarqueeViewRunning(true);
                 }
 
                 @Override
@@ -419,6 +427,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
                     setLogoVisibility(View.GONE);
                     setRetryLayoutVisibility(View.VISIBLE);
+                    stopMarqueeView();
                 }
             });
             videoView.setOnCompletionListener(new IPolyvVideoViewListenerEvent.OnCompletionListener() {
@@ -428,6 +437,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     if (view != null) {
                         view.onCompletion();
                     }
+                    stopMarqueeView();
                 }
             });
             videoView.setOnInfoListener(new IPolyvVideoViewListenerEvent.OnInfoListener() {
@@ -453,6 +463,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     if (view != null) {
                         view.onVideoPlay(isFirst);
                     }
+                    setAllowMarqueeViewRunning(true);
                 }
             });
             videoView.setOnVideoPauseListener(new IPolyvVideoViewListenerEvent.OnVideoPauseListener() {
@@ -462,6 +473,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     if (view != null) {
                         view.onVideoPause();
                     }
+                    setAllowMarqueeViewRunning(false);
                 }
             });
             videoView.setOnGestureLeftDownListener(new IPolyvVideoViewListenerEvent.OnGestureLeftDownListener() {
@@ -610,10 +622,47 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGetMarqueeVoListener(new IPolyvVideoViewListenerEvent.OnGetMarqueeVoListener() {
                 @Override
                 public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo) {
-                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
-                    if (view != null) {
-                        view.onGetMarqueeVo(marqueeVo, getConfig().getUser().getViewerName());
+                    if (!isMarqueeExisted()) {
+                        return;
                     }
+                    PLVMarqueeCommonController.getInstance().updateMarqueeView(marqueeVo,
+                            getConfig().getUser().getViewerName(),
+                            new PLVMarqueeCommonController.IPLVMarqueeControllerCallback() {
+                                @Override
+                                public void onMarqueeModel(@PLVMarqueeSDKController.MARQUEE_CONTROLLER_TIP int controllerTip,
+                                                           PLVMarqueeModel marqueeModel) {
+                                    switch (controllerTip) {
+                                        case PLVMarqueeSDKController.ALLOW_PLAY_MARQUEE:
+                                            isAllowMarqueeRunning = true;
+                                            stopMarqueeView();
+                                            setMarqueeViewModel(marqueeModel);
+                                            break;
+                                        case PLVMarqueeSDKController.NOT_ALLOW_PLAY_MARQUEE:
+                                            isAllowMarqueeRunning = false;
+                                            stopMarqueeView();
+                                            break;
+                                        case PLVMarqueeSDKController.MARQUEE_SIGN_ERROR:
+                                        case PLVMarqueeSDKController.NOT_ALLOW_PLAY_VIDEO:
+                                            isAllowMarqueeRunning = false;
+                                            final Activity activity = (Activity) videoView.getContext();
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    String msg = PLVMarqueeCommonController.getInstance().getErrorMessage();
+                                                    Toast.makeText(
+                                                            activity,
+                                                            "".equals(msg) ? "跑马灯验证失败" : msg,
+                                                            Toast.LENGTH_SHORT
+                                                    ).show();
+                                                    activity.finish();
+                                                }
+                                            });
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            });
                 }
             });
             videoView.setOnDanmuServerOpenListener(new IPolyvVideoViewListenerEvent.OnDanmuServerOpenListener() {
@@ -716,6 +765,45 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             view.updatePlayInfo(builder.build());
         }
         return position;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 跑马灯显示控制">
+    private boolean isMarqueeExisted() {
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        IPLVMarqueeView marqueeView = view.getMarqueeView();
+        return marqueeView != null;
+    }
+
+    private void setMarqueeViewModel(PLVMarqueeModel marqueeViewModel) {
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        IPLVMarqueeView marqueeView = view.getMarqueeView();
+        if (marqueeView!=null) {
+            marqueeView.setPLVMarqueeModel(marqueeViewModel);
+        }
+    }
+
+    private void setAllowMarqueeViewRunning(boolean allow) {
+        if (!isAllowMarqueeRunning) {
+            return;
+        }
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        IPLVMarqueeView marqueeView = view.getMarqueeView();
+        if (marqueeView != null) {
+            if (allow) {
+                marqueeView.start();
+            } else {
+                marqueeView.pause();
+            }
+        }
+    }
+
+    private void stopMarqueeView() {
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        IPLVMarqueeView marqueeView = view.getMarqueeView();
+        if (marqueeView!=null) {
+            marqueeView.stop();
+        }
     }
     // </editor-fold>
 

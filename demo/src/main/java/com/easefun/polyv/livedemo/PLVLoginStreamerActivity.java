@@ -206,6 +206,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                 PolyvLiveChannelType liveChannelType = loginVO.getLiveChannelType();
                 if (PolyvLiveChannelType.PPT.equals(liveChannelType)) {
                     //进入手机开播三分屏场景
+                    boolean isOpenCamera = "N".equals(loginVO.getIsOnlyAudio());
                     PLVLaunchResult launchResult = PLVLSLiveStreamerActivity.launchStreamer(
                             PLVLoginStreamerActivity.this,
                             loginVO.getChannelId(),
@@ -216,7 +217,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                             loginVO.getRole(),
                             loginVO.getColinMicType(),
                             true,
-                            true,
+                            isOpenCamera,
                             true
                     );
                     if (!launchResult.isSuccess()) {

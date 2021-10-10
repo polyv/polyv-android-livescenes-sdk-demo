@@ -6,6 +6,7 @@ import android.view.SurfaceView;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -328,5 +329,10 @@ public interface IPLVLinkMicContract {
          * @return size
          */
         int getRTCListSize();
+
+        /**
+         * 重制连麦请求所需的权限列表
+         */
+        void resetRequestPermissionList(ArrayList<String> permissions);
     }
 }

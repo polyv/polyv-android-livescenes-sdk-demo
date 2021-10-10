@@ -222,6 +222,11 @@ public class PLVLCLiveMoreLayout {
         show(true);
     }
 
+    public void updateWhenOnlyAudio(boolean isOnlyAudio){
+        tvPlayVideoSwitch.setVisibility(isOnlyAudio ? View.GONE : View.VISIBLE);
+        tvOnlyAudioSwitch.setSelected(isOnlyAudio);
+    }
+
     public void showWhenLandscape() {
         onLandscape();
         show(false);

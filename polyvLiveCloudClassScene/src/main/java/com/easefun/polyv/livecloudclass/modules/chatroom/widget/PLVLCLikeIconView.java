@@ -10,8 +10,13 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.CycleInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -68,17 +73,19 @@ public class PLVLCLikeIconView extends RelativeLayout {
 
 
         //圆背景
-        View bg = new View(getContext());
+        final View bg = new View(getContext());
         bg.setBackgroundResource(R.drawable.plvlc_chatroom_btn_like);
         float d = srcWH;
         LayoutParams bgLp = new LayoutParams((int) d, (int) d);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        bgLp.bottomMargin = ConvertUtils.dp2px(5);
         /**
          * ///暂时保留，以后有必要时再使用
          *  bgLp.addRule(Gravity.CENTER);
          *  bgLp.bottomMargin = PolyvScreenUtils.dip2px(getContext(), 3);
          */
+
 
         bgLp.rightMargin = PLVScreenUtils.dip2px(getContext(), 16);
         bg.setLayoutParams(bgLp);
@@ -88,6 +95,7 @@ public class PLVLCLikeIconView extends RelativeLayout {
                 if (onButtonClickListener != null) {
                     onButtonClickListener.onClick(PLVLCLikeIconView.this);
                 }
+                bg.startAnimation(createClickAnimation());
             }
         });
 
@@ -120,6 +128,25 @@ public class PLVLCLikeIconView extends RelativeLayout {
 
     public void setOnButtonClickListener(@Nullable OnClickListener l) {
         onButtonClickListener = l;
+    }
+
+    private AnimationSet createClickAnimation(){
+
+        CycleInterpolator interpolator = new CycleInterpolator(1);
+
+        Animation rotateAnimation = new RotateAnimation(0f, -30f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,0.5f);
+
+        Animation scaleAnimation = new ScaleAnimation(1.0f, 1.2f, 1.0f, 1.2f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,0.5f);
+
+        AnimationSet animatorSet = new AnimationSet(true);
+        animatorSet.setDuration(200);
+        animatorSet.setInterpolator(interpolator);
+        animatorSet.addAnimation(rotateAnimation);
+        animatorSet.addAnimation(scaleAnimation);
+        return animatorSet;
+
     }
 
     @Override
@@ -162,7 +189,8 @@ public class PLVLCLikeIconView extends RelativeLayout {
             R.drawable.plvlc_chatroom_btn_like_6,
             R.drawable.plvlc_chatroom_btn_like_7,
             R.drawable.plvlc_chatroom_btn_like_8,
-            R.drawable.plvlc_chatroom_btn_like_9
+            R.drawable.plvlc_chatroom_btn_like_9,
+            R.drawable.plvlc_chatroom_btn_like_10,
     };
     private Random randomColor = new Random();
 
@@ -181,7 +209,7 @@ public class PLVLCLikeIconView extends RelativeLayout {
                 LayoutParams bgLp = new LayoutParams(iconWidth, iconHeight);
                 view.setLayoutParams(bgLp);
 
-                addView(view);
+                addView(view,0);
                 startAnimator(view);
             }
         });
@@ -203,6 +231,9 @@ public class PLVLCLikeIconView extends RelativeLayout {
                 view.setX(pointF.x);
                 view.setY(pointF.y);
                 view.setAlpha(1 - animation.getAnimatedFraction() + 0.1f);
+                //刚出现时有从小到大的效果
+                view.setScaleX(0.5f + animation.getAnimatedFraction() );
+                view.setScaleY(0.5f + animation.getAnimatedFraction());
             }
         }
     }

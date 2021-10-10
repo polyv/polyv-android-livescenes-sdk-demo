@@ -30,6 +30,7 @@
     <string name="plv_chat_toast_login_success">聊天室登录成功</string>
     <string name="plv_chat_toast_login_failed">聊天室连接失败</string>
     <string name="plv_chat_toast_been_kicked">您已被管理员踢出聊天室！</string>
+    <string name="plv_chat_toast_kicked_streamer">频道已被禁止直播</string>
     <string name="plv_chat_toast_account_login_elsewhere">该账号已在其他设备登录！</string>
     <string name="plv_chat_toast_send_msg_success">发言成功</string>
     <string name="plv_chat_toast_post_msg_success">提交成功</string>
@@ -40,13 +41,14 @@
     <string name="plv_chat_toast_history_all_loaded">历史记录已全部加载完成！</string>
     <string name="plv_chat_toast_history_load_failed">历史记录加载失败</string>
     <string name="plv_chat_view_all_message">查看全部</string>
-    <string name="plv_chat_view_special_message">只看讲师</string>
+    <string name="plv_chat_view_special_message">只看主持</string>
     <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
     <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
     <string name="plv_chat_chooser_sel_img">选择图片</string>
     <string name="plv_chat_send_img_error_tip_permission_denied">发送图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复</string>
     <string name="plv_chat_send_img_error_tip_permission_cancel">请允许存储权限后再发送图片</string>
     <string name="plv_chat_cannot_retrieve_selected_image">不能检索到选择的图片</string>
+    <string name="plv_chat_connect_fail_and_cannot_input">聊天室连接失败，请尝试刷新解\n决。如无法解决请联系管理员。</string>
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">暂不支持移动端购买</string>
 

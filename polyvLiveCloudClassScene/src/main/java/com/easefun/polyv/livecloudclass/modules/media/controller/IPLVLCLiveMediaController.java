@@ -90,6 +90,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateWhenLeaveLinkMic();
 
     /**
+     * 当仅限音频模式时，更新布局
+     */
+    void updateWhenOnlyAudio(boolean isOnlyAudio);
+
+    /**
      * 点击关闭悬浮窗
      */
     void updateOnClickCloseFloatingView();

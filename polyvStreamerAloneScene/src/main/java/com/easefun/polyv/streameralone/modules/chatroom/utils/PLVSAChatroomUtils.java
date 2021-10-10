@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
@@ -90,6 +91,10 @@ public class PLVSAChatroomUtils {
     //添加表情
     private static void appendEmo(String emoKey, EditText inputEt) {
         SpannableStringBuilder span = new SpannableStringBuilder(emoKey);
+        if(inputEt.getText().length() + span.length() >= 200){
+            Log.e("ChatroomUtils", "appendEmo fail because exceed maxLength 200");
+            return;
+        }
         int textSize = (int) inputEt.getTextSize();
         Drawable drawable;
         ImageSpan imageSpan;

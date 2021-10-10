@@ -56,14 +56,15 @@
         android:layout="@layout/plvlc_live_land_channel_controller_view_stub" />
 
     <!-- 跑马灯-->
-    <com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeView
-        android:id="@+id/plvlc_marquee_view"
+    <com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView
+        android:id="@+id/polyv_marquee_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/plvlc_video_viewstub"
         app:layout_constraintLeft_toLeftOf="@id/plvlc_video_viewstub"
         app:layout_constraintRight_toRightOf="@id/plvlc_video_viewstub"
-        app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub" />
+        app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub"
+        />
 
     <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout

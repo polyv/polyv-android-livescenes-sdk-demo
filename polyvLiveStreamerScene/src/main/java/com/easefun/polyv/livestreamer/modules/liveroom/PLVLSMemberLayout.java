@@ -126,6 +126,7 @@ public class PLVLSMemberLayout extends FrameLayout {
             plvlsMemberListLinkMicDownAllTv.setVisibility(INVISIBLE);
             plvlsMemberListLinkMicMuteAllAudioTv.setVisibility(INVISIBLE);
         }
+        updateMemberListLinkMicShowType(liveRoomDataManager.isOnlyAudio());
     }
     // </editor-fold>
 
@@ -397,6 +398,19 @@ public class PLVLSMemberLayout extends FrameLayout {
         }
     };
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="音频开播">
+
+    /**
+     * 更新成员列表显示类型
+     * @param isOnlyAudio 只显示音频部分
+     */
+    private void updateMemberListLinkMicShowType(boolean isOnlyAudio){
+        if(memberAdapter != null){
+            memberAdapter.setOnlyShowAudioUI(isOnlyAudio);
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="定时更新模糊背景view">
     private void startUpdateBlurViewTimer() {

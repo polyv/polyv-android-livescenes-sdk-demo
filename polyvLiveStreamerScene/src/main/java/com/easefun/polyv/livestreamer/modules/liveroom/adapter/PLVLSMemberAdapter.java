@@ -51,6 +51,8 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     private boolean isVideoLinkMicType = true;
     private boolean isGuestAutoLinkMic;
     private boolean isGuest = false;
+    //是否只显示音频连麦
+    private boolean isOnlyShowAudioUI = false;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -191,6 +193,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         } else {
             holder.plvlsMemberSwipeMenu.enabledSwipe(true);
             holder.showSwipeMenuInFirstOpenMemberLayout();
+        }
+        //设置是否只显示音频连麦
+        if(isOnlyShowAudioUI) {
+            holder.plvlsMemberCamIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
+            holder.plvlsMemberCamFrontIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
         }
         //设置禁言状态
         holder.plvlsMemberBanTv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
@@ -422,6 +429,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     //设置成员列表布局的状态
     public void setIsFirstOpenMemberLayout() {
         this.isFirstOpenMemberLayout = true;
+        notifyDataSetChanged();
+    }
+
+    public void setOnlyShowAudioUI(boolean isOnlyAudio){
+        this.isOnlyShowAudioUI = isOnlyAudio;
         notifyDataSetChanged();
     }
     // </editor-fold>

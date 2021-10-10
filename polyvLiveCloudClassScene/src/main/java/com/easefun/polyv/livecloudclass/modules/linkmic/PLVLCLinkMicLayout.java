@@ -1,7 +1,10 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -29,6 +32,7 @@ import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAd
 import com.easefun.polyv.livecloudclass.modules.linkmic.service.PLVLCLinkMicForegroundService;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
@@ -37,14 +41,17 @@ import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -244,6 +251,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         initLinkMicControlBar(linkMicControlBar);
+
+        observeOnAudioState(liveRoomDataManager);
     }
 
 
@@ -958,5 +967,51 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public @interface TryScrollViewStateType {/**/
     }
 // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据订阅 - 仅音频模式信息">
+
+    private void observeOnAudioState(final IPLVLiveRoomDataManager liveRoomDataManager) {
+        //监听 直播间是否是仅音频模式
+        liveRoomDataManager.getIsOnlyAudioEnabled().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean onlyAudio) {
+                if(onlyAudio == null){
+                    onlyAudio = false;
+                }
+                ArrayList<String> permissions = new ArrayList<>();
+                permissions.add(Manifest.permission.RECORD_AUDIO);
+                if(!onlyAudio){
+                    permissions.add(Manifest.permission.CAMERA);
+                }
+                linkMicPresenter.resetRequestPermissionList(permissions);
+                if(linkMicListAdapter != null){
+                    linkMicListAdapter.setOnlyAudio(onlyAudio);
+                    linkMicListAdapter.updateTeacherCoverImage();
+                }
+            }
+        });
+
+        //封面图
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (polyvLiveClassDetailVOPLVStatefulData == null || !polyvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                    return;
+                }
+                PLVLiveClassDetailVO liveClassDetail = polyvLiveClassDetailVOPLVStatefulData.getData();
+                if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                    return;
+                }
+
+                String coverImage = liveClassDetail.getData().getSplashImg();
+                if(linkMicListAdapter != null){
+                    linkMicListAdapter.setCoverImage(coverImage);
+                    linkMicListAdapter.updateTeacherCoverImage();
+                }
+            }
+        });
+    }
+    // </editor-fold >
 
 }

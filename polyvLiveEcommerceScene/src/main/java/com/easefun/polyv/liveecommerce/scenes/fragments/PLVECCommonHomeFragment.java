@@ -1,6 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -28,6 +30,7 @@ import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
+import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 /**
  * 直播和回放主页共同业务的fragment
@@ -56,6 +59,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         chatroomPresenter.requestChatHistory(0);
         //初始化socket并登录
         initSocketLoginManager();
+        //获取表情列表
+        chatroomPresenter.getChatEmotionImages();
 
         observeChatroomData();
     }
@@ -176,7 +181,12 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         public void onKickEvent(@NonNull PLVKickEvent kickEvent, boolean isOwn) {
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
-                showExitDialog(R.string.plv_chat_toast_been_kicked);
+                PLVToast.Builder.context(Utils.getApp())
+                        .duration(3000)
+                        .setText(R.string.plv_chat_toast_been_kicked)
+                        .build()
+                        .show();
+                ((Activity)getContext()).finish();
             }
         }
 

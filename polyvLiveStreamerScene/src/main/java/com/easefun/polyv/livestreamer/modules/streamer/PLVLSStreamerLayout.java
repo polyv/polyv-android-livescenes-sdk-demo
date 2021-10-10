@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.streamer;
 
 import android.app.AlertDialog;
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -24,8 +26,10 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
 import com.easefun.polyv.livestreamer.modules.streamer.service.PLVLSForegroundService;
@@ -103,6 +107,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                 streamerPresenter.setupRenderView(surfaceView, linkMicId);
             }
         });
+        streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());
 
         //启动前台服务，防止在后台被杀
         PLVLSForegroundService.startService();
@@ -118,6 +123,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         streamerPresenter = new PLVStreamerPresenter(liveRoomDataManager);
         streamerPresenter.registerView(streamerView);
         streamerPresenter.init();
+        observeClassDetailData();
     }
 
     @Override
@@ -325,4 +331,32 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
     };
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="订阅 - 直播间信息">
+    private void observeClassDetailData(){
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if(liveRoomDataManager.isOnlyAudio()) {
+                    //音频开播模式下，设置封面图
+                    if (plvLiveClassDetailVOPLVStatefulData != null && plvLiveClassDetailVOPLVStatefulData.getData() != null
+                            && plvLiveClassDetailVOPLVStatefulData.getData().getData() != null) {
+                        updateTeacherCameraCoverImage(plvLiveClassDetailVOPLVStatefulData.getData().getData().getSplashImg());
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 更新讲师的封面图
+     */
+    private void updateTeacherCameraCoverImage(String coverImage){
+        if(streamerAdapter != null){
+            streamerAdapter.updateCoverImage(coverImage);
+        }
+
+    }
+    // </editor-fold >
 }
