@@ -45,6 +45,13 @@
                     android:background="@color/black"
                     tools:visibility="invisible" />
 
+                <!-- 封面图（仅音频模式时展示）-->
+                <ImageView
+                    android:id="@+id/plvlc_link_mic_iv_cover_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"/>
+
                 <!--底部渐变背景-->
                 <View
                     android:layout_width="match_parent"

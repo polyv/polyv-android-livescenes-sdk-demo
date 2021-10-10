@@ -6,7 +6,7 @@ import android.widget.ImageView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -47,6 +47,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     }
 
     @Override
+    public IPLVMarqueeView getMarqueeView(){
+        return null;
+    }
+
+    @Override
     public void onSubVideoViewPlay(boolean isFirst) {
 
     }
@@ -66,6 +71,7 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
 
     }
 
+    @Override
     public void onSubVideoViewVisiblityChanged(boolean isOpenAdHead, boolean isShow) {
 
     }
@@ -101,11 +107,6 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     }
 
     @Override
-    public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName) {
-
-    }
-
-    @Override
     public void onRestartPlay() {
 
     }
@@ -136,5 +137,10 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     @Override
     public boolean onNetworkRecover() {
         return false;
+    }
+
+    @Override
+    public void onOnlyAudio(boolean isOnlyAudio) {
+        
     }
 }

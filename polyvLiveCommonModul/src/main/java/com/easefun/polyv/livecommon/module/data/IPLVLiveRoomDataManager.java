@@ -55,6 +55,11 @@ public interface IPLVLiveRoomDataManager {
     LiveData<PLVStatefulData<PLVLiveRoomDataManager.LiveStatus>> getLiveStatusData();
 
     /**
+     * 获取仅音频模式开关
+     */
+    LiveData<Boolean> getIsOnlyAudioEnabled();
+
+    /**
      * 获取请求商品接口的rank
      */
     int getCommodityRank();
@@ -78,6 +83,16 @@ public interface IPLVLiveRoomDataManager {
      * 获取是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
      */
     boolean isSupportRTC();
+
+    /**
+     * 设置是否是仅音频模式（限三分屏场景
+     */
+    void setOnlyAudio(boolean onlyAudio);
+
+    /**
+     * 是否是音频开播
+     */
+    boolean isOnlyAudio();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

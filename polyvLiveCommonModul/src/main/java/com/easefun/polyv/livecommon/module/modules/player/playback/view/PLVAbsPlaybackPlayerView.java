@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -42,6 +42,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public PLVPlayerLogoView getLogo(){
+        return null;
+    }
+
+    @Override
+    public IPLVMarqueeView getMarqueeView(){
         return null;
     }
 
@@ -112,11 +117,6 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public void onDoubleClick() {
-
-    }
-
-    @Override
-    public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName) {
 
     }
 

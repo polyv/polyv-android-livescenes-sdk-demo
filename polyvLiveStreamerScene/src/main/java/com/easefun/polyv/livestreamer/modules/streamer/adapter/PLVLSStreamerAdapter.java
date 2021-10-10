@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -30,6 +31,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
     private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
     private static final String PAYLOAD_UPDATE_GUEST_STATUS = "updateGuestStatus";
+    public static final String PAYLOAD_UPDATE_COVER_IMAGE = "updateCoverImage";
+
+    //默认的直播间封面图
+    private static final String DEFAULT_LIVE_STREAM_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
+
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -45,6 +51,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     private RecyclerView streamerRv;
     @Nullable
     private SurfaceView localRenderView;
+
+    //音频开播模式，只允许音频开播与连麦
+    private boolean isOnlyAudio = false;
+    //封面图
+    private String coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -135,6 +146,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             }
         }
 
+        bindCoverImage(holder, isOnlyAudio, isTeacher);
+
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
 
@@ -213,6 +226,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 case PAYLOAD_UPDATE_GUEST_STATUS:
                     updateGuestViewStatus(holder, itemDataBean);
                     break;
+                case PAYLOAD_UPDATE_COVER_IMAGE:
+                    bindCoverImage(holder, isOnlyAudio, isTeacher);
+                    break;
                 default:
                     break;
             }
@@ -275,6 +291,28 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     public void updateAllItem() {
         notifyDataSetChanged();
     }
+
+    /**
+     * 设置是否是音频开播。
+     * @param isOnlyAudio
+     */
+    public void setIsOnlyAudio(boolean isOnlyAudio) {
+        this.isOnlyAudio = isOnlyAudio;
+    }
+
+    /**
+     * 设置封面图
+     * 仅在音频开播模式下({@link #isOnlyAudio = true})，将该封面图设置到讲师摄像头占位
+     */
+    public void updateCoverImage(String coverImage){
+        if(TextUtils.isEmpty(coverImage)){
+            coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
+        } else if(coverImage.startsWith("//")){
+            coverImage = "https:"+coverImage;
+        }
+        this.coverImage = coverImage;
+        notifyItemChanged(0, PAYLOAD_UPDATE_COVER_IMAGE);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
@@ -318,6 +356,16 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.GONE);
         }
     }
+
+    private void bindCoverImage(@NonNull StreamerItemViewHolder holder, boolean onlyAudio, boolean isTeacher){
+        //如果是音频开播（音频连麦），则将讲师的占位图改为封面图
+        if(onlyAudio && isTeacher){
+            holder.plvlsStreamerCoverImage.setVisibility(View.VISIBLE);
+            PLVImageLoader.getInstance().loadImage(coverImage, holder.plvlsStreamerCoverImage);
+        } else {
+            holder.plvlsStreamerCoverImage.setVisibility(View.INVISIBLE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -333,6 +381,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private FrameLayout plvlsStreamerRenderViewContainer;
         private ImageView plvlsStreamerMicStateIv;
         private TextView plvlsStreamerNickTv;
+        private ImageView plvlsStreamerCoverImage;
         @Nullable
         private SurfaceView renderView;
         private PLVRoundRectLayout roundRectLayout;
@@ -349,6 +398,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerMicStateIv = itemView.findViewById(R.id.plvls_streamer_mic_state_iv);
             plvlsStreamerNickTv = itemView.findViewById(R.id.plvls_streamer_nick_tv);
             plvsStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvls_streamer_guest_link_status_tv);
+            plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
+
         }
     }
     // </editor-fold>

@@ -93,6 +93,7 @@
                 android:textSize="12sp"
                 tools:text="主持人主持人主持人主持人主持人主持人" />
 
+<!--            点赞人数-->
             <TextView
                 android:id="@+id/likes_tv"
                 android:layout_width="wrap_content"
@@ -103,10 +104,12 @@
                 android:layout_marginRight="16dp"
                 android:drawableLeft="@drawable/plvlc_icon_praise"
                 android:drawablePadding="4dp"
+                android:visibility="gone"
                 android:text="12"
                 android:textColor="#ADADC0"
                 android:textSize="12sp" />
 
+<!--            在线人数-->
             <TextView
                 android:id="@+id/viewer_count_tv"
                 android:layout_width="wrap_content"

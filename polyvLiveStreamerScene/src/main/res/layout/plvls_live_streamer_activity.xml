@@ -45,7 +45,7 @@
     <!--聊天室区域-->
     <com.easefun.polyv.livestreamer.modules.chatroom.PLVLSChatroomLayout
         android:id="@+id/plvls_chatroom_ly"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="202dp"
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="8dp"

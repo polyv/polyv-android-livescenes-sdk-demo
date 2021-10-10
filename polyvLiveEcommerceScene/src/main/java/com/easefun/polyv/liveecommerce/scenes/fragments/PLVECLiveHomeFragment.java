@@ -669,7 +669,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         int textSize = ConvertUtils.dp2px(12);
         drawable.setBounds(0, 0, (int) (textSize * 1.5), (int) (textSize * 1.5));
         span.setSpan(imageSpan, span.length() - 1, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return new PLVCustomGiftEvent(span);
+        PLVCustomGiftEvent plvCustomGiftEvent = new PLVCustomGiftEvent(span);
+        plvCustomGiftEvent.setTime(System.currentTimeMillis());
+        return plvCustomGiftEvent;
     }
     // </editor-fold>
 

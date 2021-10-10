@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
@@ -46,6 +47,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
     private static final String PAYLOAD_UPDATE_CUP = "updateCup";
     private static final String PAYLOAD_UPDATE_NET_QUALITY = "updateNetQuality";
+    private static final String PAYLOAD_UPDATE_COVER_IMAGE = "updateCoverImage";
+
+    //默认的封面图
+    private static final String DEFAULT_LIVE_STREAM_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
+
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -77,6 +83,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private PLVLinkMicListShowMode listShowMode = PLVLinkMicListShowMode.SHOW_ALL;
     //是否已经回调了绑定老师ViewHolder
     private boolean hasNotifyTeacherViewHolderBind = false;
+    //封面图
+    private String coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
+    //是否是仅音频模式
+    private boolean isOnlyAudio = false;
 
 
     /**** View ****/
@@ -137,6 +147,21 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //设置rv布局管理器
     public void setLinearLayoutManager(LinearLayoutManager linearLayoutManager) {
         this.linearLayoutManager = linearLayoutManager;
+    }
+
+    //设置封面图
+    public void setCoverImage(String coverImage) {
+        if(TextUtils.isEmpty(coverImage)){
+            coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
+        } else if(coverImage.startsWith("//")){
+            coverImage = "https:" + coverImage;
+        }
+        this.coverImage = coverImage;
+    }
+
+    //设置音频开播模式下的音频连麦
+    public void setOnlyAudio(boolean onlyAudio) {
+        isOnlyAudio = onlyAudio;
     }
 
     // </editor-fold>
@@ -292,6 +317,22 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         notifyItemChanged(myPos, PAYLOAD_UPDATE_NET_QUALITY);
     }
 
+    public void updateTeacherCoverImage(){
+        if(dataList == null){
+            return;
+        }
+        int teacherPosition = 0;
+        for (int i = 0; i < dataList.size(); i++) {
+            PLVLinkMicItemDataBean index = dataList.get(i);
+            if (index.isTeacher()) {
+                teacherPosition = i;
+                break;
+            }
+        }
+        //仅更新讲师封面图
+        notifyItemChanged(teacherPosition, PAYLOAD_UPDATE_COVER_IMAGE);
+    }
+
     //更新奖杯
     public void updateCup(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_CUP);
@@ -374,6 +415,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 hasNotifyTeacherViewHolderBind = true;
                 onTeacherSwitchViewBindListener.onTeacherSwitchViewBind(holder.switchViewAnchorLayout);
             }
+
+            bindCoverImage(holder, isOnlyAudio, isTeacher);
         }
 
         //调整item的宽高
@@ -517,6 +560,9 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                         //netQuality
                         holder.qualityWidget.setNetQuality(netQuality);
                     }
+                    break;
+                case PAYLOAD_UPDATE_COVER_IMAGE:
+                    bindCoverImage(holder, isOnlyAudio, isTeacher);
                     break;
                 default:
                     break;
@@ -672,6 +718,15 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             }
         }
     }
+
+    private void bindCoverImage(LinkMicItemViewHolder holder, boolean onlyAudio, boolean isTeacher){
+        if(onlyAudio && isTeacher){
+            holder.coverImageView.setVisibility(View.VISIBLE);
+            PLVImageLoader.getInstance().loadImage(coverImage,holder.coverImageView);
+        } else {
+            holder.coverImageView.setVisibility(View.INVISIBLE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -699,6 +754,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         private PLVRoundRectLayout roundRectLayout;
         private PLVLSNetworkQualityWidget qualityWidget;
+        private ImageView coverImageView;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -714,6 +770,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             roundRectLayout = itemView.findViewById(R.id.plvlc_linkmic_item_round_rect_layout);
             switchViewAnchorLayout = itemView.findViewById(R.id.plvlc_linkmic_switch_anchor_item);
             qualityWidget = itemView.findViewById(R.id.plvlc_link_mic_net_quality_view);
+            coverImageView = itemView.findViewById(R.id.plvlc_link_mic_iv_cover_image);
             qualityWidget.shouldShowNoNetworkHint(false);
             qualityWidget.setNetQualityRes(
                     R.drawable.plv_network_signal_watcher_good,

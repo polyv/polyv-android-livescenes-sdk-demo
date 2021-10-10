@@ -19,6 +19,7 @@ import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListe
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
+import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.IPLVLSChatroomLayout;
 import com.easefun.polyv.livestreamer.modules.document.IPLVLSDocumentLayout;
@@ -246,6 +247,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsStreamerLy.enableRecordingAudioVolume(isOpenMic);
         plvlsStreamerLy.enableLocalVideo(isOpenCamera);
         plvlsStreamerLy.setCameraDirection(isFrontCamera);
+
+        if(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio()){
+            //如果是音频开播，主动关闭摄像头，其优先级大于传进来的isOpenCamera
+            plvlsStreamerLy.enableLocalVideo(false);
+        }
 
         // 初始化状态栏布局
         plvlsStatusBarLy.init(liveRoomDataManager);

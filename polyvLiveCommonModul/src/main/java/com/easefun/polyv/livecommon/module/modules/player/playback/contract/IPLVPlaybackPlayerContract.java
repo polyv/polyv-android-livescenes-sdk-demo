@@ -7,7 +7,7 @@ import android.view.View;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -58,6 +58,12 @@ public interface IPLVPlaybackPlayerContract {
          * 获取logo
          */
         PLVPlayerLogoView getLogo();
+
+        /**
+         * 获取跑马灯view
+         * @return
+         */
+       IPLVMarqueeView getMarqueeView();
 
         /**
          * 播放器准备完成回调
@@ -148,14 +154,6 @@ public interface IPLVPlaybackPlayerContract {
          * 双击手势触发
          */
         void onDoubleClick();
-
-        /**
-         * 获取跑马灯回调
-         *
-         * @param marqueeVo  跑马灯数据
-         * @param viewerName 观看用户名
-         */
-        void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName);
 
         /**
          * 该频道直播的服务端弹幕开关

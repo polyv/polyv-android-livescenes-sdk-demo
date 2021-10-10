@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.data;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.annotation.NonNull;
 
@@ -7,6 +8,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 
 /**
  * 直播间数据管理器，实现IPLVLiveRoomDataManager接口。
@@ -35,6 +37,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
     //频道名称
     private MutableLiveData<PLVStatefulData<String>> channelNameData = new MutableLiveData<>();
+    //仅音频模式
+    private MutableLiveData<Boolean> isOnlyAudio = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
     //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
@@ -45,6 +49,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     public PLVLiveRoomDataManager(@NonNull PLVLiveChannelConfig config) {
         this.liveChannelConfig = config;
         liveRoomDataRequester = new PLVLiveRoomDataRequester(config);
+        isOnlyAudio.setValue(PLVStreamerInnerDataTransfer.getInstance().isOnlyAudio());
     }
     // </editor-fold>
 
@@ -83,6 +88,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     }
 
     @Override
+    public LiveData<Boolean> getIsOnlyAudioEnabled() {
+        return isOnlyAudio;
+    }
+
+    @Override
     public int getCommodityRank() {
         return liveRoomDataRequester.getCommodityRank();
     }
@@ -109,6 +119,20 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
         }
         return isSupportRTC;
     }
+
+    @Override
+    public void setOnlyAudio(boolean onlyAudio) {
+        isOnlyAudio.postValue(onlyAudio);
+    }
+
+    @Override
+    public boolean isOnlyAudio() {
+        if(isOnlyAudio.getValue() == null){
+            return false;
+        }
+        return isOnlyAudio.getValue();
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 3、http接口请求">

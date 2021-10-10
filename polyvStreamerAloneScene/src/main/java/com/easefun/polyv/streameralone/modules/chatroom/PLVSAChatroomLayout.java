@@ -51,6 +51,7 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAMessageAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.holder.PLVSAMessageViewHolder;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgInputWindow;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -596,7 +597,12 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         public void onKickEvent(@NonNull PLVKickEvent kickEvent, boolean isOwn) {
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
-                showExitDialog(R.string.plv_chat_toast_been_kicked);
+                PLVToast.Builder.context(PLVAppUtils.getApp())
+                        .duration(3000)
+                        .setText(R.string.plv_chat_toast_kicked_streamer)
+                        .build()
+                        .show();
+                ((Activity)getContext()).finish();
             }
         }
 

@@ -64,6 +64,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private boolean attachedToWindow = false;
 
     private long lastClickCameraSwitchViewTime;
+
+    /**
+     * 限制每800ms点击一次
+     **/
+    private static final long QUICK_CLICK_LIMIT_TIME = 800;
+    private long lastClickTime = 0;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -317,13 +323,23 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
+    private boolean quickClickLimit() {
+        long curClickTime = System.currentTimeMillis();
+        if ((curClickTime - lastClickTime) >= QUICK_CLICK_LIMIT_TIME) {
+            lastClickTime = curClickTime;
+            return false;
+        }
+        return true;
+    }
     @Override
     public void onClick(final View v) {
         int id = v.getId();
         if (id == R.id.plvsa_more_camera_iv
                 || id == R.id.plvsa_more_camera_tv) {
-            if (streamerPresenter != null) {
-                streamerPresenter.enableLocalVideo(plvsaMoreCameraIv.isSelected());
+            if (!quickClickLimit()) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.enableLocalVideo(plvsaMoreCameraIv.isSelected());
+                }
             }
         } else if (id == R.id.plvsa_more_mic_iv
                 || id == R.id.plvsa_more_mic_tv) {

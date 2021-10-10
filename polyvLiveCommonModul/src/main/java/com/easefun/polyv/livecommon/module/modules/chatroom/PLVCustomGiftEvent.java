@@ -15,6 +15,7 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
     private SpannableStringBuilder span;
     private String giftImg;
     private int giftDrawableId;
+    private Long time;
 
     public PLVCustomGiftEvent(SpannableStringBuilder span) {
         this.span = span;
@@ -55,6 +56,7 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
         SpannableStringBuilder span = new SpannableStringBuilder(uNick + (isGift ? " 赠送了 " : " 打赏 ") + rewardContent + " ");
         PLVCustomGiftEvent customGiftEvent = new PLVCustomGiftEvent(span);
         customGiftEvent.setGiftImg(gImg);
+        customGiftEvent.setTime(System.currentTimeMillis());
         if (!isGift) {
             customGiftEvent.setGiftDrawableId(R.drawable.plv_icon_money);
         }
@@ -69,5 +71,13 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
     @Override
     public String getListenEvent() {
         return PLVMessageBaseEvent.LISTEN_EVENT;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 }

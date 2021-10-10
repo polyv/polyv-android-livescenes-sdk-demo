@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
+import android.Manifest;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -179,6 +180,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         PLVLinkMicConfig.getInstance().init(viewerId, true);//需先初始化，再创建manager
         streamerManager = PLVStreamerManagerFactory.createNewStreamerManager();
+        if(liveRoomDataManager.isOnlyAudio()){
+            //音频开播模式下，不请求相机权限
+            ArrayList permissions = new ArrayList<String>();
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+            streamerManager.resetRequestPermissionList(permissions);
+        }
 
         streamerMsgHandler = new PLVStreamerMsgHandler(this);
         streamerMsgHandler.run();
@@ -218,6 +225,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             public void onStreamerEngineCreatedSuccess() {
                 PLVCommonLog.d(TAG, "推流和连麦初始化成功");
                 streamerInitState = STREAMER_MIC_INITIATED;
+
+                streamerManager.setOnlyAudio(liveRoomDataManager.isOnlyAudio());
 
                 PLVLinkMicItemDataBean linkMicItemDataBean = new PLVLinkMicItemDataBean();
                 linkMicItemDataBean.setMuteAudio(!curEnableRecordingAudioVolume);
@@ -414,6 +423,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void setupRenderView(SurfaceView renderView, String linkMicId) {
         if (isMyLinkMicId(linkMicId)) {
+            if(liveRoomDataManager.isOnlyAudio()) {
+                streamerManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
+                return;
+            }
             streamerManager.setupLocalVideo(renderView);
         } else {
             streamerManager.setupRemoteVideo(renderView, linkMicId);
