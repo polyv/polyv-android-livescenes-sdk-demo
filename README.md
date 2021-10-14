@@ -2,7 +2,7 @@ polyv-android-livescenes-sdk-demo
 ===
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v1.6.2-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.6.2)
+[![GitHub release](https://img.shields.io/badge/release-v1.6.3-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.6.3)
 
 ### 1 简介
 此项目是保利威 Android 多场景 Demo。
@@ -49,7 +49,7 @@ Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
 | Github仓库Tag | 依赖SDK版本 | API文档                                                                                 | Comon层 | 观看端-云课堂场景 | 观看端-直播带货场景 | 开播端-手机开播三分屏场景 |开播端-手机开播纯视频场景 |
 | ------------- | ----------- | ------------------------------------------------------------------------------------ | ------- | ------------- | ---------------- | -------------------- |-------------------- |
-| 1.6.2         | 1.6.2       | [v1.6.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.2/index.html)      | ✅       | ✅            | ✅               | ✅                    |✅                   |
+| 1.6.3        | 1.6.3      | [v1.6.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.2/index.html)     | ✅       | ✅            | ✅               | ✅                    |✅                   |
 | 1.6.0         | 1.6.0       | [v1.6.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.0/index.html)      | ✅       | ✅            |                  | ✅                    |✅                   |
 | 1.5.3         | 1.5.3       | [v1.5.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.3/index.html)      | ✅       | ✅            | ✅               | ✅                    |✅                   |
 | 1.5.2         | 1.5.2       | [v1.5.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.2/index.html)      | ✅       | ✅            |                  | ✅                    |✅                   |
