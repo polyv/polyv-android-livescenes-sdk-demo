@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
-import com.easefun.polyv.livecloudclass.modules.linkmic.service.PLVLCLinkMicForegroundService;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -37,6 +36,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicC
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
+import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -484,7 +484,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         linkMicListAdapter.updateAllItem();
         //启动前台服务
         Activity activity = (Activity) getContext();
-        PLVLCLinkMicForegroundService.startForegroundService(activity.getClass());
+        PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
 
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinChannelSuccess();
@@ -534,7 +534,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         teacherLocationViewSwitcher = null;
         setMediaInLinkMicListLinkMicId(null);
         //停止前台服务
-        PLVLCLinkMicForegroundService.stopForegroundService();
+        PLVForegroundService.stopForegroundService();
         //回调离开连麦
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onLeaveChannel();

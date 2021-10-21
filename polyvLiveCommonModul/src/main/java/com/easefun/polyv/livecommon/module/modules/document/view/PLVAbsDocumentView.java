@@ -79,4 +79,10 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
     public void onPptDelete(boolean success, @Nullable PLVSPPTInfo.DataBean.ContentsBean deletedPptBean) {
         // Not implemented.
     }
+
+    @Override
+    public boolean onRequestOpenPptView(int pptId, String pptName) {
+        // Not implemented.
+        return false;
+    }
 }

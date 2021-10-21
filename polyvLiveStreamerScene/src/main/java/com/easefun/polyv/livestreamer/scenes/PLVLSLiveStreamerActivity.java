@@ -161,6 +161,9 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if (plvlsDocumentLy != null) {
             plvlsDocumentLy.destroy();
         }
+        if (liveRoomDataManager != null) {
+            liveRoomDataManager.destroy();
+        }
     }
 
     @Override

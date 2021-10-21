@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:background="#BF000000">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+        android:id="@+id/plvhc_live_room_guide_linkmic_layout"
+        android:layout_width="250dp"
+        android:layout_height="86dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:rectRadius="8dp"
+        app:plvGradientOrientation="leftRight"
+        app:plvGradientColors="#00B16C, #00E78D"
+        app:triangleMargin="24dp"
+        app:triangleMarginType="left"
+        app:trianglePosition="top">
+
+        <TextView
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="点击可操作老师或学生的麦克风、摄像头等操作"
+            android:textColor="#E6FFFFFF"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical" />
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/plvhc_live_room_guide_linkmic_icon"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="180dp"
+            android:layout_marginStart="180dp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+    <RelativeLayout
+        android:id="@+id/plvhc_live_room_guide_start_class_layout"
+        android:layout_width="259dp"
+        android:layout_height="52dp"
+        android:clipChildren="false"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:layout_marginTop="100dp">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+            android:layout_width="198dp"
+            android:layout_height="46dp"
+            app:rectRadius="8dp"
+            app:plvGradientOrientation="leftRight"
+            app:plvGradientColors="#00B16C, #00E78D"
+            app:triangleHeight="8dp"
+            app:triangleWidth="12dp"
+            app:triangleMargin="17dp"
+            app:triangleMarginType="top"
+            app:trianglePosition="right"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="点击可以开始上课"
+                android:textColor="#E6FFFFFF"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp" />
+
+            <ImageView
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:src="@drawable/plvhc_live_room_guide_start_class_icon"
+                android:layout_marginLeft="133dp"
+                android:layout_marginStart="133dp"
+                android:layout_gravity="center_vertical" />
+
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+        <View
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/plvhc_live_room_guide_start_class_circle_shape"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

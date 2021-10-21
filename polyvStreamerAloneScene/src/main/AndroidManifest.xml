@@ -14,6 +14,6 @@
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.Translucent" />
 
-        <service android:name=".modules.streamer.service.PLVSAForegroundService" />
+        <service android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService" />
     </application>
 </manifest>

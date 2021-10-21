@@ -4,13 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import androidx.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livescenes.document.PLVDocumentDataManager;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
@@ -18,12 +15,9 @@ import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.upload.IPLVSDocumentUploadManager;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
-import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadSDKInitErrorListener;
-import com.easefun.polyv.livescenes.upload.manager.PLVSDocumentUploadManagerFactory;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.livescenes.document.PLVDocumentWebProcessor;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
@@ -32,8 +26,6 @@ import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-
-import okhttp3.ResponseBody;
 
 /**
  * 开播文档模块 Model层实现
@@ -66,8 +58,6 @@ public class PLVDocumentRepository {
     private final MutableLiveData<PLVSPPTStatus> plvsPptStatusLiveData = new MutableLiveData<>();
     // 事件 - PPT文本标注内容变更
     private final MutableLiveData<PLVSPPTPaintStatus> plvsPptPaintStatusLiveData = new MutableLiveData<>();
-    // 事件 - PPT文档删除响应回调
-    private final MutableLiveData<PLVStatefulData<PLVSPPTInfo.DataBean.ContentsBean>> pptOnDeleteResponseLiveData = new MutableLiveData<>();
 
     /**
      * 缓存 PPT文档列表
@@ -100,7 +90,6 @@ public class PLVDocumentRepository {
         this.liveRoomDataManager=liveRoomDataManager;
         initMsgListener();
         initWebProcessor();
-        initDocumentUploadManager();
     }
 
     private void initMsgListener() {
@@ -169,20 +158,6 @@ public class PLVDocumentRepository {
         });
     }
 
-    /**
-     * 初始化PPT文档上传管理器
-     */
-    private void initDocumentUploadManager() {
-        documentUploadManager = PLVSDocumentUploadManagerFactory.createDocumentUploadManager();
-        documentUploadManager.init(new OnPLVSDocumentUploadSDKInitErrorListener() {
-            @Override
-            public void onInitError(int errCode, String msg, Throwable throwable) {
-                Log.e(TAG, "documentUploadManager init error. [code = " + errCode + ", msg = " + msg + "]", throwable);
-                documentUploadManager = null;
-            }
-        });
-    }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - Webview">
@@ -211,7 +186,7 @@ public class PLVDocumentRepository {
      * 回调 {@link #getPptInfoLiveData()}
      */
     public void requestPptCoverList() {
-        requestPptCoverList(false);
+        PLVDocumentNetRepo.getInstance().requestPptCoverList();
     }
 
     /**
@@ -221,25 +196,7 @@ public class PLVDocumentRepository {
      * @param forceRefresh 是否强制从服务器获取数据以刷新列表
      */
     public void requestPptCoverList(boolean forceRefresh) {
-        if (!forceRefresh) {
-            if (cachePptInfo != null) {
-                plvsPptInfoLiveData.postValue(PLVStatefulData.success(cachePptInfo));
-                return;
-            }
-        }
-
-        PLVDocumentDataManager.getDocumentList(new PLVrResponseCallback<PLVSPPTInfo>() {
-            @Override
-            public void onSuccess(PLVSPPTInfo plvspptInfo) {
-                cachePptInfo = plvspptInfo;
-                plvsPptInfoLiveData.postValue(PLVStatefulData.success(cachePptInfo));
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        });
+        PLVDocumentNetRepo.getInstance().requestPptCoverList(forceRefresh);
     }
 
     /**
@@ -276,11 +233,7 @@ public class PLVDocumentRepository {
      * @param listener 上传监听回调
      */
     public void uploadPptFile(final Context context, final File file, final String type, final OnPLVSDocumentUploadListener listener) {
-        if (documentUploadManager == null) {
-            return;
-        }
-        documentUploadManager.startPollingConvertStatus();
-        documentUploadManager.addUploadTask(context, type, file, listener);
+        PLVDocumentNetRepo.getInstance().uploadPptFile(context, file, type, listener);
     }
 
     /**
@@ -289,42 +242,7 @@ public class PLVDocumentRepository {
      * @param autoId 需要删除的文档ID
      */
     public void deleteDocument(final int autoId) {
-        if (cachePptInfo == null || cachePptInfo.getData() == null || cachePptInfo.getData().getContents() == null) {
-            Log.w(TAG, "delete document failed. ppt list is null.");
-            return;
-        }
-
-        PLVSPPTInfo.DataBean.ContentsBean deleteBean = null;
-        // 根据autoId遍历获取需要删除的文档vo
-        for (PLVSPPTInfo.DataBean.ContentsBean bean : cachePptInfo.getData().getContents()) {
-            if (bean.getAutoId() == autoId) {
-                deleteBean = bean;
-                break;
-            }
-        }
-
-        if (deleteBean == null) {
-            Log.w(TAG, "delete document failed. ppt bean is null.");
-            return;
-        }
-
-        final PLVSPPTInfo.DataBean.ContentsBean finalDeleteBean = deleteBean;
-        PLVDocumentDataManager.delDocument(deleteBean, new PLVrResponseCallback<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody responseBody) {
-                pptOnDeleteResponseLiveData.postValue(PLVStatefulData.success(finalDeleteBean));
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                pptOnDeleteResponseLiveData.postValue(PLVStatefulData.<PLVSPPTInfo.DataBean.ContentsBean>error(e.getMessage(), e));
-            }
-        });
+        PLVDocumentNetRepo.getInstance().deleteDocument(autoId);
     }
 
     /**
@@ -333,46 +251,7 @@ public class PLVDocumentRepository {
      * @param fileId 需要删除的ppt文件ID
      */
     public void deleteDocument(final String fileId) {
-        if (cachePptInfo == null || cachePptInfo.getData() == null || cachePptInfo.getData().getContents() == null) {
-            Log.w(TAG, "delete document failed. ppt list is null.");
-            return;
-        }
-        if (TextUtils.isEmpty(fileId)) {
-            Log.w(TAG, "delete document failed. fileId is empty.");
-            return;
-        }
-
-        PLVSPPTInfo.DataBean.ContentsBean deleteBean = null;
-        // 根据fileId遍历获取需要删除的文档vo
-        for (PLVSPPTInfo.DataBean.ContentsBean bean : cachePptInfo.getData().getContents()) {
-            if (fileId.equalsIgnoreCase(bean.getFileId())) {
-                deleteBean = bean;
-                break;
-            }
-        }
-
-        if (deleteBean == null) {
-            Log.w(TAG, "delete document failed. ppt bean is null.");
-            return;
-        }
-
-        final PLVSPPTInfo.DataBean.ContentsBean finalDeleteBean = deleteBean;
-        PLVDocumentDataManager.delDocument(deleteBean, new PLVrResponseCallback<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody responseBody) {
-                pptOnDeleteResponseLiveData.postValue(PLVStatefulData.success(finalDeleteBean));
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                pptOnDeleteResponseLiveData.postValue(PLVStatefulData.<PLVSPPTInfo.DataBean.ContentsBean>error(e.getMessage(), e));
-            }
-        });
+        PLVDocumentNetRepo.getInstance().deleteDocument(fileId);
     }
 
     /**
@@ -380,13 +259,10 @@ public class PLVDocumentRepository {
      */
     public void destroy() {
         PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
-        if (documentUploadManager != null) {
-            documentUploadManager.destroy();
-            documentUploadManager = null;
-        }
         cachePptInfo = null;
         cachePptJsModel.clear();
         cachePptJsModel = null;
+        PLVDocumentNetRepo.getInstance().destroy();
     }
 
     // </editor-fold>
@@ -398,7 +274,7 @@ public class PLVDocumentRepository {
     }
 
     public LiveData<PLVStatefulData<PLVSPPTInfo>> getPptInfoLiveData() {
-        return plvsPptInfoLiveData;
+        return PLVDocumentNetRepo.getInstance().getPptInfoLiveData();
     }
 
     public LiveData<PLVStatefulData<PLVSPPTJsModel>> getPptJsModelLiveData() {
@@ -414,7 +290,7 @@ public class PLVDocumentRepository {
     }
 
     public LiveData<PLVStatefulData<PLVSPPTInfo.DataBean.ContentsBean>> getPptOnDeleteResponseLiveData() {
-        return pptOnDeleteResponseLiveData;
+        return PLVDocumentNetRepo.getInstance().getPptOnDeleteResponseLiveData();
     }
 
     // </editor-fold>

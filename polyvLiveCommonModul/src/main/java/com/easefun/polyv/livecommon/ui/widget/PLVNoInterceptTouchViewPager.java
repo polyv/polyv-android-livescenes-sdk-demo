@@ -30,6 +30,7 @@ public class PLVNoInterceptTouchViewPager extends PLVSimpleViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+//        return false;
         boolean result = super.onInterceptTouchEvent(ev);//handle slide-touch-up no restore
         return dispatchTouchEvent && result;//inner view click
     }

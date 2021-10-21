@@ -53,7 +53,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Left"
-            android:background="@drawable/plvsc_widget_confirm_dialog_left_button_bg"
+            android:background="@drawable/plvsa_widget_confirm_dialog_left_button_bg"
             android:paddingTop="11dp"
             android:paddingBottom="11dp" />
 
@@ -75,7 +75,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="Right"
-            android:background="@drawable/plvsc_widget_confirm_dialog_right_button_bg"
+            android:background="@drawable/plvsa_widget_confirm_dialog_right_button_bg"
             android:paddingTop="11dp"
             android:paddingBottom="11dp">
 

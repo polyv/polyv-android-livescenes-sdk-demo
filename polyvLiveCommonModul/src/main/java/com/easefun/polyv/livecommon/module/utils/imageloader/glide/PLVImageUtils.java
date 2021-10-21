@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.text.TextUtils;
 
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
@@ -175,5 +176,18 @@ public class PLVImageUtils {
          */
 
         return new int[]{imageWidth, imageHeight};
+    }
+
+    public static String fixImageUrl(String origin) {
+        if (TextUtils.isEmpty(origin)) {
+            return origin;
+        }
+        if (origin.startsWith("//")) {
+            return "http:" + origin;
+        } else if (origin.startsWith("/")) {
+            return "http://livestatic.videocc.net" + origin;
+        } else {
+            return origin;
+        }
     }
 }

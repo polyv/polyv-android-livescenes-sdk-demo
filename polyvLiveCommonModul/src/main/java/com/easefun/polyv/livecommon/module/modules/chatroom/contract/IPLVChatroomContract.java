@@ -11,6 +11,7 @@ import android.util.Pair;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
@@ -31,6 +32,7 @@ import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
 
@@ -198,6 +200,12 @@ public interface IPLVChatroomContract {
         void onSendProhibitedWord(@NonNull String prohibitedMessage, @NonNull String hintMsg, @NonNull String status);
 
         /**
+         * 房间开启关闭变化
+         */
+        @MainThread
+        void onCloseRoomStatusChanged(boolean isClose);
+
+        /**
          * 接收到的需要添加到列表的文本发言、图片信息
          */
         @WorkerThread
@@ -223,6 +231,13 @@ public interface IPLVChatroomContract {
          */
         @MainThread
         void onHistoryRequestFailed(String errorMsg, Throwable t, int viewIndex);
+
+        /**
+         * 踢出列表数据
+         *
+         * @param dataList 数据列表
+         */
+        void onKickUsersList(List<PLVSocketUserBean> dataList);
     }
     // </editor-fold>
 
@@ -322,6 +337,11 @@ public interface IPLVChatroomContract {
         void requestChatHistory(int viewIndex);
 
         /**
+         * 请求被踢出的用户列表
+         */
+        void requestKickUsers();
+
+        /**
          * 获取历史记录成功的次数
          */
         int getChatHistoryTime();
@@ -335,6 +355,19 @@ public interface IPLVChatroomContract {
          * 获取聊天室个性表情
          */
         void getChatEmotionImages();
+
+        /**
+         * 是否关闭房间
+         */
+        boolean isCloseRoom();
+
+        /**
+         * 开启/关闭房间
+         *
+         * @param isClose  true：关闭，false：开启
+         * @param listener 监听器
+         */
+        void toggleRoom(final boolean isClose, final IPolyvChatroomManager.RequestApiListener<String> listener);
 
         /**
          * 获取聊天室的数据

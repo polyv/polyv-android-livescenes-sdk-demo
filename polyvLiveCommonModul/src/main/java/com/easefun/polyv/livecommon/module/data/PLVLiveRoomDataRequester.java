@@ -18,6 +18,10 @@ import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.sign.PLVSignCreator;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.hiclass.PLVHiClassDataBean;
+import com.plv.livescenes.hiclass.api.PLVHCApiManager;
+import com.plv.livescenes.hiclass.vo.PLVHCLessonDetailVO;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.EncryptUtils;
 
 import org.json.JSONObject;
@@ -52,7 +56,7 @@ public class PLVLiveRoomDataRequester {
     private Disposable channelSwitchDisposable;
     private Disposable getLiveStatusDisposable;
     private Disposable updateChannelNameDisposable;
-
+    private Disposable lessonDetailDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -138,6 +142,7 @@ public class PLVLiveRoomDataRequester {
         String appId = PolyvLiveSDKClient.getInstance().getAppId();
         channelDetailDisposable = PolyvChatApiRequestHelper.getInstance().requestLiveClassDetailApi(channelId, appId, appSecret)
                 .retryWhen(new PLVRxBaseRetryFunction(3, 3000))
+                .compose(new PLVRxBaseTransformer<PolyvLiveClassDetailVO, PolyvLiveClassDetailVO>())
                 .subscribe(new Consumer<PolyvLiveClassDetailVO>() {
                     @Override
                     public void accept(PolyvLiveClassDetailVO liveClassDetailVO) throws Exception {
@@ -168,6 +173,7 @@ public class PLVLiveRoomDataRequester {
         String channelId = getConfig().getChannelId();
         channelSwitchDisposable = PolyvChatApiRequestHelper.getInstance().requestFunctionSwitch(channelId)
                 .retryWhen(new PLVRxBaseRetryFunction(3, 3000))
+                .compose(new PLVRxBaseTransformer<PolyvChatFunctionSwitchVO, PolyvChatFunctionSwitchVO>())
                 .subscribe(new Consumer<PolyvChatFunctionSwitchVO>() {
                     @Override
                     public void accept(PolyvChatFunctionSwitchVO polyvChatFunctionSwitchVO) throws Exception {
@@ -348,6 +354,46 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="获取详情课节数据 - 请求、取消">
+    void requestLessonDetail(final IPLVNetRequestListener<PLVHiClassDataBean> listener) {
+        disposeLessonDetail();
+        boolean isTeacherType = PLVSocketUserConstant.USERTYPE_TEACHER.equals(getConfig().getUser().getViewerType());
+        String courseCode = getConfig().getHiClassConfig().getCourseCode();
+        long lessonId = getConfig().getHiClassConfig().getLessonId();
+        String token = getConfig().getHiClassConfig().getToken();
+        lessonDetailDisposable = PLVHCApiManager.getInstance().getLessonDetail(isTeacherType, courseCode, lessonId, token)
+                .retryWhen(new PLVRxBaseRetryFunction(3, 3000))
+                .compose(new PLVRxBaseTransformer<PLVHCLessonDetailVO, PLVHCLessonDetailVO>())
+                .subscribe(new Consumer<PLVHCLessonDetailVO>() {
+                    @Override
+                    public void accept(PLVHCLessonDetailVO plvhcLessonDetailVO) throws Exception {
+                        if (plvhcLessonDetailVO.isSuccess() != null
+                                && plvhcLessonDetailVO.isSuccess()
+                                && plvhcLessonDetailVO.getData() != null) {
+                            if (listener != null) {
+                                listener.onSuccess(plvhcLessonDetailVO.getData());
+                            }
+                        } else {
+                            throw new Exception(plvhcLessonDetailVO.getError().getDesc() + "-" + plvhcLessonDetailVO.getError().getCode());
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposeLessonDetail() {
+        if (lessonDetailDisposable != null) {
+            lessonDetailDisposable.dispose();
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -356,6 +402,7 @@ public class PLVLiveRoomDataRequester {
         disposeChannelSwitch();
         disposeGetLiveStatus();
         disposeUpdateChannelName();
+        disposeLessonDetail();
     }
     // </editor-fold>
 

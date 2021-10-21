@@ -23,6 +23,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
@@ -32,7 +33,7 @@ import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
-import com.easefun.polyv.livestreamer.modules.streamer.service.PLVLSForegroundService;
+import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -110,7 +111,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());
 
         //启动前台服务，防止在后台被杀
-        PLVLSForegroundService.startService();
+        PLVForegroundService.startForegroundService(PLVLSLiveStreamerActivity.class, "POLYV开播", R.drawable.plvls_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
     }
@@ -239,7 +240,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     @Override
     public void destroy() {
         streamerPresenter.destroy();
-        PLVLSForegroundService.stopService();
+        PLVForegroundService.stopForegroundService();
     }
     // </editor-fold>
 

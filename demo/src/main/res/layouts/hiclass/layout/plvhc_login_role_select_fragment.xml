@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#171A38">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/plvhc_login_bg" />
+
+    <ImageView
+        android:id="@+id/plvhc_login_welcome_tv"
+        android:layout_width="185dp"
+        android:layout_height="36dp"
+        android:src="@drawable/plvhc_login_welcome_text"
+        android:layout_marginTop="121dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/plvhc_login_role_select_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择你的角色"
+        android:textColor="#FFF"
+        android:textSize="26sp"
+        android:layout_marginTop="9dp"
+        android:layout_marginLeft="34dp"
+        android:layout_marginStart="34dp"
+        app:layout_constraintTop_toBottomOf="@id/plvhc_login_welcome_tv"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_login_role_student_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:radius="16dp"
+        android:background="#2D3452"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:layout_marginTop="31dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        app:layout_constraintTop_toBottomOf="@id/plvhc_login_role_select_tv">
+
+        <ImageView
+            android:id="@+id/plvhc_login_role_student_icon_iv"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/plvhc_login_role_student_icon"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/plvhc_login_role_student_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我是学生"
+            android:textStyle="bold"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            android:includeFontPadding="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignTop="@id/plvhc_login_role_student_icon_iv"
+            android:layout_toRightOf="@id/plvhc_login_role_student_icon_iv"
+            android:layout_toEndOf="@id/plvhc_login_role_student_icon_iv" />
+
+        <TextView
+            android:id="@+id/plvhc_login_role_student_label_desc_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="轻松在线学习"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignBottom="@id/plvhc_login_role_student_icon_iv"
+            android:layout_toRightOf="@id/plvhc_login_role_student_icon_iv"
+            android:layout_toEndOf="@id/plvhc_login_role_student_icon_iv" />
+
+        <ImageView
+            android:id="@+id/plvhc_login_role_student_nav_iv"
+            android:layout_width="10dp"
+            android:layout_height="18dp"
+            android:src="@drawable/plvhc_login_role_select_nav_icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_login_role_teacher_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:radius="16dp"
+        android:background="#2D3452"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        app:layout_constraintTop_toBottomOf="@id/plvhc_login_role_student_layout">
+
+        <ImageView
+            android:id="@+id/plvhc_login_role_teacher_icon_iv"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/plvhc_login_role_teacher_icon"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/plvhc_login_role_teacher_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我是老师"
+            android:textStyle="bold"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            android:includeFontPadding="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignTop="@id/plvhc_login_role_teacher_icon_iv"
+            android:layout_toRightOf="@id/plvhc_login_role_teacher_icon_iv"
+            android:layout_toEndOf="@id/plvhc_login_role_teacher_icon_iv" />
+
+        <TextView
+            android:id="@+id/plvhc_login_role_teacher_label_desc_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="轻松直播开课"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignBottom="@id/plvhc_login_role_teacher_icon_iv"
+            android:layout_toRightOf="@id/plvhc_login_role_teacher_icon_iv"
+            android:layout_toEndOf="@id/plvhc_login_role_teacher_icon_iv" />
+
+        <ImageView
+            android:id="@+id/plvhc_login_role_teacher_nav_iv"
+            android:layout_width="10dp"
+            android:layout_height="18dp"
+            android:src="@drawable/plvhc_login_role_select_nav_icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

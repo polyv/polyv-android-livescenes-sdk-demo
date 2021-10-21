@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BF000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:radius="16dp"
+        app:mode="top"
+        android:background="#FFF"
+        android:layout_marginTop="44dp">
+
+        <TextView
+            android:id="@+id/plvhc_login_area_code_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择国家地区"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="23dp"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/plvhc_login_area_code_back_iv"
+            android:layout_width="20dp"
+            android:layout_height="26dp"
+            android:padding="5dp"
+            android:src="@drawable/plvhc_login_area_code_select_back_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@id/plvhc_login_area_code_label_tv"
+            android:layout_alignBottom="@id/plvhc_login_area_code_label_tv" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/plvhc_login_area_code_rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="23dp"
+            android:layout_below="@id/plvhc_login_area_code_label_tv"
+            android:layout_alignParentBottom="true" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVSt
 import com.easefun.polyv.livescenes.streamer.listener.IPLVSStreamerOnLiveStatusChangeListener;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
+import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -712,6 +713,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         final String roomId = loginRoomId;
         listUsersDisposable = PLVChatApiRequestHelper.getListUsers(roomId, DEFAULT_MEMBER_PAGE, DEFAULT_MEMBER_LENGTH)
                 .retryWhen(new PLVRxBaseRetryFunction(Integer.MAX_VALUE, 3000))
+                .compose(new PLVRxBaseTransformer<PLVListUsersVO, PLVListUsersVO>())
                 .subscribe(new Consumer<PLVListUsersVO>() {
                     @Override
                     public void accept(PLVListUsersVO plvsListUsersVO) throws Exception {

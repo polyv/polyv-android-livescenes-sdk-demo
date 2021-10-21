@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+        android:id="@+id/plvhc_teacher_login_bg_iv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/plvhc_login_teacher_login_bg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="225dp"
+        android:background="@drawable/plvhc_login_top_left_corner_bg_shape">
+
+        <TextView
+            android:id="@+id/plvhc_login_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="34dp"
+            android:layout_marginLeft="34dp"
+            android:layout_marginTop="33dp"
+            android:text="登录账号"
+            android:textColor="#FFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvhc_login_label_teacher_tv"
+            android:layout_width="48dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="讲师"
+            android:textColor="#FFF"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/plvhc_login_label_tv"
+            app:layout_constraintLeft_toRightOf="@id/plvhc_login_label_tv"
+            app:layout_constraintStart_toEndOf="@id/plvhc_login_label_tv"
+            app:layout_constraintTop_toTopOf="@id/plvhc_login_label_tv"
+            app:plvBottomLeftRadius="2dp"
+            app:plvBottomRightRadius="15dp"
+            app:plvGradientColors="#0080FF, #3399FF"
+            app:plvGradientOrientation="leftRight"
+            app:plvTopLeftRadius="15dp"
+            app:plvTopRightRadius="2dp" />
+
+        <LinearLayout
+            android:id="@+id/plvhc_login_teacher_account_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="38dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="34dp"
+            android:paddingRight="34dp"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_label_tv">
+
+            <TextView
+                android:id="@+id/plvhc_login_teacher_account_area_code_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:text="+86"
+                android:textColor="#EEE"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/plvhc_login_area_code_select_iv"
+                android:layout_width="10dp"
+                android:layout_height="7dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:src="@drawable/plvhc_login_teacher_area_code_select_icon" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="#33FFFFFF" />
+
+            <EditText
+                android:id="@+id/plvhc_login_account_et"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="11dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="请输入账号"
+                android:inputType="phone"
+                android:singleLine="true"
+                android:textColor="#EEE"
+                android:textColorHint="#80EEEEEE"
+                android:textSize="16sp"
+                tools:text="10029430024" />
+
+            <ImageView
+                android:id="@+id/plvhc_login_account_clear_iv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/plvhc_login_input_clear_icon"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/plvhc_login_teacher_account_bottom_separate_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="34dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="34dp"
+            android:background="#33FFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_teacher_account_ll" />
+
+        <LinearLayout
+            android:id="@+id/plvhc_login_teacher_password_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="51dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="34dp"
+            android:paddingRight="34dp"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_teacher_account_bottom_separate_view">
+
+            <EditText
+                android:id="@+id/plvhc_login_teacher_password_et"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="11dp"
+                android:layout_marginRight="11dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="请输入密码"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:textColor="#EEE"
+                android:textColorHint="#80EEEEEE"
+                android:textSize="16sp"
+                tools:text="afshiohqowfhoifhowqfafshiohqowfhoifhowqfafshiohqowfhoifhowqfafshiohqowfhoifhowqf" />
+
+            <ImageView
+                android:id="@+id/plvhc_login_teacher_password_clear_iv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="11dp"
+                android:src="@drawable/plvhc_login_input_clear_icon"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/plvhc_login_teacher_password_visibility_iv"
+                android:layout_width="20dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="11dp"
+                android:src="@drawable/plvhc_login_teacher_password_visibility_selector" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/plvhc_login_teacher_password_bottom_separate_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="34dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="34dp"
+            android:background="#33FFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_teacher_password_ll" />
+
+        <TextView
+            android:id="@+id/plvhc_login_teacher_btn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="24dp"
+            android:background="@drawable/plvhc_login_button_bg"
+            android:gravity="center"
+            android:text="登录"
+            android:textColor="@color/plvhc_login_button_text_color_selector"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_teacher_password_bottom_separate_view" />
+
+        <LinearLayout
+            android:id="@+id/plvhc_login_teacher_remember_password_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="39dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="@id/plvhc_login_teacher_btn"
+            app:layout_constraintStart_toStartOf="@id/plvhc_login_teacher_btn"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_login_teacher_btn">
+
+            <CheckBox
+                android:id="@+id/plvhc_login_teacher_remember_password_cb"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:button="@null"
+                android:drawableStart="@drawable/plvhc_login_checkbox_selector"
+                android:gravity="center"
+                android:padding="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="记住密码"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plvhc_login_teacher_agree_contract_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="@+id/plvhc_login_teacher_remember_password_ll"
+            app:layout_constraintStart_toStartOf="@+id/plvhc_login_teacher_remember_password_ll"
+            app:layout_constraintTop_toBottomOf="@+id/plvhc_login_teacher_remember_password_ll">
+
+            <CheckBox
+                android:id="@+id/plvhc_login_agree_contract_cb"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:button="@null"
+                android:drawableStart="@drawable/plvhc_login_checkbox_selector"
+                android:padding="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="已阅读并同意"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/plvhc_login_contract_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="《使用协议》"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+            android:id="@+id/plvhc_login_teacher_agree_contract_indicate_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:padding="15dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/plvhc_login_teacher_agree_contract_ll"
+            app:layout_constraintLeft_toLeftOf="@id/plvhc_login_teacher_agree_contract_ll"
+            app:layout_constraintRight_toRightOf="@id/plvhc_login_teacher_agree_contract_ll"
+            app:plvGradientColors="#00B16C, #00E78D"
+            app:plvGradientOrientation="leftRight"
+            app:rectRadius="8dp"
+            app:triangleHeight="9dp"
+            app:triangleMargin="21dp"
+            app:triangleMarginType="left"
+            app:trianglePosition="bottom"
+            app:triangleWidth="12dp"
+            tools:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="请先勾选同意后再进行登录"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/plvhc_login_back_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="53dp"
+        android:src="@drawable/plvhc_login_nav_back"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.easefun.polyv.livedemo.hiclass.fragments.teacher.widget.PLVHCLoginAreaCodeSelectLayout
+        android:id="@+id/plvhc_login_area_code_select_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

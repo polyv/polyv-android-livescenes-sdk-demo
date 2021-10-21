@@ -54,9 +54,15 @@ public class PLVLiveChannelConfig {
      */
     private String colinMicType;
 
+    /**
+     * 互动学堂课堂信息
+     */
+    private HiClassConfig hiClassConfig;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
+        hiClassConfig = new HiClassConfig();
     }
 
     public PLVLiveChannelConfig(PLVLiveChannelConfig old) {
@@ -69,6 +75,7 @@ public class PLVLiveChannelConfig {
         channelType = old.channelType;
         channelName = old.channelName;
         colinMicType = old.colinMicType;
+        hiClassConfig = new HiClassConfig(old.hiClassConfig);
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -166,6 +173,19 @@ public class PLVLiveChannelConfig {
     public void setColinMicType(String colinMicType) {
         this.colinMicType = colinMicType;
     }
+
+    /**
+     * 设置互动学堂课堂信息
+     *
+     * @param token      token
+     * @param lessonId   课节Id
+     * @param courseCode 课程号
+     */
+    public void setHiClassConfig(String token, long lessonId, String courseCode) {
+        hiClassConfig.token = token;
+        hiClassConfig.lessonId = lessonId;
+        hiClassConfig.courseCode = courseCode;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -200,6 +220,10 @@ public class PLVLiveChannelConfig {
     //获取频道类型
     public PolyvLiveChannelType getChannelType() {
         return channelType;
+    }
+
+    public HiClassConfig getHiClassConfig() {
+        return hiClassConfig;
     }
 
     //是否是三分屏频道类型
@@ -319,6 +343,58 @@ public class PLVLiveChannelConfig {
         @Override
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
+        }
+    }
+
+    /**
+     * 互动学堂课堂信息
+     */
+    public static class HiClassConfig {
+
+        HiClassConfig() {
+        }
+
+        HiClassConfig(HiClassConfig old) {
+            token = old.token;
+            lessonId = old.lessonId;
+            courseCode = old.courseCode;
+        }
+
+        /**
+         * token
+         */
+        private String token;
+        /**
+         * 课节Id
+         */
+        private long lessonId;
+        /**
+         * 课程号
+         */
+        private String courseCode;
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+
+        public long getLessonId() {
+            return lessonId;
+        }
+
+        public void setLessonId(long lessonId) {
+            this.lessonId = lessonId;
+        }
+
+        public String getCourseCode() {
+            return courseCode;
+        }
+
+        public void setCourseCode(String courseCode) {
+            this.courseCode = courseCode;
         }
     }
 }

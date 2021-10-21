@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.easefun.polyv.livehiclass">
+
+    <application>
+        <activity
+            android:name="com.easefun.polyv.livehiclass.scenes.PLVHCLiveHiClassActivity"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name="com.easefun.polyv.livehiclass.modules.chatroom.widget.PLVHCChatMsgInputWindow"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:screenOrientation="behind"
+            android:theme="@style/AppTheme.Translucent" />
+        <service android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService" />
+    </application>
+</manifest>

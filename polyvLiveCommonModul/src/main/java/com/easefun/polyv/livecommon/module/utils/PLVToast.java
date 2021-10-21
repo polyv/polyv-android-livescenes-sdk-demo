@@ -6,12 +6,16 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +50,7 @@ public class PLVToast {
 
         final TextView textView = new AppCompatTextView(param.context);
         textView.setMinWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 228));
+        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 158));
         textView.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         textView.setMaxLines(4);
         textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -54,12 +58,44 @@ public class PLVToast {
         textView.setTextColor(param.textColor);
         int horizontalPadding = PLVUIUtil.dip2px(param.context, 16);
         int verticalPadding = PLVUIUtil.dip2px(param.context, 10);
+
+        if (param.drawableResId != 0) {
+            textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 196));
+            textView.setPadding(PLVUIUtil.dip2px(param.context, 8), 0, 0, 0);
+
+            ImageView imageView = new AppCompatImageView(param.context);
+            imageView.setImageResource(param.drawableResId);
+
+            final LinearLayout linearLayout = new LinearLayout(param.context);
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            linearLayout.setGravity(Gravity.CENTER);
+            linearLayout.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+            linearLayout.addView(imageView);
+            linearLayout.addView(textView);
+            linearLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    GradientDrawable gradientDrawable = new GradientDrawable();
+                    gradientDrawable.setColor(param.backgroundColor);
+                    if (textView.getLayout() == null || textView.getLayout().getLineCount() > 1) {
+                        gradientDrawable.setCornerRadius(PLVUIUtil.dip2px(param.context, 8));
+                    } else {
+                        gradientDrawable.setCornerRadius(PLVUIUtil.dip2px(param.context, 20));
+                    }
+                    linearLayout.setBackground(gradientDrawable);
+                }
+            });
+
+            toast.setView(linearLayout);
+            return;
+        }
+
         textView.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         textView.post(new Runnable() {
             @Override
             public void run() {
                 GradientDrawable gradientDrawable = new GradientDrawable();
-                gradientDrawable.setColor(Color.parseColor("#991B202D"));
+                gradientDrawable.setColor(param.backgroundColor);
                 if (textView.getLayout() == null || textView.getLayout().getLineCount() > 1) {
                     gradientDrawable.setCornerRadius(PLVUIUtil.dip2px(param.context, 8));
                 } else {
@@ -100,14 +136,19 @@ public class PLVToast {
     private static class ToastParam {
         private Context context;
         private CharSequence text;
-        private @ColorInt
-        int textColor;
+        @ColorInt
+        private int textColor;
+        @ColorInt
+        private int backgroundColor;
+        @DrawableRes
+        private int drawableResId;
         private int showDuration;
     }
 
     public static class Builder {
 
         private static final int DEFAULT_TEXT_COLOR = Color.parseColor("#F0F1F5");
+        private static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#991B202D");
         private static final int DEFAULT_SHOW_DURATION = Toast.LENGTH_SHORT;
 
         private ToastParam param;
@@ -115,6 +156,7 @@ public class PLVToast {
         private Builder() {
             param = new ToastParam();
             param.textColor = DEFAULT_TEXT_COLOR;
+            param.backgroundColor = DEFAULT_BACKGROUND_COLOR;
             param.showDuration = DEFAULT_SHOW_DURATION;
         }
 
@@ -140,6 +182,16 @@ public class PLVToast {
 
         public Builder setTextColor(@ColorInt int textColor) {
             param.textColor = textColor;
+            return this;
+        }
+
+        public Builder setBackgroundColor(@ColorInt int backgroundColor) {
+            param.backgroundColor = backgroundColor;
+            return this;
+        }
+
+        public Builder setDrawable(@DrawableRes int drawableResId) {
+            param.drawableResId = drawableResId;
             return this;
         }
 

@@ -2,8 +2,12 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
 import androidx.annotation.IntRange;
 
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * date: 2020/7/27
@@ -31,6 +35,10 @@ public class PLVLinkMicItemDataBean {
     private boolean muteAudio;
     //奖杯数量
     private int cupNum;
+    //举手状态
+    private boolean isRaiseHand;
+    //画笔授权状态
+    private boolean isHasPaint;
     //参考[PLVSocketUserConstant]
     private String userType;
     //头衔
@@ -43,25 +51,57 @@ public class PLVLinkMicItemDataBean {
 
     //linkMic status
     private String status = STATUS_IDLE;
-    private MuteMedia muteVideoInRtcJoinList;
-    private MuteMedia muteAudioInRtcJoinList;
+    private Map<Integer, MuteMedia> muteVideoInRtcJoinListMap = new HashMap<>();
+    private Map<Integer, MuteMedia> muteAudioInRtcJoinListMap = new HashMap<>();
+
+    //流类型
+    private int streamType = PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX;
 
     public MuteMedia getMuteVideoInRtcJoinList() {
-        return muteVideoInRtcJoinList;
+        return getMuteVideoInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+    }
+
+    public MuteMedia getMuteVideoInRtcJoinList(int streamType) {
+        return muteVideoInRtcJoinListMap.get(streamType);
     }
 
     public void setMuteVideoInRtcJoinList(MuteMedia muteVideoInRtcJoinList) {
-        this.muteVideoInRtcJoinList = muteVideoInRtcJoinList;
-        setMuteVideo(muteVideoInRtcJoinList.isMute);
+        this.muteVideoInRtcJoinListMap.put(muteVideoInRtcJoinList.getStreamType(), muteVideoInRtcJoinList);
+        if (includeStreamType(muteVideoInRtcJoinList.getStreamType())) {
+            setMuteVideo(muteVideoInRtcJoinList.isMute);
+        }
     }
 
     public MuteMedia getMuteAudioInRtcJoinList() {
-        return muteAudioInRtcJoinList;
+        return getMuteAudioInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+    }
+
+    public MuteMedia getMuteAudioInRtcJoinList(int streamType) {
+        return muteAudioInRtcJoinListMap.get(streamType);
     }
 
     public void setMuteAudioInRtcJoinList(MuteMedia muteAudioInRtcJoinList) {
-        this.muteAudioInRtcJoinList = muteAudioInRtcJoinList;
-        setMuteAudio(muteAudioInRtcJoinList.isMute);
+        this.muteAudioInRtcJoinListMap.put(muteAudioInRtcJoinList.getStreamType(), muteAudioInRtcJoinList);
+        if (includeStreamType(muteAudioInRtcJoinList.getStreamType())) {
+            setMuteAudio(muteAudioInRtcJoinList.isMute);
+        }
+    }
+
+    public int getStreamType() {
+        return streamType;
+    }
+
+    public void setStreamType(int streamType) {
+        this.streamType = streamType;
+    }
+
+    public boolean equalStreamType(int streamType) {
+        return this.streamType == streamType;
+    }
+
+    public boolean includeStreamType(int streamType) {
+        return equalStreamType(streamType)
+                || PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX == this.streamType;
     }
 
     public String getStatus() {
@@ -119,6 +159,22 @@ public class PLVLinkMicItemDataBean {
 
     public void setCupNum(int cupNum) {
         this.cupNum = cupNum;
+    }
+
+    public boolean isRaiseHand() {
+        return isRaiseHand;
+    }
+
+    public void setRaiseHand(boolean raiseHand) {
+        isRaiseHand = raiseHand;
+    }
+
+    public boolean isHasPaint() {
+        return isHasPaint;
+    }
+
+    public void setHasPaint(boolean hasPaint) {
+        this.isHasPaint = hasPaint;
     }
 
     public int getCurVolume() {
@@ -189,9 +245,15 @@ public class PLVLinkMicItemDataBean {
 
     public static class MuteMedia {
         boolean isMute;
+        int streamType;
 
         public MuteMedia(boolean isMute) {
+            this(isMute, PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+        }
+
+        public MuteMedia(boolean isMute, int streamType) {
             this.isMute = isMute;
+            this.streamType = streamType;
         }
 
         public boolean isMute() {
@@ -201,9 +263,17 @@ public class PLVLinkMicItemDataBean {
         public void setMute(boolean mute) {
             isMute = mute;
         }
+
+        public int getStreamType() {
+            return streamType;
+        }
+
+        public void setStreamType(int streamType) {
+            this.streamType = streamType;
+        }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="状态方法被调用触发回调">
+    // <editor-fold defaultstate="collapsed" desc="连麦状态方法被调用触发回调">
     private Runnable statusMethodCallListener;
 
     public void setStatusMethodCallListener(Runnable runnable) {
@@ -227,13 +297,16 @@ public class PLVLinkMicItemDataBean {
                 ", muteVideo=" + muteVideo +
                 ", muteAudio=" + muteAudio +
                 ", cupNum=" + cupNum +
+                ", isRaiseHand=" + isRaiseHand +
+                ", isHasPaint=" + isHasPaint +
                 ", userType='" + userType + '\'' +
                 ", actor='" + actor + '\'' +
                 ", pic='" + pic + '\'' +
                 ", curVolume=" + curVolume +
                 ", status='" + status + '\'' +
-                ", muteVideoInRtcJoinList=" + muteVideoInRtcJoinList +
-                ", muteAudioInRtcJoinList=" + muteAudioInRtcJoinList +
+                ", muteVideoInRtcJoinListMap=" + muteVideoInRtcJoinListMap +
+                ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
+                ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
                 '}';
     }

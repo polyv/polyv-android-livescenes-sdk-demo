@@ -8,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -31,6 +30,7 @@ import java.util.List;
 
 //need android:windowSoftInputMode="stateHidden|adjustResize"
 public abstract class PLVInputWindow extends PLVBaseActivity {
+    // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVInputWindow";
     private static final int ALLOW_SHOW_INTERVAL = 1200;
     private static long lastStartTime;
@@ -46,7 +46,34 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     private ViewGroup willShowPopupLayout;
 
     protected static InputListener inputListener;
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="公共静态方法">
+    public static void show(Activity packageActivity, Class<? extends PLVInputWindow> cls, InputListener listener) {
+        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
+            lastStartTime = System.currentTimeMillis();
+            inputListener = listener;
+            Intent intent = new Intent(packageActivity, cls);
+            packageActivity.startActivity(intent);
+            packageActivity.overridePendingTransition(0, 0);
+        }
+    }
+
+    public static void show(Activity packageActivity, Intent intent, InputListener listener) {
+        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
+            lastStartTime = System.currentTimeMillis();
+            inputListener = listener;
+            packageActivity.startActivity(intent);
+            packageActivity.overridePendingTransition(0, 0);
+        }
+    }
+
+    public static void setLastInputText(SpannableStringBuilder spannableStringBuilder) {
+        lastInputText = spannableStringBuilder;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +86,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         FrameLayout content = findViewById(android.R.id.content);
         final View childOfContent = content.getChildAt(0);
         childOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
             public void onGlobalLayout() {//all call, but not show viewBg
                 int usableHeightNow = computeUsableHeight(childOfContent);
                 int usableHeightSansKeyboard = childOfContent.getRootView().getHeight();
@@ -98,22 +126,52 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         }
     }
 
-    public int computeUsableHeight(View view) {
-        Rect r = new Rect();
-        view.getWindowVisibleDisplayFrame(r);
-        //隐藏状态栏情况下才需计算
-        return r.bottom;//待完善，横屏为r.bottom，竖屏时为r.bottom-r.top+navbarHeight，存在刘海屏需-r.top，不存在刘海时需使用0(r.top有值)
+    @Override
+    public void finish() {
+        if (isShowKeyBoard || popupLayoutIsVisible()) {
+            hideSoftInputAndPopupLayout();
+            return;
+        }
+        if (inputView != null) {
+            lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏
+        }
+        inputListener = null;
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        super.finish();
+        overridePendingTransition(0, 0);//after finish
     }
 
-    public boolean isHideStatusBar() {
-        return false;//待完善
+    @Override
+    public void onBackPressed() {
+        if (!isShowKeyBoard && !popupLayoutIsVisible()) {
+            backPressed();
+        }
+        super.onBackPressed();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            requestClose();
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (!hasFocus) {
+            hideSoftInputAndPopupLayout();
+        }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
         viewBg = findViewById(bgViewId());
         viewBg.setVisibility(View.GONE);
         inputView = findViewById(inputViewId());
-        if (!TextUtils.isEmpty(lastInputText)) {
+        if (lastInputText != null) {
             inputView.setText(lastInputText);
             inputView.setSelection(inputView.getText().length());
         }
@@ -160,6 +218,19 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                 return false;
             }
         });
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="对外API">
+    public int computeUsableHeight(View view) {
+        Rect r = new Rect();
+        view.getWindowVisibleDisplayFrame(r);
+        //隐藏状态栏情况下才需计算
+        return r.bottom;//待完善，横屏为r.bottom，竖屏时为r.bottom-r.top+navbarHeight，存在刘海屏需-r.top，不存在刘海时需使用0(r.top有值)
+    }
+
+    public boolean isHideStatusBar() {
+        return false;//待完善
     }
 
     public void hideStatusBar() {
@@ -213,81 +284,28 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     public void backPressed() {
     }
 
-    public abstract boolean firstShowInput();
-
-    public abstract int layoutId();
-
-    public abstract int bgViewId();
-
-    public abstract int inputViewId();
-
-    public static void show(Activity packageActivity, Class<? extends PLVInputWindow> cls, InputListener listener) {
-        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
-            lastStartTime = System.currentTimeMillis();
-            inputListener = listener;
-            Intent intent = new Intent(packageActivity, cls);
-            packageActivity.startActivity(intent);
-            packageActivity.overridePendingTransition(0, 0);
-        }
-    }
-
-    public static void show(Activity packageActivity, Intent intent, InputListener listener) {
-        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
-            lastStartTime = System.currentTimeMillis();
-            inputListener = listener;
-            packageActivity.startActivity(intent);
-            packageActivity.overridePendingTransition(0, 0);
-        }
-    }
-
     public void requestClose() {
         hideSoftInputAndPopupLayout();
         isShowKeyBoard = false;
         finish();
     }
-
-    // <editor-fold defaultstate="collapsed" desc="生命周期等方法">
-    @Override
-    public void onBackPressed() {
-        if (!isShowKeyBoard && !popupLayoutIsVisible()) {
-            backPressed();
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    public void finish() {
-        if (isShowKeyBoard || popupLayoutIsVisible()) {
-            hideSoftInputAndPopupLayout();
-            return;
-        }
-        if (inputView != null) {
-            lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏
-        }
-        inputListener = null;
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        super.finish();
-        overridePendingTransition(0, 0);//after finish
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            requestClose();
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (!hasFocus) {
-            hideSoftInputAndPopupLayout();
-        }
-    }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="popupLayout">
+    // <editor-fold defaultstate="collapsed" desc="抽象API">
+    //第一次弹出时显示输入框布局还是弹窗布局(例如表情布局为弹窗布局类型)
+    public abstract boolean firstShowInput();
+
+    //输入窗口布局的id
+    public abstract int layoutId();
+
+    //输入窗口布局的键盘未弹出时的背景view的id
+    public abstract int bgViewId();
+
+    //输入窗口布局的输入框view的id
+    public abstract int inputViewId();
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="保护API">
     protected void addPopupButton(View view) {
         popupButtonList.add(view);
     }
@@ -357,7 +375,9 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 输入窗口监听器">
     public interface InputListener {
         boolean onSendMsg(String message);
     }
+    // </editor-fold>
 }

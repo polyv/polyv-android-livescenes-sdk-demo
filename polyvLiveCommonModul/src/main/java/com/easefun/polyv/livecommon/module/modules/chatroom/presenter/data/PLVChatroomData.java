@@ -26,6 +26,8 @@ public class PLVChatroomData {
     private MutableLiveData<Long> viewerCountData = new MutableLiveData<>();
     //在线人数
     private MutableLiveData<Integer> onlineCountData = new MutableLiveData<>();
+    //踢出人数
+    private MutableLiveData<Integer> kickCountData = new MutableLiveData<>();
     //聊天室收到的文本发言信息(包括自己本地发送的信息)
     private MutableLiveData<Pair<CharSequence, Boolean>> speakMessageData = new MutableLiveData<>();
     //聊天室登录事件
@@ -74,6 +76,14 @@ public class PLVChatroomData {
 
     public void postOnlineCountData(int onlineCount) {
         onlineCountData.postValue(onlineCount);
+    }
+
+    public LiveData<Integer> getKickCountData() {
+        return kickCountData;
+    }
+
+    public void postKickCountData(int kickCount) {
+        kickCountData.postValue(kickCount);
     }
 
     public LiveData<Pair<CharSequence, Boolean>> getSpeakMessageData() {

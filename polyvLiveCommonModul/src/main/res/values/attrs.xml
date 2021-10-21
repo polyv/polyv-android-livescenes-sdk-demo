@@ -164,37 +164,46 @@
         <attr name="clickToClose" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="PLVTriangleIndicateTextView">
-        <attr name="triangleWidth" format="dimension" />
-        <attr name="triangleHeight" format="dimension" />
-        <attr name="triangleMargin" format="dimension" />
-        <attr name="trianglePosition" format="enum">
-            <enum name="top" value="0" />
-            <enum name="bottom" value="1" />
-        </attr>
-        <attr name="triangleMarginType" format="enum">
-            <enum name="left" value="0" />
-            <enum name="right" value="1" />
-        </attr>
-        <attr name="indicateColor" format="color" />
-        <attr name="rectRadius" format="dimension" />
-    </declare-styleable>
+    <attr name="triangleWidth" format="dimension" />
+    <attr name="triangleHeight" format="dimension" />
+    <attr name="triangleMargin" format="dimension" />
+    <attr name="trianglePosition" format="enum">
+        <enum name="top" value="0" />
+        <enum name="bottom" value="1" />
+        <enum name="left" value="2" />
+        <enum name="right" value="3" />
+    </attr>
+    <attr name="triangleMarginType" format="enum">
+        <enum name="left" value="0" />
+        <enum name="right" value="1" />
+        <enum name="top" value="2" />
+        <enum name="bottom" value="3" />
+    </attr>
+    <attr name="indicateColor" format="color" />
+    <attr name="rectRadius" format="dimension" />
+    <attr name="plvGradientOrientation" format="enum">
+        <enum name="leftRight" value="0" />
+        <enum name="bottomLeftTopRight" value="1" />
+        <enum name="bottomTop" value="2" />
+        <enum name="bottomRightTopLeft" value="3" />
+        <enum name="rightLeft" value="4" />
+        <enum name="topRightBottomLeft" value="5" />
+        <enum name="topBottom" value="6" />
+        <enum name="topLeftBottomRight" value="7" />
+    </attr>
+    <attr name="plvGradientStartColor" format="color" />
+    <attr name="plvGradientMiddleColor" format="color" />
+    <attr name="plvGradientEndColor" format="color" />
+    <attr name="plvGradientColors" format="string" />
 
-    <declare-styleable name="PLVGradientView">
-        <attr name="plvGradientOrientation" format="enum">
-            <enum name="leftRight" value="0" />
-            <enum name="bottomLeftTopRight" value="1" />
-            <enum name="bottomTop" value="2" />
-            <enum name="bottomRightTopLeft" value="3" />
-            <enum name="rightLeft" value="4" />
-            <enum name="topRightBottomLeft" value="5" />
-            <enum name="topBottom" value="6" />
-            <enum name="topLeftBottomRight" value="7" />
-        </attr>
-        <attr name="plvGradientStartColor" format="color" />
-        <attr name="plvGradientMiddleColor" format="color" />
-        <attr name="plvGradientEndColor" format="color" />
-        <attr name="plvGradientColors" format="string" />
+    <declare-styleable name="PLVTriangleIndicateTextView">
+        <attr name="triangleWidth" />
+        <attr name="triangleHeight" />
+        <attr name="triangleMargin" />
+        <attr name="trianglePosition" />
+        <attr name="triangleMarginType" />
+        <attr name="indicateColor" />
+        <attr name="rectRadius" />
     </declare-styleable>
 
     <declare-styleable name="PLVTriangleIndicateLayout">
@@ -204,7 +213,36 @@
         <attr name="trianglePosition" />
         <attr name="triangleMarginType" />
         <attr name="indicateColor" />
+        <attr name="plvGradientColors" />
+        <attr name="plvGradientOrientation" />
         <attr name="rectRadius" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVGradientView">
+        <attr name="plvGradientOrientation" />
+        <attr name="plvGradientStartColor" />
+        <attr name="plvGradientMiddleColor" />
+        <attr name="plvGradientEndColor" />
+        <attr name="plvGradientColors" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVRoundRectGradientTextView">
+        <attr name="plvGradientOrientation" />
+        <attr name="plvGradientStartColor" />
+        <attr name="plvGradientMiddleColor" />
+        <attr name="plvGradientEndColor" />
+        <attr name="plvGradientColors" />
+        <attr name="plvRadius" format="dimension" />
+        <attr name="plvTopLeftRadius" format="dimension" />
+        <attr name="plvTopRightRadius" format="dimension" />
+        <attr name="plvBottomLeftRadius" format="dimension" />
+        <attr name="plvBottomRightRadius" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVRoundColorView">
+        <attr name="plvMainRadius" format="dimension" />
+        <attr name="plvMainColor" format="color" />
+        <attr name="plvBackgroundColor" format="color" />
     </declare-styleable>
 
 </resources>

@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.IPolyvOnlineCountListener;
 import com.easefun.polyv.livescenes.chatroom.IPolyvProhibitedWordListener;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
@@ -30,8 +31,8 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.log.chat.PolyvChatroomELog;
-import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
+import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.net.PolyvApiManager;
@@ -42,6 +43,8 @@ import com.plv.foundationsdk.net.PLVResponseApiBean2;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
+import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -116,6 +119,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private long viewerCount;
     //在线人数
     private int onlineCount;
+    //踢出人数
+    private int kickCount;
 
     //每次获取的历史记录条数
     private int getChatHistoryCount = GET_CHAT_HISTORY_COUNT;
@@ -134,6 +139,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     //图片表情列表的disposable
     private Disposable chatEmotionImagesDisposable;
+
+    //请求踢出的用户列表的disposable
+    private Disposable kickUsersDisposable;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -201,6 +209,21 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         @Override
                         public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
                             view.onSendProhibitedWord(prohibitedMessage, hintMsg, status);
+                        }
+                    });
+                }
+            }
+        });
+        //添加房间开启关闭监听器
+        PolyvChatroomManager.getInstance().addOnRoomStatusListener(new IPolyvChatroomManager.RoomStatusListener() {
+            @Override
+            public void onStatus(final boolean isClose) {
+                PLVCommonLog.d(TAG, "chatroom onRoomStatus: " + isClose);
+                if (getConfig().getChannelId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getChannelId())) {
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                            view.onCloseRoomStatusChanged(isClose);
                         }
                     });
                 }
@@ -458,6 +481,42 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void requestKickUsers() {
+        if (kickUsersDisposable != null) {
+            kickUsersDisposable.dispose();
+        }
+        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
+        }
+        kickUsersDisposable = PLVChatApiRequestHelper.getKickUsers(loginRoomId)
+                .subscribe(new Consumer<PLVKickUsersVO>() {
+                    @Override
+                    public void accept(final PLVKickUsersVO plvsKickUsersVO) throws Exception {
+                        if (plvsKickUsersVO.getCode() == 200) {
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    kickCount = plvsKickUsersVO.getData().size();
+                                    chatroomData.postKickCountData(kickCount);
+                                    view.onKickUsersList(plvsKickUsersVO.getData());
+                                }
+                            });
+                        } else {
+                            PLVCommonLog.exception(new Throwable(plvsKickUsersVO.toString()));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                        //发送错误日志，便于排查问题
+                        PLVELogSender.send(PolyvChatroomELog.class, PolyvChatroomELog.Event.GET_KICKUSERS_FAIL, throwable);
+                    }
+                });
+    }
+
+    @Override
     public int getChatHistoryTime() {
         return getChatHistoryTime;
     }
@@ -498,6 +557,16 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 });
     }
 
+    @Override
+    public boolean isCloseRoom() {
+        return PolyvChatroomManager.getInstance().isCloseRoom();
+    }
+
+    @Override
+    public void toggleRoom(boolean isClose, IPolyvChatroomManager.RequestApiListener<String> listener) {
+        PolyvChatroomManager.getInstance().toggleRoom(isClose, listener);
+    }
+
     @NonNull
     @Override
     public PLVChatroomData getData() {
@@ -520,6 +589,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         if (chatEmotionImagesDisposable != null){
             chatEmotionImagesDisposable.dispose();
+        }
+        if (kickUsersDisposable != null) {
+            kickUsersDisposable.dispose();
         }
         liveRoomDataManager.getFunctionSwitchVO().removeObserver(functionSwitchObserver);
         liveRoomDataManager.getClassDetailVO().removeObserver(classDetailVOObserver);

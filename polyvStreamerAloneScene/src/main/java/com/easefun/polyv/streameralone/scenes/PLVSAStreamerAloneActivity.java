@@ -167,6 +167,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         if (homeFragment != null) {
             homeFragment.destroy();
         }
+        if (liveRoomDataManager != null) {
+            liveRoomDataManager.destroy();
+        }
     }
 
     @Override

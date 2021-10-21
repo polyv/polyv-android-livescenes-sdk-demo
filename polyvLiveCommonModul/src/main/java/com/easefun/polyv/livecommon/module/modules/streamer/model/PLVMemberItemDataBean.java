@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.model;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.plv.socket.user.PLVClassStatusBean;
 import com.plv.socket.user.PLVSocketUserBean;
 
 /**
@@ -30,6 +31,7 @@ public class PLVMemberItemDataBean {
 
     public void setSocketUserBean(PLVSocketUserBean socketUserBean) {
         this.socketUserBean = socketUserBean;
+        syncClassStatusToLinkMicBean(socketUserBean, linkMicItemDataBean);
     }
 
     public PLVLinkMicItemDataBean getLinkMicItemDataBean() {
@@ -38,5 +40,41 @@ public class PLVMemberItemDataBean {
 
     public void setLinkMicItemDataBean(PLVLinkMicItemDataBean linkMicItemDataBean) {
         this.linkMicItemDataBean = linkMicItemDataBean;
+        syncClassStatusToLinkMicBean(socketUserBean, linkMicItemDataBean);
+    }
+
+    public void updateBaseLinkMicBean(PLVLinkMicItemDataBean linkMicItemDataBean) {
+        if (this.linkMicItemDataBean == null || linkMicItemDataBean == null) {
+            return;
+        }
+        this.linkMicItemDataBean.setUserType(linkMicItemDataBean.getUserType());
+        this.linkMicItemDataBean.setActor(linkMicItemDataBean.getActor());
+        this.linkMicItemDataBean.setNick(linkMicItemDataBean.getNick());
+        this.linkMicItemDataBean.setPic(linkMicItemDataBean.getPic());
+        this.linkMicItemDataBean.setLinkMicId(linkMicItemDataBean.getLinkMicId());
+    }
+
+    public void addBaseLinkMicBean(PLVSocketUserBean socketUserBean) {
+        if (socketUserBean == null) {
+            return;
+        }
+        PLVLinkMicItemDataBean linkMicItemDataBean = new PLVLinkMicItemDataBean();
+        linkMicItemDataBean.setUserType(socketUserBean.getUserType());
+        linkMicItemDataBean.setActor(socketUserBean.getActor());
+        linkMicItemDataBean.setNick(socketUserBean.getNick());
+        linkMicItemDataBean.setPic(socketUserBean.getPic());
+        linkMicItemDataBean.setLinkMicId(socketUserBean.getUserId());
+        setLinkMicItemDataBean(linkMicItemDataBean);
+    }
+
+    private void syncClassStatusToLinkMicBean(PLVSocketUserBean socketUserBean, PLVLinkMicItemDataBean linkMicItemDataBean) {
+        if (socketUserBean == null || linkMicItemDataBean == null) {
+            return;
+        }
+        PLVClassStatusBean classStatusBean = socketUserBean.getClassStatus();
+        if (classStatusBean != null) {
+            linkMicItemDataBean.setHasPaint(classStatusBean.hasPaint());
+            linkMicItemDataBean.setCupNum(classStatusBean.getCup());
+        }
     }
 }
