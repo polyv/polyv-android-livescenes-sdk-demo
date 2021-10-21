@@ -277,8 +277,8 @@ public class PLVLSPptListLayout extends FrameLayout {
      */
     private void initPptConvertSelectDialog() {
         pptConvertSelectDialog = new PLVConfirmDialog(getContext())
-                .setTitle(getResources().getString(R.string.document_upload_choose_convert_type))
-                .setContent(getResources().getString(R.string.document_upload_choose_convert_type_hint));
+                .setTitle(getResources().getString(R.string.plvls_document_upload_choose_convert_type))
+                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint));
     }
 
     /**
@@ -514,7 +514,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
                 if (pptVO.getUploadStatus() == PLVPptUploadStatus.STATUS_CONVERT_ANIMATE_LOSS) {
                     // 确认动效丢失，移除上传进度缓存
-                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                     // 确认动效丢失认为转码成功
                     for (PLVLSPptVO uploadListPptVO : mergePptCoverList()) {
                         if (uploadListPptVO.getFileId().equalsIgnoreCase(pptVO.getFileId())) {
@@ -534,7 +534,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                                 @Override
                                 public void onClick(View v) {
                                     // 点击取消时，清除上传进度缓存，下次不再提示
-                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                                     documentUploadAgainConfirmDialog.hide();
                                 }
                             })
@@ -542,7 +542,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                             .setRightBtnListener(new OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                                     // 重新选择文件上传
                                     if (getContext() instanceof Activity) {
                                         PLVFileChooseUtils.chooseFile((Activity) getContext(), PLVFileChooseUtils.REQUEST_CODE_CHOOSE_UPLOAD_DOCUMENT);

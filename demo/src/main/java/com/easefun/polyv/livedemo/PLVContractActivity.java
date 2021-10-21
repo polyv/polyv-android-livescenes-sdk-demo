@@ -16,6 +16,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
  * 隐私政策页
  */
 public class PLVContractActivity extends PLVBaseActivity {
+
     public static final String KEY_IS_PRIVATE_POLICY = "key_is_private_policy";
 
     private static final String URL_PRIVATE_POLICY = "https://s2.videocc.net/app-simple-pages/privacy-policy/index.html";

@@ -275,10 +275,10 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录直播">
     private void loginLive() {
-        String appId = etLiveAppId.getText().toString();
-        String appSecret = etLiveAppSecert.getText().toString();
-        String userId = etLiveUserId.getText().toString();
-        String channelId = etLiveChannelId.getText().toString();
+        final String appId = etLiveAppId.getText().toString();
+        final String appSecret = etLiveAppSecert.getText().toString();
+        final String userId = etLiveUserId.getText().toString();
+        final String channelId = etLiveChannelId.getText().toString();
         loginManager.loginLive(appId, appSecret, userId, channelId, new IPLVSceneLoginManager.OnLoginListener<PolyvLiveLoginResult>() {
             @Override
             public void onLoginSuccess(PolyvLiveLoginResult polyvLiveLoginResult) {
@@ -325,11 +325,11 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录回放">
     private void loginPlayback() {
-        String appId = etPlaybackAppId.getText().toString();
-        String appSecret = etPlaybackAppSecret.getText().toString();
-        String userId = etPlaybackUserId.getText().toString();
-        String channelId = etPlaybackChannelId.getText().toString();
-        String vid = etPlaybackVideoId.getText().toString();
+        final String appId = etPlaybackAppId.getText().toString();
+        final String appSecret = etPlaybackAppSecret.getText().toString();
+        final String userId = etPlaybackUserId.getText().toString();
+        final String channelId = etPlaybackChannelId.getText().toString();
+        final String vid = etPlaybackVideoId.getText().toString();
         loginManager.loginPlayback(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PolyvPlaybackLoginResult>() {
             @Override
             public void onLoginSuccess(PolyvPlaybackLoginResult polyvPlaybackLoginResult) {

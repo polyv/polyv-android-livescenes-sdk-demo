@@ -7,6 +7,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 
 /**
  * 直播间数据管理器的接口
@@ -53,6 +54,16 @@ public interface IPLVLiveRoomDataManager {
      * 获取直播状态LiveData
      */
     LiveData<PLVStatefulData<PLVLiveRoomDataManager.LiveStatus>> getLiveStatusData();
+
+    /**
+     * 获取有状态的互动学堂课节详情LiveData
+     */
+    LiveData<PLVStatefulData<PLVHiClassDataBean>> getFulHiClassDataBean();
+
+    /**
+     * 获取互动学堂课节详情LiveData
+     */
+    LiveData<PLVHiClassDataBean> getHiClassDataBean();
 
     /**
      * 获取仅音频模式开关
@@ -133,6 +144,11 @@ public interface IPLVLiveRoomDataManager {
      * 更新频道名称
      */
     void requestUpdateChannelName();
+
+    /**
+     * 获取详情课节数据
+     */
+    void requestLessonDetail();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

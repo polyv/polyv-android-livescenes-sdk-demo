@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="370dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/plvhc_live_room_class_stop_tv"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:src="@drawable/plvhc_live_room_stop_has_next" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_class_end_content_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="43dp"
+            android:text="课节已结束"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_class_time_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvhc_live_room_class_end_content_tv"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
+            android:text="上课时长"
+            android:textColor="#CCFFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_class_time_number_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/plvhc_live_room_class_time_text_tv"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/plvhc_live_room_class_time_text_tv"
+            android:text="00:50:22"
+            android:textColor="#FFFFFF"
+            android:textSize="21sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvhc_live_room_class_stop_tv"
+            android:background="@drawable/plvhc_live_room_class_stop_ly_shape">
+
+            <TextView
+                android:id="@+id/plvhc_live_room_next_class_notice_tv"
+                android:layout_width="116dp"
+                android:layout_height="30dp"
+                android:background="@drawable/plvhc_live_room_class_stop_tv_shape"
+                android:gravity="center"
+                android:text="下节课预告"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvhc_live_room_next_class_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/plvhc_live_room_next_class_notice_tv"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:maxWidth="196dp"
+                android:maxLines="2"
+                android:text="这是课节名称这是课节名称课节 这是课节名称这是课两行显示…"
+                android:textColor="#CCFFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvhc_live_room_next_class_start_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/plvhc_live_room_next_class_title_tv"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="11dp"
+                android:layout_marginBottom="23dp"
+                android:text="2021/02/01 18:30"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/plvhc_live_room_confirm_tv"
+                android:layout_width="100dp"
+                android:layout_height="36dp"
+                android:layout_alignBottom="@+id/plvhc_live_room_next_class_start_time_tv"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="3dp"
+                android:background="@drawable/plvhc_live_room_class_stop_next_tv_shape"
+                android:gravity="center"
+                android:text="进入下节课"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

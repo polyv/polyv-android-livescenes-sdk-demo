@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView;
@@ -31,7 +32,7 @@ import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAdapter;
-import com.easefun.polyv.streameralone.modules.streamer.service.PLVSAForegroundService;
+import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -92,7 +93,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         }
 
         //启动前台服务，防止在后台被杀
-        PLVSAForegroundService.startService();
+        PLVForegroundService.startForegroundService(PLVSAStreamerAloneActivity.class, "POLYV开播", R.drawable.plvsa_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
     }
@@ -233,7 +234,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     public void destroy() {
         streamerPresenter.destroy();
-        PLVSAForegroundService.stopService();
+        PLVForegroundService.stopForegroundService();
     }
     // </editor-fold>
 

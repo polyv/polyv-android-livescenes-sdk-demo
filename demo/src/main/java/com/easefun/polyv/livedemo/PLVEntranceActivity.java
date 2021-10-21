@@ -1,19 +1,14 @@
 package com.easefun.polyv.livedemo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
-import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+import com.easefun.polyv.livedemo.hiclass.PLVLoginHiClassActivity;
 
 /**
  * @author suhongtao
@@ -24,6 +19,7 @@ public class PLVEntranceActivity extends AppCompatActivity implements View.OnCli
             new SparseArray<Class<? extends Activity>>() {{
                 put(R.id.plv_entrance_live_streamer_btn, PLVLoginStreamerActivity.class);
                 put(R.id.plv_entrance_live_cloudclass_btn, PLVLoginWatcherActivity.class);
+                put(R.id.plv_entrance_hi_class_btn, PLVLoginHiClassActivity.class);
             }};
 
     @Override
@@ -40,36 +36,4 @@ public class PLVEntranceActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    public static class ScaleBgImageView extends AppCompatImageView {
-
-        private final Matrix matrix = new Matrix();
-
-        public ScaleBgImageView(Context context) {
-            super(context);
-        }
-
-        public ScaleBgImageView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public ScaleBgImageView(Context context, AttributeSet attrs, int defStyleAttr) {
-            super(context, attrs, defStyleAttr);
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            super.onLayout(changed, left, top, right, bottom);
-            int screenWidth = ScreenUtils.getScreenWidth();
-            int drawableWidth = getDrawable().getIntrinsicWidth();
-            float scale = ((float) screenWidth) / drawableWidth;
-
-            matrix.setScale(scale, scale);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            canvas.concat(matrix);
-            getDrawable().draw(canvas);
-        }
-    }
 }

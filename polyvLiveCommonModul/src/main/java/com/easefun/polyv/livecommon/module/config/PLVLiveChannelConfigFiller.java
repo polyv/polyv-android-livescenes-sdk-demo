@@ -128,6 +128,17 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 设置互动学堂课堂信息
+     *
+     * @param token      token
+     * @param lessonId   课节Id
+     * @param courseCode 课程号
+     */
+    public static void setHiClassConfig(String token, long lessonId, String courseCode) {
+        channelConfig.setHiClassConfig(token, lessonId, courseCode);
+    }
+
+    /**
      * 生成新的config对象
      *
      * @return PLVLiveChannelConfig

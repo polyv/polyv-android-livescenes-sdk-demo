@@ -4,25 +4,34 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.expandmenu.utils.DpOrPxUtils;
+import com.plv.foundationsdk.log.PLVCommonLog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author suhongtao
  */
 public class PLVTriangleIndicateLayout extends FrameLayout {
+
+    private static final String TAG = PLVTriangleIndicateLayout.class.getSimpleName();
 
     private AttributeSet mAttrs = null;
 
@@ -42,6 +51,27 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     private static final int DEFAULT_TRIANGLE_POSITION = POSITION_TOP;
     private static final int DEFAULT_TRIANGLE_MARGIN_TYPE = MARGIN_TYPE_LEFT;
 
+    public static final int ORIENTATION_LEFT_TO_RIGHT = 0;
+    public static final int ORIENTATION_BOTTOM_LEFT_TO_TOP_RIGHT = 1;
+    public static final int ORIENTATION_BOTTOM_TO_TOP = 2;
+    public static final int ORIENTATION_BOTTOM_RIGHT_TO_TOP_LEFT = 3;
+    public static final int ORIENTATION_RIGHT_TO_LEFT = 4;
+    public static final int ORIENTATION_TOP_RIGHT_TO_BOTTOM_LEFT = 5;
+    public static final int ORIENTATION_TOP_TO_BOTTOM = 6;
+    public static final int ORIENTATION_TOP_LEFT_TO_BOTTOM_RIGHT = 7;
+
+    private final SparseArray<GradientDrawable.Orientation> orientationMapper = new SparseArray<GradientDrawable.Orientation>() {{
+        put(ORIENTATION_LEFT_TO_RIGHT, GradientDrawable.Orientation.LEFT_RIGHT);
+        put(ORIENTATION_BOTTOM_LEFT_TO_TOP_RIGHT, GradientDrawable.Orientation.BL_TR);
+        put(ORIENTATION_BOTTOM_TO_TOP, GradientDrawable.Orientation.BOTTOM_TOP);
+        put(ORIENTATION_BOTTOM_RIGHT_TO_TOP_LEFT, GradientDrawable.Orientation.BR_TL);
+        put(ORIENTATION_RIGHT_TO_LEFT, GradientDrawable.Orientation.RIGHT_LEFT);
+        put(ORIENTATION_TOP_RIGHT_TO_BOTTOM_LEFT, GradientDrawable.Orientation.TR_BL);
+        put(ORIENTATION_TOP_TO_BOTTOM, GradientDrawable.Orientation.TOP_BOTTOM);
+        put(ORIENTATION_TOP_LEFT_TO_BOTTOM_RIGHT, GradientDrawable.Orientation.TL_BR);
+    }};
+
+
     private float triangleWidth;
     private float triangleHeight;
     private float triangleMargin;
@@ -49,7 +79,10 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     private int triangleMarginType;
     private int indicateColor;
     private float radius;
+    private int orientation = ORIENTATION_LEFT_TO_RIGHT;
+    private String gradientColors = null;
 
+    private LinearGradient linearGradient = null;
     private Paint paint;
     private Path path;
     private ShapeDrawable shapeDrawable;
@@ -74,13 +107,18 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     private void init() {
         TypedArray typedArray = getContext().obtainStyledAttributes(mAttrs, R.styleable.PLVTriangleIndicateLayout);
 
-        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
-        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
-        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
-        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_trianglePosition, DEFAULT_TRIANGLE_POSITION);
-        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
-        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_indicateColor, DEFAULT_TRIANGLE_COLOR);
-        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_rectRadius, 0);
+        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
+        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
+        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
+        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_trianglePosition, DEFAULT_TRIANGLE_POSITION);
+        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
+        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateLayout_indicateColor, DEFAULT_TRIANGLE_COLOR);
+        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_rectRadius, 0);
+
+        if (typedArray.hasValue(R.styleable.PLVTriangleIndicateLayout_plvGradientColors)) {
+            orientation = typedArray.getInt(R.styleable.PLVTriangleIndicateLayout_plvGradientOrientation, orientation);
+            gradientColors = typedArray.getString(R.styleable.PLVTriangleIndicateLayout_plvGradientColors);
+        }
 
         typedArray.recycle();
     }
@@ -111,6 +149,10 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
 
             int width = (int) (getMeasuredWidth() + triangleHeight);
             setMeasuredDimension(width, getMeasuredHeight());
+        }
+
+        if (gradientColors != null) {
+            parseGradientColor(getMeasuredWidth(), getMeasuredHeight());
         }
     }
 
@@ -201,6 +243,87 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
         }
     }
 
+    private void parseGradientColor(int width, int height) {
+        if (gradientColors == null) {
+            return;
+        }
+
+        List<Integer> colorList = new ArrayList<>();
+        String[] colorStrArray = gradientColors.replaceAll(" ", "").split(",");
+        for (String colorStr : colorStrArray) {
+            try {
+                colorList.add(Color.parseColor(colorStr));
+            } catch (Exception e) {
+                PLVCommonLog.e(TAG, e.getMessage());
+            }
+        }
+        if (colorList.size() < 1) {
+            colorList.add(indicateColor);
+        }
+        if (colorList.size() < 2) {
+            colorList.add(colorList.get(0));
+        }
+        final int[] colors = new int[colorList.size()];
+        for (int i = 0; i < colors.length; ++i) {
+            colors[i] = colorList.get(i);
+        }
+
+        int x0, y0, x1, y1;
+        switch (orientation) {
+            case ORIENTATION_BOTTOM_LEFT_TO_TOP_RIGHT:
+                x0 = 0;
+                y0 = height;
+                x1 = width;
+                y1 = 0;
+                break;
+            case ORIENTATION_BOTTOM_TO_TOP:
+                x0 = width / 2;
+                y0 = height;
+                x1 = width / 2;
+                y1 = 0;
+                break;
+            case ORIENTATION_BOTTOM_RIGHT_TO_TOP_LEFT:
+                x0 = width;
+                y0 = height;
+                x1 = 0;
+                y1 = 0;
+                break;
+            case ORIENTATION_RIGHT_TO_LEFT:
+                x0 = width;
+                y0 = height / 2;
+                x1 = 0;
+                y1 = height / 2;
+                break;
+            case ORIENTATION_TOP_RIGHT_TO_BOTTOM_LEFT:
+                x0 = width;
+                y0 = 0;
+                x1 = 0;
+                y1 = height;
+                break;
+            case ORIENTATION_TOP_TO_BOTTOM:
+                x0 = width / 2;
+                y0 = 0;
+                x1 = width / 2;
+                y1 = height;
+                break;
+            case ORIENTATION_TOP_LEFT_TO_BOTTOM_RIGHT:
+                x0 = 0;
+                y0 = 0;
+                x1 = width;
+                y1 = height;
+                break;
+            case ORIENTATION_LEFT_TO_RIGHT:
+            default:
+                x0 = 0;
+                y0 = height / 2;
+                x1 = width;
+                y1 = height / 2;
+                break;
+        }
+
+        linearGradient = new LinearGradient(x0, y0, x1, y1, colors, null, Shader.TileMode.MIRROR);
+    }
+
     private void initBackground() {
         Point first = new Point();
         Point second = new Point();
@@ -284,7 +407,11 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
         PathShape pathShape = new PathShape(path, getMeasuredWidth(), getMeasuredHeight());
         shapeDrawable.setShape(pathShape);
         paint = shapeDrawable.getPaint();
-        paint.setColor(indicateColor);
+        if (linearGradient == null) {
+            paint.setColor(indicateColor);
+        } else {
+            paint.setShader(linearGradient);
+        }
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
     }

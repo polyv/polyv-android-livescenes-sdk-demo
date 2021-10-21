@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#2B2F48"
+        android:paddingLeft="40dp"
+        android:paddingTop="24dp"
+        android:paddingRight="40dp"
+        android:paddingBottom="24dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="16dp"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_invitation_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="老师正在邀请你上台"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_invitation_countdown_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvhc_linkmic_invitation_title_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="5秒后将自动上台"
+            android:textColor="#7FEEEEEE"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_answer_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/plvhc_linkmic_invitation_countdown_title_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="17dp"
+            android:background="@drawable/plvhc_live_room_student_start_class_stroke_bg"
+            android:paddingLeft="22dp"
+            android:paddingTop="11dp"
+            android:paddingRight="22dp"
+            android:paddingBottom="11dp"
+            android:text="立即上台(5s)"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</android.support.constraint.ConstraintLayout>

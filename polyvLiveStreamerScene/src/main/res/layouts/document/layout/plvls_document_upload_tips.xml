@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="8dp"
         android:maxWidth="400dp"
-        android:text="@string/document_upload_tips"
+        android:text="@string/plvls_document_upload_tips"
         android:textColor="#C0C0C0"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -23,8 +23,12 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
 
     public static final int POSITION_TOP = 0;
     public static final int POSITION_BOTTOM = 1;
+    public static final int POSITION_LEFT = 2;
+    public static final int POSITION_RIGHT = 3;
     public static final int MARGIN_TYPE_LEFT = 0;
     public static final int MARGIN_TYPE_RIGHT = 1;
+    public static final int MARGIN_TYPE_TOP = 2;
+    public static final int MARGIN_TYPE_BOTTOM = 3;
 
     private static final int DEFAULT_TRIANGLE_WIDTH = 12; // dp
     private static final int DEFAULT_TRIANGLE_HEIGHT = 8; // dp
@@ -77,16 +81,31 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        if (trianglePosition == POSITION_TOP || trianglePosition == POSITION_BOTTOM) {
+            // 三角指示在上下
+            int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+            int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        int childHeightSize = (int) (heightSize - triangleHeight);
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize, heightMode);
+            int childHeightSize = (int) (heightSize - triangleHeight);
+            int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize, heightMode);
 
-        super.onMeasure(widthMeasureSpec, childHeightMeasureSpec);
+            super.onMeasure(widthMeasureSpec, childHeightMeasureSpec);
 
-        int height = (int) (getMeasuredHeight() + triangleHeight);
-        setMeasuredDimension(getMeasuredWidth(), height);
+            int height = (int) (getMeasuredHeight() + triangleHeight);
+            setMeasuredDimension(getMeasuredWidth(), height);
+        } else {
+            // 三角指示在左右
+            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+            int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+
+            int childWidthSize = (int) (widthSize - triangleHeight);
+            int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(childWidthSize, widthMode);
+
+            super.onMeasure(childWidthMeasureSpec, heightMeasureSpec);
+
+            int width = (int) (getMeasuredWidth() + triangleHeight);
+            setMeasuredDimension(width, getMeasuredHeight());
+        }
     }
 
     @Override
@@ -97,6 +116,8 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
         canvas.drawPath(path, paint);
         if (trianglePosition == POSITION_TOP) {
             canvas.translate(0, triangleHeight);
+        } else if (trianglePosition == POSITION_LEFT) {
+            canvas.translate(triangleHeight, 0);
         }
         super.onDraw(canvas);
     }
@@ -107,13 +128,14 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
 
-        Point first, second, third;
+        Point first = new Point();
+        Point second = new Point();
+        Point third = new Point();
         if (trianglePosition == POSITION_TOP) {
-            int leftBottomX;
+            int leftBottomX = 0;
             if (triangleMarginType == MARGIN_TYPE_LEFT) {
                 leftBottomX = (int) triangleMargin;
-            } else {
-                // marginType == right
+            } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftBottomX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
             }
             // leftBottom
@@ -122,13 +144,11 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
             second = new Point((int) (leftBottomX + triangleWidth), (int) triangleHeight);
             // top
             third = new Point((int) (leftBottomX + triangleWidth / 2), 0);
-        } else {
-            // position == bottom
-            int leftTopX;
+        } else if (trianglePosition == POSITION_BOTTOM) {
+            int leftTopX = 0;
             if (triangleMarginType == MARGIN_TYPE_LEFT) {
                 leftTopX = (int) triangleMargin;
-            } else {
-                // marginType == right
+            } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftTopX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
             }
             // leftTop
@@ -137,14 +157,45 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
             second = new Point((int) (leftTopX + triangleWidth), (int) (getMeasuredHeight() - triangleHeight));
             // bottom
             third = new Point((int) (leftTopX + triangleWidth / 2), getMeasuredHeight());
+        } else if (trianglePosition == POSITION_LEFT) {
+            int topY = 0;
+            if (triangleMarginType == MARGIN_TYPE_TOP) {
+                topY = (int) triangleMargin;
+            } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
+                topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
+            }
+            // left
+            first = new Point(0, (int) (topY + triangleWidth / 2));
+            // top
+            second = new Point((int) triangleHeight, topY);
+            // bottom
+            third = new Point((int) triangleHeight, (int) (topY + triangleWidth));
+        } else if (trianglePosition == POSITION_RIGHT) {
+            int topY = 0;
+            if (triangleMarginType == MARGIN_TYPE_TOP) {
+                topY = (int) triangleMargin;
+            } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
+                topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
+            }
+            // top
+            first = new Point((int) (getMeasuredWidth() - triangleHeight), topY);
+            // right
+            second = new Point(getMeasuredWidth(), (int) (topY + triangleWidth / 2));
+            // bottom
+            third = new Point((int) (getMeasuredWidth() - triangleHeight), (int) (topY + triangleWidth));
         }
 
         RectF roundRect;
         if (trianglePosition == POSITION_TOP) {
-            roundRect = new RectF(0, (int) triangleHeight, getMeasuredWidth(), getMeasuredHeight());
+            roundRect = new RectF(0, triangleHeight, getMeasuredWidth(), getMeasuredHeight());
+        } else if (trianglePosition == POSITION_BOTTOM) {
+            roundRect = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight() - triangleHeight);
+        } else if (trianglePosition == POSITION_LEFT) {
+            roundRect = new RectF(triangleHeight, 0, getMeasuredWidth(), getMeasuredHeight());
+        } else if (trianglePosition == POSITION_RIGHT) {
+            roundRect = new RectF(0, 0, getMeasuredWidth() - triangleHeight, getMeasuredHeight());
         } else {
-            // triangle position == bottom
-            roundRect = new RectF(0, 0, getMeasuredWidth(), (int) (getMeasuredHeight() - triangleHeight));
+            roundRect = new RectF();
         }
 
         path = new Path();

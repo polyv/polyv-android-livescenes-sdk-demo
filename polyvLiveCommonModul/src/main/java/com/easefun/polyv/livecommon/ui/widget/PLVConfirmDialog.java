@@ -1,7 +1,6 @@
 package com.easefun.polyv.livecommon.ui.widget;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -18,13 +17,17 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.expandmenu.utils.DpOrPxUtils;
 
+import java.lang.ref.WeakReference;
+
 /**
  * date: 2020-05-21
  * author: hwj
  */
 public class PLVConfirmDialog {
 
-    private Dialog dialog;
+    private final WeakReference<Context> contextWeakReference;
+
+    private PLVOnFocusDialog dialog;
     private TextView plvConfirmTitle;
     private TextView plvConfirmContent;
     private TextView plvLeftConfirmBtn;
@@ -33,6 +36,7 @@ public class PLVConfirmDialog {
     private View plvSplitView;
 
     public PLVConfirmDialog(Context context) {
+        contextWeakReference = new WeakReference<>(context);
         View root = LayoutInflater.from(context).inflate(layoutId(), null, false);
 
         RelativeLayout dialogWrapper = new RelativeLayout(context);
@@ -40,10 +44,10 @@ public class PLVConfirmDialog {
         rootLp.addRule(RelativeLayout.CENTER_IN_PARENT);
         dialogWrapper.addView(root, rootLp);
 
-        dialog = new AlertDialog.Builder(context)
-                .setView(dialogWrapper)
-                .setCancelable(true)
-                .create();
+        dialog = new PLVOnFocusDialog(context);
+        dialog.setContentView(dialogWrapper);
+        dialog.setCancelable(true);
+
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -116,6 +120,10 @@ public class PLVConfirmDialog {
         return this;
     }
 
+    public PLVConfirmDialog setTitle(@StringRes int resId) {
+        return setTitle(dialog.getContext().getString(resId));
+    }
+
     public PLVConfirmDialog setTitleVisibility(int visibility) {
         plvConfirmTitle.setVisibility(visibility);
         return this;
@@ -127,8 +135,7 @@ public class PLVConfirmDialog {
     }
 
     public PLVConfirmDialog setContent(@StringRes int resId) {
-        plvConfirmContent.setText(dialog.getContext().getString(resId));
-        return this;
+        return setContent(dialog.getContext().getString(resId));
     }
 
     public PLVConfirmDialog setContentVisibility(int visibility) {
@@ -142,8 +149,7 @@ public class PLVConfirmDialog {
     }
 
     public PLVConfirmDialog setLeftButtonText(@StringRes int resId) {
-        plvLeftConfirmBtn.setText(dialog.getContext().getString(resId));
-        return this;
+        return setLeftButtonText(dialog.getContext().getString(resId));
     }
 
     public PLVConfirmDialog setRightButtonText(String rightText) {
@@ -152,8 +158,7 @@ public class PLVConfirmDialog {
     }
 
     public PLVConfirmDialog setRightButtonText(@StringRes int resId) {
-        plvRightConfirmBtn.setText(dialog.getContext().getString(resId));
-        return this;
+        return setRightButtonText(dialog.getContext().getString(resId));
     }
 
     public PLVConfirmDialog setLeftBtnListener(final View.OnClickListener leftBtnListener) {
@@ -208,6 +213,10 @@ public class PLVConfirmDialog {
         return this;
     }
 
+    public void setOnWindowFocusChangedListener(PLVOnFocusDialog.OnWindowFocusChangeListener listener) {
+        dialog.setOnWindowFocusChangedListener(listener);
+    }
+
     /**
      * window是否正在显示
      */
@@ -219,7 +228,12 @@ public class PLVConfirmDialog {
      * 显示window
      */
     public void show() {
-        dialog.show();
+        if (contextWeakReference != null
+                && contextWeakReference.get() != null
+                && contextWeakReference.get() instanceof Activity
+                && !((Activity) contextWeakReference.get()).isFinishing()) {
+            dialog.show();
+        }
     }
 
     /**

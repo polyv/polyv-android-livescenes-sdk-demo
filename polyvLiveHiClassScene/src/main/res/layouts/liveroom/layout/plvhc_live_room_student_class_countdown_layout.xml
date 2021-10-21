@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvhc_live_room_student_countdown_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="visible"
+        tools:visibility="gone">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVGradientView
+            android:id="@+id/plvhc_live_room_student_countdown_gradient_bg"
+            android:layout_width="217dp"
+            android:layout_height="95dp"
+            app:plvGradientOrientation="leftRight"
+            app:plvGradientColors="#E62D324C, #0030344F"
+            android:layout_marginLeft="48dp"
+            android:layout_marginStart="48dp"
+            app:layout_constraintLeft_toLeftOf="@+id/plvhc_live_room_student_countdown_clock_iv"
+            app:layout_constraintStart_toStartOf="@+id/plvhc_live_room_student_countdown_clock_iv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/plvhc_live_room_student_countdown_clock_iv"
+            android:layout_width="94dp"
+            android:layout_height="113dp"
+            android:src="@drawable/plvhc_live_room_student_countdown_clock_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_student_countdown_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="距离课程开始还有"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginTop="17dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintTop_toTopOf="@id/plvhc_live_room_student_countdown_gradient_bg"
+            app:layout_constraintLeft_toRightOf="@id/plvhc_live_room_student_countdown_clock_iv"
+            app:layout_constraintStart_toEndOf="@id/plvhc_live_room_student_countdown_clock_iv" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_student_countdown_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0:00:00"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintTop_toBottomOf="@id/plvhc_live_room_student_countdown_label_tv"
+            app:layout_constraintLeft_toRightOf="@id/plvhc_live_room_student_countdown_clock_iv"
+            app:layout_constraintStart_toEndOf="@id/plvhc_live_room_student_countdown_clock_iv" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/plvhc_live_room_student_countdown_placeholder_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:visibility="gone"
+        tools:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/plvhc_live_room_student_countdown_placeholder_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="老师正在准备课程,请稍后"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_live_room_student_start_class_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:radius="16dp"
+        android:background="#2B2F48"
+        android:paddingTop="35dp"
+        android:paddingBottom="35dp"
+        android:paddingLeft="58dp"
+        android:paddingRight="58dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/plvhc_live_room_student_start_class_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="老师开始上课了"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            android:id="@+id/plvhc_live_room_student_go_to_class_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="立即前往(3s)"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/plvhc_live_room_student_start_class_stroke_bg"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/plvhc_live_room_student_start_class_label" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</android.support.constraint.ConstraintLayout>

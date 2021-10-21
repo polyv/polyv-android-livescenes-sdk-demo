@@ -25,6 +25,7 @@ import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
 
@@ -153,6 +154,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onCloseRoomStatusChanged(boolean isClose) {
+
+    }
+
+    @Override
     public void onSpeakImgDataList(List<PLVBaseViewData> chatMessageDataList) {
 
     }
@@ -164,6 +170,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onHistoryRequestFailed(String errorMsg, Throwable t, int viewIndex) {
+
+    }
+
+    @Override
+    public void onKickUsersList(List<PLVSocketUserBean> dataList) {
 
     }
 }

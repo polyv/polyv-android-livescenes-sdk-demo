@@ -8,6 +8,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 
 /**
@@ -37,6 +38,10 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
     //频道名称
     private MutableLiveData<PLVStatefulData<String>> channelNameData = new MutableLiveData<>();
+    //有状态的课节详情数据
+    private MutableLiveData<PLVStatefulData<PLVHiClassDataBean>> fulClassDataBean = new MutableLiveData<>();
+    //课节详情数据
+    private MutableLiveData<PLVHiClassDataBean> classDataBean = new MutableLiveData<>();
     //仅音频模式
     private MutableLiveData<Boolean> isOnlyAudio = new MutableLiveData<>();
     //直播场次Id
@@ -85,6 +90,16 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<LiveStatus>> getLiveStatusData() {
         return liveStatusData;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<PLVHiClassDataBean>> getFulHiClassDataBean() {
+        return fulClassDataBean;
+    }
+
+    @Override
+    public LiveData<PLVHiClassDataBean> getHiClassDataBean() {
+        return classDataBean;
     }
 
     @Override
@@ -238,6 +253,23 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             @Override
             public void onFailed(String msg, Throwable throwable) {
                 channelNameData.postValue(PLVStatefulData.<String>error(msg, throwable));
+            }
+        });
+    }
+
+    @Override
+    public void requestLessonDetail() {
+        liveRoomDataRequester.requestLessonDetail(new PLVLiveRoomDataRequester.IPLVNetRequestListener<PLVHiClassDataBean>() {
+            @Override
+            public void onSuccess(PLVHiClassDataBean hiClassDataBean) {
+                fulClassDataBean.postValue(PLVStatefulData.success(hiClassDataBean));
+                classDataBean.postValue(hiClassDataBean);
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                fulClassDataBean.postValue(PLVStatefulData.<PLVHiClassDataBean>error(msg, throwable));
+                classDataBean.postValue(null);
             }
         });
     }

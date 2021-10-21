@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BF000000">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_document_upload_tips_round_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:radius="16dp"
+        android:paddingTop="26dp"
+        android:paddingBottom="22dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:background="@drawable/plvhc_document_tips_gradient_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="上传须知"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/tv_tips"
+            android:layout_width="322dp"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="8dp"
+            android:maxWidth="400dp"
+            android:text="@string/plvhc_document_upload_tips"
+            android:textColor="#BFFFFFFF"
+            android:textSize="14sp"
+            android:layout_below="@id/tv_title" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/plvhc_document_upload_tips_close"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toTopOf="@id/plvhc_document_upload_tips_round_layout"
+        app:layout_constraintRight_toRightOf="@id/plvhc_document_upload_tips_round_layout"
+        app:layout_constraintEnd_toEndOf="@id/plvhc_document_upload_tips_round_layout" />
+
+</android.support.constraint.ConstraintLayout>

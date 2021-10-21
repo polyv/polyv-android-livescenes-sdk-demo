@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#171A38">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/plvhc_login_bg" />
+
+    <TextView
+        android:id="@+id/plvhc_teacher_company_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择公司"
+        android:textSize="26sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="119dp"
+        android:layout_marginLeft="34dp"
+        android:layout_marginStart="34dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/plvhc_teacher_company_rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintTop_toBottomOf="@id/plvhc_teacher_company_label_tv"
+        app:layout_constraintBottom_toTopOf="@id/plvhc_teacher_company_login_tv" />
+
+    <TextView
+        android:id="@+id/plvhc_teacher_company_login_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="登录"
+        android:textSize="16sp"
+        android:textColor="@color/plvhc_login_button_text_color_selector"
+        android:gravity="center"
+        android:background="@drawable/plvhc_login_button_bg"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvhc_login_back_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="53dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:visibility="visible"
+        android:src="@drawable/plvhc_login_nav_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

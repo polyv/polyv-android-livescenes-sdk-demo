@@ -334,7 +334,7 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         } else if (id == R.id.send_msg_tv) {
             postMsgWithAnswer();
         } else if (id == R.id.plvsa_chatroom_sel_img_iv) {
-            selectImg();
+            requestSelectImg();
         } else if (id == R.id.plvsa_chatroom_close_answer_window_tv) {
             plvsaChatroomAnswerLy.setVisibility(View.GONE);
         } else if (id == R.id.plvsa_emoji_tab_emoji_iv){

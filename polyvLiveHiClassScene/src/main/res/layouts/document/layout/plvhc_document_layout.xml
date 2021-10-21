@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#191A22">
+
+    <com.plv.livescenes.document.PLVDocumentContainerView
+        android:id="@+id/plvhc_document_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_document_zoom_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="#E6242940"
+        android:paddingStart="8dp"
+        android:paddingEnd="11dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="21dp"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/plvhc_document_zoom_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/plvhc_document_zoom_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/plvhc_document_zoom_iv"
+            android:text="默认尺寸"
+            android:textColor="#CCFFFFFF"
+            android:textSize="14sp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvhc_document_zoom_hint_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="18dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="9dp"
+        android:text="150%"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:plvGradientColors="#B3000000"
+        app:plvRadius="4dp"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/plvhc_document_minimize_group_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/plvhc_document_minimize_group_icon"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/plvhc_document_minimize_group_tv"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/plvhc_document_minimize_count_text_bg"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="#23273D"
+        android:textSize="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/plvhc_document_minimize_group_iv"
+        app:layout_constraintEnd_toEndOf="@id/plvhc_document_minimize_group_iv"
+        app:layout_constraintRight_toRightOf="@id/plvhc_document_minimize_group_iv"
+        tools:text="2"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+        android:id="@+id/plvhc_document_minimize_group_root_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:paddingLeft="12dp"
+        android:paddingTop="8dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:indicateColor="#232840"
+        app:layout_constraintBottom_toBottomOf="@id/plvhc_document_minimize_group_iv"
+        app:layout_constraintLeft_toRightOf="@id/plvhc_document_minimize_group_iv"
+        app:layout_constraintStart_toEndOf="@id/plvhc_document_minimize_group_iv"
+        app:rectRadius="8dp"
+        app:triangleHeight="8dp"
+        app:triangleMargin="10dp"
+        app:triangleMarginType="bottom"
+        app:trianglePosition="left"
+        app:triangleWidth="12dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/plvhc_document_minimize_group_list_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+</android.support.constraint.ConstraintLayout>
