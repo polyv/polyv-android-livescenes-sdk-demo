@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="plvNeedSeparateView" format="boolean" />
+
+    <declare-styleable name="PLVHCLoginLessonItemView">
+        <attr name="plvNeedSeparateView" />
+    </declare-styleable>
+
+</resources>

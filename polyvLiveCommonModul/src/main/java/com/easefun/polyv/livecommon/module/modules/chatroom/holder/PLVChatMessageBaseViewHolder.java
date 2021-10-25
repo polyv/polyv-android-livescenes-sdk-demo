@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
@@ -11,9 +12,11 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgContent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.chat.PLVProhibitedWordVO;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
@@ -46,6 +49,12 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
     protected boolean isLocalChatImg;//是否是本地的图片发言信息
     protected int localImgProgress;//本地图片发送进度，不能重置
     protected int localImgStatus;//本地图片发送状态，不能重置
+    protected String localImgFailMessage;//本地图片发送失败原因
+
+    protected String giftImg;//打赏的图片url
+    protected int giftDrawableId;//打赏的图片资源id
+
+    protected PLVProhibitedWordVO prohibitedWordVO;//严禁词信息
 
     protected PLVChatQuoteVO chatQuoteVO;//被回复人的信息
     protected CharSequence quoteSpeakMsg;//被回复人发送的文本信息
@@ -74,6 +83,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         chatImgWidth = 0;
         chatImgHeight = 0;
         isLocalChatImg = false;
+        prohibitedWordVO = null;
         chatQuoteVO = null;
         quoteSpeakMsg = null;
     }
@@ -96,6 +106,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvLocalMessage) messageData).getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) ((PolyvLocalMessage) messageData).getObjects()[validIndex];
+            prohibitedWordVO = ((PolyvLocalMessage) messageData).getProhibitedWord();
             chatQuoteVO = ((PolyvLocalMessage) messageData).getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
                 quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
@@ -120,6 +131,8 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             chatImgUrl = localImgEvent.getImageFilePath();
             chatImgWidth = localImgEvent.getWidth();
             chatImgHeight = localImgEvent.getHeight();
+            localImgStatus = localImgEvent.getSendStatus();
+            localImgFailMessage = localImgEvent.getObj1()+"";
         } else if (messageData instanceof PolyvQuestionMessage) {//本地的提问信息
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvQuestionMessage) messageData).getObjects().length - 1, msgIndex);
@@ -148,9 +161,27 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
                     chatImgWidth = (int) chatImgContent.getSize().getWidth();
                     chatImgHeight = (int) chatImgContent.getSize().getHeight();
                 }
+                if ("emotion".equals(chatImgContent.getType())){
+                    //图片表情要80
+                    chatImgWidth = ConvertUtils.dp2px(80);
+                    chatImgHeight = ConvertUtils.dp2px(80);
+                }
             }
         } else if (messageData instanceof PLVCustomGiftEvent) {//自定义打赏礼物信息
             speakMsg = ((PLVCustomGiftEvent) messageData).getSpan();
+            giftImg = ((PLVCustomGiftEvent) messageData).getGiftImg();
+            giftDrawableId = ((PLVCustomGiftEvent) messageData).getGiftDrawableId();
+        } else if (messageData instanceof PLVChatEmotionEvent){ // 个性图片表情消息
+            PLVChatEmotionEvent emotionEvent = (PLVChatEmotionEvent) messageData;
+            if(emotionEvent.getUser() == null) {
+                fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
+            } else {
+                fillFieldFromUser(emotionEvent.getUser());
+            }
+            chatImgUrl = PLVFaceManager.getInstance().getEmotionUrl(emotionEvent.getId());
+
+            chatImgWidth = ConvertUtils.dp2px(80);
+            chatImgHeight = ConvertUtils.dp2px(80);
         }
     }
 

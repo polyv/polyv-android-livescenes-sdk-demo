@@ -5,17 +5,22 @@ import androidx.viewpager.widget.ViewPager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 
-import com.easefun.polyv.businesssdk.sub.gif.RelativeImageSpan;
+
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSEmoGridViewAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSEmoPagerAdapter;
+import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSEmotionGridViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +30,17 @@ import java.util.List;
  */
 public class PLVLSChatroomUtils {
     private static int emojiLength;
+    //一页的表情数量
+    private static float emojiPageCount = 12 * 4;
+
+    private static float emotionPageCount = 10 * 5;//目前上限为50个
 
     // <editor-fold defaultstate="collapsed" desc="发送表情相关">
     //初始化表情列表
     public static void initEmojiList(ViewPager emojiVp, int gridViewLayoutId, final EditText inputEt) {
         List<View> lists = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        int size = (int) Math.ceil(PLVFaceManager.getInstance().getFaceMap().size() / emojiPageCount);
+        for (int i = 0; i < size; i++) {
             lists.add(initEmojiGridView(gridViewLayoutId, inputEt, i));
         }
         PLVLSEmoPagerAdapter emoPagerAdapter = new PLVLSEmoPagerAdapter(lists, emojiVp.getContext());
@@ -41,8 +51,8 @@ public class PLVLSChatroomUtils {
     private static View initEmojiGridView(int gridViewLayoutId, final EditText inputEt, int position) {
         GridView gridView = (GridView) LayoutInflater.from(inputEt.getContext()).inflate(gridViewLayoutId, null);
         List<String> lists = new ArrayList<>(PLVFaceManager.getInstance().getFaceMap().keySet());
-        final List<String> elists = lists.subList(position * (12 * 4),
-                Math.min((position + 1) * (12 * 4), lists.size()));
+        final List<String> elists = lists.subList(Math.min(position * (int) emojiPageCount, lists.size()),
+                Math.min((position + 1) * (int) emojiPageCount, lists.size()));
         PLVLSEmoGridViewAdapter emoGridViewAdapter = new PLVLSEmoGridViewAdapter(elists, inputEt.getContext());
         gridView.setAdapter(emoGridViewAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -52,6 +62,28 @@ public class PLVLSChatroomUtils {
             }
         });
         return gridView;
+    }
+
+    public static void initEmotionList(ViewPager emotionVp, int gridViewLayoutId, List<PLVEmotionImageVO.EmotionImage> emotionImageList,
+                                       final AdapterView.OnItemClickListener listener,
+                                       AdapterView.OnItemLongClickListener longClickListener){
+        List<View> lists = new ArrayList<>();
+        int size = (int) Math.ceil(emotionImageList.size() / emotionPageCount);
+        for (int i = 0; i < size; i++) {
+            GridView gridView = (GridView) LayoutInflater.from(emotionVp.getContext()).inflate(gridViewLayoutId, null);
+            gridView.setNumColumns(7);
+            gridView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+//            final List<PLVEmotionImageVO.EmotionImage> elists = emotionImageList.subList(Math.min(i * (int) emotionPageCount, emotionImageList.size()),
+//                    Math.min((i + 1) * (int) emotionPageCount, emotionImageList.size()));
+
+            PLVLSEmotionGridViewAdapter adapter = new PLVLSEmotionGridViewAdapter(emotionImageList, emotionVp.getContext());
+            gridView.setAdapter(adapter);
+            gridView.setOnItemClickListener(listener);
+            gridView.setOnItemLongClickListener(longClickListener);
+            lists.add(gridView);
+        }
+        PLVLSEmoPagerAdapter emoPagerAdapter = new PLVLSEmoPagerAdapter(lists, emotionVp.getContext());
+        emotionVp.setAdapter(emoPagerAdapter);
     }
 
 
@@ -88,6 +120,10 @@ public class PLVLSChatroomUtils {
     //添加表情
     private static void appendEmo(String emoKey, EditText inputEt) {
         SpannableStringBuilder span = new SpannableStringBuilder(emoKey);
+        if(inputEt.getText().length() + span.length() >= 200){
+            Log.e("ChatroomUtils", "appendEmo fail because exceed maxLength 200");
+            return;
+        }
         int textSize = (int) inputEt.getTextSize();
         Drawable drawable;
         ImageSpan imageSpan;

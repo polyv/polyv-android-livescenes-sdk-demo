@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.streamer;
 
 import android.app.AlertDialog;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import androidx.annotation.NonNull;
@@ -16,18 +17,23 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
+import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
-import com.easefun.polyv.livestreamer.modules.streamer.service.PLVLSForegroundService;
+import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -102,8 +108,12 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                 streamerPresenter.setupRenderView(surfaceView, linkMicId);
             }
         });
+        streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());
 
-        PLVLSForegroundService.startService();
+        //启动前台服务，防止在后台被杀
+        PLVForegroundService.startForegroundService(PLVLSLiveStreamerActivity.class, "POLYV开播", R.drawable.plvls_ic_launcher);
+        //防止自动息屏、锁屏
+        setKeepScreenOn(true);
     }
     // </editor-fold>
 
@@ -114,6 +124,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         streamerPresenter = new PLVStreamerPresenter(liveRoomDataManager);
         streamerPresenter.registerView(streamerView);
         streamerPresenter.init();
+        observeClassDetailData();
     }
 
     @Override
@@ -229,7 +240,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     @Override
     public void destroy() {
         streamerPresenter.destroy();
-        PLVLSForegroundService.stopService();
+        PLVForegroundService.stopForegroundService();
     }
     // </editor-fold>
 
@@ -239,6 +250,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         @Override
         public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
             super.onStreamerEngineCreatedSuccess(linkMicUid, linkMicList);
+            streamerPresenter.setMixLayoutType(PLVSStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER);
             streamerAdapter.setMyLinkMicId(linkMicUid);
             streamerAdapter.setDataList(linkMicList);
             plvlsStreamerRv.setAdapter(streamerAdapter);
@@ -269,14 +281,14 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onUsersJoin(List<String> uids) {
-            super.onUsersJoin(uids);
+        public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
+            super.onUsersJoin(dataBeanList);
             streamerAdapter.updateAllItem();
         }
 
         @Override
-        public void onUsersLeave(List<String> uids) {
-            super.onUsersLeave(uids);
+        public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
+            super.onUsersLeave(dataBeanList);
             streamerAdapter.updateAllItem();
         }
 
@@ -308,6 +320,44 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                         .show();
             }
         }
+
+        @Override
+        public void onGuestRTCStatusChanged(int pos) {
+            streamerAdapter.updateGuestStatus(pos);
+        }
+
+        @Override
+        public void onGuestMediaStatusChanged(int pos) {
+            streamerAdapter.updateGuestStatus(pos);
+        }
     };
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="订阅 - 直播间信息">
+    private void observeClassDetailData(){
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if(liveRoomDataManager.isOnlyAudio()) {
+                    //音频开播模式下，设置封面图
+                    if (plvLiveClassDetailVOPLVStatefulData != null && plvLiveClassDetailVOPLVStatefulData.getData() != null
+                            && plvLiveClassDetailVOPLVStatefulData.getData().getData() != null) {
+                        updateTeacherCameraCoverImage(plvLiveClassDetailVOPLVStatefulData.getData().getData().getSplashImg());
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 更新讲师的封面图
+     */
+    private void updateTeacherCameraCoverImage(String coverImage){
+        if(streamerAdapter != null){
+            streamerAdapter.updateCoverImage(coverImage);
+        }
+
+    }
+    // </editor-fold >
 }

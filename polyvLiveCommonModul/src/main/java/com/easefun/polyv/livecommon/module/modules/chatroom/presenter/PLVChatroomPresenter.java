@@ -11,13 +11,16 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataRequester;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
+import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.IPolyvOnlineCountListener;
 import com.easefun.polyv.livescenes.chatroom.IPolyvProhibitedWordListener;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
@@ -28,6 +31,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.log.chat.PolyvChatroomELog;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
@@ -35,18 +39,23 @@ import com.easefun.polyv.livescenes.net.PolyvApiManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.net.PLVResponseApiBean2;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
+import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRemoveContentEvent;
 import com.plv.socket.event.chat.PLVRemoveHistoryEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
@@ -61,6 +70,7 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.log.PLVELogSender;
+import com.plv.socket.socketio.PLVSocketIOClient;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -91,7 +101,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVChatroomPresenter";
     //默认获取的历史记录条数
-    public static final int GET_CHAT_HISTORY_COUNT = 20;
+    public static final int GET_CHAT_HISTORY_COUNT = 10;
     //聊天信息处理间隔
     private static final int CHAT_MESSAGE_TIMESPAN = 500;
     //直播间数据管理器
@@ -109,6 +119,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private long viewerCount;
     //在线人数
     private int onlineCount;
+    //踢出人数
+    private int kickCount;
 
     //每次获取的历史记录条数
     private int getChatHistoryCount = GET_CHAT_HISTORY_COUNT;
@@ -122,6 +134,14 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private int requestHistoryViewIndex;
     //获取历史记录的disposable
     private Disposable chatHistoryDisposable;
+    //历史记录是否包含打赏事件
+    private boolean isHistoryContainRewardEvent;
+
+    //图片表情列表的disposable
+    private Disposable chatEmotionImagesDisposable;
+
+    //请求踢出的用户列表的disposable
+    private Disposable kickUsersDisposable;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -189,6 +209,21 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         @Override
                         public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
                             view.onSendProhibitedWord(prohibitedMessage, hintMsg, status);
+                        }
+                    });
+                }
+            }
+        });
+        //添加房间开启关闭监听器
+        PolyvChatroomManager.getInstance().addOnRoomStatusListener(new IPolyvChatroomManager.RoomStatusListener() {
+            @Override
+            public void onStatus(final boolean isClose) {
+                PLVCommonLog.d(TAG, "chatroom onRoomStatus: " + isClose);
+                if (getConfig().getChannelId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getChannelId())) {
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                            view.onCloseRoomStatusChanged(isClose);
                         }
                     });
                 }
@@ -308,9 +343,39 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public Pair<Boolean, Integer> sendChatEmotionImage(final PLVChatEmotionEvent emotionEvent) {
+        PLVCommonLog.d(TAG, "chatroom sendChatEmotionImage: " + liveRoomDataManager.getSessionId());
+        int sendValue = PolyvChatroomManager.getInstance().sendEmotionImage(emotionEvent, new Ack() {
+            @Override
+            public void call(Object... args) {
+                PLVCommonLog.d(TAG, "chatroom sendTextMessage call: " + Arrays.toString(args));
+                if (args == null || args.length == 0 || args[0] == null) {
+                    return;
+                }
+                /**
+                 * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
+                 *if ("".equals(args[0])) {
+                 *    // 触发严禁词时，args[0]为""
+                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
+                 *    return;
+                 *}
+                 */
+
+                acceptEmotionMessage(emotionEvent, String.valueOf(args[0]));
+            }
+        });
+        if (sendValue == PolyvLocalMessage.SENDVALUE_BANIP) {//被禁言也认为发送成功，但不会广播给其他用户
+            acceptEmotionMessage(emotionEvent, "");
+        }
+        PLVCommonLog.d(TAG, "chatroom sendChatEmotionImage: " + emotionEvent.getId() + ", sendValue: " + sendValue);
+        return new Pair<>(sendValue > 0 || sendValue == PolyvLocalMessage.SENDVALUE_BANIP, sendValue);
+    }
+
+    @Override
     public void sendChatImage(final PolyvSendLocalImgEvent localImgEvent) {
         PLVCommonLog.d(TAG, "chatroom sendChatImage: " + localImgEvent.getImageFilePath() + ", sessionId: " + liveRoomDataManager.getSessionId());
         PolyvChatroomManager.getInstance().sendChatImage(localImgEvent, liveRoomDataManager.getSessionId());
+        localImgEvent.setTime(System.currentTimeMillis());
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
@@ -331,6 +396,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         customEvent.setTip(tip);
         customEvent.setEmitMode(PolyvBaseCustomEvent.EMITMODE_ALL);//设置广播方式，EMITMODE_ALL为广播给包括自己的所有用户，EMITMODE_OTHERS为广播给不包括自己的所有用户
         customEvent.setVersion(PolyvCustomEvent.VERSION_1);//设置信息的版本号，对该版本号的信息才进行处理
+        customEvent.setTime(System.currentTimeMillis());
         PLVCommonLog.d(TAG, "chatroom sendCustomGiftMessage: " + customEvent);
         PolyvChatroomManager.getInstance().sendCustomMsg(customEvent);
         return customEvent;
@@ -357,12 +423,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             chatHistoryDisposable.dispose();
         }
         int start = getChatHistoryTime * getChatHistoryCount;
-        int end = (getChatHistoryTime + 1) * getChatHistoryCount;
+        int end = (getChatHistoryTime + 1) * getChatHistoryCount - 1;
         String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
         if (TextUtils.isEmpty(loginRoomId)) {
             loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
         }
-        chatHistoryDisposable = PolyvApiManager.getPolyvApichatApi().getChatHistory(loginRoomId, start, end, 1)
+        chatHistoryDisposable = PolyvApiManager.getPolyvApichatApi().getChatHistory(loginRoomId, start, end, 1, 1)
                 .map(new Function<ResponseBody, JSONArray>() {
                     @Override
                     public JSONArray apply(ResponseBody responseBody) throws Exception {
@@ -373,7 +439,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 .map(new Function<JSONArray, JSONArray>() {
                     @Override
                     public JSONArray apply(JSONArray jsonArray) throws Exception {
-                        if (jsonArray.length() <= getChatHistoryCount) {
+                        if (jsonArray.length() < getChatHistoryCount) {
                             isNoMoreChatHistory = true;
                         }
                         return jsonArray;
@@ -415,8 +481,90 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void requestKickUsers() {
+        if (kickUsersDisposable != null) {
+            kickUsersDisposable.dispose();
+        }
+        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
+        }
+        kickUsersDisposable = PLVChatApiRequestHelper.getKickUsers(loginRoomId)
+                .subscribe(new Consumer<PLVKickUsersVO>() {
+                    @Override
+                    public void accept(final PLVKickUsersVO plvsKickUsersVO) throws Exception {
+                        if (plvsKickUsersVO.getCode() == 200) {
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    kickCount = plvsKickUsersVO.getData().size();
+                                    chatroomData.postKickCountData(kickCount);
+                                    view.onKickUsersList(plvsKickUsersVO.getData());
+                                }
+                            });
+                        } else {
+                            PLVCommonLog.exception(new Throwable(plvsKickUsersVO.toString()));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                        //发送错误日志，便于排查问题
+                        PLVELogSender.send(PolyvChatroomELog.class, PolyvChatroomELog.Event.GET_KICKUSERS_FAIL, throwable);
+                    }
+                });
+    }
+
+    @Override
     public int getChatHistoryTime() {
         return getChatHistoryTime;
+    }
+
+    @Override
+    public void setHistoryContainRewardEvent(boolean historyContainRewardEvent) {
+        this.isHistoryContainRewardEvent = historyContainRewardEvent;
+    }
+
+    @Override
+    public void getChatEmotionImages() {
+        //由于目前后端限制个性图片表情上限为50个，故此暂不做分页实现，默认写死
+        int size = 100;
+        int page = 1;
+        String channel = PLVSocketIOClient.getInstance().getChannelId();
+        String accountId = PLVSocketIOClient.getInstance().getAccountUserId();
+        if (chatEmotionImagesDisposable != null){
+            chatEmotionImagesDisposable.dispose();
+        }
+        chatEmotionImagesDisposable = PolyvApiManager.getPolyvApichatApi().getEmotionImages(channel, accountId, page, size)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<PLVResponseApiBean2<PLVEmotionImageVO>>() {
+                    @Override
+                    public void accept(PLVResponseApiBean2<PLVEmotionImageVO> polyvEmotionImageVO) throws Exception {
+                        if (polyvEmotionImageVO != null && polyvEmotionImageVO.getData() != null && polyvEmotionImageVO.getData().getList() != null) {
+                            List<PLVEmotionImageVO.EmotionImage> emotionImages = polyvEmotionImageVO.getData().getList();
+                            chatroomData.postEmotionImages(emotionImages);
+                            //初始化PLVFaceManager
+                            PLVFaceManager.getInstance().initEmotionList(emotionImages);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+
+    @Override
+    public boolean isCloseRoom() {
+        return PolyvChatroomManager.getInstance().isCloseRoom();
+    }
+
+    @Override
+    public void toggleRoom(boolean isClose, IPolyvChatroomManager.RequestApiListener<String> listener) {
+        PolyvChatroomManager.getInstance().toggleRoom(isClose, listener);
     }
 
     @NonNull
@@ -438,6 +586,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         if (chatHistoryDisposable != null) {
             chatHistoryDisposable.dispose();
+        }
+        if (chatEmotionImagesDisposable != null){
+            chatEmotionImagesDisposable.dispose();
+        }
+        if (kickUsersDisposable != null) {
+            kickUsersDisposable.dispose();
         }
         liveRoomDataManager.getFunctionSwitchVO().removeObserver(functionSwitchObserver);
         liveRoomDataManager.getClassDetailVO().removeObserver(classDetailVOObserver);
@@ -463,8 +617,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     continue;
                 }
                 String messageSource = jsonObject.optString("msgSource");
+                JSONObject jsonObject_user = jsonObject.optJSONObject("user");
+                JSONObject jsonObject_content = jsonObject.optJSONObject("content");
                 if (!TextUtils.isEmpty(messageSource)) {
-                    //收/发红包/图片信息，这里仅取图片信息
+                    //收/发红包/图片信息/打赏信息，这里仅取图片信息
                     if (PLVHistoryConstant.MSGSOURCE_CHATIMG.equals(messageSource)) {
                         int itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG;
                         PLVChatImgHistoryEvent chatImgHistory = PLVGsonUtil.fromJson(PLVChatImgHistoryEvent.class, jsonObject.toString());
@@ -477,17 +633,29 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 || PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatImgHistory.getUser().getUserId());
                         PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(chatImgHistory, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag() : null);
                         tempChatItems.add(0, itemData);
+                    } else if (PLVHistoryConstant.MSGSOURCE_REWARD.equals(messageSource)) {
+                        //打赏信息
+                        PLVRewardEvent.ContentBean rewardContentsBean = PolyvEventHelper.gson.fromJson(jsonObject_content.toString(), PLVRewardEvent.ContentBean.class);
+                        PLVRewardEvent rewardEvent = new PLVRewardEvent();
+                        if (rewardContentsBean != null) {
+                            rewardEvent.setContent(rewardContentsBean);
+                            rewardEvent.setRoomId(jsonObject_user.optInt("roomId"));
+
+                            PLVCustomGiftEvent customGiftEvent = PLVCustomGiftEvent.generateCustomGiftEvent(rewardEvent);
+                            PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(customGiftEvent, PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT);
+                            if (isHistoryContainRewardEvent) {
+                                tempChatItems.add(0, itemData);
+                            }
+                        }
                     }
                     continue;
                 }
-                JSONObject jsonObject_user = jsonObject.optJSONObject("user");
                 if (jsonObject_user != null) {
                     String uid = jsonObject_user.optString("uid");
-                    if (PLVHistoryConstant.UID_REWARD.equals(uid) || PLVHistoryConstant.UID_CUSTOMMSG.equals(uid)) {
-                        //打赏/自定义信息，这里过滤掉
+                    if (PLVHistoryConstant.UID_CUSTOMMSG.equals(uid)) {
+                        //自定义信息，这里过滤掉
                         continue;
                     }
-                    JSONObject jsonObject_content = jsonObject.optJSONObject("content");
                     if (jsonObject_content != null) {
                         //content不为字符串的信息，这里过滤掉
                         continue;
@@ -549,12 +717,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (socketMessages == null || socketMessages.isEmpty()) {
             return;
         }
+
         final List<PLVBaseViewData> chatMessageDataList = new ArrayList<>();
         for (PLVSocketMessage chatroomMessage : socketMessages) {
             String message = chatroomMessage.getMessage();
             String event = chatroomMessage.getEvent();
             String listenEvent = chatroomMessage.getListenEvent();
-
             Object chatMessage = null;
             int itemType = PLVChatMessageItemType.ITEMTYPE_UNDEFINED;
             boolean isSpecialType = false;
@@ -649,6 +817,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     case PLVEventConstant.MESSAGE_EVENT_LOGIN:
                         final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
                         if (loginEvent != null) {
+                            chatroomData.postLoginEventData(loginEvent);
                             callbackToView(new ViewRunnable() {
                                 @Override
                                 public void run(IPLVChatroomContract.IChatroomView view) {
@@ -773,6 +942,19 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             });
                         }
                         break;
+                    //打赏事件
+                    case PLVEventConstant.Chatroom.EVENT_REWARD:
+                        final PLVRewardEvent rewardEvent = PLVEventHelper.toMessageEventModel(message, PLVRewardEvent.class);
+                        if (rewardEvent != null) {
+                            chatroomData.postRewardEvent(rewardEvent);
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    view.onRewardEvent(rewardEvent);
+                                }
+                            });
+                        }
+                        break;
                     //管理员删除某条聊天信息事件
                     case PLVRemoveContentEvent.EVENT:
                         final PLVRemoveContentEvent removeContentEvent = PLVEventHelper.toMessageEventModel(message, PLVRemoveContentEvent.class);
@@ -802,6 +984,16 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 }
                 if (chatMessage != null) {
                     chatMessageDataList.add(new PLVBaseViewData<>(chatMessage, itemType, isSpecialType ? new PLVSpecialTypeTag() : null));
+                }
+            } else if (PLVEventConstant.EMOTION_EVENT.equals(listenEvent)){
+                final PLVChatEmotionEvent emotionEvent = PLVGsonUtil.fromJson(PLVChatEmotionEvent.class, message);
+                if(emotionEvent != null){
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                            view.onLoadEmotionMessage(emotionEvent);
+                        }
+                    });
                 }
             }
         }
@@ -865,6 +1057,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         textMessage.setId(messageId);
         //把带表情的信息解析保存下来
         textMessage.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(textMessage.getSpeakMessage(), getSpeakEmojiSizes(), Utils.getApp()));
+        //生成当前消息的时间
+        textMessage.setTime(System.currentTimeMillis());
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NotNull IPLVChatroomContract.IChatroomView view) {
@@ -872,6 +1066,17 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             }
         });
         chatroomData.postSpeakMessageData((CharSequence) textMessage.getObjects()[0], true);
+    }
+
+    private void acceptEmotionMessage(final PLVChatEmotionEvent emotionEvent, String messageId){
+        emotionEvent.setMessageId(messageId);
+        emotionEvent.setTime(System.currentTimeMillis());
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull @NotNull IPLVChatroomContract.IChatroomView view) {
+                view.onLoadEmotionMessage(emotionEvent);
+            }
+        });
     }
     // </editor-fold>
 

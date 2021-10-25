@@ -37,28 +37,56 @@
             app:scroll_mode="mode_forever" />
     </FrameLayout>
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bulletin_ly"
-        android:layout_margin="8dp"
-        android:background="@drawable/plvlc_chatroom_greeting_bg"
-        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:visibility="gone"
         tools:visibility="visible">
 
+        <com.easefun.polyv.livecommon.ui.widget.PLVGradientView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            app:plvGradientColors="#00E49E25,#E6DE9921,#E6DE9921, #E6DE9921, #00E49E25"
+            app:plvGradientOrientation="leftRight"
+            />
+
         <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView
             android:id="@+id/greeting_tv"
-            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:textSize="12sp"
+            android:ellipsize="end"
             android:visibility="invisible"
             app:scroll_first_delay="100"
             app:scroll_interval="6000"
             app:scroll_mode="mode_once" />
-    </FrameLayout>
+
+        <ImageView
+            android:id="@+id/greeting_start_left"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_centerInParent="true"
+            android:layout_toLeftOf="@id/greeting_tv"
+            android:src="@drawable/plvlc_chatroom_welcome_start_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/greeting_start_right"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@id/greeting_tv"
+            android:layout_centerInParent="true"
+            android:src="@drawable/plvlc_chatroom_welcome_start_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
     <!--marginTop/(like_iv height) unreadView outOfSight or immerse&fitsSystemWindows cover-->
     <com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView

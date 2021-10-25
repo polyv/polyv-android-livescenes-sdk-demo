@@ -1,7 +1,10 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -26,25 +29,29 @@ import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
-import com.easefun.polyv.livecloudclass.modules.linkmic.service.PLVLCLinkMicForegroundService;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
+import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -136,7 +143,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         tvSpeakingUsersText = findViewById(R.id.plvlc_linkmic_tv_speaking_users_text);
 
         //init RecyclerView
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
+        rvLinkMicList.setLayoutManager(linearLayoutManager);
         rvLinkMicList.addItemDecoration(landscapeItemDecoration);
         //禁用RecyclerView默认动画
         rvLinkMicList.getItemAnimator().setAddDuration(0);
@@ -149,7 +157,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         }
 
         //init adapter
-        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
+        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, linearLayoutManager, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
             @Override
             public SurfaceView createLinkMicRenderView() {
                 return linkMicPresenter.createRenderView(Utils.getApp());
@@ -243,6 +251,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         initLinkMicControlBar(linkMicControlBar);
+
+        observeOnAudioState(liveRoomDataManager);
     }
 
 
@@ -474,7 +484,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         linkMicListAdapter.updateAllItem();
         //启动前台服务
         Activity activity = (Activity) getContext();
-        PLVLCLinkMicForegroundService.startForegroundService(activity.getClass());
+        PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
 
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinChannelSuccess();
@@ -524,7 +534,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         teacherLocationViewSwitcher = null;
         setMediaInLinkMicListLinkMicId(null);
         //停止前台服务
-        PLVLCLinkMicForegroundService.stopForegroundService();
+        PLVForegroundService.stopForegroundService();
         //回调离开连麦
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onLeaveChannel();
@@ -542,6 +552,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVCommonLog.d(TAG, "onJoinLinkMic");
         ToastUtils.showShort("上麦成功");
         //更新连麦控制器
+        //无延迟观看时，需要在上麦的时候再设置连麦类型
+        linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
         linkMicControlBar.setJoinLinkMicSuccess();
         tryShowOrHideLandscapeRTCLayout(true);
     }
@@ -687,6 +699,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onNetQuality(int quality) {
+        linkMicListAdapter.updateNetQuality(quality);
+    }
+
+    @Override
     public void onSwitchFirstScreen(String linkMicId) {
         linkMicListAdapter.updateAllItem();
     }
@@ -697,6 +714,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             linkMicListAdapter.setTeacherViewHolderBindListener(new PLVLinkMicListAdapter.OnTeacherSwitchViewBindListener() {
                 @Override
                 public void onTeacherSwitchViewBind(PLVSwitchViewAnchorLayout teacherSwitchView) {
+                    linkMicListAdapter.setInvisibleItemLinkMicId(linkMicId);
                     if (onPLVLinkMicLayoutListener != null) {
                         teacherLocationViewSwitcher = new PLVViewSwitcher();
                         onPLVLinkMicLayoutListener.onChangeTeacherLocation(teacherLocationViewSwitcher, teacherSwitchView);
@@ -814,7 +832,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfRv.leftMargin = PLVScreenUtils.dip2px(DP_LAND_LINK_MIC_LIST_MARGIN_LEFT);
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置vertical排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        rvLinkMicList.setLayoutManager(llm);
+        linkMicListAdapter.setLinearLayoutManager(llm);
         //设置横屏item间隙
         landscapeItemDecoration.setLandscape();
         //设置item显示圆角
@@ -855,11 +875,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfRv.leftMargin = 0;
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置horizontal排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvLinkMicList.setLayoutManager(llm);
+        linkMicListAdapter.setLinearLayoutManager(llm);
         //移除横屏item间隙
         landscapeItemDecoration.setPortrait();
-        //设置horizontal排列
-        rvLinkMicList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         //取消item显示圆角
         linkMicListAdapter.setShowRoundRect(false);
 
@@ -947,5 +967,51 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public @interface TryScrollViewStateType {/**/
     }
 // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据订阅 - 仅音频模式信息">
+
+    private void observeOnAudioState(final IPLVLiveRoomDataManager liveRoomDataManager) {
+        //监听 直播间是否是仅音频模式
+        liveRoomDataManager.getIsOnlyAudioEnabled().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean onlyAudio) {
+                if(onlyAudio == null){
+                    onlyAudio = false;
+                }
+                ArrayList<String> permissions = new ArrayList<>();
+                permissions.add(Manifest.permission.RECORD_AUDIO);
+                if(!onlyAudio){
+                    permissions.add(Manifest.permission.CAMERA);
+                }
+                linkMicPresenter.resetRequestPermissionList(permissions);
+                if(linkMicListAdapter != null){
+                    linkMicListAdapter.setOnlyAudio(onlyAudio);
+                    linkMicListAdapter.updateTeacherCoverImage();
+                }
+            }
+        });
+
+        //封面图
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (polyvLiveClassDetailVOPLVStatefulData == null || !polyvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                    return;
+                }
+                PLVLiveClassDetailVO liveClassDetail = polyvLiveClassDetailVOPLVStatefulData.getData();
+                if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                    return;
+                }
+
+                String coverImage = liveClassDetail.getData().getSplashImg();
+                if(linkMicListAdapter != null){
+                    linkMicListAdapter.setCoverImage(coverImage);
+                    linkMicListAdapter.updateTeacherCoverImage();
+                }
+            }
+        });
+    }
+    // </editor-fold >
 
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,10 +24,6 @@ import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeItem;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeUtils;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
@@ -37,13 +34,15 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
-import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
-import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
@@ -51,7 +50,9 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
@@ -69,6 +70,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCPlaybackMediaLayout.class.getSimpleName();
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
+    private static final int MAX_RETRY_COUNT = 3;//断网重连重试次数
+
 
     /**
      * 横屏聊天布局可见性与弹幕开关同步
@@ -85,7 +88,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //controller
     private IPLVLCPlaybackMediaController mediaController;
     //播放失败时显示的view
-    private PLVLCPlaceHolderView noStreamView;
+    private PLVPlaceHolderView noStreamView;
     //Switch View
     private FrameLayout flPlayerSwitchViewParent;
     private PLVSwitchViewAnchorLayout switchAnchorPlayer;
@@ -98,6 +101,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private PLVPlayerLogoView logoView;
     //载入状态指示器
     private PLVLCVideoLoadingLayout loadingLayout;
+    private PLVPlayerRetryLayout playerRetryLayout;
     // tips view
     private PLVLCLightTipsView lightTipsView;
     private PLVLCVolumeTipsView volumeTipsView;
@@ -113,10 +117,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
-    //跑马灯控件
-    private PolyvMarqueeView marqueeView;
-    private PolyvMarqueeItem marqueeItem;
-    private PolyvMarqueeUtils marqueeUtils;
+    //跑马灯
+    private PLVMarqueeView marqueeView = null;
 
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
@@ -149,6 +151,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         noStreamView = findViewById(R.id.no_stream_ly);
         logoView = findViewById(R.id.playback_logo_view);
         loadingLayout = findViewById(R.id.plvlc_playback_loading_layout);
+        playerRetryLayout = findViewById(R.id.plvlc_playback_player_retry_layout);
         lightTipsView = findViewById(R.id.plvlc_playback_tipsview_light);
         volumeTipsView = findViewById(R.id.plvlc_playback_tipsview_volume);
         progressTipsView = findViewById(R.id.plvlc_playback_tipsview_progress);
@@ -165,11 +168,15 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         initDanmuView();
         initMediaController();
         initLoadingView();
+        initRetryView();
         initSwitchView();
         initLayoutWH();
     }
 
     private void initVideoView() {
+        //设置允许断网重连
+        videoView.enableRetry(true);
+        videoView.setMaxRetryCount(MAX_RETRY_COUNT);
         //设置noStreamView
         noStreamView.setPlaceHolderImg(R.drawable.plvlc_bg_player_no_stream);
         noStreamView.setPlaceHolderText(getResources().getString(R.string.plv_player_video_playback_no_stream));
@@ -179,14 +186,27 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.setNoStreamIndicator(noStreamView);
         videoView.setPlayerBufferingIndicator(loadingLayout);
         //设置跑马灯
-        videoView.post(new Runnable() {
-            @Override
-            public void run() {
-                marqueeView = ((Activity) getContext()).findViewById(R.id.plvlc_marquee_view);//after videoLayout add, post find
-                marqueeItem = new PolyvMarqueeItem();
-                videoView.setMarqueeView(marqueeView, marqueeItem);
-            }
-        });
+        marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
+        PLVMarqueeModel plvMarqueeModel = new PLVMarqueeModel()
+                .setUserName("保利威SDK")
+                .setFontAlpha(255)
+                .setFontSize(40)
+                .setFontColor(Color.RED)
+                .setFilter(false)
+                .setFilterAlpha(255)
+                .setFilterColor(Color.BLACK)
+                .setFilterBlurX(2)
+                .setFilterBlurY(2)
+                .setFilterStrength(4)
+                .setSetting(PLVMarqueeAnimationVO.ROLL)
+                .setInterval(3)
+                .setTweenTime(1)
+                .setLifeTime(2)
+                .setSpeed(200)
+                .setAlwaysShowWhenRun(true)
+                .setHiddenWhenPause(false);
+
+        marqueeView.setPLVMarqueeModel(plvMarqueeModel);
     }
 
     private void initDanmuView() {
@@ -249,6 +269,17 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     private void initLoadingView() {
         loadingLayout.bindVideoView(videoView);
+    }
+
+    private void initRetryView() {
+        playerRetryLayout.setOnClickPlayerRetryListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(playbackPlayerPresenter != null){
+                    playbackPlayerPresenter.startPlay();
+                }
+            }
+        });
     }
 
     private void initSwitchView() {
@@ -522,8 +553,18 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
+        public View getRetryLayout(){
+            return playerRetryLayout;
+        }
+
+        @Override
         public PLVPlayerLogoView getLogo() {
             return logoView;
+        }
+
+        @Override
+        public IPLVMarqueeView getMarqueeView(){
+            return marqueeView;
         }
 
         @Override
@@ -593,18 +634,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onDoubleClick() {
             super.onDoubleClick();
             mediaController.playOrPause();
-        }
-
-        @Override
-        public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName) {
-            super.onGetMarqueeVo(marqueeVo, viewerName);
-            if (marqueeUtils == null) {
-                marqueeUtils = new PolyvMarqueeUtils();
-                marqueeUtils.setUsediyurl(true);
-            }
-            // 更新为后台设置的跑马灯类型
-            String code = PLVLiveChannelConfigFiller.generateNewChannelConfig().getMarqueeCode();
-            marqueeUtils.updateMarquee((Activity) getContext(), marqueeVo, marqueeItem, viewerName, code);
         }
 
         @Override

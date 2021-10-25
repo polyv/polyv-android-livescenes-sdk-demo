@@ -31,6 +31,12 @@ public class PLVStreamerData {
 
     //是否是前置相机
     private MutableLiveData<Boolean> isFrontCamera = new MutableLiveData<>();
+
+    //是否前置摄像头镜像
+    private MutableLiveData<Boolean> isFrontMirrorMode = new MutableLiveData<>();
+
+    //当前设置的码率
+    private MutableLiveData<Integer> curBitrate = new MutableLiveData<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流状态">
@@ -83,6 +89,16 @@ public class PLVStreamerData {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="设置的码率">
+    public void postCurBitrate(int bitrate) {
+        curBitrate.postValue(bitrate);
+    }
+
+    public LiveData<Integer> getCurBitrate() {
+        return curBitrate;
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="媒体状态">
     public void postEnableAudio(boolean isEnableAudio) {
         enableAudio.postValue(isEnableAudio);
@@ -108,6 +124,14 @@ public class PLVStreamerData {
 
     public LiveData<Boolean> getIsFrontCamera() {
         return isFrontCamera;
+    }
+
+    public void postIsFrontMirrorMode(boolean isMirror) {
+        isFrontMirrorMode.postValue(isMirror);
+    }
+
+    public LiveData<Boolean> getIsFrontMirrorMode() {
+        return isFrontMirrorMode;
     }
     // </editor-fold>
 }

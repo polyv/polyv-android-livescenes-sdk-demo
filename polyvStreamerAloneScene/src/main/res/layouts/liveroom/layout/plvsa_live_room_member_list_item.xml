@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="68dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/plvsa_member_avatar_iv"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginRight="12dp"
+        android:layout_centerVertical="true"
+        tools:src="@drawable/plvsa_ic_launcher" />
+
+    <ImageView
+        android:id="@+id/plvsa_member_ban_iv"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignRight="@+id/plvsa_member_avatar_iv"
+        android:layout_alignBottom="@+id/plvsa_member_avatar_iv"
+        android:src="@drawable/plvsa_member_ban_ic"
+        android:translationX="4dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/plvsa_member_user_type_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginRight="8dp"
+        android:layout_toRightOf="@+id/plvsa_member_avatar_iv"
+        android:background="@drawable/plvsa_member_teacher_tv_bg_shape"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxEms="6"
+        android:minWidth="42dp"
+        android:layout_centerVertical="true"
+        android:paddingLeft="3dp"
+        android:singleLine="true"
+        android:text="讲师"
+        android:paddingRight="3dp"
+        android:textColor="#ffffff"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/plvsa_member_nick_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/plvsa_member_user_type_tv"
+        android:ellipsize="end"
+        android:maxEms="8"
+        android:singleLine="true"
+        android:layout_centerVertical="true"
+        android:textColor="#F0F1F5"
+        android:textSize="14sp"
+        tools:text="讲师" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/plvsa_member_linkmic_control_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/plvsa_member_linkmic_selector"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_linkmic_connecting_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/plvsa_member_linkmic"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_more_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/plvsa_member_more" />
+    </LinearLayout>
+</RelativeLayout>

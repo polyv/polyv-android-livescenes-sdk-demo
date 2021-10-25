@@ -21,6 +21,6 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <service android:name=".modules.linkmic.service.PLVLCLinkMicForegroundService" />
+        <service android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService" />
     </application>
 </manifest>

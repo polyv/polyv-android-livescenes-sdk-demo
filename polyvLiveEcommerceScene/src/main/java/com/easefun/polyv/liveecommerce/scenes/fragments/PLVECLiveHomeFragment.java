@@ -52,6 +52,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -465,6 +466,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
             ToastUtils.showShort(getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
         }
+
+        @Override
+        public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if (emotionEvent != null) {
+                //添加信息至列表
+                List<PLVBaseViewData> dataList = new ArrayList<>();
+                dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION));
+                addChatMessageToList(dataList, true);
+            }
+        }
     };
     // </editor-fold>
 
@@ -657,7 +669,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         int textSize = ConvertUtils.dp2px(12);
         drawable.setBounds(0, 0, (int) (textSize * 1.5), (int) (textSize * 1.5));
         span.setSpan(imageSpan, span.length() - 1, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return new PLVCustomGiftEvent(span);
+        PLVCustomGiftEvent plvCustomGiftEvent = new PLVCustomGiftEvent(span);
+        plvCustomGiftEvent.setTime(System.currentTimeMillis());
+        return plvCustomGiftEvent;
     }
     // </editor-fold>
 

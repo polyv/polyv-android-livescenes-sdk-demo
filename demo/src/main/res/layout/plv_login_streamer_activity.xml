@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/plv_streamer_login_bg"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <TextView
+        android:id="@+id/plvls_login_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="手机开播"
+        android:textColor="#F0F1F5"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1" />
+
+    <EditText
+        android:id="@+id/plvls_login_input_channel_et"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/plv_login_input_et_bg_selector"
+        android:gravity="left|center"
+        android:hint="请输入频道号"
+        android:paddingLeft="20dp"
+        android:paddingRight="48dp"
+        android:singleLine="true"
+        android:textColor="#F0F1F5"
+        android:textColorHint="#99F0F1F5"
+        android:inputType="number"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_login_title_tv"
+        app:layout_constraintVertical_bias="0.12" />
+
+    <ImageView
+        android:id="@+id/plvls_login_input_channel_delete_iv"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/plv_login_input_delete"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="@id/plvls_login_input_channel_et"
+        app:layout_constraintTop_toTopOf="@+id/plvls_login_input_channel_et"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/plvls_login_input_pwd_et"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/plv_login_input_et_bg_selector"
+        android:gravity="left|center"
+        android:hint="请输入密码"
+        android:inputType="textPassword"
+        android:paddingLeft="20dp"
+        android:paddingRight="48dp"
+        android:singleLine="true"
+        android:textColor="#F0F1F5"
+        android:textColorHint="#99F0F1F5"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_login_input_channel_et" />
+
+    <ImageView
+        android:id="@+id/plvls_login_input_pwd_delete_iv"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/plv_login_input_delete"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="@id/plvls_login_input_pwd_et"
+        app:layout_constraintTop_toTopOf="@+id/plvls_login_input_pwd_et"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/plvls_login_input_nick_et"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/plv_login_input_et_bg_selector"
+        android:gravity="left|center"
+        android:hint="请输入昵称"
+        android:paddingLeft="20dp"
+        android:maxLength="20"
+        android:paddingRight="48dp"
+        android:singleLine="true"
+        android:textColor="#F0F1F5"
+        android:textColorHint="#99F0F1F5"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_login_input_pwd_et" />
+
+    <ImageView
+        android:id="@+id/plvls_login_input_nick_delete_iv"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/plv_login_input_delete"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="@id/plvls_login_input_nick_et"
+        app:layout_constraintTop_toTopOf="@+id/plvls_login_input_nick_et"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/plvls_login_enter_btn"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/plv_login_enter_bt_bg_selector"
+        android:enabled="false"
+        android:gravity="center"
+        android:text="登录"
+        android:textColor="#F0F1F5"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_login_input_nick_et"
+        app:layout_constraintVertical_bias="0.2" />
+
+    <LinearLayout
+        android:id="@+id/plvls_login_remember_password_ll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:layout_marginLeft="57dp"
+        android:layout_marginStart="57dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plvls_login_enter_btn">
+
+        <CheckBox
+            android:id="@+id/plvls_login_remember_password_cb"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:padding="6dp"
+            android:drawableLeft="@drawable/plv_checkbox_selector"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="记住密码"
+            android:textColor="#99F0F1F5"
+            android:textSize="12sp"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/plvls_login_read_protocol_ly"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="@id/plvls_login_remember_password_ll"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_login_remember_password_ll">
+
+        <CheckBox
+            android:id="@+id/plvls_login_agree_contract_cb"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:padding="6dp"
+            android:drawableLeft="@drawable/plv_checkbox_selector"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已阅读并同意"
+            android:textColor="#99F0F1F5"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/plvls_login_private_policy_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="《隐私政策》"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="和"
+            android:textColor="#99F0F1F5"
+            android:textSize="12sp"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/plvls_login_usage_contract_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="《使用协议》"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/plvls_login_loading_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

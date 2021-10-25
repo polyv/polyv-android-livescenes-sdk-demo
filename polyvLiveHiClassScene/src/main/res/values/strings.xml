@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="plvhc_app_name">POLYV互动学堂</string>
+
+    <string name="plvhc_document_upload_tips">
+        1. 18:00-19:00 为上传高峰期，排队时间较长，请错峰上传；
+        \n2. 课节最大支持 500M，不超过 1000页；
+        \n3. 仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式；
+        \n4. wps 或含特殊字体、付费字体的文档请先转为 pdf 再上传。
+    </string>
+    <string name="plvhc_document_upload_choose_convert_type">选择 PPT 转码方式</string>
+    <string name="plvhc_document_upload_choose_convert_type_hint">
+    快速转码：不含 PPT 动效，速度较快。动画转码：含 PPT 动效，速度较慢，仅支持 Microsoft Office 保存的PPT
+    </string>
+    <string name="plvhc_document_upload_not_support_file_type_hint">识别文件类型失败，仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式</string>
+
+    <string name="plvhc_document_delete_confirm_title">删除文档</string>
+    <string name="plvhc_document_delete_confirm_content">删除后文档将无法恢复</string>
+    <string name="plvhc_document_delete_confirm_cancel">取消</string>
+    <string name="plvhc_document_delete_confirm">删除</string>
+
+    <string name="plvhc_document_upload_retry_title">上传中断</string>
+    <string name="plvhc_document_upload_retry_content">本地有文档上次上传中断，是否重新上传</string>
+    <string name="plvhc_document_upload_retry_cancel">取消</string>
+    <string name="plvhc_document_upload_retry_confirm">重新上传</string>
+
+    <string name="plvhc_document_upload_convert_fail_title">无法解码</string>
+    <string name="plvhc_document_upload_convert_fail_content">暂不支持加密文档，请确保文档已解密 或 转为PDF文件 重试。如无法解决请联系客服。</string>
+    <string name="plvhc_document_upload_convert_fail_cancel">取消</string>
+    <string name="plvhc_document_upload_convert_fail_retry">重新上传</string>
+
+    <string name="plvhc_document_upload_convert_type_quick">快速转码</string>
+    <string name="plvhc_document_upload_convert_type_animate">动画转码</string>
+
+
+</resources>

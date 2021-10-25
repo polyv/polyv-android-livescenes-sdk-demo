@@ -7,14 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,6 +46,7 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.enums.PLVLSPptV
 import com.easefun.polyv.livestreamer.modules.document.popuplist.holder.PLVLSPptListViewHolder;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSDocumentDeleteArrow;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -61,7 +64,7 @@ import io.reactivex.functions.Consumer;
 
 /**
  * PPT文档和PPT页面列表选择弹层布局
- * 弹层布局请勿直接在布局文件引入，请通过{@link #open()}方法显示弹层
+ * 弹层布局请勿直接在布局文件引入，请通过{@link #open(boolean)}方法显示弹层
  *
  * @author suhongtao
  */
@@ -84,6 +87,7 @@ public class PLVLSPptListLayout extends FrameLayout {
     private ImageView plvlsDocumentListBackIv;
     private TextView plvlsDocumentNameTv;
     private TextView plvlsDocumentPageTv;
+    private TextView plvlsDocumentRefreshTv;
     private View plvlsDocumentSeparatorView;
     private RecyclerView plvlsDocumentPptRv;
     private PLVTriangleIndicateTextView plvlsDocumentBackIndicator;
@@ -176,6 +180,7 @@ public class PLVLSPptListLayout extends FrameLayout {
         initPptUploadAgainConfirmDialog();
         initDocumentUploadListener();
         initOnClickBackListener();
+        initOnClickRefreshListener();
         PLVBlurUtils.initBlurView(plvlsBlurView);
 
         initMvpView();
@@ -186,6 +191,7 @@ public class PLVLSPptListLayout extends FrameLayout {
         plvlsDocumentListBackIv = (ImageView) rootView.findViewById(R.id.plvls_document_list_back_iv);
         plvlsDocumentNameTv = (TextView) rootView.findViewById(R.id.plvls_document_name_tv);
         plvlsDocumentPageTv = (TextView) rootView.findViewById(R.id.plvls_document_page_tv);
+        plvlsDocumentRefreshTv = (TextView) rootView.findViewById(R.id.plvls_document_refresh_tv);
         plvlsDocumentSeparatorView = (View) rootView.findViewById(R.id.plvls_document_separator_view);
         plvlsDocumentPptRv = (RecyclerView) rootView.findViewById(R.id.plvls_document_ppt_rv);
         plvlsDocumentBackIndicator = (PLVTriangleIndicateTextView) rootView.findViewById(R.id.plvls_document_back_indicator);
@@ -271,8 +277,8 @@ public class PLVLSPptListLayout extends FrameLayout {
      */
     private void initPptConvertSelectDialog() {
         pptConvertSelectDialog = new PLVConfirmDialog(getContext())
-                .setTitle(getResources().getString(R.string.document_upload_choose_convert_type))
-                .setContent(getResources().getString(R.string.document_upload_choose_convert_type_hint));
+                .setTitle(getResources().getString(R.string.plvls_document_upload_choose_convert_type))
+                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint));
     }
 
     /**
@@ -316,6 +322,18 @@ public class PLVLSPptListLayout extends FrameLayout {
     }
 
     /**
+     * 初始化刷新按钮点击监听
+     */
+    private void initOnClickRefreshListener() {
+        plvlsDocumentRefreshTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
+            }
+        });
+    }
+
+    /**
      * 初始化 MVP - View
      */
     private void initMvpView() {
@@ -353,6 +371,9 @@ public class PLVLSPptListLayout extends FrameLayout {
             public boolean requestSelectUploadFileConvertType(final Uri fileUri) {
                 if (fileUri == null) {
                     Log.w(TAG, "file uri is null.");
+                    PLVToast.Builder.context(getContext())
+                            .setText("无法访问文件所在路径")
+                            .build().show();
                     return false;
                 }
 
@@ -364,29 +385,13 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
                 if (TextUtils.isEmpty(filePath)) {
                     Log.w(TAG, "file path is empty.");
+                    PLVToast.Builder.context(getContext())
+                            .setText("无法访问文件所在路径")
+                            .build().show();
                     return false;
                 }
 
                 final File uploadFile = new File(filePath);
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-                String fileMimeType = null;
-                if (!TextUtils.isEmpty(fileExtension)) {
-                    fileMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                }
-                // 不支持的上传格式，弹toast取消上传
-                if (TextUtils.isEmpty(fileMimeType)) {
-                    PLVToast.Builder.context(getContext())
-                            .setText("识别文件类型失败，仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式")
-                            .build()
-                            .show();
-                    return false;
-                } else if (!PLVFileChooseUtils.isSupportMimeType(fileMimeType)) {
-                    PLVToast.Builder.context(getContext())
-                            .setText("仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式")
-                            .build()
-                            .show();
-                    return false;
-                }
 
                 // 弹窗提示选择转码方式
                 pptConvertSelectDialog
@@ -509,7 +514,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
                 if (pptVO.getUploadStatus() == PLVPptUploadStatus.STATUS_CONVERT_ANIMATE_LOSS) {
                     // 确认动效丢失，移除上传进度缓存
-                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                     // 确认动效丢失认为转码成功
                     for (PLVLSPptVO uploadListPptVO : mergePptCoverList()) {
                         if (uploadListPptVO.getFileId().equalsIgnoreCase(pptVO.getFileId())) {
@@ -529,7 +534,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                                 @Override
                                 public void onClick(View v) {
                                     // 点击取消时，清除上传进度缓存，下次不再提示
-                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                                     documentUploadAgainConfirmDialog.hide();
                                 }
                             })
@@ -537,7 +542,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                             .setRightBtnListener(new OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getId());
+                                    PLVDocumentPresenter.getInstance().removeUploadCache(pptVO.getFileId());
                                     // 重新选择文件上传
                                     if (getContext() instanceof Activity) {
                                         PLVFileChooseUtils.chooseFile((Activity) getContext(), PLVFileChooseUtils.REQUEST_CODE_CHOOSE_UPLOAD_DOCUMENT);
@@ -609,6 +614,14 @@ public class PLVLSPptListLayout extends FrameLayout {
             @Override
             public void onUploadFailed(@Nullable PLVSPPTInfo.DataBean.ContentsBean documentBean, int errorCode, String msg, Throwable throwable) {
                 Log.i(TAG, "document upload onUploadFailed");
+                String message = msg;
+                if (TextUtils.isEmpty(message)) {
+                    message = throwable.getMessage();
+                }
+                PLVToast.Builder.context(getContext())
+                        .setText(errorCode + "-" + message)
+                        .build().show();
+
                 // 上传失败回调 更新视图显示
                 if (documentBean == null) {
                     return;
@@ -682,7 +695,10 @@ public class PLVLSPptListLayout extends FrameLayout {
     /**
      * 打开弹层
      */
-    public void open() {
+    public void open(boolean refresh) {
+        if(refresh){
+            PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
+        }
         final int landscapeHeight = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         if (menuDrawer == null) {
             // 弹层初始化
@@ -791,8 +807,15 @@ public class PLVLSPptListLayout extends FrameLayout {
         showViewType = PLVLSPptViewType.COVER;
         plvlsDocumentListBackIv.setVisibility(GONE);
         plvlsDocumentBackIndicator.setVisibility(GONE);
-        plvlsDocumentNameTv.setText("所有文档");
-        plvlsDocumentPageTv.setText("共" + mergedCoverList.size() + "个");
+        plvlsDocumentPageTv.setVisibility(GONE);
+        plvlsDocumentRefreshTv.setVisibility(VISIBLE);
+
+        String name = String.format("所有文档 共%s个", mergedCoverList.size());
+        SpannableString spannableString = new SpannableString(name);
+        spannableString.setSpan(new AbsoluteSizeSpan(ConvertUtils.sp2px(12f)),
+                name.lastIndexOf("共"), name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        plvlsDocumentNameTv.setText(spannableString);
         pptListAdapter.setCurrentSelectedId(currentAutoId);
         pptListAdapter.updatePptList(mergedCoverList, PLVLSPptViewType.COVER);
         plvlsDocumentPptRv.scrollToPosition(currentAutoId);
@@ -804,6 +827,9 @@ public class PLVLSPptListLayout extends FrameLayout {
     private void updatePptPageViewContent() {
         showViewType = PLVLSPptViewType.PAGE;
         plvlsDocumentListBackIv.setVisibility(VISIBLE);
+        plvlsDocumentPageTv.setVisibility(VISIBLE);
+        plvlsDocumentRefreshTv.setVisibility(GONE);
+
         if (lastPptName == null) {
             plvlsDocumentNameTv.setText("");
         } else {

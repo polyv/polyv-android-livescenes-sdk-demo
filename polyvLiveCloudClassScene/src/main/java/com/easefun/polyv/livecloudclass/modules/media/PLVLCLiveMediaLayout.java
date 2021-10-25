@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +30,7 @@ import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeItem;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeUtils;
-import com.easefun.polyv.businesssdk.sub.marquee.PolyvMarqueeView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
@@ -44,19 +42,22 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeView;
-import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaceHolderView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
-import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
+import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
@@ -82,7 +83,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVLCLiveVideoLayout";
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
-
+    private static final String DEFAULT_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
     /**
      * 横屏聊天布局可见性与弹幕开关同步
      * true -> 当弹幕关闭时，也隐藏横屏聊天布局
@@ -110,11 +111,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PLVPlayerLogoView logoView;
     //主播放器控制栏
     private IPLVLCLiveMediaController mediaController;
+    //封面图
+    private ImageView coverImageView;
 
     //播放器缓冲显示的view
     private PLVLCVideoLoadingLayout loadingView;
     //当前没有直播显示的view
-    private PLVLCPlaceHolderView noStreamView;
+    private PLVPlaceHolderView noStreamView;
     //直播停止时显示的view
     private View stopStreamView;
 
@@ -133,9 +136,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
     //跑马灯
-    private PolyvMarqueeView marqueeView;
-    private PolyvMarqueeItem marqueeItem;
-    private PolyvMarqueeUtils marqueeUtils;
+    private IPLVMarqueeView marqueeView = null;
 
     //截图，用于刷新直播的时候防止黑屏
     private ImageView screenshotIV;
@@ -155,6 +156,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private boolean isClickShowSubTab = true;
     private boolean isShowLandscapeRTCLayout = false;
     private boolean isLandscape;
+
+    private boolean isOnlyAudio = false;
+    private String coverImage = DEFAULT_COVER_IMAGE;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
@@ -200,9 +204,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         timeCountDownTv = findViewById(R.id.time_count_down_tv);
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
+        coverImageView = findViewById(R.id.plvlc_cover_image_view);
 
         // 底部占位图
-        PLVLCPlaceHolderView placeHolderView = new PLVLCPlaceHolderView(getContext());
+        PLVPlaceHolderView placeHolderView = new PLVPlaceHolderView(getContext());
         placeHolderView.setVisibility(VISIBLE);
         placeHolderView.setPlaceHolderText("");
         addView(placeHolderView, 0);
@@ -228,14 +233,28 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         videoView.setStopStreamIndicator(stopStreamView);
         videoView.setMediaController(mediaController);
         //设置跑马灯
-        videoView.post(new Runnable() {
-            @Override
-            public void run() {
-                marqueeView = ((Activity) getContext()).findViewById(R.id.plvlc_marquee_view);//after videoLayout add, post find
-                marqueeItem = new PolyvMarqueeItem();
-                videoView.setMarqueeView(marqueeView, marqueeItem);
-            }
-        });
+        marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
+        PLVMarqueeModel plvMarqueeModel = new PLVMarqueeModel()
+                .setUserName("保利威SDK")
+                .setFontAlpha(255)
+                .setFontSize(40)
+                .setFontColor(Color.RED)
+                .setFilter(false)
+                .setFilterAlpha(255)
+                .setFilterColor(Color.BLACK)
+                .setFilterBlurX(2)
+                .setFilterBlurY(2)
+                .setFilterStrength(4)
+                .setSetting(PLVMarqueeAnimationVO.ROLL)
+                .setInterval(3)
+                .setTweenTime(1)
+                .setLifeTime(2)
+                .setSpeed(200)
+                .setAlwaysShowWhenRun(true)
+                .setHiddenWhenPause(false)
+                ;
+
+        marqueeView.setPLVMarqueeModel(plvMarqueeModel);
     }
 
     private void initDanmuView() {
@@ -341,6 +360,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.removeView(playerView);
                     videoView.removeView(screenshotIV);
                     videoView.removeView(audioModeView);
+                    videoView.removeView(coverImageView);
                     videoView.removeView(logoView);
                     videoView.removeView(loadingView);
                     videoView.removeView(noStreamView);
@@ -349,6 +369,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     flLivePlayerSwitchView.addView(playerView);
                     flLivePlayerSwitchView.addView(screenshotIV);
                     flLivePlayerSwitchView.addView(audioModeView);
+                    flLivePlayerSwitchView.addView(coverImageView);
                     flLivePlayerSwitchView.addView(logoView);
                     flLivePlayerSwitchView.addView(loadingView);
                     flLivePlayerSwitchView.addView(noStreamView);
@@ -373,6 +394,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.addView(playerView, 0);
                     videoView.addView(screenshotIV);
                     videoView.addView(audioModeView);
+                    videoView.addView(coverImageView);
                     videoView.addView(logoView);
                     videoView.addView(loadingView);
                     videoView.addView(noStreamView);
@@ -693,6 +715,20 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         @Override
+        public IPLVMarqueeView getMarqueeView(){
+            return marqueeView;
+        }
+
+        @Override
+        public void onSubVideoViewLoadImage(String imageUrl, ImageView imageView) {
+            PLVImageLoader.getInstance().loadImage(subVideoView.getContext(), imageUrl, imageView);
+            ViewGroup.LayoutParams lp = imageView.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            imageView.setLayoutParams(lp);
+        }
+
+        @Override
         public void onSubVideoViewClick(boolean mainPlayerIsPlaying) {
             super.onSubVideoViewClick(mainPlayerIsPlaying);
 
@@ -741,6 +777,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public void onLiveEnd() {
             super.onLiveEnd();
+            Log.i(TAG, "onLiveEnd: ");
             startLiveTimeCountDown(liveStartTime);
         }
 
@@ -753,18 +790,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 mediaController.updateWhenVideoViewPrepared();
             }
             mediaController.show();
-        }
-
-        @Override
-        public void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName) {
-            super.onGetMarqueeVo(marqueeVo, viewerName);
-            if (marqueeUtils == null) {
-                marqueeUtils = new PolyvMarqueeUtils();
-                marqueeUtils.setUsediyurl(true);
-            }
-            // 更新为后台设置的跑马灯类型
-            String code = PLVLiveChannelConfigFiller.generateNewChannelConfig().getMarqueeCode();
-            marqueeUtils.updateMarquee((Activity) getContext(), marqueeVo, marqueeItem, viewerName, code);
         }
 
         @Override
@@ -801,6 +826,12 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         public boolean onNetworkRecover() {
             //如果加入了连麦，那么断网重连后，不让播放器内部自动拉流播放
             return isJoinRTC;
+        }
+
+        @Override
+        public void onOnlyAudio(boolean isOnlyAudio) {
+            super.onOnlyAudio(isOnlyAudio);
+            mediaController.updateWhenOnlyAudio(isOnlyAudio);
         }
     };
     // </editor-fold>
@@ -868,6 +899,31 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 封面图更新显示">
+
+    /**
+     * 更新封面图显示，仅限三分屏场景，已开启仅音频模式{@link #isOnlyAudio=true}下使用
+     */
+    private void updateCoverImage(boolean isOnlyAudio, String coverImage){
+        if(!isOnlyAudio){
+            coverImageView.setVisibility(INVISIBLE);
+            return;
+        }
+
+        if(TextUtils.isEmpty(coverImage)){
+            coverImage = DEFAULT_COVER_IMAGE;
+        }
+
+        if(coverImage.startsWith("//")){
+            coverImage = "https:" + coverImage;
+        }
+
+        coverImageView.setVisibility(VISIBLE);
+        PLVImageLoader.getInstance().loadImage(coverImage, coverImageView);
+
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="旋转处理">
     @Override
@@ -940,6 +996,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 }
                 //设置视频名称
                 mediaController.setVideoName(liveClassDetail.getData().getName());
+                //更新封面图
+                coverImage = liveClassDetail.getData().getSplashImg();
+                updateCoverImage(isOnlyAudio, coverImage);
             }
         });
 
@@ -970,6 +1029,19 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                             break;
                     }
                 }
+            }
+        });
+
+        //监听 直播间是否是仅音频模式
+        liveRoomDataManager.getIsOnlyAudioEnabled().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean onlyAudio) {
+                if(onlyAudio == null){
+                    onlyAudio = false;
+                }
+                isOnlyAudio = onlyAudio;
+                //更新封面图
+                updateCoverImage(isOnlyAudio, coverImage);
             }
         });
     }

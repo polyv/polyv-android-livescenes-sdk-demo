@@ -19,11 +19,14 @@ import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentV
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livestreamer.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 文档区域控制栏布局
@@ -79,8 +82,8 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     private PLVAbsDocumentView documentMvpView;
 
     // 当前文档ID
-    private int autoId;
-    // 当前页面索引，从0开始
+    private int currentAutoId;
+    // 当前页面索引，从0开始，就是当前auto Id
     private int currentPageIndex = 0;
     /**
      * 页面总数
@@ -88,6 +91,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
      * Value: 总页面数，autoId为0时为总白板数
      */
     private SparseArray<Integer> autoId2PageCountMap = new SparseArray<>();
+    private boolean isShowByGuest;
 
     // </editor-fold>
 
@@ -255,31 +259,28 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     private void initPptPageSelector() {
         // 首次进入只有1个白板
         currentPageIndex = 0;
-        autoId2PageCountMap.put(0, 1);
+        autoId2PageCountMap.put(AUTO_ID_WHITE_BOARD, 1);
 
         // 只有1个白板时不显示白板页面指示和上下页切换按钮
         plvlsDocumentPageIndicateTv.setVisibility(GONE);
-        plvlsDocumentLastPageIv.setVisibility(GONE);
-        plvlsDocumentNextPageIv.setVisibility(GONE);
+        setPageSelectorVisibility(false);
 
         plvlsDocumentWhiteboardAddIv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 点一次按钮多一个白板
-                int pageCount = autoId2PageCountMap.get(0, 1);
-                pageCount++;
-                autoId2PageCountMap.put(0, pageCount);
 
-                plvlsDocumentPageIndicateTv.setText(String.format(Locale.getDefault(), "%d/%d", currentPageIndex + 1, pageCount));
-                if (pageCount > 1) {
-                    updatePageSelectorEnabledType(currentPageIndex, pageCount);
-                    plvlsDocumentPageIndicateTv.setVisibility(VISIBLE);
-                    plvlsDocumentLastPageIv.setVisibility(VISIBLE);
-                    plvlsDocumentNextPageIv.setVisibility(VISIBLE);
-                }
+                int pageCount = autoId2PageCountMap.get(AUTO_ID_WHITE_BOARD, 1);
+                pageCount++;
+                autoId2PageCountMap.put(AUTO_ID_WHITE_BOARD, pageCount);
 
                 // 切换到新增的白板
-                processChangePptPage(pageCount - 1, pageCount);
+                currentPageIndex = pageCount - 1;
+                updatePageIndicator(AUTO_ID_WHITE_BOARD, currentPageIndex);
+                //回调，发送到presenter来更新数据层
+                if (onChangePptPageListener != null) {
+                    onChangePptPageListener.onChangePage(currentPageIndex);
+                }
 
                 PLVToast.Builder.context(getContext())
                         .setText("新增白板成功")
@@ -288,19 +289,19 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             }
         });
 
-        // 切换至上一个白板
+        // 切换至上一步
         plvlsDocumentLastPageIv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                processChangePptPage(currentPageIndex - 1, autoId2PageCountMap.get(autoId, 1));
+                PLVDocumentPresenter.getInstance().changePptToLastStep();
             }
         });
 
-        // 切换至下一个白板
+        // 切换至下一步
         plvlsDocumentNextPageIv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                processChangePptPage(currentPageIndex + 1, autoId2PageCountMap.get(autoId, 1));
+                PLVDocumentPresenter.getInstance().changePptToNextStep();
             }
         });
     }
@@ -337,32 +338,30 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                 autoId2PageCountMap.put(plvspptJsModel.getAutoId(), pageCount);
             }
 
+            //用户交互操作发送到JS时，会收到来自JS的文档变化回调
             @Override
-            public void onPptPageChange(int autoId, int pageId) {
-                PLVLSDocumentControllerLayout.this.autoId = autoId;
-                PLVLSDocumentControllerLayout.this.currentPageIndex = pageId;
-                boolean isWhiteBoard = autoId == 0;
+            public void onPptStatusChange(PLVSPPTStatus pptStatus) {
+                currentAutoId = pptStatus.getAutoId();
+                currentPageIndex = pptStatus.getPageId();
+                autoId2PageCountMap.put(currentAutoId, pptStatus.getTotal());
+
+                updatePageIndicator(currentAutoId, currentPageIndex);
+
+                /*
+                更新画笔和添加白板按钮状态
+                 */
+                boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
+                //添加白板控件和画笔控件
                 if (isWhiteBoard) {
-                    plvlsDocumentWhiteboardAddIv.setVisibility(VISIBLE);
+                    if (!isShowByGuest) {
+                        plvlsDocumentWhiteboardAddIv.setVisibility(VISIBLE);
+                    }
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_active);
                 } else {
                     // PPT文档模式 不显示白板相关按钮
                     plvlsDocumentWhiteboardAddIv.setVisibility(GONE);
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_inactive);
                 }
-
-                int pageCount = autoId2PageCountMap.get(autoId, 1);
-                if (pageCount > 1) {
-                    plvlsDocumentPageIndicateTv.setVisibility(VISIBLE);
-                    plvlsDocumentLastPageIv.setVisibility(VISIBLE);
-                    plvlsDocumentNextPageIv.setVisibility(VISIBLE);
-                } else {
-                    plvlsDocumentPageIndicateTv.setVisibility(GONE);
-                    plvlsDocumentLastPageIv.setVisibility(GONE);
-                    plvlsDocumentNextPageIv.setVisibility(GONE);
-                }
-                plvlsDocumentPageIndicateTv.setText(String.format(Locale.getDefault(), "%d/%d", pageId + 1, pageCount));
-                updatePageSelectorEnabledType(pageId, pageCount);
             }
         };
 
@@ -388,6 +387,22 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
      */
     public void show() {
         rootView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 显示嘉宾控制器
+     */
+    public void showByGuest() {
+        isShowByGuest = true;
+        show();
+        int childCount = plvlsDocumentControllerLl.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = plvlsDocumentControllerLl.getChildAt(i);
+            if (view != null) {
+                view.setVisibility(INVISIBLE);
+            }
+        }
+        plvlsDocumentFullscreenIv.setVisibility(VISIBLE);
     }
 
     /**
@@ -458,25 +473,6 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     }
 
     /**
-     * 处理ppt页面变更
-     *
-     * @param pageId    将要切换到的ppt页面
-     * @param pageCount 总页面
-     */
-    private void processChangePptPage(int pageId, int pageCount) {
-        if (pageId < 0 || pageId >= pageCount) {
-            return;
-        }
-        currentPageIndex = pageId;
-        updatePageSelectorEnabledType(currentPageIndex, pageCount);
-        plvlsDocumentPageIndicateTv.setText(String.format(Locale.getDefault(), "%d/%d", currentPageIndex + 1, pageCount));
-
-        if (onChangePptPageListener != null) {
-            onChangePptPageListener.onChangePage(currentPageIndex);
-        }
-    }
-
-    /**
      * 更新上下页按钮状态
      * 首页不可再切上一页，末页不可再切下一页
      *
@@ -495,6 +491,30 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         } else {
             plvlsDocumentLastPageIv.setEnabled(true);
             plvlsDocumentNextPageIv.setEnabled(true);
+        }
+    }
+
+    //更新页面指示器
+    private void updatePageIndicator(int autoId, int pageIndex) {
+        //翻页控件
+        int pageCount = autoId2PageCountMap.get(autoId, 1);
+        //pageId+1是因为返回的每次是数组index，要+1才正常。
+        plvlsDocumentPageIndicateTv.setText(String.format(Locale.getDefault(), "%d/%d", pageIndex + 1, pageCount));
+        if (pageCount > 1) {
+            plvlsDocumentPageIndicateTv.setVisibility(VISIBLE);
+            setPageSelectorVisibility(true);
+        } else {
+            plvlsDocumentPageIndicateTv.setVisibility(GONE);
+            setPageSelectorVisibility(false);
+        }
+        updatePageSelectorEnabledType(pageIndex, pageCount);
+    }
+
+    //设置翻页指示器可见性
+    private void setPageSelectorVisibility(boolean show) {
+        if (!isShowByGuest) {
+            plvlsDocumentLastPageIv.setVisibility(show ? VISIBLE : GONE);
+            plvlsDocumentNextPageIv.setVisibility(show ? VISIBLE : GONE);
         }
     }
 

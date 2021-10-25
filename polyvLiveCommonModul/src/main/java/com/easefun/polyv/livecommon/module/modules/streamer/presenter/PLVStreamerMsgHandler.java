@@ -13,6 +13,7 @@ import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.linkmic.model.PLVJoinRequestSEvent;
+import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVBanIpEvent;
@@ -24,6 +25,7 @@ import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
+import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
@@ -42,8 +44,9 @@ import io.socket.client.Socket;
 public class PLVStreamerMsgHandler {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVStreamerMsgHandler";
+    private static final String LINK_MIC_TYPE_AUDIO = "audio";
 
-    private PLVStreamerPresenter streamerPresenter;
+    private final PLVStreamerPresenter streamerPresenter;
 
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
@@ -66,7 +69,7 @@ public class PLVStreamerMsgHandler {
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnConnectStatusListener(onConnectStatusListener);
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
 
-        streamerPresenter.streamerManager.removeEventHandler(linkMicEventHandler);
+        streamerPresenter.getStreamerManager().removeEventHandler(linkMicEventHandler);
     }
     // </editor-fold>
 
@@ -120,6 +123,10 @@ public class PLVStreamerMsgHandler {
                         PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceIDEvent.class);
                         acceptOnSliceIDEvent(onSliceIDEvent);
                         break;
+                    case PLVEventConstant.Ppt.ON_SLICE_START_EVENT:
+                        PLVOnSliceStartEvent onSliceStartEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceStartEvent.class);
+                        acceptOnSliceStartEvent(onSliceStartEvent);
+                        break;
                     //用户请求连麦事件
                     case PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT:
                         PLVJoinRequestSEvent joinRequestSEvent = PLVGsonUtil.fromJson(PLVJoinRequestSEvent.class, message);
@@ -134,6 +141,15 @@ public class PLVStreamerMsgHandler {
                     case PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT:
                         PLVJoinAnswerSEvent joinAnswerSEvent = PLVGsonUtil.fromJson(PLVJoinAnswerSEvent.class, message);
                         acceptJoinAnswerSEvent(joinAnswerSEvent);
+                        break;
+                    //嘉宾被禁用观众视频或麦克风
+                    case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
+                        PLVLinkMicMedia micMedia = PLVGsonUtil.fromJson(PLVLinkMicMedia.class, message);
+                        if (micMedia != null) {
+                            boolean isMute = micMedia.isMute();
+                            boolean isAudio = LINK_MIC_TYPE_AUDIO.equals(micMedia.getType());
+                            streamerPresenter.callUpdateGuestMediaStatus(isMute, isAudio);
+                        }
                         break;
                 }
             }
@@ -264,7 +280,21 @@ public class PLVStreamerMsgHandler {
 
     private void acceptOnSliceIDEvent(PLVOnSliceIDEvent onSliceIDEvent) {
         if (onSliceIDEvent != null && onSliceIDEvent.getData() != null) {
-            streamerPresenter.liveRoomDataManager.setSessionId(onSliceIDEvent.getData().getSessionId());
+            streamerPresenter.getLiveRoomDataManager().setSessionId(onSliceIDEvent.getData().getSessionId());
+            //嘉宾响应全体静音
+            if ("audio".equals(onSliceIDEvent.getData().getAvConnectMode())) {
+                streamerPresenter.callUpdateGuestMediaStatus(true, true);
+            }
+        }
+    }
+
+    private void acceptOnSliceStartEvent(PLVOnSliceStartEvent onSliceStartEvent) {
+        if (onSliceStartEvent != null && onSliceStartEvent.getData() != null) {
+            //嘉宾更新新的sessionId，防止使用上一场次的sessionId导致请求错误的连麦列表数据。
+            if (streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)) {
+                String sessionId = onSliceStartEvent.getSessionId();
+                streamerPresenter.getLiveRoomDataManager().setSessionId(sessionId);
+            }
         }
     }
 
@@ -276,7 +306,10 @@ public class PLVStreamerMsgHandler {
             //更新成员列表数据
             if (hasChanged) {
                 streamerPresenter.callUpdateSortMemberList();
-                streamerPresenter.getData().postUserRequestData(linkMicItemDataBean.getLinkMicId());
+                //嘉宾不回调用户请求连麦的数据
+                if (!streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)) {
+                    streamerPresenter.getData().postUserRequestData(linkMicItemDataBean.getLinkMicId());
+                }
                 streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -289,7 +322,15 @@ public class PLVStreamerMsgHandler {
 
     private void acceptJoinLeaveSEvent(PLVJoinLeaveSEvent joinLeaveSEvent) {
         if (joinLeaveSEvent != null && joinLeaveSEvent.getUser() != null) {
-            updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId());
+            String userId = joinLeaveSEvent.getUser().getUserId();
+            if (streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerId().equals(userId) &&
+                    streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)) {
+                //如果当前用户是嘉宾，则收到joinLeave的时候不要把自己移除了。
+                PLVCommonLog.d(TAG, "guest receive joinLeave");
+            } else {
+                updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId());
+            }
+
         }
     }
 
@@ -310,6 +351,10 @@ public class PLVStreamerMsgHandler {
             public void onJoinChannelSuccess(String uid) {
                 super.onJoinChannelSuccess(uid);
                 PLVCommonLog.d(TAG, "onJoinChannelSuccess: " + uid);
+                if (PLVSocketUserConstant.USERTYPE_GUEST.equals(streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType())) {
+                    streamerPresenter.getStreamerManager().switchRoleToBroadcaster();
+                    streamerPresenter.callUpdateGuestStatus(true);
+                }
             }
 
             @Override
@@ -365,7 +410,7 @@ public class PLVStreamerMsgHandler {
                         continue;
                     }
                     String linkMicId = linkMicItemDataBean.getLinkMicId();
-                    if (linkMicId == null || linkMicId.equals(streamerPresenter.streamerManager.getLinkMicUid())) {
+                    if (linkMicId == null || linkMicId.equals(streamerPresenter.getStreamerManager().getLinkMicUid())) {
                         continue;
                     }
                     boolean hitInVolumeInfoList = false;
@@ -404,7 +449,7 @@ public class PLVStreamerMsgHandler {
                 });
             }
         };
-        streamerPresenter.streamerManager.addEventHandler(linkMicEventHandler);
+        streamerPresenter.getStreamerManager().addEventHandler(linkMicEventHandler);
     }
     // </editor-fold>
 
@@ -416,16 +461,17 @@ public class PLVStreamerMsgHandler {
             item.second.getLinkMicItemDataBean().setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
             streamerPresenter.callUpdateSortMemberList();
         }
-        Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicUid);
+        final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicUid);
         if (linkMicItem != null) {
             streamerPresenter.streamerList.remove(linkMicItem.second);
             streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                 @Override
                 public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
                     //更新推流和连麦列表
-                    view.onUsersLeave(Collections.singletonList(linkMicUid));
+                    view.onUsersLeave(Collections.singletonList(linkMicItem.second));
                 }
             });
+            streamerPresenter.updateMixLayoutUsers();
         }
     }
 

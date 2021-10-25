@@ -2,7 +2,12 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
 import androidx.annotation.IntRange;
 
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * date: 2020/7/27
@@ -22,41 +27,81 @@ public class PLVLinkMicItemDataBean {
     private String nick;
     //连麦Id
     private String linkMicId;
+    //用户Id
+    private String userId;
     //是否mute视频
     private boolean muteVideo;
     //是否mute音频
     private boolean muteAudio;
     //奖杯数量
     private int cupNum;
+    //举手状态
+    private boolean isRaiseHand;
+    //画笔授权状态
+    private boolean isHasPaint;
     //参考[PLVSocketUserConstant]
     private String userType;
     //头衔
     private String actor;
+    //头像
+    private String pic;
     //最大值为[MAX_VOLUME]
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
 
     //linkMic status
     private String status = STATUS_IDLE;
-    private MuteMedia muteVideoInRtcJoinList;
-    private MuteMedia muteAudioInRtcJoinList;
+    private Map<Integer, MuteMedia> muteVideoInRtcJoinListMap = new HashMap<>();
+    private Map<Integer, MuteMedia> muteAudioInRtcJoinListMap = new HashMap<>();
+
+    //流类型
+    private int streamType = PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX;
 
     public MuteMedia getMuteVideoInRtcJoinList() {
-        return muteVideoInRtcJoinList;
+        return getMuteVideoInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+    }
+
+    public MuteMedia getMuteVideoInRtcJoinList(int streamType) {
+        return muteVideoInRtcJoinListMap.get(streamType);
     }
 
     public void setMuteVideoInRtcJoinList(MuteMedia muteVideoInRtcJoinList) {
-        this.muteVideoInRtcJoinList = muteVideoInRtcJoinList;
-        setMuteVideo(muteVideoInRtcJoinList.isMute);
+        this.muteVideoInRtcJoinListMap.put(muteVideoInRtcJoinList.getStreamType(), muteVideoInRtcJoinList);
+        if (includeStreamType(muteVideoInRtcJoinList.getStreamType())) {
+            setMuteVideo(muteVideoInRtcJoinList.isMute);
+        }
     }
 
     public MuteMedia getMuteAudioInRtcJoinList() {
-        return muteAudioInRtcJoinList;
+        return getMuteAudioInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+    }
+
+    public MuteMedia getMuteAudioInRtcJoinList(int streamType) {
+        return muteAudioInRtcJoinListMap.get(streamType);
     }
 
     public void setMuteAudioInRtcJoinList(MuteMedia muteAudioInRtcJoinList) {
-        this.muteAudioInRtcJoinList = muteAudioInRtcJoinList;
-        setMuteAudio(muteAudioInRtcJoinList.isMute);
+        this.muteAudioInRtcJoinListMap.put(muteAudioInRtcJoinList.getStreamType(), muteAudioInRtcJoinList);
+        if (includeStreamType(muteAudioInRtcJoinList.getStreamType())) {
+            setMuteAudio(muteAudioInRtcJoinList.isMute);
+        }
+    }
+
+    public int getStreamType() {
+        return streamType;
+    }
+
+    public void setStreamType(int streamType) {
+        this.streamType = streamType;
+    }
+
+    public boolean equalStreamType(int streamType) {
+        return this.streamType == streamType;
+    }
+
+    public boolean includeStreamType(int streamType) {
+        return equalStreamType(streamType)
+                || PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX == this.streamType;
     }
 
     public String getStatus() {
@@ -116,6 +161,22 @@ public class PLVLinkMicItemDataBean {
         this.cupNum = cupNum;
     }
 
+    public boolean isRaiseHand() {
+        return isRaiseHand;
+    }
+
+    public void setRaiseHand(boolean raiseHand) {
+        isRaiseHand = raiseHand;
+    }
+
+    public boolean isHasPaint() {
+        return isHasPaint;
+    }
+
+    public void setHasPaint(boolean hasPaint) {
+        this.isHasPaint = hasPaint;
+    }
+
     public int getCurVolume() {
         return curVolume;
     }
@@ -130,6 +191,14 @@ public class PLVLinkMicItemDataBean {
 
     public void setActor(String actor) {
         this.actor = actor;
+    }
+
+    public String getPic() {
+        return PLVEventHelper.fixChatPic(pic);
+    }
+
+    public void setPic(String pic) {
+        this.pic = pic;
     }
 
     /**
@@ -166,11 +235,25 @@ public class PLVLinkMicItemDataBean {
         return STATUS_RTC_JOIN.equals(status);
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public static class MuteMedia {
         boolean isMute;
+        int streamType;
 
         public MuteMedia(boolean isMute) {
+            this(isMute, PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
+        }
+
+        public MuteMedia(boolean isMute, int streamType) {
             this.isMute = isMute;
+            this.streamType = streamType;
         }
 
         public boolean isMute() {
@@ -180,9 +263,17 @@ public class PLVLinkMicItemDataBean {
         public void setMute(boolean mute) {
             isMute = mute;
         }
+
+        public int getStreamType() {
+            return streamType;
+        }
+
+        public void setStreamType(int streamType) {
+            this.streamType = streamType;
+        }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="状态方法被调用触发回调">
+    // <editor-fold defaultstate="collapsed" desc="连麦状态方法被调用触发回调">
     private Runnable statusMethodCallListener;
 
     public void setStatusMethodCallListener(Runnable runnable) {
@@ -196,17 +287,27 @@ public class PLVLinkMicItemDataBean {
     }
     // </editor-fold>
 
+
     @Override
     public String toString() {
         return "PLVLinkMicItemDataBean{" +
                 "nick='" + nick + '\'' +
                 ", linkMicId='" + linkMicId + '\'' +
+                ", userId='" + userId + '\'' +
                 ", muteVideo=" + muteVideo +
                 ", muteAudio=" + muteAudio +
                 ", cupNum=" + cupNum +
+                ", isRaiseHand=" + isRaiseHand +
+                ", isHasPaint=" + isHasPaint +
                 ", userType='" + userType + '\'' +
                 ", actor='" + actor + '\'' +
+                ", pic='" + pic + '\'' +
                 ", curVolume=" + curVolume +
+                ", status='" + status + '\'' +
+                ", muteVideoInRtcJoinListMap=" + muteVideoInRtcJoinListMap +
+                ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
+                ", streamType=" + streamType +
+                ", statusMethodCallListener=" + statusMethodCallListener +
                 '}';
     }
 }

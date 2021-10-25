@@ -1,1 +1,7 @@
-include ':demo', ':polyvLiveCommonModul', ':polyvLiveEcommerceScene', ':polyvLiveCloudClassScene', ':polyvLiveStreamerScene'
+include ':demo',
+        ':polyvLiveCommonModul',
+        ':polyvLiveEcommerceScene',
+        ':polyvLiveCloudClassScene',
+        ':polyvLiveStreamerScene', 
+        ':polyvStreamerAloneScene',
+        ':polyvLiveHiClassScene'

@@ -14,25 +14,25 @@ import com.easefun.polyv.livecommon.module.modules.document.model.PLVDocumentRep
 import com.easefun.polyv.livecommon.module.modules.document.model.PLVPptUploadLocalRepository;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMarkToolType;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMode;
-import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVPptUploadStatus;
 import com.easefun.polyv.livecommon.module.modules.document.model.vo.PLVPptUploadLocalCacheVO;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.model.PLVSAssistantInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSChangePPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSEditTextInfo;
-import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVMessageBaseEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.eventbus.ppt.PLVOnSliceStartEventBus;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserBean;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -45,6 +45,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 /**
+ * 文档操作相关全局单例Presenter
+ * 涉及处理白板&ppt的信息交互逻辑
+ * <p>
+ * 对于文档列表获取，上传文档，删除文档等涉及网络的操作，转发到{@link PLVDocumentNetPresenter}处理
+ *
  * @author suhongtao
  */
 public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
@@ -73,9 +78,11 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     private static final String TAG = PLVDocumentPresenter.class.getSimpleName();
 
+    // 白板autoId为0
+    public static final int AUTO_ID_WHITE_BOARD = 0;
+
     // 标志位 是否已经经过初始化
     private boolean isInitialized = false;
-
     /**
      * MVP - View 弱引用
      */
@@ -100,6 +107,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
      */
     private boolean isStreamStarted = false;
 
+    //是否是嘉宾
+    private boolean isGuest = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化方法">
@@ -108,15 +118,14 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     public void init(LifecycleOwner lifecycleOwner,
                      IPLVLiveRoomDataManager liveRoomDataManager,
                      PLVSDocumentWebProcessor documentWebProcessor) {
+        isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
         initRepository(liveRoomDataManager, documentWebProcessor);
         initSocketListener();
 
         observeRefreshPptMessage(lifecycleOwner);
-        observePptInfo(lifecycleOwner);
         observePptJsModel(lifecycleOwner);
         observePptStatus(lifecycleOwner);
         observePptPaintStatus(lifecycleOwner);
-        observePptOnDeleteResponse(lifecycleOwner);
 
         observeOnSliceStartEvent();
 
@@ -132,7 +141,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
      */
     private void initRepository(IPLVLiveRoomDataManager liveRoomDataManager, PLVSDocumentWebProcessor documentWebProcessor) {
         plvDocumentRepository = new PLVDocumentRepository(documentWebProcessor);
-        plvDocumentRepository.init();
+        plvDocumentRepository.init(liveRoomDataManager);
 
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserId(liveRoomDataManager.getConfig().getUser().getViewerId());
@@ -141,7 +150,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETUSER, PLVGsonUtil.toJson(userBean));
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"speaker\"}");
-        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":0,\"isCamClosed\":0}");
+        if (!isGuest) {
+            plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":0,\"isCamClosed\":0}");
+        }
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETPAINTSTATUS, "{\"status\":\"open\"}");
 
         plvPptUploadLocalRepository = new PLVPptUploadLocalRepository();
@@ -155,7 +166,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
-                if (!PLVEventConstant.Ppt.ON_ASSISTANT_CONTROL.equals(listenEvent)) {
+                if (!PLVEventConstant.Ppt.ON_ASSISTANT_CONTROL.equals(event)) {
                     return;
                 }
                 PLVSAssistantInfo assistantInfo = PLVGsonUtil.fromJson(PLVSAssistantInfo.class, message);
@@ -169,7 +180,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                     }
                 }
             }
-        }, PLVEventConstant.Ppt.ON_ASSISTANT_CONTROL);
+        });
     }
 
     /**
@@ -182,29 +193,8 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         plvDocumentRepository.getRefreshPptMessageLiveData().observe(lifecycleOwner, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String message) {
-                PolyvSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
-            }
-        });
-    }
-
-    /**
-     * 监听Model层所有PPT文档列表更新
-     * 向view层回调
-     *
-     * @param lifecycleOwner
-     */
-    private void observePptInfo(LifecycleOwner lifecycleOwner) {
-        plvDocumentRepository.getPptInfoLiveData().observe(lifecycleOwner, new Observer<PLVStatefulData<PLVSPPTInfo>>() {
-            @Override
-            public void onChanged(@Nullable PLVStatefulData<PLVSPPTInfo> plvspptInfo) {
-                if (plvspptInfo == null || !plvspptInfo.isSuccess()) {
-                    return;
-                }
-                for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-                    IPLVDocumentContract.View view = viewWeakReference.get();
-                    if (view != null) {
-                        view.onPptCoverList(plvspptInfo.getData());
-                    }
+                if (isStreamStarted) {
+                    PLVSocketWrapper.getInstance().emit(PLVMessageBaseEvent.LISTEN_EVENT, message);
                 }
             }
         });
@@ -250,6 +240,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                     IPLVDocumentContract.View view = viewWeakReference.get();
                     if (view != null) {
                         view.onPptPageChange(plvspptStatus.getAutoId(), plvspptStatus.getPageId());
+                        view.onPptStatusChange(plvspptStatus);
                     }
                 }
             }
@@ -270,29 +261,6 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                     IPLVDocumentContract.View view = viewWeakReference.get();
                     if (view != null) {
                         view.onPptPaintStatus(plvspptPaintStatus);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * 监听Model层删除PPT回调事件
-     *
-     * @param lifecycleOwner
-     */
-    private void observePptOnDeleteResponse(LifecycleOwner lifecycleOwner) {
-        plvDocumentRepository.getPptOnDeleteResponseLiveData().observe(lifecycleOwner, new Observer<PLVStatefulData<PLVSPPTInfo.DataBean.ContentsBean>>() {
-            @Override
-            public void onChanged(@Nullable PLVStatefulData<PLVSPPTInfo.DataBean.ContentsBean> response) {
-                if (response == null) {
-                    return;
-                }
-
-                for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-                    IPLVDocumentContract.View view = viewWeakReference.get();
-                    if (view != null) {
-                        view.onPptDelete(response.isSuccess(), response.getData());
                     }
                 }
             }
@@ -323,6 +291,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     @Override
     public void registerView(IPLVDocumentContract.View view) {
+        PLVDocumentNetPresenter.getInstance().registerView(view);
         viewWeakReferenceList.add(new WeakReference<>(view));
     }
 
@@ -391,7 +360,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
-        PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(0, pageId);
+        PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(AUTO_ID_WHITE_BOARD, pageId);
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, PLVGsonUtil.toJson(changePptInfo));
     }
 
@@ -415,6 +384,22 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     }
 
     @Override
+    public void changePptToLastStep() {
+        if (!checkInitialized()) {
+            return;
+        }
+        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoPreviousStep\"}");
+    }
+
+    @Override
+    public void changePptToNextStep() {
+        if (!checkInitialized()) {
+            return;
+        }
+        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoNextStep\"}");
+    }
+
+    @Override
     public void changeTextContent(String content) {
         if (!checkInitialized()) {
             return;
@@ -425,15 +410,12 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     @Override
     public void requestGetPptCoverList() {
-        requestGetPptCoverList(false);
+        PLVDocumentNetPresenter.getInstance().requestGetPptCoverList();
     }
 
     @Override
     public void requestGetPptCoverList(boolean forceRefresh) {
-        if (!checkInitialized()) {
-            return;
-        }
-        plvDocumentRepository.requestPptCoverList(forceRefresh);
+        PLVDocumentNetPresenter.getInstance().requestGetPptCoverList(forceRefresh);
     }
 
     @Override
@@ -446,252 +428,61 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     @Override
     public void onSelectUploadFile(Uri fileUri) {
-        for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-            IPLVDocumentContract.View view = viewWeakReference.get();
-            if (view != null) {
-                boolean consume = view.requestSelectUploadFileConvertType(fileUri);
-                if (consume) {
-                    return;
-                }
-            }
-        }
+        PLVDocumentNetPresenter.getInstance().onSelectUploadFile(fileUri);
     }
 
     @Override
     public void uploadFile(Context context, File uploadFile, final String convertType, final OnPLVSDocumentUploadListener listener) {
-        if (!checkInitialized()) {
-            return;
-        }
-
-        final PLVPptUploadLocalCacheVO localCacheVO = new PLVPptUploadLocalCacheVO();
-        localCacheVO.setStatus(PLVPptUploadStatus.STATUS_UNPREPARED);
-        localCacheVO.setFileName(uploadFile.getName());
-        localCacheVO.setFilePath(uploadFile.getAbsolutePath());
-        localCacheVO.setConvertType(convertType);
-
-        plvDocumentRepository.uploadPptFile(context, uploadFile, convertType, new OnPLVSDocumentUploadListener() {
-            @Override
-            public void onPrepared(PLVSPPTInfo.DataBean.ContentsBean documentBean) {
-                if (listener != null) {
-                    listener.onPrepared(documentBean);
-                }
-                // onPrepared 本地保存上传任务进度
-                localCacheVO.setFileId(documentBean.getFileId());
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_PREPARED);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-            }
-
-            @Override
-            public void onUploadProgress(PLVSPPTInfo.DataBean.ContentsBean documentBean, int progress) {
-                if (listener != null) {
-                    listener.onUploadProgress(documentBean, progress);
-                }
-                // 更新本地上传任务进度
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_UPLOADING);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-            }
-
-            @Override
-            public void onUploadSuccess(PLVSPPTInfo.DataBean.ContentsBean documentBean) {
-                if (listener != null) {
-                    listener.onUploadSuccess(documentBean);
-                }
-                // 更新本地上传任务进度 上传完成 下一步服务器转码
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_UPLOAD_SUCCESS);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-                // 向服务器拉取新的PPT文档列表数据
-                plvDocumentRepository.requestPptCoverList(true);
-            }
-
-            @Override
-            public void onUploadFailed(@Nullable PLVSPPTInfo.DataBean.ContentsBean documentBean, int errorCode, String msg, Throwable throwable) {
-                if (listener != null) {
-                    listener.onUploadFailed(documentBean, errorCode, msg, throwable);
-                }
-                // 更新本地上传任务进度 上传失败
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_UPLOAD_FAILED);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-            }
-
-            @Override
-            public void onConvertSuccess(PLVSPPTInfo.DataBean.ContentsBean documentBean) {
-                if (listener != null) {
-                    listener.onConvertSuccess(documentBean);
-                }
-                if (convertType.equals(documentBean.getConvertType())) {
-                    localCacheVO.setStatus(PLVPptUploadStatus.STATUS_CONVERT_SUCCESS);
-                } else {
-                    // 上传时传入的convertType与服务端返回不一致 动效丢失（普通转码必定不会出现）
-                    localCacheVO.setStatus(PLVPptUploadStatus.STATUS_CONVERT_ANIMATE_LOSS);
-                }
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-
-                // 动效丢失 向View回调
-                if (localCacheVO.getStatus() == PLVPptUploadStatus.STATUS_CONVERT_ANIMATE_LOSS) {
-                    List<PLVPptUploadLocalCacheVO> convertAnimateLossVOList = new ArrayList<>();
-                    convertAnimateLossVOList.add(localCacheVO);
-                    for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-                        IPLVDocumentContract.View view = viewWeakReference.get();
-                        if (view != null) {
-                            boolean consume = view.notifyFileConvertAnimateLoss(convertAnimateLossVOList);
-                            if (consume) {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onConvertFailed(PLVSPPTInfo.DataBean.ContentsBean documentBean, int errorCode, String msg, Throwable throwable) {
-                if (listener != null) {
-                    listener.onConvertFailed(documentBean, errorCode, msg, throwable);
-                }
-                // 更新本地上传任务进度 转码失败
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_CONVERT_FAILED);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-            }
-
-            @Override
-            public void onDocumentExist(PLVSPPTInfo.DataBean.ContentsBean documentBean) {
-                if (listener != null) {
-                    listener.onDocumentExist(documentBean);
-                }
-                // 文件已存在 移除本地上传任务进度
-                plvPptUploadLocalRepository.removeCache(localCacheVO.getFileId());
-            }
-
-            @Override
-            public void onDocumentConverting(PLVSPPTInfo.DataBean.ContentsBean documentBean) {
-                if (listener != null) {
-                    listener.onDocumentConverting(documentBean);
-                }
-                // 更新本地上传任务进度 已经在转码中
-                localCacheVO.setStatus(PLVPptUploadStatus.STATUS_CONVERTING);
-                plvPptUploadLocalRepository.saveCache(localCacheVO);
-            }
-        });
+        PLVDocumentNetPresenter.getInstance().uploadFile(context, uploadFile, convertType, listener);
     }
 
     @Override
     public void restartUploadFromCache(Context context, String fileId, OnPLVSDocumentUploadListener listener) {
-        if (!checkInitialized()) {
-            return;
-        }
-        // 根据fileId拿到本地上传进度缓存
-        PLVPptUploadLocalCacheVO localCacheVO = plvPptUploadLocalRepository.getCache(fileId);
-        if (localCacheVO == null) {
-            return;
-        }
-        File file = new File(localCacheVO.getFilePath());
-        if (!file.exists()) {
-            Log.w(TAG, "file is not exist.");
-            return;
-        }
-        uploadFile(context, file, localCacheVO.getConvertType(), listener);
+        PLVDocumentNetPresenter.getInstance().restartUploadFromCache(context, fileId, listener);
     }
 
     @Override
     public void checkUploadFileStatus() {
-        if (!checkInitialized()) {
-            return;
-        }
-        List<PLVPptUploadLocalCacheVO> uploadNotSuccessVOList = new ArrayList<>();
-        List<PLVPptUploadLocalCacheVO> convertAnimateLossVOList = new ArrayList<>();
-        for (PLVPptUploadLocalCacheVO vo : plvPptUploadLocalRepository.listCache()) {
-            if (vo.getStatus() == null) {
-                plvPptUploadLocalRepository.removeCache(vo.getFileId());
-                continue;
-            }
-            if (!PLVPptUploadStatus.isStatusUploadSuccess(vo.getStatus())) {
-                // 上传失败
-                File file = new File(vo.getFilePath());
-                if (!file.exists()) {
-                    Log.i(TAG, "上次上传失败的文件已经不存在");
-                    // 文件不存在时直接清除本地缓存
-                    plvPptUploadLocalRepository.removeCache(vo.getFileId());
-                } else {
-                    // 上传失败，在确认重新上传或取消上传后才清除本地缓存
-                    uploadNotSuccessVOList.add(vo);
-                    continue;
-                }
-            }
-            if (PLVPptUploadStatus.STATUS_CONVERT_ANIMATE_LOSS == vo.getStatus()) {
-                // 转码动画丢失，在手动确认后才清除本地缓存
-                convertAnimateLossVOList.add(vo);
-                continue;
-            }
-
-            // 其它状态不需要回调，清除本地缓存
-            plvPptUploadLocalRepository.removeCache(vo.getFileId());
-        }
-
-        // 向View回调 上传失败
-        if (uploadNotSuccessVOList.size() > 0) {
-            for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-                IPLVDocumentContract.View view = viewWeakReference.get();
-                if (view != null) {
-                    boolean consume = view.notifyFileUploadNotSuccess(uploadNotSuccessVOList);
-                    if (consume) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 向View回调 动效丢失
-        if (convertAnimateLossVOList.size() > 0) {
-            for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
-                IPLVDocumentContract.View view = viewWeakReference.get();
-                if (view != null) {
-                    boolean consume = view.notifyFileConvertAnimateLoss(convertAnimateLossVOList);
-                    if (consume) {
-                        break;
-                    }
-                }
-            }
-        }
+        PLVDocumentNetPresenter.getInstance().checkUploadFileStatus();
     }
 
     @Override
     public void removeUploadCache(int autoId) {
-        if (!checkInitialized()) {
-            return;
-        }
-        PLVSPPTInfo.DataBean.ContentsBean contentsBean = getPptContentsBeanFromAutoId(autoId);
-        if (contentsBean == null) {
-            return;
-        }
-        plvPptUploadLocalRepository.removeCache(contentsBean.getFileId());
+        PLVDocumentNetPresenter.getInstance().removeUploadCache(autoId);
     }
 
     @Override
     public void removeUploadCache(List<PLVPptUploadLocalCacheVO> localCacheVOS) {
-        if (!checkInitialized()) {
-            return;
-        }
-        if (localCacheVOS == null) {
-            return;
-        }
-        for (PLVPptUploadLocalCacheVO localCacheVO : localCacheVOS) {
-            plvPptUploadLocalRepository.removeCache(localCacheVO.getFileId());
-        }
+        PLVDocumentNetPresenter.getInstance().removeUploadCache(localCacheVOS);
+    }
+
+    @Override
+    public void removeUploadCache(String fileId) {
+        PLVDocumentNetPresenter.getInstance().removeUploadCache(fileId);
     }
 
     @Override
     public void deleteDocument(int autoId) {
-        if (!checkInitialized()) {
-            return;
-        }
-        plvDocumentRepository.deleteDocument(autoId);
+        PLVDocumentNetPresenter.getInstance().deleteDocument(autoId);
     }
 
     @Override
     public void deleteDocument(String fileId) {
-        if (!checkInitialized()) {
-            return;
+        PLVDocumentNetPresenter.getInstance().deleteDocument(fileId);
+    }
+
+    @Override
+    public void requestOpenPptView(int pptId, String pptName) {
+        for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
+            IPLVDocumentContract.View view = viewWeakReference.get();
+            if (view == null) {
+                continue;
+            }
+            if (view.onRequestOpenPptView(pptId, pptName)) {
+                // consume
+                break;
+            }
         }
-        plvDocumentRepository.deleteDocument(fileId);
     }
 
     @Override
@@ -699,6 +490,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (plvDocumentRepository != null) {
             plvDocumentRepository.destroy();
         }
+        PLVDocumentNetPresenter.getInstance().destroy();
         isInitialized = false;
         viewWeakReferenceList.clear();
         compositeDisposable.dispose();
@@ -722,32 +514,6 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
             Log.w(TAG, "Call PLVLSDocumentPresenter.init() first!");
         }
         return isInitialized;
-    }
-
-    /**
-     * 根据autoId获取PPT文档VO
-     * 从本地缓存中获取
-     *
-     * @param autoId 文档id
-     * @return 返回PPT文档VO，当本地缓存没有对应autoId的ppt文档vo时，返回null
-     */
-    @Nullable
-    private PLVSPPTInfo.DataBean.ContentsBean getPptContentsBeanFromAutoId(int autoId) {
-        if (!checkInitialized()) {
-            return null;
-        }
-        PLVSPPTInfo pptInfo = plvDocumentRepository.getCachePptCoverList();
-        if (pptInfo == null || pptInfo.getData() == null || pptInfo.getData().getContents() == null) {
-            Log.w(TAG, "cache ppt cover list is null.");
-            return null;
-        }
-        List<PLVSPPTInfo.DataBean.ContentsBean> contentsBeans = pptInfo.getData().getContents();
-        for (PLVSPPTInfo.DataBean.ContentsBean contentsBean : contentsBeans) {
-            if (contentsBean.getAutoId() == autoId) {
-                return contentsBean;
-            }
-        }
-        return null;
     }
 
     // </editor-fold>

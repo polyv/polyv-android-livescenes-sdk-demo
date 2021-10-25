@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.media.controller;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
@@ -89,6 +90,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * 当离开连麦时，更新布局
      */
     void updateWhenLeaveLinkMic();
+
+    /**
+     * 当仅限音频模式时，更新布局
+     */
+    void updateWhenOnlyAudio(boolean isOnlyAudio);
 
     /**
      * 点击关闭悬浮窗

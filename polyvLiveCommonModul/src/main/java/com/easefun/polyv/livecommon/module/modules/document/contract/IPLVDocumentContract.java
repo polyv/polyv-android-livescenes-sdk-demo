@@ -16,6 +16,7 @@ import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.easefun.polyv.livescenes.upload.PLVSDocumentUploadConstant;
 
@@ -77,6 +78,12 @@ public interface IPLVDocumentContract {
         void onPptPageChange(int autoId, int pageId);
 
         /**
+         * 回调 ppt状态变更
+         * @param pptStatus ppt状态
+         */
+        void onPptStatusChange(PLVSPPTStatus pptStatus);
+
+        /**
          * 回调 标注工具输入文本时，当点击文本区域触发
          *
          * @param pptPaintStatus 输入的文本
@@ -112,10 +119,18 @@ public interface IPLVDocumentContract {
         /**
          * PPT文档删除回调
          *
-         * @param success 是否成功删除
+         * @param success        是否成功删除
          * @param deletedPptBean 被删除的PPT文档vo 当删除失败时为null
          */
         void onPptDelete(boolean success, @Nullable PLVSPPTInfo.DataBean.ContentsBean deletedPptBean);
+
+        /**
+         * 回调 打开指定的PPT页面
+         *
+         * @return 是否消费事件 当返回true时不再分发给其它view 返回false时继续分发
+         * @see Presenter#requestOpenPptView(int, String)
+         */
+        boolean onRequestOpenPptView(int pptId, String pptName);
 
     }
 
@@ -207,6 +222,16 @@ public interface IPLVDocumentContract {
         void changePptPage(int autoId, int pageId);
 
         /**
+         * 切换至PPT文档上一步
+         */
+        void changePptToLastStep();
+
+        /**
+         * 切换至PPT文档下一步
+         */
+        void changePptToNextStep();
+
+        /**
          * 改变文本标注工具在webview中的显示内容
          *
          * @param content 文本
@@ -278,15 +303,26 @@ public interface IPLVDocumentContract {
          * 移除本地上传文档缓存
          *
          * @param autoId 文档ID
+         * @deprecated {@link #removeUploadCache(String)}
          */
+        @Deprecated
         void removeUploadCache(int autoId);
 
         /**
          * 移除本地上传文档缓存
          *
          * @param localCacheVOS
+         * @deprecated {@link #removeUploadCache(String)}
          */
+        @Deprecated
         void removeUploadCache(List<PLVPptUploadLocalCacheVO> localCacheVOS);
+
+        /**
+         * 移除本地上传文档缓存
+         *
+         * @param fileId 文件ID
+         */
+        void removeUploadCache(String fileId);
 
         /**
          * 删除PPT文档
@@ -301,6 +337,14 @@ public interface IPLVDocumentContract {
          * @param fileId ppt文件ID
          */
         void deleteDocument(String fileId);
+
+        /**
+         * 请求打开指定的PPT页面
+         *
+         * @param pptId 文档ID
+         * @see View#onRequestOpenPptView(int, String)
+         */
+        void requestOpenPptView(int pptId, String pptName);
 
         /**
          * 销毁方法

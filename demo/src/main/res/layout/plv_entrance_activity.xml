@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".PLVEntranceActivity">
 
-    <view
-        class="com.easefun.polyv.livedemo.PLVEntranceActivity$ScaleBgImageView"
+    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/plv_entrance_bg" />
@@ -31,6 +30,14 @@
             android:layout_marginTop="-16dp"
             android:onClick="onClick"
             android:background="@drawable/plv_entrance_live_bg" />
+
+        <Button
+            android:id="@+id/plv_entrance_hi_class_btn"
+            android:text="互动学堂"
+            style="@style/plv_entrance_button_style"
+            android:layout_marginTop="-16dp"
+            android:onClick="onClick"
+            android:background="@drawable/plv_entrance_hi_class_bg" />
 
     </LinearLayout>
 

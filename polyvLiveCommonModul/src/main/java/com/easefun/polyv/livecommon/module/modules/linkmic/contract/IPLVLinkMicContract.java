@@ -6,6 +6,7 @@ import android.view.SurfaceView;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,6 +125,12 @@ public interface IPLVLinkMicContract {
          * 响应远端用户麦克风音量变化
          */
         void onRemoteUserVolumeChanged(List<PLVLinkMicItemDataBean> linkMicList);
+
+        /**
+         * 更新本地网络质量
+         * @param quality 网络质量
+         */
+        void onNetQuality(int quality);
 
         /**
          * 切换第一画面
@@ -322,5 +329,10 @@ public interface IPLVLinkMicContract {
          * @return size
          */
         int getRTCListSize();
+
+        /**
+         * 重制连麦请求所需的权限列表
+         */
+        void resetRequestPermissionList(ArrayList<String> permissions);
     }
 }

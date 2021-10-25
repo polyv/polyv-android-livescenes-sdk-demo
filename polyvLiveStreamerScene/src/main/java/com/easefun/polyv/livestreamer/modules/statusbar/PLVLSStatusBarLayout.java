@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentV
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
+import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livestreamer.R;
@@ -35,9 +36,11 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
-import com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSNetworkQualityWidget;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.util.Locale;
+
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 状态栏布局
@@ -45,8 +48,6 @@ import java.util.Locale;
 public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBarLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final int WHAT_HIDE_USER_REQUEST_TIPS = 1;
-    //白板的ID
-    private static final int AUTO_ID_WHITE_BOARD = 0;
 
     //view
     private TextView plvlsStatusBarChannelInfoTv;
@@ -90,6 +91,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     // 最后一次打开的非白板文档ID和对应的页面ID
     private int lastOpenNotWhiteBoardAutoId;
     private int lastOpenNotWhiteBoardPageId;
+    //角色
+    private String userType;
+
+    /**
+     * 连麦显示类型，0-默认都显示，1-只显示音频连麦；2-只显示视频连麦
+     */
+    private int linkMicShowType = 0;
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper()) {
@@ -186,6 +194,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             @Override
             public boolean isStreamerStartSuccess() {
                 return onViewActionListener != null && onViewActionListener.isStreamerStartSuccess();
+            }
+
+            @Override
+            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
+                memberLayout.updateLinkMicMediaType(isVideoLinkMicType);
             }
         });
     }
@@ -313,6 +326,14 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         channelInfoLayout.init(liveRoomDataManager);
         memberLayout.init(liveRoomDataManager);
+        userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
+            plvlsStatusBarClassControlTv.setVisibility(GONE);
+            plvlsStatusBarLinkmicIv.setVisibility(GONE);
+            plvlsStatusBarDocumentIv.setVisibility(GONE);
+            plvlsStatusBarWhiteboardIv.setVisibility(GONE);
+        }
+        updateLinkMicShowType(liveRoomDataManager.isOnlyAudio());
     }
 
     @Override
@@ -450,6 +471,12 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="音频开播控制">
+    private void updateLinkMicShowType(boolean isOnlyAudio){
+        linkMicShowType = isOnlyAudio ? 1 : 0;
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="文档选择处理">
 
     private void processSelectDocument() {
@@ -458,7 +485,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             PLVDocumentPresenter.getInstance().changePptPage(lastOpenNotWhiteBoardAutoId, lastOpenNotWhiteBoardPageId);
         } else {
             if (pptListLayout != null) {
-                pptListLayout.open();
+                pptListLayout.open(true);
             }
         }
     }
@@ -509,7 +536,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 return;
             }
             v.setSelected(!v.isSelected());
-            linkMicControlWindow.show(v);
+            linkMicControlWindow.show(v,linkMicShowType);
         } else if (id == R.id.plvls_status_bar_document_iv) {
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
             processSelectDocument();

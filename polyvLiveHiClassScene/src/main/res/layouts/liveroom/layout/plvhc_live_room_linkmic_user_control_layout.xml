@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:layout_width="260dp"
+        android:layout_height="243dp"
+        android:layout_gravity="center">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:layout_width="match_parent"
+            android:layout_height="213dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/plvhc_linkmic_control_ly_bg_shape"
+            app:radius="16dp">
+
+            <TextView
+                android:id="@+id/plvhc_linkmic_nick_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="32dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="这是一个用户昵称这是一个用户昵称这是一个用户昵称"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/plvhc_linkmic_nick_tv"
+                android:layout_marginTop="24dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
+                <ImageView
+                    android:id="@+id/plvhc_linkmic_mic_iv"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/plvhc_linkmic_control_mic_selector"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_camera_iv"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/plvhc_linkmic_camera_iv"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/plvhc_linkmic_control_camera_selector"
+                    app:layout_constraintLeft_toRightOf="@+id/plvhc_linkmic_mic_iv"
+                    app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_paint_iv"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/plvhc_linkmic_paint_iv"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/plvhc_linkmic_control_paint_selector"
+                    app:layout_constraintLeft_toRightOf="@+id/plvhc_linkmic_camera_iv"
+                    app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_cup_iv"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/plvhc_linkmic_cup_iv"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/plvhc_linkmic_control_cup"
+                    app:layout_constraintLeft_toRightOf="@+id/plvhc_linkmic_paint_iv"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/plvhc_linkmic_camera_orient_iv"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/plvhc_linkmic_control_camera_orient"
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toRightOf="@+id/plvhc_linkmic_camera_iv"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="麦克风"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/plvhc_linkmic_mic_iv"
+                    app:layout_constraintRight_toRightOf="@id/plvhc_linkmic_mic_iv"
+                    app:layout_constraintTop_toBottomOf="@+id/plvhc_linkmic_mic_iv" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="摄像头"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/plvhc_linkmic_camera_iv"
+                    app:layout_constraintRight_toRightOf="@id/plvhc_linkmic_camera_iv"
+                    app:layout_constraintTop_toBottomOf="@+id/plvhc_linkmic_camera_iv" />
+
+                <TextView
+                    android:id="@+id/plvhc_linkmic_paint_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="画笔"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/plvhc_linkmic_paint_iv"
+                    app:layout_constraintRight_toRightOf="@id/plvhc_linkmic_paint_iv"
+                    app:layout_constraintTop_toBottomOf="@+id/plvhc_linkmic_paint_iv" />
+
+                <TextView
+                    android:id="@+id/plvhc_linkmic_cup_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="奖杯"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintLeft_toLeftOf="@+id/plvhc_linkmic_cup_iv"
+                    app:layout_constraintRight_toRightOf="@id/plvhc_linkmic_cup_iv"
+                    app:layout_constraintTop_toBottomOf="@+id/plvhc_linkmic_cup_iv" />
+
+                <TextView
+                    android:id="@+id/plvhc_linkmic_camera_orient_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="方向"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toLeftOf="@+id/plvhc_linkmic_camera_orient_iv"
+                    app:layout_constraintRight_toRightOf="@id/plvhc_linkmic_camera_orient_iv"
+                    app:layout_constraintTop_toBottomOf="@+id/plvhc_linkmic_camera_orient_iv" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/plvhc_linkmic_close_tv"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/plvhc_linkmic_control_tv_bg_shape"
+                android:gravity="center"
+                android:text="关闭"
+                android:textColor="#ffffff"
+                android:textSize="14sp" />
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/plvhc_linkmic_avatar_iv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/plvhc_chatroom_ic_viewer"
+            app:civ_border_color="#ffffff"
+            app:civ_border_width="1dp" />
+    </FrameLayout>
+</FrameLayout>

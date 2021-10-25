@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1c34"
+    android:paddingLeft="16dp"
+    android:paddingTop="40dp"
+    android:paddingRight="16dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingBottom="40dp">
+
+    <ImageView
+        android:id="@+id/plvhc_back_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/plvhc_live_room_back"
+        android:translationX="-12dp"
+        android:translationY="-32dp" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_render_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="16dp"
+        android:layout_toLeftOf="@+id/plvhc_device_info_ly"
+        android:background="@drawable/plvhc_live_room_camera_bg_shape"
+        app:radius="16dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/plvhc_live_room_camera" />
+
+        <com.easefun.polyv.livecommon.module.utils.media.PLVCameraTextureView
+            android:id="@+id/plvhc_camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvhc_device_info_ly"
+        android:layout_width="203dp"
+        android:layout_alignParentRight="true"
+        android:layout_height="match_parent"
+        android:background="#242940"
+        android:paddingLeft="20dp"
+        android:paddingTop="16dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="16dp"
+        app:radius="16dp">
+
+        <ImageView
+            android:id="@+id/plvhc_setting_mic_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/plvhc_setting_mic" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/plvhc_setting_mic_iv"
+            android:gravity="center"
+            android:text="麦克风"
+            android:textColor="#eeeeee"
+            android:textSize="14sp" />
+
+        <Switch
+            android:id="@+id/plvhc_setting_mic_sw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="1dp"
+            android:thumb="@drawable/plvhc_live_room_setting_switch_thumb_selector"
+            android:track="@drawable/plvhc_live_room_setting_switch_track_selector" />
+
+        <com.easefun.polyv.livehiclass.ui.widget.PLVHCVolumeView
+            android:id="@+id/plvhc_setting_mic_volume_view"
+            android:layout_width="130dp"
+            android:layout_height="14dp"
+            android:layout_below="@+id/plvhc_setting_mic_iv"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="5dp" />
+
+        <ImageView
+            android:id="@+id/plvhc_setting_camera_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_below="@+id/plvhc_setting_mic_volume_view"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/plvhc_setting_camera" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_alignTop="@+id/plvhc_setting_camera_iv"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/plvhc_setting_camera_iv"
+            android:gravity="center"
+            android:text="摄像头"
+            android:textColor="#eeeeee"
+            android:textSize="14sp" />
+
+        <Switch
+            android:id="@+id/plvhc_setting_camera_sw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvhc_setting_camera_iv"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="1dp"
+            android:thumb="@drawable/plvhc_live_room_setting_switch_thumb_selector"
+            android:track="@drawable/plvhc_live_room_setting_switch_track_selector" />
+
+        <ImageView
+            android:id="@+id/plvhc_setting_camera_orient_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_below="@+id/plvhc_setting_camera_iv"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/plvhc_setting_camera_orient" />
+
+        <TextView
+            android:id="@+id/plvhc_setting_camera_orient_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_alignTop="@+id/plvhc_setting_camera_orient_iv"
+            android:layout_marginLeft="4dp"
+            android:layout_toRightOf="@+id/plvhc_setting_camera_orient_iv"
+            android:gravity="center"
+            android:text="方向"
+            android:textColor="#eeeeee"
+            android:textSize="14sp" />
+
+        <include
+            android:id="@+id/plvhc_setting_camera_orient_sw"
+            layout="@layout/plvhc_widget_switch_front_back_layout"
+            android:layout_width="69dp"
+            android:layout_height="22dp"
+            android:layout_alignTop="@+id/plvhc_setting_camera_orient_iv"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="1dp" />
+
+        <TextView
+            android:id="@+id/plvhc_setting_enter_tv"
+            android:layout_width="126dp"
+            android:layout_height="36dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/plvhc_live_room_enter_room_shape"
+            android:gravity="center"
+            android:text="进入教室"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</RelativeLayout>

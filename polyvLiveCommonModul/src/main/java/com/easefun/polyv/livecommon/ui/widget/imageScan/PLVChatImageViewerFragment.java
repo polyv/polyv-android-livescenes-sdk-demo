@@ -13,12 +13,14 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVUrlTag;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVQuoteEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -161,6 +163,15 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
                 } else {
                     urlTag = new PLVUrlTag(imgUrl, baseEvent);
                     ((PolyvSendLocalImgEvent) baseEvent).setObj2(urlTag);
+                }
+            } else if (baseEvent instanceof PLVChatEmotionEvent) {
+                PLVChatEmotionEvent emotionEvent = (PLVChatEmotionEvent) baseEvent;
+                imgUrl = PLVFaceManager.getInstance().getEmotionUrl(emotionEvent.getId());
+                if (emotionEvent.getObj2() instanceof PLVUrlTag){
+                    urlTag= (PLVUrlTag) emotionEvent.getObj2();
+                }else{
+                    urlTag=new PLVUrlTag(imgUrl,baseEvent);
+                    emotionEvent.setObj2(urlTag);
                 }
             } else {
                 continue;

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/plvsa_member_top_triangle_view"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="@drawable/plvsa_member_control_top_triangle_bg_layer"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/plvsa_member_control_bg_shape"
+        android:paddingLeft="14dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingRight="4dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <ImageView
+            android:id="@+id/plvsa_member_camera_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_more_camera_selector"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_member_camera_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_camera_iv"
+            android:layout_alignBottom="@id/plvsa_member_camera_iv"
+            android:layout_toRightOf="@+id/plvsa_member_camera_iv"
+            android:gravity="center|left"
+            android:minEms="4"
+            android:text="摄像头"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_mic_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/plvsa_member_camera_iv"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_more_mic_selector"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_member_mic_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_mic_iv"
+            android:layout_alignBottom="@id/plvsa_member_mic_iv"
+            android:layout_toRightOf="@+id/plvsa_member_mic_iv"
+            android:gravity="center|left"
+            android:minEms="4"
+            android:text="麦克风"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_kick_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/plvsa_member_mic_iv"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_member_kick" />
+
+        <TextView
+            android:id="@+id/plvsa_member_kick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_kick_iv"
+            android:layout_alignBottom="@+id/plvsa_member_kick_iv"
+            android:layout_toRightOf="@+id/plvsa_member_kick_iv"
+            android:gravity="center|left"
+            android:paddingRight="10dp"
+            android:minEms="4"
+            android:text="踢出"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_ban_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/plvsa_member_kick_iv"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_more_close_room_selector" />
+
+        <TextView
+            android:id="@+id/plvsa_member_ban_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_ban_iv"
+            android:layout_alignBottom="@+id/plvsa_member_ban_iv"
+            android:layout_toRightOf="@+id/plvsa_member_ban_iv"
+            android:gravity="center|left"
+            android:minEms="4"
+            android:singleLine="true"
+            android:text="禁言"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/plvsa_member_bottom_triangle_view"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="@drawable/plvsa_member_control_bottom_triangle_bg_layer" />
+</LinearLayout>

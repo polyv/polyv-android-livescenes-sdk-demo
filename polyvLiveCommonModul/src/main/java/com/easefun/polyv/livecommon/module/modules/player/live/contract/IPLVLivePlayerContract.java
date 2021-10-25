@@ -4,13 +4,14 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -63,11 +64,24 @@ public interface IPLVLivePlayerContract {
         PLVPlayerLogoView getLogo();
 
         /**
+         * 获取跑马灯控件
+         */
+        IPLVMarqueeView getMarqueeView();
+
+        /**
          * 子播放器开始播放回调
          *
          * @param isFirst 每次加载完成后是否是第一次start播放
          */
         void onSubVideoViewPlay(boolean isFirst);
+
+        /**
+         * 子播放器加载暖场图片回调
+         *
+         * @param imageUrl
+         * @param imageView
+         */
+        void onSubVideoViewLoadImage(String imageUrl, ImageView imageView);
 
         /**
          * 子播放器点击事件
@@ -130,14 +144,6 @@ public interface IPLVLivePlayerContract {
         void onLinesChanged(int linesPos);
 
         /**
-         * 获取跑马灯回调
-         *
-         * @param marqueeVo  跑马灯数据
-         * @param viewerName 观看用户名
-         */
-        void onGetMarqueeVo(PolyvLiveMarqueeVO marqueeVo, String viewerName);
-
-        /**
          * 重新开始播放回调
          */
         void onRestartPlay();
@@ -186,6 +192,12 @@ public interface IPLVLivePlayerContract {
          * @return true表示不使用播放器内部重连逻辑，false表示使用。
          */
         boolean onNetworkRecover();
+
+        /**
+         * 仅音频模式
+         * @param isOnlyAudio true表示音频开播，仅音频模式打开
+         */
+        void onOnlyAudio(boolean isOnlyAudio);
     }
     // </editor-fold>
 

@@ -5,16 +5,18 @@ import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
+import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
@@ -23,6 +25,7 @@ import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
 
@@ -62,6 +65,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onAnswerEvent(@NonNull PLVTAnswerEvent answerEvent) {
+
+    }
+
+    @Override
+    public void onRewardEvent(@NonNull PLVRewardEvent rewardEvent) {
 
     }
 
@@ -131,12 +139,22 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+
+    }
+
+    @Override
     public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
 
     }
 
     @Override
     public void onSendProhibitedWord(@NonNull String prohibitedMessage, @NonNull String hintMsg, @NonNull String status) {
+
+    }
+
+    @Override
+    public void onCloseRoomStatusChanged(boolean isClose) {
 
     }
 
@@ -152,6 +170,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onHistoryRequestFailed(String errorMsg, Throwable t, int viewIndex) {
+
+    }
+
+    @Override
+    public void onKickUsersList(List<PLVSocketUserBean> dataList) {
 
     }
 }

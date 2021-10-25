@@ -29,6 +29,7 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -69,7 +70,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     /**** Model ****/
     private IPolyvLinkMicManager linkMicManager;
+    @Nullable
     private PLVLinkMicMsgHandler linkMicMsgHandler;
+    @Nullable
     private IPLVRTCInvokeStrategy rtcInvokeStrategy;
     //账号数据
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -79,6 +82,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private int linkMicInitState = LINK_MIC_UNINITIATED;
     private String myLinkMicId = "";
     private boolean isAudioLinkMic;
+    //socket消息更新连麦状态的时间
+    private long socketRefreshOpenStatusData = -1;
     private boolean isTeacherOpenLinkMic;
     //是否已经初始化过第一画面用户
     private boolean hasInitFirstScreenUser = false;
@@ -90,6 +95,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private List<PLVLinkMicItemDataBean> linkMicList = new LinkedList<>();
     //mute事件缓存列表。用于解决，Mute事件到达时，连麦列表中还不存在该成员，导致mute事件遗漏的情况。
     private PLVLinkMicMuteCacheList muteCacheList = new PLVLinkMicMuteCacheList();
+    //音视频模式，禁止的类型，用于全体静音等
+    private String avConnectMode = "";
 
     /**** Disposable ****/
     private Disposable getLinkMicListDelay;
@@ -206,10 +213,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                                 linkMicView.onJoinLinkMic();
                                 linkMicView.updateAllLinkMicList();
                             }
-                            //上麦后，摄像头关闭，麦克风打开
-                            muteVideo(true);
-                            muteAudio(false);
 
+                            loadLinkMicConnectMode(avConnectMode);
                         }
                     });
             rtcInvokeStrategy.setOnLeaveLinkMicListener(new IPLVRTCInvokeStrategy.OnLeaveLinkMicListener() {
@@ -253,9 +258,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                                 linkMicView.onJoinLinkMic();
                                 linkMicView.onShowLinkMicList();
                             }
-                            //上麦后，摄像头关闭，麦克风打开
-                            muteVideo(true);
-                            muteAudio(false);
+
+                            loadLinkMicConnectMode(avConnectMode);
 
                             dispose(getLinkMicListTimer);
                             getLinkMicListTimer = PLVRxTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
@@ -307,7 +311,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         this.linkMicView = null;
         linkMicInitState = LINK_MIC_UNINITIATED;
         linkMicManager.destroy();
-        linkMicMsgHandler.destroy();
+        if (linkMicMsgHandler != null) {
+            linkMicMsgHandler.destroy();
+        }
         PolyvLinkMicConfig.getInstance().clear();
     }
 
@@ -328,7 +334,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     @Override
     public void leaveLinkMic() {
-        rtcInvokeStrategy.setLeaveLinkMic();
+        if (rtcInvokeStrategy != null) {
+            rtcInvokeStrategy.setLeaveLinkMic();
+        }
     }
 
     @Override
@@ -388,6 +396,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Override
     public void setupRenderView(SurfaceView renderView, String linkMicId) {
         if (linkMicManager.getLinkMicUid().equals(linkMicId)) {
+            if(liveRoomDataManager.isOnlyAudio()){
+                linkMicManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
+            }
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
             linkMicManager.setupRemoteVideo(renderView, linkMicId);
@@ -401,16 +412,29 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     @Override
     public boolean isJoinLinkMic() {
-        return rtcInvokeStrategy.isJoinLinkMic();
+        if (rtcInvokeStrategy != null) {
+            return rtcInvokeStrategy.isJoinLinkMic();
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean isJoinChannel() {
-        return rtcInvokeStrategy.isJoinChannel();
+        if (rtcInvokeStrategy != null) {
+            return rtcInvokeStrategy.isJoinChannel();
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void setIsAudioLinkMic(boolean isAudioLinkMic) {
+        long interval = (System.currentTimeMillis() - socketRefreshOpenStatusData) / 1000;
+        //服务端轮询到的连麦类型，距离上一次socket获取的类型的时间差不足10秒，就不通过轮询更新了
+        if (interval < 10) {
+            return;
+        }
         this.isAudioLinkMic = isAudioLinkMic;//通过服务端轮询接口获取连麦类型
     }
 
@@ -439,7 +463,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
             @Override
             public void run() {
-                rtcInvokeStrategy.setLiveStart();
+                if (rtcInvokeStrategy != null) {
+                    rtcInvokeStrategy.setLiveStart();
+                }
             }
         });
     }
@@ -447,13 +473,21 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     @Override
     public void setLiveEnd() {
-        rtcInvokeStrategy.setLiveEnd();
+        if (rtcInvokeStrategy != null) {
+            rtcInvokeStrategy.setLiveEnd();
+        }
     }
 
     @Override
     public int getRTCListSize() {
         return linkMicList.size();
     }
+
+    @Override
+    public void resetRequestPermissionList(ArrayList<String> permissions) {
+        linkMicManager.resetRequestPermissionList(permissions);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="http请求">
@@ -555,7 +589,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 }
                 PLVCommonLog.d(TAG, "第一画面:" + firstScreenLinkMicId);
 
-                if (rtcInvokeStrategy.isJoinChannel() && !hasInitFirstScreenUser) {
+                if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel() && !hasInitFirstScreenUser) {
                     hasInitFirstScreenUser = true;
                     rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId);
                     if (linkMicView != null) {
@@ -658,7 +692,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         //是否打开本地视频
         linkMicManager.enableLocalVideo(!isAudioLinkMic);
         //加入频道
-        rtcInvokeStrategy.setJoinLinkMic();
+        if (rtcInvokeStrategy != null) {
+            rtcInvokeStrategy.setJoinLinkMic();
+        }
         if (linkMicView != null) {
             linkMicView.onTeacherAllowJoin();
         }
@@ -699,7 +735,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     // <editor-fold defaultstate="collapsed" desc="连麦方法封装">
     //当主动离开频道的时候，可能因为断网的原因，收不到rtc引擎的onLeaveChannel()回调，因此要主动执行离开频道的逻辑
     void leaveChannel() {
-        if (rtcInvokeStrategy.isJoinChannel()) {
+        if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
             dispose(getLinkMicListTimer);
             cleanLinkMicListData();
             muteCacheList.clear();
@@ -710,10 +746,32 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     private void cleanLinkMicListData() {
-        PLVCommonLog.d(TAG, "cleanLinkMicListData() called \n"+Log.getStackTraceString(new Throwable()));
+        PLVCommonLog.d(TAG, "cleanLinkMicListData() called \n" + Log.getStackTraceString(new Throwable()));
         hasInitFirstScreenUser = false;
         hasInitFirstTeacherLocation = false;
         linkMicList.clear();
+    }
+
+    /**
+     * 加载连麦音视频模式
+     */
+    private void loadLinkMicConnectMode(String mode){
+        if(TextUtils.isEmpty(mode)){
+            //默认上麦后，摄像头关闭，麦克风打开
+            muteVideo(true);
+            muteAudio(false);
+            return;
+        }
+        if("audio".equals(mode)){
+            muteAudio(true);
+            //默认关闭摄像头
+            muteVideo(true);
+        } else if("video".equals(mode)){
+            muteVideo(true);
+            //默认开启了音频
+            muteAudio(false);
+        }
+
     }
     // </editor-fold>
 
@@ -760,6 +818,13 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         public void onJoinChannelSuccess(String uid) {
             PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onJoinChannelSuccess, uid=" + uid);
             stopJoinTimeoutCount();
+            //连麦限制，全体静音响应
+            if("audio".equals(avConnectMode)){
+                muteAudio(true);
+            }
+            else if("video".equals(avConnectMode)){
+                muteVideo(true);
+            }
         }
 
         @Override
@@ -876,6 +941,14 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 linkMicView.onRemoteUserVolumeChanged(linkMicList);
             }
         }
+
+        @Override
+        public void onNetworkQuality(int quality) {
+            super.onNetworkQuality(quality);
+            if (linkMicView != null) {
+                linkMicView.onNetQuality(quality);
+            }
+        }
     }
 // </editor-fold>
 
@@ -895,7 +968,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onTeacherHangupMe() {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherHangupMe");
-            rtcInvokeStrategy.setLeaveLinkMic();
+            if (rtcInvokeStrategy != null) {
+                rtcInvokeStrategy.setLeaveLinkMic();
+            }
         }
 
         @Override
@@ -920,13 +995,20 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         public void onTeacherCloseLinkMic() {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherCloseLinkMic");
             handleTeacherCloseLinkMic();
-            rtcInvokeStrategy.setLeaveLinkMic();
+            if (rtcInvokeStrategy != null) {
+                rtcInvokeStrategy.setLeaveLinkMic();
+            }
         }
 
         @Override
         public void onTeacherMuteMedia(boolean isMute, boolean isAudio) {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherMuteMedia");
-            if (!rtcInvokeStrategy.isJoinChannel()) {
+            if(isMute){
+                avConnectMode = isAudio ? "audio" : "video";
+            } else {
+                avConnectMode = "";
+            }
+            if (rtcInvokeStrategy == null || !rtcInvokeStrategy.isJoinChannel()) {
                 return;
             }
             for (int i = 0; i < linkMicList.size(); i++) {
@@ -953,7 +1035,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean) {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onUserJoinSuccess");
-            if (!rtcInvokeStrategy.isJoinChannel()) {
+            if (rtcInvokeStrategy == null || !rtcInvokeStrategy.isJoinChannel()) {
                 return;
             }
             boolean userExistInList = false;
@@ -979,7 +1061,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onTeacherSendCup(String linkMicId, int cupNum) {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherSendCup");
-            if (!rtcInvokeStrategy.isJoinChannel()) {
+            if (rtcInvokeStrategy == null || !rtcInvokeStrategy.isJoinChannel()) {
                 return;
             }
             for (PLVLinkMicItemDataBean itemDataBean : linkMicList) {
@@ -992,6 +1074,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
         @Override
         public void onUpdateLinkMicType(boolean isAudio) {
+            socketRefreshOpenStatusData = System.currentTimeMillis();
             isAudioLinkMic = isAudio;//通过socket消息更新连麦类型
         }
 
@@ -1001,7 +1084,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             if (view == null || TextUtils.isEmpty(linkMicId)) {
                 return;
             }
-            rtcInvokeStrategy.setFirstScreenLinkMicId(linkMicId);
+            if (rtcInvokeStrategy != null) {
+                rtcInvokeStrategy.setFirstScreenLinkMicId(linkMicId);
+            }
             //将[linkMicId]切换到连麦列表的第一画面
             if (linkMicList.isEmpty()) {
                 return;
@@ -1065,7 +1150,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
         @Override
         public void onSwitchPPTViewLocation(boolean toMainScreen) {
-            if (rtcInvokeStrategy.isJoinChannel()) {
+            if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
                 //当加入连麦的时候，才回调该方法
                 if (linkMicView != null) {
                     linkMicView.onSwitchPPTViewLocation(toMainScreen);
@@ -1077,7 +1162,16 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         public void onFinishClass() {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onFinishClass");
             handleTeacherCloseLinkMic();
-            rtcInvokeStrategy.setLiveEnd();
+            if (rtcInvokeStrategy != null) {
+                rtcInvokeStrategy.setLiveEnd();
+            }
+        }
+
+        @Override
+        public void onLinkMicConnectMode(String avConnectMode) {
+            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onLinkMicConnectMode "+avConnectMode);
+            //socket消息，早于连麦，缓存下来后更新刚进来时的连麦状态
+            PLVLinkMicPresenter.this.avConnectMode = avConnectMode;
         }
     }
     // </editor-fold>

@@ -36,10 +36,12 @@
         app:layout_constraintLeft_toRightOf="@id/plvls_status_bar_channel_info_tv" />
 
     <!--网络质量-->
-    <com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSNetworkQualityWidget
+    <com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget
         android:id="@+id/plvls_status_bar_net_quality_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="14dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="14dp"
         android:layout_marginLeft="12dp"
         app:layout_constraintLeft_toRightOf="@id/plvls_status_bar_streamer_time_tv" />
 

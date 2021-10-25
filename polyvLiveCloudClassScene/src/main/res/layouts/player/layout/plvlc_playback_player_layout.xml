@@ -93,6 +93,13 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!--重试按钮-->
+    <com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout
+        android:visibility="gone"
+        android:id="@+id/plvlc_playback_player_retry_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- 控制栏 -->
     <com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCPlaybackMediaController
         android:id="@+id/plvlc_playback_media_controller"

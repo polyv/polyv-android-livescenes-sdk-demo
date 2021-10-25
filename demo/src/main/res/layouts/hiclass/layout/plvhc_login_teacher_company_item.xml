@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:background="@drawable/plvhc_login_company_bg">
+
+    <TextView
+        android:id="@+id/plvhc_login_teacher_company_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        tools:text="wwwwwwww"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:gravity="start"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp" />
+
+    <ImageView
+        android:id="@+id/plvhc_login_teacher_company_iv"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/plvhc_login_teacher_company_selector"
+        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp" />
+
+
+</LinearLayout>

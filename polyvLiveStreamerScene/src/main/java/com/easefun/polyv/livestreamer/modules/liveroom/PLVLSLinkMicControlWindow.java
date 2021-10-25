@@ -30,6 +30,12 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
     private TextView plvlsLinkmicAudioTypeTv;
 
     private OnViewActionListener onViewActionListener;
+
+    /**
+     * 显示连麦类型
+     * 0-默认显示音、视频连麦 1-只显示音频连麦 2-只显示视频连麦
+     */
+    private int showType = 0;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -56,6 +62,18 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
+
+    /**
+     * 根据类型显示连麦
+     * @param view
+     * @param showType 0-默认显示音、视频连麦 1-只显示音频连麦 2-只显示视频连麦
+     */
+    public void show(View view, int showType){
+        this.showType = showType;
+        updateLinkMicShowTypeView(showType);
+        show(view);
+    }
+
     public void show(View view) {
         int[] location = new int[2];
         view.getLocationInWindow(location);//window
@@ -82,12 +100,11 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
 
     public void resetLinkMicControlView() {
         plvlsLinkmicVideoTypeLy.setSelected(false);
-        plvlsLinkmicVideoTypeLy.setVisibility(View.VISIBLE);
         plvlsLinkmicAudioTypeLy.setSelected(false);
-        plvlsLinkmicAudioTypeLy.setVisibility(View.VISIBLE);
         plvlsLinkmicControlSplitView.setVisibility(View.VISIBLE);
         plvlsLinkmicVideoTypeTv.setText("视频连麦");
         plvlsLinkmicAudioTypeTv.setText("音频连麦");
+        updateLinkMicShowTypeView(showType);
     }
     // </editor-fold>
 
@@ -98,6 +115,9 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
                 @Override
                 public void onCall(Object... args) {
                     updateLinkMicControlView(isVideoType, isOpen);
+                    if (onViewActionListener != null) {
+                        onViewActionListener.updateLinkMicMediaType(isVideoType);
+                    }
                 }
             });
             if (!isOpenLinkMic) {
@@ -136,6 +156,26 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
             }
         }
     }
+
+    /**
+     * 根据连麦显示类型，控制是否显示音/视频连麦的UI
+     * @param showType
+     */
+    private void updateLinkMicShowTypeView(int showType){
+        if(showType == 1){
+            plvlsLinkmicVideoTypeLy.setVisibility(View.GONE);
+            plvlsLinkmicAudioTypeLy.setVisibility(View.VISIBLE);
+            plvlsLinkmicControlSplitView.setVisibility(View.GONE);
+        } else if(showType == 2){
+            plvlsLinkmicVideoTypeLy.setVisibility(View.VISIBLE);
+            plvlsLinkmicAudioTypeLy.setVisibility(View.GONE);
+            plvlsLinkmicControlSplitView.setVisibility(View.GONE);
+        } else {
+            plvlsLinkmicVideoTypeLy.setVisibility(View.VISIBLE);
+            plvlsLinkmicAudioTypeLy.setVisibility(View.VISIBLE);
+            plvlsLinkmicControlSplitView.setVisibility(View.VISIBLE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
@@ -158,6 +198,13 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
          * @return true：成功，false：未成功
          */
         boolean isStreamerStartSuccess();
+
+        /**
+         * 更新连麦媒体类型
+         *
+         * @param isVideoLinkMicType true：视频类型，false：音频类型
+         */
+        void updateLinkMicMediaType(boolean isVideoLinkMicType);
     }
     // </editor-fold>
 }

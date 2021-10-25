@@ -65,6 +65,8 @@ public class PLVOrientationManager {
     private void updateLastRationObserver() {
         if (!rotationObservers.isEmpty()) {
             lastRotationObserver = rotationObservers.get(rotationObservers.size() - 1);
+        } else {
+            lastRotationObserver = null;
         }
     }
 

@@ -60,6 +60,7 @@
         android:layout_toRightOf="@id/avatar_iv">
 
         <LinearLayout
+            android:id="@+id/chat_msg_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/plvlc_tv_receive"
@@ -85,7 +86,7 @@
                 android:visibility="gone" />
 
             <!--显示被回复人发送的文本信息-->
-            <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+            <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
                 android:id="@+id/quote_text_message_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,7 +103,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:background="#D3D3D3"
                 android:scaleType="centerCrop"
                 android:visibility="gone" />
 
@@ -116,7 +116,7 @@
                 android:background="#33ffffff"
                 android:visibility="gone" />
 
-            <com.easefun.polyv.businesssdk.sub.gif.GifSpanTextView
+            <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
                 android:id="@+id/text_message_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -130,7 +130,6 @@
             android:id="@+id/img_message_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#D3D3D3"
             android:scaleType="centerCrop"
             android:visibility="gone" />
 

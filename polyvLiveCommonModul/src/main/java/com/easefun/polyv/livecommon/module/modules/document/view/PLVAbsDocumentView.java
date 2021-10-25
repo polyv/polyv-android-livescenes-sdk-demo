@@ -10,6 +10,7 @@ import com.easefun.polyv.livecommon.module.modules.document.model.vo.PLVPptUploa
 import com.easefun.polyv.livescenes.document.model.PLVSPPTInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
+import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 
 import java.util.List;
 
@@ -47,6 +48,11 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
     }
 
     @Override
+    public void onPptStatusChange(PLVSPPTStatus pptStatus) {
+        // Not implemented.
+    }
+
+    @Override
     public void onPptPaintStatus(@Nullable PLVSPPTPaintStatus pptPaintStatus) {
         // Not implemented.
     }
@@ -72,5 +78,11 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
     @Override
     public void onPptDelete(boolean success, @Nullable PLVSPPTInfo.DataBean.ContentsBean deletedPptBean) {
         // Not implemented.
+    }
+
+    @Override
+    public boolean onRequestOpenPptView(int pptId, String pptName) {
+        // Not implemented.
+        return false;
     }
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="#2D3452">
+
+    <LinearLayout
+        android:id="@+id/plvhc_login_lesson_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/plvhc_login_lesson_item_image_iv"
+            android:layout_width="88dp"
+            android:layout_height="66dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/plvhc_login_lesson_item_image_default"
+            app:radius_iv="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginLeft="15dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/plvhc_login_lesson_item_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="这是课节名称" />
+
+            <TextView
+                android:id="@+id/plvhc_login_lesson_item_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#BFFFFFFF"
+                android:textSize="12sp"
+                tools:text="0000-00-00 00:00" />
+
+            <TextView
+                android:id="@+id/plvhc_login_course_item_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:singleLine="true"
+                android:textColor="#BFFFFFFF"
+                android:textSize="12sp"
+                tools:text="这是课程名称这是课程名称这是课程名称这是课程名称这是课程名称这是课程名称这是课程名称" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/plvhc_login_lesson_item_separate_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/plvhc_login_lesson_info_layout"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="#14FFFFFF" />
+
+</RelativeLayout>

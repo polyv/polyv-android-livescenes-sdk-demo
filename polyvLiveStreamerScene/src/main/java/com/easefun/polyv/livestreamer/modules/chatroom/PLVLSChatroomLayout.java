@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.chatroom;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
@@ -34,6 +37,7 @@ import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
@@ -41,12 +45,15 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
@@ -95,6 +102,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+    private long lastTimeClickFrontCameraControl = 0;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -170,6 +178,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                     }
 
                     @Override
+                    public boolean onSendEmotion(PLVEmotionImageVO.EmotionImage emotionImage) {
+                        Pair<Boolean, Integer> pair = sendChatEmotion(new PLVChatEmotionEvent(emotionImage.getId()));
+                        return pair.first;
+                    }
+
+                    @Override
                     public boolean onSendMsg(String message) {
                         return sendChatMessage(message);
                     }
@@ -209,6 +223,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
 
         initSocketLoginManager();
+        showLinkMicType(liveRoomDataManager.isOnlyAudio());
     }
 
     @Override
@@ -308,6 +323,10 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     private void sendChatMessage(PolyvSendLocalImgEvent imgEvent) {
         chatroomPresenter.sendChatImage(imgEvent);
+    }
+
+    private Pair<Boolean, Integer> sendChatEmotion(PLVChatEmotionEvent emotionEvent) {
+        return chatroomPresenter.sendChatEmotionImage(emotionEvent);
     }
     // </editor-fold>
 
@@ -428,12 +447,35 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
 
         @Override
+        public void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent) {
+            super.onLoadEmotionMessage(emotionEvent);
+            if (emotionEvent == null) {
+                return;
+            }
+            final List<PLVBaseViewData> dataList = new ArrayList<>();
+            dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
+            //添加信息至列表
+            addChatMessageToList(dataList, true);
+        }
+
+        @Override
         public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
             super.onLocalImageMessage(localImgEvent);
             List<PLVBaseViewData> dataList = new ArrayList<>();
             dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag()));
             //添加信息至列表
             addChatMessageToList(dataList, true);
+        }
+
+        @Override
+        public void onSendProhibitedWord(@NonNull final String prohibitedMessage, @NonNull final String hintMsg, @NonNull final String status) {
+            super.onSendProhibitedWord(prohibitedMessage, hintMsg, status);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    chatMessageAdapter.notifyProhibitedChanged(prohibitedMessage, hintMsg, status);
+                }
+            });
         }
 
         @Override
@@ -494,6 +536,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                         .setText(R.string.plv_chat_toast_reconnecting)
                         .build()
                         .show();
+                changeInputWindowState(false);
             }
         }
 
@@ -505,7 +548,9 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                         .setText(R.string.plv_chat_toast_reconnect_success)
                         .build()
                         .show();
+                changeInputWindowState(true);
             }
+            initChatroomEmotion();
         }
 
         @Override
@@ -521,7 +566,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         public void onKickEvent(@NonNull PLVKickEvent kickEvent, boolean isOwn) {
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
-                showExitDialog(R.string.plv_chat_toast_been_kicked);
+                PLVToast.Builder.context(PLVAppUtils.getApp())
+                        .duration(3000)
+                        .setText(R.string.plv_chat_toast_kicked_streamer)
+                        .build()
+                        .show();
+                ((Activity)getContext()).finish();
             }
         }
 
@@ -570,28 +620,102 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             }
         } else if (id == R.id.plvls_chatroom_toolbar_front_camera_control_iv) {
             if (!v.isSelected()) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onFrontCameraControl(v.getTag() != null);
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastTimeClickFrontCameraControl > 1000) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onFrontCameraControl(v.getTag() != null);
+                    }
+                    lastTimeClickFrontCameraControl = currentTime;
                 }
+
             }
         } else if (id == R.id.plvls_chatroom_toolbar_open_input_window_tv) {
-            PLVLSChatMsgInputWindow.show(((Activity) getContext()), PLVLSChatMsgInputWindow.class, new PLVLSChatMsgInputWindow.MessageSendListener() {
-                @Override
-                public void onSendImg(PolyvSendLocalImgEvent imgEvent) {
-                    sendChatMessage(imgEvent);
-                }
-
-                @Override
-                public boolean onSendQuoteMsg(String message) {
-                    return false;
-                }
-
-                @Override
-                public boolean onSendMsg(String message) {
-                    return sendChatMessage(message);
-                }
-            });
+            clickInputWindow();
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 表情">
+    private void initChatroomEmotion() {
+        if (chatroomPresenter == null) {
+            return;
+        }
+        //加载个性表情
+        chatroomPresenter.getChatEmotionImages();
+        chatroomPresenter.getData().getEmotionImages().observe((LifecycleOwner) getContext(), new Observer<List<PLVEmotionImageVO.EmotionImage>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVEmotionImageVO.EmotionImage> emotionImageList) {
+                if (chatroomPresenter != null) {
+                    chatroomPresenter.getData().getEmotionImages().removeObserver(this);
+                }
+                if (emotionImageList != null && !emotionImageList.isEmpty()) {
+                    PLVFaceManager.getInstance().initEmotionList(emotionImageList);
+                } else {
+                    Log.e(getClass().getSimpleName(), "emotionImages is null or empty");
+                }
+            }
+        });
+    }
+    // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="连麦控制">
+    private void showLinkMicType(boolean isOnlyAudio){
+        plvlsChatroomToolbarCameraControlIv.setVisibility(isOnlyAudio ? View.GONE : VISIBLE);
+        plvlsChatroomToolbarFrontCameraControlIv.setVisibility(isOnlyAudio ? View.GONE : VISIBLE);
+    }
+    // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 输入框">
+
+    /**
+     * 改变输入框状态
+     * @param isEnableInput 是否允许输入
+     */
+    private void changeInputWindowState(boolean isEnableInput){
+        plvlsChatroomToolbarOpenInputWindowTv.setFocusable(isEnableInput);
+        if(isEnableInput){
+            plvlsChatroomToolbarOpenInputWindowTv.setText("有话要说...");
+        } else {
+            //聊天室断开无法连接时，不允许输入
+            plvlsChatroomToolbarOpenInputWindowTv.setText("聊天室连接失败");
+        }
+    }
+
+    /**
+     * 点击输入框
+     */
+    private void clickInputWindow(){
+
+        if(!plvlsChatroomToolbarOpenInputWindowTv.isFocusable()){
+            PLVToast.Builder.context(getContext())
+                    .setText(getResources().getString(R.string.plv_chat_connect_fail_and_cannot_input))
+                    .duration(Toast.LENGTH_LONG)
+                    .build()
+                    .show();
+            return;
+        }
+        PLVLSChatMsgInputWindow.show(((Activity) getContext()), PLVLSChatMsgInputWindow.class, new PLVLSChatMsgInputWindow.MessageSendListener() {
+            @Override
+            public void onSendImg(PolyvSendLocalImgEvent imgEvent) {
+                sendChatMessage(imgEvent);
+            }
+
+            @Override
+            public boolean onSendQuoteMsg(String message) {
+                return false;
+            }
+
+            @Override
+            public boolean onSendEmotion(PLVEmotionImageVO.EmotionImage emotionImage) {
+                Pair<Boolean, Integer> pair = sendChatEmotion(new PLVChatEmotionEvent(emotionImage.getId()));
+                return pair.first;
+            }
+
+            @Override
+            public boolean onSendMsg(String message) {
+                return sendChatMessage(message);
+            }
+        });
+    }
+    // </editor-fold >
 }

@@ -27,6 +27,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.liveroom.adapter.PLVLSMemberAdapter;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -88,6 +89,44 @@ public class PLVLSMemberLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        memberAdapter = new PLVLSMemberAdapter(liveRoomDataManager);
+        plvlsMemberListRv.setAdapter(memberAdapter);
+
+        memberAdapter.setOnViewActionListener(new PLVLSMemberAdapter.OnViewActionListener() {
+            @Override
+            public void onMicControl(int position, boolean isMute) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onMicControl(position, isMute);
+                }
+            }
+
+            @Override
+            public void onCameraControl(int position, boolean isMute) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onCameraControl(position, isMute);
+                }
+            }
+
+            @Override
+            public void onFrontCameraControl(int position, boolean isFront) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onFrontCameraControl(position, isFront);
+                }
+            }
+
+            @Override
+            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
+                }
+            }
+        });
+
+        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
+            plvlsMemberListLinkMicDownAllTv.setVisibility(INVISIBLE);
+            plvlsMemberListLinkMicMuteAllAudioTv.setVisibility(INVISIBLE);
+        }
+        updateMemberListLinkMicShowType(liveRoomDataManager.isOnlyAudio());
     }
     // </editor-fold>
 
@@ -177,38 +216,6 @@ public class PLVLSMemberLayout extends FrameLayout {
 
         plvlsMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         plvlsMemberListRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(0, ConvertUtils.dp2px(8)));
-        memberAdapter = new PLVLSMemberAdapter();
-        plvlsMemberListRv.setAdapter(memberAdapter);
-
-        memberAdapter.setOnViewActionListener(new PLVLSMemberAdapter.OnViewActionListener() {
-            @Override
-            public void onMicControl(int position, boolean isMute) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onMicControl(position, isMute);
-                }
-            }
-
-            @Override
-            public void onCameraControl(int position, boolean isMute) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onCameraControl(position, isMute);
-                }
-            }
-
-            @Override
-            public void onFrontCameraControl(int position, boolean isFront) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onFrontCameraControl(position, isFront);
-                }
-            }
-
-            @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
-                }
-            }
-        });
 
         blurView = findViewById(R.id.blur_ly);
         PLVBlurUtils.initBlurView(blurView);
@@ -288,13 +295,17 @@ public class PLVLSMemberLayout extends FrameLayout {
         if (memberAdapter.getItemCount() == 0) {
             plvlsMemberCountTv.setText("");//列表中没数据时，不显示在线人数
         } else {
-            plvlsMemberCountTv.setText("(共" + Math.max(onlineCount, memberAdapter.getItemCount()) + "人)");
+            plvlsMemberCountTv.setText("(" + Math.max(onlineCount, memberAdapter.getItemCount()) + "人)");
         }
     }
 
     public void setStreamerStatus(boolean isStartedStatus) {
         this.isStartedStatus = isStartedStatus;
         memberAdapter.setStreamerStatus(isStartedStatus);
+    }
+
+    public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
+        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType);
     }
 
     public boolean onBackPressed() {
@@ -387,6 +398,19 @@ public class PLVLSMemberLayout extends FrameLayout {
         }
     };
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="音频开播">
+
+    /**
+     * 更新成员列表显示类型
+     * @param isOnlyAudio 只显示音频部分
+     */
+    private void updateMemberListLinkMicShowType(boolean isOnlyAudio){
+        if(memberAdapter != null){
+            memberAdapter.setOnlyShowAudioUI(isOnlyAudio);
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="定时更新模糊背景view">
     private void startUpdateBlurViewTimer() {

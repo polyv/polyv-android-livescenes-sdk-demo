@@ -8,14 +8,26 @@ import android.graphics.drawable.Drawable;
 
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 表情集合类
  */
 public class PLVFaceManager {
+
+    /**
+     * 黄脸表情emoji
+     */
+    private Map<String, Integer> mFaceMap;
+
+    private List<PLVEmotionImageVO.EmotionImage> emotionList = new ArrayList<>();
 
     private PLVFaceManager() {
         initFaceMap();
@@ -27,19 +39,6 @@ public class PLVFaceManager {
         if (null == instance)
             instance = new PLVFaceManager();
         return instance;
-    }
-
-    public static Drawable eraseColor(Drawable drawable, int id) {
-        if (drawable instanceof BitmapDrawable) {
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            bitmap = eraseColor(bitmap, Color.WHITE);
-            bitmap = eraseColor(bitmap, Color.rgb(230, 230, 230));
-            if (id != R.drawable.polyv_33 && id != R.drawable.polyv_71)
-                bitmap = eraseColor(bitmap, Color.BLACK);
-            return new BitmapDrawable(bitmap);
-        } else {
-            return drawable;
-        }
     }
 
     public static Bitmap eraseColor(Bitmap src, int color) {
@@ -62,10 +61,13 @@ public class PLVFaceManager {
         return mFaceMap;
     }
 
-    private Map<String, Integer> mFaceMap;
 
+    /**
+     * 初始化黄脸emoji表情
+     */
     private void initFaceMap() {
         mFaceMap = new LinkedHashMap<String, Integer>();
+        /*
         mFaceMap.put("[微笑]", R.drawable.polyv_1);
         mFaceMap.put("[撇嘴]", R.drawable.polyv_2);
         mFaceMap.put("[色]", R.drawable.polyv_3);
@@ -104,7 +106,7 @@ public class PLVFaceManager {
         mFaceMap.put("[晕]", R.drawable.polyv_35);
         mFaceMap.put("[折磨]", R.drawable.polyv_36);
         mFaceMap.put("[衰]", R.drawable.polyv_37);
-        mFaceMap.put("[骷髅]", R.drawable.polyv_38);
+//        mFaceMap.put("[骷髅]", R.drawable.polyv_38);
         mFaceMap.put("[敲打]", R.drawable.polyv_39);
         mFaceMap.put("[再见]", R.drawable.polyv_40);
 
@@ -123,7 +125,7 @@ public class PLVFaceManager {
         mFaceMap.put("[亲亲]", R.drawable.polyv_53);
         mFaceMap.put("[吓]", R.drawable.polyv_54);
         mFaceMap.put("[可怜]", R.drawable.polyv_55);
-        mFaceMap.put("[菜刀]", R.drawable.polyv_56);
+//        mFaceMap.put("[菜刀]", R.drawable.polyv_56);
         mFaceMap.put("[西瓜]", R.drawable.polyv_57);
         mFaceMap.put("[啤酒]", R.drawable.polyv_58);
         mFaceMap.put("[篮球]", R.drawable.polyv_59);
@@ -132,7 +134,7 @@ public class PLVFaceManager {
 
         mFaceMap.put("[咖啡]", R.drawable.polyv_61);
         mFaceMap.put("[饭]", R.drawable.polyv_62);
-        mFaceMap.put("[猪头]", R.drawable.polyv_63);
+//        mFaceMap.put("[猪头]", R.drawable.polyv_63);
         mFaceMap.put("[玫瑰]", R.drawable.polyv_64);
         mFaceMap.put("[凋谢]", R.drawable.polyv_65);
         mFaceMap.put("[示爱]", R.drawable.polyv_66);
@@ -140,11 +142,11 @@ public class PLVFaceManager {
         mFaceMap.put("[心碎]", R.drawable.polyv_68);
         mFaceMap.put("[蛋糕]", R.drawable.polyv_69);
         mFaceMap.put("[闪电]", R.drawable.polyv_70);
-        mFaceMap.put("[炸弹]", R.drawable.polyv_71);
-        mFaceMap.put("[刀]", R.drawable.polyv_72);
+//        mFaceMap.put("[炸弹]", R.drawable.polyv_71);
+//        mFaceMap.put("[刀]", R.drawable.polyv_72);
         mFaceMap.put("[足球]", R.drawable.polyv_73);
         mFaceMap.put("[瓢虫]", R.drawable.polyv_74);
-        mFaceMap.put("[便便]", R.drawable.polyv_75);
+//        mFaceMap.put("[便便]", R.drawable.polyv_75);
         mFaceMap.put("[月亮]", R.drawable.polyv_76);
         mFaceMap.put("[太阳]", R.drawable.polyv_77);
         mFaceMap.put("[礼物]", R.drawable.polyv_78);
@@ -171,6 +173,65 @@ public class PLVFaceManager {
         mFaceMap.put("[回头]", R.drawable.polyv_98);
         mFaceMap.put("[跳绳]", R.drawable.polyv_99);
         mFaceMap.put("[挥手]", R.drawable.polyv_100);
+        */
+
+        mFaceMap.put("[呲牙]", R.drawable.polyv_101);
+        mFaceMap.put("[大笑]", R.drawable.polyv_102);
+        mFaceMap.put("[可爱]", R.drawable.polyv_103);
+        mFaceMap.put("[害羞]", R.drawable.polyv_104);
+        mFaceMap.put("[偷笑]", R.drawable.polyv_105);
+        mFaceMap.put("[再见]", R.drawable.polyv_106);
+        mFaceMap.put("[惊讶]", R.drawable.polyv_107);
+        mFaceMap.put("[哭笑]", R.drawable.polyv_108);
+        mFaceMap.put("[酷]", R.drawable.polyv_109);
+        mFaceMap.put("[奸笑]", R.drawable.polyv_110);
+        mFaceMap.put("[鼓掌]", R.drawable.polyv_111);
+        mFaceMap.put("[大哭]", R.drawable.polyv_112);
+        mFaceMap.put("[敲打]", R.drawable.polyv_113);
+        mFaceMap.put("[吃瓜]", R.drawable.polyv_114);
+        mFaceMap.put("[让我看看]", R.drawable.polyv_115);
+        mFaceMap.put("[按脸哭]", R.drawable.polyv_116);
+        mFaceMap.put("[打哈欠]", R.drawable.polyv_117);
+        mFaceMap.put("[愤怒]", R.drawable.polyv_118);
+        mFaceMap.put("[难过]", R.drawable.polyv_119);
+        mFaceMap.put("[ok]", R.drawable.polyv_120);
+        mFaceMap.put("[爱心]", R.drawable.polyv_121);
+        mFaceMap.put("[加1]", R.drawable.polyv_122);
+        mFaceMap.put("[心碎]", R.drawable.polyv_123);
+        mFaceMap.put("[正确]", R.drawable.polyv_124);
+        mFaceMap.put("[错误]", R.drawable.polyv_125);
+        mFaceMap.put("[满分]", R.drawable.polyv_126);
+        mFaceMap.put("[笔记]", R.drawable.polyv_127);
+        mFaceMap.put("[胜利]", R.drawable.polyv_128);
+        mFaceMap.put("[比心]", R.drawable.polyv_129);
+        mFaceMap.put("[赞]", R.drawable.polyv_130);
+        mFaceMap.put("[蛋糕]", R.drawable.polyv_131);
+        mFaceMap.put("[礼物]", R.drawable.polyv_132);
+        mFaceMap.put("[红包]", R.drawable.polyv_133);
+        mFaceMap.put("[奶茶]", R.drawable.polyv_134);
+        mFaceMap.put("[时钟]", R.drawable.polyv_135);
+        mFaceMap.put("[晚安]", R.drawable.polyv_136);
+    }
+
+    public void initEmotionList(@NotNull List<PLVEmotionImageVO.EmotionImage> emotionImages){
+        emotionList.clear();
+        this.emotionList.addAll(emotionImages);
+    }
+
+    /**
+     * 获取个性表情列表
+     */
+    public List<PLVEmotionImageVO.EmotionImage> getEmotionList(){
+        return emotionList;
+    }
+
+    public String getEmotionUrl(@NotNull String id){
+        for(PLVEmotionImageVO.EmotionImage emotion: emotionList){
+            if(id.equals(emotion.getId())){
+                return emotion.getUrl();
+            }
+        }
+        return "";
     }
 
     public int getFaceId(String faceStr) {

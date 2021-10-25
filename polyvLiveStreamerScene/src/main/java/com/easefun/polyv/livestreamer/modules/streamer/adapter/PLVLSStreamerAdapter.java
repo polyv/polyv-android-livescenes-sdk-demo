@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -27,8 +28,14 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVLSStreamerAdapter";
 
-    public static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
-    public static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
+    private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
+    private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
+    private static final String PAYLOAD_UPDATE_GUEST_STATUS = "updateGuestStatus";
+    public static final String PAYLOAD_UPDATE_COVER_IMAGE = "updateCoverImage";
+
+    //默认的直播间封面图
+    private static final String DEFAULT_LIVE_STREAM_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
+
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -42,6 +49,13 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     //rv
     private RecyclerView streamerRv;
+    @Nullable
+    private SurfaceView localRenderView;
+
+    //音频开播模式，只允许音频开播与连麦
+    private boolean isOnlyAudio = false;
+    //封面图
+    private String coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -63,7 +77,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         viewHolder.renderView = renderView;
         if (renderView != null) {
             viewHolder.plvlsStreamerRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        }else {
+        } else {
             PLVCommonLog.e(TAG, "create render view return null");
         }
         return viewHolder;
@@ -100,6 +114,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
         String actor = itemDataBean.getActor();
+        String status = itemDataBean.getStatus();
 
         //昵称
         StringBuilder nickString = new StringBuilder();
@@ -131,8 +146,17 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             }
         }
 
+        bindCoverImage(holder, isOnlyAudio, isTeacher);
+
         //是否关闭摄像头
         bindVideoMute(holder, isMuteVideo, linkMicId);
+
+        //设置本地渲染器
+        if (myLinkMicId.equals(linkMicId)) {
+            localRenderView = holder.renderView;
+        }
+
+        updateGuestViewStatus(holder, itemDataBean);
 
         //设置点击事件监听器
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +180,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
+        String status = itemDataBean.getStatus();
 
         //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
         if (isAudioLinkMic && !isTeacher && !isGuest) {
@@ -198,6 +223,12 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     //是否关闭摄像头
                     bindVideoMute(holder, isMuteVideo, linkMicId);
                     break;
+                case PAYLOAD_UPDATE_GUEST_STATUS:
+                    updateGuestViewStatus(holder, itemDataBean);
+                    break;
+                case PAYLOAD_UPDATE_COVER_IMAGE:
+                    bindCoverImage(holder, isOnlyAudio, isTeacher);
+                    break;
                 default:
                     break;
             }
@@ -209,7 +240,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         super.onViewRecycled(holder);
 
         //标记view重新创建
-        if (holder.renderView != null) {
+        //如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
+        if (holder.renderView != null && holder.renderView != localRenderView) {
             holder.isViewRecycled = true;
             holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
             adapterCallback.releaseLinkMicRenderView(holder.renderView);
@@ -250,9 +282,36 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_VOLUME);
     }
 
+    //更新嘉宾状态
+    public void updateGuestStatus(int pos) {
+        notifyItemChanged(pos, PAYLOAD_UPDATE_GUEST_STATUS);
+    }
+
     //更新所有item
     public void updateAllItem() {
         notifyDataSetChanged();
+    }
+
+    /**
+     * 设置是否是音频开播。
+     * @param isOnlyAudio
+     */
+    public void setIsOnlyAudio(boolean isOnlyAudio) {
+        this.isOnlyAudio = isOnlyAudio;
+    }
+
+    /**
+     * 设置封面图
+     * 仅在音频开播模式下({@link #isOnlyAudio = true})，将该封面图设置到讲师摄像头占位
+     */
+    public void updateCoverImage(String coverImage){
+        if(TextUtils.isEmpty(coverImage)){
+            coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
+        } else if(coverImage.startsWith("//")){
+            coverImage = "https:"+coverImage;
+        }
+        this.coverImage = coverImage;
+        notifyItemChanged(0, PAYLOAD_UPDATE_COVER_IMAGE);
     }
     // </editor-fold>
 
@@ -281,6 +340,32 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             }
         }
     }
+
+    //更新嘉宾状态
+    private void updateGuestViewStatus(StreamerItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean) {
+        if (itemDataBean.isGuest()&&myLinkMicId.equals(itemDataBean.getLinkMicId())) {
+            holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.VISIBLE);
+            if (PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(itemDataBean.getStatus())) {
+                holder.plvsStreamerGuestLinkStatusTv.setText("连麦中");
+                holder.plvsStreamerGuestLinkStatusTv.setSelected(true);
+            } else {
+                holder.plvsStreamerGuestLinkStatusTv.setText("未连麦");
+                holder.plvsStreamerGuestLinkStatusTv.setSelected(false);
+            }
+        } else {
+            holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.GONE);
+        }
+    }
+
+    private void bindCoverImage(@NonNull StreamerItemViewHolder holder, boolean onlyAudio, boolean isTeacher){
+        //如果是音频开播（音频连麦），则将讲师的占位图改为封面图
+        if(onlyAudio && isTeacher){
+            holder.plvlsStreamerCoverImage.setVisibility(View.VISIBLE);
+            PLVImageLoader.getInstance().loadImage(coverImage, holder.plvlsStreamerCoverImage);
+        } else {
+            holder.plvlsStreamerCoverImage.setVisibility(View.INVISIBLE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -296,9 +381,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private FrameLayout plvlsStreamerRenderViewContainer;
         private ImageView plvlsStreamerMicStateIv;
         private TextView plvlsStreamerNickTv;
+        private ImageView plvlsStreamerCoverImage;
         @Nullable
         private SurfaceView renderView;
         private PLVRoundRectLayout roundRectLayout;
+        private TextView plvsStreamerGuestLinkStatusTv;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -310,6 +397,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerRenderViewContainer = itemView.findViewById(R.id.plvls_streamer_render_view_container);
             plvlsStreamerMicStateIv = itemView.findViewById(R.id.plvls_streamer_mic_state_iv);
             plvlsStreamerNickTv = itemView.findViewById(R.id.plvls_streamer_nick_tv);
+            plvsStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvls_streamer_guest_link_status_tv);
+            plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
+
         }
     }
     // </editor-fold>

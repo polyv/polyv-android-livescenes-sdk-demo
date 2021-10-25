@@ -80,6 +80,13 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 配置频道名称
+     */
+    public static void setupChannelName(String channelName) {
+        channelConfig.setupChannelName(channelName);
+    }
+
+    /**
      * 配置vid
      */
     public static void setupVid(String vid) {
@@ -113,6 +120,26 @@ public class PLVLiveChannelConfigFiller {
 
     public static void setMarqueeCode(String code){
         channelConfig.setMarqueeCode(code);
+    }
+
+    /**
+     * 设置嘉宾连麦类型
+     *
+     * @param colinMicType 嘉宾连麦类型
+     */
+    public static void setColinMicType(String colinMicType) {
+        channelConfig.setColinMicType(colinMicType);
+    }
+
+    /**
+     * 设置互动学堂课堂信息
+     *
+     * @param token      token
+     * @param lessonId   课节Id
+     * @param courseCode 课程号
+     */
+    public static void setHiClassConfig(String token, long lessonId, String courseCode) {
+        channelConfig.setHiClassConfig(token, lessonId, courseCode);
     }
 
     /**

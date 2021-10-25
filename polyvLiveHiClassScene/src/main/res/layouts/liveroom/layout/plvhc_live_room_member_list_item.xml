@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvhc_member_parent_ly"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="5dp"
+    android:clipChildren="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:background="#22273D">
+
+    <TextView
+        android:id="@+id/plvhc_member_nick_tv"
+        android:layout_width="142dp"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxEms="8"
+        android:paddingLeft="16dp"
+        android:singleLine="true"
+        android:text="学生名称最多八字…"
+        android:textColor="#ffffffff"
+        android:textSize="14sp" />
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_hands_up_ly"
+        android:layout_width="80dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/plvhc_member_hands_up_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_list_hands_up" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/plvhc_member_publish_control_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:singleLine="true"
+                android:text="上台"
+                android:textColor="@color/plvhc_member_list_linkmic_status_text_selector"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/plvhc_member_linkmic_connecting_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:src="@drawable/plvhc_member_list_linkmic_connecting_animation"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 上下台 "
+            android:singleLine="true"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_paint_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/plvhc_member_paint_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_list_paint_selector" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  画笔  "
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_mic_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/plvhc_member_mic_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_list_mic_selector" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 麦克风 "
+            android:singleLine="true"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_camera_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/plvhc_member_camera_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_list_camera_selector" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text=" 摄像头 "
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_cups_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/plvhc_member_cups_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:text="999"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  奖励  "
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_ban_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/plvhc_member_ban_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_list_ban_selector" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  禁言  "
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/plvhc_member_kick_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="2dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/plvhc_member_kick_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/plvhc_member_kick" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  移出  "
+            android:textSize="12sp"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+</LinearLayout>

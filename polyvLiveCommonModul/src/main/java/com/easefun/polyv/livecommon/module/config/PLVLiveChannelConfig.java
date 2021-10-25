@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.easefun.polyv.livescenes.feature.login.model.PLVSLoginVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -44,13 +45,24 @@ public class PLVLiveChannelConfig {
     private PolyvLiveChannelType channelType;
 
     /**
-     * 自定义跑马灯code
+     * 频道名称
      */
-    private String marqueeCode;
+    private String channelName;
+
+    /**
+     * 嘉宾连麦类型
+     */
+    private String colinMicType;
+
+    /**
+     * 互动学堂课堂信息
+     */
+    private HiClassConfig hiClassConfig;
 
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
+        hiClassConfig = new HiClassConfig();
     }
 
     public PLVLiveChannelConfig(PLVLiveChannelConfig old) {
@@ -61,7 +73,9 @@ public class PLVLiveChannelConfig {
         videoListType = old.videoListType;
         isLive = old.isLive;
         channelType = old.channelType;
-        marqueeCode = old.marqueeCode;
+        channelName = old.channelName;
+        colinMicType = old.colinMicType;
+        hiClassConfig = new HiClassConfig(old.hiClassConfig);
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -116,6 +130,13 @@ public class PLVLiveChannelConfig {
     }
 
     /**
+     * 配置频道名称
+     */
+    public void setupChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    /**
      * 配置vid
      */
     public void setupVid(String vid) {
@@ -145,10 +166,26 @@ public class PLVLiveChannelConfig {
         this.channelType = channelType;
     }
 
-    public void setMarqueeCode(String marqueeCode) {
-        this.marqueeCode = marqueeCode;
+    /**
+     * 设置嘉宾连麦类型
+     * @param colinMicType 嘉宾连麦类型
+     */
+    public void setColinMicType(String colinMicType) {
+        this.colinMicType = colinMicType;
     }
 
+    /**
+     * 设置互动学堂课堂信息
+     *
+     * @param token      token
+     * @param lessonId   课节Id
+     * @param courseCode 课程号
+     */
+    public void setHiClassConfig(String token, long lessonId, String courseCode) {
+        hiClassConfig.token = token;
+        hiClassConfig.lessonId = lessonId;
+        hiClassConfig.courseCode = courseCode;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -162,6 +199,10 @@ public class PLVLiveChannelConfig {
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getChannelName() {
+        return channelName;
     }
 
     public String getVid() {
@@ -181,6 +222,10 @@ public class PLVLiveChannelConfig {
         return channelType;
     }
 
+    public HiClassConfig getHiClassConfig() {
+        return hiClassConfig;
+    }
+
     //是否是三分屏频道类型
     public boolean isPPTChannelType() {
         return channelType == PolyvLiveChannelType.PPT;
@@ -191,10 +236,10 @@ public class PLVLiveChannelConfig {
         return channelType == PolyvLiveChannelType.ALONE;
     }
 
-    public String getMarqueeCode() {
-        return marqueeCode;
+    //嘉宾是否是自动上麦
+    public boolean isAutoLinkToGuest() {
+        return TextUtils.isEmpty(colinMicType) || PLVSLoginVO.COLINMICTYPE_AUTO.equals(colinMicType);
     }
-
     // </editor-fold>
 
     /**
@@ -298,6 +343,58 @@ public class PLVLiveChannelConfig {
         @Override
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
+        }
+    }
+
+    /**
+     * 互动学堂课堂信息
+     */
+    public static class HiClassConfig {
+
+        HiClassConfig() {
+        }
+
+        HiClassConfig(HiClassConfig old) {
+            token = old.token;
+            lessonId = old.lessonId;
+            courseCode = old.courseCode;
+        }
+
+        /**
+         * token
+         */
+        private String token;
+        /**
+         * 课节Id
+         */
+        private long lessonId;
+        /**
+         * 课程号
+         */
+        private String courseCode;
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+
+        public long getLessonId() {
+            return lessonId;
+        }
+
+        public void setLessonId(long lessonId) {
+            this.lessonId = lessonId;
+        }
+
+        public String getCourseCode() {
+            return courseCode;
+        }
+
+        public void setCourseCode(String courseCode) {
+            this.courseCode = courseCode;
         }
     }
 }
