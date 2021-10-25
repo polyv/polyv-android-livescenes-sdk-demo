@@ -118,10 +118,6 @@ public class PLVLiveChannelConfigFiller {
         channelConfig.setChannelType(channelType);
     }
 
-    public static void setMarqueeCode(String code){
-        channelConfig.setMarqueeCode(code);
-    }
-
     /**
      * 设置嘉宾连麦类型
      *
