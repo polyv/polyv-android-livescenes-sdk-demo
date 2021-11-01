@@ -124,3 +124,5 @@
 -dontwarn com.hpplay.**
 
 -keep class com.easefun.polyv.livecommon.module.modules.cast.**{*;}
+
+-keep class com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper{*;}

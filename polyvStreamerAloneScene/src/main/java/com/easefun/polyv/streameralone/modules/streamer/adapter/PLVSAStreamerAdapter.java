@@ -2,6 +2,7 @@ package com.easefun.polyv.streameralone.modules.streamer.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.GestureDetector;
@@ -484,7 +485,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
         private boolean isRenderViewSetup = false;
 
-        public StreamerItemViewHolder(View itemView) {
+        public StreamerItemViewHolder(final View itemView) {
             super(itemView);
             plvsaStreamerRoundRectLy = itemView.findViewById(R.id.plvsa_streamer_round_rect_ly);
             plvsaStreamerRenderViewContainer = itemView.findViewById(R.id.plvsa_streamer_render_view_container);
@@ -492,6 +493,20 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
             plvsaStreamerNickTv = itemView.findViewById(R.id.plvsa_streamer_nick_tv);
             plvsaStreamerBottomLeftLy = itemView.findViewById(R.id.plvsa_streamer_bottom_left_ly);
             plvsaStreamerAvatarIv = itemView.findViewById(R.id.plvsa_streamer_avatar_iv);
+            if (plvsaStreamerRoundRectLy != null) {
+                plvsaStreamerRoundRectLy.setOnOrientationChangedListener(new PLVRoundRectLayout.OnOrientationChangedListener() {
+                    @Override
+                    public void onChanged(boolean isPortrait) {
+                        ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) plvsaStreamerRoundRectLy.getLayoutParams();
+                        if (isPortrait) {
+                            lp.dimensionRatio = "H,9:16";
+                        } else {
+                            lp.dimensionRatio = "H,16:9";
+                        }
+                        plvsaStreamerRoundRectLy.requestLayout();
+                    }
+                });
+            }
         }
     }
     // </editor-fold>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,10 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -35,6 +38,7 @@ import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAda
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -339,6 +343,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             if (streamerAdapter.getItemType() == itemType) {
                 return;
             }
+            lp.gravity = Gravity.NO_GRAVITY;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
             lp.topMargin = 0;
             plvsaStreamerRv.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
             streamerAdapter.setItemType(itemType);
@@ -347,12 +353,33 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             if (streamerAdapter.getItemType() == itemType) {
                 return;
             }
-            lp.topMargin = ConvertUtils.dp2px(78);
+            if (PLVScreenUtils.isPortrait(getContext())) {
+                lp.gravity = Gravity.NO_GRAVITY;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.topMargin = ConvertUtils.dp2px(78);
+            } else {
+                lp.gravity = Gravity.CENTER_VERTICAL;
+                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                lp.topMargin = 0;
+            }
+
             plvsaStreamerRv.setLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false));
             streamerAdapter.setItemType(itemType);
         }
         plvsaStreamerRv.setLayoutParams(lp);
         plvsaStreamerRv.setAdapter(streamerAdapter);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="旋转处理">
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE);
+        } else {
+            streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
+        }
     }
     // </editor-fold>
 }

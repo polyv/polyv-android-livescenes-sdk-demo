@@ -5,7 +5,6 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -41,8 +40,6 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
-import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
-import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
@@ -187,26 +184,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.setPlayerBufferingIndicator(loadingLayout);
         //设置跑马灯
         marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
-        PLVMarqueeModel plvMarqueeModel = new PLVMarqueeModel()
-                .setUserName("保利威SDK")
-                .setFontAlpha(255)
-                .setFontSize(40)
-                .setFontColor(Color.RED)
-                .setFilter(false)
-                .setFilterAlpha(255)
-                .setFilterColor(Color.BLACK)
-                .setFilterBlurX(2)
-                .setFilterBlurY(2)
-                .setFilterStrength(4)
-                .setSetting(PLVMarqueeAnimationVO.ROLL)
-                .setInterval(3)
-                .setTweenTime(1)
-                .setLifeTime(2)
-                .setSpeed(200)
-                .setAlwaysShowWhenRun(true)
-                .setHiddenWhenPause(false);
-
-        marqueeView.setPLVMarqueeModel(plvMarqueeModel);
     }
 
     private void initDanmuView() {

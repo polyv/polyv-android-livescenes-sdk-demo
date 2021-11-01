@@ -53,7 +53,7 @@ public class PLVECCommodityViewHolder extends PLVBaseViewHolder<PLVBaseViewData,
         commodityNameTv.setText(contentsBean.getName());
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
-        commoditySrcPriceTv.setVisibility(contentsBean.getPrice() == contentsBean.getRealPrice() ? View.GONE : View.VISIBLE);
+        commoditySrcPriceTv.setVisibility((contentsBean.getPrice() == contentsBean.getRealPrice() || contentsBean.getPrice() == 0) ? View.GONE : View.VISIBLE);
         commoditySrcPriceTv.setText("¥" + trimZero(nf.format(contentsBean.getPrice())));
         commodityRealPriceTv.setText(contentsBean.getRealPrice() == 0 ? "免费" : ("¥" + trimZero(nf.format(contentsBean.getRealPrice()) + "")));
         commodityShelfTv.setText("去购买");

@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -11,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
@@ -19,11 +20,13 @@ import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
+import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -230,6 +233,14 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         resetView();
         //是否是特殊身份类型
         boolean isSpecialType = PLVEventHelper.isSpecialType(userType);//管理员、讲师、助教、嘉宾都视为特殊身份类型
+
+        final String loginUserId = nullable(new PLVSugarUtil.Supplier<String>() {
+            @Override
+            public String get() {
+                return PLVSocketWrapper.getInstance().getLoginVO().getUserId();
+            }
+        });
+
         //设置头像
         if (avatar != null && avatarIv != null) {
             int defaultAvatar;
@@ -253,7 +264,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         //设置昵称
         if (nickName != null) {
-            if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
+            if (loginUserId != null && loginUserId.equals(userId)) {
                 nickName = nickName + "(我)";
             }
             if (actor != null) {
@@ -290,7 +301,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         //设置被回复人相关的信息
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
-            if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())) {
+            if (loginUserId != null && loginUserId.equals(chatQuoteVO.getUserId())) {
                 nickName = nickName + "(我)";
             }
             if (quoteSplitView != null) {

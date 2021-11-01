@@ -5,12 +5,15 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,26 +28,47 @@ import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 
 /**
  * 更多布局
  */
 public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 按钮表格每行显示数量
+    private static final int GRID_COLUMN_COUNT_PORT = 5;
+    private static final int GRID_COLUMN_COUNT_LAND = 3;
+    // 弹层布局位置
+    private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
+    private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 更多布局高度
+    private static final int MORE_LAYOUT_HEIGHT_PORT = ViewGroup.LayoutParams.WRAP_CONTENT;
+    private static final int MORE_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
+    // 更多布局位置
+    private static final int MORE_LAYOUT_GRAVITY_PORT = Gravity.BOTTOM;
+    private static final int MORE_LAYOUT_GRAVITY_LAND = Gravity.END;
+    // 更多布局背景
+    private static final int MORE_LAYOUT_BACKGROUND_RES_PORT = R.drawable.plvsa_more_ly_shape;
+    private static final int MORE_LAYOUT_BACKGROUND_RES_LAND = R.drawable.plvsa_more_ly_shape_land;
+
     //view
+    private ConstraintLayout plvsaMoreLayout;
+    private TextView plvsaMoreTextTv;
+    private GridLayout plvsaMoreSettingsLayout;
     private ImageView plvsaMoreCameraIv;
-    private ImageView plvsaMoreMicIv;
-    private ImageView plvsaMoreCameraSwitchIv;
-    private ImageView plvsaMoreMirrorIv;
-    private ImageView plvsaMoreFlashlightIv;
     private TextView plvsaMoreCameraTv;
+    private ImageView plvsaMoreMicIv;
     private TextView plvsaMoreMicTv;
+    private ImageView plvsaMoreCameraSwitchIv;
     private TextView plvsaMoreCameraSwitchTv;
+    private ImageView plvsaMoreMirrorIv;
     private TextView plvsaMoreMirrorTv;
+    private ImageView plvsaMoreFlashlightIv;
     private TextView plvsaMoreFlashlightTv;
     private ImageView plvsaMoreBitrateIv;
-    private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreBitrateTv;
+    private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreCloseRoomTv;
 
     //streamerPresenter
@@ -92,19 +116,22 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_more_layout, this);
 
+        plvsaMoreLayout = (ConstraintLayout) findViewById(R.id.plvsa_more_layout);
+        plvsaMoreTextTv = (TextView) findViewById(R.id.plvsa_more_text_tv);
+        plvsaMoreSettingsLayout = (GridLayout) findViewById(R.id.plvsa_more_settings_layout);
         plvsaMoreCameraIv = (ImageView) findViewById(R.id.plvsa_more_camera_iv);
-        plvsaMoreMicIv = (ImageView) findViewById(R.id.plvsa_more_mic_iv);
-        plvsaMoreCameraSwitchIv = (ImageView) findViewById(R.id.plvsa_more_camera_switch_iv);
-        plvsaMoreMirrorIv = (ImageView) findViewById(R.id.plvsa_more_mirror_iv);
-        plvsaMoreFlashlightIv = (ImageView) findViewById(R.id.plvsa_more_flashlight_iv);
         plvsaMoreCameraTv = (TextView) findViewById(R.id.plvsa_more_camera_tv);
+        plvsaMoreMicIv = (ImageView) findViewById(R.id.plvsa_more_mic_iv);
         plvsaMoreMicTv = (TextView) findViewById(R.id.plvsa_more_mic_tv);
+        plvsaMoreCameraSwitchIv = (ImageView) findViewById(R.id.plvsa_more_camera_switch_iv);
         plvsaMoreCameraSwitchTv = (TextView) findViewById(R.id.plvsa_more_camera_switch_tv);
+        plvsaMoreMirrorIv = (ImageView) findViewById(R.id.plvsa_more_mirror_iv);
         plvsaMoreMirrorTv = (TextView) findViewById(R.id.plvsa_more_mirror_tv);
+        plvsaMoreFlashlightIv = (ImageView) findViewById(R.id.plvsa_more_flashlight_iv);
         plvsaMoreFlashlightTv = (TextView) findViewById(R.id.plvsa_more_flashlight_tv);
         plvsaMoreBitrateIv = (ImageView) findViewById(R.id.plvsa_more_bitrate_iv);
-        plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreBitrateTv = (TextView) findViewById(R.id.plvsa_more_bitrate_tv);
+        plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreCloseRoomTv = (TextView) findViewById(R.id.plvsa_more_close_room_tv);
 
         plvsaMoreCameraIv.setOnClickListener(this);
@@ -151,7 +178,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),
                     PLVMenuDrawer.Type.OVERLAY,
-                    Position.BOTTOM,
+                    PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND,
                     PLVMenuDrawer.MENU_DRAG_CONTAINER,
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
@@ -186,11 +213,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 }
             });
-            menuDrawer.openMenu();
         } else {
             menuDrawer.attachToContainer();
-            menuDrawer.openMenu();
         }
+
+        updateViewWithOrientation();
+        menuDrawer.openMenu();
     }
 
     public void close() {
@@ -410,6 +438,34 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         attachedToWindow = false;
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    private void updateViewWithOrientation() {
+        Position menuPosition;
+        FrameLayout.LayoutParams moreLayoutParam = (FrameLayout.LayoutParams) plvsaMoreLayout.getLayoutParams();
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            menuPosition = MENU_DRAWER_POSITION_PORT;
+            moreLayoutParam.height = MORE_LAYOUT_HEIGHT_PORT;
+            moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_PORT;
+            plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_PORT);
+            plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_PORT);
+        } else {
+            menuPosition = MENU_DRAWER_POSITION_LAND;
+            moreLayoutParam.height = MORE_LAYOUT_HEIGHT_LAND;
+            moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_LAND;
+            plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_LAND);
+            plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_LAND);
+        }
+
+        if (menuDrawer != null) {
+            menuDrawer.setPosition(menuPosition);
+        }
+        plvsaMoreLayout.setLayoutParams(moreLayoutParam);
     }
 
     // </editor-fold>

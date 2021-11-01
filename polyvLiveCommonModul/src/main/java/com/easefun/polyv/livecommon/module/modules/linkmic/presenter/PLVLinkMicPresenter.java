@@ -446,6 +446,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Override
     public void setIsTeacherOpenLinkMic(boolean isTeacherOpenLinkMic) {
         this.isTeacherOpenLinkMic = isTeacherOpenLinkMic;
+        if (isJoinLinkMic() && !isTeacherOpenLinkMic) {
+            leaveLinkMic();
+        }
     }
 
     @Override
@@ -819,12 +822,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onJoinChannelSuccess, uid=" + uid);
             stopJoinTimeoutCount();
             //连麦限制，全体静音响应
-            if("audio".equals(avConnectMode)){
-                muteAudio(true);
-            }
-            else if("video".equals(avConnectMode)){
-                muteVideo(true);
-            }
+            loadLinkMicConnectMode(avConnectMode);
         }
 
         @Override
@@ -1003,11 +1001,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onTeacherMuteMedia(boolean isMute, boolean isAudio) {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherMuteMedia");
-            if(isMute){
-                avConnectMode = isAudio ? "audio" : "video";
-            } else {
-                avConnectMode = "";
-            }
+
             if (rtcInvokeStrategy == null || !rtcInvokeStrategy.isJoinChannel()) {
                 return;
             }
@@ -1101,8 +1095,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             }
             final int indexOfTarget = linkMicList.indexOf(itemToBeFirst);
 
-            view.updateFirstScreenChanged(linkMicId, oldFirstScreenPos, indexOfTarget);
-
             if (liveRoomDataManager.getConfig().isAloneChannelType()) {
                 //如果切换的第一画面的位置正好在media的位置，说明第一画面已经在主屏，则不再处理
                 if (indexOfTarget == view.getMediaViewIndexInLinkMicList()) {
@@ -1146,6 +1138,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     view.performClickInLinkMicListItem(pptIndexInLinkMicList);
                 }
             }
+
+            view.updateFirstScreenChanged(linkMicId, oldFirstScreenPos, indexOfTarget);
         }
 
         @Override

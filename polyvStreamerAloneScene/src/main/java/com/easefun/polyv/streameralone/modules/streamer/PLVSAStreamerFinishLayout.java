@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +26,16 @@ import java.util.Locale;
 public class PLVSAStreamerFinishLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 顶部图标间距
+    private static final int FINISH_ICON_MARGIN_TOP_PORT = ConvertUtils.dp2px(69);
+    private static final int FINISH_ICON_MARGIN_TOP_LAND = ConvertUtils.dp2px(38);
+    // 分割线间距
+    private static final int SPLIT_VIEW_MARGIN_TOP_PORT = ConvertUtils.dp2px(40);
+    private static final int SPLIT_VIEW_MARGIN_TOP_LAND = ConvertUtils.dp2px(18);
+    // 底部确认按钮间距
+    private static final int FINISH_CLOSE_BUTTON_MARGIN_BOTTOM_PORT = ConvertUtils.dp2px(119);
+    private static final int FINISH_CLOSE_BUTTON_MARGIN_BOTTOM_LAND = ConvertUtils.dp2px(44);
 
     private View rootView;
     private ImageView plvsaStreamerFinishIv;
@@ -96,7 +108,32 @@ public class PLVSAStreamerFinishLayout extends FrameLayout {
     public void show() {
         initStartEndTime();
         initStreamTime();
+        updateViewWithOrientation();
         setVisibility(VISIBLE);
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    private void updateViewWithOrientation() {
+        MarginLayoutParams finishIconLayoutParam = (MarginLayoutParams) plvsaStreamerFinishIv.getLayoutParams();
+        MarginLayoutParams splitViewLayoutParam = (MarginLayoutParams) plvsaStreamerFinishSplitView.getLayoutParams();
+        MarginLayoutParams closeButtonLayoutParam = (MarginLayoutParams) plvsaStreamerFinishCloseBtn.getLayoutParams();
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            finishIconLayoutParam.topMargin = FINISH_ICON_MARGIN_TOP_PORT;
+            splitViewLayoutParam.topMargin = SPLIT_VIEW_MARGIN_TOP_PORT;
+            closeButtonLayoutParam.bottomMargin = FINISH_CLOSE_BUTTON_MARGIN_BOTTOM_PORT;
+        } else {
+            finishIconLayoutParam.topMargin = FINISH_ICON_MARGIN_TOP_LAND;
+            splitViewLayoutParam.topMargin = SPLIT_VIEW_MARGIN_TOP_LAND;
+            closeButtonLayoutParam.bottomMargin = FINISH_CLOSE_BUTTON_MARGIN_BOTTOM_LAND;
+        }
+
+        plvsaStreamerFinishIv.setLayoutParams(finishIconLayoutParam);
+        plvsaStreamerFinishSplitView.setLayoutParams(splitViewLayoutParam);
+        plvsaStreamerFinishCloseBtn.setLayoutParams(closeButtonLayoutParam);
     }
 
     // </editor-fold>

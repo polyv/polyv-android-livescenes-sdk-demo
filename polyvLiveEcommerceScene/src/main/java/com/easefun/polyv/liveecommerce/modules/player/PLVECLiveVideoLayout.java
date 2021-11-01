@@ -98,6 +98,10 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     //Listener
     private IPLVECVideoLayout.OnViewActionListener onViewActionListener;
+
+    /**暂无直播的图片以及文字*/
+    private ImageView nostreamIv;
+    private TextView nostreamTv;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -137,6 +141,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoViewParentParent = (ViewGroup) videoView.getParent().getParent();
         videoViewParentIndexInParent = videoViewParentParent.indexOfChild((View) videoView.getParent());
 
+        nostreamIv = findViewById(R.id.nostream_iv);
+        nostreamTv = findViewById(R.id.nostream_tv);
         logoView = findViewById(R.id.logo_view);
 
         initVideoView();
@@ -455,6 +461,10 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             } else {
                 llAuxiliaryCountDown.setVisibility(GONE);
             }
+            if (isShow) {
+                nostreamIv.setVisibility(View.GONE);
+                nostreamTv.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -493,6 +503,10 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             super.onLiveEnd();
             ToastUtils.showShort(R.string.plv_player_toast_live_end);
             hidePlayCenterView();
+            if (isSubVideoViewShow()) {
+                nostreamIv.setVisibility(View.GONE);
+                nostreamTv.setVisibility(View.GONE);
+            }
         }
 
         @Override

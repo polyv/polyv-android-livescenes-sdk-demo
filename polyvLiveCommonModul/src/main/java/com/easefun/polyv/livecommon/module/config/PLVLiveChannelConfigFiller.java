@@ -139,6 +139,13 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 开播登录时，此频道是否仍在直播（仅开播场景使用）
+     */
+    public static void setLiveStreamingWhenLogin(boolean liveStreamingWhenLogin){
+        channelConfig.setLiveStreamingWhenLogin(liveStreamingWhenLogin);
+    }
+
+    /**
      * 生成新的config对象
      *
      * @return PLVLiveChannelConfig

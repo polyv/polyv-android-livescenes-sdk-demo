@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -11,9 +12,12 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.linkmic.model.PLVJoinRequestSEvent;
 import com.plv.linkmic.model.PLVLinkMicMedia;
+import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVBanIpEvent;
@@ -285,6 +289,19 @@ public class PLVStreamerMsgHandler {
             if ("audio".equals(onSliceIDEvent.getData().getAvConnectMode())) {
                 streamerPresenter.callUpdateGuestMediaStatus(true, true);
             }
+
+            //更新data，响应直播恢复
+            if(PLVLiveChannelConfigFiller.generateNewChannelConfig().isLiveStreamingWhenLogin()){
+                //更新ppt状态
+                PLVPPTStatus pptStatus = new PLVPPTStatus();
+                PLVOnSliceIDEvent.DataBean data = onSliceIDEvent.getData();
+                pptStatus.setAutoId(data.getAutoId());
+                pptStatus.setStep(PLVFormatUtils.integerValueOf(data.getStep(), 0));
+                pptStatus.setPageId(data.getPageId());
+
+                PLVStreamerInnerDataTransfer.getInstance().setPPTStatusForOnSliceStartEvent(pptStatus);
+            }
+
         }
     }
 

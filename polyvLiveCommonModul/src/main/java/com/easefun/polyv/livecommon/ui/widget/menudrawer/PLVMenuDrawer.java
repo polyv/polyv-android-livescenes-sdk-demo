@@ -873,7 +873,7 @@ public abstract class PLVMenuDrawer extends ViewGroup {
         mIndicatorClipRect.bottom = bottom;
     }
 
-    private void setPosition(Position position) {
+    public void setPosition(Position position) {
         mPosition = position;
         mResolvedPosition = getPosition();
     }

@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVPptUploadStatus;
 import com.easefun.polyv.livecommon.module.modules.document.model.vo.PLVPptUploadLocalCacheVO;
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
@@ -134,6 +135,9 @@ public class PLVLSPptListLayout extends FrameLayout {
     private int currentAutoId = 0;
     // 当前ppt页面id
     private int currentPageId = 0;
+
+    //直播恢复初始化tag
+    private boolean recoverTag = false;
 
     // PPT文档详情 视图缓存
     private String lastPptName = null;
@@ -345,6 +349,18 @@ public class PLVLSPptListLayout extends FrameLayout {
 
             @Override
             public void onPptPageList(@Nullable PLVSPPTJsModel plvspptJsModel) {
+
+                if(!recoverTag && PLVLiveChannelConfigFiller.generateNewChannelConfig().isLiveStreamingWhenLogin()){
+                    //如果是恢复直播，需要更新一下状态
+                    if(plvspptJsModel != null && !TextUtils.isEmpty(plvspptJsModel.getFileName())){
+                        lastPptName = plvspptJsModel.getFileName();
+                        currentAutoId = plvspptJsModel.getAutoId();
+                        showViewType = PLVLSPptViewType.PAGE;
+                        refreshPptPageStatus(plvspptJsModel);
+                        recoverTag = true;
+                        return;
+                    }
+                }
                 processPptPageList(plvspptJsModel);
             }
 
@@ -944,6 +960,13 @@ public class PLVLSPptListLayout extends FrameLayout {
         if (jsModel == null || currentAutoId != jsModel.getAutoId()) {
             return;
         }
+        refreshPptPageStatus(jsModel);
+    }
+
+    /**
+     * 刷新ppt状态
+     */
+    private void refreshPptPageStatus(PLVSPPTJsModel jsModel){
         List<PLVLSPptVO> pptVOList = new ArrayList<>();
         for (PLVSPPTDetail pptDetail : jsModel.getPPTImages()) {
             String imageUrl = pptDetail.getImageUrl();

@@ -56,6 +56,11 @@ public interface IPLVSASettingLayout {
     boolean onBackPressed();
 
     /**
+     * 开始直播
+     */
+    void liveStart();
+
+    /**
      * view交互事件监听器
      */
     interface OnViewActionListener {

@@ -2,7 +2,6 @@ package com.easefun.polyv.livestreamer.modules.chatroom;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +35,6 @@ import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
-import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
@@ -63,7 +60,6 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
-import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
@@ -643,19 +639,6 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
         //加载个性表情
         chatroomPresenter.getChatEmotionImages();
-        chatroomPresenter.getData().getEmotionImages().observe((LifecycleOwner) getContext(), new Observer<List<PLVEmotionImageVO.EmotionImage>>() {
-            @Override
-            public void onChanged(@Nullable List<PLVEmotionImageVO.EmotionImage> emotionImageList) {
-                if (chatroomPresenter != null) {
-                    chatroomPresenter.getData().getEmotionImages().removeObserver(this);
-                }
-                if (emotionImageList != null && !emotionImageList.isEmpty()) {
-                    PLVFaceManager.getInstance().initEmotionList(emotionImageList);
-                } else {
-                    Log.e(getClass().getSimpleName(), "emotionImages is null or empty");
-                }
-            }
-        });
     }
     // </editor-fold >
 

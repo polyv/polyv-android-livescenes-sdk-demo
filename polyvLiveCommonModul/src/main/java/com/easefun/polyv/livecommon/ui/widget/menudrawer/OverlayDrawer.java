@@ -120,17 +120,21 @@ public class OverlayDrawer extends DraggableDrawer {
             switch (getPosition()) {
                 case LEFT:
                     mMenuContainer.setTranslationX(offsetPixels - mMenuSize);
+                    mMenuContainer.setTranslationY(0);
                     break;
 
                 case TOP:
+                    mMenuContainer.setTranslationX(0);
                     mMenuContainer.setTranslationY(offsetPixels - mMenuSize);
                     break;
 
                 case RIGHT:
                     mMenuContainer.setTranslationX(offsetPixels + mMenuSize);
+                    mMenuContainer.setTranslationY(0);
                     break;
 
                 case BOTTOM:
+                    mMenuContainer.setTranslationX(0);
                     mMenuContainer.setTranslationY(offsetPixels + mMenuSize);
                     break;
             }
@@ -138,17 +142,21 @@ public class OverlayDrawer extends DraggableDrawer {
             switch (getPosition()) {
                 case TOP:
                     mMenuContainer.offsetTopAndBottom(offsetPixels - mMenuContainer.getBottom());
+                    mMenuContainer.offsetLeftAndRight(0);
                     break;
 
                 case BOTTOM:
                     mMenuContainer.offsetTopAndBottom(offsetPixels - (mMenuContainer.getTop() - getHeight()));
+                    mMenuContainer.offsetLeftAndRight(0);
                     break;
 
                 case LEFT:
+                    mMenuContainer.offsetTopAndBottom(0);
                     mMenuContainer.offsetLeftAndRight(offsetPixels - mMenuContainer.getRight());
                     break;
 
                 case RIGHT:
+                    mMenuContainer.offsetTopAndBottom(0);
                     mMenuContainer.offsetLeftAndRight(offsetPixels - (mMenuContainer.getLeft() - getWidth()));
                     break;
             }

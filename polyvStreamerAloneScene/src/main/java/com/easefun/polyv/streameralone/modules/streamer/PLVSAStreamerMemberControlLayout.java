@@ -3,12 +3,14 @@ package com.easefun.polyv.streameralone.modules.streamer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -29,6 +32,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class PLVSAStreamerMemberControlLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 弹层布局位置
+    private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
+    private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+
     private CircleImageView plvsaStreamerAvatarIv;
     private TextView plvsaStreamerUserTypeTv;
     private TextView plvsaStreamerNickTv;
@@ -48,6 +56,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
     private OnViewActionListener onViewActionListener;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -68,6 +77,14 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_streamer_member_control_layout, this);
+
+        ViewStub viewStub;
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            viewStub = (ViewStub) findViewById(R.id.plvsa_member_control_layout_viewstub_port);
+        } else {
+            viewStub = (ViewStub) findViewById(R.id.plvsa_member_control_layout_viewstub_land);
+        }
+        viewStub.inflate();
 
         plvsaStreamerAvatarIv = (CircleImageView) findViewById(R.id.plvsa_streamer_avatar_iv);
         plvsaStreamerUserTypeTv = (TextView) findViewById(R.id.plvsa_streamer_user_type_tv);
@@ -150,7 +167,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),
                     PLVMenuDrawer.Type.OVERLAY,
-                    Position.BOTTOM,
+                    PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND,
                     PLVMenuDrawer.MENU_DRAG_CONTAINER,
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
@@ -221,6 +238,27 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
         }
         return false;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        Position menuPosition;
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            menuPosition = MENU_DRAWER_POSITION_PORT;
+        } else {
+            menuPosition = MENU_DRAWER_POSITION_LAND;
+        }
+
+        if (menuDrawer != null) {
+            menuDrawer.setPosition(menuPosition);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">

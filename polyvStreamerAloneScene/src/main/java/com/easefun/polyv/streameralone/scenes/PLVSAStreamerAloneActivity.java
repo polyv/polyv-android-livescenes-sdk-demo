@@ -1,13 +1,16 @@
 package com.easefun.polyv.streameralone.scenes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.MotionEvent;
@@ -19,6 +22,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -34,7 +38,10 @@ import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayou
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAEmptyFragment;
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAStreamerHomeFragment;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 /**
  * 手机开播纯视频场景界面
@@ -50,10 +57,16 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private static final String EXTRA_ACTOR = "actor";  // 开播者头衔
     private static final String EXTRA_CHANNEL_NAME = "channelName";//直播间名称
 
+    // 背景图片
+    private static final int RES_BACKGROUND_PORT = R.drawable.plvsa_streamer_page_bg;
+    private static final int RES_BACKGROUND_LAND = R.drawable.plvsa_streamer_page_bg_land;
+
     // 直播间数据管理器，每个业务初始化所需的参数
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     // view
+    // 根布局
+    private ConstraintLayout plvsaRootLayout;
     // 推流和连麦布局
     private IPLVSAStreamerLayout streamerLayout;
     // 直播设置布局
@@ -140,6 +153,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         initParams();
         initLiveRoomManager();
         initView();
+
+        checkStreamRecover();
 
         observeSettingLayout();
         observeViewPagerLayout();
@@ -235,6 +250,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, PLVSocketUserConstant.USERTYPE_TEACHER, actor);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setupChannelName(channelName);
+
+        PLVLiveLocalActionHelper.getInstance().enterChannel(channelId);
     }
     // </editor-fold>
 
@@ -250,6 +267,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面UI">
     private void initView() {
+        plvsaRootLayout = (ConstraintLayout) findViewById(R.id.plvsa_root_layout);
         streamerLayout = findViewById(R.id.plvsa_streamer_layout);
         settingLayout = findViewById(R.id.plvsa_setting_layout);
         cleanUpLayout = findViewById(R.id.plvsa_clean_up_layout);
@@ -277,6 +295,20 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (PLVScreenUtils.isPortrait(this)) {
+            plvsaRootLayout.setBackgroundResource(RES_BACKGROUND_PORT);
+        } else {
+            plvsaRootLayout.setBackgroundResource(RES_BACKGROUND_LAND);
+        }
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 直播设置">
     private void observeSettingLayout() {
         settingLayout.setOnViewActionListener(new IPLVSASettingLayout.OnViewActionListener() {
@@ -286,6 +318,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 homeFragment.updateChannelName();
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.startLive();
+                //开始直播后，请求成员列表接口
+                streamerLayout.getStreamerPresenter().requestMemberList();
             }
 
             @Override
@@ -397,8 +431,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 streamerLayout.getStreamerPresenter().registerView(homeFragment.getMoreLayoutStreamerView());
                 streamerLayout.getStreamerPresenter().registerView(homeFragment.getMemberLayoutStreamerView());
                 streamerLayout.getStreamerPresenter().registerView(homeFragment.getStatusBarLayoutStreamerView());
-                //请求成员列表接口
-                streamerLayout.getStreamerPresenter().requestMemberList();
 
                 //监听用户连麦请求的变化
                 streamerLayout.addOnUserRequestListener(new IPLVOnDataChangedListener<String>() {
@@ -487,4 +519,45 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     }
 
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="设置直播恢复">
+
+    private void checkStreamRecover() {
+        boolean isTeacher = PLVSocketUserConstant.USERTYPE_TEACHER.equals(PLVLiveChannelConfigFiller.generateNewChannelConfig().getUser().getViewerType());
+
+        if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setMessage("检测到之前异常退出\n是否恢复直播？")
+                    .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            liveRoomDataManager.setNeedStreamRecover(false);
+                            streamerLayout.getStreamerPresenter().setRecoverStream(false);
+                            streamerLayout.getStreamerPresenter().stopLiveStream();
+                        }
+                    })
+                    .setNegativeButton("恢复直播", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            liveRoomDataManager.setNeedStreamRecover(true);
+                            streamerLayout.getStreamerPresenter().setRecoverStream(true);
+                            //读取状态
+                            PLVLiveLocalActionHelper.Action action = PLVLiveLocalActionHelper.getInstance().getChannelAction(liveRoomDataManager.getConfig().getChannelId());
+                            if(!action.isPortrait){
+                                PLVScreenUtils.enterLandscape(PLVSAStreamerAloneActivity.this);
+                                ScreenUtils.setLandscape(PLVSAStreamerAloneActivity.this);
+                                streamerLayout.getStreamerPresenter().setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE);
+                            }
+                            streamerLayout.setBitrate(action.bitrate);
+                            streamerLayout.setCameraDirection(action.isFrontCamera);
+                            //开始直播
+                            settingLayout.liveStart();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    // </editor-fold >
 }

@@ -232,6 +232,11 @@ public interface IPLVStreamerContract {
         int getMaxBitrate();
 
         /**
+         * 是否恢复上一场直播流来推流
+         */
+        boolean isRecoverStream();
+
+        /**
          * 是否允许录制声音
          *
          * @param enable true：允许，false：不允许
@@ -280,6 +285,11 @@ public interface IPLVStreamerContract {
          * @param mixLayoutType 混流布局类型
          */
         void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);
+
+        /**
+         * 设置直播推流，是否需要恢复上一场的流继续推流
+         */
+        void setRecoverStream(boolean recoverStream);
 
         /**
          * 创建渲染器

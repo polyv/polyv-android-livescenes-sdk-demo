@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
@@ -146,6 +147,18 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             return false;
         }
         return isOnlyAudio.getValue();
+    }
+
+    @Override
+    public void setNeedStreamRecover(boolean isNeed) {
+        //不需要恢复直播，重制状态
+        liveChannelConfig.setLiveStreamingWhenLogin(isNeed);
+        PLVLiveChannelConfigFiller.setLiveStreamingWhenLogin(isNeed);
+    }
+
+    @Override
+    public boolean isNeedStreamRecover() {
+        return liveChannelConfig.isLiveStreamingWhenLogin();
     }
 
     // </editor-fold>

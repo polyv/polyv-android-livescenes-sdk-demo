@@ -1,6 +1,7 @@
 package com.easefun.polyv.streameralone.scenes.fragments;
 
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,8 +32,10 @@ import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMoreLayout;
 import com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,11 @@ import java.util.List;
  */
 public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 布局间距
+    private static final int LAYOUT_VERTICAL_PADDING = ConvertUtils.dp2px(8);
+    private static final int LAYOUT_HORIZON_PADDING_PORT = ConvertUtils.dp2px(8);
+    private static final int LAYOUT_HORIZON_PADDING_LAND = ConvertUtils.dp2px(16);
 
     /**
      * 当聊天室消息数量达到此值时，显示清屏指引
@@ -113,6 +121,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
         initMoreLayout();
         initMemberLayout();
+
+        updateViewWithOrientation();
     }
 
     private void initMoreLayout() {
@@ -186,6 +196,31 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
             plvsaStatusBarLayout.destroy();
         }
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateViewWithOrientation();
+    }
+
+    private void updateViewWithOrientation() {
+        if (getContext() == null) {
+            return;
+        }
+        // padding - left right top bottom
+        int pl, pr, pt, pb;
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            pl = pr = LAYOUT_HORIZON_PADDING_PORT;
+        } else {
+            pl = pr = LAYOUT_HORIZON_PADDING_LAND;
+        }
+        pt = pb = LAYOUT_VERTICAL_PADDING;
+        view.setPadding(pl, pt, pr, pb);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 聊天室">

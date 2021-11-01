@@ -88,6 +88,11 @@ public interface IPLVLCLinkMicLayout {
     boolean isMediaShowInLinkMicList();
 
     /**
+     * 回调通知，在加入连麦时已经将PPT切换到了主屏幕
+     */
+    void notifySwitchedPptToMainScreenOnJoinChannel();
+
+    /**
      * 设置连麦布局监听器
      *
      * @param onPLVLinkMicLayoutListener 连麦布局监听器

@@ -538,6 +538,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         chatEmotionImagesDisposable = PolyvApiManager.getPolyvApichatApi().getEmotionImages(channel, accountId, page, size)
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<PLVResponseApiBean2<PLVEmotionImageVO>>() {
                     @Override
                     public void accept(PLVResponseApiBean2<PLVEmotionImageVO> polyvEmotionImageVO) throws Exception {

@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -199,6 +200,9 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                 } else {
                     localInfoManager.saveLoginInfo("", "", "", false);
                 }
+
+                //更新开播状态
+                PLVLiveChannelConfigFiller.setLiveStreamingWhenLogin(loginVO.isLiveStatus());
 
                 //不填写登录昵称时，使用登录接口返回的后台设置的昵称
                 String loginNick = TextUtils.isEmpty(nick) ? loginVO.getTeacherNickname() : nick;

@@ -51,6 +51,8 @@ import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,6 +97,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     //纯视频频道连麦时，讲师的位置切换器
     private PLVViewSwitcher teacherLocationViewSwitcher;
+
+    private final List<Runnable> onUserJoinPendingTask = new LinkedList<>();
 
     //Listener
     private OnPLVLinkMicLayoutListener onPLVLinkMicLayoutListener;
@@ -337,6 +341,27 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void notifySwitchedPptToMainScreenOnJoinChannel() {
+        PLVSwitchViewAnchorLayout firstScreenSwitchView = linkMicListAdapter.getFirstScreenSwitchView();
+        if (firstScreenSwitchView != null) {
+            // 加入连麦后，PPT切换到主屏幕，再把PPT切到连麦列表，第一画面切到主屏幕
+            onSwitchPPTViewLocation(false);
+        } else {
+            onUserJoinPendingTask.add(new Runnable() {
+                @Override
+                public void run() {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onSwitchPPTViewLocation(false);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    @Override
     public int getMediaViewIndexInLinkMicList() {
         return linkMicListAdapter.getMediaViewIndexInLinkMicList();
     }
@@ -568,6 +593,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onUsersJoin(List<String> uids) {
+        Iterator<Runnable> pendingTaskIterator = onUserJoinPendingTask.iterator();
+        while (pendingTaskIterator.hasNext()) {
+            pendingTaskIterator.next().run();
+            pendingTaskIterator.remove();
+        }
 
         linkMicListAdapter.updateAllItem();
 

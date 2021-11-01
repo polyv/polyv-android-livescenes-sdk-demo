@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="229dp"
+    android:layout_gravity="bottom"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="211dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/plvsa_streamer_member_control_ly_shape"
+        android:clipChildren="false">
+
+        <TextView
+            android:id="@+id/plvsa_streamer_nick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="62dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxEms="8"
+            android:singleLine="true"
+            android:text="讲师"
+            android:textColor="#F0F1F5"
+            android:textSize="14sp" />
+
+        <View
+            android:id="@+id/plvsa_streamer_split_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/plvsa_streamer_nick_tv"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="24dp"
+            android:background="#19ffffff" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvsa_streamer_split_view"
+            android:layout_marginTop="24dp">
+
+            <ImageView
+                android:id="@+id/plvsa_streamer_camera_iv"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:padding="8dp"
+                android:src="@drawable/plvsa_more_camera_selector"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/plvsa_streamer_mic_iv"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/plvsa_streamer_mic_iv"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:padding="8dp"
+                android:src="@drawable/plvsa_more_mic_selector"
+                app:layout_constraintLeft_toRightOf="@+id/plvsa_streamer_camera_iv"
+                app:layout_constraintRight_toLeftOf="@+id/plvsa_streamer_down_linkmic_iv"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/plvsa_streamer_down_linkmic_iv"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:padding="8dp"
+                android:src="@drawable/plvsa_streamer_down_linkmic"
+                app:layout_constraintLeft_toRightOf="@+id/plvsa_streamer_mic_iv"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plvsa_streamer_camera_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="摄像头"
+                android:textColor="#99ffffff"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_camera_iv"
+                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_camera_iv"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_camera_iv" />
+
+            <TextView
+                android:id="@+id/plvsa_streamer_mic_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="麦克风"
+                android:textColor="#99ffffff"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_mic_iv"
+                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_mic_iv"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_mic_iv" />
+
+            <TextView
+                android:id="@+id/plvsa_streamer_down_linkmic_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="下麦"
+                android:textColor="#99ffffff"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_down_linkmic_iv"
+                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_down_linkmic_iv"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_down_linkmic_iv" />
+        </android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/plvsa_streamer_avatar_iv"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/plvsa_member_student_missing_face"
+        app:civ_border_color="#ffffff"
+        app:civ_border_width="1dp" />
+
+    <TextView
+        android:id="@+id/plvsa_streamer_user_type_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/plvsa_member_guest_tv_bg_shape"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxEms="6"
+        android:minWidth="42dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:singleLine="true"
+        android:text="讲师"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp" />
+</FrameLayout>
