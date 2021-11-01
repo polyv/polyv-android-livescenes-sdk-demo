@@ -3,8 +3,10 @@ package com.easefun.polyv.streameralone.modules.statusbar;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
+import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +24,10 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.utils.PLVNetworkUtils;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 import java.util.List;
@@ -280,6 +285,10 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
         @Override
         public void onNetworkQuality(int quality) {
+            if (!PLVNetworkUtils.isConnected(getContext())) {
+                quality = PLVLinkMicConstant.NetQuality.NET_QUALITY_NO_CONNECTION;
+            }
+
             switch (quality) {
                 case PLVLinkMicConstant.NetQuality.NET_QUALITY_GOOD:
                     plvsaStatusBarNetworkStatusIv.setImageResource(R.drawable.plvsa_network_signal_3);
@@ -355,6 +364,66 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             notificationText = "你的摄像头已关闭";
         }
         plvsaStatusBarNotificationTv.setText(notificationText);
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateViewWithOrientation();
+    }
+
+    private void updateViewWithOrientation() {
+        moveNetworkStatusLayout();
+    }
+
+    /**
+     * 竖屏：网络状态控件在关闭按钮下方
+     * 横屏：网络状态控件在关闭按钮左侧
+     */
+    private void moveNetworkStatusLayout() {
+        final int idStatusBarCloseIv = plvsaStatusBarCloseIv.getId();
+        final int idNetworkStatusLayout = plvsaStatusBarNetworkStatusLayout.getId();
+
+        ConstraintLayout.LayoutParams networkStatusLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarNetworkStatusLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams teacherLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarStreamerTeacherLayout.getLayoutParams();
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            networkStatusLayoutParam.topToBottom = idStatusBarCloseIv;
+            networkStatusLayoutParam.rightToRight = idStatusBarCloseIv;
+            networkStatusLayoutParam.endToEnd = idStatusBarCloseIv;
+            networkStatusLayoutParam.rightToLeft = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.endToStart = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.topToTop = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            networkStatusLayoutParam.topMargin = ConvertUtils.dp2px(12);
+            networkStatusLayoutParam.rightMargin = 0;
+            networkStatusLayoutParam.setMarginEnd(0);
+
+            teacherLayoutParam.rightToLeft = idNetworkStatusLayout;
+            teacherLayoutParam.endToStart = idNetworkStatusLayout;
+        } else {
+            networkStatusLayoutParam.topToBottom = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.rightToRight = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.endToEnd = ConstraintLayout.LayoutParams.UNSET;
+            networkStatusLayoutParam.rightToLeft = idStatusBarCloseIv;
+            networkStatusLayoutParam.endToStart = idStatusBarCloseIv;
+            networkStatusLayoutParam.topToTop = idStatusBarCloseIv;
+            networkStatusLayoutParam.bottomToBottom = idStatusBarCloseIv;
+
+            networkStatusLayoutParam.topMargin = 0;
+            networkStatusLayoutParam.rightMargin = ConvertUtils.dp2px(8);
+            networkStatusLayoutParam.setMarginEnd(ConvertUtils.dp2px(8));
+
+            teacherLayoutParam.rightToLeft = ConstraintLayout.LayoutParams.UNSET;
+            teacherLayoutParam.endToStart = ConstraintLayout.LayoutParams.UNSET;
+        }
+
+        plvsaStatusBarNetworkStatusLayout.setLayoutParams(networkStatusLayoutParam);
+        plvsaStatusBarStreamerTeacherLayout.setLayoutParams(teacherLayoutParam);
     }
 
     // </editor-fold>

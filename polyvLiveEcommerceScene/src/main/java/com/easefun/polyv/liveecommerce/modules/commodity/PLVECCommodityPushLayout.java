@@ -76,7 +76,7 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
         commodityNameTv.setText(name);
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
-        commoditySrcPriceTv.setVisibility(realPrice == srcPrice ? View.GONE : View.VISIBLE);
+        commoditySrcPriceTv.setVisibility((Math.abs(realPrice - srcPrice) < 0.0000001 || srcPrice == 0) ? View.GONE : View.VISIBLE);
         commoditySrcPriceTv.setText("¥" + trimZero(nf.format(srcPrice)));
         commodityRealPriceTv.setText(realPrice == 0 ? "免费" : ("¥" + trimZero(nf.format(realPrice))));
     }

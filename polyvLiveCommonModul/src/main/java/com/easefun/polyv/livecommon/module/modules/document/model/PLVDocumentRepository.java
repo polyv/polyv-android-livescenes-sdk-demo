@@ -18,9 +18,12 @@ import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.document.PLVDocumentWebProcessor;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -109,6 +112,12 @@ public class PLVDocumentRepository {
                             webProcessor.getWebview().callMessage(PLVLivePPTProcessor.UPDATE_PPT, message);
                         }
                     }
+
+                    //如果开播端异常退出，需要恢复直播的话，更新退出前的数据
+                    if(PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event) &&
+                            liveRoomDataManager.isNeedStreamRecover()){
+                        updatePPTStatusByOnSliceID(message);
+                    }
                 }
             };
             PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
@@ -158,6 +167,21 @@ public class PLVDocumentRepository {
         });
     }
 
+    /**
+     * 通过onSliceID更新pptStatus信息
+     * @param message
+     */
+    private void updatePPTStatusByOnSliceID(String message){
+        PLVOnSliceIDEvent event = PLVGsonUtil.fromJson(PLVOnSliceIDEvent.class, message);
+        if(event != null && event.getData() != null){
+            PLVOnSliceIDEvent.DataBean data = event.getData();
+            PLVSPPTStatus pptStatus = new PLVSPPTStatus();
+            pptStatus.setAutoId(data.getAutoId());
+            pptStatus.setStep(PLVFormatUtils.integerValueOf(data.getStep(), 0));
+            pptStatus.setPageId(data.getPageId());
+            plvsPptStatusLiveData.postValue(pptStatus);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - Webview">

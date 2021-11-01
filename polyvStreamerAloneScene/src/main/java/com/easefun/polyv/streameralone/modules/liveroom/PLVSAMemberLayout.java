@@ -4,6 +4,7 @@ import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -28,6 +30,8 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
@@ -37,8 +41,21 @@ import java.util.List;
  */
 public class PLVSAMemberLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 竖屏时屏幕高度
+    private static final int SCREEN_HEIGHT_IN_PORT = Math.max(ScreenUtils.getScreenHeight(), ScreenUtils.getScreenWidth());
+    // 横屏时菜单横向尺寸
+    private static final int MENU_SIZE_LAND = ConvertUtils.dp2px(400);
+    // 清晰度弹层布局位置
+    private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
+    private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 布局背景
+    private static final int LAYOUT_BACKGROUND_RES_PORT = R.drawable.plvsa_more_ly_shape;
+    private static final int LAYOUT_BACKGROUND_RES_LAND = R.drawable.plvsa_more_ly_shape_land;
+
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //view
+    private LinearLayout plvsaMemberLayout;
     private TextView plvsaMemberOnlineCountTv;
     private RecyclerView plvsaMemberListRv;
     //adapter
@@ -72,10 +89,9 @@ public class PLVSAMemberLayout extends FrameLayout {
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_member_layout, this);
 
+        plvsaMemberLayout = findViewById(R.id.plvsa_member_layout);
         plvsaMemberOnlineCountTv = findViewById(R.id.plvsa_member_online_count_tv);
         plvsaMemberListRv = findViewById(R.id.plvsa_member_list_rv);
-
-
     }
     // </editor-fold>
 
@@ -91,6 +107,7 @@ public class PLVSAMemberLayout extends FrameLayout {
             public void onMicControl(int position, boolean isMute) {
                 if (streamerPresenter != null) {
                     streamerPresenter.muteUserMedia(position, false, isMute);
+                    toastMuteMic(isMute);
                 }
             }
 
@@ -98,6 +115,7 @@ public class PLVSAMemberLayout extends FrameLayout {
             public void onCameraControl(int position, boolean isMute) {
                 if (streamerPresenter != null) {
                     streamerPresenter.muteUserMedia(position, true, isMute);
+                    toastMuteCamera(isMute);
                 }
             }
 
@@ -114,18 +132,16 @@ public class PLVSAMemberLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="API">
     public void open() {
-        final int portraitHeight = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         if (menuDrawer == null) {
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),
                     PLVMenuDrawer.Type.OVERLAY,
-                    Position.BOTTOM,
+                    PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND,
                     PLVMenuDrawer.MENU_DRAG_CONTAINER,
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
             menuDrawer.setMenuView(this);
             menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
-            menuDrawer.setMenuSize((int) (portraitHeight * (memberAdapter.getItemCount() > 10 ? 0.75 : 0.5)));
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
             menuDrawer.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
@@ -155,12 +171,12 @@ public class PLVSAMemberLayout extends FrameLayout {
                     }
                 }
             });
-            menuDrawer.openMenu();
         } else {
-            menuDrawer.setMenuSize((int) (portraitHeight * (memberAdapter.getItemCount() > 10 ? 0.75 : 0.5)));
             menuDrawer.attachToContainer();
-            menuDrawer.openMenu();
         }
+
+        updateViewWithOrientation();
+        menuDrawer.openMenu();
     }
 
     public void close() {
@@ -305,6 +321,41 @@ public class PLVSAMemberLayout extends FrameLayout {
     };
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateViewWithOrientation();
+    }
+
+    private void updateViewWithOrientation() {
+        // 竖屏时菜单竖向尺寸
+        final int menuSizePort = (int) (SCREEN_HEIGHT_IN_PORT * (memberAdapter.getItemCount() > 10 ? 0.75 : 0.5));
+
+        int menuSize;
+        Position menuPosition;
+        int layoutBackgroundResId;
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            menuSize = menuSizePort;
+            menuPosition = MENU_DRAWER_POSITION_PORT;
+            layoutBackgroundResId = LAYOUT_BACKGROUND_RES_PORT;
+        } else {
+            menuSize = MENU_SIZE_LAND;
+            menuPosition = MENU_DRAWER_POSITION_LAND;
+            layoutBackgroundResId = LAYOUT_BACKGROUND_RES_LAND;
+        }
+
+        if (menuDrawer != null) {
+            menuDrawer.setMenuSize(menuSize);
+            menuDrawer.setPosition(menuPosition);
+        }
+        plvsaMemberLayout.setBackgroundResource(layoutBackgroundResId);
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部方法">
     private void toastUserLinkMicMsg(List<PLVLinkMicItemDataBean> linkMicItemDataBeans, boolean isJoin) {
         if (streamerPresenter != null && streamerPresenter.getStreamerStatus() != PLVStreamerPresenter.STREAMER_STATUS_START_SUCCESS) {
@@ -319,6 +370,20 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
         PLVToast.Builder.context(getContext())
                 .setText(firstLinkMicItem.getNick() + "已" + (isJoin ? "上麦" : "下麦"))
+                .build()
+                .show();
+    }
+
+    private void toastMuteMic(boolean isMute) {
+        PLVToast.Builder.context(getContext())
+                .setText("麦克风" + (isMute ? "关闭" : "开启"))
+                .build()
+                .show();
+    }
+
+    private void toastMuteCamera(boolean isMute) {
+        PLVToast.Builder.context(getContext())
+                .setText("摄像头" + (isMute ? "关闭" : "开启"))
                 .build()
                 .show();
     }

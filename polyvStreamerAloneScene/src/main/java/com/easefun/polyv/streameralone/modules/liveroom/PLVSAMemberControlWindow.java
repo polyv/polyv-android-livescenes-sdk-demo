@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -100,8 +101,12 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberBanIv.setSelected(isBan);
         plvsaMemberBanTv.setText(isBan ? "取消禁言" : "禁言");
 
-        int portraitHeight = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
-        int portraitWidth = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
+        final int maxScreenLength = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
+        final int minScreenLength = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
+        final boolean isPortrait = PLVScreenUtils.isPortrait(view.getContext());
+
+        int screenHeight = isPortrait ? maxScreenLength : minScreenLength;
+        int screenWidth = isPortrait ? minScreenLength : maxScreenLength;
 
         View contentView = popupWindow.getContentView();
         contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -111,7 +116,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         int[] location = new int[2];
         view.getLocationInWindow(location);//window
 
-        boolean isSideUp = contentViewHeight + location[1] + view.getHeight() > portraitHeight;
+        boolean isSideUp = contentViewHeight + location[1] + view.getHeight() > screenHeight;
         if (isSideUp) {
             plvsaMemberTopTriangleView.setVisibility(View.GONE);
             plvsaMemberBottomTriangleView.setVisibility(View.VISIBLE);
@@ -119,7 +124,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
             plvsaMemberTopTriangleView.setVisibility(View.VISIBLE);
             plvsaMemberBottomTriangleView.setVisibility(View.GONE);
         }
-        int contentViewX = portraitWidth - ConvertUtils.dp2px(8) - contentViewWidth;
+        int contentViewX = screenWidth - ConvertUtils.dp2px(8) - contentViewWidth;
         int contentViewY = isSideUp ? (location[1] - contentViewHeight) : (location[1] + view.getHeight());
         int triangleX = location[0] + view.getWidth() / 2 - contentViewX - ConvertUtils.dp2px(8);
         ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) plvsaMemberBottomTriangleView.getLayoutParams();

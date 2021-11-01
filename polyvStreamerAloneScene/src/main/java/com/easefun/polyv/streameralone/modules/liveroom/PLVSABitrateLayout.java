@@ -8,30 +8,56 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * 清晰度设置布局
  */
 public class PLVSABitrateLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 清晰度表格每行显示数量
+    private static final int BITRATE_LAYOUT_SPAN_PORT = 3;
+    private static final int BITRATE_LAYOUT_SPAN_LAND = 1;
+    // 清晰度弹层布局位置
+    private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
+    private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 清晰度布局宽度、高度、布局位置
+    private static final int BITRATE_LAYOUT_WIDTH_PORT = ViewGroup.LayoutParams.MATCH_PARENT;
+    private static final int BITRATE_LAYOUT_WIDTH_LAND = ConvertUtils.dp2px(214);
+    private static final int BITRATE_LAYOUT_HEIGHT_PORT = ConvertUtils.dp2px(214);
+    private static final int BITRATE_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
+    private static final int BITRATE_LAYOUT_GRAVITY_PORT = Gravity.BOTTOM;
+    private static final int BITRATE_LAYOUT_GRAVITY_LAND = Gravity.END;
+    // 清晰度布局背景
+    private static final int BITRATE_LAYOUT_BACKGROUND_RES_PORT = R.drawable.plvsa_setting_bitrate_ly_shape;
+    private static final int BITRATE_LAYOUT_BACKGROUND_RES_LAND = R.drawable.plvsa_setting_bitrate_ly_shape_land;
+
     //布局弹层
     private PLVMenuDrawer menuDrawer;
 
     //view
+    private RelativeLayout plvsaSettingBitrateLayoutRoot;
+    private TextView plvsaSettingBitrateTv;
     private RecyclerView plvsaSettingBitrateRv;
 
     //adapter
     private BitrateAdapter bitrateAdapter;
+    // Layout Manager
+    private GridLayoutManager bitrateLayoutManager;
 
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
@@ -57,11 +83,13 @@ public class PLVSABitrateLayout extends FrameLayout {
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_setting_bitrate_layout, this, true);
 
+        plvsaSettingBitrateLayoutRoot = findViewById(R.id.plvsa_setting_bitrate_layout_root);
+        plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
         plvsaSettingBitrateRv = findViewById(R.id.plvsa_setting_bitrate_rv);
 
-        plvsaSettingBitrateRv.setLayoutManager(new GridLayoutManager(getContext(), 3));
-//        plvsaSettingBitrateRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(6), 0));
         bitrateAdapter = new BitrateAdapter();
+        bitrateLayoutManager = new GridLayoutManager(getContext(), 3);
+        plvsaSettingBitrateRv.setLayoutManager(bitrateLayoutManager);
         plvsaSettingBitrateRv.setAdapter(bitrateAdapter);
     }
     // </editor-fold>
@@ -72,12 +100,13 @@ public class PLVSABitrateLayout extends FrameLayout {
         if (onViewActionListener != null && onViewActionListener.getBitrateInfo() != null) {
             bitrateAdapter.updateData(onViewActionListener.getBitrateInfo().first, onViewActionListener.getBitrateInfo().second);
         }
+        updateViewWithOrientation();
 
         if (menuDrawer == null) {
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),
                     PLVMenuDrawer.Type.OVERLAY,
-                    Position.BOTTOM,
+                    PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND,
                     PLVMenuDrawer.MENU_DRAG_CONTAINER,
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
@@ -144,6 +173,36 @@ public class PLVSABitrateLayout extends FrameLayout {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    private void updateViewWithOrientation() {
+        Position menuDrawerPosition;
+        FrameLayout.LayoutParams bitrateLayoutParam = (LayoutParams) plvsaSettingBitrateLayoutRoot.getLayoutParams();
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            bitrateLayoutParam.width = BITRATE_LAYOUT_WIDTH_PORT;
+            bitrateLayoutParam.height = BITRATE_LAYOUT_HEIGHT_PORT;
+            bitrateLayoutParam.gravity = BITRATE_LAYOUT_GRAVITY_PORT;
+            bitrateLayoutManager.setSpanCount(BITRATE_LAYOUT_SPAN_PORT);
+            plvsaSettingBitrateLayoutRoot.setBackgroundResource(BITRATE_LAYOUT_BACKGROUND_RES_PORT);
+            menuDrawerPosition = MENU_DRAWER_POSITION_PORT;
+        } else {
+            bitrateLayoutParam.width = BITRATE_LAYOUT_WIDTH_LAND;
+            bitrateLayoutParam.height = BITRATE_LAYOUT_HEIGHT_LAND;
+            bitrateLayoutParam.gravity = BITRATE_LAYOUT_GRAVITY_LAND;
+            bitrateLayoutManager.setSpanCount(BITRATE_LAYOUT_SPAN_LAND);
+            plvsaSettingBitrateLayoutRoot.setBackgroundResource(BITRATE_LAYOUT_BACKGROUND_RES_LAND);
+            menuDrawerPosition = MENU_DRAWER_POSITION_LAND;
+        }
+
+        plvsaSettingBitrateLayoutRoot.setLayoutParams(bitrateLayoutParam);
+        if (menuDrawer != null) {
+            menuDrawer.setPosition(menuDrawerPosition);
+        }
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部类 - 清晰度适配器">
     private class BitrateAdapter extends RecyclerView.Adapter<BitrateAdapter.BitrateViewHolder> {
         private int maxBitrate;
@@ -157,13 +216,9 @@ public class PLVSABitrateLayout extends FrameLayout {
 
         @Override
         public void onBindViewHolder(@NonNull final BitrateViewHolder holder, int position) {
-            String bitrateText = getBitrateText(position);
+            String bitrateText = getBitrateTextByBitrate(getBitrate(position));
             holder.plvsaBitrateTv.setText(bitrateText);
-            if (position == selPosition) {
-                holder.plvsaBitrateParentLy.setSelected(true);
-            } else {
-                holder.plvsaBitrateParentLy.setSelected(false);
-            }
+            holder.plvsaBitrateParentLy.setSelected(position == selPosition);
             holder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -190,25 +245,17 @@ public class PLVSABitrateLayout extends FrameLayout {
             notifyDataSetChanged();
         }
 
-        private String getBitrateText(int position) {
-            String bitrateText = "";
-            if (position == 0) {
-                bitrateText = maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? "超清" : maxBitrate == PLVSStreamerConfig.Bitrate.BITRATE_HIGH ? "高清" : "标清";
-            } else if (position == 1) {
-                bitrateText = maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? "高清" : "标清";
-            } else if (position == 2) {
-                bitrateText = "标清";
-            }
-            return bitrateText;
+        private String getBitrateTextByBitrate(int bitrate) {
+            return PLVStreamerConfig.Bitrate.getText(bitrate);
         }
 
         private int getBitrate(int pos) {
             if (pos == 0) {
-                return maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? PLVSStreamerConfig.Bitrate.BITRATE_SUPER : maxBitrate == PLVSStreamerConfig.Bitrate.BITRATE_HIGH ? PLVSStreamerConfig.Bitrate.BITRATE_HIGH : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
+                return maxBitrate >= PLVStreamerConfig.Bitrate.BITRATE_SUPER ? PLVStreamerConfig.Bitrate.BITRATE_SUPER : maxBitrate == PLVStreamerConfig.Bitrate.BITRATE_HIGH ? PLVStreamerConfig.Bitrate.BITRATE_HIGH : PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
             } else if (pos == 1) {
-                return maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? PLVSStreamerConfig.Bitrate.BITRATE_HIGH : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
+                return maxBitrate >= PLVStreamerConfig.Bitrate.BITRATE_SUPER ? PLVStreamerConfig.Bitrate.BITRATE_HIGH : PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
             } else {
-                return PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
+                return PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
             }
         }
 

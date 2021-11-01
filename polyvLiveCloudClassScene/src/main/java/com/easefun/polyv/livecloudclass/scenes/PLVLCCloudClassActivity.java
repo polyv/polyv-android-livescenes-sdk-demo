@@ -678,6 +678,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     //对于三分屏频道，如果PPT此时还在悬浮窗，则将PPT从悬浮窗切到主屏幕，将播放器从主屏幕切到悬浮窗
                     if (floatingPPTLayout.isPPTInFloatingLayout()) {
                         pptViewSwitcher.switchView();
+                        linkMicLayout.notifySwitchedPptToMainScreenOnJoinChannel();
                     }
                 }
                 //隐藏悬浮窗

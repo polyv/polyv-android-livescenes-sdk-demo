@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
+import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -31,6 +34,10 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 
@@ -39,6 +46,17 @@ import java.util.ArrayList;
  */
 public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 设置配置布局左右间距
+    private final static int SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT = ConvertUtils.dp2px(24);
+    private final static int SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND = ConvertUtils.dp2px(132);
+    // 开始直播按钮左右间距
+    private final static int START_LIVE_BUTTON_HORIZON_MARGIN_PORT = ConvertUtils.dp2px(24);
+    private final static int START_LIVE_BUTTON_HORIZON_MARGIN_LAND = ConvertUtils.dp2px(144);
+    // 标题框最大显示行数
+    private final static int LIVE_TITLE_MAX_LINES_PORT = Integer.MAX_VALUE;
+    private final static int LIVE_TITLE_MAX_LINES_LAND = 2;
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //data
@@ -59,12 +77,15 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ImageView plvsaSettingClosePageIv;
     private ConstraintLayout plvsaSettingConfigLy;
     private TextView plvsaSettingLiveTitleTv;
+    private View plvsaSettingLiveTitleSplitView;
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
+    private ImageView plvsaSettingScreenOrientationIv;
     private TextView plvsaSettingCameraOrientTv;
     private TextView plvsaSettingMirrorTv;
     private TextView plvsaSettingBitrateTv;
+    private TextView plvsaSettingScreenOrientationTv;
     private Button plvsaSettingStartLiveBtn;
 
     private String liveTitle;
@@ -100,12 +121,15 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingClosePageIv = findViewById(R.id.plvsa_setting_close_page_iv);
         plvsaSettingConfigLy = findViewById(R.id.plvsa_setting_config_ly);
         plvsaSettingLiveTitleTv = findViewById(R.id.plvsa_setting_live_title_tv);
+        plvsaSettingLiveTitleSplitView = findViewById(R.id.plvsa_setting_live_title_split_view);
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
         plvsaSettingBitrateIv = findViewById(R.id.plvsa_setting_bitrate_iv);
+        plvsaSettingScreenOrientationIv = findViewById(R.id.plvsa_setting_screen_orientation_iv);
         plvsaSettingCameraOrientTv = findViewById(R.id.plvsa_setting_camera_orient_tv);
         plvsaSettingMirrorTv = findViewById(R.id.plvsa_setting_mirror_tv);
         plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
+        plvsaSettingScreenOrientationTv = findViewById(R.id.plvsa_setting_screen_orientation_tv);
         plvsaSettingStartLiveBtn = findViewById(R.id.plvsa_setting_start_live_btn);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
@@ -116,6 +140,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingMirrorTv.setOnClickListener(this);
         plvsaSettingBitrateIv.setOnClickListener(this);
         plvsaSettingBitrateTv.setOnClickListener(this);
+        plvsaSettingScreenOrientationIv.setOnClickListener(this);
+        plvsaSettingScreenOrientationTv.setOnClickListener(this);
 
         initTitleInputLayout();
         initBitrateLayout();
@@ -172,8 +198,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 if (onViewActionListener != null) {
                     onViewActionListener.onBitrateClick(bitrate);
                 }
-                plvsaSettingBitrateTv.setText(PLVSStreamerConfig.Bitrate.getText(bitrate));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrate));
                 updateBitrateIcon(bitrate);
+                PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrate);
             }
         });
         bitrateLayout.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
@@ -205,6 +232,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             @Override
             public void onClick(View v) {
                 ViewGroup.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                removeView(titleInputLayout);
                 addView(titleInputLayout, layoutParams);
             }
         });
@@ -251,7 +279,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (onViewActionListener != null) {
             Pair<Integer, Integer> bitrateInfo = onViewActionListener.getBitrateInfo();
             if (bitrateInfo != null) {
-                plvsaSettingBitrateTv.setText(PLVSStreamerConfig.Bitrate.getText(bitrateInfo.second));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrateInfo.second));
                 updateBitrateIcon(bitrateInfo.second);
             }
         }
@@ -291,7 +319,28 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     public boolean onBackPressed() {
         return bitrateLayout.onBackPressed();
     }
-    // </editor-fold>
+
+    @Override
+    public void liveStart() {
+        if (onViewActionListener != null) {
+            int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
+            if (currentNetworkQuality == PLVSStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                //如果断网，则不直播，显示弹窗。
+                showAlertDialogNoNetwork();
+                return;
+            }
+        }
+        if (liveTitle.length() == 0) {
+            PLVToast.Builder.context(getContext())
+                    .setText("直播标题不能为空")
+                    .build()
+                    .show();
+            return;
+        }
+        checkPermissionToStartCountDown();
+    }
+
+// </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 MVP - View">
 
@@ -308,7 +357,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         return;
                     }
                     switchBitrateByUser = false;
-                    String toastText = "已切换为" + PLVSStreamerConfig.Bitrate.getText(bitrate);
+                    String toastText = "已切换为" + PLVStreamerConfig.Bitrate.getText(bitrate);
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -344,35 +393,51 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        MarginLayoutParams settingConfigLayoutParam = (MarginLayoutParams) plvsaSettingConfigLy.getLayoutParams();
+        MarginLayoutParams startLiveButtonParam = (MarginLayoutParams) plvsaSettingStartLiveBtn.getLayoutParams();
+        int liveTitleMaxLines;
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND;
+            startLiveButtonParam.leftMargin = startLiveButtonParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_LAND;
+            liveTitleMaxLines = LIVE_TITLE_MAX_LINES_LAND;
+        } else {
+            settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT;
+            startLiveButtonParam.leftMargin = startLiveButtonParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_PORT;
+            liveTitleMaxLines = LIVE_TITLE_MAX_LINES_PORT;
+        }
+
+        plvsaSettingConfigLy.setLayoutParams(settingConfigLayoutParam);
+        plvsaSettingStartLiveBtn.setLayoutParams(startLiveButtonParam);
+        plvsaSettingLiveTitleTv.setMaxLines(liveTitleMaxLines);
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
+        if (!PLVDebounceClicker.tryClick(this)) {
+            return;
+        }
         int id = v.getId();
         if (id == R.id.plvsa_setting_close_page_iv) {
             ((Activity) getContext()).onBackPressed();
         } else if (id == R.id.plvsa_setting_start_live_btn) {
-            if (onViewActionListener != null) {
-                int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-                if (currentNetworkQuality == PLVSStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
-                    //如果断网，则不直播，显示弹窗。
-                    showAlertDialogNoNetwork();
-                    return;
-                }
-            }
-            if (liveTitle.length() == 0) {
-                PLVToast.Builder.context(getContext())
-                        .setText("直播标题不能为空")
-                        .build()
-                        .show();
-                return;
-            }
-            checkPermissionToStartCountDown();
+            liveStart();
         } else if (id == R.id.plvsa_setting_camera_orient_iv
                 || id == R.id.plvsa_setting_camera_orient_tv) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastClickCameraSwitchViewTime > 500) {
                 if (streamerPresenter != null) {
                     streamerPresenter.setCameraDirection(!isFrontCamera);
+                    PLVLiveLocalActionHelper.getInstance().updateCameraDirection(!isFrontCamera);
                 }
                 lastClickCameraSwitchViewTime = currentTime;
             }
@@ -384,6 +449,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == R.id.plvsa_setting_bitrate_iv
                 || id == R.id.plvsa_setting_bitrate_tv) {
             bitrateLayout.open();
+        } else if (id == plvsaSettingScreenOrientationIv.getId()
+                || id == plvsaSettingScreenOrientationTv.getId()) {
+            changeScreenOrientation();
         }
     }
     // </editor-fold>
@@ -456,16 +524,28 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     private void updateBitrateIcon(int selectedBitrate) {
         switch (selectedBitrate) {
-            case PLVSStreamerConfig.Bitrate.BITRATE_STANDARD:
+            case PLVStreamerConfig.Bitrate.BITRATE_STANDARD:
                 plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_sd);
                 break;
-            case PLVSStreamerConfig.Bitrate.BITRATE_HIGH:
+            case PLVStreamerConfig.Bitrate.BITRATE_HIGH:
                 plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_hd);
                 break;
-            case PLVSStreamerConfig.Bitrate.BITRATE_SUPER:
+            case PLVStreamerConfig.Bitrate.BITRATE_SUPER:
                 plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_uhd);
                 break;
             default:
+        }
+    }
+
+    private void changeScreenOrientation() {
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            PLVScreenUtils.enterLandscape((Activity) getContext());
+            ScreenUtils.setLandscape((Activity) getContext());
+            PLVLiveLocalActionHelper.getInstance().updateOrientation(false);
+        } else {
+            PLVScreenUtils.enterPortrait((Activity) getContext());
+            ScreenUtils.setPortrait((Activity) getContext());
+            PLVLiveLocalActionHelper.getInstance().updateOrientation(true);
         }
     }
 

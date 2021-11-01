@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -59,7 +60,6 @@ public class PLVSACleanUpLayout extends FrameLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_clean_up_layout, this);
         findView();
         initConfirmBtnOnClickListener();
-        initCleanUpIconAnimation();
 
         setVisibility(GONE);
     }
@@ -79,22 +79,6 @@ public class PLVSACleanUpLayout extends FrameLayout {
         });
     }
 
-    /**
-     * 初始化清屏指引动画
-     * 清屏指引图标左右平移
-     * <p>
-     * 屏幕左右安全区域大小：50dp
-     */
-    private void initCleanUpIconAnimation() {
-        final int safeMarginDp = 50;
-        final int cleanUpIconIvWidthDp = 123;
-        final int left = ConvertUtils.dp2px(safeMarginDp);
-        final int right = ScreenUtils.getScreenWidth() - ConvertUtils.dp2px(safeMarginDp + cleanUpIconIvWidthDp);
-        final int maxTranslationX = right - left;
-        cleanUpIconAnimator = ObjectAnimator.ofFloat(plvsaLiveRoomCleanUpIconIv, "translationX", 0, maxTranslationX, 0);
-        cleanUpIconAnimator.setDuration(2000);
-        cleanUpIconAnimator.setRepeatCount(ValueAnimator.INFINITE);
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流 MVP - View">
@@ -118,15 +102,11 @@ public class PLVSACleanUpLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="View父类方法重写">
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        cleanUpIconAnimator.start();
-    }
-
-    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        cleanUpIconAnimator.cancel();
+        if (cleanUpIconAnimator != null) {
+            cleanUpIconAnimator.cancel();
+        }
     }
     // </editor-fold>
 
@@ -145,8 +125,32 @@ public class PLVSACleanUpLayout extends FrameLayout {
         if (!isStreaming) {
             return false;
         }
+        if (cleanUpIconAnimator == null) {
+            setupCleanUpIconAnimation();
+        }
+        cleanUpIconAnimator.start();
         setVisibility(VISIBLE);
         return true;
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理 - 动效初始化">
+
+    /**
+     * 初始化清屏指引动画
+     * 清屏指引图标左右平移
+     * <p>
+     * 屏幕左右安全区域大小：竖屏50dp、横屏180dp
+     */
+    private void setupCleanUpIconAnimation() {
+        final int safeMarginDp = PLVScreenUtils.isPortrait(getContext()) ? 50 : 180;
+        final int cleanUpIconIvWidthDp = 123;
+        final int availableTranslationWidth = ScreenUtils.getScreenOrientatedWidth() - ConvertUtils.dp2px(2 * safeMarginDp + cleanUpIconIvWidthDp);
+        cleanUpIconAnimator = ObjectAnimator.ofFloat(plvsaLiveRoomCleanUpIconIv, "translationX", -availableTranslationWidth / 2F, availableTranslationWidth / 2F, -availableTranslationWidth / 2F);
+        cleanUpIconAnimator.setDuration(2000);
+        cleanUpIconAnimator.setRepeatCount(ValueAnimator.INFINITE);
+    }
+
+    // </editor-fold>
+
 }

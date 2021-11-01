@@ -173,6 +173,10 @@ public class PLVLinkMicMsgHandler {
                     boolean isAudio = LINK_MIC_TYPE_AUDIO.equals(micMedia.getType());
                     for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
                         onLinkMicDataListener.onTeacherMuteMedia(isMute, isAudio);
+                        if(TextUtils.isEmpty(micMedia.getSocketId())){
+                            //如果soicketid为空，则认为是全体静音，而不是针对某个人的操作
+                            onLinkMicDataListener.onLinkMicConnectMode(isMute ? micMedia.getType() : "");
+                        }
                     }
                 }
                 break;

@@ -10,13 +10,12 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,6 +39,7 @@ import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPers
 import com.easefun.polyv.streameralone.modules.chatroom.utils.PLVSAChatroomUtils;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -84,29 +84,13 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     private ImageView plvsaEmojiTabEmojiIv;
     private ImageView plvsaEmojiTabPersonalIv;
     private RecyclerView emojiPersonalRv;
+    @Nullable
+    private TextView plvsaChatroomChatMsgSendTvLand;
 
     //个性化表情预览弹窗
     private PLVImagePreviewPopupWindow emotionPreviewWindow;
 
     // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="监听器">
-    private TextWatcher inputViewTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            if (s.length() > 0) {
-            } else {
-            }
-        }
-    };
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Override
@@ -115,7 +99,6 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         initParams();
         initView();
     }
-    // </editor-fold>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,6 +137,17 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
+
+    private void inflateView() {
+        ViewStub chatMsgInputViewStub;
+        if (PLVScreenUtils.isPortrait(this)) {
+            chatMsgInputViewStub = findViewById(R.id.plvsa_chatroom_chat_msg_input_layout_port_view_stub);
+        } else {
+            chatMsgInputViewStub = findViewById(R.id.plvsa_chatroom_chat_msg_input_layout_land_view_stub);
+        }
+        chatMsgInputViewStub.inflate();
+    }
+
     private void initView() {
         plvsaChatroomSelEmojiIv = findViewById(R.id.plvsa_chatroom_sel_emoji_iv);
         plvsaChatroomSelImgIv = findViewById(R.id.plvsa_chatroom_sel_img_iv);
@@ -169,6 +163,7 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         plvsaEmojiTabEmojiIv = findViewById(R.id.plvsa_emoji_tab_emoji_iv);
         plvsaEmojiTabPersonalIv = findViewById(R.id.plvsa_emoji_tab_personal_iv);
         emojiPersonalRv = findViewById(R.id.emoji_personal_rv);
+        plvsaChatroomChatMsgSendTvLand = findViewById(R.id.plvsa_chatroom_chat_msg_send_tv_land);
 
         emotionPreviewWindow = new PLVImagePreviewPopupWindow(this);
 
@@ -179,7 +174,9 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         plvsaChatroomMsgDeleteIv.setOnClickListener(this);
         plvsaChatroomMsgSendTv.setOnClickListener(this);
         plvsaChatroomCloseAnswerWindowTv.setOnClickListener(this);
-        plvsaChatroomChatMsgInputEt.addTextChangedListener(inputViewTextWatcher);
+        if (plvsaChatroomChatMsgSendTvLand != null) {
+            plvsaChatroomChatMsgSendTvLand.setOnClickListener(this);
+        }
 
         plvsaChatroomChatMsgInputEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -216,6 +213,13 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API - 实现父类PLVInputWindow定义的方法">
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        inflateView();
+    }
+
     @Override
     public boolean firstShowInput() {
         return true;
@@ -331,15 +335,16 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
             togglePopupLayout(plvsaChatroomSelEmojiIv, plvsaEmojiListLayout);
         } else if (id == R.id.delete_msg_iv) {
             PLVSAChatroomUtils.deleteEmoText(plvsaChatroomChatMsgInputEt);
-        } else if (id == R.id.send_msg_tv) {
+        } else if (id == R.id.send_msg_tv
+                || id == R.id.plvsa_chatroom_chat_msg_send_tv_land) {
             postMsgWithAnswer();
         } else if (id == R.id.plvsa_chatroom_sel_img_iv) {
             requestSelectImg();
         } else if (id == R.id.plvsa_chatroom_close_answer_window_tv) {
             plvsaChatroomAnswerLy.setVisibility(View.GONE);
-        } else if (id == R.id.plvsa_emoji_tab_emoji_iv){
+        } else if (id == R.id.plvsa_emoji_tab_emoji_iv) {
             changeEmojiTab(true);
-        } else if (id == R.id.plvsa_emoji_tab_personal_iv){
+        } else if (id == R.id.plvsa_emoji_tab_personal_iv) {
             changeEmojiTab(false);
         }
     }

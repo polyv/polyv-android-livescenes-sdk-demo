@@ -1,6 +1,7 @@
 package com.easefun.polyv.livestreamer.scenes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.View;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -28,6 +30,7 @@ import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentContr
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
  * 手机开播三分屏场景界面。
@@ -140,6 +143,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         initLiveRoomManager();
         initView();
 
+        checkStreamRecover();
+
         observeStatusBarLayout();
         observeStreamerLayout();
         observeChatroomLayout();
@@ -221,6 +226,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, role, actor);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setColinMicType(colinMicType);
+
+        PLVLiveLocalActionHelper.getInstance().enterChannel(channelId);
     }
     // </editor-fold>
 
@@ -460,11 +467,13 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
             @Override
             public boolean onCameraControl(boolean isMute) {
+                PLVLiveLocalActionHelper.getInstance().updateCameraEnable(!isMute);
                 return plvlsStreamerLy.enableLocalVideo(!isMute);
             }
 
             @Override
             public boolean onFrontCameraControl(boolean isFront) {
+                PLVLiveLocalActionHelper.getInstance().updateCameraDirection(isFront);
                 return plvlsStreamerLy.setCameraDirection(isFront);
             }
         });
@@ -514,4 +523,39 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         });
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="设置直播恢复">
+
+    private void checkStreamRecover() {
+        boolean isTeacher = PLVSocketUserConstant.USERTYPE_TEACHER.equals(PLVLiveChannelConfigFiller.generateNewChannelConfig().getUser().getViewerType());
+
+        if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setMessage("检测到之前异常退出\n是否恢复直播？")
+                    .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            liveRoomDataManager.setNeedStreamRecover(false);
+                            plvlsStreamerLy.getStreamerPresenter().setRecoverStream(false);
+                            plvlsStreamerLy.stopClass();
+                        }
+                    })
+                    .setNegativeButton("恢复直播", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            liveRoomDataManager.setNeedStreamRecover(true);
+                            plvlsStreamerLy.getStreamerPresenter().setRecoverStream(true);
+                            PLVLiveLocalActionHelper.Action action = PLVLiveLocalActionHelper.getInstance().getChannelAction(liveRoomDataManager.getConfig().getChannelId());
+                            plvlsStatusBarLy.switchPptType(action.pptType);
+                            plvlsStreamerLy.setCameraDirection(action.isFrontCamera);
+                            plvlsStreamerLy.enableLocalVideo(action.isEnableCamera);
+                            plvlsStreamerLy.startClass();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    // </editor-fold >
 }
