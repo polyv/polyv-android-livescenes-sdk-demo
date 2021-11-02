@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic.adapter;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -343,7 +344,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     @NonNull
     @Override
     public LinkMicItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_linkmic_scroll_item, parent, false);
+        final View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_linkmic_scroll_item, parent, false);
         itemView.getLayoutParams().width = getItemWidth();
         itemView.requestLayout();
 
@@ -361,16 +362,38 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             @Override
             public void onLayoutChange(View v, final int left, int top, final int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 final int newWidth = right - left;
+                final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(viewHolder.qualityWidget.getLayoutParams());
                 //切换到主屏幕的时候，不要显示view holder的昵称和麦克风
                 if (newWidth != getItemWidth()) {
                     viewHolder.tvNick.setVisibility(View.GONE);
                     viewHolder.ivMicState.setVisibility(View.GONE);
+                    v.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (itemView.getContext() != null) {
+                                if (PLVScreenUtils.isPortrait(itemView.getContext())) {
+                                    updateNetQualityLayout(itemView.getContext(), layoutParams, 20, 12);
+                                } else {
+                                    updateNetQualityLayout(itemView.getContext(), layoutParams, 24, 16);
+                                }
+                                viewHolder.qualityWidget.setLayoutParams(layoutParams);
+                            }
+                        }
+                    });
                 } else {
                     v.post(new Runnable() {
                         @Override
                         public void run() {
                             viewHolder.tvNick.setVisibility(View.VISIBLE);
                             viewHolder.ivMicState.setVisibility(View.VISIBLE);
+                            if (itemView.getContext() != null) {
+                                if (PLVScreenUtils.isPortrait(itemView.getContext())) {
+                                    updateNetQualityLayout(itemView.getContext(), layoutParams, 12, 4);
+                                } else {
+                                    updateNetQualityLayout(itemView.getContext(), layoutParams, 16, 4);
+                                }
+                                viewHolder.qualityWidget.setLayoutParams(layoutParams);
+                            }
                         }
                     });
                 }
@@ -494,6 +517,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 } else {
                     switchViewHasMedia = null;
                 }
+                updateAllItem();
             }
         });
 
@@ -738,6 +762,15 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //获取渲染器的布局参数
     private FrameLayout.LayoutParams getRenderViewLayoutParam() {
         return new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+    }
+
+    /** 更新上面网络信号塔的布局尺寸，size是信号塔的尺寸，distance是右边距和上边距 */
+    private void updateNetQualityLayout(Context context, FrameLayout.LayoutParams layoutParams, int size, int distance) {
+        layoutParams.width = PLVScreenUtils.dip2px(context, size);
+        layoutParams.height = PLVScreenUtils.dip2px(context, size);
+        layoutParams.gravity = Gravity.END|Gravity.TOP;
+        layoutParams.rightMargin = PLVScreenUtils.dip2px(context, distance);
+        layoutParams.topMargin = PLVScreenUtils.dip2px(context, distance);
     }
     // </editor-fold>
 

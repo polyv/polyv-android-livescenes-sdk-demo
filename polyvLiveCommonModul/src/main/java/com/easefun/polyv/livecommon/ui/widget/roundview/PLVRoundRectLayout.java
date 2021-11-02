@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.ui.widget.roundview;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Outline;
@@ -13,6 +14,7 @@ import android.view.ViewOutlineProvider;
 import android.widget.RelativeLayout;
 
 import com.easefun.polyv.livecommon.R;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 
 //need default bg
@@ -33,6 +35,8 @@ public class PLVRoundRectLayout extends RelativeLayout {
     public static final int MODE_BOTTOM = 5;
 
     private int mRoundMode = MODE_ALL;
+
+    private OnOrientationChangedListener onOrientationChangedListener;
 
     public PLVRoundRectLayout(Context context) {
         this(context, null);
@@ -97,6 +101,15 @@ public class PLVRoundRectLayout extends RelativeLayout {
         mRadius = radius;
     }
 
+    /**
+     * 设置屏幕旋转变化监听
+     * @param li 监听器
+     */
+    public void setOnOrientationChangedListener(OnOrientationChangedListener li) {
+        this.onOrientationChangedListener = li;
+        li.onChanged(ScreenUtils.isPortrait());
+    }
+
     private void checkPathChanged() {
 
         if (getWidth() == mWidth && getHeight() == mHeight && mLastRadius == mRadius) {
@@ -154,7 +167,17 @@ public class PLVRoundRectLayout extends RelativeLayout {
         } else {
             super.draw(canvas);
         }
+    }
 
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (onOrientationChangedListener != null) {
+            onOrientationChangedListener.onChanged(newConfig.orientation != Configuration.ORIENTATION_LANDSCAPE);
+        }
+    }
 
+    public interface OnOrientationChangedListener {
+        void onChanged(boolean isPortrait);
     }
 }

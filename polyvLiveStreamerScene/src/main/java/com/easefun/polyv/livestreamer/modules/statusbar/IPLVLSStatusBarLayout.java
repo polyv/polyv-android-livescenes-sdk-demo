@@ -63,6 +63,12 @@ public interface IPLVLSStatusBarLayout {
     void setStreamerStatus(boolean isStartedStatus);
 
     /**
+     * 切换选择的ppt类型
+     * @param pptType 0-白板；1-ppt
+     */
+    public void switchPptType(int pptType);
+
+    /**
      * 更新网络状态
      *
      * @param networkQuality 网络状态常量

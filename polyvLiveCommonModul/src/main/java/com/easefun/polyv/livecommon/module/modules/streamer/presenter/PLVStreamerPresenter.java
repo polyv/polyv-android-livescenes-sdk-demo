@@ -149,6 +149,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean curEnableLocalVideo = true;
     private boolean isFrontMirror = true;
     private int pushPictureResolution = PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE;
+    //开始推流是否需要恢复上一场的直播流，继续推流
+    private boolean isRecoverStream = false;
 
     /**** 容器 ****/
     //推流和连麦列表
@@ -321,6 +323,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public boolean isRecoverStream() {
+        return isRecoverStream;
+    }
+
+    @Override
     public boolean enableRecordingAudioVolume(final boolean enable) {
         curEnableRecordingAudioVolume = enable;
         if (!isInitStreamerManager()) {
@@ -412,6 +419,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void setRecoverStream(boolean recoverStream) {
+        isRecoverStream = recoverStream;
+    }
+
+    @Override
     public SurfaceView createRenderView(Context context) {
         return streamerManager.createRendererView(context);
     }
@@ -449,7 +461,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 return;
             //已经初始化
             case STREAMER_MIC_INITIATED:
-                streamerManager.startLiveStream();
+                streamerManager.startLiveStream(isRecoverStream);
                 break;
             default:
                 break;
@@ -458,6 +470,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public void stopLiveStream() {
+        isRecoverStream = false;
         streamerStatus = STREAMER_STATUS_STOP;
         streamerManager.stopLiveStream();
         streamerData.postStreamerStatus(false);
@@ -597,6 +610,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     public void destroy() {
         streamerInitState = STREAMER_MIC_UNINITIATED;
         streamerStatus = STREAMER_STATUS_STOP;
+        isRecoverStream = false;
 
         handler.removeCallbacksAndMessages(null);
         streamerMsgHandler.destroy();
@@ -1194,11 +1208,23 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     // <editor-fold defaultstate="collapsed" desc="数据存储">
     private void saveBitrate() {
+        if (curBitrate < PLVStreamerConfig.Bitrate.BITRATE_STANDARD
+                || curBitrate > PLVStreamerConfig.Bitrate.BITRATE_SUPER) {
+            // invalid bitrate data
+            return;
+        }
         SPUtils.getInstance().put("plv_key_bitrate", curBitrate);
     }
 
     private int loadBitrate() {
-        return SPUtils.getInstance().getInt("plv_key_bitrate", PLVStreamerConfig.Bitrate.BITRATE_SUPER);
+        int bitrate = SPUtils.getInstance().getInt("plv_key_bitrate", PLVStreamerConfig.Bitrate.BITRATE_SUPER);
+        if (bitrate < PLVStreamerConfig.Bitrate.BITRATE_STANDARD) {
+            bitrate = PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
+        }
+        if (bitrate > PLVStreamerConfig.Bitrate.BITRATE_SUPER) {
+            bitrate = PLVStreamerConfig.Bitrate.BITRATE_SUPER;
+        }
+        return bitrate;
     }
     // </editor-fold>
 

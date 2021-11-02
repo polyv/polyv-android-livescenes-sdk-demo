@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
@@ -39,7 +41,25 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
 
+    // 频道信息布局高度
+    private static final int CHANNEL_INFO_LAYOUT_HEIGHT_PORT = ViewGroup.LayoutParams.WRAP_CONTENT;
+    private static final int CHANNEL_INFO_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
+    // 频道信息布局弹层布局位置
+    private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
+    private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 频道信息线性布局方向
+    private static final int INFO_LINEAR_LAYOUT_ORIENTATION_PORT = LinearLayout.HORIZONTAL;
+    private static final int INFO_LINEAR_LAYOUT_ORIENTATION_LAND = LinearLayout.VERTICAL;
+    // 频道信息布局左右间距
+    private static final int INFO_PADDING_LEFT = ConvertUtils.dp2px(32);
+    private static final int INFO_PADDING_RIGHT_PORT = ConvertUtils.dp2px(32);
+    private static final int INFO_PADDING_RIGHT_LAND = ConvertUtils.dp2px(52);
+    // 频道信息布局布局背景
+    private static final int CHANNEL_INFO_LAYOUT_BACKGROUND_RES_PORT = R.drawable.plvsa_status_bar_channel_info_ly_shape;
+    private static final int CHANNEL_INFO_LAYOUT_BACKGROUND_RES_LAND = R.drawable.plvsa_status_bar_channel_info_ly_shape_land;
+
     private View rootView;
+    private RelativeLayout plvsaChannelInfoLayout;
     private TextView plvsaChannelInfoTv;
     private LinearLayout plvsaChannelInfoLl;
     private LinearLayout plvsaChannelInfoNameLl;
@@ -83,6 +103,7 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
     }
 
     private void findView() {
+        plvsaChannelInfoLayout = (RelativeLayout) findViewById(R.id.plvsa_channel_info_layout);
         plvsaChannelInfoTv = (TextView) findViewById(R.id.plvsa_channel_info_tv);
         plvsaChannelInfoLl = (LinearLayout) findViewById(R.id.plvsa_channel_info_ll);
         plvsaChannelInfoNameLl = (LinearLayout) findViewById(R.id.plvsa_channel_info_name_ll);
@@ -231,11 +252,12 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
                     }
                 }
             });
-            menuDrawer.openMenu();
         } else {
             menuDrawer.attachToContainer();
-            menuDrawer.openMenu();
         }
+
+        updateViewWithOrientation();
+        menuDrawer.openMenu();
     }
 
     public void close() {
@@ -257,6 +279,42 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
         }
         return false;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    private void updateViewWithOrientation() {
+        Position menuPosition;
+        int backgroundResId;
+        ViewGroup.LayoutParams channelInfoLayoutParam = plvsaChannelInfoLayout.getLayoutParams();
+        int infoLinearLayoutOrientation;
+        int channelInfoLayoutPaddingRight;
+
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            menuPosition = MENU_DRAWER_POSITION_PORT;
+            backgroundResId = CHANNEL_INFO_LAYOUT_BACKGROUND_RES_PORT;
+            channelInfoLayoutParam.height = CHANNEL_INFO_LAYOUT_HEIGHT_PORT;
+            infoLinearLayoutOrientation = INFO_LINEAR_LAYOUT_ORIENTATION_PORT;
+            channelInfoLayoutPaddingRight = INFO_PADDING_RIGHT_PORT;
+        } else {
+            menuPosition = MENU_DRAWER_POSITION_LAND;
+            backgroundResId = CHANNEL_INFO_LAYOUT_BACKGROUND_RES_LAND;
+            channelInfoLayoutParam.height = CHANNEL_INFO_LAYOUT_HEIGHT_LAND;
+            infoLinearLayoutOrientation = INFO_LINEAR_LAYOUT_ORIENTATION_LAND;
+            channelInfoLayoutPaddingRight = INFO_PADDING_RIGHT_LAND;
+        }
+
+        if (menuDrawer != null) {
+            menuDrawer.setPosition(menuPosition);
+        }
+        plvsaChannelInfoLayout.setBackgroundResource(backgroundResId);
+        plvsaChannelInfoLayout.setLayoutParams(channelInfoLayoutParam);
+        plvsaChannelInfoNameLl.setOrientation(infoLinearLayoutOrientation);
+        plvsaChannelInfoStartTimeLl.setOrientation(infoLinearLayoutOrientation);
+        plvsaChannelInfoIdLl.setOrientation(infoLinearLayoutOrientation);
+        plvsaChannelInfoLl.setPadding(INFO_PADDING_LEFT, 0, channelInfoLayoutPaddingRight, 0);
+    }
+
     // </editor-fold>
 
 }

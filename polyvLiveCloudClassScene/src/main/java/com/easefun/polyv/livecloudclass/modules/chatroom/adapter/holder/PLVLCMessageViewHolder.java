@@ -4,6 +4,7 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -11,8 +12,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;

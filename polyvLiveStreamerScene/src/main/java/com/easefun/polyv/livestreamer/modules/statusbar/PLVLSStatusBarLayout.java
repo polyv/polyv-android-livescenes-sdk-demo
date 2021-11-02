@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.statusbar;
 
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocum
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
@@ -39,8 +42,6 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.util.Locale;
-
-import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 状态栏布局
@@ -390,6 +391,14 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         }
     }
 
+    public void switchPptType(int pptType){
+        if(pptType == PLVDocumentMode.WHITEBOARD.ordinal()){
+            PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
+        } else if(pptType == PLVDocumentMode.PPT.ordinal()){
+            PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
+        }
+    }
+
     @Override
     public void updateNetworkQuality(int networkQuality) {
         plvlsStatusBarNetQualityView.setNetQuality(networkQuality);
@@ -538,9 +547,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             v.setSelected(!v.isSelected());
             linkMicControlWindow.show(v,linkMicShowType);
         } else if (id == R.id.plvls_status_bar_document_iv) {
+            PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.PPT.ordinal());
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
             processSelectDocument();
         } else if (id == R.id.plvls_status_bar_whiteboard_iv) {
+            PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.WHITEBOARD.ordinal());
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
             PLVDocumentPresenter.getInstance().changeToWhiteBoard();
         }

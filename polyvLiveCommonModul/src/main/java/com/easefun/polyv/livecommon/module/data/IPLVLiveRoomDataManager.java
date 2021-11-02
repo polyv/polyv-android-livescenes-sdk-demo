@@ -104,6 +104,16 @@ public interface IPLVLiveRoomDataManager {
      * 是否是音频开播
      */
     boolean isOnlyAudio();
+
+    /**
+     * 设置是否需要恢复直播
+     */
+    public void setNeedStreamRecover(boolean isNeed);
+
+    /**
+     * 是否需要恢复流直播
+     */
+    boolean isNeedStreamRecover();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

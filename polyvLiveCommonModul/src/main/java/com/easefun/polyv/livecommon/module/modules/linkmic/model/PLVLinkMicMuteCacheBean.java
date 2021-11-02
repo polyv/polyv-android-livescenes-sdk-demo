@@ -8,8 +8,8 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.model;
  */
 public class PLVLinkMicMuteCacheBean {
     private String linkMicId = "";
-    private boolean muteAudio = true;
-    private boolean muteVideo = true;
+    private boolean muteAudio = false;
+    private boolean muteVideo = false;
 
     public PLVLinkMicMuteCacheBean(String linkMicId) {
         this.linkMicId = linkMicId;

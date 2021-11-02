@@ -59,6 +59,12 @@ public class PLVLiveChannelConfig {
      */
     private HiClassConfig hiClassConfig;
 
+    /**
+     * 开播登录时，此频道是否仍在直播（如讲师异常退出后重新进入）
+     * （仅开播场景使用）
+     */
+    private boolean isLiveStreamingWhenLogin = false;
+
     public PLVLiveChannelConfig() {
         account = new Account();
         user = new User();
@@ -76,6 +82,7 @@ public class PLVLiveChannelConfig {
         channelName = old.channelName;
         colinMicType = old.colinMicType;
         hiClassConfig = new HiClassConfig(old.hiClassConfig);
+        isLiveStreamingWhenLogin = old.isLiveStreamingWhenLogin;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -186,6 +193,13 @@ public class PLVLiveChannelConfig {
         hiClassConfig.lessonId = lessonId;
         hiClassConfig.courseCode = courseCode;
     }
+
+    /**
+     * 开播登录时，此频道是否仍在直播（仅开播场景使用）
+     */
+    public void setLiveStreamingWhenLogin(boolean liveStreamingWhenLogin) {
+        isLiveStreamingWhenLogin = liveStreamingWhenLogin;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -239,6 +253,13 @@ public class PLVLiveChannelConfig {
     //嘉宾是否是自动上麦
     public boolean isAutoLinkToGuest() {
         return TextUtils.isEmpty(colinMicType) || PLVSLoginVO.COLINMICTYPE_AUTO.equals(colinMicType);
+    }
+
+    /**
+     * 开播登录时，此频道是否仍在直播（仅开播场景使用）
+     */
+    public boolean isLiveStreamingWhenLogin() {
+        return isLiveStreamingWhenLogin;
     }
     // </editor-fold>
 
