@@ -143,6 +143,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     //请求踢出的用户列表的disposable
     private Disposable kickUsersDisposable;
 
+    private final String MESSAGE_EVENT_REDPAPER = "REDPAPER";
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
     //直播详情数据观察者
@@ -756,6 +757,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             } else if (PLVEventConstant.MESSAGE_EVENT.equals(listenEvent)) {
                 //非自定义信息
                 switch (event) {
+                    case MESSAGE_EVENT_REDPAPER:    //红包雨(用户自定义业务流程)
+                        chatroomData.postRedpaperVO(message);
+                        break;
                     //文本类型发言
                     case PLVEventConstant.Chatroom.MESSAGE_EVENT_SPEAK:
                         final PLVSpeakEvent speakEvent = PLVEventHelper.toMessageEventModel(message, PLVSpeakEvent.class);

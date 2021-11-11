@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
+import com.easefun.polyv.livecommon.module.modules.vo.RedpaperVO;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -501,8 +502,18 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听聊天室点赞数据、监听文本发言信息">
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听聊天室点赞数据、红包、监听文本发言信息">
     private void observeChatroomData() {
+        //红包雨
+        chatroomPresenter.getData().getRedpaperVO().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String redpaperResp) {
+                if (chatFragment != null) {
+                    chatFragment.setRedpaper(redpaperResp);
+                }
+            }
+        });
+
         chatroomPresenter.getData().getLikesCountData().observe((LifecycleOwner) getContext(), new Observer<Long>() {
             @Override
             public void onChanged(@Nullable Long l) {
