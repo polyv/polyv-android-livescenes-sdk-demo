@@ -43,6 +43,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.vo.RedpaperVO;
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
@@ -57,6 +58,7 @@ import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
@@ -700,6 +702,25 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         return changeMessageTypeLy != null && changeMessageTypeLy.isSelected();
     }
     // </editor-fold>
+
+    public void setRedpaper(String response) {
+        Log.d(">>","resp:"+response);
+        RedpaperVO redpaperVO = PLVGsonUtil.fromJson(RedpaperVO.class, response);
+        final AlertDialog dialog = new AlertDialog.Builder(getContext()).setTitle("提示")
+                .setMessage("恭喜您抢到红包："+redpaperVO.getTotalAmount())
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setCancelable(false).show();
+    }
 
     // <editor-fold defaultstate="collapsed" desc="输入框 - 文本改变监听器">
     private TextWatcher inputTextWatcher = new TextWatcher() {

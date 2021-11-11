@@ -37,8 +37,19 @@ public class PLVChatroomData {
 
     private MutableLiveData<List<PLVEmotionImageVO.EmotionImage>> emotionImagesData = new MutableLiveData<>();
 
+    //红包雨信息
+    private MutableLiveData<String> redpaperVO = new MutableLiveData<>();
+
     public LiveData<PolyvBulletinVO> getBulletinVO() {
         return bulletinVO;
+    }
+
+    public LiveData<String> getRedpaperVO() {
+        return redpaperVO;
+    }
+
+    public void postRedpaperVO(String redpaperResp) {
+        redpaperVO.postValue(redpaperResp);
     }
 
     //bulletin为null时为隐藏公告
