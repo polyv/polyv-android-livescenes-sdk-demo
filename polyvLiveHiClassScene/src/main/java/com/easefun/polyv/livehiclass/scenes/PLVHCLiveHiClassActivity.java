@@ -31,6 +31,7 @@ import com.easefun.polyv.livehiclass.modules.toolbar.IPLVHCToolBarLayout;
 import com.easefun.polyv.livehiclass.modules.toolbar.enums.PLVHCMarkToolEnums;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.PLVHiClassGlobalConfig;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -499,6 +500,46 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
                 if (plvhcStatusBarLy != null) {
                     plvhcStatusBarLy.onLessonEnd();
                 }
+            }
+
+            @Override
+            public void onUserHasGroupLeader(boolean isHasGroupLeader) {
+                plvhcToolBarLy.onUserHasGroupLeader(isHasGroupLeader);
+                if (plvhcDocumentLy != null) {
+                    plvhcDocumentLy.onUserHasGroupLeader(isHasGroupLeader);
+                }
+            }
+
+            @Override
+            public void onJoinDiscuss(String groupId, String groupName, PLVSwitchRoomEvent switchRoomEvent) {
+                plvhcToolBarLy.onJoinDiscuss(groupId);
+                if (plvhcStatusBarLy != null) {
+                    plvhcStatusBarLy.onJoinDiscuss(groupId, groupName);
+                }
+                if (plvhcDocumentLy != null) {
+                    plvhcDocumentLy.onJoinDiscuss(switchRoomEvent);
+                }
+            }
+
+            @Override
+            public void onLeaveDiscuss(PLVSwitchRoomEvent switchRoomEvent) {
+                plvhcToolBarLy.onLeaveDiscuss();
+                if (plvhcStatusBarLy != null) {
+                    plvhcStatusBarLy.onLeaveDiscuss();
+                }
+                if (plvhcDocumentLy != null) {
+                    plvhcDocumentLy.onLeaveDiscuss(switchRoomEvent);
+                }
+            }
+
+            @Override
+            public void onLeaderRequestHelp() {
+                plvhcToolBarLy.onLeaderRequestHelp();
+            }
+
+            @Override
+            public void onLeaderCancelHelp() {
+                plvhcToolBarLy.onLeaderCancelHelp();
             }
         });
     }

@@ -10,6 +10,7 @@ import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.da
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 
@@ -230,6 +231,11 @@ public interface IPLVMultiRoleLinkMicContract {
         void onRemoteNetworkStatus(PLVNetworkStatusVO networkStatusVO);
 
         /**
+         * 讲师昵称
+         */
+        void onTeacherInfo(String nick);
+
+        /**
          * 课节准备中
          */
         void onLessonPreparing(long serverTime, long lessonStartTime);
@@ -254,6 +260,65 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param willAutoStopLessonTimeMs 还剩多少时间将要自动结束课节，默认10分钟
          */
         void onLessonLateTooLong(long willAutoStopLessonTimeMs);
+
+        /**
+         * 响应用户被授权组长
+         *
+         * @param isHasGroupLeader true：自己当前被授权，false：自己当前没有被授权
+         * @param nick             组长的昵称
+         * @param isGroupChanged   是否是切换分组，true：切换，false：加入
+         * @param isLeaderChanged  是否是切换组长，true：切换，false：初始设置的组长
+         * @param groupName        分组的名称
+         * @param leaderId         组长Id，为null表示分组里没有组长
+         */
+        void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable String leaderId);
+
+        /**
+         * 即将加入讨论
+         *
+         * @param countdownTimeMs 倒计时时间
+         */
+        void onWillJoinDiscuss(long countdownTimeMs);
+
+        /**
+         * 加入讨论
+         *
+         * @param groupId         分组Id
+         * @param groupName       分组名称
+         * @param switchRoomEvent 切换房间事件
+         */
+        void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 离开讨论
+         *
+         * @param switchRoomEvent 切换房间事件
+         */
+        void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 讲师加入分组讨论
+         *
+         * @param isJoin true：加入，false：离开
+         */
+        void onTeacherJoinDiscuss(boolean isJoin);
+
+        /**
+         * 讲师发送广播通知
+         *
+         * @param content 通知内容
+         */
+        void onTeacherSendBroadcast(String content);
+
+        /**
+         * 组长请求帮助
+         */
+        void onLeaderRequestHelp();
+
+        /**
+         * 组长取消帮助
+         */
+        void onLeaderCancelHelp();
     }
     // </editor-fold>
 
@@ -480,6 +545,11 @@ public interface IPLVMultiRoleLinkMicContract {
          * 获取限制的连麦人数，未能获取时为0，也可用 {@link PLVMultiRoleLinkMicData#getLimitLinkNumber()} 方法监听获取
          */
         int getLimitLinkNumber();
+
+        /**
+         * 是否加入了分组讨论
+         */
+        boolean isJoinDiscuss();
 
         /**
          * 获取连麦数据

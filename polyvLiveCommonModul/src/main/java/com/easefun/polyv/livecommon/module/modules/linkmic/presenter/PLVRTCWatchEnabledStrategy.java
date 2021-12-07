@@ -11,6 +11,7 @@ import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
+import com.plv.livescenes.linkmic.IPLVLinkMicManager;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
@@ -109,8 +110,8 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
      */
     @Override
     public void setLiveStart() {
-        Activity topActivity= ActivityUtils.getTopActivity();
-        if (topActivity!=null){
+        Activity topActivity = ActivityUtils.getTopActivity();
+        if (topActivity != null) {
             topActivity.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
         if (!isJoinChannel) {
@@ -133,8 +134,12 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     public void setJoinLinkMic() {
         isJoinLinkMic = true;
         linkMicManager.switchRoleToBroadcaster();
-        PLVLinkMicJoinSuccess joinSuccess = linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
-        onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId(), new IPLVLinkMicManager.OnSendJoinSuccessMsgListener() {
+            @Override
+            public void onSendJoinSuccessMsg(PLVLinkMicJoinSuccess joinSuccess) {
+                onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+            }
+        });
     }
 
     /**
@@ -147,6 +152,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     @Override
     public void setLeaveLinkMic() {
         linkMicManager.switchRoleToAudience();
+        linkMicManager.muteLocalVideo(true);
         linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
         onLeaveLinkMicListener.onLeaveLinkMic();
         isJoinLinkMic = false;

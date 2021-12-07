@@ -64,6 +64,10 @@ public class PLVHCMemberTypeWindow {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
+    public void setIsSimpleLayout() {
+        kickTv.setVisibility(View.GONE);
+    }
+
     public void show(View view) {
         int[] location = new int[2];
         view.getLocationInWindow(location);//window

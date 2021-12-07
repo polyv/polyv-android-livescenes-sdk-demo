@@ -45,6 +45,7 @@ import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.model.PLVKickUsersVO;
+import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -136,6 +137,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable chatHistoryDisposable;
     //历史记录是否包含打赏事件
     private boolean isHistoryContainRewardEvent;
+
+    //分组Id
+    private String groupId;
 
     //图片表情列表的disposable
     private Disposable chatEmotionImagesDisposable;
@@ -396,6 +400,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         customEvent.setTip(tip);
         customEvent.setEmitMode(PolyvBaseCustomEvent.EMITMODE_ALL);//设置广播方式，EMITMODE_ALL为广播给包括自己的所有用户，EMITMODE_OTHERS为广播给不包括自己的所有用户
         customEvent.setVersion(PolyvCustomEvent.VERSION_1);//设置信息的版本号，对该版本号的信息才进行处理
+        /**
+         * 设置自定义消息是否加入历史聊天记录，默认设置为加入
+         * PLVCustomEvent.JOIN_HISTORY_TRUE为加入
+         * PLVCustomEvent.JOIN_HISTORY_FALSE为不加入
+         * */
+        customEvent.setJoinHistory(PLVCustomEvent.JOIN_HISTORY_TRUE);
         customEvent.setTime(System.currentTimeMillis());
         PLVCommonLog.d(TAG, "chatroom sendCustomGiftMessage: " + customEvent);
         PolyvChatroomManager.getInstance().sendCustomMsg(customEvent);
@@ -424,11 +434,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         int start = getChatHistoryTime * getChatHistoryCount;
         int end = (getChatHistoryTime + 1) * getChatHistoryCount - 1;
-        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
-        if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
-        }
-        chatHistoryDisposable = PolyvApiManager.getPolyvApichatApi().getChatHistory(loginRoomId, start, end, 1, 1)
+        chatHistoryDisposable = PolyvApiManager.getPolyvApichatApi().getChatHistory(getRoomIdCombineDiscuss(), start, end, 1, 1)
                 .map(new Function<ResponseBody, JSONArray>() {
                     @Override
                     public JSONArray apply(ResponseBody responseBody) throws Exception {
@@ -568,6 +574,18 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         PolyvChatroomManager.getInstance().toggleRoom(isClose, listener);
     }
 
+    @Override
+    public void onJoinDiscuss(String groupId) {
+        this.groupId = groupId;
+        clearHistoryInfo();
+    }
+
+    @Override
+    public void onLeaveDiscuss() {
+        groupId = null;
+        clearHistoryInfo();
+    }
+
     @NonNull
     @Override
     public PLVChatroomData getData() {
@@ -576,17 +594,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     @Override
     public void destroy() {
-        getChatHistoryTime = 0;
-        hasRequestHistoryEvent = false;
-        isNoMoreChatHistory = false;
+        clearHistoryInfo();
         if (iChatroomViews != null) {
             iChatroomViews.clear();
         }
         if (messageDisposable != null) {
             messageDisposable.dispose();
-        }
-        if (chatHistoryDisposable != null) {
-            chatHistoryDisposable.dispose();
         }
         if (chatEmotionImagesDisposable != null){
             chatEmotionImagesDisposable.dispose();
@@ -682,6 +695,15 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             }
         }
         return tempChatItems;
+    }
+
+    private void clearHistoryInfo() {
+        getChatHistoryTime = 0;
+        hasRequestHistoryEvent = false;
+        isNoMoreChatHistory = false;
+        if (chatHistoryDisposable != null) {
+            chatHistoryDisposable.dispose();
+        }
     }
     // </editor-fold>
 
@@ -1012,6 +1034,17 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // <editor-fold defaultstate="collapsed" desc="内部工具方法">
     private PLVLiveChannelConfig getConfig() {
         return liveRoomDataManager.getConfig();
+    }
+
+    private String getRoomIdCombineDiscuss() {
+        if (!TextUtils.isEmpty(groupId)) {
+            return groupId;
+        }
+        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
+        }
+        return loginRoomId;
     }
 
     private int[] getSpeakEmojiSizes() {

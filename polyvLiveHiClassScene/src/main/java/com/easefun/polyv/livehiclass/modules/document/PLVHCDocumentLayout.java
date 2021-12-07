@@ -45,7 +45,9 @@ import com.plv.livescenes.document.event.PLVRefreshPptContainerTotalEvent;
 import com.plv.livescenes.document.event.PLVRemovePaintBrushAuthEvent;
 import com.plv.livescenes.document.event.PLVResetZoomEvent;
 import com.plv.livescenes.document.event.PLVSendSocketDataEvent;
+import com.plv.livescenes.document.event.PLVSetGroupLeaderEvent;
 import com.plv.livescenes.document.event.PLVStartEditTextEvent;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.document.event.PLVToggleOperationStatusEvent;
 import com.plv.livescenes.document.event.PLVZoomPercentChangeEvent;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -69,6 +71,7 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
     private static final String TAG = PLVHCDocumentLayout.class.getSimpleName();
 
     private static final int MAX_OPEN_DOCUMENT_LIMIT = 5;
+    private static final int ZOOM_DEFAULT_PERCENT = 100;
     private static final long ZOOM_HINT_SHOW_TIMEOUT = TimeUnit.SECONDS.toMillis(2);
 
     private View rootView;
@@ -94,6 +97,8 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
     private int documentOpenCount = 0;
     private long zoomHintTextLastShowTimestamp = 0;
     private boolean hasPaint = false;
+    private boolean isLeader;
+    private int zoomPercent = ZOOM_DEFAULT_PERCENT;
 
     private PLVHCMarkToolEnums.MarkTool lastSelectMarkTool;
     private PLVHCMarkToolEnums.Color lastSelectColor;
@@ -179,16 +184,23 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
                 return liveRoomDataManager.getConfig().getUser().getViewerName();
             }
         });
+        final String sessionId = nullable(new PLVSugarUtil.Supplier<String>() {
+            @Override
+            public String get() {
+                return liveRoomDataManager.getSessionId();
+            }
+        });
 
         containerView.setViewerId(viewerId);
         containerView.setViewerName(viewerName);
         containerView.setUserType(userType);
+        containerView.setSessionId(sessionId);
         containerView.setOnReceiveEventListener(this);
         containerView.loadWeb();
 
         // 初始化工具和颜色
         final boolean isTeacherType = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
-        changeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType));
+        changeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType || isLeader));
         changeColor(PLVHCMarkToolEnums.Color.getDefaultColor(isTeacherType));
     }
 
@@ -263,10 +275,43 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
         }
         if (isHasPaint) {
             containerView.sendEvent(new PLVGivePaintBrushAuthEvent());
-            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(false)));
+            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isLeader)));
             changeColor(getOrDefault(lastSelectColor, PLVHCMarkToolEnums.Color.getDefaultColor(false)));
         } else {
             containerView.sendEvent(new PLVRemovePaintBrushAuthEvent());
+        }
+    }
+
+    @Override
+    public void onUserHasGroupLeader(boolean isHasGroupLeader) {
+        this.isLeader = isHasGroupLeader;
+        this.hasPaint = isHasGroupLeader;
+        updateWhenLeaderChanged(false);
+        containerView.sendEvent(new PLVSetGroupLeaderEvent(isHasGroupLeader));
+        if (isHasGroupLeader) {
+            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isLeader)));
+            changeColor(getOrDefault(lastSelectColor, PLVHCMarkToolEnums.Color.getDefaultColor(false)));
+        }
+    }
+
+    @Override
+    public void onJoinDiscuss(PLVSwitchRoomEvent switchRoomEvent) {
+        isLeader = false;
+        hasPaint = false;
+        updateWhenLeaderChanged(false);
+        if (switchRoomEvent != null) {
+            containerView.sendEvent(switchRoomEvent);
+        }
+    }
+
+    @Override
+    public void onLeaveDiscuss(PLVSwitchRoomEvent switchRoomEvent) {
+        isLeader = false;
+        hasPaint = false;
+        updateWhenLeaderChanged(true);
+        containerView.sendEvent(new PLVSetGroupLeaderEvent(false));
+        if (switchRoomEvent != null) {
+            containerView.sendEvent(switchRoomEvent);
         }
     }
 
@@ -326,7 +371,7 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
         final boolean isStudent = PLVSocketUserConstant.USERTYPE_SCSTUDENT.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
         final int minimizeCount = plvhcDocumentMinimizeGroupListLl.getChildCount();
         plvhcDocumentMinimizeGroupTv.setText(String.valueOf(minimizeCount));
-        if (isStudent || minimizeCount <= 0) {
+        if ((isStudent && !isLeader) || minimizeCount <= 0) {
             plvhcDocumentMinimizeGroupIv.setVisibility(GONE);
             plvhcDocumentMinimizeGroupTv.setVisibility(GONE);
             plvhcDocumentMinimizeGroupRootLayout.setVisibility(GONE);
@@ -441,17 +486,19 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
     }
 
     private void processZoomPercentChange(String data) {
-        final boolean isTeacher = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
-        if (!isTeacher) {
-            // 仅讲师弹出缩放提示
-            return;
-        }
         PLVZoomPercentChangeEvent event = PLVZoomPercentChangeEvent.fromJson(data);
         if (event == null || event.getZoomPercent() == null) {
             return;
         }
-        final int zoomPercent = (int) (event.getZoomPercent() * 100);
-        plvhcDocumentZoomLayout.setVisibility(zoomPercent == 100 ? View.GONE : View.VISIBLE);
+        zoomPercent = (int) (event.getZoomPercent() * 100);
+
+        final boolean isTeacher = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
+        if (!isTeacher && !isLeader) {
+            // 仅讲师和组长弹出缩放提示
+            return;
+        }
+
+        plvhcDocumentZoomLayout.setVisibility(zoomPercent == ZOOM_DEFAULT_PERCENT ? View.GONE : View.VISIBLE);
 
         final String zoomPercentHintText = zoomPercent + "%";
         plvhcDocumentZoomHintTv.setText(zoomPercentHintText);
@@ -502,6 +549,19 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
         updateMinimizeGroupCount();
     }
 
+    private void updateWhenLeaderChanged(boolean isLeaveDiscuss) {
+        if (isLeaveDiscuss) {
+            zoomPercent = ZOOM_DEFAULT_PERCENT;
+            plvhcDocumentMinimizeGroupListLl.removeAllViews();
+        }
+        if (!isLeader) {
+            plvhcDocumentZoomHintTv.setVisibility(View.GONE);
+            plvhcDocumentZoomLayout.setVisibility(View.GONE);
+        } else if (zoomPercent != ZOOM_DEFAULT_PERCENT) {
+            plvhcDocumentZoomLayout.setVisibility(View.VISIBLE);
+        }
+        updateMinimizeGroupCount();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">

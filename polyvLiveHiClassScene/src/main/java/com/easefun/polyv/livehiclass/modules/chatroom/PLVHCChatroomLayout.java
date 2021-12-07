@@ -298,6 +298,22 @@ public class PLVHCChatroomLayout extends FrameLayout implements IPLVHCChatroomLa
     }
 
     @Override
+    public void onJoinDiscuss(String groupId) {
+        chatroomPresenter.onJoinDiscuss(groupId);
+        removeChatMessageToList(null, true);
+        //请求一次历史记录
+        chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
+    }
+
+    @Override
+    public void onLeaveDiscuss() {
+        chatroomPresenter.onLeaveDiscuss();
+        removeChatMessageToList(null, true);
+        //请求一次历史记录
+        chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
+    }
+
+    @Override
     public void handleImgSelectResult(Intent data) {
         final Uri selectedUri = data.getData();
         if (selectedUri != null) {

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#BF000000">
+
+    <RelativeLayout
+        android:id="@+id/plvhc_group_leader_cancel_help_guide_layout"
+        android:layout_width="234dp"
+        android:layout_height="52dp"
+        android:clipChildren="false"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+            android:layout_width="172dp"
+            android:layout_height="46dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            app:plvGradientColors="#00B16C, #00E78D"
+            app:plvGradientOrientation="leftRight"
+            app:rectRadius="8dp"
+            app:triangleHeight="8dp"
+            app:triangleMargin="17dp"
+            app:triangleMarginType="top"
+            app:trianglePosition="right"
+            app:triangleWidth="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:text="再次点击可取消操作"
+                android:textColor="#E6FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+        <View
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/plvhc_live_room_guide_start_class_circle_shape" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/plvhc_group_leader_request_help_guide_layout"
+        android:layout_width="221dp"
+        android:layout_height="52dp"
+        android:clipChildren="false"
+        android:visibility="gone"
+        tools:layout_marginTop="100dp"
+        tools:visibility="visible">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+            android:layout_width="159dp"
+            android:layout_height="46dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            app:plvGradientColors="#00B16C, #00E78D"
+            app:plvGradientOrientation="leftRight"
+            app:rectRadius="8dp"
+            app:triangleHeight="8dp"
+            app:triangleMargin="17dp"
+            app:triangleMarginType="top"
+            app:trianglePosition="right"
+            app:triangleWidth="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:text="点击可以呼叫老师"
+                android:textColor="#E6FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+        <View
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/plvhc_live_room_guide_start_class_circle_shape" />
+
+    </RelativeLayout>
+</FrameLayout>

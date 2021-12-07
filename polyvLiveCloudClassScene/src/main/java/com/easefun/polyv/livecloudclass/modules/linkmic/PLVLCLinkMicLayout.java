@@ -26,7 +26,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
@@ -51,9 +50,9 @@ import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -528,7 +527,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             //如果是纯视频并且支持RTC的频道
 
             //把之前切换到连麦列表讲师位置的media(video)切回主屏
-            if (teacherLocationViewSwitcher != null) {
+            if (teacherLocationViewSwitcher != null && teacherLocationViewSwitcher.isViewSwitched()) {
                 teacherLocationViewSwitcher.switchView();
             } else {
                 PLVCommonLog.exception(new Exception("teacherLocationViewSwitcher should not be null"));
@@ -635,8 +634,23 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             for (String uid : uids) {
                 if (mediaInLinkMicListLinkMicId != null && mediaInLinkMicListLinkMicId.equals(uid)) {
                     //如果用户离开的位置刚好在media的位置，则将media切回主屏
-                    performClickInLinkMicListItem(getMediaViewIndexInLinkMicList());
+                    final int mediaIndex = getMediaViewIndexInLinkMicList();
+                    RecyclerView.ViewHolder viewHolder = rvLinkMicList.findViewHolderForAdapterPosition(mediaIndex);
+                    if (viewHolder != null) {
+                        viewHolder.itemView.performClick();
+                    }
                     break;
+                }
+            }
+        }
+
+        // 纯视频场景 讲师离开连麦 将连麦视图与播放器视图切换回原位
+        if (liveChannelType == PolyvLiveChannelType.ALONE) {
+            final String mainTeacherLinkMicId = linkMicPresenter.getMainTeacherLinkMicId();
+            if (mainTeacherLinkMicId != null && uids.contains(mainTeacherLinkMicId)) {
+                if (teacherLocationViewSwitcher != null && teacherLocationViewSwitcher.isViewSwitched()) {
+                    teacherLocationViewSwitcher.switchView();
+                    linkMicListAdapter.setHasNotifyTeacherViewHolderBind(false);
                 }
             }
         }

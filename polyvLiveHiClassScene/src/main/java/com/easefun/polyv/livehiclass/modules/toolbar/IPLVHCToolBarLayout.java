@@ -59,6 +59,35 @@ public interface IPLVHCToolBarLayout {
     void onLessonEnd(long inClassTime);
 
     /**
+     * 用户获取组长权限
+     *
+     * @param isHasGroupLeader true：自己有组长权限，false：自己没有组长权限
+     */
+    void onUserHasGroupLeader(boolean isHasGroupLeader);
+
+    /**
+     * 加入讨论
+     *
+     * @param groupId 分组Id
+     */
+    void onJoinDiscuss(String groupId);
+
+    /**
+     * 离开讨论
+     */
+    void onLeaveDiscuss();
+
+    /**
+     * 组长请求帮助
+     */
+    void onLeaderRequestHelp();
+
+    /**
+     * 组长取消帮助
+     */
+    void onLeaderCancelHelp();
+
+    /**
      * 调整布局
      */
     void adjustLayout();

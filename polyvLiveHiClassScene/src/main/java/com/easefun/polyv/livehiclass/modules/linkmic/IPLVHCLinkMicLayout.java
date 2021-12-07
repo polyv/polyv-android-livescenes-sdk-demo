@@ -1,10 +1,12 @@
 package com.easefun.polyv.livehiclass.modules.linkmic;
 
+import androidx.annotation.Nullable;
 import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 
 /**
@@ -159,5 +161,36 @@ public interface IPLVHCLinkMicLayout {
          * 课节结束
          */
         void onLessonEnd(long inClassTime, boolean isTeacherType, boolean hasNextClass);
+
+        /**
+         * 用户获取组长权限
+         *
+         * @param isHasGroupLeader true：自己有组长权限，false：自己没有组长权限
+         */
+        void onUserHasGroupLeader(boolean isHasGroupLeader);
+
+        /**
+         * 加入讨论
+         *
+         * @param groupId         分组Id
+         * @param groupName       分组名称
+         * @param switchRoomEvent 切换房间事件
+         */
+        void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 离开讨论
+         */
+        void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 组长请求帮助
+         */
+        void onLeaderRequestHelp();
+
+        /**
+         * 组长取消帮助
+         */
+        void onLeaderCancelHelp();
     }
 }

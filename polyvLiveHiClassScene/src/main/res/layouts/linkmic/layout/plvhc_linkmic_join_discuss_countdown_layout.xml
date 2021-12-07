@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#2B2F48"
+        android:minWidth="160dp"
+        android:minHeight="140dp"
+        app:radius="16dp">
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_join_discuss_down_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="3"
+            android:textColor="@color/white"
+            android:textSize="60sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/plvhc_linkmic_join_discuss_down_time_tv"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:text="即将进入小组讨论"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</RelativeLayout>

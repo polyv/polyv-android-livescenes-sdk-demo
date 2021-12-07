@@ -87,8 +87,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private boolean isTeacherOpenLinkMic;
     //是否已经初始化过第一画面用户
     private boolean hasInitFirstScreenUser = false;
-    //纯视频频道类型连麦时，是否已经初始化完成连麦布局讲师的位置
-    private boolean hasInitFirstTeacherLocation = false;
     //纯视频频道类型连麦时，主屏的讲师连麦Id
     private String mainTeacherLinkMicId;
     //连麦列表
@@ -196,16 +194,20 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         public void onJoinLinkMic(PLVLinkMicJoinSuccess data) {
                             PLVLinkMicItemDataBean selfDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(data);
                             //已经存在则不要重复添加
+                            boolean selfExist = false;
                             for (PLVLinkMicItemDataBean bean : linkMicList) {
                                 if (selfDataBean.getLinkMicId().equals(bean.getLinkMicId())) {
-                                    return;
+                                    selfExist = true;
+                                    break;
                                 }
                             }
-                            //添加自己
-                            if (linkMicList.isEmpty()) {
-                                linkMicList.add(selfDataBean);
-                            } else {
-                                linkMicList.add(1, selfDataBean);//添加自己
+                            if (!selfExist) {
+                                //添加自己
+                                if (linkMicList.isEmpty()) {
+                                    linkMicList.add(selfDataBean);
+                                } else {
+                                    linkMicList.add(1, selfDataBean);//添加自己
+                                }
                             }
 
                             if (linkMicView != null) {
@@ -224,10 +226,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     while (it.hasNext()) {
                         PLVLinkMicItemDataBean dataBean = it.next();
                         if (dataBean.getLinkMicId().equals(myLinkMicId)) {
-                            it.remove();
                             if (linkMicView != null) {
                                 linkMicView.onUsersLeave(Collections.singletonList(myLinkMicId));
                             }
+                            it.remove();
                             break;
                         }
                     }
@@ -384,6 +386,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
+    public void setPushPictureResolutionType(int type) {
+        linkMicManager.setPushPictureResolutionType(type);
+    }
+
+    @Override
     public SurfaceView createRenderView(Context context) {
         return linkMicManager.createRendererView(context);
     }
@@ -394,9 +401,14 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
+    public String getMainTeacherLinkMicId() {
+        return mainTeacherLinkMicId;
+    }
+
+    @Override
     public void setupRenderView(SurfaceView renderView, String linkMicId) {
         if (linkMicManager.getLinkMicUid().equals(linkMicId)) {
-            if(liveRoomDataManager.isOnlyAudio()){
+            if (liveRoomDataManager.isOnlyAudio()) {
                 linkMicManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
             }
             linkMicManager.setupLocalVideo(renderView, linkMicId);
@@ -592,24 +604,27 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 }
                 PLVCommonLog.d(TAG, "第一画面:" + firstScreenLinkMicId);
 
-                if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel() && !hasInitFirstScreenUser) {
-                    hasInitFirstScreenUser = true;
+                if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
                     rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId);
                     if (linkMicView != null) {
                         //位置传递-1表示不需要对新旧位置的View渲染更新，只记录第一画面的id即可。
                         linkMicView.updateFirstScreenChanged(firstScreenLinkMicId, -1, -1);
                     }
-                    //找出第一画面，并插入到连麦列表顶部
-                    PLVLinkMicItemDataBean firstScreenDataBean = null;
-                    for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : linkMicList) {
-                        if (plvLinkMicItemDataBean.getLinkMicId().equals(firstScreenLinkMicId)) {
-                            firstScreenDataBean = plvLinkMicItemDataBean;
-                            linkMicList.remove(plvLinkMicItemDataBean);
-                            break;
+
+                    if (linkMicList.size() > 0
+                            && !linkMicList.get(0).getLinkMicId().equals(firstScreenLinkMicId)) {
+                        //找出第一画面，并插入到连麦列表顶部
+                        PLVLinkMicItemDataBean firstScreenDataBean = null;
+                        for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : linkMicList) {
+                            if (plvLinkMicItemDataBean.getLinkMicId().equals(firstScreenLinkMicId)) {
+                                firstScreenDataBean = plvLinkMicItemDataBean;
+                                linkMicList.remove(plvLinkMicItemDataBean);
+                                break;
+                            }
                         }
-                    }
-                    if (firstScreenDataBean != null) {
-                        linkMicList.add(0, firstScreenDataBean);
+                        if (firstScreenDataBean != null) {
+                            linkMicList.add(0, firstScreenDataBean);
+                        }
                     }
                 }
 
@@ -622,8 +637,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
                 //4. 纯视频频道类型，如果列表列表添加了讲师，则调整讲师的位置
                 if (liveRoomDataManager.getConfig().isAloneChannelType()
-                        && !hasInitFirstTeacherLocation) {
-                    hasInitFirstTeacherLocation = true;
+                        && teacherLinkMicId != null
+                        && newJoinUserList.contains(teacherLinkMicId)) {
                     mainTeacherLinkMicId = teacherLinkMicId;
                     if (linkMicView != null) {
                         for (int i = 0; i < linkMicList.size(); i++) {
@@ -750,26 +765,24 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     private void cleanLinkMicListData() {
         PLVCommonLog.d(TAG, "cleanLinkMicListData() called \n" + Log.getStackTraceString(new Throwable()));
-        hasInitFirstScreenUser = false;
-        hasInitFirstTeacherLocation = false;
         linkMicList.clear();
     }
 
     /**
      * 加载连麦音视频模式
      */
-    private void loadLinkMicConnectMode(String mode){
-        if(TextUtils.isEmpty(mode)){
+    private void loadLinkMicConnectMode(String mode) {
+        if (TextUtils.isEmpty(mode)) {
             //默认上麦后，摄像头关闭，麦克风打开
             muteVideo(true);
             muteAudio(false);
             return;
         }
-        if("audio".equals(mode)){
+        if ("audio".equals(mode)) {
             muteAudio(true);
             //默认关闭摄像头
             muteVideo(true);
-        } else if("video".equals(mode)){
+        } else if ("video".equals(mode)) {
             muteVideo(true);
             //默认开启了音频
             muteAudio(false);
@@ -850,10 +863,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             while (it.hasNext()) {
                 PLVLinkMicItemDataBean dataBean = it.next();
                 if (dataBean.getLinkMicId().equals(uid)) {
-                    it.remove();
                     if (linkMicView != null) {
                         linkMicView.onUsersLeave(Collections.singletonList(uid));
                     }
+                    it.remove();
                     break;
                 }
             }
@@ -1042,9 +1055,14 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             if (!userExistInList) {
                 muteCacheList.updateUserMuteCacheWhenJoinList(dataBean);
                 if (dataBean.isTeacher()) {
-                    linkMicList.add(0, dataBean);//添加讲师
+                    // 添加讲师
+                    linkMicList.add(0, dataBean);
+                } else if (dataBean.getLinkMicId().equals(myLinkMicId)) {
+                    // 添加自己
+                    PLVCommonLog.d(TAG, "onUserJoinSuccess-> 收到自己的joinSuccess事件");
                 } else {
-                    linkMicList.add(dataBean);//添加观众
+                    // 添加观众
+                    linkMicList.add(dataBean);
                 }
                 if (linkMicView != null) {
                     linkMicView.onUsersJoin(Collections.singletonList(dataBean.getLinkMicId()));
@@ -1163,7 +1181,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
         @Override
         public void onLinkMicConnectMode(String avConnectMode) {
-            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onLinkMicConnectMode "+avConnectMode);
+            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onLinkMicConnectMode " + avConnectMode);
             //socket消息，早于连麦，缓存下来后更新刚进来时的连麦状态
             PLVLinkMicPresenter.this.avConnectMode = avConnectMode;
         }

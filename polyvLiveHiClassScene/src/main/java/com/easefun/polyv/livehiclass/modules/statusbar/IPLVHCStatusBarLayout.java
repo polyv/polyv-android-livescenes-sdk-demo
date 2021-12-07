@@ -26,6 +26,19 @@ public interface IPLVHCStatusBarLayout {
     void onLessonEnd();
 
     /**
+     * 加入讨论
+     *
+     * @param groupId   分组Id
+     * @param groupName 分组名称
+     */
+    void onJoinDiscuss(String groupId, String groupName);
+
+    /**
+     * 离开讨论
+     */
+    void onLeaveDiscuss();
+
+    /**
      * 更新网络质量
      *
      * @param networkQuality

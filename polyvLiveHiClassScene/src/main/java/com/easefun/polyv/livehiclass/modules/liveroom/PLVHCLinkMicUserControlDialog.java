@@ -92,15 +92,15 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
         this.onViewActionListener = listener;
     }
 
-    public void bindViewData(PLVLinkMicItemDataBean linkMicItemDataBean, boolean isMySelf) {
+    public void bindViewData(PLVLinkMicItemDataBean linkMicItemDataBean, boolean isMySelf, boolean isLeader) {
         if (linkMicItemDataBean == null) {
             return;
         }
         linkMicUid = linkMicItemDataBean.getLinkMicId();
         plvhcLinkmicPaintIv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
         plvhcLinkmicPaintTv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
-        plvhcLinkmicCupIv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
-        plvhcLinkmicCupTv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
+        plvhcLinkmicCupIv.setVisibility((isMySelf || isLeader) ? View.GONE : View.VISIBLE);
+        plvhcLinkmicCupTv.setVisibility((isMySelf || isLeader) ? View.GONE : View.VISIBLE);
         plvhcLinkmicCameraOrientIv.setVisibility((isMySelf && !linkMicItemDataBean.isMuteVideo()) ? View.VISIBLE : View.GONE);
         plvhcLinkmicCameraOrientTv.setVisibility((isMySelf && !linkMicItemDataBean.isMuteVideo()) ? View.VISIBLE : View.GONE);
         ConstraintLayout.LayoutParams cameraIvLp = (ConstraintLayout.LayoutParams) plvhcLinkmicCameraIv.getLayoutParams();

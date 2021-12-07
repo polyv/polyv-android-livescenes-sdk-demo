@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="bottom|end"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/plvhc_toolbar_mark_tool_control_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/plvhc_toolbar_mark_undo_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/plvhc_document_mark_tool_undo_selector" />
+
+            <ImageView
+                android:id="@+id/plvhc_toolbar_mark_delete_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginLeft="14dp"
+                android:src="@drawable/plvhc_document_mark_tool_delete_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvhc_toolbar_mark_tool_current_color_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginLeft="14dp"
+                app:plvBackgroundColor="#E6242940"
+                app:plvMainColor="#FF6363"
+                app:plvMainRadius="6dp" />
+
+            <RelativeLayout
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginLeft="14dp">
+
+                <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                    android:id="@+id/plvhc_toolbar_current_mark_tool_iv"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#E6242940"
+                    android:src="@drawable/plvhc_document_move_icon"
+                    app:radius_iv="18dp" />
+
+                <ImageView
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:src="@drawable/plvhc_document_mark_tool_more_icon"
+                    android:tint="#F0F1F5" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical">
+
+        <com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCGroupLeaderRequestHelpLayout
+            android:id="@+id/plvhc_toolbar_leader_help_ly"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="14dp" />
+
+        <ImageView
+            android:id="@+id/plvhc_toolbar_document_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="14dp"
+            android:src="@drawable/plvhc_toolbar_document_view_selector" />
+
+        <ImageView
+            android:id="@+id/plvhc_toolbar_member_list_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="14dp"
+            android:src="@drawable/plvhc_toolbar_member_view_selector" />
+
+        <FrameLayout
+            android:id="@+id/plvhc_toolbar_chatroom_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp">
+
+            <ImageView
+                android:id="@+id/plvhc_toolbar_chatroom_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/plvhc_toolbar_chatroom_view_selector" />
+
+            <!--聊天室其他用户发言的提示-->
+            <View
+                android:id="@+id/plvhc_toolbar_chatroom_msg_tips_view"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="right"
+                android:background="@drawable/plvhc_toolbar_chatroom_msg_tip_view_bg_shape"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/plvhc_toolbar_setting_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/plvhc_toolbar_setting_view_selector" />
+
+    </LinearLayout>
+
+</LinearLayout>

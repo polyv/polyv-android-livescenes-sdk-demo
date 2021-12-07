@@ -105,6 +105,10 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         boolean hasPaint = linkMicItemDataBean.isHasPaint();
         boolean isHandsUp = linkMicItemDataBean.isRaiseHand();
 
+        //init view status
+        viewParam.plvhcLinkmicTeacherAvatarPlaceholderIv.setVisibility(View.GONE);
+        viewParam.plvhcLinkmicTeacherPrepareTv.setVisibility(View.GONE);
+        viewParam.plvhcLinkmicTeacherPlaceIv.setVisibility(View.GONE);
         //set video
         setupRenderView();
         setVideoStatus(isMuteVideo);
@@ -158,6 +162,9 @@ public class PLVHCLinkMicItemView extends FrameLayout {
     }
 
     public void addItemView(ViewParam viewParam) {
+        if (viewParam.plvhcLinkmicParentLy.getParent() instanceof ViewGroup) {
+            ((ViewGroup) viewParam.plvhcLinkmicParentLy.getParent()).removeView(viewParam.plvhcLinkmicParentLy);
+        }
         addView(viewParam.plvhcLinkmicParentLy);
         moveViewParam(this.viewParam, viewParam);
     }
@@ -202,6 +209,25 @@ public class PLVHCLinkMicItemView extends FrameLayout {
     public void updateTeacherPreparingStatus(boolean isPreparing) {
         viewParam.plvhcLinkmicTeacherAvatarPlaceholderIv.setVisibility(isPreparing ? View.VISIBLE : View.GONE);
         viewParam.plvhcLinkmicTeacherPrepareTv.setVisibility(isPreparing ? View.VISIBLE : View.GONE);
+        viewParam.plvhcLinkmicTeacherPlaceIv.setVisibility((isPreparing || viewParam.renderView != null) ? View.GONE : View.VISIBLE);
+        if (viewParam.renderView == null && viewParam.linkMicItemDataBean != null) {
+            String nick = viewParam.linkMicItemDataBean.getNick();
+            if (!TextUtils.isEmpty(nick)) {
+                viewParam.plvhcLinkmicNickTv.setText("老师-" + nick + "的位置");
+                adjustNickNameViewLocation(false);
+            }
+        }
+    }
+
+    public void updateLeaderStatus(boolean isHasLeader) {
+        if (viewParam.linkMicItemDataBean == null) {
+            return;
+        }
+        if (isHasLeader) {
+            viewParam.plvhcLinkmicNickTv.setText("组长-" + viewParam.linkMicItemDataBean.getNick());
+        } else {
+            viewParam.plvhcLinkmicNickTv.setText(viewParam.linkMicItemDataBean.getNick());
+        }
     }
 
     public void updateVideoStatus() {
@@ -327,6 +353,10 @@ public class PLVHCLinkMicItemView extends FrameLayout {
                 viewParam.plvhcLinkmicRenderViewContainer.addView(viewParam.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             }
         }
+        adjustNickNameViewLocation(isMuteVideo);
+    }
+
+    private void adjustNickNameViewLocation(boolean isMuteVideo) {
         FrameLayout.LayoutParams nickTvParams = (LayoutParams) viewParam.plvhcLinkmicNickTv.getLayoutParams();
         if (nickTvParams != null) {
             nickTvParams.gravity = isMuteVideo ? Gravity.CENTER : Gravity.BOTTOM;
@@ -376,6 +406,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         //view
         private ViewGroup plvhcLinkmicParentLy;
         private ImageView plvhcLinkmicTeacherAvatarPlaceholderIv;
+        private ImageView plvhcLinkmicTeacherPlaceIv;
         private TextView plvhcLinkmicTeacherPrepareTv;
         private FrameLayout plvhcLinkmicRenderViewContainer;
         private ImageView plvhcLinkmicMicStateIv;
@@ -396,6 +427,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
             plvhcLinkmicParentLy = itemView.findViewById(R.id.plvhc_linkmic_parent_ly);
             plvhcLinkmicRenderViewContainer = itemView.findViewById(R.id.plvhc_linkmic_render_view_container);
             plvhcLinkmicTeacherAvatarPlaceholderIv = itemView.findViewById(R.id.plvhc_linkmic_teacher_avatar_placeholder_iv);
+            plvhcLinkmicTeacherPlaceIv = itemView.findViewById(R.id.plvhc_linkmic_teacher_place_iv);
             plvhcLinkmicTeacherPrepareTv = itemView.findViewById(R.id.plvhc_linkmic_teacher_prepare_tv);
             plvhcLinkmicMicStateIv = itemView.findViewById(R.id.plvhc_linkmic_mic_state_iv);
             plvhcLinkmicNickTv = itemView.findViewById(R.id.plvhc_linkmic_nick_tv);
@@ -411,6 +443,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
             dest.renderView = src.renderView;
             dest.plvhcLinkmicRenderViewContainer = src.plvhcLinkmicRenderViewContainer;
             dest.plvhcLinkmicTeacherAvatarPlaceholderIv = src.plvhcLinkmicTeacherAvatarPlaceholderIv;
+            dest.plvhcLinkmicTeacherPlaceIv = src.plvhcLinkmicTeacherPlaceIv;
             dest.plvhcLinkmicTeacherPrepareTv = src.plvhcLinkmicTeacherPrepareTv;
             dest.plvhcLinkmicMicStateIv = src.plvhcLinkmicMicStateIv;
             dest.plvhcLinkmicNickTv = src.plvhcLinkmicNickTv;
@@ -423,6 +456,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
             src.renderView = null;
             src.plvhcLinkmicRenderViewContainer = null;
             src.plvhcLinkmicTeacherAvatarPlaceholderIv = null;
+            src.plvhcLinkmicTeacherPlaceIv = null;
             src.plvhcLinkmicTeacherPrepareTv = null;
             src.plvhcLinkmicMicStateIv = null;
             src.plvhcLinkmicNickTv = null;

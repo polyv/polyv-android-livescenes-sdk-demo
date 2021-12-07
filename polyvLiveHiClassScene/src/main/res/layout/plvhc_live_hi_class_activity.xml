@@ -71,9 +71,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 高亮引导布局 -->
+    <!-- 讲师上课高亮引导布局 -->
     <com.easefun.polyv.livehiclass.modules.liveroom.PLVHCGuideLayout
         android:id="@+id/plvhc_live_room_guide_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- 组长请求帮助高亮指引布局 -->
+    <com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCGroupLeaderGuideLayout
+        android:id="@+id/plvhc_leader_request_help_guide_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />

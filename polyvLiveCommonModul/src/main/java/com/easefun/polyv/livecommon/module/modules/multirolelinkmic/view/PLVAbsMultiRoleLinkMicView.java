@@ -7,6 +7,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 
 import java.util.List;
@@ -156,6 +157,11 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
     }
 
     @Override
+    public void onTeacherInfo(String nick) {
+
+    }
+
+    @Override
     public void onLessonPreparing(long serverTime, long lessonStartTime) {
 
     }
@@ -172,6 +178,46 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
 
     @Override
     public void onLessonLateTooLong(long willAutoStopLessonTimeMs) {
+
+    }
+
+    @Override
+    public void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable String leaderId) {
+
+    }
+
+    @Override
+    public void onWillJoinDiscuss(long countdownTimeMs) {
+
+    }
+
+    @Override
+    public void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent) {
+
+    }
+
+    @Override
+    public void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent) {
+
+    }
+
+    @Override
+    public void onTeacherJoinDiscuss(boolean isJoin) {
+
+    }
+
+    @Override
+    public void onTeacherSendBroadcast(String content) {
+
+    }
+
+    @Override
+    public void onLeaderRequestHelp() {
+
+    }
+
+    @Override
+    public void onLeaderCancelHelp() {
 
     }
 }

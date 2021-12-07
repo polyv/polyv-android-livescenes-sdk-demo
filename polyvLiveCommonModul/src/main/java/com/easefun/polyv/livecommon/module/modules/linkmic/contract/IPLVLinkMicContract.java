@@ -5,6 +5,7 @@ import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -239,6 +240,13 @@ public interface IPLVLinkMicContract {
         void switchCamera();
 
         /**
+         * 设置推流画面类型
+         *
+         * @param type 类型
+         */
+        void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
+
+        /**
          * 创建渲染器
          *
          * @param context 上下文
@@ -252,6 +260,13 @@ public interface IPLVLinkMicContract {
          * @return 连麦ID
          */
         String getLinkMicId();
+
+        /**
+         * 获取讲师连麦ID
+         *
+         * @return 讲师连麦ID
+         */
+        String getMainTeacherLinkMicId();
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器

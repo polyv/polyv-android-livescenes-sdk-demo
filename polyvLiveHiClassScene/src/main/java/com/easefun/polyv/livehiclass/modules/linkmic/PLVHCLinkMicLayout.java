@@ -27,7 +27,9 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livehiclass.R;
 import com.easefun.polyv.livehiclass.modules.linkmic.item.IPLVHCLinkMicItemLayout;
 import com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCJoinDiscussCountDownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCLinkMicInvitationCountdownWindow;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCSeminarCountdownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCTeacherScreenStreamLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCClassStopHasNextDialog;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCClassStopNoNextDialog;
@@ -38,6 +40,7 @@ import com.easefun.polyv.livehiclass.ui.widget.PLVHCToast;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.PLVHiClassConstant;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
@@ -69,8 +72,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
     private PLVHCClassStopHasNextDialog classStopHasNextDialog;
     private PLVHCLinkMicInvitationCountdownWindow linkMicInvitationCountdownWindow;
     private PLVHCTeacherScreenStreamLayout teacherScreenStreamLayout;
+    //dialog
+    private AlertDialog teacherSendBroadcastDialog;
 
+    private String teacherNick;
     private boolean isHasPaintPermission;
+    private boolean isGroupLeader;
 
     //run task after init linkMicItemLayout
     private List<Runnable> initiatedTasks = new ArrayList<>();
@@ -121,7 +128,10 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
             linkMicItemLayout.setOnViewActionListener(new IPLVHCLinkMicItemLayout.OnViewActionListener() {
                 @Override
                 public void onClickItemView(final int position, final PLVLinkMicItemDataBean linkMicItemDataBean) {
-                    if (linkMicItemDataBean == null || !linkMicPresenter.isTeacherType()) {
+                    if (linkMicItemDataBean == null || (!linkMicPresenter.isTeacherType() && !isGroupLeader)) {
+                        return;
+                    }
+                    if (isGroupLeader && linkMicItemDataBean.isTeacher()) {
                         return;
                     }
                     final boolean isMyself = linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId());
@@ -154,7 +164,7 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
                             linkMicPresenter.switchCamera();
                         }
                     });
-                    linkMicUserControlDialog.bindViewData(linkMicItemDataBean, isMyself);
+                    linkMicUserControlDialog.bindViewData(linkMicItemDataBean, isMyself, isGroupLeader);
                     linkMicUserControlDialog.show();
                 }
             });
@@ -337,9 +347,10 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
             runTaskAfterInitItemLayout(new Runnable() {
                 @Override
                 public void run() {
-                    linkMicItemLayout.bindData(linkMicList);
-                    if (!linkMicPresenter.isTeacherType()) {
+                    linkMicItemLayout.bindData(linkMicList, linkMicPresenter.isJoinDiscuss());
+                    if (!linkMicPresenter.isTeacherType() && !linkMicPresenter.isJoinDiscuss()) {
                         PLVLinkMicItemDataBean placeLinkMicItem = new PLVLinkMicItemDataBean();
+                        placeLinkMicItem.setNick(teacherNick);
                         linkMicItemLayout.setPlaceLinkMicItem(placeLinkMicItem, false);
                     }
                 }
@@ -589,12 +600,24 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         }
 
         @Override
+        public void onTeacherInfo(String nick) {
+            teacherNick = nick;
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.updatePlaceLinkMicItemNick(teacherNick);
+                }
+            });
+        }
+
+        @Override
         public void onLessonPreparing(long serverTime, long lessonStartTime) {
             runTaskAfterInitItemLayout(new Runnable() {
                 @Override
                 public void run() {
-                    if (!linkMicPresenter.isTeacherType()) {
+                    if (!linkMicPresenter.isTeacherType() && !linkMicPresenter.isJoinDiscuss()) {
                         PLVLinkMicItemDataBean placeLinkMicItem = new PLVLinkMicItemDataBean();
+                        placeLinkMicItem.setNick(teacherNick);
                         linkMicItemLayout.setPlaceLinkMicItem(placeLinkMicItem, true);
                     }
                 }
@@ -654,6 +677,100 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
                     .setText("拖堂时间过长，" + timeMinute + "分钟后将强制下课")
                     .build()
                     .show();
+        }
+
+        @Override
+        public void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable final String leaderId) {
+            isGroupLeader = isHasGroupLeader;
+            hideControlWindow();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.onUserHasLeader(leaderId);
+                }
+            });
+            new PLVHCSeminarCountdownWindow(PLVHCLinkMicLayout.this).acceptOnUserHasGroupLeader(isHasGroupLeader, nick, isGroupChanged, isLeaderChanged, groupName);
+            if (onViewActionListener != null) {
+                onViewActionListener.onUserHasGroupLeader(isHasGroupLeader);
+            }
+        }
+
+        @Override
+        public void onWillJoinDiscuss(long countdownTimeMs) {
+            new PLVHCJoinDiscussCountDownWindow(PLVHCLinkMicLayout.this).acceptOnWillJoinDiscuss(countdownTimeMs);
+        }
+
+        @Override
+        public void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent) {
+            isGroupLeader = false;
+            hideControlWindow();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.clearData(true);
+                }
+            });
+            if (onViewActionListener != null) {
+                onViewActionListener.onJoinDiscuss(groupId, groupName, switchRoomEvent);
+            }
+        }
+
+        @Override
+        public void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent) {
+            isGroupLeader = false;
+            hideControlWindow();
+            new PLVHCSeminarCountdownWindow(PLVHCLinkMicLayout.this).acceptOnLeaveDiscuss();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.clearData(false);
+                }
+            });
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaveDiscuss(switchRoomEvent);
+            }
+        }
+
+        @Override
+        public void onTeacherJoinDiscuss(boolean isJoin) {
+            if (isJoin) {
+                PLVHCToast.Builder.context(getContext())
+                        .setText("老师已进入分组")
+                        .build()
+                        .show();
+            }
+        }
+
+        @Override
+        public void onTeacherSendBroadcast(String content) {
+            if (teacherSendBroadcastDialog != null) {
+                teacherSendBroadcastDialog.dismiss();
+            }
+            teacherSendBroadcastDialog = new AlertDialog.Builder(getContext())
+                    .setTitle("提示")
+                    .setMessage(content)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create();
+            teacherSendBroadcastDialog.show();
+        }
+
+        @Override
+        public void onLeaderRequestHelp() {
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaderRequestHelp();
+            }
+        }
+
+        @Override
+        public void onLeaderCancelHelp() {
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaderCancelHelp();
+            }
         }
     };
     // </editor-fold>
@@ -746,6 +863,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新成员控制弹层">
+    private void hideControlWindow() {
+        if (linkMicUserControlDialog != null && linkMicUserControlDialog.isShowing()) {
+            linkMicUserControlDialog.hide();
+        }
+    }
+
     private void checkHideControlWindow() {
         if (linkMicItemLayout == null) {
             return;
@@ -768,7 +891,7 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         if (pos >= 0 && linkMicUserControlDialog != null && linkMicUserControlDialog.isShowing()) {
             PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItemLayout.getDataBeanList().get(pos);
             if (linkMicItemDataBean.getLinkMicId() != null && linkMicItemDataBean.getLinkMicId().equals(linkMicUserControlDialog.getLinkMicUid())) {
-                linkMicUserControlDialog.bindViewData(linkMicItemDataBean, linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId()));
+                linkMicUserControlDialog.bindViewData(linkMicItemDataBean, linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId()), isGroupLeader);
             }
         }
     }
