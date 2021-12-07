@@ -664,7 +664,8 @@ public class PLVHCPptListLayout extends FrameLayout {
      * 根据显示样式，向Presenter请求更新列表数据
      */
     private void requestUpdateData() {
-        PLVDocumentPresenter.getInstance().requestGetPptCoverList();
+        //分组后各个房间的文档公用一个，需要强制刷新
+        PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
     }
 
     /**

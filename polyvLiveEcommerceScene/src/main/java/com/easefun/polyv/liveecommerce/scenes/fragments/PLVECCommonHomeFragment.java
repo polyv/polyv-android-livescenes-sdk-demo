@@ -199,7 +199,19 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
-            showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
+            PLVToast.Builder.context(Utils.getApp())
+                    .duration(2000)
+                    .setText(R.string.plv_chat_toast_account_login_elsewhere)
+                    .build()
+                    .show();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        (getActivity()).finish();
+                    }
+                }
+            },3000);
         }
     };
 

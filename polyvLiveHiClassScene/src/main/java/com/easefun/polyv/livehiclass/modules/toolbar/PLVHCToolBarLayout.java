@@ -1,5 +1,6 @@
 package com.easefun.polyv.livehiclass.modules.toolbar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +11,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +24,8 @@ import com.easefun.polyv.livehiclass.R;
 import com.easefun.polyv.livehiclass.modules.chatroom.IPLVHCChatroomLayout;
 import com.easefun.polyv.livehiclass.modules.chatroom.PLVHCChatroomLayout;
 import com.easefun.polyv.livehiclass.modules.document.popuplist.PLVHCPptListLayout;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCGroupLeaderGuideLayout;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCGroupLeaderRequestHelpLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCExitConfirmDialog;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCMemberLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCSettingLayout;
@@ -35,6 +37,7 @@ import com.easefun.polyv.livehiclass.ui.widget.PLVHCToast;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.livescenes.streamer.linkmic.PLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -50,6 +53,7 @@ import io.reactivex.functions.Consumer;
 public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final int RAISE_HAND_TIME = 10;
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     //聊天室布局
     private IPLVHCChatroomLayout chatroomLayout;
     //成员列表布局
@@ -58,6 +62,9 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     private PLVHCSettingLayout settingLayout;
     //文档管理布局
     private PLVHCPptListLayout pptListLayout;
+    //组长请求帮助的高亮指引布局
+    @Nullable
+    private PLVHCGroupLeaderGuideLayout leaderGuideLayout;
 
     //student view
     private ViewGroup plvhcToolbarStudentHandsUpLy;
@@ -68,7 +75,7 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     private ImageView plvhcToolbarStudentChatroomIv;
     private View plvhcToolbarStudentChatroomMsgTipsView;
     private LinearLayout plvhcToolbarStudentMarkToolControlGroup;
-    //teacher view
+    //teacher/leader view
     private ImageView plvhcToolbarClassIv;
     private ImageView plvhcToolbarDocumentIv;
     private ImageView plvhcToolbarMemberListIv;
@@ -77,15 +84,27 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     private View plvhcToolbarChatroomMsgTipsView;
     private ImageView plvhcToolbarSettingIv;
     private PLVHCStudentHandsLayout plvhcToolbarMemberHandsUpLy;
-    // student&teacher share view
+    private LinearLayout plvhcToolbarMarkToolControlGroup;
+    private PLVHCGroupLeaderRequestHelpLayout leaderRequestHelpLayout;
+    // student&teacher&leader share view
     private PLVHCMarkToolControllerLayout plvhcToolbarMarkToolControllerLayout;
     private ImageView plvhcToolbarMarkUndoIv;
     private ImageView plvhcToolbarMarkDeleteIv;
     private PLVRoundColorView plvhcToolbarMarkToolCurrentColorView;
     private PLVRoundImageView plvhcToolbarCurrentMarkToolIv;
 
+    //是否是讲师布局
     private boolean isTeacherLayout;
+    //是否是组长布局
+    private boolean isLeaderLayout;
+    //组长是否在请求帮助
+    private boolean isLeaderRequestHelp;
+    //上课按钮是否可用
     private boolean isClassButtonEnable;
+    //是否能调整布局
+    private boolean isCanAdjustLayout;
+    //记录学生布局的举手按钮的可见状态
+    private int studentHandsUpLyVisibility = View.INVISIBLE;
 
     private boolean isFullScreen;
     private int smallScreenHeight;
@@ -125,10 +144,13 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
 
     private void initStudentLayout() {
         isTeacherLayout = false;
-        ViewStub studentLyStub = findViewById(R.id.plvhc_toolbar_student_ly_stub);
-        studentLyStub.inflate();
+        isLeaderLayout = false;
+        removeAllViews();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.plvhc_toolbar_student_layout, null);
+        addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         //student view
         plvhcToolbarStudentHandsUpLy = findViewById(R.id.plvhc_toolbar_student_hands_up_ly);
+        plvhcToolbarStudentHandsUpLy.setVisibility(studentHandsUpLyVisibility);
         plvhcToolbarStudentHandsUpIv = findViewById(R.id.plvhc_toolbar_student_hands_up_iv);
         plvhcToolbarStudentHandsUpCdTv = findViewById(R.id.plvhc_toolbar_student_hands_up_cd_tv);
         plvhcToolbarStudentChatroomLy = findViewById(R.id.plvhc_toolbar_student_chatroom_ly);
@@ -152,12 +174,19 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
         plvhcToolbarCurrentMarkToolIv.setOnClickListener(this);
 
         initMarkToolControllerLayout();
+        adjustToolbarLayout();
+        memberLayout.hideWindow();
+        if (leaderGuideLayout != null) {
+            leaderGuideLayout.hide();
+        }
     }
 
     private void initTeacherLayout() {
         isTeacherLayout = true;
-        ViewStub teacherLyStub = findViewById(R.id.plvhc_toolbar_teacher_ly_stub);
-        teacherLyStub.inflate();
+        isLeaderLayout = false;
+        removeAllViews();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.plvhc_toolbar_teacher_layout, null);
+        addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         //teacher view
         plvhcToolbarMemberHandsUpLy = (PLVHCStudentHandsLayout) findViewById(R.id.plvhc_toolbar_member_hands_up_ly);
         plvhcToolbarMarkUndoIv = (ImageView) findViewById(R.id.plvhc_toolbar_mark_undo_iv);
@@ -174,6 +203,7 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
         plvhcToolbarMarkToolControllerLayout = new PLVHCMarkToolControllerLayout(getContext());
 
         //初始化点击事件
+        plvhcToolbarMemberHandsUpLy.setOnClickListener(this);
         plvhcToolbarClassIv.setOnClickListener(this);
         plvhcToolbarDocumentIv.setOnClickListener(this);
         plvhcToolbarMemberListIv.setOnClickListener(this);
@@ -190,6 +220,106 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
         }
 
         initMarkToolControllerLayout();
+        adjustToolbarLayout();
+        memberLayout.hideWindow();
+        if (leaderGuideLayout != null) {
+            leaderGuideLayout.hide();
+        }
+    }
+
+    private void initGroupStudentLayout() {
+        isTeacherLayout = false;
+        isLeaderLayout = false;
+        removeAllViews();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.plvhc_toolbar_group_student_layout, null);
+        addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        //student view
+        plvhcToolbarStudentChatroomLy = findViewById(R.id.plvhc_toolbar_student_chatroom_ly);
+        plvhcToolbarStudentChatroomIv = findViewById(R.id.plvhc_toolbar_student_chatroom_iv);
+        plvhcToolbarStudentChatroomMsgTipsView = findViewById(R.id.plvhc_toolbar_student_chatroom_msg_tips_view);
+        plvhcToolbarStudentSettingIv = findViewById(R.id.plvhc_toolbar_student_setting_iv);
+        plvhcToolbarMarkUndoIv = (ImageView) findViewById(R.id.plvhc_toolbar_student_mark_undo_iv);
+        plvhcToolbarMarkDeleteIv = (ImageView) findViewById(R.id.plvhc_toolbar_student_mark_delete_iv);
+        plvhcToolbarMarkToolCurrentColorView = (PLVRoundColorView) findViewById(R.id.plvhc_toolbar_student_mark_tool_current_color_view);
+        plvhcToolbarCurrentMarkToolIv = (PLVRoundImageView) findViewById(R.id.plvhc_toolbar_student_current_mark_tool_iv);
+        plvhcToolbarStudentMarkToolControlGroup = (LinearLayout) findViewById(R.id.plvhc_toolbar_student_mark_tool_control_group);
+        plvhcToolbarMarkToolControllerLayout = new PLVHCMarkToolControllerLayout(getContext());
+
+        //初始化点击事件
+        plvhcToolbarStudentChatroomIv.setOnClickListener(this);
+        plvhcToolbarStudentSettingIv.setOnClickListener(this);
+        plvhcToolbarMarkUndoIv.setOnClickListener(this);
+        plvhcToolbarMarkDeleteIv.setOnClickListener(this);
+        plvhcToolbarMarkToolCurrentColorView.setOnClickListener(this);
+        plvhcToolbarCurrentMarkToolIv.setOnClickListener(this);
+
+        initMarkToolControllerLayout();
+        adjustToolbarLayout();
+        memberLayout.hideWindow();
+        if (leaderGuideLayout != null) {
+            leaderGuideLayout.hide();
+        }
+    }
+
+    private void initGroupLeaderLayout() {
+        isTeacherLayout = false;
+        isLeaderLayout = true;
+        removeAllViews();
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.plvhc_toolbar_group_leader_layout, null);
+        addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        //teacher view
+        plvhcToolbarMarkUndoIv = (ImageView) findViewById(R.id.plvhc_toolbar_mark_undo_iv);
+        plvhcToolbarMarkDeleteIv = (ImageView) findViewById(R.id.plvhc_toolbar_mark_delete_iv);
+        plvhcToolbarMarkToolCurrentColorView = (PLVRoundColorView) findViewById(R.id.plvhc_toolbar_mark_tool_current_color_view);
+        plvhcToolbarCurrentMarkToolIv = (PLVRoundImageView) findViewById(R.id.plvhc_toolbar_current_mark_tool_iv);
+        leaderRequestHelpLayout = findViewById(R.id.plvhc_toolbar_leader_help_ly);
+        plvhcToolbarDocumentIv = (ImageView) findViewById(R.id.plvhc_toolbar_document_iv);
+        plvhcToolbarMemberListIv = (ImageView) findViewById(R.id.plvhc_toolbar_member_list_iv);
+        plvhcToolbarChatroomLy = findViewById(R.id.plvhc_toolbar_chatroom_ly);
+        plvhcToolbarChatroomIv = (ImageView) findViewById(R.id.plvhc_toolbar_chatroom_iv);
+        plvhcToolbarChatroomMsgTipsView = findViewById(R.id.plvhc_toolbar_chatroom_msg_tips_view);
+        plvhcToolbarSettingIv = (ImageView) findViewById(R.id.plvhc_toolbar_setting_iv);
+        plvhcToolbarMarkToolControlGroup = findViewById(R.id.plvhc_toolbar_mark_tool_control_group);
+        plvhcToolbarMarkToolControllerLayout = new PLVHCMarkToolControllerLayout(getContext());
+
+        //初始化点击事件
+        plvhcToolbarDocumentIv.setOnClickListener(this);
+        plvhcToolbarMemberListIv.setOnClickListener(this);
+        plvhcToolbarChatroomIv.setOnClickListener(this);
+        plvhcToolbarSettingIv.setOnClickListener(this);
+        plvhcToolbarMarkUndoIv.setOnClickListener(this);
+        plvhcToolbarMarkDeleteIv.setOnClickListener(this);
+        plvhcToolbarMarkToolCurrentColorView.setOnClickListener(this);
+        plvhcToolbarCurrentMarkToolIv.setOnClickListener(this);
+        leaderRequestHelpLayout.setOnLayoutClickListener(new PLVHCGroupLeaderRequestHelpLayout.OnHelpLayoutClickListener() {
+            @Override
+            public void onClick(boolean isRequest) {
+                if (isRequest) {
+                    PLVLinkMicEventSender.getInstance().groupRequestHelp(null);
+                    if (leaderGuideLayout != null) {
+                        leaderGuideLayout.showCancelHelpGuide(leaderRequestHelpLayout);
+                    }
+                } else {
+                    PLVLinkMicEventSender.getInstance().groupCancelHelp(null);
+                }
+                PLVHCToast.Builder.context(getContext())
+                        .setText(isRequest ? "请求已发起" : "请求已取消")
+                        .build()
+                        .show();
+            }
+        });
+        if (isLeaderRequestHelp) {
+            leaderRequestHelpLayout.onRequestHelp();
+        }
+
+        initMarkToolControllerLayout();
+        adjustToolbarLayout();
+        initLeaderGuideLayout();
+        memberLayout.setIsSimpleLayout();
+        memberLayout.hideWindow();
+        if (leaderGuideLayout != null) {
+            leaderGuideLayout.showRequestHelpGuide(leaderRequestHelpLayout);
+        }
     }
 
     private void initChatroomLayout() {
@@ -266,9 +396,16 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
         });
     }
 
+    private void initLeaderGuideLayout() {
+        if (leaderGuideLayout == null) {
+            leaderGuideLayout = ((Activity) getContext()).findViewById(R.id.plvhc_leader_request_help_guide_layout);
+        }
+    }
+
     private void initMarkToolControllerLayout() {
+        plvhcToolbarMarkToolControllerLayout.init(liveRoomDataManager, isLeaderLayout);
         // 进入时初始化标注工具状态
-        handleChangeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherLayout));
+        handleChangeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherLayout || isLeaderLayout));
         handleChangeColor(PLVHCMarkToolEnums.Color.getDefaultColor(isTeacherLayout));
         changeMarkToolState(false, false);
 
@@ -289,6 +426,7 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVHCToolBarLayout定义的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
         String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType)) {
             initTeacherLayout();
@@ -300,8 +438,6 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
         //register after init
         chatroomLayout.getChatroomPresenter().registerView(memberLayout.getChatroomView());
         chatroomLayout.getChatroomPresenter().requestKickUsers();
-
-        plvhcToolbarMarkToolControllerLayout.init(liveRoomDataManager);
     }
 
     @Override
@@ -328,11 +464,12 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     public void onLessonPreparing(long serverTime, long lessonStartTime) {
         if (plvhcToolbarClassIv != null) {
             plvhcToolbarClassIv.setSelected(false);
-            isClassButtonEnable = true;
         }
         if (plvhcToolbarStudentHandsUpLy != null) {
             plvhcToolbarStudentHandsUpLy.setVisibility(View.INVISIBLE);
         }
+        isClassButtonEnable = true;
+        studentHandsUpLyVisibility = View.INVISIBLE;
         chatroomLayout.onLessonPreparing(serverTime, lessonStartTime);
     }
 
@@ -340,11 +477,12 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     public void onLessonStarted() {
         if (plvhcToolbarClassIv != null) {
             plvhcToolbarClassIv.setSelected(true);
-            isClassButtonEnable = true;
         }
         if (plvhcToolbarStudentHandsUpLy != null) {
             plvhcToolbarStudentHandsUpLy.setVisibility(View.VISIBLE);
         }
+        isClassButtonEnable = true;
+        studentHandsUpLyVisibility = View.VISIBLE;
         chatroomLayout.onLessonStarted();
     }
 
@@ -352,35 +490,66 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     public void onLessonEnd(long inClassTime) {
         if (plvhcToolbarClassIv != null) {
             plvhcToolbarClassIv.setSelected(false);
-            isClassButtonEnable = true;
         }
         if (plvhcToolbarStudentHandsUpLy != null) {
             plvhcToolbarStudentHandsUpLy.setVisibility(View.INVISIBLE);
         }
+        if (leaderGuideLayout != null) {
+            leaderGuideLayout.hide();
+        }
+        isClassButtonEnable = true;
+        studentHandsUpLyVisibility = View.INVISIBLE;
         chatroomLayout.onLessonEnd(inClassTime);
     }
 
     @Override
-    public void adjustLayout() {
-        if (!isTeacherLayout) {
-            int lackStudentLyHeight = getHeight() - ConvertUtils.dp2px(228);
-            if (lackStudentLyHeight < 0) {
-                addBottomMargin = lackStudentLyHeight / 2;
-                addBottomMargin(plvhcToolbarStudentHandsUpLy, addBottomMargin);
-                addBottomMargin(plvhcToolbarStudentChatroomLy, addBottomMargin);
-            }
+    public void onUserHasGroupLeader(boolean isHasGroupLeader) {
+        if (isHasGroupLeader) {
+            initGroupLeaderLayout();
         } else {
-            int lackTeacherLyHeight = getHeight() - ConvertUtils.dp2px(276);
-            if (lackTeacherLyHeight < 0) {
-                addBottomMargin = lackTeacherLyHeight / 4;
-                addBottomMargin(plvhcToolbarClassIv, addBottomMargin);
-                addBottomMargin(plvhcToolbarDocumentIv, addBottomMargin);
-                addBottomMargin(plvhcToolbarMemberListIv, addBottomMargin);
-                addBottomMargin(plvhcToolbarChatroomLy, addBottomMargin);
-                addBottomMargin(plvhcToolbarMemberHandsUpLy, addBottomMargin * 2);
+            initGroupStudentLayout();
+        }
+    }
+
+    @Override
+    public void onJoinDiscuss(String groupId) {
+        isLeaderRequestHelp = false;
+        chatroomLayout.onJoinDiscuss(groupId);
+    }
+
+    @Override
+    public void onLeaveDiscuss() {
+        chatroomLayout.onLeaveDiscuss();
+        if (liveRoomDataManager != null) {
+            String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+            if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType)) {
+                initTeacherLayout();
+            } else {
+                initStudentLayout();
             }
         }
-        plvhcToolbarMarkToolControllerLayout.setAddBottomMargin(addBottomMargin);
+    }
+
+    @Override
+    public void onLeaderRequestHelp() {
+        isLeaderRequestHelp = true;
+        if (leaderRequestHelpLayout != null) {
+            leaderRequestHelpLayout.onRequestHelp();
+        }
+    }
+
+    @Override
+    public void onLeaderCancelHelp() {
+        isLeaderRequestHelp = false;
+        if (leaderRequestHelpLayout != null) {
+            leaderRequestHelpLayout.onCancelHelp();
+        }
+    }
+
+    @Override
+    public void adjustLayout() {
+        isCanAdjustLayout = true;
+        adjustToolbarLayout();
     }
 
     @Override
@@ -392,13 +561,20 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
 
     @Override
     public void acceptHasPaintToMe(boolean isHasPaint) {
-        if (plvhcToolbarStudentMarkToolControlGroup == null) {
-            return;
-        }
         if (isHasPaint) {
-            plvhcToolbarStudentMarkToolControlGroup.setVisibility(View.VISIBLE);
+            if (plvhcToolbarStudentMarkToolControlGroup != null) {
+                plvhcToolbarStudentMarkToolControlGroup.setVisibility(View.VISIBLE);
+            }
+            if (isLeaderLayout && plvhcToolbarMarkToolControlGroup != null) {
+                plvhcToolbarMarkToolControlGroup.setVisibility(View.VISIBLE);
+            }
         } else {
-            plvhcToolbarStudentMarkToolControlGroup.setVisibility(View.GONE);
+            if (plvhcToolbarStudentMarkToolControlGroup != null) {
+                plvhcToolbarStudentMarkToolControlGroup.setVisibility(View.GONE);
+            }
+            if (isLeaderLayout && plvhcToolbarMarkToolControlGroup != null) {
+                plvhcToolbarMarkToolControlGroup.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -452,6 +628,33 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部方法">
+    private void adjustToolbarLayout() {
+        if (!isCanAdjustLayout) {
+            return;
+        }
+        if (!isTeacherLayout && !isLeaderLayout) {
+            int lackStudentLyHeight = getHeight() - ConvertUtils.dp2px(228);
+            if (lackStudentLyHeight < 0) {
+                addBottomMargin = lackStudentLyHeight / 2;
+                addBottomMargin(plvhcToolbarStudentHandsUpLy, addBottomMargin);
+                addBottomMargin(plvhcToolbarStudentChatroomLy, addBottomMargin);
+            }
+        } else {
+            int lackTeacherLyHeight = getHeight() - ConvertUtils.dp2px(276);
+            if (lackTeacherLyHeight < 0) {
+                addBottomMargin = lackTeacherLyHeight / 4;
+                addBottomMargin(plvhcToolbarClassIv, addBottomMargin);
+                addBottomMargin(plvhcToolbarDocumentIv, addBottomMargin);
+                addBottomMargin(plvhcToolbarMemberListIv, addBottomMargin);
+                addBottomMargin(plvhcToolbarChatroomLy, addBottomMargin);
+                addBottomMargin(leaderRequestHelpLayout, addBottomMargin);
+
+                addBottomMargin(plvhcToolbarMemberHandsUpLy, addBottomMargin * 2);
+            }
+        }
+        plvhcToolbarMarkToolControllerLayout.setAddBottomMargin(addBottomMargin);
+    }
+
     private void addBottomMargin(View view, int addMargin) {
         if (view == null) {
             return;
@@ -641,7 +844,8 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
             if (plvhcToolbarStudentChatroomMsgTipsView != null) {
                 plvhcToolbarStudentChatroomMsgTipsView.setVisibility(View.GONE);
             }
-        } else if (id == R.id.plvhc_toolbar_member_list_iv) {
+        } else if (id == R.id.plvhc_toolbar_member_list_iv
+                || id == R.id.plvhc_toolbar_member_hands_up_ly) {
             memberLayout.show(getWidth(), smallScreenHeight, smallScreenLocation);
         } else if (id == R.id.plvhc_toolbar_student_setting_iv
                 || id == R.id.plvhc_toolbar_setting_iv) {

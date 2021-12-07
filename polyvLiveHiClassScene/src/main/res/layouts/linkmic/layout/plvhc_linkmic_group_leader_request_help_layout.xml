@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <ImageView
+        android:id="@+id/plvhc_group_request_help_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/plvhc_linkmic_group_help_request" />
+
+    <ImageView
+        android:id="@+id/plvhc_group_request_help_status_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/plvhc_linkmic_group_help_anim"
+        android:visibility="gone" />
+</FrameLayout>

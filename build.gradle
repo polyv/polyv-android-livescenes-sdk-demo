@@ -30,6 +30,9 @@ allprojects {
         maven{
             url 'https://maven.aliyun.com/repository/public'
         }
+        maven {//maven central snapshots 地址
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
         //保利威阿里云效
         maven {
             credentials {
@@ -38,15 +41,22 @@ allprojects {
             }
             url 'https://packages.aliyun.com/maven/repository/2102846-release-8EVsoM/'
         }
+        maven {
+            credentials {
+                username '609cc5623a10edbf36da9615'
+                password 'EbkbzTNHRJ=P'
+            }
+            url 'https://packages.aliyun.com/maven/repository/2102846-snapshot-HHyKxp/'
+        }
     }
 }
 
 ext {
     compileSdkVersion = 27
-    minSdkVersion = 21
+    minSdkVersion = 17//如果需要降级到21，请查看文档：
     targetSdkVersion = 27
-    versionCode = 171
-    versionName = "1.7.1"
+    versionCode = 172
+    versionName = "1.7.2"
 }
 
 task clean(type: Delete) {

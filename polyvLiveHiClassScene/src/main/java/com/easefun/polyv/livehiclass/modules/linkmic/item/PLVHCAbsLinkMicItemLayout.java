@@ -2,6 +2,7 @@ package com.easefun.polyv.livehiclass.modules.linkmic.item;
 
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -16,10 +17,13 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
     // <editor-fold defaultstate="collapsed" desc="变量">
     //data
     private List<PLVLinkMicItemDataBean> dataBeanList;
+    private boolean isJoinDiscuss;
+    private String leaderId;
     //viewList
     private List<PLVHCLinkMicItemView> itemViewList;
     //占位item
     private PLVLinkMicItemDataBean placeDataBean;
+    private boolean isTeacherPreparing;
     //listener
     protected PLVHCLinkMicItemView.OnRenderViewCallback onRenderViewCallback;
     protected OnViewActionListener onViewActionListener;
@@ -41,10 +45,24 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVHCLinkMicItemLayout定义的方法">
     @Override
-    public void bindData(List<PLVLinkMicItemDataBean> dataBeanList) {
+    public void bindData(List<PLVLinkMicItemDataBean> dataBeanList, boolean isJoinDiscuss) {
         this.dataBeanList = dataBeanList;
+        this.isJoinDiscuss = isJoinDiscuss;
         for (int i = 0; i < Math.min(getDataCount(), dataBeanList.size()); i++) {
             itemViewList.get(i).bindData(dataBeanList.get(i));
+        }
+    }
+
+    @Override
+    public void clearData(boolean isJoinDiscuss) {
+        for (int i = 0; i < getDataCount(); i++) {
+            itemViewList.get(i).removeRenderView();
+            itemViewList.get(i).setVisibility(getHideItemMode());
+        }
+        dataBeanList = null;
+        placeDataBean = null;
+        if (!isJoinDiscuss) {
+            leaderId = null;
         }
     }
 
@@ -52,11 +70,20 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
     public void setPlaceLinkMicItem(PLVLinkMicItemDataBean placeLinkMicItem, boolean isTeacherPreparing) {
         if ((dataBeanList != null && dataBeanList.isEmpty())
                 || placeDataBean != null) {
-            placeDataBean = placeLinkMicItem;
+            this.placeDataBean = placeLinkMicItem;
+            this.isTeacherPreparing = isTeacherPreparing;
             itemViewList.get(0).setVisibility(View.VISIBLE);
             itemViewList.get(0).bindData(placeDataBean);
-            itemViewList.get(0).updateTeacherPreparingStatus(isTeacherPreparing);
             itemViewList.get(0).removeRenderView();
+            itemViewList.get(0).updateTeacherPreparingStatus(isTeacherPreparing);
+        }
+    }
+
+    @Override
+    public void updatePlaceLinkMicItemNick(String nick) {
+        if (placeDataBean != null && TextUtils.isEmpty(placeDataBean.getNick())) {
+            placeDataBean.setNick(nick);
+            setPlaceLinkMicItem(placeDataBean, isTeacherPreparing);
         }
     }
 
@@ -72,7 +99,8 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
         }
         if (placeDataBean != null
                 && dataBean.isTeacher()
-                && position == 0) {
+                && position == 0
+                && !isJoinDiscuss) {
             itemViewList.get(0).bindData(dataBean);
             itemViewList.get(0).updateTeacherPreparingStatus(false);
             placeDataBean = null;
@@ -91,6 +119,9 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
         }
         itemViewList.get(position).addItemView(viewParam);
         itemViewList.get(position).bindData(dataBean);
+        if (leaderId != null && leaderId.equals(dataBean.getLinkMicId())) {
+            itemViewList.get(position).updateLeaderStatus(true);
+        }
     }
 
     @Override
@@ -100,9 +131,11 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
         }
         if (placeDataBean == null
                 && dataBean.isTeacher()
-                && position == 0) {
+                && position == 0
+                && !isJoinDiscuss) {
             placeDataBean = dataBean;
             itemViewList.get(0).removeRenderView();
+            itemViewList.get(0).updateTeacherPreparingStatus(false);
             return;
         }
         position = position + (placeDataBean == null ? 0 : 1);
@@ -196,6 +229,22 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
             return;
         }
         itemViewList.get(position).updateHasPaint();
+    }
+
+    @Override
+    public void onUserHasLeader(String leaderId) {
+        String oldLeaderId = this.leaderId;
+        this.leaderId = leaderId;
+        for (int i = 0; i < getDataCount(); i++) {
+            String linkMicId = itemViewList.get(i).getLinkMicId();
+            if (linkMicId != null) {
+                if (linkMicId.equals(this.leaderId)) {
+                    itemViewList.get(i).updateLeaderStatus(true);
+                } else if (linkMicId.equals(oldLeaderId)) {
+                    itemViewList.get(i).updateLeaderStatus(false);
+                }
+            }
+        }
     }
 
     @Override

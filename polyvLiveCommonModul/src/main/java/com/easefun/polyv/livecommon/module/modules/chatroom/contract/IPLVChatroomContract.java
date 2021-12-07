@@ -370,6 +370,18 @@ public interface IPLVChatroomContract {
         void toggleRoom(final boolean isClose, final IPolyvChatroomManager.RequestApiListener<String> listener);
 
         /**
+         * 加入讨论
+         *
+         * @param groupId 分组Id
+         */
+        void onJoinDiscuss(String groupId);
+
+        /**
+         * 离开讨论
+         */
+        void onLeaveDiscuss();
+
+        /**
          * 获取聊天室的数据
          */
         @NonNull

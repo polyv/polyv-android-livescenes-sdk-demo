@@ -165,6 +165,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         isOnlyAudio = onlyAudio;
     }
 
+    public void setHasNotifyTeacherViewHolderBind(boolean hasNotifyTeacherViewHolderBind) {
+        this.hasNotifyTeacherViewHolderBind = hasNotifyTeacherViewHolderBind;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 第一画面">

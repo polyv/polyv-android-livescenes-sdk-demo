@@ -389,15 +389,20 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public void setFrontCameraMirror(boolean enable) {
+    public void setFrontCameraMirror(final boolean enable) {
         if (!isInitStreamerManager()) {
             return;
         }
         if (curCameraFront) {
             this.isFrontMirror = enable;
             streamerData.postIsFrontMirrorMode(isFrontMirror);
-            streamerManager.setLocalPreviewMirror(enable);
-            streamerManager.setLocalPushMirror(enable);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    streamerManager.setLocalPreviewMirror(enable);
+                    streamerManager.setLocalPushMirror(enable);
+                }
+            });
         }
     }
 

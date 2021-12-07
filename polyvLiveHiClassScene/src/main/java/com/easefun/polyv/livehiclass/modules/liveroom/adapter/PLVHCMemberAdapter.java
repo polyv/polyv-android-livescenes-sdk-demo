@@ -19,6 +19,8 @@ import com.easefun.polyv.livehiclass.R;
 import com.easefun.polyv.livehiclass.ui.widget.PLVHCConfirmDialog;
 import com.easefun.polyv.livehiclass.ui.widget.PLVHCToast;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.net.model.PLVSocketLoginVO;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final String PAYLOAD_UPDATE_USER_COUNT_CHANGED = "updateUserCountChanged";
     //data
     private List<PLVMemberItemDataBean> dataBeanList;
+    private boolean isSimpleLayout = false;
     //listener
     private OnViewActionListener onViewActionListener;
     // </editor-fold>
@@ -127,6 +130,10 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_USER_COUNT_CHANGED);
     }
 
+    public void setIsSimpleLayout() {
+        this.isSimpleLayout = true;
+    }
+
     public void setOnViewActionListener(OnViewActionListener listener) {
         onViewActionListener = listener;
     }
@@ -166,6 +173,13 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             plvhcMemberCupsTv = findViewById(R.id.plvhc_member_cups_tv);
             plvhcMemberBanIv = findViewById(R.id.plvhc_member_ban_iv);
             plvhcMemberKickIv = findViewById(R.id.plvhc_member_kick_iv);
+
+            if (isSimpleLayout) {
+                ((ViewGroup) plvhcMemberHandsUpIv.getParent()).setVisibility(View.GONE);
+                ((ViewGroup) plvhcMemberCupsTv.getParent()).setVisibility(View.GONE);
+                ((ViewGroup) plvhcMemberBanIv.getParent()).setVisibility(View.GONE);
+                ((ViewGroup) plvhcMemberKickIv.getParent()).setVisibility(View.GONE);
+            }
 
             AnimationDrawable animationDrawable = (AnimationDrawable) plvhcMemberLinkmicConnectingIv.getDrawable();
             animationDrawable.start();
@@ -313,6 +327,14 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         }
 
+        private boolean isMyUserId() {
+            PLVSocketLoginVO socketLoginVO = PLVSocketWrapper.getInstance().getLoginVO();
+            if (socketLoginVO == null || socketLoginVO.getUserId() == null) {
+                return false;
+            }
+            return socketUserBean != null && socketLoginVO.getUserId().equals(socketUserBean.getUserId());
+        }
+
         private <T extends View> T findViewById(@IdRes int id) {
             return itemView.findViewById(id);
         }
@@ -391,6 +413,9 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     onViewActionListener.onPaintControlAction(getAdapterPosition(), isAllow, new Ack() {
                         @Override
                         public void call(Object... args) {
+                            if (isMyUserId()) {
+                                return;
+                            }
                             PLVHCToast.Builder.context(v.getContext())
                                     .setDrawable(isAllow ? R.drawable.plvhc_member_list_paint : R.drawable.plvhc_member_list_paint_disable)
                                     .setText(isAllow ? "已授权该学生画笔" : "已收回该学生画笔")
@@ -408,6 +433,9 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     onViewActionListener.onMicControlAction(getAdapterPosition(), isMute, new Ack() {
                         @Override
                         public void call(Object... args) {
+                            if (isMyUserId()) {
+                                return;
+                            }
                             PLVHCToast.Builder.context(v.getContext())
                                     .setDrawable(isMute ? R.drawable.plvhc_member_mic_sel : R.drawable.plvhc_member_mic)
                                     .setText(isMute ? "已关闭该学生麦克风" : "已开启该学生麦克风")
@@ -425,6 +453,9 @@ public class PLVHCMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     onViewActionListener.onCameraControlAction(getAdapterPosition(), isMute, new Ack() {
                         @Override
                         public void call(Object... args) {
+                            if (isMyUserId()) {
+                                return;
+                            }
                             PLVHCToast.Builder.context(v.getContext())
                                     .setDrawable(isMute ? R.drawable.plvhc_member_camera_sel : R.drawable.plvhc_member_camera)
                                     .setText(isMute ? "已关闭该学生摄像头" : "已开启该学生摄像头")

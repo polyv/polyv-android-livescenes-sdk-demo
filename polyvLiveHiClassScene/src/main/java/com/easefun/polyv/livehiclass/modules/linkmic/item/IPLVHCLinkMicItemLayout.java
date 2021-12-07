@@ -12,9 +12,17 @@ public interface IPLVHCLinkMicItemLayout {
     /**
      * 绑定数据
      *
-     * @param dataBeanList 数据列表
+     * @param dataBeanList  数据列表
+     * @param isJoinDiscuss 是否加入了分组讨论
      */
-    void bindData(List<PLVLinkMicItemDataBean> dataBeanList);
+    void bindData(List<PLVLinkMicItemDataBean> dataBeanList, boolean isJoinDiscuss);
+
+    /**
+     * 清除数据
+     *
+     * @param isJoinDiscuss 是否加入讨论，true：加入,false：离开
+     */
+    void clearData(boolean isJoinDiscuss);
 
     /**
      * 设置占位Item
@@ -23,6 +31,13 @@ public interface IPLVHCLinkMicItemLayout {
      * @param isTeacherPreparing 是否讲师准备中
      */
     void setPlaceLinkMicItem(PLVLinkMicItemDataBean placeLinkMicItem, boolean isTeacherPreparing);
+
+    /**
+     * 更新占位Item的昵称
+     *
+     * @param nick 昵称
+     */
+    void updatePlaceLinkMicItemNick(String nick);
 
     /**
      * 获取数据
@@ -91,6 +106,13 @@ public interface IPLVHCLinkMicItemLayout {
      * 用户画笔授权变化
      */
     void onUserHasPaint(int position);
+
+    /**
+     * 用户组长变化
+     *
+     * @param leaderId 组长Id
+     */
+    void onUserHasLeader(String leaderId);
 
     /**
      * 设置renderView监听回调

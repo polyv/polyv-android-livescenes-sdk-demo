@@ -1,11 +1,14 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
+import android.os.Looper;
+
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
 import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
+import com.plv.livescenes.linkmic.IPLVLinkMicManager;
 
 /**
  * date: 2020/12/23
@@ -52,10 +55,13 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
                     public void onJoinChannelSuccess(String uid) {
                         isJoinLinkMic = true;
                         linkMicManager.switchRoleToBroadcaster();
-                        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
                         PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onJoinChannelSuccess");
-                        PLVLinkMicJoinSuccess joinSuccess = linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
-                        onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+                        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId(), new IPLVLinkMicManager.OnSendJoinSuccessMsgListener() {
+                            @Override
+                            public void onSendJoinSuccessMsg(PLVLinkMicJoinSuccess joinSuccess) {
+                                onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+                            }
+                        });
                     }
                 });
             }

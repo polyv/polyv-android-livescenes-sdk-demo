@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
+import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleMemberList;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.view.PLVAbsMultiRoleLinkMicView;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -78,6 +79,7 @@ public class PLVHCMemberLayout extends FrameLayout implements View.OnClickListen
     private int onlineCount;
     private int kickCount;
     private boolean isSelectOnlineList = true;
+    private boolean isSimpleLayout = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -228,6 +230,20 @@ public class PLVHCMemberLayout extends FrameLayout implements View.OnClickListen
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
+    public void hideWindow() {
+        memberTypeWindow.hide();
+    }
+
+    public void setIsSimpleLayout() {
+        this.isSimpleLayout = true;
+        plvhcMemberListHandsUpTv.setVisibility(View.GONE);
+        plvhcMemberListCupsTv.setVisibility(View.GONE);
+        plvhcMemberListBanTv.setVisibility(View.GONE);
+        plvhcMemberListKickTv.setVisibility(View.GONE);
+        memberTypeWindow.setIsSimpleLayout();
+        memberAdapter.setIsSimpleLayout();
+    }
+
     public void show(int viewWidth, int viewHeight, int[] viewLocation) {
         if (container == null) {
             container = ((Activity) getContext()).findViewById(R.id.plvhc_live_room_popup_container);
@@ -242,7 +258,7 @@ public class PLVHCMemberLayout extends FrameLayout implements View.OnClickListen
         final int screenWidth = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
 
         int height = viewHeight - ConvertUtils.dp2px(16);
-        int width = screenWidth - ConvertUtils.dp2px(50 + 66);
+        int width = isSimpleLayout ? ConvertUtils.dp2px(408) : (screenWidth - ConvertUtils.dp2px(50 + 66));
 
         FrameLayout.LayoutParams lp = new LayoutParams(width, height);
         lp.rightMargin = ConvertUtils.dp2px(66);
@@ -364,7 +380,7 @@ public class PLVHCMemberLayout extends FrameLayout implements View.OnClickListen
                     if (integer == null) {
                         return;
                     }
-                    int onlineCount = Math.max(0, integer - 1);//由于自己不显示在在线列表，因此减1
+                    int onlineCount = Math.max(0, integer);
                     updateOnlineCount(onlineCount);
                 }
             });
@@ -392,6 +408,8 @@ public class PLVHCMemberLayout extends FrameLayout implements View.OnClickListen
         if (memberAdapter.getDataBeanList().isEmpty()) {
             onlineCount = 0;
         } else if (onlineCount < memberAdapter.getDataBeanList().size()) {
+            onlineCount = memberAdapter.getDataBeanList().size();
+        } else if (onlineCount > memberAdapter.getDataBeanList().size() && onlineCount < PLVMultiRoleMemberList.MEMBER_LENGTH_MORE) {
             onlineCount = memberAdapter.getDataBeanList().size();
         }
         return onlineCount;

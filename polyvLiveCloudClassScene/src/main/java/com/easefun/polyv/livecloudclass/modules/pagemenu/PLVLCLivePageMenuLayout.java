@@ -469,7 +469,19 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
-            showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
+            PLVToast.Builder.context(Utils.getApp())
+                    .duration(2000)
+                    .setText(R.string.plv_chat_toast_account_login_elsewhere)
+                    .build()
+                    .show();
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if ((Activity)getContext() != null) {
+                        ((Activity)getContext()).finish();
+                    }
+                }
+            },3000);
         }
     };
 

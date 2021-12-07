@@ -1,8 +1,5 @@
 package com.easefun.polyv.livehiclass.modules.statusbar;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
-
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
@@ -34,6 +31,9 @@ import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
 /**
  * 状态栏布局
@@ -69,6 +69,8 @@ public class PLVHCStatusBarLayout extends FrameLayout implements IPLVHCStatusBar
     private long lessonPresetEndTime;
     private boolean lessonStart = false;
     private boolean lessonEnd = false;
+
+    private String saveLessonName = "";
 
     private PLVNetworkStatusVO upstreamNetworkStatus;
 
@@ -158,6 +160,7 @@ public class PLVHCStatusBarLayout extends FrameLayout implements IPLVHCStatusBar
                                 lessonRealStartTime = serverTimeInMs - inClassTimeInSec * 1000;
                             }
                             if (hiClassDataBean.getData().getName() != null) {
+                                saveLessonName = hiClassDataBean.getData().getName();
                                 setLessonName(hiClassDataBean.getData().getName());
                             }
                         }
@@ -182,6 +185,16 @@ public class PLVHCStatusBarLayout extends FrameLayout implements IPLVHCStatusBar
     @Override
     public void onLessonEnd() {
         lessonEnd = true;
+    }
+
+    @Override
+    public void onJoinDiscuss(String groupId, String groupName) {
+        setLessonName(saveLessonName + "-" + groupName);
+    }
+
+    @Override
+    public void onLeaveDiscuss() {
+        setLessonName(saveLessonName);
     }
 
     @Override

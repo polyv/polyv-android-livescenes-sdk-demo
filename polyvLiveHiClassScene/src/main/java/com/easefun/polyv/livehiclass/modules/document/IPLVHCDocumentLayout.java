@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livehiclass.modules.toolbar.enums.PLVHCMarkToolEnums;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 
 /**
  * @author suhongtao
@@ -54,6 +55,23 @@ public interface IPLVHCDocumentLayout {
      * @param isHasPaint
      */
     void acceptHasPaintToMe(boolean isHasPaint);
+
+    /**
+     * 用户获取组长权限
+     *
+     * @param isHasGroupLeader true：自己有组长权限，false：自己没有组长权限
+     */
+    void onUserHasGroupLeader(boolean isHasGroupLeader);
+
+    /**
+     * 加入讨论
+     */
+    void onJoinDiscuss(PLVSwitchRoomEvent switchRoomEvent);
+
+    /**
+     * 离开讨论
+     */
+    void onLeaveDiscuss(PLVSwitchRoomEvent switchRoomEvent);
 
     /**
      * 设置view交互事件监听器

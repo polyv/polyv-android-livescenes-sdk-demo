@@ -270,6 +270,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         this.liveTitle = liveRoomDataManager.getConfig().getChannelName();
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
+
+        //标记默认的布局方向
+        PLVLiveLocalActionHelper.getInstance().updateOrientation(PLVScreenUtils.isPortrait(getContext()));
     }
 
     @Override

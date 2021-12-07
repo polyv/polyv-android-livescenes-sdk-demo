@@ -63,7 +63,7 @@ public class PLVMultiRoleLinkMicList {
     private List<PLVLinkMicItemDataBean> linkMicList = new LinkedList<>();
     //加入rtc的列表数据
     private Map<String, PLVLinkMicItemDataBean> rtcJoinMap = new HashMap<>();
-    //记录的讲师屏幕流状态
+    //记录的讲师/组长屏幕流状态
     private Map<String, Boolean> teacherScreenStreamMap = new HashMap<>();
 
     //我的连麦item
@@ -73,9 +73,12 @@ public class PLVMultiRoleLinkMicList {
     private PLVClassStatusBean myClassStatusBeanOnSliceId;
     private String myLinkMicId;
     private boolean isTeacherType;
+    //分组的组长Id
+    private String groupLeaderId;
 
     //disposable
     private Disposable linkMicListTimerDisposable;
+    private Disposable linkMicListOnceDisposable;
     //listener
     private List<OnLinkMicListListener> onLinkMicListListeners = new ArrayList<>();
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
@@ -100,6 +103,11 @@ public class PLVMultiRoleLinkMicList {
         return rtcJoinMap;
     }
 
+    public void notifyLeaderChanged(String groupLeaderId) {
+        this.groupLeaderId = groupLeaderId;
+        sortLinkMicList(groupLeaderId);
+    }
+
     public void requestData() {
         requestLinkMicListApi();
     }
@@ -122,6 +130,10 @@ public class PLVMultiRoleLinkMicList {
 
     public void addMyItemToLinkMicList(boolean curEnableLocalVideo, boolean curEnableLocalAudio) {
         addMyItemToLinkMicListInner(curEnableLocalVideo, curEnableLocalAudio);
+    }
+
+    public void removeMyItemToLinkMicList() {
+        removeMyItemToLinkMicListInner();
     }
 
     public boolean updateLinkMicItemInfoWithRtcJoinList(PLVLinkMicItemDataBean linkMicItemDataBean, final String linkMicUid) {
@@ -151,9 +163,10 @@ public class PLVMultiRoleLinkMicList {
     public void destroy() {
         linkMicList.clear();
         rtcJoinMap.clear();
-        teacherScreenStreamMap.clear();
+        cleanTeacherScreenStream();
         onLinkMicListListeners.clear();
         dispose(linkMicListTimerDisposable);
+        dispose(linkMicListOnceDisposable);
         PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
         if (linkMicManager != null) {
             linkMicManager.removeEventHandler(linkMicEventListener);
@@ -167,22 +180,36 @@ public class PLVMultiRoleLinkMicList {
         linkMicListTimerDisposable = PLVRxTimer.timer(DELAY_TO_GET_LINK_MIC_LIST, INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
-                callbackToListener(new ListenerRunnable() {
-                    @Override
-                    public void run(@NonNull OnLinkMicListListener linkMicListListener) {
-                        linkMicListListener.onGetLinkMicListStatus(liveRoomDataManager.getSessionId(), new PLVLinkMicDataRepository.IPLVLinkMicDataRepoListener<PLVLinkMicJoinStatus>() {
-                            @Override
-                            public void onSuccess(PLVLinkMicJoinStatus data) {
-                                PLVCommonLog.d(TAG, "requestLinkMicListFromServer.onSuccess->\n" + data.toString());
-                                updateLinkMicListWithJoinStatus(data);
-                            }
+                acceptGetLinkMicListStatus();
+            }
+        });
+    }
 
-                            @Override
-                            public void onFail(PLVLinkMicHttpRequestException throwable) {
-                                super.onFail(throwable);
-                                PLVCommonLog.exception(throwable);
-                            }
-                        });
+    private void requestLinkMicListApiOnce() {
+        dispose(linkMicListOnceDisposable);
+        linkMicListOnceDisposable = PLVRxTimer.delay(DELAY_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+            @Override
+            public void accept(Long aLong) throws Exception {
+                acceptGetLinkMicListStatus();
+            }
+        });
+    }
+
+    private void acceptGetLinkMicListStatus() {
+        callbackToListener(new ListenerRunnable() {
+            @Override
+            public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                linkMicListListener.onGetLinkMicListStatus(liveRoomDataManager.getSessionId(), new PLVLinkMicDataRepository.IPLVLinkMicDataRepoListener<PLVLinkMicJoinStatus>() {
+                    @Override
+                    public void onSuccess(PLVLinkMicJoinStatus data) {
+                        PLVCommonLog.d(TAG, "requestLinkMicListFromServer.onSuccess->\n" + data.toString());
+                        updateLinkMicListWithJoinStatus(data);
+                    }
+
+                    @Override
+                    public void onFail(PLVLinkMicHttpRequestException throwable) {
+                        super.onFail(throwable);
+                        PLVCommonLog.exception(throwable);
                     }
                 });
             }
@@ -190,13 +217,22 @@ public class PLVMultiRoleLinkMicList {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="添加自己的连麦item">
+    // <editor-fold defaultstate="collapsed" desc="增删自己的连麦item">
     private void addMyItemToLinkMicListInner(boolean curEnableLocalVideo, boolean curEnableLocalAudio) {
         Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(myLinkMicId);
         if (linkMicItem == null && myLinkMicItemBean != null) {
             myLinkMicItemBean.setMuteVideo(!curEnableLocalVideo);
             myLinkMicItemBean.setMuteAudio(!curEnableLocalAudio);
-            final int addIndex = isTeacherType ? 0 : linkMicList.size();
+            myLinkMicItemBean.setStatus(PLVLinkMicItemDataBean.STATUS_RTC_JOIN);
+            int addIndex = isTeacherType ? 0 : linkMicList.size();
+            if (isLeaderId(myLinkMicId)) {
+                addIndex = 0;
+                for (int i = 0; i < linkMicList.size(); i++) {
+                    if (linkMicList.get(i).isTeacher()) {
+                        addIndex = i + 1;
+                    }
+                }
+            }
             linkMicList.add(addIndex, myLinkMicItemBean);
             if (myClassStatusBeanOnSliceId != null) {
                 myLinkMicItemBean.setHasPaint(myClassStatusBeanOnSliceId.hasPaint());
@@ -209,11 +245,33 @@ public class PLVMultiRoleLinkMicList {
                     linkMicListListener.syncLinkMicItem(myLinkMicItemBean, userId);
                 }
             });
+            final int finalAddIndex = addIndex;
             callbackToListener(new ListenerRunnable() {
                 @Override
                 public void run(@NonNull OnLinkMicListListener linkMicListListener) {
                     //更新连麦列表
-                    linkMicListListener.onLinkMicItemInsert(myLinkMicItemBean, addIndex);
+                    linkMicListListener.onLinkMicItemInsert(myLinkMicItemBean, finalAddIndex);
+                }
+            });
+            //连麦状态改变，更新成员列表
+            callbackToListener(new ListenerRunnable() {
+                @Override
+                public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                    linkMicListListener.onLinkMicItemInfoChanged();
+                }
+            });
+        }
+    }
+
+    private void removeMyItemToLinkMicListInner() {
+        final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(myLinkMicId);
+        if (linkMicItem != null) {
+            linkMicList.remove(linkMicItem.second);
+            callbackToListener(new ListenerRunnable() {
+                @Override
+                public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                    //更新连麦列表
+                    linkMicListListener.onLinkMicItemRemove(linkMicItem.second, linkMicItem.first);
                 }
             });
         }
@@ -222,7 +280,7 @@ public class PLVMultiRoleLinkMicList {
     private void createMyLinkMicItem(String myLinkMicId) {
         if (myLinkMicItemBean == null && myLinkMicId != null) {
             myLinkMicItemBean = new PLVLinkMicItemDataBean();
-            myLinkMicItemBean.setStatus(PLVLinkMicItemDataBean.STATUS_RTC_JOIN);
+            myLinkMicItemBean.setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
             myLinkMicItemBean.setLinkMicId(myLinkMicId);
             myLinkMicItemBean.setActor(liveRoomDataManager.getConfig().getUser().getActor());
             myLinkMicItemBean.setNick(liveRoomDataManager.getConfig().getUser().getViewerName());
@@ -267,11 +325,12 @@ public class PLVMultiRoleLinkMicList {
         for (PLVJoinInfoEvent joinInfoEvent : joinList) {
             final PLVLinkMicItemDataBean linkMicItemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(joinInfoEvent);
             final PLVSocketUserBean socketUserBean = PLVLinkMicDataMapper.map2SocketUserBean(joinInfoEvent);
+            final boolean isGroupLeader = joinInfoEvent.getClassStatus() != null && joinInfoEvent.getClassStatus().isGroupLeader();
             //补充或更新成员列表中的数据信息
             callbackToListener(new ListenerRunnable() {
                 @Override
                 public void run(@NonNull OnLinkMicListListener linkMicListListener) {
-                    boolean result = linkMicListListener.onUpdateLinkMicItemInfo(socketUserBean, linkMicItemDataBean, true);
+                    boolean result = linkMicListListener.onUpdateLinkMicItemInfo(socketUserBean, linkMicItemDataBean, true, isGroupLeader);
                     if (result) {
                         hasChangedLinkMicList[0] = true;
                     }
@@ -290,7 +349,7 @@ public class PLVMultiRoleLinkMicList {
             callbackToListener(new ListenerRunnable() {
                 @Override
                 public void run(@NonNull OnLinkMicListListener linkMicListListener) {
-                    boolean result = linkMicListListener.onUpdateLinkMicItemInfo(socketUserBean, linkMicItemDataBean, false);
+                    boolean result = linkMicListListener.onUpdateLinkMicItemInfo(socketUserBean, linkMicItemDataBean, false, false);
                     if (result) {
                         hasChangedLinkMicList[0] = true;
                     }
@@ -309,11 +368,10 @@ public class PLVMultiRoleLinkMicList {
     }
 
     private void removeLinkMicItemNoExistServer(List<PLVJoinInfoEvent> joinList) {
-        final List<Pair<Integer, PLVLinkMicItemDataBean>> willRemoveLinkMicList = new ArrayList<>();
         Iterator<PLVLinkMicItemDataBean> linkMicItemDataBeanIterator = linkMicList.iterator();
         int i = 0;
         while (linkMicItemDataBeanIterator.hasNext()) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItemDataBeanIterator.next();
+            final PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItemDataBeanIterator.next();
             String linkMicId = linkMicItemDataBean.getLinkMicId();
             boolean isExistServerList = false;
             for (PLVJoinInfoEvent joinInfoEvent : joinList) {
@@ -323,20 +381,18 @@ public class PLVMultiRoleLinkMicList {
                 }
             }
             if (!isExistServerList && !isMyLinkMicId(linkMicId)) {
+                //这里注意linkMicList的data每remove一个就要调一次onLinkMicItemRemove方法通知视图更新
                 linkMicItemDataBeanIterator.remove();
-                willRemoveLinkMicList.add(new Pair<>(i, linkMicItemDataBean));
+                final int finalI = i;
+                callbackToListener(new ListenerRunnable() {
+                    @Override
+                    public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                        linkMicListListener.onLinkMicItemRemove(linkMicItemDataBean, finalI);
+                    }
+                });
+                i--;
             }
             i++;
-        }
-        if (!willRemoveLinkMicList.isEmpty()) {
-            callbackToListener(new ListenerRunnable() {
-                @Override
-                public void run(@NonNull OnLinkMicListListener linkMicListListener) {
-                    for (Pair<Integer, PLVLinkMicItemDataBean> positionData : willRemoveLinkMicList) {
-                        linkMicListListener.onLinkMicItemRemove(positionData.second, positionData.first);
-                    }
-                }
-            });
         }
         for (Map.Entry<String, Boolean> teacherScreenStreamEntry : teacherScreenStreamMap.entrySet()) {
             boolean value = teacherScreenStreamEntry.getValue();
@@ -357,14 +413,65 @@ public class PLVMultiRoleLinkMicList {
         }
     }
 
+    private void cleanTeacherScreenStream() {
+        for (Map.Entry<String, Boolean> teacherScreenStreamEntry : teacherScreenStreamMap.entrySet()) {
+            boolean value = teacherScreenStreamEntry.getValue();
+            String key = teacherScreenStreamEntry.getKey();
+            if (!value || isMyLinkMicId(key)) {
+                continue;
+            }
+            callOnTeacherScreenStream(key, false);
+        }
+        teacherScreenStreamMap.clear();
+    }
+
+    private void sortLinkMicList(String groupLeaderId) {
+        if (groupLeaderId == null) {
+            return;
+        }
+        int position = -1;
+        int teacherPosition = -1;
+        int leaderPosition = -1;
+        for (PLVLinkMicItemDataBean linkMicItemDataBean : linkMicList) {
+            position++;
+            if (linkMicItemDataBean.isTeacher()) {
+                teacherPosition = position;
+            }
+            if (linkMicItemDataBean.getLinkMicId() != null
+                    && linkMicItemDataBean.getLinkMicId().equals(groupLeaderId)) {
+                leaderPosition = position;
+            }
+        }
+        if (leaderPosition != -1 && leaderPosition != teacherPosition && leaderPosition - teacherPosition != 1) {
+            PLVLinkMicItemDataBean linkMicItemDataBean = linkMicList.remove(leaderPosition);
+            if (leaderPosition > teacherPosition) {
+                linkMicList.add(teacherPosition + 1, linkMicItemDataBean);
+            } else {
+                linkMicList.add(teacherPosition, linkMicItemDataBean);
+            }
+            callbackToListener(new ListenerRunnable() {
+                @Override
+                public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                    linkMicListListener.onLinkMicListChanged(linkMicList);
+                }
+            });
+        }
+    }
+
     private void sortLinkMicList(List<PLVJoinInfoEvent> joinList) {
         boolean isNeedSort = false;
         PLVLinkMicItemDataBean[] sortLinkMicArr = new PLVLinkMicItemDataBean[linkMicList.size()];
         List<PLVJoinInfoEvent> copyJoinList = new ArrayList<>(joinList);
         Iterator<PLVJoinInfoEvent> joinListIterator = copyJoinList.iterator();
+        int joinListPosition = -1;
+        int groupLeaderPosition = -1;
         while (joinListIterator.hasNext()) {
+            joinListPosition++;
             PLVJoinInfoEvent joinInfoEvent = joinListIterator.next();
             String linkMicId = joinInfoEvent.getUserId();
+            if (linkMicId != null && linkMicId.equals(groupLeaderId)) {
+                groupLeaderPosition = joinListPosition;
+            }
             boolean isExistLocalList = false;
             for (PLVLinkMicItemDataBean linkMicItem : linkMicList) {
                 if (linkMicId != null && linkMicId.equals(linkMicItem.getLinkMicId())) {
@@ -374,13 +481,18 @@ public class PLVMultiRoleLinkMicList {
             }
             if (!isExistLocalList || PLVSocketUserConstant.USERTYPE_TEACHER.equals(joinInfoEvent.getUserType())) {
                 joinListIterator.remove();
+                joinListPosition--;
             }
+        }
+        if (groupLeaderPosition != -1) {
+            PLVJoinInfoEvent joinInfoEvent = copyJoinList.remove(groupLeaderPosition);
+            copyJoinList.add(0, joinInfoEvent);
         }
         List<PLVLinkMicItemDataBean> sortLinkMicList = new ArrayList<>();
         int linkMicItemSortIndex = -1;
         for (PLVLinkMicItemDataBean linkMicItem : linkMicList) {
             if (linkMicItem.isTeacher() || linkMicItem.getLinkMicId() == null) {
-                sortLinkMicList.add(linkMicItem);
+                sortLinkMicList.add(0, linkMicItem);
                 continue;
             }
             linkMicItemSortIndex++;
@@ -433,27 +545,36 @@ public class PLVMultiRoleLinkMicList {
                 }
                 final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(linkMicUid);
                 if (linkMicItem == null) {
-                    final int addIndex = linkMicItemDataBean.isTeacher() ? 0 : linkMicList.size();
+                    int addIndex = linkMicItemDataBean.isTeacher() ? 0 : linkMicList.size();
+                    if (isLeaderId(linkMicItemDataBean.getLinkMicId())) {
+                        addIndex = 0;
+                        for (int i = 0; i < linkMicList.size(); i++) {
+                            if (linkMicList.get(i).isTeacher()) {
+                                addIndex = i + 1;
+                            }
+                        }
+                    }
                     linkMicList.add(addIndex, linkMicItemDataBean);
                     if (PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX == linkMicItemBean.getStreamType()) {
-                        if (isTeacherLinkMicId(linkMicUid)) {
+                        if (isTeacherLinkMicId(linkMicUid) || isLeaderId(linkMicUid)) {
                             linkMicItemDataBean.setStreamType(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_CAMERA);
                             callOnTeacherScreenStream(linkMicUid, true);
                         } else {
                             linkMicItemDataBean.setStreamType(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN);
                         }
                     } else if (PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN == linkMicItemBean.getStreamType()
-                            && isTeacherLinkMicId(linkMicUid)) {
+                            && (isTeacherLinkMicId(linkMicUid) || isLeaderId(linkMicUid))) {
                         callOnTeacherScreenStream(linkMicUid, true);
                         return false;
                     } else {
                         linkMicItemDataBean.setStreamType(linkMicItemBean.getStreamType());
                     }
                     updateLinkMicItemMediaStatus(linkMicItemBean, linkMicItemDataBean);
+                    final int finalAddIndex = addIndex;
                     callbackToListener(new ListenerRunnable() {
                         @Override
                         public void run(@NonNull OnLinkMicListListener linkMicListListener) {
-                            linkMicListListener.onLinkMicItemInsert(linkMicItemDataBean, addIndex);
+                            linkMicListListener.onLinkMicItemInsert(linkMicItemDataBean, finalAddIndex);
                         }
                     });
                 }
@@ -520,6 +641,10 @@ public class PLVMultiRoleLinkMicList {
             });
             return isTeacherLinkMicId[0];
         }
+    }
+
+    private boolean isLeaderId(String linkMicId) {
+        return linkMicId != null && linkMicId.equals(groupLeaderId);
     }
 
     private boolean isMyLinkMicId(String linkMicId) {
@@ -593,6 +718,7 @@ public class PLVMultiRoleLinkMicList {
                 PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT,
                 PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT,
                 PLVEventConstant.Class.SE_SWITCH_MESSAGE,
+                PLVEventConstant.Seminar.SEMINAR_EVENT,
                 Socket.EVENT_MESSAGE);
     }
 
@@ -787,6 +913,7 @@ public class PLVMultiRoleLinkMicList {
     }
 
     private void acceptUserJoinChannel(final String linkMicUid, final int streamType) {
+        requestLinkMicListApiOnce();
         PLVLinkMicItemDataBean linkMicItemDataBean = rtcJoinMap.get(linkMicUid);
         if (linkMicItemDataBean == null) {
             linkMicItemDataBean = new PLVLinkMicItemDataBean();
@@ -811,14 +938,16 @@ public class PLVMultiRoleLinkMicList {
                 });
             } else {
                 if (PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN == streamType) {
-                    if (isTeacherLinkMicId(linkMicUid)) {
+                    if (isTeacherLinkMicId(linkMicUid) || isLeaderId(linkMicUid)) {
                         callOnTeacherScreenStream(linkMicUid, true);
                     } else {
                         callbackToListener(new ListenerRunnable() {
                             @Override
                             public void run(@NonNull OnLinkMicListListener linkMicListListener) {
+                                linkMicList.remove(position);
                                 linkMicListListener.onLinkMicItemRemove(linkMicItemBean, position);
                                 linkMicItemBean.setStreamType(streamType);
+                                linkMicList.add(position, linkMicItemBean);
                                 linkMicListListener.onLinkMicItemInsert(linkMicItemBean, position);
                             }
                         });
@@ -898,7 +1027,7 @@ public class PLVMultiRoleLinkMicList {
         /**
          * 更新连麦列表item信息
          */
-        boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList);
+        boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isGroupLeader);
 
         /**
          * 获取保存过的连麦item
@@ -982,7 +1111,7 @@ public class PLVMultiRoleLinkMicList {
         }
 
         @Override
-        public boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList) {
+        public boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isGroupLeader) {
             return false;
         }
 
