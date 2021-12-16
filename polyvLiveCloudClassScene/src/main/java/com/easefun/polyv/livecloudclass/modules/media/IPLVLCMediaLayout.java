@@ -12,6 +12,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -148,6 +149,11 @@ public interface IPLVLCMediaLayout {
     void updateViewerCount(long viewerCount);
 
     /**
+     * 更新ppt状态数据变更
+     */
+    void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
+
+    /**
      * 当加入RTC时，更新布局
      *
      * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度
@@ -158,6 +164,21 @@ public interface IPLVLCMediaLayout {
      * 当离开RTC时，更新布局
      */
     void updateWhenLeaveRTC();
+
+    /**
+     * 加入连麦
+     */
+    void updateWhenJoinLinkMic();
+
+    /**
+     * 离开连麦
+     */
+    void updateWhenLeaveLinkMic();
+
+    /**
+     * 更新网络质量
+     */
+    void acceptNetworkQuality(int quality);
 
     void notifyRTCPrepared();
 
@@ -271,6 +292,31 @@ public interface IPLVLCMediaLayout {
          * 发送点赞动作
          */
         void onSendLikesAction();
+
+        /**
+         * PPT翻页（直播独有）
+         */
+        void onPPTTurnPage(String type);
+
+        /**
+         * 修改无延迟观看模式
+         *
+         * @param watchLowLatency 是否无延迟观看
+         */
+        void onWatchLowLatency(boolean watchLowLatency);
+
+        /**
+         * rtc观看切换暂停和恢复播放
+         *
+         * @param toPause 是否切换到暂停状态
+         */
+        void onRtcPauseResume(boolean toPause);
+
+        /**
+         * rtc观看是否正在暂停
+         */
+        boolean isRtcPausing();
+
     }
     // </editor-fold>
 

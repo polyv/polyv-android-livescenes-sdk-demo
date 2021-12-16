@@ -41,6 +41,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeView;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -63,6 +64,8 @@ import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -117,6 +120,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PLVPlaceHolderView noStreamView;
     //直播停止时显示的view
     private View stopStreamView;
+    // 网络较差时提示view
+    private PLVLCNetworkTipsView networkTipsView;
 
     //tips view
     private PLVLCLightTipsView lightTipsView;
@@ -149,6 +154,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private int landscapeMarginRightForLinkMicLayout;
     //是否加入了RTC
     private boolean isJoinRTC;
+    //是否加入了连麦
+    private boolean isJoinLinkMic;
+    // 是否无延迟观看
+    private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     //ppt或连麦在点击右下角的显示按钮后的显示状态，默认ppt或者连麦是显示的
     private boolean isClickShowSubTab = true;
     private boolean isShowLandscapeRTCLayout = false;
@@ -202,6 +211,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         coverImageView = findViewById(R.id.plvlc_cover_image_view);
+        networkTipsView = (PLVLCNetworkTipsView) findViewById(R.id.network_tips_view);
 
         // 底部占位图
         PLVPlaceHolderView placeHolderView = new PLVPlaceHolderView(getContext());
@@ -215,6 +225,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         initAudioModeView();
         initLoadingView();
         initSwitchView();
+        initNetworkTipsLayout();
         initLayoutWH();
     }
 
@@ -302,6 +313,35 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 }
             }
 
+            @Override
+            public void onPPTTurnPage(String type) {
+                onViewActionListener.onPPTTurnPage(type);
+            }
+
+            @Override
+            public void onChangeLowLatencyMode(boolean isLowLatency) {
+                PLVLCLiveMediaLayout.this.isLowLatency = isLowLatency;
+                livePlayerPresenter.startPlay(isLowLatency);
+                if (onViewActionListener != null) {
+                    onViewActionListener.onWatchLowLatency(isLowLatency);
+                }
+                networkTipsView.setIsLowLatency(isLowLatency);
+            }
+
+            @Override
+            public void onRtcPauseResume(boolean toPause) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onRtcPauseResume(toPause);
+                }
+            }
+
+            @Override
+            public boolean isRtcPausing() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isRtcPausing();
+                }
+                return false;
+            }
         });
     }
 
@@ -380,6 +420,20 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         });
     }
 
+    private void initNetworkTipsLayout() {
+        networkTipsView.setOnClickChangeNormalLatencyListener(new PLVLCNetworkTipsView.OnClickChangeNormalLatencyListener() {
+            @Override
+            public void onClickChangeNormalLatency() {
+                PLVLCLiveMediaLayout.this.isLowLatency = false;
+                livePlayerPresenter.startPlay(false);
+                if (onViewActionListener != null) {
+                    onViewActionListener.onWatchLowLatency(false);
+                }
+                mediaController.notifyLowLatencyUpdate(false);
+            }
+        });
+    }
+
     private void initLayoutWH() {
         //调整播放器布局的宽高
         post(new Runnable() {
@@ -411,7 +465,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     @Override
     public void startPlay() {
-        livePlayerPresenter.startPlay();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                livePlayerPresenter.startPlay(isLowLatency);
+                if (onViewActionListener != null) {
+                    onViewActionListener.onWatchLowLatency(isLowLatency);
+                }
+                networkTipsView.setIsLowLatency(isLowLatency);
+            }
+        });
     }
 
     @Override
@@ -539,11 +602,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public void updatePPTStatusChange(PLVPPTStatus plvpptStatus) {
+        mediaController.updatePPTStatusChange(plvpptStatus);
+    }
+
+    @Override
     public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
 
-        mediaController.updateWhenJoinLinkMic(liveRoomDataManager.isSupportRTC());
+        mediaController.updateWhenJoinRtc(liveRoomDataManager.isSupportRTC());
 
         if (liveRoomDataManager.isSupportRTC()) {
             //如果支持RTC，连麦时停止播放器播放，使用rtc视频流+rtc音频流
@@ -569,7 +637,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         isJoinRTC = false;
         landscapeMarginRightForLinkMicLayout = 0;
 
-        mediaController.updateWhenLeaveLinkMic();
+        mediaController.updateWhenLeaveRtc();
 
         if (liveRoomDataManager.isSupportRTC()) {
             startPlay();
@@ -584,6 +652,27 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         } else {
             setLandscape();
         }
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic() {
+        isJoinLinkMic = true;
+
+        mediaController.updateWhenJoinLinkMic(liveRoomDataManager.isSupportRTC());
+        networkTipsView.setIsLinkMic(true);
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+        isJoinLinkMic = false;
+
+        mediaController.updateWhenLeaveLinkMic();
+        networkTipsView.setIsLinkMic(true);
+    }
+
+    @Override
+    public void acceptNetworkQuality(int quality) {
+        networkTipsView.acceptNetworkQuality(quality);
     }
 
     @Override
@@ -809,6 +898,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onOnlyAudio(isOnlyAudio);
             mediaController.updateWhenOnlyAudio(isOnlyAudio);
         }
+
+        @Override
+        public void onLowLatencyNetworkQuality(int networkQuality) {
+            networkTipsView.acceptNetworkQuality(networkQuality);
+        }
     };
     // </editor-fold>
 
@@ -831,6 +925,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         switchAnchorLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
         switchAnchorLp.rightMargin = show ? landscapeMarginRightForLinkMicLayout : 0;
         playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+
+        MarginLayoutParams networkTipsLp = (MarginLayoutParams) networkTipsView.getLayoutParams();
+        networkTipsLp.rightMargin = show ? landscapeMarginRightForLinkMicLayout : 0;
+        networkTipsView.setLayoutParams(networkTipsLp);
     }
     // </editor-fold>
 
@@ -927,6 +1025,12 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             //否则不预留右边距
             showLandscapeRTCLayout(false);
         }
+        post(new Runnable() {
+            @Override
+            public void run() {
+                chatLandscapeLayout.setVisibility(danmuWrapper.getToggleDanmuStatus() ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void setPortrait() {
@@ -937,6 +1041,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         int portraitWidth = Math.min(ScreenUtils.getScreenHeight(), ScreenUtils.getScreenWidth());
         vlp.height = (int) (portraitWidth / RATIO_WH);
         setLayoutParams(vlp);
+
         //switch anchor
         MarginLayoutParams switchAnchorLp = (MarginLayoutParams) playerSwitchAnchor.getLayoutParams();
         switchAnchorLp.width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -944,6 +1049,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         switchAnchorLp.height = (int) (portraitWidth / RATIO_WH);
         switchAnchorLp.rightMargin = 0;
         playerSwitchAnchor.setLayoutParams(switchAnchorLp);
+
+        // network tips
+        MarginLayoutParams networkTipsLp = (MarginLayoutParams) networkTipsView.getLayoutParams();
+        networkTipsLp.rightMargin = 0;
+        networkTipsView.setLayoutParams(networkTipsLp);
     }
     // </editor-fold>
 

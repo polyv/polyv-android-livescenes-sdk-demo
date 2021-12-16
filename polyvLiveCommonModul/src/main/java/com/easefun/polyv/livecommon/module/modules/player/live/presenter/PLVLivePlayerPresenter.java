@@ -17,12 +17,10 @@ import com.easefun.polyv.businesssdk.api.auxiliary.IPolyvAuxiliaryVideoViewListe
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
-import com.easefun.polyv.businesssdk.model.video.PolyvBaseVideoParams;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveLinesVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveVideoParams;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -36,11 +34,15 @@ import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.model.video.PLVBaseVideoParams;
+import com.plv.business.model.video.PLVLiveVideoParams;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
+import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -68,6 +70,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     private PolyvAuxiliaryVideoview subVideoView;
     //logo对象
     private PLVPlayerLogoView logoView;
+
+    private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
 
     private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
     // </editor-fold>
@@ -114,15 +118,21 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     @Override
     public void startPlay() {
-        PolyvLiveVideoParams liveVideoParams = new PolyvLiveVideoParams(
+        startPlay(isLowLatency);
+    }
+
+    @Override
+    public void startPlay(boolean lowLatency) {
+        PLVLiveVideoParams liveVideoParams = new PLVLiveVideoParams(
                 getConfig().getChannelId(),
                 getConfig().getAccount().getUserId(),
                 getConfig().getUser().getViewerId()
         );
-        liveVideoParams.buildOptions(PolyvBaseVideoParams.WAIT_AD, true)
-                .buildOptions(PolyvBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
-                .buildOptions(PolyvBaseVideoParams.MARQUEE, true)
-                .buildOptions(PolyvBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName());
+        liveVideoParams.buildOptions(PLVBaseVideoParams.WAIT_AD, true)
+                .buildOptions(PLVBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
+                .buildOptions(PLVBaseVideoParams.MARQUEE, true)
+                .buildOptions(PLVBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
+                .buildOptions(PLVLiveVideoParams.LOW_LATENCY, isLowLatency = lowLatency);
         if (videoView != null) {
             videoView.playByMode(liveVideoParams, PLVPlayOption.PLAYMODE_LIVE);
         }
@@ -688,6 +698,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     return false;
                 }
             });
+            videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
+                @Override
+                public void onNetworkQuality(int networkQuality) {
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLowLatencyNetworkQuality(networkQuality);
+                    }
+                }
+            });
             videoView.setOnGetLogoListener(new IPolyvVideoViewListenerEvent.OnGetLogoListener() {
                 @Override
                 public void onLogo(String logoImage, int logoAlpha, int logoPosition, String logoHref) {
@@ -724,6 +743,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     if (view != null) {
                         view.onOnlyAudio(isOnlyAudio);
                     }
+                }
+            });
+            videoView.setOnSessionIdChangedListener(new IPLVLiveListenerEvent.OnSessionIdChangedListener() {
+                @Override
+                public void onSessionChanged(String sessionId) {
+                    liveRoomDataManager.setSessionId(sessionId);
                 }
             });
         }

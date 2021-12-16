@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
@@ -44,6 +45,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -174,6 +176,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             @Override
             public void releaseRenderView(SurfaceView surfaceView) {
                 linkMicPresenter.releaseRenderView(surfaceView);
+            }
+
+            @Override
+            public void muteAudioVideo(String linkMicId, boolean mute) {
+                linkMicPresenter.muteAudio(linkMicId, mute);
+                linkMicPresenter.muteVideo(linkMicId, mute);
+            }
+
+            @Override
+            public void muteAllAudioVideo(boolean mute) {
+                linkMicPresenter.muteAllAudio(mute);
+                linkMicPresenter.muteAllVideo(mute);
             }
 
             @Override
@@ -316,6 +330,20 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         }
     }
 
+    @Override
+    public void pause() {
+        linkMicListAdapter.pauseAllRenderView();
+    }
+
+    @Override
+    public void resume() {
+        linkMicListAdapter.resumeAllRenderView();
+    }
+
+    @Override
+    public boolean isPausing() {
+        return linkMicListAdapter.isPausing();
+    }
 
     @Override
     public void setIsTeacherOpenLinkMic(boolean isTeacherOpenLinkMic) {
@@ -402,6 +430,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void setLiveEnd() {
         linkMicPresenter.setLiveEnd();
+    }
+
+    @Override
+    public void setWatchLowLatency(boolean watchLowLatency) {
+        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch()) {
+            linkMicPresenter.setWatchRtc(watchLowLatency);
+        }
     }
 
     @Override
@@ -499,7 +534,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onShowLinkMicList() {
+    public void onJoinRtcChannel() {
         curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
         //显示连麦根布局
         flMediaLinkMicRoot.setKeepScreenOn(true);
@@ -511,13 +546,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
 
         if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onJoinChannelSuccess();
+            onPLVLinkMicLayoutListener.onJoinRtcChannel();
         }
         isMediaShowInLinkMicList = false;
     }
 
     @Override
-    public void onReleaseLinkMicList() {
+    public void onLeaveRtcChannel() {
         //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
         //这里实际存在3种情况：
         //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
@@ -561,7 +596,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVForegroundService.stopForegroundService();
         //回调离开连麦
         if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onLeaveChannel();
+            onPLVLinkMicLayoutListener.onLeaveRtcChannel();
         }
     }
 
@@ -575,10 +610,15 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //我，加入频道成功
         PLVCommonLog.d(TAG, "onJoinLinkMic");
         ToastUtils.showShort("上麦成功");
+        // 连麦成功不再暂停rtc观看
+        resume();
         //更新连麦控制器
         //无延迟观看时，需要在上麦的时候再设置连麦类型
         linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
         linkMicControlBar.setJoinLinkMicSuccess();
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onJoinLinkMic();
+        }
         tryShowOrHideLandscapeRTCLayout(true);
     }
 
@@ -588,16 +628,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         //更新连麦控制器
         linkMicControlBar.setLeaveLinkMic();
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onLeaveLinkMic();
+        }
     }
 
     @Override
     public void onUsersJoin(List<String> uids) {
-        Iterator<Runnable> pendingTaskIterator = onUserJoinPendingTask.iterator();
-        while (pendingTaskIterator.hasNext()) {
-            pendingTaskIterator.next().run();
-            pendingTaskIterator.remove();
-        }
-
         linkMicListAdapter.updateAllItem();
 
         if (curTryScrollViewState == TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK
@@ -625,6 +662,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         }
 
         tryShowOrHideLandscapeRTCLayout(true);
+
+        Iterator<Runnable> pendingTaskIterator = onUserJoinPendingTask.iterator();
+        while (pendingTaskIterator.hasNext()) {
+            pendingTaskIterator.next().run();
+            pendingTaskIterator.remove();
+        }
     }
 
     @Override
@@ -745,6 +788,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onNetQuality(int quality) {
         linkMicListAdapter.updateNetQuality(quality);
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onNetworkQuality(quality);
+        }
     }
 
     @Override

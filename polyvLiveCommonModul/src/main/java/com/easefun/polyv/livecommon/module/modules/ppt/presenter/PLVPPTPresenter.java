@@ -136,19 +136,24 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         view.switchPPTViewLocation(eventVo.isPptOnMainScreen());
                     }
                 }
+                if (PLVEventConstant.Class.FINISH_CLASS.equals(event)) {
+                    // 下课时，将PPT切回悬浮窗
+                    if (view != null) {
+                        view.switchPPTViewLocation(false);
+                    }
+                }
             }
         };
         PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(followTeacherPptVideoLocationListener);
     }
 
     @Override
-    public void removeMsgDelayTime() {
-        delayTime = 0;
-    }
-
-    @Override
-    public void recoverMsgDelayTime() {
-        delayTime = MSG_DELAY_TIME;
+    public void notifyIsWatchLowLatency(boolean isLowLatency) {
+        if (isLowLatency) {
+            delayTime = 500;
+        } else {
+            delayTime = MSG_DELAY_TIME;
+        }
     }
 
     @Override

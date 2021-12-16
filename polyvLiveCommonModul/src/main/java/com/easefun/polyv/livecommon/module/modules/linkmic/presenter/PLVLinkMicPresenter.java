@@ -29,6 +29,7 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -95,6 +96,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private PLVLinkMicMuteCacheList muteCacheList = new PLVLinkMicMuteCacheList();
     //音视频模式，禁止的类型，用于全体静音等
     private String avConnectMode = "";
+    // 是否rtc观看
+    private boolean isWatchRtc;
+    // 是否正在mute全体
+    private boolean isMuteAllAudio;
+    private boolean isMuteAllVideo;
 
     /**** Disposable ****/
     private Disposable getLinkMicListDelay;
@@ -164,11 +170,12 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         linkMicMsgHandler = new PLVLinkMicMsgHandler(myLinkMicId);
         linkMicMsgHandler.addLinkMicMsgListener(socketEventListener);
         //初始化RTC调用策略实现
+        isWatchRtc = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
         initRTCInvokeStrategy();
     }
 
     private void initRTCInvokeStrategy() {
-        if (PolyvLinkMicConfig.getInstance().isPureRtcWatchEnabled()) {
+        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() && isWatchRtc) {
             //RTC 无延迟观看
             rtcInvokeStrategy = new PLVRTCWatchEnabledStrategy(
                     this, linkMicManager, liveRoomDataManager,
@@ -176,7 +183,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         @Override
                         public void onJoinRTCChannelWatch() {
                             if (linkMicView != null) {
-                                linkMicView.onShowLinkMicList();
+                                linkMicView.onJoinRtcChannel();
                             }
                             stopJoinTimeoutCount();
                             dispose(getLinkMicListTimer);
@@ -257,8 +264,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             linkMicList.add(0, PLVLinkMicDataMapper.map2LinkMicItemData(data));//添加自己
                             //如果是参与者，则是自动加入rtc频道的，要等讲师同意，才能加入连麦列表
                             if (linkMicView != null) {
+                                linkMicView.onJoinRtcChannel();
                                 linkMicView.onJoinLinkMic();
-                                linkMicView.onShowLinkMicList();
                             }
 
                             loadLinkMicConnectMode(avConnectMode);
@@ -312,6 +319,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         myLinkMicId = "";
         this.linkMicView = null;
         linkMicInitState = LINK_MIC_UNINITIATED;
+
+        //发送joinLeave
+        linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
         linkMicManager.destroy();
         if (linkMicMsgHandler != null) {
             linkMicMsgHandler.destroy();
@@ -381,6 +391,36 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
+    public void muteAudio(String linkMicId, boolean mute) {
+        if (myLinkMicId != null && myLinkMicId.equals(linkMicId)) {
+            muteAudio(mute);
+        } else {
+            linkMicManager.muteRemoteAudio(linkMicId, mute);
+        }
+    }
+
+    @Override
+    public void muteVideo(String linkMicId, boolean mute) {
+        if (myLinkMicId != null && myLinkMicId.equals(linkMicId)) {
+            muteVideo(mute);
+        } else {
+            linkMicManager.muteRemoteVideo(linkMicId, mute);
+        }
+    }
+
+    @Override
+    public void muteAllAudio(boolean mute) {
+        isMuteAllAudio = mute;
+        linkMicManager.muteAllRemoteAudio(mute);
+    }
+
+    @Override
+    public void muteAllVideo(boolean mute) {
+        isMuteAllVideo = mute;
+        linkMicManager.muteAllRemoteVideo(mute);
+    }
+
+    @Override
     public void switchCamera() {
         linkMicManager.switchCamera();
     }
@@ -414,6 +454,12 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
             linkMicManager.setupRemoteVideo(renderView, linkMicId);
+            if (isMuteAllAudio) {
+                linkMicManager.muteRemoteAudio(linkMicId, true);
+            }
+            if (isMuteAllVideo) {
+                linkMicManager.muteRemoteVideo(linkMicId, true);
+            }
         }
     }
 
@@ -491,6 +537,20 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         if (rtcInvokeStrategy != null) {
             rtcInvokeStrategy.setLiveEnd();
         }
+    }
+
+    @Override
+    public void setWatchRtc(boolean watchRtc) {
+        if (isWatchRtc == watchRtc) {
+            return;
+        }
+        setLiveEnd();
+        if (rtcInvokeStrategy != null) {
+            rtcInvokeStrategy.destroy();
+        }
+        isWatchRtc = watchRtc;
+        initRTCInvokeStrategy();
+        setLiveStart();
     }
 
     @Override
@@ -758,7 +818,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             cleanLinkMicListData();
             muteCacheList.clear();
             if (linkMicView != null) {
-                linkMicView.onReleaseLinkMicList();
+                linkMicView.onLeaveRtcChannel();
             }
         }
     }

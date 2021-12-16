@@ -197,7 +197,7 @@ public class PLVHCMarkToolControllerLayout extends FrameLayout {
     }
 
     private void initControllerState() {
-        updateCurrentSelectedMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType || isLeader));
+        updateCurrentSelectedMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType));
         updateCurrentSelectedColor(PLVHCMarkToolEnums.Color.getDefaultColor(isTeacherType));
     }
 

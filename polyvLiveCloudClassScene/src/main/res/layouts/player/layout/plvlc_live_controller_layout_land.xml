@@ -25,6 +25,15 @@
             android:src="@drawable/plvlc_controller_video_bottom_landscape_gradient" />
     </FrameLayout>
 
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout
+        android:id="@+id/video_ppt_turn_page_land_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:visibility="invisible" />
+
     <TextView
         android:id="@+id/video_name_land_tv"
         android:layout_width="wrap_content"

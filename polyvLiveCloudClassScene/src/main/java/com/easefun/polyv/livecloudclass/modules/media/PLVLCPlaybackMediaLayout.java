@@ -55,6 +55,7 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -433,6 +434,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public void updatePPTStatusChange(PLVPPTStatus plvpptStatus) {
+
+    }
+
+    @Override
     public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
 
     }
@@ -447,6 +453,20 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     }
 
+    @Override
+    public void updateWhenJoinLinkMic() {
+
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+
+    }
+
+    @Override
+    public void acceptNetworkQuality(int quality) {
+
+    }
 
     @Override
     public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {

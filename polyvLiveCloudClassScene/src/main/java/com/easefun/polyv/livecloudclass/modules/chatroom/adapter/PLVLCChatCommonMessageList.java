@@ -108,6 +108,7 @@ public class PLVLCChatCommonMessageList {
                 chatMsgRv.scrollToPosition(0);
             }
         }
+
     }
 
     public void removeChatMessage(String id, boolean isLandscapeLayout) {

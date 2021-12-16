@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livescenes.model.PolyvPlaybackVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.easefun.polyv.mediasdk.player.IMediaPlayer;
 import com.easefun.polyv.livescenes.playback.video.api.IPolyvPlaybackListenerEvent;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -40,7 +41,7 @@ import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 
 import java.lang.ref.WeakReference;
 
-import tv.danmaku.ijk.media.player.IMediaPlayer;
+
 
 /**
  * mvp-回放播放器presenter层实现，实现 IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter 接口

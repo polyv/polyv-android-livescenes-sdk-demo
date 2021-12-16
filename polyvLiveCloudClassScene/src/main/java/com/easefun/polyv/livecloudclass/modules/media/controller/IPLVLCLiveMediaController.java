@@ -7,6 +7,7 @@ import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaControll
 import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
  * 直播播放器控制栏接口，继承于直播播放器所需设置的 IPolyvMediaController 接口
@@ -78,6 +79,18 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateWhenVideoViewPrepared();
 
     /**
+     * 加入rtc时更新布局
+     *
+     * @param isHideRefreshButton 是否要隐藏刷新按钮 {@link #updateWhenJoinLinkMic(boolean)}
+     */
+    void updateWhenJoinRtc(boolean isHideRefreshButton);
+
+    /**
+     * 离开rtc时更新布局
+     */
+    void updateWhenLeaveRtc();
+
+    /**
      * 当加入连麦时，更新布局
      *
      * @param isHideRefreshButton 是否要隐藏刷新按钮，频道支持RTC时，由于使用的是rtc视频流+rtc音频流，非cdn视频流不能刷新，因此需要隐藏
@@ -100,11 +113,21 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateOnClickCloseFloatingView();
 
     /**
+     * 更新PPT状态信息
+     */
+    void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
+
+    /**
      * 弹幕切换按钮点击回调
      *
      * @param v danmuView
      */
     void dispatchDanmuSwitchOnClicked(View v);
+
+    /**
+     * 更新无延迟观看模式
+     */
+    void notifyLowLatencyUpdate(boolean isLowLatency);
 
     /**
      * 释放
@@ -146,6 +169,28 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * @param show true 表示显示，false表示隐藏
          */
         void onShow(boolean show);
+
+        /**
+         * ppt翻页
+         */
+        void onPPTTurnPage(String type);
+
+        /**
+         * 切换无延迟观看模式
+         */
+        void onChangeLowLatencyMode(boolean isLowLatency);
+
+        /**
+         * rtc观看切换暂停和恢复播放
+         *
+         * @param toPause 是否切换到暂停状态
+         */
+        void onRtcPauseResume(boolean toPause);
+
+        /**
+         * rtc观看是否正在暂停
+         */
+        boolean isRtcPausing();
     }
     // </editor-fold>
 }

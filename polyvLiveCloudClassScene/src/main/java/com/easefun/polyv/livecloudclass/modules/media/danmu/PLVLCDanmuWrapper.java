@@ -91,6 +91,13 @@ public class PLVLCDanmuWrapper {
             }
         }
     }
+    /**
+     * 获取弹幕开关的状态
+     * true->打开;false->关闭
+     * */
+    public boolean getToggleDanmuStatus() {
+        return isDanmuToggleOpen;
+    }
     // </editor-fold>
 
     public void setOnServerDanmuOpen(boolean isServerDanmuOpen) {

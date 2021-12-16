@@ -62,6 +62,11 @@
 
     </com.easefun.polyv.livescenes.video.PolyvLiveVideoView>
 
+    <!-- 网络状态较差提示条布局 -->
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView
+        android:id="@+id/network_tips_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- 子播放器布局 -->
     <include

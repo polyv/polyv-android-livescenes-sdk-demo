@@ -89,6 +89,10 @@ public interface IPLVRTCInvokeStrategy {
     void setOnLeaveLinkMicListener(OnLeaveLinkMicListener li);
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="销毁">
+    void destroy();
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="接口声明">
 
     /**

@@ -149,31 +149,51 @@ public class PLVPlaceHolderView extends ConstraintLayout {
 
     // <editor-fold defaultstate="collapsed" desc="屏幕位置改变重置View属性">
     private void setPortraitBig() {
-        LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
-        lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_PORT;
-        ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(View.VISIBLE);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
+                lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_PORT;
+                ivPlaceholderImg.setLayoutParams(lpOfImg);
+                tvPlaceholderText.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void setPortraitSmall() {
-        LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
-        lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
-        ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(View.GONE);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
+                lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
+                ivPlaceholderImg.setLayoutParams(lpOfImg);
+                tvPlaceholderText.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void setLandscapeBig() {
-        LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
-        lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_LAND;
-        ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(View.VISIBLE);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
+                lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_LAND;
+                ivPlaceholderImg.setLayoutParams(lpOfImg);
+                tvPlaceholderText.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void setLandscapeSmall() {
-        LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
-        lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
-        ivPlaceholderImg.setLayoutParams(lpOfImg);
-        tvPlaceholderText.setVisibility(View.GONE);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lpOfImg = (LayoutParams) ivPlaceholderImg.getLayoutParams();
+                lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
+                ivPlaceholderImg.setLayoutParams(lpOfImg);
+                tvPlaceholderText.setVisibility(View.GONE);
+            }
+        });
     }
 // </editor-fold>
 }

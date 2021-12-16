@@ -43,7 +43,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/black"
-                    tools:visibility="invisible" />
+                    tools:visibility="invisible">
+
+                    <ImageView
+                        android:id="@+id/plvlc_link_mic_render_view_pause_placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/plvlc_linkmic_pause_placeholder"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
                 <!-- 封面图（仅音频模式时展示）-->
                 <ImageView

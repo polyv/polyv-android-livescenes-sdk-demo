@@ -405,7 +405,7 @@ public class PLVHCToolBarLayout extends FrameLayout implements IPLVHCToolBarLayo
     private void initMarkToolControllerLayout() {
         plvhcToolbarMarkToolControllerLayout.init(liveRoomDataManager, isLeaderLayout);
         // 进入时初始化标注工具状态
-        handleChangeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherLayout || isLeaderLayout));
+        handleChangeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherLayout));
         handleChangeColor(PLVHCMarkToolEnums.Color.getDefaultColor(isTeacherLayout));
         changeMarkToolState(false, false);
 
