@@ -29,6 +29,7 @@ import com.easefun.polyv.livehiclass.modules.linkmic.item.IPLVHCLinkMicItemLayou
 import com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCJoinDiscussCountDownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCLinkMicInvitationCountdownWindow;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCReceiveBroadcastDialog;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCSeminarCountdownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCTeacherScreenStreamLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCClassStopHasNextDialog;
@@ -73,7 +74,7 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
     private PLVHCLinkMicInvitationCountdownWindow linkMicInvitationCountdownWindow;
     private PLVHCTeacherScreenStreamLayout teacherScreenStreamLayout;
     //dialog
-    private AlertDialog teacherSendBroadcastDialog;
+    private PLVHCReceiveBroadcastDialog teacherSendBroadcastDialog;
 
     private String teacherNick;
     private boolean isHasPaintPermission;
@@ -110,8 +111,6 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
 
         //启动前台服务，防止在后台被杀
         PLVForegroundService.startForegroundService(PLVHCLiveHiClassActivity.class, "POLYV互动学堂", R.drawable.plvhc_ic_launcher);
-        //防止自动息屏、锁屏
-        setKeepScreenOn(true);
     }
 
     private void initLinkMicItemLayout(boolean isLittleLayout) {
@@ -744,18 +743,10 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         @Override
         public void onTeacherSendBroadcast(String content) {
             if (teacherSendBroadcastDialog != null) {
-                teacherSendBroadcastDialog.dismiss();
+                teacherSendBroadcastDialog.hide();
             }
-            teacherSendBroadcastDialog = new AlertDialog.Builder(getContext())
-                    .setTitle("提示")
-                    .setMessage(content)
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .create();
+            teacherSendBroadcastDialog = new PLVHCReceiveBroadcastDialog(getContext());
+            teacherSendBroadcastDialog.setContent(content);
             teacherSendBroadcastDialog.show();
         }
 

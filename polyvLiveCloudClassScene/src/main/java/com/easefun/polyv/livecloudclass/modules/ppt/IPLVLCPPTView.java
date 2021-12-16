@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.ppt;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
  * date: 2020/10/16
@@ -21,19 +22,31 @@ public interface IPLVLCPPTView {
     void initLivePPT(OnPLVLCLivePPTViewListener onPLVLCPPTViewListener);
 
     /**
-     * 移除延迟时间
+     * 进入rtc频道
      */
-    void removeDelayTime();
+    void notifyJoinRtcChannel();
 
     /**
-     * 恢复延迟时间
+     * 退出rtc频道
      */
-    void recoverDelayTime();
+    void notifyLeaveRtcChannel();
+
+    /**
+     * 设置是否无延迟观看
+     */
+    void setIsLowLatencyWatch(boolean isLowLatencyWatch);
 
     /**
      * 发送sei时间戳数据到PPT
      */
     void sendSEIData(long ts);
+
+    /**
+     * 控制PPT翻页
+     *
+     * @param type 翻页类型
+     */
+    void turnPagePPT(String type);
 
 
 // </editor-fold>
@@ -120,6 +133,11 @@ public interface IPLVLCPPTView {
          * 直播回调，回到上一个Activity
          */
         void onLiveBackTopActivity();
+
+        /**
+         * 直播ppt状态更新
+         */
+        void onLivePPTStatusChange(PLVPPTStatus pptStatus);
     }
     // </editor-fold>
 

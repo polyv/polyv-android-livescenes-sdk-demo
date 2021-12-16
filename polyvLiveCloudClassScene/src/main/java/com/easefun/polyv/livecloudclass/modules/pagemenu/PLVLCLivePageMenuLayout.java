@@ -20,7 +20,6 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
@@ -29,6 +28,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommon
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -52,7 +52,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVColorTransitionPagerTitleView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVSimplePagerTitleView;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -100,6 +100,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCTuWenFragment tuWenFragment;//图文直播tab页
     private PLVLCQuizFragment quizFragment;//咨询提问tab页
     private PLVLCChatFragment chatFragment;//互动聊天tab页
+    private PLVLCQAFragment questionsAndAnswersFragment;//问答tab页
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -360,6 +361,22 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabFragmentList.add(iFrameFragment);
     }
 
+    private void addQATab(PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+        pageMenuTabTitleList.add(channelMenusBean.getName());
+        questionsAndAnswersFragment = new PLVLCQAFragment();
+
+        PLVLiveClassDetailVO.DataBean.QADataBean qaDataBean = new PLVLiveClassDetailVO.DataBean.QADataBean();
+        qaDataBean.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+        qaDataBean.setRoomId(liveRoomDataManager.getConfig().getChannelId());
+        qaDataBean.setSessionId(liveRoomDataManager.getSessionId());
+        qaDataBean.setUserId(liveRoomDataManager.getConfig().getUser().getViewerId());
+        qaDataBean.setUserPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
+        qaDataBean.setUserNick(liveRoomDataManager.getConfig().getUser().getViewerName());
+        qaDataBean.setSocketMsg();
+        questionsAndAnswersFragment.init(qaDataBean.getSocketMsg());
+        pageMenuTabFragmentList.add(questionsAndAnswersFragment);
+    }
+
     private void addTuWenTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
         tuWenFragment = new PLVLCTuWenFragment();
@@ -582,6 +599,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                             addIFrameTab(channelMenusBean);
                         } else if (PolyvLiveClassDetailVO.MENUTYPE_TUWEN.equals(channelMenusBean.getMenuType())) {
                             addTuWenTab(channelMenusBean);
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_QA.equals(channelMenusBean.getMenuType())) {
+                            addQATab(channelMenusBean);
                         }
                     }
                     refreshPageMenuTabAdapter();

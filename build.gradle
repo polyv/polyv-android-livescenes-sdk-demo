@@ -55,12 +55,11 @@ ext {
     compileSdkVersion = 27
     minSdkVersion = 17//如果需要降级到21，请查看文档：
     targetSdkVersion = 27
-    versionCode = 172
-    versionName = "1.7.2"
+    versionCode = 180
+    versionName = "1.8.0"
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
 

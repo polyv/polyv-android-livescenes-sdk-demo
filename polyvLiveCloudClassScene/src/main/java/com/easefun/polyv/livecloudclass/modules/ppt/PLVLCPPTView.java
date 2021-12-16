@@ -15,14 +15,18 @@ import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTVodProcessor;
 import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView;
 import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
+import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.web.PLVWebview;
+import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 import static com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog.PPTEvent.PPT_SEND_WEB_MESSAGE;
 
@@ -50,6 +54,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     //Presenter
     private IPLVPPTContract.IPLVPPTPresenter presenter;
+
+    private boolean isLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
+    private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -156,13 +163,21 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
 
     @Override
-    public void removeDelayTime() {
-        presenter.removeMsgDelayTime();
+    public void notifyJoinRtcChannel() {
+        isRtcWatch = true;
+        updateMsgDelayTime();
     }
 
     @Override
-    public void recoverDelayTime() {
-        presenter.recoverMsgDelayTime();
+    public void notifyLeaveRtcChannel() {
+        isRtcWatch = false;
+        updateMsgDelayTime();
+    }
+
+    @Override
+    public void setIsLowLatencyWatch(boolean isLowLatencyWatch) {
+        this.isLowLatencyWatch = isLowLatencyWatch;
+        updateMsgDelayTime();
     }
 
     @Override
@@ -171,6 +186,11 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         sendWebMessage(PolyvLivePPTProcessor.SETSEIDATA, "{\"time\":" + ts + "}");
     }
 
+    @Override
+    public void turnPagePPT(String type) {
+        PLVCommonLog.d(TAG, "turnPagePPT: "+type);
+        sendWebMessage(PLVLivePPTProcessor.CHANGE_PPT_PAGE, "{\"type\":\"" + type + "\"}");
+    }
 
     // </editor-fold>
 
@@ -252,6 +272,14 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="内部处理方法">
+
+    private void updateMsgDelayTime() {
+        presenter.notifyIsWatchLowLatency(isRtcWatch || isLowLatencyWatch);
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="添加直播或回放JS事件监听器">
     //添加回放JS事件监听器
     private void addPlaybackJSEventListener() {
@@ -327,6 +355,16 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             public void backTopActivity() {
                 if (onLivePPTViewListener != null) {
                     onLivePPTViewListener.onLiveBackTopActivity();
+                }
+            }
+
+            @Override
+            public void onPPTStatusChange(String data) {
+                PLVPPTStatus pptStatus = PLVGsonUtil.fromJson(PLVPPTStatus.class, data);
+                if(pptStatus != null && pptStatus.getMaxTeacherOp() != null){
+                    if(onLivePPTViewListener != null){
+                        onLivePPTViewListener.onLivePPTStatusChange(pptStatus);
+                    }
                 }
             }
         });

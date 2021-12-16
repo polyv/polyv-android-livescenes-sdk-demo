@@ -22,6 +22,7 @@ import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVQuoteEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
+import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -138,8 +139,8 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
                 selImgPosition = imgTagList.size();
             }
             Object baseEvent = data.getData();
-            String imgUrl;
-            PLVUrlTag urlTag;
+            String imgUrl = null;
+            PLVUrlTag urlTag = null;
             if (baseEvent instanceof PLVChatImgHistoryEvent) {
                 imgUrl = ((PLVChatImgHistoryEvent) baseEvent).getContent().getUploadImgUrl();
                 if (((PLVChatImgHistoryEvent) baseEvent).getObj2() instanceof PLVUrlTag) {
@@ -148,7 +149,20 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
                     urlTag = new PLVUrlTag(imgUrl, baseEvent);
                     ((PLVChatImgHistoryEvent) baseEvent).setObj2(urlTag);
                 }
-            } else if (baseEvent instanceof PLVChatImgEvent) {
+            } else if (baseEvent instanceof PLVTAnswerEvent) {   //兼容提问-图片信息
+                PLVTAnswerEvent answerEven = (PLVTAnswerEvent) baseEvent;
+                if (answerEven.getObj2() instanceof PLVUrlTag) {
+                    urlTag = (PLVUrlTag) answerEven.getObj2();
+                    imgUrl = urlTag.getUrl();
+                }else {
+                    if(answerEven.getObj1()!=null){
+                        imgUrl = answerEven.getObj1().toString();
+                        urlTag = new PLVUrlTag(imgUrl, baseEvent);
+                        ((PLVTAnswerEvent) baseEvent).setObj2(urlTag);
+                    }
+                }
+            }
+            else if (baseEvent instanceof PLVChatImgEvent) {
                 imgUrl = ((PLVChatImgEvent) baseEvent).getValues().get(0).getUploadImgUrl();
                 if (((PLVChatImgEvent) baseEvent).getObj2() instanceof PLVUrlTag) {
                     urlTag = (PLVUrlTag) ((PLVChatImgEvent) baseEvent).getObj2();
@@ -176,10 +190,12 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
             } else {
                 continue;
             }
-            if (urlTag == null) {
+            if (urlTag == null && imgUrl!=null) {
                 urlTag = new PLVUrlTag(imgUrl, baseEvent);
             }
-            imgTagList.add(urlTag);
+            if(urlTag!=null){
+                imgTagList.add(urlTag);
+            }
         }
         return selImgPosition;
     }

@@ -12,11 +12,11 @@ import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
-import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
+import com.plv.business.api.common.player.PLVPlayerConstant;
 
 import java.util.List;
 
@@ -196,9 +196,17 @@ public interface IPLVLivePlayerContract {
 
         /**
          * 仅音频模式
+         *
          * @param isOnlyAudio true表示音频开播，仅音频模式打开
          */
         void onOnlyAudio(boolean isOnlyAudio);
+
+        /**
+         * 网络质量回调
+         *
+         * @param networkQuality 网络质量
+         */
+        void onLowLatencyNetworkQuality(@PLVPlayerConstant.NetQualityType int networkQuality);
     }
     // </editor-fold>
 
@@ -225,6 +233,7 @@ public interface IPLVLivePlayerContract {
 
         /**
          * 设置是否打开片头广告
+         *
          * @param isAllowOpenAdHead
          */
         void setAllowOpenAdHead(boolean isAllowOpenAdHead);
@@ -233,6 +242,13 @@ public interface IPLVLivePlayerContract {
          * 开始播放
          */
         void startPlay();
+
+        /**
+         * 开始播放
+         *
+         * @param lowLatency 是否无延迟观看
+         */
+        void startPlay(boolean lowLatency);
 
         /**
          * 重新开始播放

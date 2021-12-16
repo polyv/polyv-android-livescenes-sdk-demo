@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.chatroom.holder;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.easefun.polyv.businesssdk.model.chat.PolyvAnswerVO;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -12,6 +13,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgContent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -142,6 +144,19 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromUser(tAnswerEvent.getUser());
             int validIndex = Math.min(tAnswerEvent.getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) tAnswerEvent.getObjects()[validIndex];
+            //如msgType为image类型说明发送的speakMsg为json串
+            if(tAnswerEvent.getMsgType()!=null && tAnswerEvent.getMsgType().equalsIgnoreCase(PLVTAnswerEvent.TYPE_IMAGE)){
+                String msg  = speakMsg.toString();
+                PolyvAnswerVO imgAnswerEvent = PLVGsonUtil.fromJson(PolyvAnswerVO.class,msg);
+                if(imgAnswerEvent!=null){
+                    chatImgUrl = imgAnswerEvent.getUrl();
+                    chatImgWidth = (int) imgAnswerEvent.getWidth();
+                    chatImgHeight =(int) imgAnswerEvent.getHeight();
+                    tAnswerEvent.setObj1(chatImgUrl);
+                    speakMsg = null;
+                }
+            }
+
         } else if (messageData instanceof PLVSpeakHistoryEvent) {//历史发言信息
             PLVSpeakHistoryEvent speakHistoryEvent = (PLVSpeakHistoryEvent) messageData;
             fillFieldFromUser(speakHistoryEvent.getUser());

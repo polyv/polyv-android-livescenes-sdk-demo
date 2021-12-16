@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
 
 /**
  * date: 2020/9/8
@@ -83,6 +84,11 @@ public interface IPLVLiveLandscapePlayerController {
      * 获取更多按钮
      */
     ImageView getMoreView();
+
+    /**
+     * 获取ppt翻页控件
+     */
+    PLVLCPPTTurnPageLayout getPPTTurnPageLayout();
 
     /**
      * 显示

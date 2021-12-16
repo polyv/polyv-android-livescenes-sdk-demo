@@ -200,7 +200,7 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
 
         // 初始化工具和颜色
         final boolean isTeacherType = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
-        changeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType || isLeader));
+        changeMarkTool(PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isTeacherType));
         changeColor(PLVHCMarkToolEnums.Color.getDefaultColor(isTeacherType));
     }
 
@@ -275,7 +275,7 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
         }
         if (isHasPaint) {
             containerView.sendEvent(new PLVGivePaintBrushAuthEvent());
-            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isLeader)));
+            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(false)));
             changeColor(getOrDefault(lastSelectColor, PLVHCMarkToolEnums.Color.getDefaultColor(false)));
         } else {
             containerView.sendEvent(new PLVRemovePaintBrushAuthEvent());
@@ -289,7 +289,7 @@ public class PLVHCDocumentLayout extends FrameLayout implements IPLVHCDocumentLa
         updateWhenLeaderChanged(false);
         containerView.sendEvent(new PLVSetGroupLeaderEvent(isHasGroupLeader));
         if (isHasGroupLeader) {
-            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(isLeader)));
+            changeMarkTool(getOrDefault(lastSelectMarkTool, PLVHCMarkToolEnums.MarkTool.getDefaultMarkTool(false)));
             changeColor(getOrDefault(lastSelectColor, PLVHCMarkToolEnums.Color.getDefaultColor(false)));
         }
     }

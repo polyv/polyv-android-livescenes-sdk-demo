@@ -3,12 +3,14 @@ package com.easefun.polyv.livecloudclass.modules.chatroom;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
@@ -39,6 +42,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
     //提问信息列表
     private PLVMessageRecyclerView quizMsgRv;
     private PLVLCMessageAdapter messageAdapter;
+    private PLVChatImageViewerFragment chatImageViewerFragment;//聊天图片查看fragment
 
     //输入框
     private EditText inputEt;
@@ -77,6 +81,16 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         quizMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(16), ConvertUtils.dp2px(16)));
         PLVMessageRecyclerView.setLayoutManager(quizMsgRv);
         messageAdapter = new PLVLCMessageAdapter();
+        messageAdapter.setOnViewActionListener(new PLVLCMessageAdapter.OnViewActionListener() {
+            @Override
+            public void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
+                if (isQuoteImg) {
+                    chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) getContext(), messageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
+                } else {
+                    chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) getContext(), messageAdapter.getDataList(), messageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
+                }
+            }
+        });
         //设置信息索引，需在chatroomPresenter.registerView后设置
         messageAdapter.setMsgIndex(chatroomPresenter.getViewIndex(chatroomView));
         quizMsgRv.setAdapter(messageAdapter);
@@ -261,6 +275,17 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         } else if (id == R.id.send_msg_tv) {
             sendQuestionMessage(inputEt.getText().toString());
         }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="拦截返回事件">
+    @Override
+    public boolean onBackPressed() {
+        if (chatImageViewerFragment != null && chatImageViewerFragment.isVisible()) {
+            chatImageViewerFragment.hide();
+            return true;
+        }
+        return super.onBackPressed();
     }
     // </editor-fold>
 }

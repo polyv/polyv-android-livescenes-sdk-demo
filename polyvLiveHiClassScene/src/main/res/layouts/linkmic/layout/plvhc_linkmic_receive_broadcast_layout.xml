@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:background="#2B2F48"
+        android:minWidth="320dp"
+        android:paddingLeft="26dp"
+        android:paddingTop="16dp"
+        android:paddingRight="26dp"
+        android:paddingBottom="16dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="16dp"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_message_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:fontFamily="sans-serif-medium"
+            android:text="广播通知"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/plvhc_split_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/plvhc_linkmic_message_title_tv"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#19ffffff"
+            android:minWidth="268dp" />
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_message_content_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvhc_split_view"
+            android:lineSpacingMultiplier="1.1"
+            android:maxLines="5"
+            android:minHeight="36dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:text="通知信息"
+            android:textColor="#ccffffff"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/plvhc_linkmic_message_confirm_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/plvhc_linkmic_message_content_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/plvhc_live_room_student_start_class_stroke_bg"
+            android:paddingLeft="36dp"
+            android:paddingTop="11dp"
+            android:paddingRight="36dp"
+            android:paddingBottom="11dp"
+            android:text="好的"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</android.support.constraint.ConstraintLayout>

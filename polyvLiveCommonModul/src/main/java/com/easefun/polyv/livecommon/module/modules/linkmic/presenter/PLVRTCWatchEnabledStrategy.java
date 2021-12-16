@@ -8,10 +8,10 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
 import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
-import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.linkmic.listener.PLVLinkMicEventListener;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
@@ -31,6 +31,8 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     private PLVLinkMicPresenter linkMicPresenter;
     private IPolyvLinkMicManager linkMicManager;
     private IPLVLiveRoomDataManager liveRoomDataManager;
+
+    private PLVLinkMicEventListener linkMicEventListener;
 
     /**** Listener ****/
     private OnJoinLinkMicListener onJoinLinkMicListener;
@@ -57,7 +59,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
         linkMicPresenter.pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
             @Override
             public void run() {
-                linkMicManager.addEventHandler(new PolyvLinkMicEventListener() {
+                linkMicManager.addEventHandler(linkMicEventListener = new PLVLinkMicEventListener() {
                     @Override
                     public void onJoinChannelSuccess(String uid) {
                         isJoinChannel = true;
@@ -189,6 +191,26 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     @Override
     public void setOnLeaveLinkMicListener(OnLeaveLinkMicListener li) {
         onLeaveLinkMicListener = li;
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="销毁">
+
+    @Override
+    public void destroy() {
+        if (linkMicEventListener != null) {
+            linkMicManager.removeEventHandler(linkMicEventListener);
+            linkMicEventListener = null;
+        }
+
+        linkMicPresenter = null;
+        linkMicManager = null;
+        liveRoomDataManager = null;
+        onBeforeJoinChannelListener = null;
+        onJoinRTCChannelWatchListener = null;
+        onJoinLinkMicListener = null;
+        onLeaveLinkMicListener = null;
     }
 
     // </editor-fold>

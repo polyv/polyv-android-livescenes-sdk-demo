@@ -59,6 +59,25 @@ public interface IPLVLCLinkMicLayout {
     void showControlBar();
 
     /**
+     * 暂停播放
+     *
+     * @see #resume()
+     */
+    void pause();
+
+    /**
+     * 恢复播放
+     *
+     * @see #pause()
+     */
+    void resume();
+
+    /**
+     * 是否正在暂停
+     */
+    boolean isPausing();
+
+    /**
      * 设置是否讲师打开连麦
      *
      * @param isTeacherOpenLinkMic 讲师是否打开连麦
@@ -115,6 +134,11 @@ public interface IPLVLCLinkMicLayout {
      * 设置直播结束
      */
     void setLiveEnd();
+
+    /**
+     * 设置是否无延迟观看
+     */
+    void setWatchLowLatency(boolean watchLowLatency);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2. 需要外部响应的事件监听器">
@@ -142,19 +166,28 @@ public interface IPLVLCLinkMicLayout {
         // <editor-fold defaultstate="collapsed" desc="连麦事件监听">
 
         /**
-         * 加入连麦成功
+         * 加入rtc
          */
-        void onJoinChannelSuccess();
+        void onJoinRtcChannel();
 
         /**
-         * 离开连麦
+         * 离开rtc
          */
-        void onLeaveChannel();
+        void onLeaveRtcChannel();
+
+        void onJoinLinkMic();
+
+        void onLeaveLinkMic();
 
         /**
          * 是否要显示RTC布局
          */
         void onShowLandscapeRTCLayout(boolean show);
+
+        /**
+         * rtc网络质量回调
+         */
+        void onNetworkQuality(int quality);
         // </editor-fold>
 
         // <editor-fold defaultstate="collapsed" desc="点击事件监听器">

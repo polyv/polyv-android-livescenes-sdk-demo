@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
 
 /**
  * date: 2020/9/8
@@ -108,6 +109,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     @Override
     public ImageView getMoreView() {
         return findViewById(R.id.more_land_iv);
+    }
+
+    @Override
+    public PLVLCPPTTurnPageLayout getPPTTurnPageLayout() {
+        return findViewById(R.id.video_ppt_turn_page_land_layout);
     }
 
     @Override

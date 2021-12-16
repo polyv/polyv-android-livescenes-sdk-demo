@@ -2,9 +2,9 @@ package com.easefun.polyv.livecommon.module.modules.socket;
 
 import android.support.annotation.NonNull;
 
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -74,7 +74,10 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                 .setAvatarUrl(getConfig().getUser().getViewerAvatar())//用户头像
                 .setUserType(getConfig().getUser().getViewerType())//用户类型
                 .setActor(getConfig().getUser().getActor())//用户头衔
-                .setChannelId(getConfig().getChannelId());//频道号
+                .setChannelId(getConfig().getChannelId())//频道号
+                .setParam4(getConfig().getUser().getParam4())//自定义统计参数p4
+                .setParam5(getConfig().getUser().getParam5())//自定义统计参数p5
+        ;
         //登录socket
         PolyvSocketWrapper.getInstance().login(PLVSocketLoginVO.createFromUserClient());
     }

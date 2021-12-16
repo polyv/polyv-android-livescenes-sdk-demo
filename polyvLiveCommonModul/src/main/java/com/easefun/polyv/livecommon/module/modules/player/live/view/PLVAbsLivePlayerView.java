@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
-import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -142,6 +141,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
 
     @Override
     public void onOnlyAudio(boolean isOnlyAudio) {
-        
+
+    }
+
+    @Override
+    public void onLowLatencyNetworkQuality(int networkQuality) {
+
     }
 }

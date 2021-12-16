@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.WindowManager;
@@ -41,8 +42,11 @@ import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import java.util.ArrayList;
 
 /**
  * date: 2020/10/12
@@ -83,6 +87,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     // 悬浮PPT布局 和 播放器布局 的切换器
     private PLVViewSwitcher pptViewSwitcher = new PLVViewSwitcher();
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -427,6 +432,38 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onSendLikesAction() {
                 livePageMenuLayout.getChatroomPresenter().sendLikeMessage();
             }
+
+            @Override
+            public void onPPTTurnPage(String type) {
+                if (floatingPPTLayout != null && floatingPPTLayout.getPPTView() != null) {
+                    floatingPPTLayout.getPPTView().turnPagePPT(type);
+                }
+            }
+
+            @Override
+            public void onWatchLowLatency(boolean watchLowLatency) {
+                floatingPPTLayout.setIsLowLatencyWatch(watchLowLatency);
+                if (linkMicLayout != null) {
+                    linkMicLayout.setWatchLowLatency(watchLowLatency);
+                }
+            }
+
+            @Override
+            public void onRtcPauseResume(boolean toPause) {
+                if (linkMicLayout == null) {
+                    return;
+                }
+                if (toPause) {
+                    linkMicLayout.pause();
+                } else {
+                    linkMicLayout.resume();
+                }
+            }
+
+            @Override
+            public boolean isRtcPausing() {
+                return linkMicLayout.isPausing();
+            }
         });
 
         //当前页面 监听 播放器数据中的PPT是否显示状态
@@ -649,6 +686,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         finish();
                     }
                 }
+
+                @Override
+                public void onLivePPTStatusChange(PLVPPTStatus plvpptStatus) {
+                    //更新PPT状态
+                    if(mediaLayout != null){
+                        mediaLayout.updatePPTStatusChange(plvpptStatus);
+                    }
+                }
             });
         } else {
             //设置回放PPT事件监听
@@ -673,7 +718,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         //设置连麦布局监听器
         linkMicLayout.setOnPLVLinkMicLayoutListener(new IPLVLCLinkMicLayout.OnPLVLinkMicLayoutListener() {
             @Override
-            public void onJoinChannelSuccess() {
+            public void onJoinRtcChannel() {
                 if (liveRoomDataManager.getConfig().isPPTChannelType()) {
                     //对于三分屏频道，如果PPT此时还在悬浮窗，则将PPT从悬浮窗切到主屏幕，将播放器从主屏幕切到悬浮窗
                     if (floatingPPTLayout.isPPTInFloatingLayout()) {
@@ -684,19 +729,29 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //隐藏悬浮窗
                 floatingPPTLayout.hide();
                 //更新PPT的延迟时间为0
-                floatingPPTLayout.getPPTView().removeDelayTime();
+                floatingPPTLayout.getPPTView().notifyJoinRtcChannel();
                 //更新播放器布局
                 mediaLayout.updateWhenJoinRTC(linkMicLayout.getLandscapeWidth());
             }
 
             @Override
-            public void onLeaveChannel() {
+            public void onLeaveRtcChannel() {
                 //显示悬浮窗
                 floatingPPTLayout.show();
                 //重置PPT延迟时间
-                floatingPPTLayout.getPPTView().recoverDelayTime();
+                floatingPPTLayout.getPPTView().notifyLeaveRtcChannel();
                 //更新播放器布局
                 mediaLayout.updateWhenLeaveRTC();
+            }
+
+            @Override
+            public void onJoinLinkMic() {
+                mediaLayout.updateWhenJoinLinkMic();
+            }
+
+            @Override
+            public void onLeaveLinkMic() {
+                mediaLayout.updateWhenLeaveLinkMic();
             }
 
             @Override
@@ -709,13 +764,18 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onNetworkQuality(int quality) {
+                mediaLayout.acceptNetworkQuality(quality);
+            }
+
+            @Override
             public void onChangeTeacherLocation(PLVViewSwitcher viewSwitcher, PLVSwitchViewAnchorLayout switchView) {
                 viewSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
                 viewSwitcher.switchView();
                 mediaLayout.getPlayerSwitchView().post(new Runnable() {
                     @Override
                     public void run() {
-                        if(mediaLayout != null && mediaLayout.getPlayerSwitchView() != null) {
+                        if (mediaLayout != null && mediaLayout.getPlayerSwitchView() != null) {
                             //兼容 constraint-layout 升级到 2.0.0+ 出现的无延迟黑屏问题
                             mediaLayout.getPlayerSwitchView().requestLayout();
                         }
