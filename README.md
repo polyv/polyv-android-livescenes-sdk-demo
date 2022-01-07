@@ -2,7 +2,7 @@ polyv-android-livescenes-sdk-demo
 ===
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v1.8.0-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.8.0)
+[![GitHub release](https://img.shields.io/badge/release-v1.8.1-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.8.1)
 
 [版本更新记录](./CHANGELOG.md)
 ### 1 简介
@@ -54,6 +54,7 @@ Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
 | Github仓库Tag | 依赖SDK版本 | API文档                                                                             | Common层 | 观看端-云课堂场景 | 观看端-直播带货场景 | 开播端-手机开播三分屏场景 | 开播端-手机开播纯视频场景 | 互动学堂场景 |
 |-------------|---------|-----------------------------------------------------------------------------------|---------|-----------|------------|---------------|---------------|--------|
+| 1.8.1       | 1.8.1   | [v1.8.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.1/index.html)   | ✅       | ✅         |✅            |✅                | ✅             | ✅      |
 | 1.8.0       | 1.8.0   | [v1.8.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.0/index.html)   | ✅       | ✅         |            |               | ✅             | ✅      |
 | 1.7.2       | 1.7.2   | [v1.7.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.2/index.html)   | ✅       | ✅         | ✅          | ✅             | ✅             | ✅      |
 | 1.7.1       | 1.7.1   | [v1.7.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.1/index.html)   | ✅       | ✅         | ✅          | ✅             | ✅             |        |

@@ -1,7 +1,8 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
-import androidx.annotation.NonNull;
 import android.util.Pair;
+
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
@@ -10,6 +11,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -97,6 +99,13 @@ public interface IPLVLCMediaLayout {
      * @return 横屏聊天布局
      */
     PLVLCChatLandscapeLayout getChatLandscapeLayout();
+
+    /**
+     * 获取播放器自定义水印
+     *
+     * @return logoview
+     */
+    PLVPlayerLogoView getLogoView();
 
     /**
      * 设置view交互事件监听器

@@ -1,11 +1,9 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
-import androidx.lifecycle.LiveData;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +14,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
@@ -67,6 +71,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     //logo view
     private PLVPlayerLogoView logoView;
+    //marquee view
+    private PLVMarqueeView marqueeView;
 
     //主播放器父控件的父控件
     private ViewGroup videoViewParentParent;
@@ -116,6 +122,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         playCenterView.setOnClickListener(this);
 
         logoView = findViewById(R.id.logo_view);
+
+        marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
 
         initSubVideoViewChangeListener();
     }
@@ -306,6 +314,16 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public boolean isCurrentLowLatencyMode() {
+        return false;
+    }
+
+    @Override
+    public void switchLowLatencyMode(boolean isLowLatencyMode) {
+        // 回放没有切换延迟模式
+    }
+
+    @Override
     public LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO() {
         return null;
     }
@@ -364,6 +382,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         @Override
         public PLVPlayerLogoView getLogo() {
             return logoView;
+        }
+
+        @Override
+        public IPLVMarqueeView getMarqueeView() {
+            return marqueeView;
         }
 
         @Override

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/plvsa_streamer_item_ly_bg_shape"
+    tools:layout_width="200dp">
+
+    <ImageView
+        android:id="@+id/plvsa_iv_placeholder_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/plvsa_streamer_no_live_placeholder" />
+
+    <TextView
+        android:id="@+id/plvsa_tv_placeholder_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/plv_player_video_live_no_stream"
+        android:textColor="#E4E4E4"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/plvsa_iv_placeholder_img"
+        android:textSize="12sp" />
+
+</RelativeLayout>

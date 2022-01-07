@@ -1,20 +1,21 @@
 package com.easefun.polyv.livestreamer.modules.streamer;
 
 import android.app.AlertDialog;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -293,32 +294,37 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onStreamerError(int errorCode, Throwable throwable) {
+        public void onStreamerError(final int errorCode, final Throwable throwable) {
             super.onStreamerError(errorCode, throwable);
-            if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
-                String tips = throwable.getMessage();
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setMessage(tips)
-                        .setPositiveButton("设置", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PLVFastPermission.getInstance().jump2Settings(getContext());
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .create();
-                dialog.show();
-            } else {
-                PLVToast.Builder.context(getContext())
-                        .setText(throwable.getMessage())
-                        .build()
-                        .show();
-            }
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
+                        String tips = throwable.getMessage();
+                        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                .setMessage(tips)
+                                .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PLVFastPermission.getInstance().jump2Settings(getContext());
+                                    }
+                                })
+                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create();
+                        dialog.show();
+                    } else {
+                        PLVToast.Builder.context(getContext())
+                                .setText(throwable.getMessage())
+                                .build()
+                                .show();
+                    }
+                }
+            });
         }
 
         @Override

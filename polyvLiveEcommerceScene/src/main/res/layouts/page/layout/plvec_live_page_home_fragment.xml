@@ -175,4 +175,10 @@
             android:textColor="#ffffff"
             android:textSize="12sp" />
     </LinearLayout>
+
+    <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView
+        android:id="@+id/plvec_live_network_tips_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

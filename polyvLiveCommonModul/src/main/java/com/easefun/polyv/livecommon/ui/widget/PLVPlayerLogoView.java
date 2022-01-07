@@ -3,13 +3,14 @@ package com.easefun.polyv.livecommon.ui.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -43,9 +44,17 @@ public class PLVPlayerLogoView extends FrameLayout {
         addLogo(logoParam, false);
     }
 
+    public LogoParam getParamZero() {
+        if (logoParams.size() >= 1) {
+            return logoParams.get(0);
+        }
+        return null;
+    }
+
     private void addLogo(final LogoParam logoParam, boolean posted) {
-        if (logoParam == null)
+        if (logoParam == null) {
             return;
+        }
         if (!posted && (logoParam.width < 1 || logoParam.height < 1)) {
             if (getWidth() == 0 || getHeight() == 0) {
                 post(new Runnable() {

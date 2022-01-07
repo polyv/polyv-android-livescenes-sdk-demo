@@ -2,15 +2,10 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.Manifest;
 import android.app.Activity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -21,6 +16,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
@@ -29,13 +30,13 @@ import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -231,6 +232,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isGuest()){
+                    return;
+                }
                 ViewGroup.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 removeView(titleInputLayout);
                 addView(titleInputLayout, layoutParams);
@@ -249,7 +253,11 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 liveRoomDataManager.getConfig().setupChannelName(liveTitle);
                 liveRoomDataManager.requestUpdateChannelName();
                 if (onViewActionListener != null) {
-                    onViewActionListener.onStartLiveAction();
+                    if(isGuest()){
+                        onViewActionListener.onEnterLiveAction();
+                    } else {
+                        onViewActionListener.onStartLiveAction();
+                    }
                 }
             }
 
@@ -259,6 +267,18 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    private void initStartLiveBtnText(){
+        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plvsa_setting_start_live));
+    }
+
+    /**
+     * 判断当前用户类型是否是嘉宾
+     */
+    private boolean isGuest() {
+        String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+        return PLVSocketUserConstant.USERTYPE_GUEST.equals(userType);
     }
     // </editor-fold>
 
@@ -270,6 +290,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         this.liveTitle = liveRoomDataManager.getConfig().getChannelName();
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
+        initStartLiveBtnText();
     }
 
     @Override
@@ -281,6 +302,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             if (bitrateInfo != null) {
                 plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrateInfo.second));
                 updateBitrateIcon(bitrateInfo.second);
+                PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrateInfo.second);
             }
         }
 
@@ -324,7 +346,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     public void liveStart() {
         if (onViewActionListener != null) {
             int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-            if (currentNetworkQuality == PLVSStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            if (currentNetworkQuality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
                 //如果断网，则不直播，显示弹窗。
                 showAlertDialogNoNetwork();
                 return;

@@ -2,7 +2,6 @@ package com.easefun.polyv.liveecommerce.scenes;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import androidx.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,10 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.GestureDetector;
@@ -25,6 +20,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
@@ -321,6 +322,19 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 isUserCloseFloatingWindow = true;
             }
 
+            @Override
+            public void acceptOnLowLatencyChange(boolean isLowLatency) {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.acceptOnLowLatencyChange(isLowLatency);
+                }
+            }
+
+            @Override
+            public void acceptNetworkQuality(int networkQuality) {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.acceptNetworkQuality(networkQuality);
+                }
+            }
         });
         //当前activity 可以手势操作暂停和播放
         initGesture();
@@ -602,6 +616,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onSetVideoViewRectAction(Rect videoViewRect) {
             videoLayout.setVideoViewRect(videoViewRect);
+        }
+
+        @Override
+        public boolean isCurrentLowLatencyMode() {
+            return videoLayout.isCurrentLowLatencyMode();
+        }
+
+        @Override
+        public void switchLowLatencyMode(boolean isLowLatency) {
+            videoLayout.switchLowLatencyMode(isLowLatency);
         }
 
         @Override

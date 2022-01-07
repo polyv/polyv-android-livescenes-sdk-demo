@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.config;
 
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -130,7 +130,7 @@ public class PLVLiveChannelConfigFiller {
      *
      * @param channelType 频道类型
      */
-    public static void setChannelType(PolyvLiveChannelType channelType) {
+    public static void setChannelType(PLVLiveChannelType channelType) {
         channelConfig.setChannelType(channelType);
     }
 

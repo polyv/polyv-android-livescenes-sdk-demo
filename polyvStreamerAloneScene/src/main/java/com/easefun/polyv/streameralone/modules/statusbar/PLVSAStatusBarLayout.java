@@ -1,12 +1,7 @@
 package com.easefun.polyv.streameralone.modules.statusbar;
 
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +9,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -27,6 +28,7 @@ import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
@@ -72,11 +74,16 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
     private PLVLinkMicItemDataBean localLinkMicItemDataBeanRef;
 
+    private IPLVLiveRoomDataManager liveRoomDataManager;
+
     // 是否打开麦克风、摄像头
     private boolean isOpenAudio = true;
     private boolean isOpenVideo = true;
 
     private OnStopLiveListener stopLiveListener;
+
+    //关闭直播提示的文案
+    private String closeContentString;
 
     // </editor-fold>
 
@@ -154,7 +161,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         if (stopLiveConfirmDialog == null) {
             stopLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(GONE)
-                    .setContent("确认结束直播吗？")
+                    .setContent(closeContentString)
                     .setRightButtonText("确认")
                     .setRightBtnListener(new OnClickListener() {
                         @Override
@@ -183,14 +190,23 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         channelInfoLayout.init(liveRoomDataManager);
     }
 
+    private void initCloseTipContent(IPLVLiveRoomDataManager liveRoomDataManager) {
+        boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+        closeContentString = isGuest ? getContext().getString(R.string.plv_live_room_dialog_exit_confirm_ask)
+                : getContext().getString(R.string.plv_live_room_dialog_steamer_exit_confirm_ask);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSAStatusBarLayout定义的方法">
 
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+
         initTeacherName(liveRoomDataManager);
         initChannelInfoLayout(liveRoomDataManager);
+        initCloseTipContent(liveRoomDataManager);
     }
 
     @Override
@@ -255,6 +271,23 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                     updateNotificationBar();
                 }
             });
+            presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isStartedStatus) {
+                    if(isStartedStatus == null){
+                        return;
+                    }
+                    if(isGuest()){
+                        if(isStartedStatus){
+                            plvsaStatusBarStreamerTimeRl.setVisibility(VISIBLE);
+                            plvsaStatusBarNetworkStatusLayout.setVisibility(VISIBLE);
+                        } else {
+                            plvsaStatusBarStreamerTimeRl.setVisibility(INVISIBLE);
+                            plvsaStatusBarNetworkStatusLayout.setVisibility(INVISIBLE);
+                        }
+                    }
+                }
+            });
         }
 
         @Override
@@ -308,42 +341,52 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         }
 
         @Override
+        public void onUserMuteAudio(String uid, boolean mute, int streamerListPos, int memberListPos) {
+            super.onUserMuteAudio(uid, mute, streamerListPos, memberListPos);
+            updateVolumeChanged();
+        }
+
+        @Override
         public void onLocalUserMicVolumeChanged() {
-            if (localLinkMicItemDataBeanRef == null) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_close);
-                return;
-            }
-            final boolean isMuteAudio = localLinkMicItemDataBeanRef.isMuteAudio();
-            final int curVolume = localLinkMicItemDataBeanRef.getCurVolume();
-            if (isMuteAudio) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_close);
-            } else if (curVolume <= 5) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_open);
-            } else if (curVolume <= 15) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_10);
-            } else if (curVolume <= 25) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_20);
-            } else if (curVolume <= 35) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_30);
-            } else if (curVolume <= 45) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_40);
-            } else if (curVolume <= 55) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_50);
-            } else if (curVolume <= 65) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_60);
-            } else if (curVolume <= 75) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_70);
-            } else if (curVolume <= 85) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_80);
-            } else if (curVolume <= 95) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_90);
-            } else if (curVolume <= 100) {
-                plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_100);
-            }
+            updateVolumeChanged();
         }
 
 
     };
+
+    private void updateVolumeChanged(){
+        if (localLinkMicItemDataBeanRef == null) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_close);
+            return;
+        }
+        final boolean isMuteAudio = localLinkMicItemDataBeanRef.isMuteAudio();
+        final int curVolume = localLinkMicItemDataBeanRef.getCurVolume();
+        if (isMuteAudio) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_close);
+        } else if (curVolume <= 5) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_open);
+        } else if (curVolume <= 15) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_10);
+        } else if (curVolume <= 25) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_20);
+        } else if (curVolume <= 35) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_30);
+        } else if (curVolume <= 45) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_40);
+        } else if (curVolume <= 55) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_50);
+        } else if (curVolume <= 65) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_60);
+        } else if (curVolume <= 75) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_70);
+        } else if (curVolume <= 85) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_80);
+        } else if (curVolume <= 95) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_90);
+        } else if (curVolume <= 100) {
+            plvsaStatusBarStreamerMicIv.setImageResource(R.drawable.plvsa_streamer_mic_volume_100);
+        }
+    }
 
     private void updateNotificationBar() {
         boolean notificationBarVisible = !isOpenVideo || !isOpenAudio;
@@ -435,6 +478,13 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             return oriString;
         }
         return oriString.substring(0, specLength) + "...";
+    }
+
+    private boolean isGuest(){
+        if(liveRoomDataManager != null){
+            return PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+        }
+        return false;
     }
 
     // </editor-fold>

@@ -3,8 +3,8 @@ package com.easefun.polyv.livecommon.module.config;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.easefun.polyv.livescenes.feature.login.model.PLVSLoginVO;
+import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.login.model.PLVLoginVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -42,7 +42,7 @@ public class PLVLiveChannelConfig {
     /**
      * 频道类型
      */
-    private PolyvLiveChannelType channelType;
+    private PLVLiveChannelType channelType;
 
     /**
      * 频道名称
@@ -53,6 +53,10 @@ public class PLVLiveChannelConfig {
      * 嘉宾连麦类型
      */
     private String colinMicType;
+    /**
+     * 是否跳过自动连麦
+     */
+    private boolean isSkipAutoLinkMic = false;
 
     /**
      * 互动学堂课堂信息
@@ -187,7 +191,7 @@ public class PLVLiveChannelConfig {
     /**
      * 设置频道类型
      */
-    public void setChannelType(PolyvLiveChannelType channelType) {
+    public void setChannelType(PLVLiveChannelType channelType) {
         this.channelType = channelType;
     }
 
@@ -218,6 +222,15 @@ public class PLVLiveChannelConfig {
     public void setLiveStreamingWhenLogin(boolean liveStreamingWhenLogin) {
         isLiveStreamingWhenLogin = liveStreamingWhenLogin;
     }
+
+    /**
+     * 设置嘉宾跳过自动连麦，设置后即使开启了自动连麦，嘉宾也不会自动上麦
+     * 默认为false
+     */
+    public void setSkipAutoLinkMic(boolean skipAutoLinkMic) {
+        isSkipAutoLinkMic = skipAutoLinkMic;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -250,7 +263,7 @@ public class PLVLiveChannelConfig {
     }
 
     //获取频道类型
-    public PolyvLiveChannelType getChannelType() {
+    public PLVLiveChannelType getChannelType() {
         return channelType;
     }
 
@@ -260,17 +273,17 @@ public class PLVLiveChannelConfig {
 
     //是否是三分屏频道类型
     public boolean isPPTChannelType() {
-        return channelType == PolyvLiveChannelType.PPT;
+        return channelType == PLVLiveChannelType.PPT;
     }
 
     //是否是纯视频频道类型
     public boolean isAloneChannelType() {
-        return channelType == PolyvLiveChannelType.ALONE;
+        return channelType == PLVLiveChannelType.ALONE;
     }
 
     //嘉宾是否是自动上麦
     public boolean isAutoLinkToGuest() {
-        return TextUtils.isEmpty(colinMicType) || PLVSLoginVO.COLINMICTYPE_AUTO.equals(colinMicType);
+        return TextUtils.isEmpty(colinMicType) || (PLVLoginVO.COLINMICTYPE_AUTO.equals(colinMicType) && !isSkipAutoLinkMic);
     }
 
     /**

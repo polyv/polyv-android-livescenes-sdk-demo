@@ -1,10 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
+
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -311,6 +312,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     // <editor-fold defaultstate="collapsed" desc="API-presenter接口实现">
     @Override
     public void destroy() {
+        //判断是否处于连麦状态，是连麦状态下才会发送joinLeave
+        if(isJoinLinkMic()){
+            //发送joinLeave
+            linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
+        }
         leaveChannel();
         dispose(getLinkMicListDelay);
         dispose(getLinkMicListTimer);
@@ -319,9 +325,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         myLinkMicId = "";
         this.linkMicView = null;
         linkMicInitState = LINK_MIC_UNINITIATED;
-
-        //发送joinLeave
-        linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
         linkMicManager.destroy();
         if (linkMicMsgHandler != null) {
             linkMicMsgHandler.destroy();
@@ -935,7 +938,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         @Override
         public void onUserMuteAudio(String uid, boolean mute) {
             PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onUserMuteAudio,uid=" + uid + " mute=" + mute);
-            boolean hit = false;
             for (int i = 0; i < linkMicList.size(); i++) {
                 PLVLinkMicItemDataBean plvLinkMicItemDataBean = linkMicList.get(i);
                 if (uid.equals(plvLinkMicItemDataBean.getLinkMicId())) {
@@ -943,19 +945,15 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     if (linkMicView != null) {
                         linkMicView.onUserMuteAudio(uid, mute, i);
                     }
-                    hit = true;
                     break;
                 }
             }
-            if (!hit) {
-                muteCacheList.addOrUpdateAudioMuteCacheList(uid, mute);
-            }
+            muteCacheList.addOrUpdateAudioMuteCacheList(uid, mute);
         }
 
         @Override
         public void onUserMuteVideo(String uid, boolean mute) {
             PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onUserMuteVideo uid=" + uid);
-            boolean hit = false;
             for (int i = 0; i < linkMicList.size(); i++) {
                 PLVLinkMicItemDataBean plvLinkMicItemDataBean = linkMicList.get(i);
                 if (uid.equals(plvLinkMicItemDataBean.getLinkMicId())) {
@@ -963,14 +961,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     if (linkMicView != null) {
                         linkMicView.onUserMuteVideo(uid, mute, i);
                     }
-                    hit = true;
                     break;
                 }
             }
-            //mute事件到达时，连麦列表中还没有添加该连麦人
-            if (!hit) {
-                muteCacheList.addOrUpdateVideoMuteCacheList(uid, mute);
-            }
+            muteCacheList.addOrUpdateVideoMuteCacheList(uid, mute);
         }
 
         @Override

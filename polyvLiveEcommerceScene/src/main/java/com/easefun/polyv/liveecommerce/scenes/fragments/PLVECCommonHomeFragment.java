@@ -2,13 +2,14 @@ package com.easefun.polyv.liveecommerce.scenes.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -131,6 +132,14 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //设置view交互事件监听器
     public void setOnViewActionListener(OnViewActionListener listener) {
+    }
+
+    public void acceptOnLowLatencyChange(boolean isLowLatency) {
+
+    }
+
+    public void acceptNetworkQuality(int quality) {
+
     }
     // </editor-fold>
 

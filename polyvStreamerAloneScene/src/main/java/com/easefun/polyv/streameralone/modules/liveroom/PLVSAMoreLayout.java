@@ -1,11 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
-import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.Gravity;
@@ -16,6 +12,11 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
@@ -69,6 +70,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreBitrateTv;
     private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreCloseRoomTv;
+    private View plvsaMoreCloseRoomLayout;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -132,6 +134,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreBitrateTv = (TextView) findViewById(R.id.plvsa_more_bitrate_tv);
         plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreCloseRoomTv = (TextView) findViewById(R.id.plvsa_more_close_room_tv);
+        plvsaMoreCloseRoomLayout = findViewById(R.id.plvsa_more_close_room_layout);
+
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -224,6 +228,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         if (menuDrawer != null) {
             menuDrawer.closeMenu();
         }
+    }
+
+    public void updateCloseRoomLayout(boolean hide){
+        plvsaMoreCloseRoomLayout.setVisibility(hide ? View.GONE : View.VISIBLE);
     }
 
     public void setOnDrawerStateChangeListener(PLVMenuDrawer.OnDrawerStateChangeListener listener) {

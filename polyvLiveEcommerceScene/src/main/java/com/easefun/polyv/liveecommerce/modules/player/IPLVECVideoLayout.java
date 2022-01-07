@@ -1,8 +1,9 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
-import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
 import android.view.View;
+
+import androidx.lifecycle.LiveData;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
@@ -179,6 +180,18 @@ public interface IPLVECVideoLayout {
     void changeMediaPlayMode(@PolyvMediaPlayMode.Mode int mediaPlayMode);
 
     /**
+     * 当前是否无延迟观看模式
+     */
+    boolean isCurrentLowLatencyMode();
+
+    /**
+     * 切换无延迟观看模式
+     *
+     * @param isLowLatencyMode 是否无延迟观看
+     */
+    void switchLowLatencyMode(boolean isLowLatencyMode);
+
+    /**
      * 获取直播播放器数据中的播放信息
      *
      * @return 播放信息数据
@@ -236,6 +249,18 @@ public interface IPLVECVideoLayout {
          * 关闭浮窗点击事件
          */
         void onCloseFloatingAction();
+
+        /**
+         * 无延迟观看回调
+         *
+         * @param isLowLatency 是否正在无延迟观看
+         */
+        void acceptOnLowLatencyChange(boolean isLowLatency);
+
+        /**
+         * 网络质量回调
+         */
+        void acceptNetworkQuality(int networkQuality);
     }
     // </editor-fold>
 }

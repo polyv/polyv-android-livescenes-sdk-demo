@@ -3,19 +3,21 @@ package com.easefun.polyv.streameralone.scenes.fragments;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -35,7 +37,9 @@ import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +79,9 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     private ImageView plvsaToolBarMoreIv;
     private ImageView plvsaToolBarMemberIv;
     private ImageView plvsaToolBarLinkmicIv;
+    private ImageView plvsaToolBarLinkmicTypeIv;
     private View plvsaToolBarMemberLinkmicRequestTipsView;
+    private TextView plvsaToolBarLinkmicTypeTip;
 
     // 聊天室消息列表观察者
     private RecyclerView.AdapterDataObserver chatMessageDataObserver;
@@ -112,12 +118,15 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaToolBarMoreIv = (ImageView) findViewById(R.id.plvsa_tool_bar_more_iv);
         plvsaToolBarMemberIv = (ImageView) findViewById(R.id.plvsa_tool_bar_member_iv);
         plvsaToolBarLinkmicIv = (ImageView) findViewById(R.id.plvsa_tool_bar_linkmic_iv);
+        plvsaToolBarLinkmicTypeIv = (ImageView) findViewById(R.id.plvsa_tool_bar_linkmic_type_iv);
         plvsaToolBarMemberLinkmicRequestTipsView = findViewById(R.id.plvsa_tool_bar_member_linkmic_request_tips_view);
+        plvsaToolBarLinkmicTypeTip = findViewById(R.id.plvsa_tool_bar_linkmic_type_tip);
 
         plvsaToolBarCallInputTv.setOnClickListener(this);
         plvsaToolBarMoreIv.setOnClickListener(this);
         plvsaToolBarMemberIv.setOnClickListener(this);
         plvsaToolBarLinkmicIv.setOnClickListener(this);
+        plvsaToolBarLinkmicTypeIv.setOnClickListener(this);
 
         initMoreLayout();
         initMemberLayout();
@@ -148,6 +157,11 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
         observeChatroomLayout();
         observeStatusBarLayout();
+        updateGuestLayout();
+    }
+
+    public void chatroomLogin(){
+        plvsaChatroomLayout.loginAndLoadHistory();
     }
 
     public void setOnViewActionListener(OnViewActionListener listener) {
@@ -162,6 +176,16 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
     public void updateUserRequestStatus() {
         showUserRequestTips();
+    }
+
+    public void updateLinkMicLayoutTypeVisibility(boolean isShow) {
+        if(isShow && !loadStatus()){
+            plvsaToolBarLinkmicTypeTip.setVisibility(View.VISIBLE);
+            saveStatus();
+        } else {
+            plvsaToolBarLinkmicTypeTip.setVisibility(View.INVISIBLE);
+        }
+        plvsaToolBarLinkmicTypeIv.setVisibility(isShow ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void openMemberLayoutAndHideUserRequestTips() {
@@ -222,6 +246,19 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     }
 
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="更新布局">
+    /**
+     * 更新嘉宾的布局
+     */
+    private void updateGuestLayout() {
+        if (isGuest()) {
+            moreLayout.updateCloseRoomLayout(true);
+            updateLinkMicLayoutTypeVisibility(false);
+            plvsaToolBarLinkmicIv.setVisibility(View.GONE);
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 聊天室">
 
@@ -388,9 +425,37 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                 return;
             }
             runnable.run();
+        } else if (id == R.id.plvsa_tool_bar_linkmic_type_iv) {
+            plvsaToolBarLinkmicTypeTip.setVisibility(View.INVISIBLE);
+            if(PLVDebounceClicker.tryClick(this, 800)) {
+                v.setSelected(!v.isSelected());
+                if (onViewActionListener != null) {
+                    onViewActionListener.onChangeLinkMicLayoutType();
+                }
+            }
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部工具方法">
+    private boolean isGuest() {
+        if (liveRoomDataManager != null) {
+            if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void saveStatus() {
+        SPUtils.getInstance().put("plv_key_linkmic_type_tips_is_showed", true);
+    }
+
+    private boolean loadStatus() {
+        return SPUtils.getInstance().getBoolean("plv_key_linkmic_type_tips_is_showed", false);
+    }
+    // </editor-fold >
+
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
     public interface OnViewActionListener {
@@ -404,6 +469,12 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         void onClickToOpenMemberLayout();
 
         boolean showCleanUpLayout();
+
+        /**
+         * 改变连麦布局类型
+         */
+        void onChangeLinkMicLayoutType();
     }
     // </editor-fold>
+
 }

@@ -1,14 +1,15 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
@@ -124,7 +125,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             playControlIv.setSelected(false);
             playProgressSb.setProgress(0);
             moreIv.setClickable(false);
-            morePopupView.hide();
+            morePopupView.hideAll();
         } else {
             playControlIv.setClickable(true);
             playProgressSb.setClickable(true);

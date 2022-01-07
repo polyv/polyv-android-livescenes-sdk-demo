@@ -1,18 +1,11 @@
 package com.easefun.polyv.streameralone.modules.chatroom;
 
 import android.app.Activity;
-import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -21,6 +14,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
@@ -214,11 +215,16 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.registerView(chatroomView);
         this.chatroomPresenter.init();
+
+        initSocketLoginManager();
+    }
+
+    @Override
+    public void loginAndLoadHistory() {
+        socketLoginManager.login();
         //请求一次历史记录
         chatroomPresenter.setHistoryContainRewardEvent(true);
         chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
-
-        initSocketLoginManager();
     }
 
     @Override
@@ -547,7 +553,6 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         socketLoginManager = new PLVSocketLoginManager(liveRoomDataManager);
         socketLoginManager.init();
         socketLoginManager.setOnSocketEventListener(onSocketEventListener);
-        socketLoginManager.login();
     }
 
     private void destroySocketLoginManager() {

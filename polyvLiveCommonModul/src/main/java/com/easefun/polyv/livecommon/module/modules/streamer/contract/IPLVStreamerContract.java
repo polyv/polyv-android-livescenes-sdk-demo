@@ -1,8 +1,9 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.view.SurfaceView;
+
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -381,6 +382,11 @@ public interface IPLVStreamerContract {
          * @return 推流状态常量
          */
         int getStreamerStatus();
+
+        /**
+         * 嘉宾尝试上麦
+         */
+        void guestTryJoinLinkMic();
 
         /**
          * 获取推流和连麦的数据

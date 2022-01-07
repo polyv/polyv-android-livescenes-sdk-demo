@@ -68,6 +68,11 @@
                     android:layout_height="24dp"
                     android:layout_gravity="bottom"
                     android:background="@drawable/plvlc_linkmic_bg_link_item_bottom_shadow" />
+                <!--logoview-->
+                <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+                    android:id="@+id/plvlc_link_mic_logo_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
                 <!-- 昵称和logo-->
                 <LinearLayout

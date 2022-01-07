@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -18,6 +16,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMode;
@@ -391,6 +392,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         }
     }
 
+    @Override
     public void switchPptType(int pptType){
         if(pptType == PLVDocumentMode.WHITEBOARD.ordinal()){
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
@@ -545,7 +547,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 return;
             }
             v.setSelected(!v.isSelected());
-            linkMicControlWindow.show(v,linkMicShowType);
+            linkMicControlWindow.show(v, linkMicControlWindow.getShowType());
         } else if (id == R.id.plvls_status_bar_document_iv) {
             PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.PPT.ordinal());
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);

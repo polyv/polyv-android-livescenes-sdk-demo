@@ -1,14 +1,9 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
-import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +11,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -31,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -102,6 +104,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         //init memberListRv
         plvsaMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         memberAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+        memberAdapter.setTeacherPermission(!isGuest());//嘉宾默认无权限，需要隐藏控制相关按钮
         memberAdapter.setOnViewActionListener(new PLVSAMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
@@ -225,11 +228,11 @@ public class PLVSAMemberLayout extends FrameLayout {
 
             presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
                 @Override
-                public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean == null) {
+                public void onChanged(@Nullable Boolean isStartedStatus) {
+                    if (isStartedStatus == null) {
                         return;
                     }
-                    memberAdapter.setStreamerStatus(aBoolean);
+                    memberAdapter.setStreamerStatus(isStartedStatus);
                 }
             });
         }
@@ -386,6 +389,13 @@ public class PLVSAMemberLayout extends FrameLayout {
                 .setText("摄像头" + (isMute ? "关闭" : "开启"))
                 .build()
                 .show();
+    }
+
+    private boolean isGuest(){
+        if(liveRoomDataManager != null){
+            return PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+        }
+        return false;
     }
     // </editor-fold>
 }

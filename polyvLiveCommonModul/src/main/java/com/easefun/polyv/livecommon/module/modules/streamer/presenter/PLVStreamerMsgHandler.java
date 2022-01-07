@@ -1,8 +1,9 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
@@ -489,6 +490,7 @@ public class PLVStreamerMsgHandler {
                 }
             });
             streamerPresenter.updateMixLayoutUsers();
+            streamerPresenter.updateLinkMicCount();
         }
     }
 

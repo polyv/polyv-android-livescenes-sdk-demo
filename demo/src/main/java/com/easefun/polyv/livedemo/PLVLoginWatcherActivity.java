@@ -3,8 +3,6 @@ package com.easefun.polyv.livedemo;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -16,6 +14,9 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
+
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
@@ -23,14 +24,14 @@ import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.liveecommerce.scenes.PLVECLiveEcommerceActivity;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.easefun.polyv.livescenes.feature.login.IPLVSceneLoginManager;
-import com.easefun.polyv.livescenes.feature.login.PLVSceneLoginManager;
-import com.easefun.polyv.livescenes.feature.login.PolyvLiveLoginResult;
-import com.easefun.polyv.livescenes.feature.login.PolyvPlaybackLoginResult;
-import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVUtils;
+import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
+import com.plv.livescenes.feature.login.PLVLiveLoginResult;
+import com.plv.livescenes.feature.login.PLVPlaybackLoginResult;
+import com.plv.livescenes.feature.login.PLVSceneLoginManager;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 /**
@@ -279,12 +280,12 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         final String appSecret = etLiveAppSecert.getText().toString();
         final String userId = etLiveUserId.getText().toString();
         final String channelId = etLiveChannelId.getText().toString();
-        loginManager.loginLive(appId, appSecret, userId, channelId, new IPLVSceneLoginManager.OnLoginListener<PolyvLiveLoginResult>() {
+        loginManager.loginLiveNew(appId, appSecret, userId, channelId, new IPLVSceneLoginManager.OnLoginListener<PLVLiveLoginResult>() {
             @Override
-            public void onLoginSuccess(PolyvLiveLoginResult polyvLiveLoginResult) {
+            public void onLoginSuccess(PLVLiveLoginResult plvLiveLoginResult) {
                 loginProgressDialog.dismiss();
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
-                PolyvLiveChannelType channelType = polyvLiveLoginResult.getChannelType();
+                PLVLiveChannelType channelType = plvLiveLoginResult.getChannelTypeNew();
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:
@@ -330,19 +331,19 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         final String userId = etPlaybackUserId.getText().toString();
         final String channelId = etPlaybackChannelId.getText().toString();
         final String vid = etPlaybackVideoId.getText().toString();
-        loginManager.loginPlayback(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PolyvPlaybackLoginResult>() {
+        loginManager.loginPlaybackNew(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
             @Override
-            public void onLoginSuccess(PolyvPlaybackLoginResult polyvPlaybackLoginResult) {
+            public void onLoginSuccess(PLVPlaybackLoginResult plvPlaybackLoginResult) {
                 loginProgressDialog.dismiss();
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
-                PolyvLiveChannelType channelType = polyvPlaybackLoginResult.getChannelType();
+                PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:
                         if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId, channelType,
                                     vid, getViewerId(), getViewerName(),getViewerAvatar(),
-                                    swtichPlaybackVodlistSw.isChecked() ? PolyvPlaybackListType.VOD : PolyvPlaybackListType.PLAYBACK
+                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
                             );
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -356,7 +357,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
                                     vid, getViewerId(), getViewerName(),getViewerAvatar(),
-                                    swtichPlaybackVodlistSw.isChecked() ? PolyvPlaybackListType.VOD : PolyvPlaybackListType.PLAYBACK);
+                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }

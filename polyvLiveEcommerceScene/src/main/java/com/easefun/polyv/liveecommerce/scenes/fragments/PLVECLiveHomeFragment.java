@@ -4,9 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -17,6 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
@@ -41,6 +42,7 @@ import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityAdapter;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailActivity;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout;
+import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
 import com.easefun.polyv.liveecommerce.modules.reward.PLVECRewardGiftAdapter;
 import com.easefun.polyv.liveecommerce.modules.reward.PLVECRewardPopupView;
 import com.easefun.polyv.liveecommerce.modules.reward.widget.PLVECRewardGiftAnimView;
@@ -111,6 +113,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     private PLVECRewardPopupView rewardPopupView;
     private PLVECRewardGiftAnimView rewardGiftAnimView;
+    // 网络较差提示
+    private PLVECNetworkTipsView networkTipsView;
     //监听器
     private OnViewActionListener onViewActionListener;
     // </editor-fold>
@@ -177,6 +181,28 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         commodityPopupView = new PLVECCommodityPopupView();
         rewardPopupView = new PLVECRewardPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
+        networkTipsView = findViewById(R.id.plvec_live_network_tips_layout);
+
+        initNetworkTipsLayout();
+    }
+
+    private void initNetworkTipsLayout() {
+        networkTipsView.setOnViewActionListener(new PLVECNetworkTipsView.OnViewActionListener() {
+            @Override
+            public void onClickChangeNormalLatency() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.switchLowLatencyMode(false);
+                }
+            }
+
+            @Override
+            public boolean isCurrentLowLatency() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isCurrentLowLatencyMode();
+                }
+                return false;
+            }
+        });
     }
 
     // </editor-fold>
@@ -232,15 +258,14 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             if (onViewActionListener != null) {
                 currentLinesPos = onViewActionListener.onGetLinesPosAction();
                 currentDefinitionPos = onViewActionListener.onGetDefinitionAction();
-                int isPlayModeViewVisibility = onViewActionListener.onGetMediaPlayModeAction() == PolyvMediaPlayMode.MODE_VIDEO ? View.VISIBLE : View.GONE;
-                morePopupView.updatePlayModeView(isPlayModeViewVisibility);
+                morePopupView.updatePlayMode(onViewActionListener.onGetMediaPlayModeAction());
             }
             morePopupView.updateLinesView(new int[]{onViewActionListener == null ? 1 : onViewActionListener.onGetLinesCountAction(), currentLinesPos});
             morePopupView.updateDefinitionView(onViewActionListener == null ?
                     new Pair<List<PolyvDefinitionVO>, Integer>(null, 0) :
                     onViewActionListener.onShowDefinitionClick(view));
         } else if (state == PLVPlayerState.NO_LIVE || state == PLVPlayerState.LIVE_END) {
-            morePopupView.hide();
+            morePopupView.hideAll();
             morePopupView.updatePlayStateView(View.GONE);
         }
     }
@@ -260,6 +285,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     public void setOnViewActionListener(PLVECCommonHomeFragment.OnViewActionListener listener) {
         this.onViewActionListener = (OnViewActionListener) listener;
     }
+
+    @Override
+    public void acceptOnLowLatencyChange(boolean isLowLatency) {
+        morePopupView.updateLatencyMode(isLowLatency);
+    }
+
+    @Override
+    public void acceptNetworkQuality(int quality) {
+        networkTipsView.acceptNetworkQuality(quality);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 公告控制">
@@ -718,6 +754,21 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                     }
                 }
             }
+
+            @Override
+            public boolean isCurrentLowLatencyMode() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isCurrentLowLatencyMode();
+                }
+                return false;
+            }
+
+            @Override
+            public void switchLowLatencyMode(boolean isLowLatency) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.switchLowLatencyMode(isLowLatency);
+                }
+            }
         });
     }
     // </editor-fold>
@@ -797,6 +848,20 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         //设置播放器的位置
         void onSetVideoViewRectAction(Rect videoViewRect);
+
+        /**
+         * 当前是否无延迟模式
+         *
+         * @return 是否无延迟模式
+         */
+        boolean isCurrentLowLatencyMode();
+
+        /**
+         * 切换无延迟模式
+         *
+         * @param isLowLatency 是否无延迟模式
+         */
+        void switchLowLatencyMode(boolean isLowLatency);
     }
     // </editor-fold>
 }

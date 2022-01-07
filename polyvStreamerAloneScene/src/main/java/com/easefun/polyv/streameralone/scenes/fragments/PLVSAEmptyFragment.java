@@ -1,17 +1,20 @@
 package com.easefun.polyv.streameralone.scenes.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
  * 清屏页
@@ -72,10 +75,15 @@ public class PLVSAEmptyFragment extends PLVBaseFragment {
         if (getContext() == null) {
             return;
         }
+
+        boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(PLVLiveChannelConfigFiller.generateNewChannelConfig().getUser().getViewerType());
+        String content = isGuest ? getContext().getString(R.string.plv_live_room_dialog_exit_confirm_ask)
+                : getContext().getString(R.string.plv_live_room_dialog_steamer_exit_confirm_ask);
+
         if (stopLiveConfirmDialog == null) {
             stopLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(View.GONE)
-                    .setContent("确认结束直播吗？")
+                    .setContent(content)
                     .setRightButtonText("确认")
                     .setRightBtnListener(new View.OnClickListener() {
                         @Override

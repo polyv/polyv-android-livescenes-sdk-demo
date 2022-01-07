@@ -2,6 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.linkmic;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 /**
@@ -139,6 +140,11 @@ public interface IPLVLCLinkMicLayout {
      * 设置是否无延迟观看
      */
     void setWatchLowLatency(boolean watchLowLatency);
+
+    /**
+     * 设置水印
+     */
+    void setLogoView(PLVPlayerLogoView plvPlayerLogoView);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2. 需要外部响应的事件监听器">

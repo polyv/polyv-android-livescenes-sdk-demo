@@ -5,13 +5,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
@@ -33,15 +34,17 @@ import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -85,6 +88,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     // 悬浮PPT布局 和 播放器布局 的切换器
     private PLVViewSwitcher pptViewSwitcher = new PLVViewSwitcher();
 
+    private PLVPlayerLogoView plvPlayerLogoView;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -103,7 +107,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     @NonNull
     public static PLVLaunchResult launchLive(@NonNull Activity activity,
                                              @NonNull String channelId,
-                                             @NonNull PolyvLiveChannelType channelType,
+                                             @NonNull PLVLiveChannelType channelType,
                                              @NonNull String viewerId,
                                              @NonNull String viewerName,
                                              @NonNull String viewerAvatar) {
@@ -143,14 +147,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param vid           视频ID
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
-     * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType}
+     * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType},新接口请参考{@link PLVPlaybackListType}
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
     public static PLVLaunchResult launchPlayback(@NonNull Activity activity,
                                                  @NonNull String channelId,
-                                                 @NonNull PolyvLiveChannelType channelType,
+                                                 @NonNull PLVLiveChannelType channelType,
                                                  @NonNull String vid,
                                                  @NonNull String viewerId,
                                                  @NonNull String viewerName,
@@ -263,7 +267,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         // 获取输入数据
         Intent intent = getIntent();
         boolean isLive = intent.getBooleanExtra(EXTRA_IS_LIVE, true);
-        PolyvLiveChannelType channelType = (PolyvLiveChannelType) intent.getSerializableExtra(EXTRA_CHANNEL_TYPE);
+        PLVLiveChannelType channelType = (PLVLiveChannelType) intent.getSerializableExtra(EXTRA_CHANNEL_TYPE);
         String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
         String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
         String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
@@ -273,14 +277,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setIsLive(isLive);
         PLVLiveChannelConfigFiller.setChannelType(channelType);
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, viewerAvatar,
-                PolyvLinkMicConfig.getInstance().getLiveChannelType() == PolyvLiveChannelType.PPT
+                PLVLinkMicConfig.getInstance().getLiveChannelTypeNew() == PLVLiveChannelType.PPT
                         ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
         // 根据不同模式，设置对应参数
         if (!isLive) { // 回放模式
             String vid = intent.getStringExtra(EXTRA_VID);
-            int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PolyvPlaybackListType.PLAYBACK);
+            int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PLVPlaybackListType.PLAYBACK);
             PLVLiveChannelConfigFiller.setupVid(vid);
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType);
         }
@@ -363,6 +367,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         } else {
             PLVScreenUtils.enterLandscape(this);
         }
+        plvPlayerLogoView = mediaLayout.getLogoView();
     }
     // </editor-fold>
 
@@ -712,6 +717,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         }
         //连麦 View 和主屏幕的切换器
         final PLVViewSwitcher linkMicItemSwitcher = new PLVViewSwitcher();
+        linkMicLayout.setLogoView(plvPlayerLogoView);
         //设置连麦布局监听器
         linkMicLayout.setOnPLVLinkMicLayoutListener(new IPLVLCLinkMicLayout.OnPLVLinkMicLayoutListener() {
             @Override
