@@ -318,25 +318,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
     private void bindVideoMute(@NonNull StreamerItemViewHolder holder, boolean isMuteVideo, String linkMicId) {
         //是否关闭摄像头
-        if (isMuteVideo) {
-            holder.plvlsStreamerRenderViewContainer.setVisibility(View.INVISIBLE);
-            //一并改变渲染器的可见性
-            if (holder.renderView != null) {
-                holder.renderView.setVisibility(View.INVISIBLE);
-            }
-            //将渲染器从View tree中移除（在部分华为机型上发现渲染器的SurfaceView隐藏后还会叠加显示）
-            if (holder.renderView != null && holder.renderView.getParent() != null) {
-                holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
-            }
-        } else {
-            holder.plvlsStreamerRenderViewContainer.setVisibility(View.VISIBLE);
-            //一并改变渲染器的可见性
-            if (holder.renderView != null) {
-                holder.renderView.setVisibility(View.VISIBLE);
-            }
-            //将渲染器从View 添加到view tree中
-            if (holder.renderView != null && holder.renderView.getParent() == null) {
-                holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        if(holder.plvlsPlaceholderView != null) {
+            if (isMuteVideo) {
+                holder.plvlsPlaceholderView.setVisibility(View.VISIBLE);
+            } else {
+                holder.plvlsPlaceholderView.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -386,6 +372,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private SurfaceView renderView;
         private PLVRoundRectLayout roundRectLayout;
         private TextView plvsStreamerGuestLinkStatusTv;
+        private View plvlsPlaceholderView;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -399,7 +386,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerNickTv = itemView.findViewById(R.id.plvls_streamer_nick_tv);
             plvsStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvls_streamer_guest_link_status_tv);
             plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
-
+            plvlsPlaceholderView = itemView.findViewById(R.id.plvsa_no_streamer_placeholder);
         }
     }
     // </editor-fold>

@@ -383,6 +383,11 @@ public interface IPLVStreamerContract {
         int getStreamerStatus();
 
         /**
+         * 嘉宾尝试上麦
+         */
+        void guestTryJoinLinkMic();
+
+        /**
          * 获取推流和连麦的数据
          */
         @NonNull

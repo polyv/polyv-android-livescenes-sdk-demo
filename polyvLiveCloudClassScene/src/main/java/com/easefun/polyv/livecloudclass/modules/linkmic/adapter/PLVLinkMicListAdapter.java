@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -92,6 +93,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private boolean hasNotifyTeacherViewHolderBind = false;
     //封面图
     private String coverImage = DEFAULT_LIVE_STREAM_COVER_IMAGE;
+    //水印logo
+    private PLVPlayerLogoView plvPlayerLogoView;
     //是否是仅音频模式
     private boolean isOnlyAudio = false;
     // 是否正在暂停
@@ -178,6 +181,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         this.hasNotifyTeacherViewHolderBind = hasNotifyTeacherViewHolderBind;
     }
 
+    //设置播放器水印logo
+    public void setPlvPlayerLogoView(PLVPlayerLogoView plvPlayerLogoView) {
+        this.plvPlayerLogoView = plvPlayerLogoView;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 第一画面">
@@ -481,6 +488,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
             bindCoverImage(holder, isOnlyAudio, isTeacher);
         }
+        bindLogoView(holder, isFirstScreen);
 
         //调整item的宽高
         ViewGroup.LayoutParams vlp = holder.itemView.getLayoutParams();
@@ -500,6 +508,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
         //设置标记
         holder.switchViewAnchorLayout.setTag(R.id.tag_link_mic_id, linkMicId);
+        holder.plvPlayerLogoView.addLogo(plvPlayerLogoView.getParamZero());
 
         //圆角
         if (showRoundRect) {
@@ -795,6 +804,16 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             holder.coverImageView.setVisibility(View.INVISIBLE);
         }
     }
+
+    private void bindLogoView(LinkMicItemViewHolder holder, boolean isFirstScreen) {
+        if (isFirstScreen && (holder != null)) {
+            holder.plvPlayerLogoView.addLogo(plvPlayerLogoView.getParamZero());
+            holder.plvPlayerLogoView.setVisibility(View.VISIBLE);
+        } else if (!isFirstScreen && (holder != null)) {
+            holder.plvPlayerLogoView.setVisibility(View.GONE);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -833,6 +852,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private PLVRoundRectLayout roundRectLayout;
         private PLVLSNetworkQualityWidget qualityWidget;
         private ImageView coverImageView;
+        private PLVPlayerLogoView plvPlayerLogoView;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -850,6 +870,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             switchViewAnchorLayout = itemView.findViewById(R.id.plvlc_linkmic_switch_anchor_item);
             qualityWidget = itemView.findViewById(R.id.plvlc_link_mic_net_quality_view);
             coverImageView = itemView.findViewById(R.id.plvlc_link_mic_iv_cover_image);
+            plvPlayerLogoView = itemView.findViewById(R.id.plvlc_link_mic_logo_view);
             qualityWidget.shouldShowNoNetworkHint(false);
             qualityWidget.setNetQualityRes(
                     R.drawable.plv_network_signal_watcher_good,

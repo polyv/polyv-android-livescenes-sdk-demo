@@ -42,6 +42,11 @@ public interface IPLVSAStreamerLayout {
     void setMirrorMode(boolean isMirror);
 
     /**
+     * 切换连麦布局类型
+     */
+    void changeLinkMicLayoutType();
+
+    /**
      * 设置推流码率
      *
      * @param bitrate 码率
@@ -98,6 +103,13 @@ public interface IPLVSAStreamerLayout {
     void addStreamerTimeListener(IPLVOnDataChangedListener<Integer> listener);
 
     /**
+     * 添加连麦人数监听器
+     *
+     * @param listener 监听器
+     */
+    void addLinkMicCountListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 开始直播
      */
     void startLive();
@@ -106,6 +118,11 @@ public interface IPLVSAStreamerLayout {
      * 暂停直播
      */
     void stopLive();
+
+    /**
+     * 进入直播间
+     */
+    void enterLive();
 
     /**
      * 获取推流和连麦presenter

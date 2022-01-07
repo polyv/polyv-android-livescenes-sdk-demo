@@ -124,7 +124,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             playControlIv.setSelected(false);
             playProgressSb.setProgress(0);
             moreIv.setClickable(false);
-            morePopupView.hide();
+            morePopupView.hideAll();
         } else {
             playControlIv.setClickable(true);
             playProgressSb.setClickable(true);

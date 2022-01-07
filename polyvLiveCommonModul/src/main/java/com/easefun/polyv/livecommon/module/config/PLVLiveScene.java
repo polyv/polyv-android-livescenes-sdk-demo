@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.config;
 
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
+import com.plv.livescenes.config.PLVLiveChannelType;
 
 /**
  * date: 2020/11/25
@@ -25,8 +25,8 @@ public enum PLVLiveScene {
      * @param channelType 频道类型
      * @return true:支持，false:不支持
      */
-    public static boolean isCloudClassSceneSupportType(PolyvLiveChannelType channelType) {
-        return channelType == PolyvLiveChannelType.PPT || channelType == PolyvLiveChannelType.ALONE;
+    public static boolean isCloudClassSceneSupportType(PLVLiveChannelType channelType) {
+        return channelType == PLVLiveChannelType.PPT || channelType == PLVLiveChannelType.ALONE;
     }
 
     /**
@@ -35,7 +35,7 @@ public enum PLVLiveScene {
      * @param channelType 频道类型
      * @return true:支持，false:不支持
      */
-    public static boolean isLiveEcommerceSceneSupportType(PolyvLiveChannelType channelType) {
-        return channelType == PolyvLiveChannelType.ALONE;
+    public static boolean isLiveEcommerceSceneSupportType(PLVLiveChannelType channelType) {
+        return channelType == PLVLiveChannelType.ALONE;
     }
 }

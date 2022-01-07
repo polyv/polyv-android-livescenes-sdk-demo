@@ -39,12 +39,13 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicP
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -114,7 +115,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     //当前滑动提示状态
     @TryScrollViewStateType
     private int curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
-    private PolyvLiveChannelType liveChannelType;
+    private PLVLiveChannelType liveChannelType;
     private boolean isShowLandscapeLayout = false;
 
     //当前是否是横屏
@@ -440,6 +441,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void setLogoView(PLVPlayerLogoView plvPlayerLogoView) {
+        linkMicListAdapter.setPlvPlayerLogoView(plvPlayerLogoView);
+    }
+
+    @Override
     public void onRTCPrepared() {
         onPLVLinkMicLayoutListener.onRTCPrepared();
     }
@@ -688,7 +694,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         }
 
         // 纯视频场景 讲师离开连麦 将连麦视图与播放器视图切换回原位
-        if (liveChannelType == PolyvLiveChannelType.ALONE) {
+        if (liveChannelType == PLVLiveChannelType.ALONE) {
             final String mainTeacherLinkMicId = linkMicPresenter.getMainTeacherLinkMicId();
             if (mainTeacherLinkMicId != null && uids.contains(mainTeacherLinkMicId)) {
                 if (teacherLocationViewSwitcher != null && teacherLocationViewSwitcher.isViewSwitched()) {
@@ -1013,12 +1019,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private void tryShowOrHideLandscapeRTCLayout(boolean show) {
         if (show) {
             //纯视频下，如果不止讲师一个人，那么显示横屏RTC列表
-            if (liveChannelType == PolyvLiveChannelType.ALONE && linkMicPresenter.getRTCListSize() > 1) {
+            if (liveChannelType == PLVLiveChannelType.ALONE && linkMicPresenter.getRTCListSize() > 1) {
                 changeShowOrHideLandscapeLayoutState(true);
             }
         } else {
             //纯视频下，如果只有讲师一个人，那么隐藏横屏RTC列表
-            if (liveChannelType == PolyvLiveChannelType.ALONE && linkMicPresenter.getRTCListSize() <= 1) {
+            if (liveChannelType == PLVLiveChannelType.ALONE && linkMicPresenter.getRTCListSize() <= 1) {
                 changeShowOrHideLandscapeLayoutState(false);
             }
         }

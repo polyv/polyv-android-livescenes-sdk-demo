@@ -31,6 +31,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -102,6 +103,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         //init memberListRv
         plvsaMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         memberAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+        memberAdapter.setTeacherPermission(!isGuest());//嘉宾默认无权限，需要隐藏控制相关按钮
         memberAdapter.setOnViewActionListener(new PLVSAMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
@@ -225,11 +227,11 @@ public class PLVSAMemberLayout extends FrameLayout {
 
             presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
                 @Override
-                public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean == null) {
+                public void onChanged(@Nullable Boolean isStartedStatus) {
+                    if (isStartedStatus == null) {
                         return;
                     }
-                    memberAdapter.setStreamerStatus(aBoolean);
+                    memberAdapter.setStreamerStatus(isStartedStatus);
                 }
             });
         }
@@ -386,6 +388,13 @@ public class PLVSAMemberLayout extends FrameLayout {
                 .setText("摄像头" + (isMute ? "关闭" : "开启"))
                 .build()
                 .show();
+    }
+
+    private boolean isGuest(){
+        if(liveRoomDataManager != null){
+            return PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+        }
+        return false;
     }
     // </editor-fold>
 }

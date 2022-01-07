@@ -198,6 +198,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/plvsa_more_close_room_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"

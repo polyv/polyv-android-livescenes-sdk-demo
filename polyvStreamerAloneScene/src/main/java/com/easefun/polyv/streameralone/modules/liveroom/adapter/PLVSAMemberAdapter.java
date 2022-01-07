@@ -48,6 +48,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     //streamerStatus
     private boolean isStartedStatus;
     private boolean isGuestAutoLinkMic;
+    //是否有全县控制连麦和更多操作
+    private boolean isHasPermission = true;
 
     private PLVSAMemberControlWindow lastShowControlWindow;
 
@@ -179,6 +181,14 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
+
+    /**
+     * 赋予主讲权限
+     */
+    public void setTeacherPermission(boolean grant) {
+        isHasPermission = grant;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新成员控制弹层">
@@ -480,7 +490,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //设置禁言显示状态
             plvsaMemberBanIv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
             //设置连麦按钮的状态
-            if (isMyself) {
+            if (isMyself || !isHasPermission) {
+                //自己和无主讲权限时，不需要显示
                 plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
                 plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 connectingAnimator.cancel();

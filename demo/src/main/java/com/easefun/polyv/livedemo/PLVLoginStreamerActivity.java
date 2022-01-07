@@ -29,12 +29,12 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.easefun.polyv.livescenes.feature.login.IPLVSceneLoginManager;
-import com.easefun.polyv.livescenes.feature.login.PLVSceneLoginManager;
-import com.easefun.polyv.livescenes.feature.login.model.PLVSLoginVO;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
+import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
+import com.plv.livescenes.feature.login.PLVSceneLoginManager;
+import com.plv.livescenes.feature.login.model.PLVLoginVO;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 
@@ -191,9 +191,9 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         if (loginManager == null) {
             loginManager = new PLVSceneLoginManager();
         }
-        loginManager.loginStreamer(channelId, password, new IPLVSceneLoginManager.OnStringCodeLoginListener<PLVSLoginVO>() {
+        loginManager.loginStreamerNew(channelId, password, new IPLVSceneLoginManager.OnStringCodeLoginListener<PLVLoginVO>() {
             @Override
-            public void onLoginSuccess(PLVSLoginVO loginVO) {
+            public void onLoginSuccess(PLVLoginVO loginVO) {
                 updateLoginViewStatus(false);
                 if (plvlsLoginRememberPasswordCb.isChecked()) {
                     localInfoManager.saveLoginInfo(channelId, password, nick, true);
@@ -207,8 +207,8 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                 //不填写登录昵称时，使用登录接口返回的后台设置的昵称
                 String loginNick = TextUtils.isEmpty(nick) ? loginVO.getTeacherNickname() : nick;
 
-                PolyvLiveChannelType liveChannelType = loginVO.getLiveChannelType();
-                if (PolyvLiveChannelType.PPT.equals(liveChannelType)) {
+                PLVLiveChannelType liveChannelType = loginVO.getLiveChannelTypeNew();
+                if (PLVLiveChannelType.PPT.equals(liveChannelType)) {
                     //进入手机开播三分屏场景
                     boolean isOpenCamera = "N".equals(loginVO.getIsOnlyAudio());
                     PLVLaunchResult launchResult = PLVLSLiveStreamerActivity.launchStreamer(
@@ -227,16 +227,18 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                     if (!launchResult.isSuccess()) {
                         onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());
                     }
-                } else if (PolyvLiveChannelType.ALONE.equals(liveChannelType)) {
+                } else if (PLVLiveChannelType.ALONE.equals(liveChannelType)) {
                     //进入手机开播纯视频场景
                     PLVLaunchResult launchResult = PLVSAStreamerAloneActivity.launchStreamer(
                             PLVLoginStreamerActivity.this,
                             loginVO.getChannelId(),
-                            loginVO.getAccountId(),
+                            loginVO.getInteractUid(),
                             loginNick,
                             loginVO.getTeacherAvatar(),
                             loginVO.getTeacherActor(),
-                            loginVO.getChannelName()
+                            loginVO.getChannelName(),
+                            loginVO.getRole(),
+                            loginVO.getColinMicType()
                     );
                     if (!launchResult.isSuccess()) {
                         onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());

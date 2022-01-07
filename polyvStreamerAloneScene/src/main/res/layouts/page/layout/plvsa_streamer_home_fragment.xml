@@ -102,4 +102,32 @@
         android:src="@drawable/plvsa_tool_bar_linkmic_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/plvsa_tool_bar_member_iv" />
+
+    <!--连麦布局类型按钮-->
+    <ImageView
+        android:id="@+id/plvsa_tool_bar_linkmic_type_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="12dp"
+        android:visibility="visible"
+        android:src="@drawable/plvsa_tool_bar_linkmic_type_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/plvsa_tool_bar_linkmic_iv" />
+
+    <!--连麦布局类型按钮提示语-->
+    <TextView
+        android:id="@+id/plvsa_tool_bar_linkmic_type_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/plvsa_tool_bar_linkmic_tip_bg"
+        android:gravity="center"
+        android:text="点击切换布局"
+        android:textColor="#E6FFFFFF"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_tool_bar_linkmic_type_iv"
+        app:layout_constraintEnd_toEndOf="@+id/plvsa_tool_bar_linkmic_type_iv"
+        app:layout_constraintStart_toStartOf="@+id/plvsa_tool_bar_linkmic_type_iv" />
 </android.support.constraint.ConstraintLayout>

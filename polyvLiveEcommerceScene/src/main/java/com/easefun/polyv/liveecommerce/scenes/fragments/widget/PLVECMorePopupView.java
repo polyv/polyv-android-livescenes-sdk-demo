@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments.widget;
 
+import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.LayoutRes;
 import android.util.Pair;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -16,6 +18,8 @@ import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.business.model.video.PLVMediaPlayMode;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 import java.util.List;
 
@@ -30,12 +34,18 @@ public class PLVECMorePopupView {
     private TextView playModeTv;
     private ImageView changeLinesIv;
     private ImageView changeDefinitionIv;
+    private LinearLayout liveMoreLatencyLl;
+    private ImageView liveMoreLatencyIv;
+    private TextView liveMoreLatencyTv;
     //直播切换线路布局
     private PopupWindow linesChangePopupWindow;
     private ViewGroup changeLinesLy;
     //直播切换清晰度布局
     private PopupWindow definitionPopupWindow;
     private ViewGroup changeDefinitionLy;
+
+    private PLVECMoreLatencyPopupView latencyPopupView;
+
     //监听器
     private OnLiveMoreClickListener liveMoreClickListener;
 
@@ -48,8 +58,9 @@ public class PLVECMorePopupView {
 
     //播放状态view的显示状态
     private int playStatusViewVisibility = View.GONE;
-    //播放模式view的显示状态
-    private int playModeViewVisibility = View.GONE;
+
+    private boolean isVideoMode = true;
+    private boolean isLowLatencyWatching = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     //是否有清晰度信息
     private boolean isHasDefinitionVO;
     //是否有多线路信息
@@ -70,6 +81,10 @@ public class PLVECMorePopupView {
     // <editor-fold defaultstate="collapsed" desc="对外API - 直播更多布局控制">
     public void showLiveMoreLayout(final View v, boolean isCurrentVideoMode, final OnLiveMoreClickListener clickListener) {
         this.liveMoreClickListener = clickListener;
+        if (latencyPopupView == null) {
+            latencyPopupView = new PLVECMoreLatencyPopupView();
+            latencyPopupView.init(v.getContext());
+        }
         if (liveMorePopupWindow == null) {
             liveMorePopupWindow = new PopupWindow(v.getContext());
             View view = initPopupWindow(v, R.layout.plvec_live_more_layout, liveMorePopupWindow);
@@ -79,6 +94,10 @@ public class PLVECMorePopupView {
             playModeTv = view.findViewById(R.id.play_mode_tv);
             changeLinesIv = view.findViewById(R.id.change_lines_iv);
             changeDefinitionIv = view.findViewById(R.id.change_definition_iv);
+            liveMoreLatencyLl = view.findViewById(R.id.plvec_live_more_latency_ll);
+            liveMoreLatencyIv = view.findViewById(R.id.plvec_live_more_latency_iv);
+            liveMoreLatencyTv = view.findViewById(R.id.plvec_live_more_latency_tv);
+
             ((ViewGroup) playModeIv.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -87,12 +106,8 @@ public class PLVECMorePopupView {
                         if (result) {
                             playModeIv.setSelected(!playModeIv.isSelected());
                             playModeTv.setText(!playModeIv.isSelected() ? "音频模式" : "视频模式");
-                            if (playModeIv.isSelected()) {
-                                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(View.GONE);
-                            } else if (isHasDefinitionVO) {
-                                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(View.VISIBLE);
-                            }
-                            hide();
+                            updateDefinitionViewVisibility();
+                            hideAll();
                         }
                     }
                 }
@@ -115,15 +130,16 @@ public class PLVECMorePopupView {
                     }
                 }
             });
-            if (playStatusViewVisibility == View.VISIBLE) {
-                ((ViewGroup) playModeIv.getParent()).setVisibility(playStatusViewVisibility);
-                if (isHasLinesInfo) {
-                    ((ViewGroup) changeLinesIv.getParent()).setVisibility(playStatusViewVisibility);
+            liveMoreLatencyLl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (clickListener == null) {
+                        return;
+                    }
+                    latencyPopupView.show(clickListener.isCurrentLowLatencyMode());
                 }
-                if (playModeViewVisibility == View.VISIBLE && isHasDefinitionVO) {
-                    ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(playStatusViewVisibility);
-                }
-            }
+            });
+            updateSubViewVisibility();
         }
         playModeIv.setSelected(!isCurrentVideoMode);
         playModeTv.setText(!playModeIv.isSelected() ? "音频模式" : "视频模式");
@@ -146,11 +162,7 @@ public class PLVECMorePopupView {
     public void updateLinesView(final int[] lines) {
         isHasLinesInfo = lines[0] > 1;
         if (changeLinesIv != null) {
-            if (!isHasLinesInfo) {
-                ((ViewGroup) changeLinesIv.getParent()).setVisibility(View.GONE);
-            } else if (playStatusViewVisibility == View.VISIBLE) {
-                ((ViewGroup) changeLinesIv.getParent()).setVisibility(View.VISIBLE);
-            }
+            updateLineViewVisibility();
         }
         if (changeLinesLy != null) {
             if (!isHasLinesInfo) {
@@ -169,7 +181,7 @@ public class PLVECMorePopupView {
                         if (liveMoreClickListener != null) {
                             liveMoreClickListener.onLinesChangeClick(v, finalI);
                         }
-                        hide();
+                        hideAll();
                     }
                 });
                 view.setSelected(false);
@@ -188,11 +200,7 @@ public class PLVECMorePopupView {
     public void updateDefinitionView(final Pair<List<PolyvDefinitionVO>, Integer> listIntegerPair) {
         isHasDefinitionVO = listIntegerPair.first != null;
         if (changeDefinitionIv != null) {
-            if (!isHasDefinitionVO) {
-                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(View.GONE);
-            } else if (playModeViewVisibility == View.VISIBLE) {
-                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(View.VISIBLE);
-            }
+            updateDefinitionViewVisibility();
         }
         if (changeDefinitionLy != null) {
             if (!isHasDefinitionVO) {
@@ -211,7 +219,7 @@ public class PLVECMorePopupView {
                         if (liveMoreClickListener != null) {
                             liveMoreClickListener.onDefinitionChangeClick(v, finalI);
                         }
-                        hide();
+                        hideAll();
                     }
                 });
                 view.setSelected(false);
@@ -245,24 +253,17 @@ public class PLVECMorePopupView {
     //暖场/无直播时隐藏切换音视频模式、切换线路相关的按钮
     public void updatePlayStateView(int visibility) {
         this.playStatusViewVisibility = visibility;
-        if (liveMorePopupWindow != null) {
-            ((ViewGroup) playModeIv.getParent()).setVisibility(visibility);
-            if (visibility != View.VISIBLE) {//根据视频是否支持线路切换来显示
-                ((ViewGroup) changeLinesIv.getParent()).setVisibility(visibility);
-            }
-            if (visibility != View.VISIBLE) {//根据视频是否支持多码率切换来显示
-                ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(visibility);
-            }
-        }
+        updateSubViewVisibility();
     }
 
-    //音频模式时隐藏切换清晰度的按钮
-    public void updatePlayModeView(int visibility) {
-        this.playModeViewVisibility = visibility;
-        if (liveMorePopupWindow != null && visibility != View.VISIBLE) {
-            //根据视频是否支持多码率切换来显示
-            ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(visibility);
-        }
+    public void updatePlayMode(int playMode) {
+        this.isVideoMode = playMode == PLVMediaPlayMode.MODE_VIDEO;
+        updateDefinitionViewVisibility();
+    }
+
+    public void updateLatencyMode(boolean isLowLatency) {
+        this.isLowLatencyWatching = isLowLatency;
+        updateSubViewVisibility();
     }
     // </editor-fold>
 
@@ -292,7 +293,7 @@ public class PLVECMorePopupView {
                         if (playbackMoreClickListener != null) {
                             playbackMoreClickListener.onChangeSpeedClick(v, speedArray.get(finalI));
                         }
-                        hide();
+                        hideAll();
                     }
                 });
                 view.setSelected(false);
@@ -305,7 +306,7 @@ public class PLVECMorePopupView {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 弹窗控制">
-    public void hide() {
+    public void hideAll() {
         if (liveMorePopupWindow != null) {
             liveMorePopupWindow.dismiss();
         }
@@ -317,6 +318,9 @@ public class PLVECMorePopupView {
         }
         if (playbackMorePopupWindow != null) {
             playbackMorePopupWindow.dismiss();
+        }
+        if (latencyPopupView != null) {
+            latencyPopupView.hide();
         }
     }
     // </editor-fold>
@@ -333,7 +337,7 @@ public class PLVECMorePopupView {
         root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hide();
+                hideAll();
             }
         });
         View closeBt = root.findViewById(R.id.close_iv);
@@ -341,12 +345,147 @@ public class PLVECMorePopupView {
             closeBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    hide();
+                    hideAll();
                 }
             });
         }
         return root;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理 - UI显示">
+
+    private void updateSubViewVisibility() {
+        updatePlayModeVisibility();
+        updateLineViewVisibility();
+        updateDefinitionViewVisibility();
+        updateLatencyLayoutVisibility();
+    }
+
+    private void updatePlayModeVisibility() {
+        if (playModeIv == null || !(playModeIv.getParent() instanceof ViewGroup)) {
+            return;
+        }
+        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
+        final boolean showPlayMode = mediaPlaying && !isLowLatencyWatching;
+        ((ViewGroup) playModeIv.getParent()).setVisibility(showPlayMode ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateLineViewVisibility() {
+        if (changeLinesIv == null || !(changeLinesIv.getParent() instanceof ViewGroup)) {
+            return;
+        }
+        final boolean supportMultiLine = isHasLinesInfo;
+        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
+        final boolean showChangeLine = supportMultiLine && mediaPlaying && !isLowLatencyWatching;
+        ((ViewGroup) changeLinesIv.getParent()).setVisibility(showChangeLine ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateDefinitionViewVisibility() {
+        if (changeDefinitionIv == null || !(changeDefinitionIv.getParent() instanceof ViewGroup)) {
+            return;
+        }
+        final boolean supportMultiDefinition = isHasDefinitionVO;
+        final boolean videoPlaying = playStatusViewVisibility == View.VISIBLE && isVideoMode;
+        final boolean showChangeDefinition = supportMultiDefinition && videoPlaying && !isLowLatencyWatching;
+        ((ViewGroup) changeDefinitionIv.getParent()).setVisibility(showChangeDefinition ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateLatencyLayoutVisibility() {
+        if (liveMoreLatencyLl == null) {
+            return;
+        }
+        final boolean supportLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
+        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
+        final boolean showLatencyLayout = supportLowLatencyWatch && mediaPlaying;
+        liveMoreLatencyLl.setVisibility(showLatencyLayout ? View.VISIBLE : View.GONE);
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 子布局">
+
+    /**
+     * 延迟切换弹层布局
+     */
+    private class PLVECMoreLatencyPopupView implements View.OnClickListener {
+
+        private PopupWindow latencyPopupWindow;
+        private View rootView;
+        private LinearLayout liveMoreLatencyLy;
+        private ImageView liveMoreLatencyBackIv;
+        private LinearLayout liveMoreLatencyLl;
+        private TextView liveMoreLowLatencyTv;
+        private TextView liveMoreNormalLatencyTv;
+        private ImageView liveMoreLatencyCloseIv;
+
+        public void init(Context context) {
+            rootView = LayoutInflater.from(context).inflate(R.layout.plvec_live_more_latency_layout, null);
+            liveMoreLatencyLy = rootView.findViewById(R.id.plvec_live_more_latency_ly);
+            liveMoreLatencyBackIv = rootView.findViewById(R.id.plvec_live_more_latency_back_iv);
+            liveMoreLatencyLl = rootView.findViewById(R.id.plvec_live_more_latency_ll);
+            liveMoreLowLatencyTv = rootView.findViewById(R.id.plvec_live_more_low_latency_tv);
+            liveMoreNormalLatencyTv = rootView.findViewById(R.id.plvec_live_more_normal_latency_tv);
+            liveMoreLatencyCloseIv = rootView.findViewById(R.id.plvec_live_more_latency_close_iv);
+
+            PLVBlurUtils.initBlurView((PLVBlurView) rootView.findViewById(R.id.blur_ly));
+
+            rootView.setOnClickListener(this);
+            liveMoreLatencyBackIv.setOnClickListener(this);
+            liveMoreLowLatencyTv.setOnClickListener(this);
+            liveMoreNormalLatencyTv.setOnClickListener(this);
+            liveMoreLatencyCloseIv.setOnClickListener(this);
+
+            initPopupWindow(context);
+        }
+
+        private void initPopupWindow(Context context) {
+            latencyPopupWindow = new PopupWindow(context);
+            latencyPopupWindow.setContentView(rootView);
+            latencyPopupWindow.setFocusable(true);
+            latencyPopupWindow.setOutsideTouchable(true);
+            latencyPopupWindow.setBackgroundDrawable(new ColorDrawable());
+            latencyPopupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+            latencyPopupWindow.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+        }
+
+        public void show(boolean isCurrentLowLatency) {
+            liveMoreLowLatencyTv.setSelected(isCurrentLowLatency);
+            liveMoreNormalLatencyTv.setSelected(!isCurrentLowLatency);
+            latencyPopupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+        }
+
+        public void hide() {
+            latencyPopupWindow.dismiss();
+        }
+
+        @Override
+        public void onClick(View v) {
+            final int viewId = v.getId();
+            if (viewId == liveMoreLowLatencyTv.getId()) {
+                // 切换到无延迟观看时，需要切换到视频观看模式
+                if (playModeIv != null && playModeIv.getParent() instanceof ViewGroup && playModeIv.isSelected()) {
+                    ((ViewGroup) playModeIv.getParent()).performClick();
+                }
+                if (liveMoreClickListener != null) {
+                    liveMoreClickListener.switchLowLatencyMode(true);
+                }
+                PLVECMorePopupView.this.hideAll();
+            } else if (viewId == liveMoreNormalLatencyTv.getId()) {
+                if (liveMoreClickListener != null) {
+                    liveMoreClickListener.switchLowLatencyMode(false);
+                }
+                PLVECMorePopupView.this.hideAll();
+            } else if (viewId == liveMoreLatencyBackIv.getId()) {
+                hide();
+            } else if (viewId == rootView.getId()
+                    || viewId == liveMoreLatencyCloseIv.getId()) {
+                PLVECMorePopupView.this.hideAll();
+            }
+        }
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
@@ -365,6 +504,10 @@ public class PLVECMorePopupView {
 
         //切换清晰度
         void onDefinitionChangeClick(View view, int definitionPos);
+
+        boolean isCurrentLowLatencyMode();
+
+        void switchLowLatencyMode(boolean isLowLatency);
     }
 
     public interface OnPlaybackMoreClickListener {

@@ -250,6 +250,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 if (item != null && item.second.getLinkMicItemDataBean() == null) {
                     item.second.setLinkMicItemDataBean(linkMicItemDataBean);
                 }
+                updateLinkMicCount();
 
                 callbackToView(new ViewRunnable() {
                     @Override
@@ -603,6 +604,57 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public int getStreamerStatus() {
         return streamerStatus;
+    }
+
+    @Override
+    public void guestTryJoinLinkMic() {
+        boolean isGuestAutoLinkMic = liveRoomDataManager.getConfig().isAutoLinkToGuest();
+        if (isGuestAutoLinkMic) {
+            //自动上麦
+            PLVLinkMicEventSender.getInstance().guestAutoLinkMic(3, new IPLVLinkMicEventSender.IPLVGuestAutoLinkMicListener() {
+                @Override
+                public void onAutoLinkMic() {
+                    if (streamerInitState == STREAMER_MIC_INITIATED) {
+                        streamerManager.joinChannel();
+                    } else {
+                        joinChannelRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                streamerManager.joinChannel();
+                            }
+                        };
+                    }
+                    requestLinkMicListApiTimer();
+                }
+
+                @Override
+                public void onTimeout() {
+                    final String msg = "嘉宾上麦超时！";
+                    PLVCommonLog.e(TAG, msg);
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull @NotNull IPLVStreamerContract.IStreamerView view) {
+                            view.onStreamerError(ERROR_GUEST_LINK_TIMEOUT, new Exception(msg));
+                        }
+                    });
+                }
+
+                @Override
+                public void onHangupByTeacher() {
+                    streamerManager.switchRoleToAudience();
+                    callUpdateGuestStatus(false);
+                }
+
+                @Override
+                public void onInviteByTeacher() {
+                    streamerManager.switchRoleToBroadcaster();
+                    callUpdateGuestStatus(true);
+                }
+            });
+        } else {
+            //手动上麦
+            PLVCommonLog.d(TAG, "暂不支持手动上麦的嘉宾");
+        }
     }
 
     @NonNull
@@ -973,6 +1025,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         SortGuestLinkMicListUtils.sort(streamerList);
                     }
                     updateMixLayoutUsers();
+                    updateLinkMicCount();
                     callbackToView(new ViewRunnable() {
                         @Override
                         public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -1002,6 +1055,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             mixUserList.add(mixUser);
         }
         streamerManager.updateMixLayoutUsers(mixUserList);
+    }
+
+    void updateLinkMicCount(){
+        streamerData.postLinkMicCount(streamerList.size());
     }
 
     private boolean updateMemberListLinkMicStatus(List<PLVJoinInfoEvent> joinList, List<PLVLinkMicJoinStatus.WaitListBean> waitList) {
@@ -1058,6 +1115,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         }
         if (!willRemoveStreamerList.isEmpty()) {
             updateMixLayoutUsers();
+            updateLinkMicCount();
             callbackToView(new ViewRunnable() {
                 @Override
                 public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -1140,6 +1198,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     if (guestDataBean != null) {
                         streamerList.add(guestDataBean);
                     }
+                    updateLinkMicCount();
                     callbackToView(new ViewRunnable() {
                         @Override
                         public void run(@NonNull @NotNull IPLVStreamerContract.IStreamerView view) {
@@ -1159,56 +1218,6 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         });
     }
 
-    //嘉宾上麦
-    private void guestTryJoinLinkMic() {
-        boolean isGuestAutoLinkMic = liveRoomDataManager.getConfig().isAutoLinkToGuest();
-        if (isGuestAutoLinkMic) {
-            //自动上麦
-            PLVLinkMicEventSender.getInstance().guestAutoLinkMic(3, new IPLVLinkMicEventSender.IPLVGuestAutoLinkMicListener() {
-                @Override
-                public void onAutoLinkMic() {
-                    if (streamerInitState == STREAMER_MIC_INITIATED) {
-                        streamerManager.joinChannel();
-                    } else {
-                        joinChannelRunnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                streamerManager.joinChannel();
-                            }
-                        };
-                    }
-                    requestLinkMicListApiTimer();
-                }
-
-                @Override
-                public void onTimeout() {
-                    final String msg = "嘉宾上麦超时！";
-                    PLVCommonLog.e(TAG, msg);
-                    callbackToView(new ViewRunnable() {
-                        @Override
-                        public void run(@NonNull @NotNull IPLVStreamerContract.IStreamerView view) {
-                            view.onStreamerError(ERROR_GUEST_LINK_TIMEOUT, new Exception(msg));
-                        }
-                    });
-                }
-
-                @Override
-                public void onHangupByTeacher() {
-                    streamerManager.switchRoleToAudience();
-                    callUpdateGuestStatus(false);
-                }
-
-                @Override
-                public void onInviteByTeacher() {
-                    streamerManager.switchRoleToBroadcaster();
-                    callUpdateGuestStatus(true);
-                }
-            });
-        } else {
-            //手动上麦
-            PLVCommonLog.d(TAG, "暂不支持手动上麦的嘉宾");
-        }
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据存储">

@@ -391,6 +391,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         }
     }
 
+    @Override
     public void switchPptType(int pptType){
         if(pptType == PLVDocumentMode.WHITEBOARD.ordinal()){
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
@@ -545,7 +546,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 return;
             }
             v.setSelected(!v.isSelected());
-            linkMicControlWindow.show(v,linkMicShowType);
+            linkMicControlWindow.show(v, linkMicControlWindow.getShowType());
         } else if (id == R.id.plvls_status_bar_document_iv) {
             PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.PPT.ordinal());
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);

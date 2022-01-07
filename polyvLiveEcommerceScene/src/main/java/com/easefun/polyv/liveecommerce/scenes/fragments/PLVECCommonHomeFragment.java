@@ -132,6 +132,14 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     //设置view交互事件监听器
     public void setOnViewActionListener(OnViewActionListener listener) {
     }
+
+    public void acceptOnLowLatencyChange(boolean isLowLatency) {
+
+    }
+
+    public void acceptNetworkQuality(int quality) {
+
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="socket - 初始化、登录、销毁">

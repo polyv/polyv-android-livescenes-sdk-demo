@@ -30,6 +30,7 @@ import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentContr
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -530,7 +531,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         boolean isTeacher = PLVSocketUserConstant.USERTYPE_TEACHER.equals(PLVLiveChannelConfigFiller.generateNewChannelConfig().getUser().getViewerType());
 
         if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
-            new AlertDialog.Builder(this)
+            final AlertDialog dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setMessage("检测到之前异常退出\n是否恢复直播？")
                     .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
@@ -541,19 +542,26 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                             plvlsStreamerLy.stopClass();
                         }
                     })
-                    .setNegativeButton("恢复直播", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            liveRoomDataManager.setNeedStreamRecover(true);
-                            plvlsStreamerLy.getStreamerPresenter().setRecoverStream(true);
-                            PLVLiveLocalActionHelper.Action action = PLVLiveLocalActionHelper.getInstance().getChannelAction(liveRoomDataManager.getConfig().getChannelId());
-                            plvlsStatusBarLy.switchPptType(action.pptType);
-                            plvlsStreamerLy.setCameraDirection(action.isFrontCamera);
-                            plvlsStreamerLy.enableLocalVideo(action.isEnableCamera);
-                            plvlsStreamerLy.startClass();
-                        }
-                    })
+                    .setNegativeButton("恢复直播", null)
                     .show();
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (plvlsStreamerLy.getNetworkQuality() == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                        plvlsStatusBarLy.showAlertDialogNoNetwork();
+                        return;
+                    }
+
+                    liveRoomDataManager.setNeedStreamRecover(true);
+                    plvlsStreamerLy.getStreamerPresenter().setRecoverStream(true);
+                    PLVLiveLocalActionHelper.Action action = PLVLiveLocalActionHelper.getInstance().getChannelAction(liveRoomDataManager.getConfig().getChannelId());
+                    plvlsStatusBarLy.switchPptType(action.pptType);
+                    plvlsStreamerLy.setCameraDirection(action.isFrontCamera);
+                    plvlsStreamerLy.enableLocalVideo(action.isEnableCamera);
+                    plvlsStreamerLy.startClass();
+                    dialog.dismiss();
+                }
+            });
         }
     }
 

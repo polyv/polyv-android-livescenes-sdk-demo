@@ -489,6 +489,7 @@ public class PLVStreamerMsgHandler {
                 }
             });
             streamerPresenter.updateMixLayoutUsers();
+            streamerPresenter.updateLinkMicCount();
         }
     }
 

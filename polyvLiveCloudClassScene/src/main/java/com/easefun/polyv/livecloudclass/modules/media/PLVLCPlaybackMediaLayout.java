@@ -372,6 +372,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public PLVPlayerLogoView getLogoView() {
+        return logoView;
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }

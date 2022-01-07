@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.graphics.Color;
@@ -23,6 +24,8 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVEmptyMediaController;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
@@ -34,9 +37,12 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
+import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayout;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -59,6 +65,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //主播放器渲染视图view
     private PolyvLiveVideoView videoView;
+    // RTC播放器容器视图
+    private IPLVECLiveRtcVideoLayout rtcVideoLayout;
     //子播放器渲染视图view
     private PolyvAuxiliaryVideoview subVideoView;
     //子播放器倒计时显示的view
@@ -85,6 +93,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     //logo view
     private PLVPlayerLogoView logoView;
+    //marquee view
+    private PLVMarqueeView marqueeView = null;
     //主播放器父控件的父控件
     private ViewGroup videoViewParentParent;
     //主播放器父控件在父控件中的位置索引
@@ -99,9 +109,14 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     //Listener
     private IPLVECVideoLayout.OnViewActionListener onViewActionListener;
 
-    /**暂无直播的图片以及文字*/
+    /**
+     * 暂无直播的图片以及文字
+     */
     private ImageView nostreamIv;
     private TextView nostreamTv;
+
+    // 是否无延迟观看模式
+    private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -123,6 +138,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvec_live_player_layout, this, true);
         videoView = findViewById(R.id.plvec_live_video_view);
+        rtcVideoLayout = findViewById(R.id.plvec_live_rtc_video_container);
 
         playCenterView = findViewById(R.id.play_center);
         hidePlayCenterView();
@@ -145,7 +161,9 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         nostreamTv = findViewById(R.id.nostream_tv);
         logoView = findViewById(R.id.logo_view);
 
+        marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
         initVideoView();
+        initRtcVideoLayout();
         initSubVideoViewChangeListener();
     }
 
@@ -155,6 +173,61 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoView.setPlayerBufferingIndicator(loadingView);
         videoView.setNoStreamIndicator(nostreamView);
         videoView.setMediaController(mediaController);
+
+        videoView.setOnRTCPlayEventListener(new IPLVLiveListenerEvent.OnRTCPlayEventListener() {
+            @Override
+            public void onRTCLiveStart() {
+                videoView.stopPlay();
+                videoView.setVisibility(View.GONE);
+                rtcVideoLayout.setLiveStart();
+            }
+
+            @Override
+            public void onRTCLiveEnd() {
+                rtcVideoLayout.setLiveEnd();
+                videoView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
+            @Override
+            public void onNetworkQuality(int networkQuality) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.acceptNetworkQuality(networkQuality);
+                }
+            }
+        });
+    }
+
+    private void initRtcVideoLayout() {
+        rtcVideoLayout.setOnViewActionListener(new IPLVECLiveRtcVideoLayout.OnViewActionListener() {
+            @Override
+            public void onRtcPrepared() {
+                videoView.rtcPrepared();
+            }
+
+            @Override
+            public void onSizeChanged(final int width, final int height) {
+                if (!isLowLatency) {
+                    return;
+                }
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        final boolean isPortrait = height > width;
+                        PLVVideoSizeUtils.fitVideoRect(isPortrait, videoView.getParent(), videoViewRect);
+                        rtcVideoLayout.requestLayout();
+                    }
+                });
+            }
+
+            @Override
+            public void acceptNetworkQuality(int quality) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.acceptNetworkQuality(quality);
+                }
+            }
+        });
     }
 
     private void initSubVideoViewChangeListener() {
@@ -196,11 +269,13 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         livePlayerPresenter.registerView(livePlayerView);
         livePlayerPresenter.init();
         livePlayerPresenter.setAllowOpenAdHead(isAllowOpenAdHead);
+
+        rtcVideoLayout.init(liveRoomDataManager);
     }
 
     @Override
     public void startPlay() {
-        livePlayerPresenter.startPlay();
+        livePlayerPresenter.startPlay(isLowLatency);
     }
 
     @Override
@@ -296,6 +371,9 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         if (audioModeView != null) {
             audioModeView.onHide();
         }
+        if (rtcVideoLayout != null) {
+            rtcVideoLayout.destroy();
+        }
         if (livePlayerPresenter != null) {
             livePlayerPresenter.destroy();
         }
@@ -348,6 +426,23 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public void changeMediaPlayMode(int mediaPlayMode) {
         livePlayerPresenter.changeMediaPlayMode(mediaPlayMode);
+    }
+
+    @Override
+    public boolean isCurrentLowLatencyMode() {
+        return this.isLowLatency;
+    }
+
+    @Override
+    public void switchLowLatencyMode(boolean isLowLatencyMode) {
+        if (this.isLowLatency == isLowLatencyMode) {
+            return;
+        }
+        this.isLowLatency = isLowLatencyMode;
+        startPlay();
+        if (onViewActionListener != null) {
+            onViewActionListener.acceptOnLowLatencyChange(this.isLowLatency);
+        }
     }
 
     @Override
@@ -417,6 +512,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public PLVPlayerLogoView getLogo() {
             return logoView;
+        }
+
+        @Override
+        public IPLVMarqueeView getMarqueeView() {
+            return marqueeView;
         }
 
         @Override

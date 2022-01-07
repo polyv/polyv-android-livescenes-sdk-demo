@@ -33,9 +33,13 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
 
     /**
      * 显示连麦类型
-     * 0-默认显示音、视频连麦 1-只显示音频连麦 2-只显示视频连麦
+     * SHOW_VIDEO_AUDIO_TYPE-默认显示音、视频连麦 SHOW_AUDIO_TYPE-只显示音频连麦 SHOW_VIDEO_TYPE-只显示视频连麦
      */
-    private int showType = 0;
+    private static final int SHOW_VIDEO_AUDIO_TYPE = 0;
+    private static final int SHOW_AUDIO_TYPE = 1;
+    private static final int SHOW_VIDEO_TYPE = 2;
+
+    private int showType = SHOW_VIDEO_AUDIO_TYPE;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -66,7 +70,7 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
     /**
      * 根据类型显示连麦
      * @param view
-     * @param showType 0-默认显示音、视频连麦 1-只显示音频连麦 2-只显示视频连麦
+     * @param showType SHOW_VIDEO_AUDIO_TYPE-默认显示音、视频连麦 SHOW_AUDIO_TYPE-只显示音频连麦 SHOW_VIDEO_TYPE-只显示视频连麦
      */
     public void show(View view, int showType){
         this.showType = showType;
@@ -105,6 +109,10 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
         plvlsLinkmicVideoTypeTv.setText("视频连麦");
         plvlsLinkmicAudioTypeTv.setText("音频连麦");
         updateLinkMicShowTypeView(showType);
+    }
+
+    public int getShowType() {
+        return showType;
     }
     // </editor-fold>
 
@@ -162,11 +170,11 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
      * @param showType
      */
     private void updateLinkMicShowTypeView(int showType){
-        if(showType == 1){
+        if(showType == SHOW_AUDIO_TYPE){
             plvlsLinkmicVideoTypeLy.setVisibility(View.GONE);
             plvlsLinkmicAudioTypeLy.setVisibility(View.VISIBLE);
             plvlsLinkmicControlSplitView.setVisibility(View.GONE);
-        } else if(showType == 2){
+        } else if(showType == SHOW_VIDEO_TYPE){
             plvlsLinkmicVideoTypeLy.setVisibility(View.VISIBLE);
             plvlsLinkmicAudioTypeLy.setVisibility(View.GONE);
             plvlsLinkmicControlSplitView.setVisibility(View.GONE);
@@ -184,8 +192,10 @@ public class PLVLSLinkMicControlWindow implements View.OnClickListener {
         int id = v.getId();
         if (id == R.id.plvls_linkmic_video_type_ly) {
             acceptLinkMicControl(true, !v.isSelected());
+            showType = v.isSelected() ? SHOW_VIDEO_AUDIO_TYPE : SHOW_VIDEO_TYPE;
         } else if (id == R.id.plvls_linkmic_audio_type_ly) {
             acceptLinkMicControl(false, !v.isSelected());
+            showType = v.isSelected() ? SHOW_VIDEO_AUDIO_TYPE : SHOW_AUDIO_TYPE;
         }
     }
     // </editor-fold>

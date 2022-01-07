@@ -321,6 +321,19 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 isUserCloseFloatingWindow = true;
             }
 
+            @Override
+            public void acceptOnLowLatencyChange(boolean isLowLatency) {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.acceptOnLowLatencyChange(isLowLatency);
+                }
+            }
+
+            @Override
+            public void acceptNetworkQuality(int networkQuality) {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.acceptNetworkQuality(networkQuality);
+                }
+            }
         });
         //当前activity 可以手势操作暂停和播放
         initGesture();
@@ -602,6 +615,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onSetVideoViewRectAction(Rect videoViewRect) {
             videoLayout.setVideoViewRect(videoViewRect);
+        }
+
+        @Override
+        public boolean isCurrentLowLatencyMode() {
+            return videoLayout.isCurrentLowLatencyMode();
+        }
+
+        @Override
+        public void switchLowLatencyMode(boolean isLowLatency) {
+            videoLayout.switchLowLatencyMode(isLowLatency);
         }
 
         @Override

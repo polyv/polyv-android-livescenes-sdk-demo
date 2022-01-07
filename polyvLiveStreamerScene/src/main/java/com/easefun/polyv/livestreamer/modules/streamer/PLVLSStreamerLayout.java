@@ -293,32 +293,37 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onStreamerError(int errorCode, Throwable throwable) {
+        public void onStreamerError(final int errorCode, final Throwable throwable) {
             super.onStreamerError(errorCode, throwable);
-            if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
-                String tips = throwable.getMessage();
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setMessage(tips)
-                        .setPositiveButton("设置", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PLVFastPermission.getInstance().jump2Settings(getContext());
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .create();
-                dialog.show();
-            } else {
-                PLVToast.Builder.context(getContext())
-                        .setText(throwable.getMessage())
-                        .build()
-                        .show();
-            }
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
+                        String tips = throwable.getMessage();
+                        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                .setMessage(tips)
+                                .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PLVFastPermission.getInstance().jump2Settings(getContext());
+                                    }
+                                })
+                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create();
+                        dialog.show();
+                    } else {
+                        PLVToast.Builder.context(getContext())
+                                .setText(throwable.getMessage())
+                                .build()
+                                .show();
+                    }
+                }
+            });
         }
 
         @Override
