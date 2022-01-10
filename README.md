@@ -4,7 +4,16 @@ polyv-android-livescenes-sdk-demo
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
 [![GitHub release](https://img.shields.io/badge/release-v1.8.1-blue.svg)](https://github.com/polyv/polyv-android-livescenes-sdk-demo/releases/tag/v1.8.1)
 
-[版本更新记录](./CHANGELOG.md)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+- [polyv-android-livescenes-sdk-demo](#polyv-android-livescenes-sdk-demo)
+    - [1 简介](#1-简介)
+    - [2 体验 Demo](#2-体验-demo)
+    - [3 文档](#3-文档)
+      - [3.1 wiki文档](#31-wiki文档)
+      - [3.2 Changelog](#32-changelog)
+    - [4 Released 版本更新列表](#4-released-版本更新列表)
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 ### 1 简介
 此项目是保利威 Android 多场景 Demo。
 
@@ -42,8 +51,11 @@ polyv-android-livescenes-sdk-demo
 
 Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
-### 3 Wiki 文档
-可在 [Wiki 文档](https://github.com/polyv/polyv-android-livescenes-sdk-demo/wiki) 中，了解 **集成方式、项目结构、SDK能力、源码释义** 等内容
+### 3 文档
+#### 3.1 wiki文档
+可在 [Wiki 文档](https://help.polyv.net/index.html#/live/android/) 中，了解 **集成方式、项目结构、SDK能力、源码释义** 等内容
+#### 3.2 Changelog
+[全版本更新记录](./CHANGELOG.md)
 
 ### 4 Released 版本更新列表
 以下表格反映：
