@@ -94,7 +94,7 @@ public class PLVLiveRoomDataRequester {
         paramMap.put("times", String.valueOf(times));
         String sign = PLVSignCreator.createSign(appSecret, paramMap);
         pageViewerDisposable = PLVResponseExcutor.excuteDataBean(
-                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, times),
+                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, PLVSignCreator.getSignatureMethod(), times),
                 Integer.class, new PLVrResponseCallback<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
@@ -222,9 +222,9 @@ public class PLVLiveRoomDataRequester {
         String sign = PLVSignCreator.createSign(appSecret, map);
         Observable<PolyvCommodityVO> commodityVOObservable;
         if (rank > -1) {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, rank, sign);
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, rank, sign, PLVSignCreator.getSignatureMethod());
         } else {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, sign);
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, sign, PLVSignCreator.getSignatureMethod());
         }
         productListDisposable = commodityVOObservable.retryWhen(new PLVRxBaseRetryFunction(3, 3000))
                 .compose(new PLVRxBaseTransformer<PolyvCommodityVO, PolyvCommodityVO>())
