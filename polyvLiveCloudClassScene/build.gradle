@@ -29,7 +29,8 @@ android {
                     'src/main/res/layouts/linkmic',
                     'src/main/res/layouts/player',
                     'src/main/res/layouts/ppt',
-                    'src/main/res/layouts/liveroom'
+                    'src/main/res/layouts/liveroom',
+                    'src/main/res/layouts/previous'
             ]
         }
     }
@@ -40,4 +41,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     api project(':polyvLiveCommonModul')
+
 }

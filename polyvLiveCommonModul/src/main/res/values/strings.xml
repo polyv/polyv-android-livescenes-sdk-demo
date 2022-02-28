@@ -3,6 +3,7 @@
     <string name="plv_scene_login_toast_cloudclass_no_support_type">云课堂场景仅支持三分屏和纯视频频道类型</string>
     <string name="plv_scene_login_toast_cloudclass_login_live_failed">启动云课堂直播失败</string>
     <string name="plv_scene_login_toast_cloudclass_login_playback_failed">启动云课堂回放失败</string>
+    <string name="plv_scene_login_toast_cloudclass_loing_no_support_vod_playback">三分屏回放不支持点播列表回放</string>
 
     <string name="plv_scene_login_toast_liveecommerce_no_support_type">直播带货场景仅支持纯视频频道类型</string>
     <string name="plv_scene_login_toast_liveecommerce_login_live_failed">启动直播带货直播失败</string>
@@ -83,6 +84,12 @@
     <string name="plv_live_room_dialog_steamer_exit_confirm_ask">确认结束直播吗？</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
+    <!--回放-往期-->
+    <string name="plv_previous_no_more_data">没有数据</string>
+    <string name="plv_previous_load_error">加载失败，请点击重试"</string>
+    <string name="plv_previous_request_error">内容加载失败,请下拉刷新重试</string>
+    <!--回放-章节-->
+    <string name="tab_chapter">章节</string>
 
     <!--通用-->
     <string name="plv_common_dialog_click_wrong">按错了</string>
@@ -91,6 +98,7 @@
     <string name="plv_common_dialog_cancel">取消</string>
     <string name="plv_common_dialog_confirm">确认</string>
     <string name="plv_common_dialog_alright">好的</string>
+
 
 
 </resources>

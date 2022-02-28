@@ -53,6 +53,7 @@ import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
@@ -140,6 +141,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     //跑马灯
     private IPLVMarqueeView marqueeView = null;
+    private IPLVWatermarkView watermarkView = null;
 
     //截图，用于刷新直播的时候防止黑屏
     private ImageView screenshotIV;
@@ -212,6 +214,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         coverImageView = findViewById(R.id.plvlc_cover_image_view);
+        watermarkView = findViewById(R.id.polyv_watermark_view);
         networkTipsView = (PLVLCNetworkTipsView) findViewById(R.id.network_tips_view);
 
         // 底部占位图
@@ -663,7 +666,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void updateWhenJoinLinkMic() {
         isJoinLinkMic = true;
-
+        videoView.setIsLinkMic(true);
         mediaController.updateWhenJoinLinkMic(liveRoomDataManager.isSupportRTC());
         networkTipsView.setIsLinkMic(true);
     }
@@ -671,7 +674,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void updateWhenLeaveLinkMic() {
         isJoinLinkMic = false;
-
+        videoView.setIsLinkMic(false);
         mediaController.updateWhenLeaveLinkMic();
         networkTipsView.setIsLinkMic(true);
     }
@@ -756,6 +759,17 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     public void addOnPlayInfoVOListener(IPLVOnDataChangedListener<PLVPlayInfoVO> listener) {
 
     }
+
+    @Override
+    public void updatePlayBackVideVid(String vid) {
+
+    }
+
+    @Override
+    public void updatePlayBackVideVidAndPlay(String vid) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view实现">
@@ -788,6 +802,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public IPLVMarqueeView getMarqueeView(){
             return marqueeView;
+        }
+
+        @Override
+        public IPLVWatermarkView getWatermarkView() {
+            return watermarkView;
         }
 
         @Override

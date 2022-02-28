@@ -37,7 +37,7 @@ public class PLVECRewardPopupView {
             };
             View view = PLVViewInitUtils.initPopupWindow(v, R.layout.plvec_live_reward_layout, popupWindow, handleHideListener);
             PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
-            view.findViewById(R.id.close_iv).setOnClickListener(handleHideListener);
+            view.findViewById(R.id.plvec_playback_more_dialog_close_iv).setOnClickListener(handleHideListener);
             final RecyclerView giftRv = view.findViewById(R.id.gift_rv);
             giftRv.setHasFixedSize(true);
             GridLayoutManager gridLayoutManager = new GridLayoutManager(giftRv.getContext(), 5);

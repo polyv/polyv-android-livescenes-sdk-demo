@@ -796,6 +796,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 return;
             }
             final boolean toPause = isPlaying();
+            //更新播放器本身的状态
+            if(toPause){
+                livePlayerPresenter.pause();
+            } else {
+                livePlayerPresenter.resume();
+            }
             onViewActionListener.onRtcPauseResume(toPause);
             acceptPlayInfo(null);
         }

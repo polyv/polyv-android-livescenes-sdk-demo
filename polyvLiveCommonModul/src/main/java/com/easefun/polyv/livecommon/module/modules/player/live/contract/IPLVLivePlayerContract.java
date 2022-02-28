@@ -14,6 +14,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.business.api.common.player.PLVPlayerConstant;
@@ -68,6 +69,11 @@ public interface IPLVLivePlayerContract {
          * 获取跑马灯控件
          */
         IPLVMarqueeView getMarqueeView();
+
+        /**
+         * 获取水印view
+         */
+        IPLVWatermarkView getWatermarkView();
 
         /**
          * 子播放器开始播放回调

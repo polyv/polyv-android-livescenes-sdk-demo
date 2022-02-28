@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
         android:id="@+id/plvlc_playback_switch_anchor_player"
@@ -73,6 +74,16 @@
         layout="@layout/plvlc_live_player_sub_video_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!-- 防盗水印 -->
+    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
+        android:id="@+id/polyv_watermark_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintLeft_toLeftOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintRight_toRightOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintTop_toTopOf="@id/plvlc_playback_switch_anchor_player" />
 
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout

@@ -65,7 +65,7 @@ public class PLVECCommodityPopupView {
             };
             View view = PLVViewInitUtils.initPopupWindow(v, R.layout.plvec_live_commodity_layout, popupWindow, handleHideListener);
             PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
-            view.findViewById(R.id.close_iv).setOnClickListener(handleHideListener);
+            view.findViewById(R.id.plvec_playback_more_dialog_close_iv).setOnClickListener(handleHideListener);
 
             emptyCommodityLy = view.findViewById(R.id.empty_commodity_ly);
             commodityCountTv = view.findViewById(R.id.commodity_count_tv);

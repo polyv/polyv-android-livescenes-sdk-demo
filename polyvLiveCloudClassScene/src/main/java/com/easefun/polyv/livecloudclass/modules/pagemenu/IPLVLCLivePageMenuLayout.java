@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
+import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 
 /**
@@ -34,6 +35,13 @@ public interface IPLVLCLivePageMenuLayout {
      * @return 聊天室presenter
      */
     IPLVChatroomContract.IChatroomPresenter getChatroomPresenter();
+
+    /**
+     * 获取回放的presenter
+     *
+     * @return 回放presenter
+     */
+    IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter getPreviousPresenter();
 
     /**
      * 设置view交互事件监听器
@@ -94,6 +102,19 @@ public interface IPLVLCLivePageMenuLayout {
          * @param message 弹幕信息
          */
         void onSendDanmuAction(CharSequence message);
+
+        /**
+         * 切换往期视频的动作
+         * @param vid 回放视频的vid
+         */
+        void onChangeVideoVidAction(String vid);
+
+        /**
+         * 跳转进度条的动作
+         * @param progress 需要切换到进度的位置 单位是秒
+         */
+        void onSeekToAction(int progress);
+
     }
     // </editor-fold>
 }

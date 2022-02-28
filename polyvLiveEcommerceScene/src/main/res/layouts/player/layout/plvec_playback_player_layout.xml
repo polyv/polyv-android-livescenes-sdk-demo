@@ -30,6 +30,12 @@
             android:src="@drawable/plvec_commodity_push_close"
             android:visibility="gone" />
     </FrameLayout>
+    <!--watermark view-->
+    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
+        android:id="@+id/plvec_watermark_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
     <!--logo 显示 -->
     <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
         android:id="@+id/logo_view"

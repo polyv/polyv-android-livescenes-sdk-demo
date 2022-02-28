@@ -26,5 +26,13 @@
     <color name="colorVulcan">#0E141E</color>
     <color name="colorGunPowder">#3E3E4E</color>
     <color name="colorCornflowerBlue">#FF6DA7FF</color>
+    
+    <color name="colorPortage">#FF78A7ED</color>
+    <color name="colorSpunPearl">#FFADADC0</color>
+    <color name="colorSoftSpunPearl">#99ADADC0</color>
+    <color name="colorSoftDodgerBlue">#e53082FE</color>
+    <color name="colorMalibu">#5C9DFF</color>
+
+
 
 </resources>

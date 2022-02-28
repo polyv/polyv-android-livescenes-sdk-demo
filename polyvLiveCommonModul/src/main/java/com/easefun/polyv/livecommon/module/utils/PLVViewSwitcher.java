@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 
+import java.lang.ref.WeakReference;
+
 /**
  * date: 2020/8/13
  * author: HWilliamgo
@@ -18,13 +20,18 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 public class PLVViewSwitcher {
 
     // <editor-fold defaultstate="collapsed" desc="静态变量">
+
     private static final String TAG = PLVViewSwitcher.class.getSimpleName();
     private static final String SWITCH_VIEW = "switchView:";
+
     // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="实例变量">
-    private PLVSwitchViewAnchorLayout switchViewA;
-    private PLVSwitchViewAnchorLayout switchViewB;
+
+    private WeakReference<PLVSwitchViewAnchorLayout> switchViewAwr;
+    private WeakReference<PLVSwitchViewAnchorLayout> switchViewBwr;
     private boolean isViewSwitched = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
@@ -36,14 +43,16 @@ public class PLVViewSwitcher {
      * @param switchViewB View B
      */
     public void registerSwitchVew(PLVSwitchViewAnchorLayout switchViewA, PLVSwitchViewAnchorLayout switchViewB) {
-        this.switchViewA = switchViewA;
-        this.switchViewB = switchViewB;
+        this.switchViewAwr = new WeakReference<>(switchViewA);
+        this.switchViewBwr = new WeakReference<>(switchViewB);
     }
 
     /**
      * 切换View位置
      */
     public void switchView() {
+        PLVSwitchViewAnchorLayout switchViewA = switchViewAwr.get();
+        PLVSwitchViewAnchorLayout switchViewB = switchViewBwr.get();
         if (switchViewA == null || switchViewB == null) {
             return;
         }
@@ -121,7 +130,8 @@ public class PLVViewSwitcher {
     public boolean isViewSwitched() {
         return isViewSwitched;
     }
-// </editor-fold>
+
+    // </editor-fold>
 
     private void exchangeView(ViewGroup viewACurParent, View viewA, ViewGroup viewBCurParent, View viewB) {
         viewACurParent.removeView(viewA);

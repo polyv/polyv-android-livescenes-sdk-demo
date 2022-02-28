@@ -31,7 +31,10 @@ import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -89,6 +92,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private boolean isTeacherOpenLinkMic;
     //是否已经初始化过第一画面用户
     private boolean hasInitFirstScreenUser = false;
+    //纯视频频道类型连麦时，是否已经初始化完成连麦布局讲师的位置
+    private boolean hasInitFirstTeacherLocation = false;
     //纯视频频道类型连麦时，主屏的讲师连麦Id
     private String mainTeacherLinkMicId;
     //连麦列表
@@ -115,6 +120,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private PolyvLinkMicEventListener eventListener = new PolyvLinkMicEventListenerImpl();
     //socket事件监听器
     private PolyvLinkMicSocketEventListener socketEventListener = new PolyvLinkMicSocketEventListener();
+    //socket监听器
+    private PLVSocketMessageObserver.OnMessageListener messageListener;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -173,6 +180,25 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         //初始化RTC调用策略实现
         isWatchRtc = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
         initRTCInvokeStrategy();
+        //Socket事件监听
+        messageListener = new PLVSocketMessageObserver.OnMessageListener() {
+            @Override
+            public void onMessage(String listenEvent, String event, String message) {
+                if(event == null){
+                    return;
+                }
+                switch (event){
+                    case PLVEventConstant.MESSAGE_EVENT_RELOGIN:{
+                        //当收到重登录的消息的时候，我们需要将判断一下是否是连麦状态，是的话就要断开连麦
+                        if(isJoinLinkMic()){
+                            leaveLinkMic();
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+        PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(messageListener);
     }
 
     private void initRTCInvokeStrategy() {
@@ -320,6 +346,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         leaveChannel();
         dispose(getLinkMicListDelay);
         dispose(getLinkMicListTimer);
+        PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(messageListener);
         linkMicList.clear();
         muteCacheList.clear();
         myLinkMicId = "";
