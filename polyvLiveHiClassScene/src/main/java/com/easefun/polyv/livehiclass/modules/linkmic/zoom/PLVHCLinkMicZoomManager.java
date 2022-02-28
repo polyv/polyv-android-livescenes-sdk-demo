@@ -2,7 +2,7 @@ package com.easefun.polyv.livehiclass.modules.linkmic.zoom;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;

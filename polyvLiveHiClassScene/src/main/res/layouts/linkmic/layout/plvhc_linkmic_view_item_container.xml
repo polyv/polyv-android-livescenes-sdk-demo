@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/plvhc_linkmic_item_container_layout_root"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/plvhc_linkmic_placeholder_iv"
         tools:text="观众啊的位置" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/plvhc_linkmic_placeholder_group"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -57,4 +57,4 @@
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -46,10 +46,10 @@ allprojects {
 
 ext {
     compileSdkVersion = 28
-    minSdkVersion = 17//如果需要降级到21，请查看文档：
+    minSdkVersion = 21
     targetSdkVersion = 28
-    versionCode = 181
-    versionName = "1.8.1"
+    versionCode = 182
+    versionName = "1.8.2"
 }
 
 task clean(type: Delete) {

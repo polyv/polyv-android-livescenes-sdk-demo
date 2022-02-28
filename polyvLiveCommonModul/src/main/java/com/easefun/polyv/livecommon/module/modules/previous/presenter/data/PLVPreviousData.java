@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.previous.presenter.data;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.plv.livescenes.model.PLVPlaybackListVO;
 

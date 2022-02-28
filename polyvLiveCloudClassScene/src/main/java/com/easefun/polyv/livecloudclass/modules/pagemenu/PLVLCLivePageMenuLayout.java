@@ -2,24 +2,26 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.viewpager.widget.ViewPager;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
@@ -28,6 +30,8 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommon
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackChapterFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackPreviousFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
@@ -35,6 +39,8 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
+import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
@@ -53,6 +59,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVSimplePagerTitleView;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
+import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -78,6 +85,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
 
+    //回放Presenter
+    private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPlaybackPresenter;
+
     //横竖屏聊天共用的列表
     private PLVLCChatCommonMessageList chatCommonMessageList;
 
@@ -101,6 +111,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCQuizFragment quizFragment;//咨询提问tab页
     private PLVLCChatFragment chatFragment;//互动聊天tab页
     private PLVLCQAFragment questionsAndAnswersFragment;//问答tab页
+    private PLVLCPlaybackPreviousFragment previousFragment;//往期视频tab页
+    private PLVLCPlaybackChapterFragment chapterFragment;//章节tab页
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -283,6 +295,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
+    public IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter getPreviousPresenter() {
+        return previousPlaybackPresenter;
+    }
+
+    @Override
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
@@ -412,6 +429,44 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabFragmentList.add(chatFragment);
     }
 
+    /**
+     * 插入往期Fragment
+     *
+     * @param channelMenusBean 频道的菜单详情
+     */
+    private void addPreviousTab(PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+        pageMenuTabTitleList.add(channelMenusBean.getName());
+        if (previousFragment == null) {
+            previousFragment = new PLVLCPlaybackPreviousFragment();
+        }
+        pageMenuTabFragmentList.add(previousFragment);
+        if (previousPlaybackPresenter == null) {
+            previousPlaybackPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
+        }
+        //初始化
+        previousFragment.init(previousPlaybackPresenter);
+        observerChapters();
+        liveRoomDataManager.requestPlaybackChannelStatus();
+        observerPreviousData();
+    }
+
+
+    /**
+     * 插入章节Fragment
+     */
+    private void addChapterTab() {
+        pageMenuTabTitleList.add(getResources().getString(R.string.tab_chapter));
+        if (chapterFragment == null) {
+            chapterFragment = new PLVLCPlaybackChapterFragment();
+        }
+        pageMenuTabFragmentList.add(chapterFragment);
+        if (previousPlaybackPresenter == null) {
+            previousPlaybackPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
+        }
+        chapterFragment.init(previousPlaybackPresenter);
+        refreshPageMenuTabAdapter();
+    }
+
     private void refreshPageMenuTabAdapter() {
         if (pageMenuTabAdapter.getCount() > 0) {
             pageMenuTabAdapter.notifyDataSetChanged();
@@ -473,7 +528,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                         .setText(R.string.plv_chat_toast_been_kicked)
                         .build()
                         .show();
-                ((Activity)getContext()).finish();
+                ((Activity) getContext()).finish();
             }
         }
 
@@ -565,6 +620,66 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听回放视频的信息：vid变更，seek跳转">
+    private void observerPreviousData() {
+        if (previousPlaybackPresenter != null) {
+            //监听vid的变更
+            previousPlaybackPresenter.getData().getPlaybackVideoVidData()
+                    .observe((LifecycleOwner) getContext(), new Observer<String>() {
+                        @Override
+                        public void onChanged(@Nullable String vid) {
+                            if (TextUtils.isEmpty(vid)) {
+                                return;
+                            }
+                            onViewActionListener.onChangeVideoVidAction(vid);
+                        }
+                    });
+
+            //监听进度的变更
+            previousPlaybackPresenter.getData().getPlayBackVidoSeekData()
+                    .observe((LifecycleOwner) getContext(), new Observer<Integer>() {
+                        @Override
+                        public void onChanged(@Nullable Integer position) {
+                            if (position == null) {
+                                return;
+                            }
+                            onViewActionListener.onSeekToAction(position);
+                        }
+                    });
+        }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听往期tab">
+    private void observerChapters() {
+        // 监听是否开启章节功能
+        liveRoomDataManager.getPlaybackChannelData().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PLVPlaybackChannelDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PLVPlaybackChannelDetailVO> detailVO) {
+                liveRoomDataManager.getPlaybackChannelData().removeObserver(this);
+                if (detailVO == null || !detailVO.isSuccess()) {
+                    return;
+                }
+                PLVPlaybackChannelDetailVO playbackDetail = detailVO.getData();
+                if (playbackDetail == null || playbackDetail.getData() == null || playbackDetail.getData().getChannelPlayback() == null) {
+                    return;
+                }
+                //判断是否开其章节功能
+                PLVPlaybackChannelDetailVO.DataBean.ChannelPlaybackBean channelPlayback = playbackDetail.getData().getChannelPlayback();
+                String sectionEnabled = channelPlayback.getSectionEnabled();
+                String hasRecordFile = channelPlayback.getHasRecordFile();
+                String hasPlaybackVideo = channelPlayback.getHasPlaybackVideo();
+                if (!liveRoomDataManager.getConfig().isLive()
+                        && sectionEnabled.equals("Y")
+                        && (hasPlaybackVideo.equals("Y") || hasRecordFile.equals("Y"))) {
+                    //开启章节tab
+                    addChapterTab();
+                }
+            }
+        });
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听直播详情信息">
     private void observeClassDetailVO() {
         //监听 直播间数据管理器对象中的直播详情数据变化
@@ -601,6 +716,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                             addTuWenTab(channelMenusBean);
                         } else if (PLVLiveClassDetailVO.MENUTYPE_QA.equals(channelMenusBean.getMenuType())) {
                             addQATab(channelMenusBean);
+                        } else if (PolyvLiveClassDetailVO.MENUTYPE_PREVIOUS.equals(channelMenusBean.getMenuType())
+                                && !liveRoomDataManager.getConfig().isLive()
+                                && liveRoomDataManager.getConfig().getVid().isEmpty()) {
+                            addPreviousTab(channelMenusBean);
                         }
                     }
                     refreshPageMenuTabAdapter();

@@ -1,8 +1,9 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.previous.adapter;
 
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVChapterAdapter;

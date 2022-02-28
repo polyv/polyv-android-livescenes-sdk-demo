@@ -1,7 +1,8 @@
 package com.easefun.polyv.livehiclass.modules.linkmic.list.item;
 
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;

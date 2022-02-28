@@ -1,6 +1,6 @@
 package com.easefun.polyv.liveecommerce.modules.playback.fragments;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
 import com.plv.livescenes.model.PLVPlaybackListVO;

@@ -5,15 +5,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livehiclass.R;
+import com.easefun.polyv.livehiclass.modules.linkmic.zoom.PLVHCLinkMicZoomManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -27,13 +28,21 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
     private View view;
     private TextView plvhcLinkmicNickTv;
     private ImageView plvhcLinkmicMicIv;
+    private LinearLayout plvhcLinkmicControlMicLayout;
     private ImageView plvhcLinkmicCameraIv;
+    private LinearLayout plvhcLinkmicControlCameraLayout;
     private ImageView plvhcLinkmicPaintIv;
-    private ImageView plvhcLinkmicCupIv;
-    private ImageView plvhcLinkmicCameraOrientIv;
     private TextView plvhcLinkmicPaintTv;
+    private LinearLayout plvhcLinkmicControlPaintLayout;
+    private ImageView plvhcLinkmicCupIv;
     private TextView plvhcLinkmicCupTv;
+    private LinearLayout plvhcLinkmicControlCupLayout;
+    private ImageView plvhcLinkmicCameraOrientIv;
     private TextView plvhcLinkmicCameraOrientTv;
+    private LinearLayout plvhcLinkmicControlCameraOrientLayout;
+    private ImageView plvhcLinkmicZoomIv;
+    private TextView plvhcLinkmicZoomTv;
+    private LinearLayout plvhcLinkmicControlZoomLayout;
     private TextView plvhcLinkmicCloseTv;
     private CircleImageView plvhcLinkmicAvatarIv;
 
@@ -64,13 +73,21 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
     private void initView() {
         plvhcLinkmicNickTv = findViewById(R.id.plvhc_linkmic_nick_tv);
         plvhcLinkmicMicIv = findViewById(R.id.plvhc_linkmic_mic_iv);
+        plvhcLinkmicControlMicLayout = findViewById(R.id.plvhc_linkmic_control_mic_layout);
         plvhcLinkmicCameraIv = findViewById(R.id.plvhc_linkmic_camera_iv);
+        plvhcLinkmicControlCameraLayout = findViewById(R.id.plvhc_linkmic_control_camera_layout);
         plvhcLinkmicPaintIv = findViewById(R.id.plvhc_linkmic_paint_iv);
-        plvhcLinkmicCupIv = findViewById(R.id.plvhc_linkmic_cup_iv);
-        plvhcLinkmicCameraOrientIv = findViewById(R.id.plvhc_linkmic_camera_orient_iv);
         plvhcLinkmicPaintTv = findViewById(R.id.plvhc_linkmic_paint_tv);
+        plvhcLinkmicControlPaintLayout = findViewById(R.id.plvhc_linkmic_control_paint_layout);
+        plvhcLinkmicCupIv = findViewById(R.id.plvhc_linkmic_cup_iv);
         plvhcLinkmicCupTv = findViewById(R.id.plvhc_linkmic_cup_tv);
+        plvhcLinkmicControlCupLayout = findViewById(R.id.plvhc_linkmic_control_cup_layout);
+        plvhcLinkmicCameraOrientIv = findViewById(R.id.plvhc_linkmic_camera_orient_iv);
         plvhcLinkmicCameraOrientTv = findViewById(R.id.plvhc_linkmic_camera_orient_tv);
+        plvhcLinkmicControlCameraOrientLayout = findViewById(R.id.plvhc_linkmic_control_camera_orient_layout);
+        plvhcLinkmicZoomIv = findViewById(R.id.plvhc_linkmic_zoom_iv);
+        plvhcLinkmicZoomTv = findViewById(R.id.plvhc_linkmic_zoom_tv);
+        plvhcLinkmicControlZoomLayout = findViewById(R.id.plvhc_linkmic_control_zoom_layout);
         plvhcLinkmicCloseTv = findViewById(R.id.plvhc_linkmic_close_tv);
         plvhcLinkmicAvatarIv = findViewById(R.id.plvhc_linkmic_avatar_iv);
 
@@ -80,6 +97,7 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
         plvhcLinkmicCupIv.setOnClickListener(this);
         plvhcLinkmicCameraOrientIv.setOnClickListener(this);
         plvhcLinkmicCloseTv.setOnClickListener(this);
+        plvhcLinkmicZoomIv.setOnClickListener(this);
     }
 
     private <T extends View> T findViewById(int id) {
@@ -97,21 +115,13 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
             return;
         }
         linkMicUid = linkMicItemDataBean.getLinkMicId();
-        plvhcLinkmicPaintIv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
-        plvhcLinkmicPaintTv.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
-        plvhcLinkmicCupIv.setVisibility((isMySelf || isLeader) ? View.GONE : View.VISIBLE);
-        plvhcLinkmicCupTv.setVisibility((isMySelf || isLeader) ? View.GONE : View.VISIBLE);
-        plvhcLinkmicCameraOrientIv.setVisibility((isMySelf && !linkMicItemDataBean.isMuteVideo()) ? View.VISIBLE : View.GONE);
-        plvhcLinkmicCameraOrientTv.setVisibility((isMySelf && !linkMicItemDataBean.isMuteVideo()) ? View.VISIBLE : View.GONE);
-        ConstraintLayout.LayoutParams cameraIvLp = (ConstraintLayout.LayoutParams) plvhcLinkmicCameraIv.getLayoutParams();
-        if (cameraIvLp != null) {
-            if (isMySelf) {
-                cameraIvLp.rightToLeft = R.id.plvhc_linkmic_camera_orient_iv;
-            } else {
-                cameraIvLp.rightToLeft = R.id.plvhc_linkmic_paint_iv;
-            }
-            plvhcLinkmicCameraIv.setLayoutParams(cameraIvLp);
-        }
+        final boolean isUserZoomIn = PLVHCLinkMicZoomManager.getInstance().isZoomIn(linkMicUid);
+        final boolean canZoomIn = PLVHCLinkMicZoomManager.getInstance().canZoomInItem();
+        final boolean showZoomLayout = !isLeader && (isUserZoomIn || canZoomIn);
+        plvhcLinkmicControlPaintLayout.setVisibility(isMySelf ? View.GONE : View.VISIBLE);
+        plvhcLinkmicControlCupLayout.setVisibility((isMySelf || isLeader) ? View.GONE : View.VISIBLE);
+        plvhcLinkmicControlCameraOrientLayout.setVisibility((isMySelf && !linkMicItemDataBean.isMuteVideo()) ? View.VISIBLE : View.GONE);
+        plvhcLinkmicControlZoomLayout.setVisibility(showZoomLayout ? View.VISIBLE : View.GONE);
         //头像
         String pic = linkMicItemDataBean.getPic();
         int drawableId = linkMicItemDataBean.isTeacher() ? R.drawable.plvhc_chatroom_ic_teacher : R.drawable.plvhc_chatroom_ic_viewer;
@@ -128,6 +138,9 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
         plvhcLinkmicMicIv.setSelected(linkMicItemDataBean.isMuteAudio());
         plvhcLinkmicCameraIv.setSelected(linkMicItemDataBean.isMuteVideo());
         plvhcLinkmicPaintIv.setSelected(linkMicItemDataBean.isHasPaint());
+
+        plvhcLinkmicZoomIv.setSelected(isUserZoomIn);
+        plvhcLinkmicZoomTv.setText(isUserZoomIn ? "恢复原位" : "放大窗口");
     }
 
     public String getLinkMicUid() {
@@ -179,6 +192,11 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
                 lastClickCameraSwitchViewTime = currentTime;
                 hide();
             }
+        } else if (id == plvhcLinkmicZoomIv.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onClickZoom();
+                hide();
+            }
         }
     }
     // </editor-fold>
@@ -194,6 +212,8 @@ public class PLVHCLinkMicUserControlDialog implements View.OnClickListener {
         void onClickCup();
 
         void onClickCameraOrient();
+
+        void onClickZoom();
     }
     // </editor-fold>
 }

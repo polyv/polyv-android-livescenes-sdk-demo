@@ -1,7 +1,8 @@
 package com.easefun.polyv.livehiclass.modules.linkmic;
 
+import android.view.View;
+
 import androidx.annotation.Nullable;
-import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
@@ -115,9 +116,9 @@ public interface IPLVHCLinkMicLayout {
         void onHasPaintToMe(boolean isHasPaint);
 
         /**
-         * 设置连麦readerView
+         * 设置连麦renderView
          */
-        void onSetupLinkMicRenderView(SurfaceView surfaceView, String linkMicId, int streamType);
+        void onSetupLinkMicRenderView(View renderView, String linkMicId, int streamType);
 
         /**
          * 学生获取奖杯

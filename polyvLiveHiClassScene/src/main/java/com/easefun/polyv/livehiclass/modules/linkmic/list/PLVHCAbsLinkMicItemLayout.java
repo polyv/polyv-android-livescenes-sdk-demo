@@ -1,14 +1,24 @@
-package com.easefun.polyv.livehiclass.modules.linkmic.item;
+package com.easefun.polyv.livehiclass.modules.linkmic.list;
 
 import android.content.Context;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.item.IPLVHCLinkMicItem;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 连麦item布局的抽象类
@@ -20,13 +30,22 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
     private boolean isJoinDiscuss;
     private String leaderId;
     //viewList
-    private List<PLVHCLinkMicItemView> itemViewList;
+    private List<IPLVHCLinkMicItem> itemViewList;
     //占位item
     private PLVLinkMicItemDataBean placeDataBean;
     private boolean isTeacherPreparing;
     //listener
-    protected PLVHCLinkMicItemView.OnRenderViewCallback onRenderViewCallback;
+    protected IPLVHCLinkMicItem.OnRenderViewCallback onRenderViewCallback;
     protected OnViewActionListener onViewActionListener;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    /**
+     * 缓存更新摄像头放大事件，避免有时候先收到事件，然后用户才加入到连麦列表
+     * Key: linkMicId
+     * Value: Runnable 处理摄像头放大逻辑
+     */
+    private final Map<String, Runnable> pendingUpdateZoomEventMap = new ConcurrentHashMap<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -110,14 +129,16 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
         if (!checkPosition(position)) {
             return;
         }
-        PLVHCLinkMicItemView newLastDataItemView = itemViewList.get(Math.max(getDataCount() - 1, 0));
+        // 取出列表最后一个
+        IPLVHCLinkMicItem newLastDataItemView = itemViewList.get(Math.max(getDataCount() - 1, 0));
         newLastDataItemView.setVisibility(View.VISIBLE);
-        PLVHCLinkMicItemView.ViewParam viewParam = new PLVHCLinkMicItemView.ViewParam();
-        newLastDataItemView.removeItemView(viewParam);
+        View itemView = newLastDataItemView.removeItemView();
+        // position 至 列表倒数第二个，按倒序依次往后移动
         for (int i = getDataCount() - 2; i >= position; i--) {
             itemViewList.get(i).moveToItemView(itemViewList.get(i + 1));
         }
-        itemViewList.get(position).addItemView(viewParam);
+        // position位置插入新加入的用户
+        itemViewList.get(position).addItemView(itemView);
         itemViewList.get(position).bindData(dataBean);
         if (leaderId != null && leaderId.equals(dataBean.getLinkMicId())) {
             itemViewList.get(position).updateLeaderStatus(true);
@@ -142,14 +163,22 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
         if (!checkPosition(position)) {
             return;
         }
-        PLVHCLinkMicItemView.ViewParam viewParam = new PLVHCLinkMicItemView.ViewParam();
-        itemViewList.get(position).removeItemView(viewParam);
+        // 移出 position 位置
+        View itemView = itemViewList.get(position).removeItemView();
+        // position+1 至 列表最后一个，按顺序依次往前移动
+        int lastIndex = position;
         for (int i = position + 1; i < Math.min(getDataCount() + 1, getMaxItemCount()); i++) {
+            if (i >= itemViewList.size() || i - 1 >= dataBeanList.size()) {
+                break;
+            }
+            lastIndex = i;
             itemViewList.get(i).moveToItemView(itemViewList.get(i - 1));
+            itemViewList.get(i - 1).bindData(dataBeanList.get(i - 1));
         }
-        PLVHCLinkMicItemView oldLastDataItemView = itemViewList.get(Math.min(getDataCount(), getMaxItemCount() - 1));
+        // 将移出的视图重新添加回去，并隐藏
+        IPLVHCLinkMicItem oldLastDataItemView = itemViewList.get(lastIndex);
         oldLastDataItemView.setVisibility(getHideItemMode());
-        oldLastDataItemView.addItemView(viewParam);
+        oldLastDataItemView.addItemView(itemView);
     }
 
     @Override
@@ -171,11 +200,25 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
                 for (int j = i + 1; j < Math.min(getDataCount(), getMaxItemCount()); j++) {
                     String findViewItemLinkMicId = itemViewList.get(j).getLinkMicId();
                     if (dataBeanLinkMicId.equals(findViewItemLinkMicId)) {
-                        itemViewList.get(i).replaceItemView(itemViewList.get(j));
+                        itemViewList.get(i).switchWithItemView(itemViewList.get(j));
                         break;
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void notifyRejoinRoom() {
+        final int startPosition = placeDataBean == null ? 0 : 1;
+        for (int i = startPosition; i < Math.min(getDataCount(), getMaxItemCount()); i++) {
+            final IPLVHCLinkMicItem itemView = itemViewList.get(i);
+            if (itemView.getLinkMicId() == null) {
+                continue;
+            }
+            // 重连后刷新画面
+            itemView.releaseRenderView();
+            itemView.setupRenderView();
         }
     }
 
@@ -248,7 +291,45 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
     }
 
     @Override
-    public void setOnRenderViewCallback(PLVHCLinkMicItemView.OnRenderViewCallback onRenderViewCallback) {
+    public void onUserUpdateZoom(final PLVUpdateMicSiteEvent updateMicSiteEvent) {
+        if (updateMicSiteEvent == null || !updateMicSiteEvent.checkIsValid()) {
+            return;
+        }
+        final String eventLinkMicId = updateMicSiteEvent.getLinkMicIdFromEventId();
+        IPLVHCLinkMicItem linkMicItem = getItemByLinkMicId(eventLinkMicId);
+        if (linkMicItem != null) {
+            linkMicItem.updateZoom(updateMicSiteEvent);
+            return;
+        }
+
+        // 没有找到对应的item，3秒后重试
+        final Runnable pendingUpdateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                final IPLVHCLinkMicItem linkMicItemRetry = getItemByLinkMicId(eventLinkMicId);
+                if (linkMicItemRetry != null) {
+                    linkMicItemRetry.updateZoom(updateMicSiteEvent);
+                }
+            }
+        };
+        pendingUpdateZoomEventMap.put(eventLinkMicId, pendingUpdateRunnable);
+        mainHandler.postDelayed(pendingUpdateRunnable, TimeUnit.SECONDS.toMillis(3));
+    }
+
+    @Override
+    public void onUserRemoveZoom(PLVRemoveMicSiteEvent removeMicSiteEvent) {
+        if (removeMicSiteEvent == null || removeMicSiteEvent.getLinkMicIdFromEventId() == null) {
+            return;
+        }
+        final String linkMicId = removeMicSiteEvent.getLinkMicIdFromEventId();
+        if (pendingUpdateZoomEventMap.containsKey(linkMicId)) {
+            mainHandler.removeCallbacks(pendingUpdateZoomEventMap.get(linkMicId));
+            pendingUpdateZoomEventMap.remove(linkMicId);
+        }
+    }
+
+    @Override
+    public void setOnRenderViewCallback(IPLVHCLinkMicItem.OnRenderViewCallback onRenderViewCallback) {
         this.onRenderViewCallback = onRenderViewCallback;
     }
 
@@ -256,10 +337,18 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
     public void setOnViewActionListener(OnViewActionListener onViewActionListener) {
         this.onViewActionListener = onViewActionListener;
     }
+
+    @Override
+    public void destroy() {
+        for (IPLVHCLinkMicItem linkMicItem : itemViewList) {
+            linkMicItem.releaseRenderView();
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
-    protected void setItemViewList(List<PLVHCLinkMicItemView> itemViewList) {
+    protected void setItemViewList(List<IPLVHCLinkMicItem> itemViewList) {
         this.itemViewList = itemViewList;
     }
     // </editor-fold>
@@ -281,6 +370,19 @@ public abstract class PLVHCAbsLinkMicItemLayout extends ConstraintLayout impleme
             return false;
         }
         return true;
+    }
+
+    @Nullable
+    protected IPLVHCLinkMicItem getItemByLinkMicId(String linkMicId) {
+        if (linkMicId == null) {
+            return null;
+        }
+        for (IPLVHCLinkMicItem linkMicItem : itemViewList) {
+            if (linkMicId.equals(linkMicItem.getLinkMicId())) {
+                return linkMicItem;
+            }
+        }
+        return null;
     }
     // </editor-fold>
 }

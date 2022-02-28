@@ -1,6 +1,8 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +12,31 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
+import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
+import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
+import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
+import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
+import com.easefun.polyv.liveecommerce.modules.playback.fragments.PLVECPreviousDialogFragment;
+import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVECPreviousAdapter;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.model.PLVPlaybackListVO;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 回放首页：主持人信息、播放控制、进度条、更多
@@ -40,15 +56,27 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //更多
     private ImageView moreIv;
     private PLVECMorePopupView morePopupView;
+    //更多回放视频
+    private ImageView moreVideoListIv;
     //监听器
     private OnViewActionListener onViewActionListener;
+    //回放更多视频的弹窗
+    private IPLVECPreviousDialogFragment previousPopupView;
+    //回放视频列表
+    private List<PLVPlaybackListVO.DataBean.ContentsBean> dataList;
+    //当前回放视频的vid
+    private String currentVid;
+
+    //更多回放视频的presenter
+    private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPresenter;
+    private PLVPreviousView plvPreviousView;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.plvec_playback_page_home_fragment, null);
+        view = inflater.inflate(R.layout.plvec_playback_page_home_fragment, container, false);
         initView();
         return view;
     }
@@ -60,7 +88,6 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             onViewActionListener.onViewCreated();
         }
     }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -75,8 +102,19 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         totalTimeTv = findViewById(R.id.total_time_tv);
         moreIv = findViewById(R.id.more_iv);
         moreIv.setOnClickListener(this);
-
+        moreVideoListIv = findViewById(R.id.more_video_list_iv);
+        moreVideoListIv.setVisibility(View.GONE);
+        //当进入的时候没有vid才会开启回放列表的功能
+        if (TextUtils.isEmpty(liveRoomDataManager.getConfig().getVid())) {
+            moreVideoListIv.setOnClickListener(this);
+            moreVideoListIv.setVisibility(View.VISIBLE);
+        }
         morePopupView = new PLVECMorePopupView();
+
+        previousPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
+        previousPopupView = new PLVECPreviousDialogFragment();
+        initPreviousView();
+        dataList = new ArrayList<>();
     }
 
     // </editor-fold>
@@ -142,6 +180,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             playProgressSb.setSecondaryProgress(playProgressSb.getMax() * bufPercent / 100);
             playControlIv.setSelected(isPlaying);
         }
+
+        //判断是否播放完成，播放完成通知
+        if (position >= totalTime && totalTime > 0) {
+            if (previousPresenter != null) {
+                previousPresenter.onPlayComplete();
+            }
+        }
     }
 
     @Override
@@ -174,6 +219,52 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             removeBulletin();
         }
     };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="回放视频列表 - MVP模式view层的实现">
+
+    /**
+     * 设置PreviousView的参数
+     */
+    private void initPreviousView() {
+        PLVPreviousView.Builder builder = new PLVPreviousView.Builder(getContext());
+        //创建PLVPreviousView
+        plvPreviousView = builder.create();
+        PLVECPreviousAdapter plvecPreviousAdapter = new PLVECPreviousAdapter();
+        plvecPreviousAdapter.setOnViewActionListener(new PLVPreviousAdapter.OnViewActionListener() {
+            @Override
+            public void changeVideoVidClick(String vid) {
+                plvPreviousView.changePlaybackVideoVid(vid);
+            }
+        });
+        builder.setAdapter(plvecPreviousAdapter)
+                .setRecyclerViewLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false))
+                .setRecyclerViewItemDecoration(new RecyclerView.ItemDecoration() {
+                    @Override
+                    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                        outRect.left = ConvertUtils.dp2px(8);
+                        outRect.bottom = ConvertUtils.dp2px(20);
+                    }
+                }).setThemeColor("#FFFFA611")
+                .setOnPrepareChangeVidListener(new PLVPreviousView.PLVPreviousViewInterface.OnPrepareChangeVideoVidListener() {
+                    @Override
+                    public void onPrepareChangeVideoVid(String vid) {
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onChangePlaybackVidAndPlay(vid);
+                        }
+                    }
+                });
+        plvPreviousView.setParams(builder);
+        //注册presenter
+        if (previousPresenter != null) {
+            previousPresenter.registerView(plvPreviousView.getPreviousView());
+        }
+        //注意这里要判断vid是否为空，为空才会去请求
+        if (liveRoomDataManager.getConfig().getVid() == null || liveRoomDataManager.getConfig().getVid().isEmpty()) {
+            //当进入的时候没有输入vid，那么这里就要请求回放视频列表
+            plvPreviousView.requestPreviousList();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 进度条拖动事件处理">
@@ -224,6 +315,24 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                     }
                 }
             });
+        } else if (id == R.id.more_video_list_iv) {
+            //弹出更多回放视频的popview
+            if (previousPopupView == null) {
+                previousPopupView = new PLVECPreviousDialogFragment();
+            }
+            if (plvPreviousView != null) {
+                previousPopupView.setPrviousView(plvPreviousView);
+            }
+            previousPopupView.showPlaybackMoreVideoDialog(dataList, currentVid, this);
+            //设置DialogFragment隐藏时的回调方法
+            previousPopupView.setDismissListener(new IPLVECPreviousDialogFragment.DismissListener() {
+                @Override
+                public void onDismissListener() {
+                    //在销毁的时候将previousPopupView置空，防止previousPopupView销毁的时候因为PLVECPlaybackFragment
+                    //持有previousPopupView导致不能销毁成功从而导致内存泄漏
+                    previousPopupView = null;
+                }
+            });
         }
     }
     // </editor-fold>
@@ -244,6 +353,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
         //获取倍速
         float onGetSpeedAction();
+
+        /**
+         * 切换回放视频的vid并立即播放视频
+         *
+         * @param vid
+         */
+        void onChangePlaybackVidAndPlay(String vid);
     }
     // </editor-fold>
 }
