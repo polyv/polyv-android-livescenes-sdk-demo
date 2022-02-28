@@ -66,6 +66,16 @@
         app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub"
         />
 
+<!--    &lt;!&ndash; 防盗水印 &ndash;&gt;-->
+<!--    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView-->
+<!--        android:id="@+id/polyv_watermark_view"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/plvlc_video_viewstub"-->
+<!--        app:layout_constraintLeft_toLeftOf="@id/plvlc_video_viewstub"-->
+<!--        app:layout_constraintRight_toRightOf="@id/plvlc_video_viewstub"-->
+<!--        app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub" />-->
+
     <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout
         android:layout_width="match_parent"

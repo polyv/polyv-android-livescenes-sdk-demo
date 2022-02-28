@@ -1,11 +1,14 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.model.PLVMicphoneStatus;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
@@ -19,7 +22,9 @@ import com.plv.socket.event.chat.PLVOTeacherInfoEvent;
 import com.plv.socket.event.linkmic.PLVJoinLeaveSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.event.linkmic.PLVOpenMicrophoneEvent;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
 import com.plv.socket.event.linkmic.PLVTeacherSetPermissionEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.ppt.PLVFinishClassEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
@@ -32,6 +37,8 @@ import com.plv.socket.event.seminar.PLVLeaveDiscussEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVClassStatusBean;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import java.util.Map;
 
 import io.socket.client.Socket;
 
@@ -180,6 +187,10 @@ public class PLVMultiRoleEventProcessor {
                         acceptCancelHelp();
                         break;
                 }
+                // 更新摄像头放大位置
+                acceptUpdateLinkMicZoom(listenEvent, event, message);
+                // 移除放大区域的摄像头画面
+                acceptRemoveLinkMicZoom(listenEvent, event, message);
             }
         };
         PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener,
@@ -190,7 +201,8 @@ public class PLVMultiRoleEventProcessor {
                 PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT,
                 PLVEventConstant.Class.SE_SWITCH_MESSAGE,
                 PLVEventConstant.Seminar.SEMINAR_EVENT,
-                Socket.EVENT_MESSAGE);
+                Socket.EVENT_MESSAGE,
+                PLVEventConstant.LinkMic.EVENT_CHANGE_MIC_SITE);
     }
 
     private void acceptLoginEvent(PLVLoginEvent loginEvent) {
@@ -211,6 +223,11 @@ public class PLVMultiRoleEventProcessor {
             }
             if (sendJoinDiscussMsgFlag && groupId != null && groupId.equals(onSliceIDEvent.getGroupId())) {
                 groupLeaderId = onSliceIDEvent.getLeader();
+            }
+
+            final Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap = onSliceIDEvent.getData().getParsedMicSite();
+            if (onEventProcessorListener != null) {
+                onEventProcessorListener.onChangeLinkMicZoom(updateMicSiteEventMap);
             }
         }
     }
@@ -340,12 +357,22 @@ public class PLVMultiRoleEventProcessor {
             @Override
             public void onCall(Object... args) {
                 if (args != null && args.length != 0 && args[0] != null) {
-                    PLVDiscussAckResult simpleAckResult = PLVGsonUtil.fromJson(PLVDiscussAckResult.class, args[0].toString());
+                    final PLVDiscussAckResult simpleAckResult = PLVGsonUtil.fromJson(PLVDiscussAckResult.class, args[0].toString());
                     if (simpleAckResult != null && simpleAckResult.isSuccess()) {
                         PLVSwitchRoomEvent switchRoomEvent = PLVSwitchRoomEvent.fromDataBean(simpleAckResult.getData());
                         if (onEventProcessorListener != null) {
                             onEventProcessorListener.onLeaveDiscuss(switchRoomEvent);
                         }
+                    }
+
+                    final Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap = nullable(new PLVSugarUtil.Supplier<Map<String, PLVUpdateMicSiteEvent>>() {
+                        @Override
+                        public Map<String, PLVUpdateMicSiteEvent> get() {
+                            return simpleAckResult.getData().getRoomsStatus().getParsedMicSite();
+                        }
+                    });
+                    if (onEventProcessorListener != null) {
+                        onEventProcessorListener.onChangeLinkMicZoom(updateMicSiteEventMap);
                     }
                 }
             }
@@ -383,6 +410,25 @@ public class PLVMultiRoleEventProcessor {
             onEventProcessorListener.onLeaderCancelHelp();
         }
     }
+
+    private void acceptUpdateLinkMicZoom(String listenEvent, String event, String message) {
+        if (PLVUpdateMicSiteEvent.SOCKET_EVENT_TYPE.equals(listenEvent)
+                && PLVUpdateMicSiteEvent.EVENT_NAME.equals(event)
+                && onEventProcessorListener != null) {
+            PLVUpdateMicSiteEvent updateMicSiteEvent = PLVUpdateMicSiteEvent.fromJson(message);
+            onEventProcessorListener.onUpdateLinkMicZoom(updateMicSiteEvent);
+        }
+    }
+
+    private void acceptRemoveLinkMicZoom(String listenEvent, String event, String message) {
+        if (PLVRemoveMicSiteEvent.SOCKET_EVENT_TYPE.equals(listenEvent)
+                && PLVRemoveMicSiteEvent.EVENT_NAME.equals(event)
+                && onEventProcessorListener != null) {
+            PLVRemoveMicSiteEvent removeMicSiteEvent = PLVRemoveMicSiteEvent.fromJson(message);
+            onEventProcessorListener.onRemoveLinkMicZoom(removeMicSiteEvent);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听rtc事件">
@@ -544,6 +590,24 @@ public class PLVMultiRoleEventProcessor {
          * 组长取消帮助
          */
         void onLeaderCancelHelp();
+
+        /**
+         * 更新摄像头放大位置
+         */
+        void onUpdateLinkMicZoom(PLVUpdateMicSiteEvent updateMicSiteEvent);
+
+        /**
+         * 移除放大区域的摄像头画面
+         */
+        void onRemoveLinkMicZoom(PLVRemoveMicSiteEvent removeMicSiteEvent);
+
+        /**
+         * 更新所有摄像头放大画面位置
+         *
+         * @param updateMicSiteEventMap Key:连麦id，Value:事件
+         */
+        void onChangeLinkMicZoom(@Nullable Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap);
+
     }
     // </editor-fold>
 }

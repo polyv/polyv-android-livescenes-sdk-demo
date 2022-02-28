@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_0"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="0"
@@ -13,7 +13,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_1"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_1"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="1"
@@ -21,7 +21,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_2"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_2"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="2"
@@ -29,7 +29,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_3"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_3"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="3"
@@ -37,7 +37,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_4"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_4"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="4"
@@ -45,7 +45,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_5"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_5"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="5"
@@ -53,7 +53,7 @@
         app:layout_constraintRight_toLeftOf="@+id/plvhc_linkmic_item_6"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView
+    <com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer
         android:id="@+id/plvhc_linkmic_item_6"
         style="@style/plvhc_linkmic_little_item_style"
         android:tag="6"

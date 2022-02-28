@@ -9,8 +9,11 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * mvp-多角色连麦view层抽象类
@@ -142,6 +145,11 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
     }
 
     @Override
+    public void onRejoinRoomSuccess() {
+
+    }
+
+    @Override
     public void onNetworkQuality(int quality) {
 
     }
@@ -218,6 +226,21 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
 
     @Override
     public void onLeaderCancelHelp() {
+
+    }
+
+    @Override
+    public void onUpdateLinkMicZoom(PLVUpdateMicSiteEvent updateMicSiteEvent) {
+
+    }
+
+    @Override
+    public void onRemoveLinkMicZoom(PLVRemoveMicSiteEvent removeMicSiteEvent) {
+
+    }
+
+    @Override
+    public void onChangeLinkMicZoom(@Nullable Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap) {
 
     }
 }

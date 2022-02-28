@@ -139,6 +139,10 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     /**
      * 启动回放页面
+     * 如果没有输入vid的情况下会加载该频道的往期视频列表，如果输入vid的话就直接播放相应vid的视频，
+     * 这样的话就不会加载往期视频列表
+     * 若是想关闭不输入vid播放往期视频列表这个功能的话可以放开下面
+     * PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");的注释
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
@@ -168,9 +172,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         if (channelType == null) {
             return PLVLaunchResult.error("channelType 为空，启动云课堂回放页失败！");
         }
-        if (TextUtils.isEmpty(vid)) {
-            return PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");
-        }
+//        if (TextUtils.isEmpty(vid)) {
+//            return PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");
+//        }
         if (TextUtils.isEmpty(viewerId)) {
             return PLVLaunchResult.error("viewerId 为空，启动云课堂回放页失败！");
         }
@@ -284,7 +288,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         if (!isLive) { // 回放模式
             String vid = intent.getStringExtra(EXTRA_VID);
             int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PLVPlaybackListType.PLAYBACK);
-            PLVLiveChannelConfigFiller.setupVid(vid);
+            //注意vid为null的情况
+            if (vid != null) {
+                PLVLiveChannelConfigFiller.setupVid(vid);
+
+            }
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType);
         }
     }
@@ -309,10 +317,6 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private void initView() {
         // 播放器ViewStub
         ViewStub videoLyViewStub = findViewById(R.id.plvlc_video_viewstub);
-
-        // 页面菜单布局
-        livePageMenuLayout = findViewById(R.id.plvlc_live_page_menu_layout);
-        livePageMenuLayout.init(liveRoomDataManager);
 
         // 悬浮PPT布局
         floatingPPTLayout = findViewById(R.id.plvlc_ppt_floating_ppt_layout);
@@ -349,8 +353,15 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout = (IPLVLCMediaLayout) videoLyViewStub.inflate();
             mediaLayout.init(liveRoomDataManager);
             mediaLayout.setPPTView(floatingPPTLayout.getPPTView().getPlaybackPPTViewToBindInPlayer());
-            mediaLayout.startPlay();
+            String vid = liveRoomDataManager.getConfig().getVid();
+            if (!TextUtils.isEmpty(vid)) {
+                mediaLayout.startPlay();
+            }
         }
+
+        // 页面菜单布局
+        livePageMenuLayout = findViewById(R.id.plvlc_live_page_menu_layout);
+        livePageMenuLayout.init(liveRoomDataManager);
 
         // 初始化横屏聊天室布局
         PLVLCChatLandscapeLayout chatLandscapeLayout = mediaLayout.getChatLandscapeLayout();
@@ -583,6 +594,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     }
                     //将当前回放视频的进度保存到PPT中
                     floatingPPTLayout.getPPTView().setPlaybackCurrentPosition(plvPlayInfoVO.getPosition());
+
+                    //页面菜单更新当前进度，通知往期、章节页面更新
+                    if(livePageMenuLayout.getPreviousPresenter() != null){
+                        livePageMenuLayout.getPreviousPresenter().updatePlaybackCurrentPosition(plvPlayInfoVO);
+                    }
                 }
             });
         }
@@ -603,6 +619,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             @Override
             public void onSendDanmuAction(CharSequence message) {
                 mediaLayout.sendDanmaku(message);
+            }
+
+            @Override
+            public void onChangeVideoVidAction(String vid) {
+                mediaLayout.updatePlayBackVideVidAndPlay(vid);
+            }
+
+            @Override
+            public void onSeekToAction(int progress) {
+                mediaLayout.seekTo(progress * 1000, mediaLayout.getDuration());
             }
         });
         //当前页面 监听 聊天室数据中的观看热度变化

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.SurfaceView;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
@@ -20,6 +19,7 @@ import com.easefun.polyv.livehiclass.R;
 import com.easefun.polyv.livehiclass.modules.chatroom.IPLVHCChatroomLayout;
 import com.easefun.polyv.livehiclass.modules.document.IPLVHCDocumentLayout;
 import com.easefun.polyv.livehiclass.modules.linkmic.IPLVHCLinkMicLayout;
+import com.easefun.polyv.livehiclass.modules.linkmic.zoom.IPLVHCLinkMicZoomLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.IPLVHCDeviceDetectionLayout;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCExitConfirmDialog;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCGuideLayout;
@@ -31,6 +31,8 @@ import com.easefun.polyv.livehiclass.modules.toolbar.IPLVHCToolBarLayout;
 import com.easefun.polyv.livehiclass.modules.toolbar.enums.PLVHCMarkToolEnums;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.PLVHiClassGlobalConfig;
 import com.plv.livescenes.net.IPLVDataRequestListener;
@@ -68,6 +70,8 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
     private IPLVHCLinkMicLayout plvhcLinkmicLy;
     // 文档布局
     private IPLVHCDocumentLayout plvhcDocumentLy;
+    // 连麦摄像头放大布局
+    private IPLVHCLinkMicZoomLayout plvhcLinkMicZoomLayout;
     // 工具栏布局
     private IPLVHCToolBarLayout plvhcToolBarLy;
     // 高亮引导布局
@@ -179,6 +183,9 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
         if (plvhcDeviceDetectionLayout != null) {
             plvhcDeviceDetectionLayout.destroy();
         }
+        if (plvhcLinkMicZoomLayout != null) {
+            plvhcLinkMicZoomLayout.destroy();
+        }
         if (plvhcStudentCupGainLayout != null) {
             plvhcStudentCupGainLayout.destroy();
         }
@@ -200,6 +207,7 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
             plvhcStudentClassCountdownLayout = null;
         }
         PLVHiClassGlobalConfig.clear();
+        PLVUserAbilityManager.myAbility().clearRole();
     }
 
     @Override
@@ -253,6 +261,7 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
         plvhcStatusBarLy = findViewById(R.id.plvhc_status_bar_ly);
         plvhcLinkmicLy = findViewById(R.id.plvhc_linkmic_ly);
         plvhcDocumentLy = findViewById(R.id.plvhc_document_ly);
+        plvhcLinkMicZoomLayout = findViewById(R.id.plvhc_linkmic_zoom_container_layout);
         plvhcToolBarLy = findViewById(R.id.plvhc_tool_bar_ly);
         plvhcLiveRoomGuideLayout = findViewById(R.id.plvhc_live_room_guide_layout);
         plvhcStudentCupGainLayout = findViewById(R.id.plvhc_student_cup_gain_layout);
@@ -283,22 +292,25 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
     private void initParams() {
         // 获取输入数据
         Intent intent = getIntent();
-        String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
-        String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
-        String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
-        String avatar = intent.getStringExtra(EXTRA_AVATAR_URL);
-        String userType = intent.getStringExtra(EXTRA_USER_TYPE);
+        final String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
+        final String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
+        final String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
+        final String avatar = intent.getStringExtra(EXTRA_AVATAR_URL);
+        final String userType = intent.getStringExtra(EXTRA_USER_TYPE);
 
-        String token = intent.getStringExtra(EXTRA_TOKEN);
-        long lessonId = intent.getLongExtra(EXTRA_LESSON_ID, 0);
-        String courseCode = intent.getStringExtra(EXTRA_COURSE_CODE);
+        final String token = intent.getStringExtra(EXTRA_TOKEN);
+        final long lessonId = intent.getLongExtra(EXTRA_LESSON_ID, 0);
+        final String courseCode = intent.getStringExtra(EXTRA_COURSE_CODE);
+
+        final boolean isTeacherType = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatar, userType);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setHiClassConfig(token, lessonId, courseCode);
         // 配置互动学堂信息，页面销毁时需调用PLVHiClassGlobalConfig.clear方法清除
-        PLVHiClassGlobalConfig.setupConfig(token, userType, PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType), courseCode, lessonId, channelId);
+        PLVHiClassGlobalConfig.setupConfig(token, userType, isTeacherType, courseCode, lessonId, channelId);
+        PLVUserAbilityManager.myAbility().addRole(isTeacherType ? PLVUserRole.HI_CLASS_TEACHER : PLVUserRole.HI_CLASS_NORMAL_STUDENT);
     }
     // </editor-fold>
 
@@ -439,9 +451,9 @@ public class PLVHCLiveHiClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onSetupLinkMicRenderView(SurfaceView surfaceView, String linkMicId, int streamType) {
+            public void onSetupLinkMicRenderView(View renderView, String linkMicId, int streamType) {
                 if (plvhcLiveRoomGuideLayout != null && plvhcLiveRoomGuideLayout.getLinkMicView() == null) {
-                    plvhcLiveRoomGuideLayout.setLinkMicView(surfaceView);
+                    plvhcLiveRoomGuideLayout.setLinkMicView(renderView);
                     final int result = plvhcLiveRoomGuideLayout.showIfNeeded();
                     if (result == PLVHCGuideLayout.SHOW_SUCCESS) {
                         plvhcLiveRoomGuideLayout = null;

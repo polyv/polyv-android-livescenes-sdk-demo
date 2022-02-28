@@ -10,6 +10,7 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
+import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 
 /**
@@ -45,6 +46,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVHiClassDataBean> classDataBean = new MutableLiveData<>();
     //仅音频模式
     private MutableLiveData<Boolean> isOnlyAudio = new MutableLiveData<>();
+    //回放频道的详细信息
+    private MutableLiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> playbackChannelDetailVO = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
     //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
@@ -109,6 +112,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     }
 
     @Override
+    public LiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> getPlaybackChannelData() {
+        return playbackChannelDetailVO;
+    }
+
+    @Override
     public int getCommodityRank() {
         return liveRoomDataRequester.getCommodityRank();
     }
@@ -159,6 +167,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public boolean isNeedStreamRecover() {
         return liveChannelConfig.isLiveStreamingWhenLogin();
+    }
+
+    @Override
+    public void setConfigVid(String vid) {
+        liveChannelConfig.setupVid(vid);
     }
 
     // </editor-fold>
@@ -283,6 +296,22 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             public void onFailed(String msg, Throwable throwable) {
                 fulClassDataBean.postValue(PLVStatefulData.<PLVHiClassDataBean>error(msg, throwable));
                 classDataBean.postValue(null);
+            }
+        });
+    }
+
+    // 获取回放频道的状态信息
+    @Override
+    public void requestPlaybackChannelStatus() {
+        liveRoomDataRequester.requestPlaybackChannelDetail(new PLVLiveRoomDataRequester.IPLVNetRequestListener<PLVPlaybackChannelDetailVO>() {
+            @Override
+            public void onSuccess(PLVPlaybackChannelDetailVO detailVO) {
+                playbackChannelDetailVO.postValue(PLVStatefulData.success(detailVO));
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                playbackChannelDetailVO.postValue(PLVStatefulData.<PLVPlaybackChannelDetailVO>error(msg,throwable));
             }
         });
     }

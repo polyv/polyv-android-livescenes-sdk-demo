@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="plvec_playback_more_video_text_color">#FFFFD16B</color>
+    <color name="plvec_playback_indicator_select_coloc">#FFFFA611</color>
+    <color name="plvec_playback_item_title_color">#CCFFFFFF</color>
+</resources>

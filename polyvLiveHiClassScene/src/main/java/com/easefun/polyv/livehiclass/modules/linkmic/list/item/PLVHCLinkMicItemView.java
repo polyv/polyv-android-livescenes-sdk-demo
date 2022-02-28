@@ -1,4 +1,4 @@
-package com.easefun.polyv.livehiclass.modules.linkmic.item;
+package com.easefun.polyv.livehiclass.modules.linkmic.list.item;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -18,22 +18,23 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livehiclass.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-
-import static com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView.ViewParam.moveViewParam;
 
 /**
  * 连麦item
  */
-public class PLVHCLinkMicItemView extends FrameLayout {
+public class PLVHCLinkMicItemView extends FrameLayout implements IPLVHCLinkMicItem {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVHCLinkMicItemView";
     //viewParam
     private ViewParam viewParam;
-    private boolean isLargeLayout;
 
     //listener
-    private OnRenderViewCallback onRenderViewCallback;
+    private IPLVHCLinkMicItem.OnRenderViewCallback onRenderViewCallback;
+
+    private float lastDownRawX = -1;
+    private float lastDownRawY = -1;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -60,8 +61,8 @@ public class PLVHCLinkMicItemView extends FrameLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
-    public void init(final boolean isLargeLayout, OnRenderViewCallback callback) {
-        this.isLargeLayout = isLargeLayout;
+    @Override
+    public void init(final boolean isLargeLayout, IPLVHCLinkMicItem.OnRenderViewCallback callback) {
         onRenderViewCallback = callback;
 
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -90,6 +91,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         });
     }
 
+    @Override
     public void bindData(PLVLinkMicItemDataBean linkMicItemDataBean) {
         if (onRenderViewCallback == null ||
                 linkMicItemDataBean == null) {
@@ -128,47 +130,39 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         setHandsUp(isHandsUp);
     }
 
+    @Override
     public PLVLinkMicItemDataBean getLinkMicItemDataBean() {
         return viewParam == null ? null : viewParam.linkMicItemDataBean;
     }
 
+    @Nullable
+    @Override
     public String getLinkMicId() {
         return getLinkMicItemDataBean() == null ? null : getLinkMicItemDataBean().getLinkMicId();
     }
 
-    public void replaceItemView(PLVHCLinkMicItemView linkMicItemView) {
-        ViewParam viewParam = new ViewParam();
-        moveViewParam(viewParam, linkMicItemView.viewParam);
-        linkMicItemView.removeView(viewParam.plvhcLinkmicParentLy);
-        moveToItemView(linkMicItemView);
-        addItemView(viewParam);
-    }
-
-    public void moveToItemView(PLVHCLinkMicItemView linkMicItemView) {
-        removeView(viewParam.plvhcLinkmicParentLy);
-        linkMicItemView.addView(viewParam.plvhcLinkmicParentLy);
-        moveViewParam(linkMicItemView.viewParam, this.viewParam);
-    }
-
-    public void removeItemView(ViewParam vp) {
-        removeView(viewParam.plvhcLinkmicParentLy);
-        if (onRenderViewCallback != null) {
-            if (viewParam.renderView != null) {
-                onRenderViewCallback.releaseLinkMicRenderView(viewParam.renderView);
-                viewParam.renderView = null;
+    @Nullable
+    @Override
+    public PLVHCLinkMicItemContainer findContainerParent() {
+        View view = this;
+        while (!(view instanceof PLVHCLinkMicItemContainer)) {
+            if (!(view.getParent() instanceof View)) {
+                return null;
             }
+            view = (View) view.getParent();
         }
-        moveViewParam(vp, this.viewParam);
+        return (PLVHCLinkMicItemContainer) view;
     }
 
-    public void addItemView(ViewParam viewParam) {
-        if (viewParam.plvhcLinkmicParentLy.getParent() instanceof ViewGroup) {
-            ((ViewGroup) viewParam.plvhcLinkmicParentLy.getParent()).removeView(viewParam.plvhcLinkmicParentLy);
+    @Override
+    public void releaseRenderView() {
+        if (onRenderViewCallback != null && viewParam.renderView != null) {
+            onRenderViewCallback.releaseLinkMicRenderView(viewParam.renderView);
+            viewParam.renderView = null;
         }
-        addView(viewParam.plvhcLinkmicParentLy);
-        moveViewParam(this.viewParam, viewParam);
     }
 
+    @Override
     public void removeRenderView() {
         viewParam.plvhcLinkmicRenderViewContainer.setVisibility(View.INVISIBLE);
         //一并改变渲染器的可见性
@@ -180,14 +174,10 @@ public class PLVHCLinkMicItemView extends FrameLayout {
             viewParam.plvhcLinkmicRenderViewContainer.removeView(viewParam.renderView);
         }
 
-        if (onRenderViewCallback != null) {
-            if (viewParam.renderView != null) {
-                onRenderViewCallback.releaseLinkMicRenderView(viewParam.renderView);
-                viewParam.renderView = null;
-            }
-        }
+        releaseRenderView();
     }
 
+    @Override
     public void setupRenderView() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -206,6 +196,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         }
     }
 
+    @Override
     public void updateTeacherPreparingStatus(boolean isPreparing) {
         viewParam.plvhcLinkmicTeacherAvatarPlaceholderIv.setVisibility(isPreparing ? View.VISIBLE : View.GONE);
         viewParam.plvhcLinkmicTeacherPrepareTv.setVisibility(isPreparing ? View.VISIBLE : View.GONE);
@@ -219,6 +210,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         }
     }
 
+    @Override
     public void updateLeaderStatus(boolean isHasLeader) {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -230,6 +222,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         }
     }
 
+    @Override
     public void updateVideoStatus() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -238,6 +231,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         setVideoStatus(isMuteVideo);
     }
 
+    @Override
     public void updateAudioStatus() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -247,6 +241,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         setAudioStatus(isMuteAudio, curVolume);
     }
 
+    @Override
     public void updateHandsUp() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -255,6 +250,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         setHandsUp(isHandsUp);
     }
 
+    @Override
     public void updateHasPaint() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -263,6 +259,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         setHasPaint(isHasPaint);
     }
 
+    @Override
     public void updateCupNum() {
         if (viewParam.linkMicItemDataBean == null) {
             return;
@@ -270,18 +267,55 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         int cupNum = viewParam.linkMicItemDataBean.getCupNum();
         setCupNum(cupNum);
     }
+
+    @Override
+    public void updateZoom(PLVUpdateMicSiteEvent updateMicSiteEvent) {
+
+    }
+
+    @Override
+    public void switchWithItemView(IPLVHCLinkMicItem linkMicItemView) {
+
+    }
+
+    @Override
+    public void moveToItemView(IPLVHCLinkMicItem linkMicItemView) {
+
+    }
+
+    @Override
+    public View removeItemView() {
+        return null;
+    }
+
+    @Override
+    public void addItemView(View rootView) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API - 实现View方法">
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            lastDownRawX = event.getRawX();
+            lastDownRawY = event.getRawY();
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (Float.compare(lastDownRawX, event.getRawX()) == 0
+                    && Float.compare(lastDownRawY, event.getRawY()) == 0) {
+                performClick();
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (onRenderViewCallback != null) {
-            if (viewParam.renderView != null) {
-                onRenderViewCallback.releaseLinkMicRenderView(viewParam.renderView);
-                viewParam.renderView = null;
-            }
-        }
+//        releaseRenderView();
     }
     // </editor-fold>
 
@@ -370,35 +404,6 @@ public class PLVHCLinkMicItemView extends FrameLayout {
     private boolean intBetween(int value, int left, int right) {
         return value > left && value <= right;
     }
-    // </editor-fold> 
-
-    // <editor-fold defaultstate="collapsed" desc="内部类 - 监听器">
-    public interface OnRenderViewCallback {
-        /**
-         * 创建连麦列表渲染器。
-         * 该渲染器必须通过多场景连麦SDK创建，不能直接构造。
-         *
-         * @return 渲染器
-         */
-        SurfaceView createLinkMicRenderView();
-
-        /**
-         * 释放渲染器
-         *
-         * @param renderView 渲染器
-         */
-        void releaseLinkMicRenderView(SurfaceView renderView);
-
-        /**
-         * 安装SurfaceView。
-         * 将创建好的SurfaceView与连麦ID关联，并设置到SDK
-         *
-         * @param surfaceView 渲染器
-         * @param linkMicId   连麦ID
-         * @param streamType  流类型
-         */
-        void setupRenderView(SurfaceView surfaceView, String linkMicId, int streamType);
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - ViewParams">
@@ -415,7 +420,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
         private TextView plvhcLinkmicCupCountTv;
         private ImageView plvhcLinkmicHasPaintIv;
         private ImageView plvhcLinkmicHandsUpIv;
-        private SurfaceView renderView;
+        private View renderView;
 
         //data
         private PLVLinkMicItemDataBean linkMicItemDataBean;
@@ -437,6 +442,7 @@ public class PLVHCLinkMicItemView extends FrameLayout {
             plvhcLinkmicHandsUpIv = itemView.findViewById(R.id.plvhc_linkmic_hands_up_iv);
         }
 
+        @Deprecated
         public static void moveViewParam(ViewParam dest, ViewParam src) {
             dest.plvhcLinkmicParentLy = src.plvhcLinkmicParentLy;
             dest.linkMicItemDataBean = src.linkMicItemDataBean;

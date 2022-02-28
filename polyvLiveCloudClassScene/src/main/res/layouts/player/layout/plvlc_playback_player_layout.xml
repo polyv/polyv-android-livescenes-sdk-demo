@@ -44,6 +44,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- 防盗水印 -->
+    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
+        android:id="@+id/polyv_watermark_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintLeft_toLeftOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintRight_toRightOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintTop_toTopOf="@id/plvlc_playback_switch_anchor_player" />
+
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
         android:id="@+id/plvlc_chat_landscape_ly"

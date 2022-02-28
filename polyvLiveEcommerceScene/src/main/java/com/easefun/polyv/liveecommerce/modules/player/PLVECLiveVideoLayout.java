@@ -32,9 +32,12 @@ import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLive
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
+import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayout;
@@ -95,6 +98,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private PLVPlayerLogoView logoView;
     //marquee view
     private PLVMarqueeView marqueeView = null;
+    //watermark view
+    private PLVWatermarkView watermarkView;
     //主播放器父控件的父控件
     private ViewGroup videoViewParentParent;
     //主播放器父控件在父控件中的位置索引
@@ -161,6 +166,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         nostreamTv = findViewById(R.id.nostream_tv);
         logoView = findViewById(R.id.logo_view);
 
+        watermarkView = findViewById(R.id.plvec_watermark_view);
         marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
         initVideoView();
         initRtcVideoLayout();
@@ -479,6 +485,16 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         return null;
     }
 
+    @Override
+    public void changePlaybackVid(String vid) {
+        PLVCommonLog.d(TAG,"live video cannot change vid");
+    }
+
+    @Override
+    public void changePlaybackVidAndPlay(String vid) {
+        PLVCommonLog.d(TAG,"live video cannot change vid and play");
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view层实现">
@@ -517,6 +533,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public IPLVMarqueeView getMarqueeView() {
             return marqueeView;
+        }
+
+        @Override
+        public IPLVWatermarkView getWatermarkView() {
+            return watermarkView;
         }
 
         @Override
@@ -624,6 +645,21 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                     PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
                 }
             }
+            //水印与视频大小匹配
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (videoView.getIjkVideoView().getRenderView() != null) {
+                        ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
+                        layoutParams.height = videoView.getIjkVideoView().getRenderView().getView().getHeight();
+                        watermarkView.setLayoutParams(layoutParams);
+                    } else {
+                        ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
+                        layoutParams.height = PLVUIUtil.dip2px(getContext(),206);
+                        watermarkView.setLayoutParams(layoutParams);
+                    }
+                }
+            });
         }
 
         @Override

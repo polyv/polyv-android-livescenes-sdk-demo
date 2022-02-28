@@ -236,6 +236,18 @@ public interface IPLVECVideoLayout {
      */
     LiveData<PLVPlayInfoVO> getPlaybackPlayInfoVO();
 
+    /**
+     * 改变回放视频的vid
+     * @param vid
+     */
+    void changePlaybackVid(String vid);
+
+    /**
+     * 改变回放视频vid并且立即播放
+     * @param vid
+     */
+    void changePlaybackVidAndPlay(String vid);
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">

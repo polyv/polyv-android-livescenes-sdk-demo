@@ -269,7 +269,6 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         initLinkMicControlBar(linkMicControlBar);
-
         observeOnAudioState(liveRoomDataManager);
     }
 
@@ -1109,5 +1108,4 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         });
     }
     // </editor-fold >
-
 }

@@ -245,4 +245,51 @@
         <attr name="plvBackgroundColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="PLVDragScaleLayout">
+        <attr name="plvMinX" format="dimension" />
+        <attr name="plvMaxX" format="dimension" />
+        <attr name="plvMinY" format="dimension" />
+        <attr name="plvMaxY" format="dimension" />
+        <attr name="plvDrag" format="flags">
+            <flag name="cornerRightTop" value="0x01" />
+            <flag name="cornerLeftTop" value="0x02" />
+            <flag name="cornerLeftBottom" value="0x04" />
+            <flag name="cornerRightBottom" value="0x08" />
+            <flag name="cornerLeft" value="0x06" />
+            <flag name="cornerRight" value="0x09" />
+            <flag name="cornerTop" value="0x03" />
+            <flag name="cornerBottom" value="0x0c" />
+            <flag name="cornerAll" value="0x0f" />
+
+            <flag name="edgeRight" value="0x10" />
+            <flag name="edgeTop" value="0x20" />
+            <flag name="edgeLeft" value="0x40" />
+            <flag name="edgeBottom" value="0x80" />
+            <flag name="edgeAll" value="0xf0" />
+
+            <flag name="multiTouch" value="0x0100" />
+
+            <flag name="center" value="0x1000" />
+        </attr>
+        <attr name="plvScale" format="flags">
+            <flag name="cornerRightTop" value="0x01" />
+            <flag name="cornerLeftTop" value="0x02" />
+            <flag name="cornerLeftBottom" value="0x04" />
+            <flag name="cornerRightBottom" value="0x08" />
+            <flag name="cornerLeft" value="0x06" />
+            <flag name="cornerRight" value="0x09" />
+            <flag name="cornerTop" value="0x03" />
+            <flag name="cornerBottom" value="0x0c" />
+            <flag name="cornerAll" value="0x0f" />
+
+            <flag name="edgeRight" value="0x10" />
+            <flag name="edgeTop" value="0x20" />
+            <flag name="edgeLeft" value="0x40" />
+            <flag name="edgeBottom" value="0x80" />
+            <flag name="edgeAll" value="0xf0" />
+
+            <flag name="multiTouch" value="0x0100" />
+        </attr>
+    </declare-styleable>
+
 </resources>

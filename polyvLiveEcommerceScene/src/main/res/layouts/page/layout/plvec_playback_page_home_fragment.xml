@@ -22,8 +22,8 @@
         android:layout_height="24dp"
         android:layout_below="@+id/watch_info_ly"
         android:layout_marginLeft="@dimen/plvec_margin_common"
-        android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_marginTop="@dimen/plvec_margin_common"
+        android:layout_marginRight="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
     <!--播放控制按钮-->
@@ -31,10 +31,9 @@
         android:id="@+id/play_control_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
         android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
         android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:layout_marginBottom="63dp"
         android:src="@drawable/plvec_play_control_sel" />
 
     <!--播放时间-->
@@ -42,9 +41,8 @@
         android:id="@+id/play_time_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:layout_toRightOf="@+id/play_control_iv"
         android:gravity="center"
@@ -56,10 +54,10 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
         android:layout_toLeftOf="@+id/total_time_tv"
-        android:layout_toRightOf="@+id/play_time_tv"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignTop="@+id/more_iv">
+        android:layout_toRightOf="@+id/play_time_tv">
 
         <SeekBar
             android:id="@+id/play_progress_sb"
@@ -82,13 +80,13 @@
         android:id="@+id/total_time_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
-        android:layout_toLeftOf="@+id/more_iv"
+        android:layout_marginLeft="14dp"
         android:gravity="center"
-        android:text="00:00"
+        android:text="00:00:00"
         android:textColor="#ffffff"
         android:textSize="12sp" />
 
@@ -97,8 +95,21 @@
         android:id="@+id/more_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
+        android:layout_marginBottom="15dp"
         android:src="@drawable/plvec_more" />
+
+    <!--回放列表-->
+    <ImageView
+        android:id="@+id/more_video_list_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="15dp"
+        android:src="@drawable/plvec_playback_list"/>
+
 </RelativeLayout>

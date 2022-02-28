@@ -3,7 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.SurfaceView;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.data.PLVMultiRoleLinkMicData;
@@ -13,8 +13,11 @@ import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.net.IPLVDataRequestListener;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
+import java.util.Map;
 
 import io.socket.client.Ack;
 
@@ -210,6 +213,11 @@ public interface IPLVMultiRoleLinkMicContract {
         void onRepeatLogin(String desc);
 
         /**
+         * 重连rtc频道成功
+         */
+        void onRejoinRoomSuccess();
+
+        /**
          * 连麦网络变化
          *
          * @param quality 网络状态常量
@@ -319,6 +327,24 @@ public interface IPLVMultiRoleLinkMicContract {
          * 组长取消帮助
          */
         void onLeaderCancelHelp();
+
+        /**
+         * 更新摄像头放大位置
+         */
+        void onUpdateLinkMicZoom(PLVUpdateMicSiteEvent updateMicSiteEvent);
+
+        /**
+         * 移除放大区域的摄像头画面
+         */
+        void onRemoveLinkMicZoom(PLVRemoveMicSiteEvent removeMicSiteEvent);
+
+        /**
+         * 更新所有摄像头放大画面位置
+         *
+         * @param updateMicSiteEventMap Key:连麦id，Value:事件
+         */
+        void onChangeLinkMicZoom(@Nullable Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap);
+
     }
     // </editor-fold>
 
@@ -398,6 +424,13 @@ public interface IPLVMultiRoleLinkMicContract {
         void switchCamera(boolean front);
 
         /**
+         * 设置推流画面类型
+         *
+         * @param type 类型
+         */
+        void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
+
+        /**
          * 获取成员列表数据
          */
         void requestMemberList();
@@ -408,14 +441,14 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param context 上下文
          * @return 渲染器
          */
-        SurfaceView createRenderView(Context context);
+        View createRenderView(Context context);
 
         /**
          * 释放渲染器
          *
          * @param renderView 渲染器
          */
-        void releaseRenderView(SurfaceView renderView);
+        void releaseRenderView(View renderView);
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -423,7 +456,7 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param renderView 渲染器
          * @param linkMicId  连麦ID
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -432,7 +465,7 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param linkMicId  连麦ID
          * @param streamType 流类型
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId, @PLVLinkMicConstant.RenderStreamTypeAnnotation int streamType);
+        void setupRenderView(View renderView, String linkMicId, @PLVLinkMicConstant.RenderStreamTypeAnnotation int streamType);
 
         /**
          * 发送奖杯给学员

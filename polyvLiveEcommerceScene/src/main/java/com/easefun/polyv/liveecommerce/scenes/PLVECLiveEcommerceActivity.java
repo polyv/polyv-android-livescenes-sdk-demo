@@ -149,6 +149,11 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     /**
      * 启动直播带货回放页
      *
+     * 如果没有输入vid的情况下会加载该频道的往期视频列表，如果输入vid的话就直接播放相应vid的视频，
+     * 这样的话就不会加载往期视频列表
+     * 若是想关闭不输入vid播放往期视频列表这个功能的话可以放开下面
+     * PLVLaunchResult.error("vid 为空，启动直播带货回放页失败")的注释
+     *
      * @param activity      上下文Activity
      * @param channelId     频道号
      * @param vid           视频ID
@@ -166,9 +171,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if (TextUtils.isEmpty(channelId)) {
             return PLVLaunchResult.error("channelId 为空，启动直播带货回放页失败");
         }
-        if (TextUtils.isEmpty(vid)) {
-            return PLVLaunchResult.error("vid 为空，启动直播带货回放页失败");
-        }
+//        if (TextUtils.isEmpty(vid)) {
+//            return PLVLaunchResult.error("vid 为空，启动直播带货回放页失败");
+//        }
         if (TextUtils.isEmpty(viewerId)) {
             return PLVLaunchResult.error("viewerId 为空，启动直播带货回放页失败");
         }
@@ -250,9 +255,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
         // 根据不同模式，设置对应参数
         if (!isLive) { // 回放模式
-            String vid = intent.getStringExtra(EXTRA_VID);
             int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PolyvPlaybackListType.PLAYBACK);
-            PLVLiveChannelConfigFiller.setupVid(vid);
+            PLVLiveChannelConfigFiller.setupVid(intent.getStringExtra(EXTRA_VID));
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType);
         }
     }
@@ -337,7 +341,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         });
         //当前activity 可以手势操作暂停和播放
         initGesture();
-        videoLayout.startPlay();
+        //判断是否有输入vid进入
+        String vid = liveRoomDataManager.getConfig().getVid();
+        if (!liveRoomDataManager.getConfig().isLive()) {
+            if (!TextUtils.isEmpty(vid)) {
+                videoLayout.startPlay();
+            }
+        } else {
+            videoLayout.startPlay();
+        }
     }
 
     //设置布局可单次点击或者多次点击
@@ -667,6 +679,11 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public float onGetSpeedAction() {
             return videoLayout.getSpeed();
+        }
+
+        @Override
+        public void onChangePlaybackVidAndPlay(String vid) {
+            videoLayout.changePlaybackVidAndPlay(vid);
         }
 
         @Override

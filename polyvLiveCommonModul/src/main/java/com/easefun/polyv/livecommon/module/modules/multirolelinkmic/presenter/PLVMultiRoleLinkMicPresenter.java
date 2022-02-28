@@ -1,5 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter;
 
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ED;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ING;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_UN;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATED;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATING;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_UNINITIATED;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -11,7 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
-import android.view.SurfaceView;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -23,10 +31,13 @@ import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.da
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.IPLVHiClassManager;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
@@ -35,6 +46,7 @@ import com.plv.livescenes.hiclass.PLVHiClassManagerFactory;
 import com.plv.livescenes.hiclass.api.PLVHCApiManager;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.linkmic.listener.PLVLinkMicEventListener;
 import com.plv.livescenes.linkmic.listener.PLVLinkMicListener;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicManagerFactory;
@@ -43,6 +55,8 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.livescenes.streamer.linkmic.PLVLinkMicEventSender;
 import com.plv.socket.event.linkmic.PLVJoinResponseAckResult;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.user.PLVClassStatusBean;
@@ -52,17 +66,11 @@ import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.socket.client.Ack;
-
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ED;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ING;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_UN;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATED;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATING;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_UNINITIATED;
 
 /**
  * mvp-多角色连麦presenter层实现，实现 IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicPresenter 接口
@@ -112,6 +120,8 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     private boolean isTeacherType;
     //是否前置摄像头预览镜像
     private boolean isFrontPreviewMirror = false;
+    //当前连麦清晰度
+    private int currentBitrate = PLVLinkMicConstant.Bitrate.BITRATE_STANDARD;
     //分组讨论的分组Id
     private String groupId;
     //分组Id对应的组名
@@ -352,22 +362,30 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     }
 
     @Override
+    public void setPushPictureResolutionType(int type) {
+        if (linkMicManager == null) {
+            return;
+        }
+        linkMicManager.setPushPictureResolutionType(type);
+    }
+
+    @Override
     public void requestMemberList() {
         memberList.requestData();
     }
 
     @Override
-    public SurfaceView createRenderView(Context context) {
-        return linkMicManager.createRendererView(context);
+    public View createRenderView(Context context) {
+        return linkMicManager.createTextureRenderView(context);
     }
 
     @Override
-    public void releaseRenderView(SurfaceView renderView) {
+    public void releaseRenderView(View renderView) {
         linkMicManager.releaseRenderView(renderView);
     }
 
     @Override
-    public void setupRenderView(SurfaceView renderView, String linkMicId) {
+    public void setupRenderView(View renderView, String linkMicId) {
         if (isMyLinkMicId(linkMicId)) {
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
@@ -376,7 +394,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     }
 
     @Override
-    public void setupRenderView(SurfaceView renderView, String linkMicId, int streamType) {
+    public void setupRenderView(View renderView, String linkMicId, int streamType) {
         if (isMyLinkMicId(linkMicId)) {
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
@@ -808,6 +826,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         memberList.observeRTCEvent(linkMicManager);
         linkMicList.observeRTCEvent(linkMicManager);
         eventProcessor.observeRTCEvent(linkMicManager);
+        registerOnRejoinRoomListener();
     }
 
     private boolean checkSelMediaPermission() {
@@ -833,6 +852,29 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                 view.onTeacherControlMyLinkMic(true);
             }
         });
+    }
+
+    private void onMyMicSiteChanged(boolean zoomIn) {
+        final Integer serverRtcMaxResolution = nullable(new PLVSugarUtil.Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return liveRoomDataManager.getHiClassDataBean().getValue().getRtcMaxResolution();
+            }
+        });
+        if (serverRtcMaxResolution == null || serverRtcMaxResolution == 0) {
+            return;
+        }
+
+        int targetBitrate;
+        if (zoomIn) {
+            targetBitrate = PLVLinkMicConstant.Bitrate.mapFromServerResolution(serverRtcMaxResolution);
+        } else {
+            targetBitrate = PLVLinkMicConstant.Bitrate.BITRATE_STANDARD;
+        }
+        if (targetBitrate != currentBitrate) {
+            linkMicManager.setBitrate(targetBitrate);
+            currentBitrate = targetBitrate;
+        }
     }
     // </editor-fold>
 
@@ -1029,6 +1071,63 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                 }
             });
         }
+
+        @Override
+        public void onUpdateLinkMicZoom(final PLVUpdateMicSiteEvent updateMicSiteEvent) {
+            if (myLinkMicId != null && myLinkMicId.equals(updateMicSiteEvent.getLinkMicIdFromEventId())) {
+                onMyMicSiteChanged(true);
+            }
+            if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.HI_CLASS_ZOOM_NEED_REACT_UPDATE_EVENT)) {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        view.onUpdateLinkMicZoom(updateMicSiteEvent);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onRemoveLinkMicZoom(final PLVRemoveMicSiteEvent removeMicSiteEvent) {
+            if (myLinkMicId != null && myLinkMicId.equals(removeMicSiteEvent.getLinkMicIdFromEventId())) {
+                onMyMicSiteChanged(false);
+            }
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onRemoveLinkMicZoom(removeMicSiteEvent);
+                }
+            });
+        }
+
+        @Override
+        public void onChangeLinkMicZoom(@Nullable final Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap) {
+            final boolean isMyselfZoomIn = myLinkMicId != null && updateMicSiteEventMap != null && updateMicSiteEventMap.containsKey(myLinkMicId);
+            onMyMicSiteChanged(isMyselfZoomIn);
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onChangeLinkMicZoom(updateMicSiteEventMap);
+                }
+            });
+        }
+    }
+
+    private void registerOnRejoinRoomListener() {
+        if (linkMicManager == null) {
+            return;
+        }
+        linkMicManager.addEventHandler(new PLVLinkMicEventListener() {
+            @Override
+            public void onRejoinChannelSuccess(String channel, String uid) {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        view.onRejoinRoomSuccess();
+                    }
+                });
+            }
+        });
     }
     // </editor-fold>
 

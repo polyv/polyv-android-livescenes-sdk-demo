@@ -1,6 +1,9 @@
-package com.easefun.polyv.livehiclass.modules.linkmic.item;
+package com.easefun.polyv.livehiclass.modules.linkmic.list;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.item.IPLVHCLinkMicItem;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
 
@@ -78,6 +81,11 @@ public interface IPLVHCLinkMicItemLayout {
     void updateListData(List<PLVLinkMicItemDataBean> dataBeanList);
 
     /**
+     * 通知rtc频道重连
+     */
+    void notifyRejoinRoom();
+
+    /**
      * 更新关闭视频
      */
     void updateUserMuteVideo(int position);
@@ -115,11 +123,21 @@ public interface IPLVHCLinkMicItemLayout {
     void onUserHasLeader(String leaderId);
 
     /**
+     * 用户摄像头放大位置更新
+     */
+    void onUserUpdateZoom(PLVUpdateMicSiteEvent updateMicSiteEvent);
+
+    /**
+     * 用户画面从摄像头放大区域移出
+     */
+    void onUserRemoveZoom(PLVRemoveMicSiteEvent removeMicSiteEvent);
+
+    /**
      * 设置renderView监听回调
      *
      * @param onRenderViewCallback 监听回调
      */
-    void setOnRenderViewCallback(PLVHCLinkMicItemView.OnRenderViewCallback onRenderViewCallback);
+    void setOnRenderViewCallback(IPLVHCLinkMicItem.OnRenderViewCallback onRenderViewCallback);
 
     /**
      * 设置view交互事件监听器
@@ -129,15 +147,20 @@ public interface IPLVHCLinkMicItemLayout {
     void setOnViewActionListener(OnViewActionListener onViewActionListener);
 
     /**
+     * 销毁方法
+     */
+    void destroy();
+
+    /**
      * view交互事件监听器
      */
     interface OnViewActionListener {
         /**
          * 点击item
          *
-         * @param position            索引
-         * @param linkMicItemDataBean 连麦数据
+         * @param position    索引
+         * @param linkMicItem item
          */
-        void onClickItemView(int position, PLVLinkMicItemDataBean linkMicItemDataBean);
+        void onClickItemView(int position, IPLVHCLinkMicItem linkMicItem);
     }
 }

@@ -1,34 +1,34 @@
-package com.easefun.polyv.livehiclass.modules.linkmic.item;
+package com.easefun.polyv.livehiclass.modules.linkmic.list;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 
 import com.easefun.polyv.livehiclass.R;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.item.IPLVHCLinkMicItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1v6的连麦item布局
+ * 1v16的连麦item布局
  */
-public class PLVHCLinkMicItemLittleLayout extends PLVHCAbsLinkMicItemLayout {
+public class PLVHCLinkMicItemLargeLayout extends PLVHCAbsLinkMicItemLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private static final int MAX_ITEM_COUNT = 7;
+    private static final int MAX_ITEM_COUNT = 17;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVHCLinkMicItemLittleLayout(Context context) {
+    public PLVHCLinkMicItemLargeLayout(Context context) {
         this(context, null);
     }
 
-    public PLVHCLinkMicItemLittleLayout(Context context, AttributeSet attrs) {
+    public PLVHCLinkMicItemLargeLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public PLVHCLinkMicItemLittleLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PLVHCLinkMicItemLargeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
     }
@@ -36,39 +36,40 @@ public class PLVHCLinkMicItemLittleLayout extends PLVHCAbsLinkMicItemLayout {
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
-        LayoutInflater.from(getContext()).inflate(R.layout.plvhc_linkmic_little_layout, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.plvhc_linkmic_large_layout, this, true);
 
-        List<PLVHCLinkMicItemView> itemViewList = new ArrayList<>();
+        List<IPLVHCLinkMicItem> itemViewList = new ArrayList<>();
         for (int i = 0; i < MAX_ITEM_COUNT; i++) {
             int id = getContext().getResources().getIdentifier("plvhc_linkmic_item_" + i, "id", getContext().getPackageName());
-            final PLVHCLinkMicItemView linkMicItemView = findViewById(id);
+            final IPLVHCLinkMicItem linkMicItemView = findViewById(id);
             linkMicItemView.setVisibility(getHideItemMode());
-            final int finalI = i;
             linkMicItemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final IPLVHCLinkMicItem linkMicItem = (IPLVHCLinkMicItem) v;
+                    final int position = getDataBeanList().indexOf(linkMicItem.getLinkMicItemDataBean());
                     if (onViewActionListener != null) {
-                        onViewActionListener.onClickItemView(finalI, linkMicItemView.getLinkMicItemDataBean());
+                        onViewActionListener.onClickItemView(position, linkMicItem);
                     }
                 }
             });
-            linkMicItemView.init(false, new PLVHCLinkMicItemView.OnRenderViewCallback() {
+            linkMicItemView.init(true, new IPLVHCLinkMicItem.OnRenderViewCallback() {
                 @Override
-                public SurfaceView createLinkMicRenderView() {
+                public View createLinkMicRenderView() {
                     return onRenderViewCallback != null ? onRenderViewCallback.createLinkMicRenderView() : null;
                 }
 
                 @Override
-                public void releaseLinkMicRenderView(SurfaceView renderView) {
+                public void releaseLinkMicRenderView(View renderView) {
                     if (onRenderViewCallback != null) {
                         onRenderViewCallback.releaseLinkMicRenderView(renderView);
                     }
                 }
 
                 @Override
-                public void setupRenderView(SurfaceView surfaceView, String linkMicId, int streamType) {
+                public void setupRenderView(View renderView, String linkMicId, int streamType) {
                     if (onRenderViewCallback != null) {
-                        onRenderViewCallback.setupRenderView(surfaceView, linkMicId, streamType);
+                        onRenderViewCallback.setupRenderView(renderView, linkMicId, streamType);
                     }
                 }
             });
@@ -86,7 +87,7 @@ public class PLVHCLinkMicItemLittleLayout extends PLVHCAbsLinkMicItemLayout {
 
     @Override
     public int getHideItemMode() {
-        return View.GONE;
+        return View.INVISIBLE;
     }
     // </editor-fold>
 }

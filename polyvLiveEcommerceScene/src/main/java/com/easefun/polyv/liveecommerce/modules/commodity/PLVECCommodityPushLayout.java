@@ -58,7 +58,7 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
         commodityNameTv = findViewById(R.id.commodity_name_tv);
         commodityRealPriceTv = findViewById(R.id.commodity_real_price_tv);
         commoditySrcPriceTv = findViewById(R.id.commodity_src_price_tv);
-        closeIv = findViewById(R.id.close_iv);
+        closeIv = findViewById(R.id.plvec_playback_more_dialog_close_iv);
         enterIv = findViewById(R.id.enter_iv);
 
         closeIv.setOnClickListener(this);
@@ -119,7 +119,7 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.close_iv) {
+        if (id == R.id.plvec_playback_more_dialog_close_iv) {
             setVisibility(View.GONE);
         } else if (id == R.id.enter_iv) {
             if (viewActionListener != null) {

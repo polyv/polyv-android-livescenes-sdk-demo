@@ -340,7 +340,7 @@ public class PLVECMorePopupView {
                 hideAll();
             }
         });
-        View closeBt = root.findViewById(R.id.close_iv);
+        View closeBt = root.findViewById(R.id.plvec_playback_more_dialog_close_iv);
         if (closeBt != null) {
             closeBt.setOnClickListener(new View.OnClickListener() {
                 @Override

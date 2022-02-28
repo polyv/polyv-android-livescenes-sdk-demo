@@ -45,6 +45,8 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLV
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
@@ -118,6 +120,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //跑马灯
     private PLVMarqueeView marqueeView = null;
 
+    //水印
+    private PLVWatermarkView watermarkView = null;
+
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
     //listener
@@ -161,6 +166,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
         llAuxiliaryCountDown.setVisibility(GONE);
+        watermarkView = findViewById(R.id.polyv_watermark_view);
 
         initVideoView();
         initDanmuView();
@@ -529,6 +535,17 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void addOnPlayInfoVOListener(IPLVOnDataChangedListener<PLVPlayInfoVO> listener) {
         playbackPlayerPresenter.getData().getPlayInfoVO().observe((LifecycleOwner) getContext(), listener);
     }
+
+    @Override
+    public void updatePlayBackVideVid(String vid) {
+        playbackPlayerPresenter.setPlayerVid(vid);
+    }
+
+    @Override
+    public void updatePlayBackVideVidAndPlay(String vid) {
+        playbackPlayerPresenter.setPlayerVidAndPlay(vid);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view实现">
@@ -567,6 +584,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public IPLVMarqueeView getMarqueeView(){
             return marqueeView;
+        }
+
+        @Override
+        public IPLVWatermarkView getWatermarkView() {
+            return watermarkView;
         }
 
         @Override
