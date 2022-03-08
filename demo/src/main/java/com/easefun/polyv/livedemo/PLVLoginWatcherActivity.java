@@ -144,7 +144,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         etLiveUserId = findViewById(R.id.plv_login_live_user_id);
         etLiveChannelId = findViewById(R.id.plv_login_live_channel_id);
         etLiveAppId = findViewById(R.id.plv_login_live_app_id);
-        etLiveAppSecert = findViewById(R.id.plv_login_live_app_secert);
+        etLiveAppSecert = findViewById(R.id.plv_login_live_app_secret);
         llLiveLayout = findViewById(R.id.plv_login_live_layout);
         etPlaybackChannelId = findViewById(R.id.plv_login_playback_channel_id);
         etPlaybackUserId = findViewById(R.id.plv_login_playback_user_id);
