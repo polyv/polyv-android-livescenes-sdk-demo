@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -16,9 +18,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout;

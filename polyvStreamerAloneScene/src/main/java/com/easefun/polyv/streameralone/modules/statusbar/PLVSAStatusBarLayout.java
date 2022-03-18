@@ -1,7 +1,12 @@
 package com.easefun.polyv.streameralone.modules.statusbar;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -347,7 +346,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
+        public void onLocalUserMicVolumeChanged(int volume) {
             updateVolumeChanged();
         }
 

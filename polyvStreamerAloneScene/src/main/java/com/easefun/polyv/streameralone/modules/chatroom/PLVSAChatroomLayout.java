@@ -1,11 +1,18 @@
 package com.easefun.polyv.streameralone.modules.chatroom;
 
 import android.app.Activity;
+import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -14,14 +21,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
@@ -599,7 +598,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(PLVAppUtils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_kicked_streamer)
                         .build()
                         .show();

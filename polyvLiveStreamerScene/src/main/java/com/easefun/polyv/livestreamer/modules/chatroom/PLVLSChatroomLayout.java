@@ -20,7 +20,6 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
@@ -564,7 +563,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(PLVAppUtils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_kicked_streamer)
                         .build()
                         .show();
@@ -673,7 +672,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         if(!plvlsChatroomToolbarOpenInputWindowTv.isFocusable()){
             PLVToast.Builder.context(getContext())
                     .setText(getResources().getString(R.string.plv_chat_connect_fail_and_cannot_input))
-                    .duration(Toast.LENGTH_LONG)
+                    .longDuration()
                     .build()
                     .show();
             return;

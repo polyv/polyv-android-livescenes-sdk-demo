@@ -1,11 +1,10 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
 import android.content.Context;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
-
-import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -1088,7 +1087,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherCloseLinkMic");
             handleTeacherCloseLinkMic();
             if (rtcInvokeStrategy != null) {
-                rtcInvokeStrategy.setLeaveLinkMic();
+                //只有在连麦中才能在断开连麦时发送joinLeave消息
+                if(isJoinLinkMic()){
+                    rtcInvokeStrategy.setLeaveLinkMic();
+                }
             }
         }
 

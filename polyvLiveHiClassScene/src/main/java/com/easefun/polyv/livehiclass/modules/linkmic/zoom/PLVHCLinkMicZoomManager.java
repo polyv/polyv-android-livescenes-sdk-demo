@@ -1,7 +1,5 @@
 package com.easefun.polyv.livehiclass.modules.linkmic.zoom;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
-
 import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -15,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * 连麦摄像头画面放大管理器

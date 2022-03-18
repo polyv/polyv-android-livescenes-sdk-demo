@@ -1,10 +1,9 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract;
 
 import android.content.Context;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.data.PLVMultiRoleLinkMicData;

@@ -134,12 +134,12 @@
                     android:hint="@string/plv_login_appId" />
 
                 <EditText
-                    android:id="@+id/plv_login_live_app_secert"
+                    android:id="@+id/plv_login_live_app_secret"
                     style="@style/plv_login_edit_text_style"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dm_42"
                     android:layout_margin="@dimen/dm_10"
-                    android:hint="@string/plv_login_appSecert" />
+                    android:hint="@string/plv_login_appSecret" />
 
 
             </LinearLayout>

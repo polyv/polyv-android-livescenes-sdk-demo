@@ -25,7 +25,6 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
-import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -96,32 +95,30 @@ public class PLVDocumentRepository {
     }
 
     private void initMsgListener() {
-        //嘉宾要监听讲师端发送过来的ppt的socket消息。后续讲师也要监听其他被授权的嘉宾或者观众操作ppt的socket消息
-        if (liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)){
-            onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
-                @Override
-                public void onMessage(String listenEvent, String event, String message) {
-                    if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event) ||
-                            PLVEventConstant.Ppt.ON_SLICE_DRAW_EVENT.equals(event) ||
-                            PLVEventConstant.Ppt.ON_SLICE_CONTROL_EVENT.equals(event) ||
-                            PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
-                            PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
-                        PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
-                        PLVDocumentWebProcessor webProcessor = documentWebProcessorWeakReference.get();
-                        if (webProcessor != null) {
-                            webProcessor.getWebview().callMessage(PLVLivePPTProcessor.UPDATE_PPT, message);
-                        }
-                    }
-
-                    //如果开播端异常退出，需要恢复直播的话，更新退出前的数据
-                    if(PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event) &&
-                            liveRoomDataManager.isNeedStreamRecover()){
-                        updatePPTStatusByOnSliceID(message);
+        //接收PPT等信息更新状态
+        onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
+            @Override
+            public void onMessage(String listenEvent, String event, String message) {
+                if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_DRAW_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_CONTROL_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
+                        PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
+                    PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
+                    PLVDocumentWebProcessor webProcessor = documentWebProcessorWeakReference.get();
+                    if (webProcessor != null) {
+                        webProcessor.getWebview().callMessage(PLVLivePPTProcessor.UPDATE_PPT, message);
                     }
                 }
-            };
-            PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
-        }
+
+                //如果开播端异常退出，需要恢复直播的话，更新退出前的数据
+                if(PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event) &&
+                        liveRoomDataManager.isNeedStreamRecover()){
+                    updatePPTStatusByOnSliceID(message);
+                }
+            }
+        };
+        PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
     }
 
     /**

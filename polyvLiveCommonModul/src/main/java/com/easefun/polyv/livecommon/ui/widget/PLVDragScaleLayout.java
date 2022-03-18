@@ -3,15 +3,14 @@ package com.easefun.polyv.livecommon.ui.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.Px;
 
 import com.easefun.polyv.livecommon.R;
 import com.plv.foundationsdk.log.PLVCommonLog;

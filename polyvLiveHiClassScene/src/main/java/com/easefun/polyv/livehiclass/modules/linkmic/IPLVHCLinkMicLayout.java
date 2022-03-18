@@ -1,8 +1,7 @@
 package com.easefun.polyv.livehiclass.modules.linkmic;
 
-import android.view.View;
-
 import androidx.annotation.Nullable;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;

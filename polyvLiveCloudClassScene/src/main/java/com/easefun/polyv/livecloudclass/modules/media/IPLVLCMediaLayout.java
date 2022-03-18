@@ -1,8 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
+import android.util.Pair;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;

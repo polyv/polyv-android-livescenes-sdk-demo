@@ -1,13 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.previous.adapter;
 
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 
 /**
  * 往期视频列表具体实现的Adapter

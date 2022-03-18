@@ -1,14 +1,13 @@
 package com.easefun.polyv.livecommon.ui.widget;
 
 import android.content.Context;
+import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-
-import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.R;
 

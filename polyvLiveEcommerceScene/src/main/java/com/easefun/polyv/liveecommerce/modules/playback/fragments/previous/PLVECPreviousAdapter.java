@@ -1,12 +1,11 @@
 package com.easefun.polyv.liveecommerce.modules.playback.fragments.previous;
 
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-
-import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.liveecommerce.R;
 
 /**

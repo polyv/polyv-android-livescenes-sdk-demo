@@ -1,9 +1,8 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
+import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
 import android.view.View;
-
-import androidx.lifecycle.LiveData;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;

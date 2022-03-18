@@ -19,7 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -137,7 +136,7 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
                         PLVToast.Builder.context(getContext())
                                 .setText("已复制")
                                 .setTextColor(Color.WHITE)
-                                .duration(Toast.LENGTH_SHORT)
+                                .shortDuration()
                                 .build().show();
                     }
                 } catch (Exception e) {

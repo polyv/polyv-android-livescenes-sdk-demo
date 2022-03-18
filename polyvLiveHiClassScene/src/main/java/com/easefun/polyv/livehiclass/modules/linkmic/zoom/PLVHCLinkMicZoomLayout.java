@@ -2,14 +2,13 @@ package com.easefun.polyv.livehiclass.modules.linkmic.zoom;
 
 import android.content.Context;
 import android.os.Looper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Pools;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.util.Pools;
 
 import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 

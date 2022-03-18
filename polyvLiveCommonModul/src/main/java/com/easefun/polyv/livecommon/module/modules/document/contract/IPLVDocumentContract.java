@@ -70,6 +70,11 @@ public interface IPLVDocumentContract {
         void onAssistantChangePptPage(int pageId);
 
         /**
+         * 回调 授权变化
+         */
+        void onUserPermissionChange();
+
+        /**
          * 回调 PPT页面变更
          *
          * @param autoId PPT ID，0表示白板

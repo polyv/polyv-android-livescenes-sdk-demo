@@ -3,6 +3,8 @@ package com.easefun.polyv.livedemo;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -13,9 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
@@ -145,7 +144,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         etLiveUserId = findViewById(R.id.plv_login_live_user_id);
         etLiveChannelId = findViewById(R.id.plv_login_live_channel_id);
         etLiveAppId = findViewById(R.id.plv_login_live_app_id);
-        etLiveAppSecert = findViewById(R.id.plv_login_live_app_secert);
+        etLiveAppSecert = findViewById(R.id.plv_login_live_app_secret);
         llLiveLayout = findViewById(R.id.plv_login_live_layout);
         etPlaybackChannelId = findViewById(R.id.plv_login_playback_channel_id);
         etPlaybackUserId = findViewById(R.id.plv_login_playback_user_id);
@@ -260,16 +259,34 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="设置测试数据">
     private void setTestData() {
-        etLiveAppId.setText("");
-        etLiveAppSecert.setText("");
-        etLiveUserId.setText("");
-        etLiveChannelId.setText("");
+        /**
+         * 现在的登录参数可以在local.properties中进行相应设置，在local.properties中设置下面的
+         * 代码即可配置相关的登录信息，不输入的话默认为“”
+         * LiveAppId=xxx
+         * LiveAppSecert=xxx
+         * LiveUserId=xxx
+         * LiveChannelId=xxx
+         *
+         * 回放参数
+         * PlaybackAppId=xxx
+         * PlaybackAppSecert=xxx
+         * PlaybackUserId=xxx
+         * PlaybackChannelId=xxx
+         * PlaybackVideoId=xxx
+         */
+        //直播登录参数
+        etLiveAppId.setText(PLVLoadParams.LiveAppId);
+        etLiveAppSecert.setText(PLVLoadParams.LiveAppSecert);
+        etLiveUserId.setText(PLVLoadParams.LiveUserId);
+        etLiveChannelId.setText(PLVLoadParams.LiveChannelId);
 
-        etPlaybackAppId.setText("");
-        etPlaybackAppSecret.setText("");
-        etPlaybackUserId.setText("");
-        etPlaybackChannelId.setText("");
-        etPlaybackVideoId.setText("");
+        //登录回放参数
+        etPlaybackAppId.setText(PLVLoadParams.PlaybackAppId);
+        etPlaybackAppSecret.setText(PLVLoadParams.PlaybackAppSecert);
+        etPlaybackUserId.setText(PLVLoadParams.PlaybackUserId);
+        etPlaybackChannelId.setText(PLVLoadParams.PlaybackChannelId);
+        etPlaybackVideoId.setText(PLVLoadParams.PlaybackVideoId);
+
     }
     // </editor-fold>
 
@@ -300,7 +317,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     //进入直播带货场景
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, getViewerId(), getViewerName(),getViewerAvatar());
+                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, getViewerId(), getViewerName(), getViewerAvatar());
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -317,7 +334,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
             public void onLoginFailed(String msg, Throwable throwable) {
                 loginProgressDialog.dismiss();
                 ToastUtils.showShort(msg);
-                PLVCommonLog.e(TAG,"loginLive onLoginFailed:"+throwable.getMessage());
+                PLVCommonLog.e(TAG, "loginLive onLoginFailed:" + throwable.getMessage());
             }
         });
     }
@@ -377,7 +394,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
             public void onLoginFailed(String msg, Throwable throwable) {
                 loginProgressDialog.dismiss();
                 ToastUtils.showShort(msg);
-                PLVCommonLog.e(TAG,"loginPlayback onLoginFailed:"+throwable.getMessage());
+                PLVCommonLog.e(TAG, "loginPlayback onLoginFailed:" + throwable.getMessage());
             }
         });
     }

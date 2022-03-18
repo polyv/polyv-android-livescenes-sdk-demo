@@ -102,5 +102,15 @@
             android:textColor="#FFF0F1F5"
             android:textSize="11sp" />
 
+        <ImageView
+            android:id="@+id/plvls_streamer_speaker_permission_status_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/plvls_streamer_guest_link_status_tv"
+            android:src="@drawable/plvls_streamer_speaker"
+            android:visibility="invisible" />
+
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

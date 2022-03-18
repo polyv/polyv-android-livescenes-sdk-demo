@@ -1,9 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
@@ -12,6 +11,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
@@ -146,6 +146,10 @@ public class PLVStreamerMsgHandler {
                     case PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT:
                         PLVJoinAnswerSEvent joinAnswerSEvent = PLVGsonUtil.fromJson(PLVJoinAnswerSEvent.class, message);
                         acceptJoinAnswerSEvent(joinAnswerSEvent);
+                        break;
+                    case PLVEventConstant.LinkMic.TEACHER_SET_PERMISSION:
+                        PLVPPTAuthentic authentic = PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message);
+                        acceptTeacherSetPermissionEvent(authentic);
                         break;
                     //嘉宾被禁用观众视频或麦克风
                     case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
@@ -360,6 +364,32 @@ public class PLVStreamerMsgHandler {
             }
         }
     }
+
+
+    private void acceptTeacherSetPermissionEvent(final PLVPPTAuthentic authentic) {
+        if(authentic != null){
+            //memberlist和streamerlist排序可能不同
+            Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
+
+            if (PLVPPTAuthentic.TYPE_SPEAKER.equals(authentic.getType())) {
+                if(memberItem != null && memberItem.second != null) {
+                    memberItem.second.getLinkMicItemDataBean().setHasSpeaker(!authentic.hasNoAthuentic());
+                }
+            }
+            final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());
+            final PLVSocketUserBean bean = (memberItem != null && memberItem.second != null) ? memberItem.second.getSocketUserBean() : null;
+            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onSetPermissionChange(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
+                }
+            });
+
+        }
+
+
+
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="连麦 - 数据监听及处理">
@@ -453,7 +483,7 @@ public class PLVStreamerMsgHandler {
             }
 
             @Override
-            public void onLocalAudioVolumeIndication(PLVAudioVolumeInfo speaker) {
+            public void onLocalAudioVolumeIndication(final PLVAudioVolumeInfo speaker) {
                 super.onLocalAudioVolumeIndication(speaker);
                 Pair<Integer, PLVLinkMicItemDataBean> item = streamerPresenter.getLinkMicItemWithLinkMicId(speaker.getUid());
                 if (item != null) {
@@ -462,7 +492,7 @@ public class PLVStreamerMsgHandler {
                 streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onLocalUserMicVolumeChanged();
+                        view.onLocalUserMicVolumeChanged(speaker.getVolume());
                     }
                 });
             }

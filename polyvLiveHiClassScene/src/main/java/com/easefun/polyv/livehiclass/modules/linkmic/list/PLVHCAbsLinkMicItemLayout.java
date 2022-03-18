@@ -3,12 +3,11 @@ package com.easefun.polyv.livehiclass.modules.linkmic.list;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
-
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livehiclass.modules.linkmic.list.item.IPLVHCLinkMicItem;

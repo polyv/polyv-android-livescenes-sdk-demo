@@ -195,6 +195,20 @@ public class PLVToast {
             return this;
         }
 
+        public Builder shortDuration() {
+            param.showDuration = Toast.LENGTH_SHORT;
+            return this;
+        }
+
+        public Builder longDuration() {
+            param.showDuration = Toast.LENGTH_LONG;
+            return this;
+        }
+
+        /**
+         * @deprecated use {@link #shortDuration()} or {@link #longDuration()} instead
+         */
+        @Deprecated
         public Builder duration(int toastDuration) {
             if (toastDuration != Toast.LENGTH_SHORT
                     && toastDuration != Toast.LENGTH_LONG) {
@@ -206,6 +220,10 @@ public class PLVToast {
 
         public PLVToast build() {
             return new PLVToast(param);
+        }
+
+        public void show() {
+            build().show();
         }
     }
 }

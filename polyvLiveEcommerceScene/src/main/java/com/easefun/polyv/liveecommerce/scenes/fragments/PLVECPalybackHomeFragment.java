@@ -2,6 +2,10 @@ package com.easefun.polyv.liveecommerce.scenes.fragments;
 
 import android.graphics.Rect;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,19 +14,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
+import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
-import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
@@ -132,9 +131,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
-    protected void updateWatchInfo(long watchCount) {
-        watchInfoLy.updateWatchCount(watchCount);
+    protected void updateWatchCount(long times) {
+        watchInfoLy.updateWatchCount(times);
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">

@@ -1,9 +1,14 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
+import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +16,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -250,8 +249,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
         }
 

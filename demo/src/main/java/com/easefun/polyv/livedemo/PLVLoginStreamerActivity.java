@@ -1,10 +1,17 @@
 package com.easefun.polyv.livedemo;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,36 +27,48 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
+import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
+import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
 import com.plv.livescenes.feature.login.model.PLVLoginVO;
+import com.plv.thirdpart.blankj.utilcode.util.EncodeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * 手机开播登录页面
  */
 public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    /**
+     * 提供给外部跳转调用的scheme，应根据实际情况配置
+     * 如果不需要支持从外部跳转进入app，需要删除AndroidManifest中的相关配置
+     */
+    private static final String SCHEME_LOGIN_FOR_WEB = "plvapp";
+    private static final String HOST_LOGIN_FOR_WEB = "live.polyv.net";
+    private static final String PATH_LOGIN_FOR_WEB = "/streamer";
+
     private EditText plvlsLoginInputChannelEt;
     private EditText plvlsLoginInputNickEt;
     private EditText plvlsLoginInputPwdEt;
@@ -79,6 +98,12 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         setTransparentStatusBar();
 
         initView();
+
+        if (isOpenFromScheme(getIntent())) {
+            tryLoginForScheme(getIntent());
+        } else {
+            initViewForSavedData();
+        }
     }
 
     private void setTransparentStatusBar() {
@@ -141,8 +166,6 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         plvlsLoginEnterBtn.setOnClickListener(this);
 
         plvlsLoginRememberPasswordCb.setOnCheckedChangeListener(onRememberPwdCheckedChangeListener);
-
-        initViewForSavedData();
     }
 
     private void initViewForSavedData() {
@@ -184,6 +207,10 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                     .show();
             return;
         }
+        if (!checkAudioPermission()) {
+            requireAudioPermissionBeforeLogin();
+            return;
+        }
         updateLoginViewStatus(true);
         final String channelId = plvlsLoginInputChannelEt.getText().toString();
         final String nick = plvlsLoginInputNickEt.getText().toString().trim();
@@ -196,6 +223,9 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
             @Override
             public void onLoginSuccess(PLVLoginVO loginVO) {
                 updateLoginViewStatus(false);
+                if (localInfoManager == null) {
+                    localInfoManager = new PLVLSLoginLocalInfoManager();
+                }
                 if (plvlsLoginRememberPasswordCb.isChecked()) {
                     localInfoManager.saveLoginInfo(channelId, password, nick, true);
                 } else {
@@ -343,6 +373,140 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         }
         return null;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部方法 - 权限检查">
+
+    private boolean checkAudioPermission() {
+        return PLVFastPermission.hasPermission(this, Manifest.permission.RECORD_AUDIO);
+    }
+
+    private void requireAudioPermissionBeforeLogin() {
+        PLVFastPermission.getInstance().start(this, listOf(Manifest.permission.RECORD_AUDIO), new PLVOnPermissionCallback() {
+            @Override
+            public void onAllGranted() {
+                loginStreamer();
+            }
+
+            @Override
+            public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+                final boolean hasAudioPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.RECORD_AUDIO);
+                if (hasAudioPermission) {
+                    // should not be here
+                    return;
+                }
+                new PLVLoginStreamerConfirmDialog(PLVLoginStreamerActivity.this)
+                        .setTitle("麦克风权限被禁止")
+                        .setContent("参与直播需要麦克风权限，请前往系统设置开启权限")
+                        .setLeftButtonText("取消")
+                        .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setRightButtonText("前往设置")
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                PLVFastPermission.getInstance().jump2Settings(PLVLoginStreamerActivity.this);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    private static class PLVLoginStreamerConfirmDialog extends PLVConfirmDialog {
+
+        public PLVLoginStreamerConfirmDialog(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected int layoutId() {
+            return R.layout.plv_login_streamer_confirm_window_layout;
+        }
+
+        @Override
+        protected float dialogWidthInDp() {
+            return 260;
+        }
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部方法 - 由外部app或web网页跳转到app登录页的处理">
+
+    private void tryLoginForScheme(Intent intent) {
+        if (intent == null || intent.getData() == null) {
+            return;
+        }
+        if (!isOpenFromScheme(intent)) {
+            return;
+        }
+        final String param = intent.getData().getQueryParameter("param");
+        final SchemeLoginParam schemeLoginParam = parseSchemeParam(param);
+        if (schemeLoginParam == null) {
+            return;
+        }
+        setTextIfNotEmpty(plvlsLoginInputChannelEt, schemeLoginParam.channel);
+        setTextIfNotEmpty(plvlsLoginInputNickEt, schemeLoginParam.nick);
+        setTextIfNotEmpty(plvlsLoginInputPwdEt, schemeLoginParam.pwd);
+        setCheckBox(plvlsLoginRememberPasswordCb, schemeLoginParam.rememberPwd);
+        setCheckBox(plvlsLoginAgreeContractCb, schemeLoginParam.agreeContract);
+
+        final boolean canAutoLogin = schemeLoginParam.channel != null
+                && schemeLoginParam.pwd != null
+                && plvlsLoginAgreeContractCb.isChecked()
+                && schemeLoginParam.autoLogin != null
+                && schemeLoginParam.autoLogin;
+        if (canAutoLogin) {
+            loginStreamer();
+        }
+    }
+
+    private static boolean isOpenFromScheme(Intent intent) {
+        if (intent == null || intent.getData() == null) {
+            return false;
+        }
+        final String scheme = intent.getData().getScheme();
+        final String host = intent.getData().getHost();
+        final String path = intent.getData().getPath();
+        return SCHEME_LOGIN_FOR_WEB.equals(scheme) && HOST_LOGIN_FOR_WEB.equals(host) && PATH_LOGIN_FOR_WEB.equals(path);
+    }
+
+    private static void setTextIfNotEmpty(EditText et, String text) {
+        if (!TextUtils.isEmpty(text)) {
+            et.setText(text);
+        }
+    }
+
+    private static void setCheckBox(CheckBox checkBox, Boolean value) {
+        if (checkBox != null && value != null) {
+            checkBox.setChecked(value);
+        }
+    }
+
+    @Nullable
+    private static SchemeLoginParam parseSchemeParam(String param) {
+        if (param == null) {
+            return null;
+        }
+        final String raw = EncodeUtils.base64UrlSafeDecodeToString(param);
+        return PLVGsonUtil.fromJson(SchemeLoginParam.class, raw);
+    }
+
+    private static class SchemeLoginParam {
+        private String channel;
+        private String nick;
+        private String pwd;
+        private Boolean rememberPwd;
+        private Boolean agreeContract;
+        private Boolean autoLogin;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">

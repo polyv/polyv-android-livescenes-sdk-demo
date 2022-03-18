@@ -2,6 +2,7 @@ package com.easefun.polyv.liveecommerce.scenes.fragments.widget;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import androidx.annotation.LayoutRes;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -12,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import androidx.annotation.LayoutRes;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;

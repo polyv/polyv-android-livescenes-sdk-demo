@@ -1,18 +1,15 @@
 package com.easefun.polyv.livehiclass.modules.linkmic.list.item;
 
-import static com.plv.foundationsdk.log.PLVCommonLog.format;
-
 import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.Group;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -22,6 +19,8 @@ import com.easefun.polyv.livehiclass.modules.linkmic.zoom.PLVHCLinkMicZoomManage
 import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.lang.ref.WeakReference;
+
+import static com.plv.foundationsdk.log.PLVCommonLog.format;
 
 /**
  * @author suhongtao

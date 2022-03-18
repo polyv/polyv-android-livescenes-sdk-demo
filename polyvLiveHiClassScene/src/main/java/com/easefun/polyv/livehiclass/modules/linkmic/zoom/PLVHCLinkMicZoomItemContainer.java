@@ -1,15 +1,12 @@
 package com.easefun.polyv.livehiclass.modules.linkmic.zoom;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
-
 import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.ui.widget.PLVDragScaleLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -22,6 +19,8 @@ import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
 import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * 连麦摄像头放大区域容器布局

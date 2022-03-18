@@ -39,6 +39,8 @@ public class PLVLinkMicItemDataBean {
     private boolean isRaiseHand;
     //画笔授权状态
     private boolean isHasPaint;
+    //主讲授权状态
+    private boolean isHasSpeaker;
     //参考[PLVSocketUserConstant]
     private String userType;
     //头衔
@@ -177,6 +179,14 @@ public class PLVLinkMicItemDataBean {
         this.isHasPaint = hasPaint;
     }
 
+    public boolean isHasSpeaker() {
+        return isHasSpeaker;
+    }
+
+    public void setHasSpeaker(boolean hasSpeaker) {
+        isHasSpeaker = hasSpeaker;
+    }
+
     public int getCurVolume() {
         return curVolume;
     }
@@ -299,6 +309,7 @@ public class PLVLinkMicItemDataBean {
                 ", cupNum=" + cupNum +
                 ", isRaiseHand=" + isRaiseHand +
                 ", isHasPaint=" + isHasPaint +
+                ", isHasSpeaker=" + isHasSpeaker +
                 ", userType='" + userType + '\'' +
                 ", actor='" + actor + '\'' +
                 ", pic='" + pic + '\'' +

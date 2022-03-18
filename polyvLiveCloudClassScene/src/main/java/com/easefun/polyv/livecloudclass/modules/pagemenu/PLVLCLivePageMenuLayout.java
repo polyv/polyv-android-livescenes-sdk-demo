@@ -2,26 +2,25 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
-import androidx.viewpager.widget.ViewPager;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
@@ -524,7 +523,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(Utils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_been_kicked)
                         .build()
                         .show();
@@ -542,7 +541,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
             PLVToast.Builder.context(Utils.getApp())
-                    .duration(2000)
+                    .shortDuration()
                     .setText(R.string.plv_chat_toast_account_login_elsewhere)
                     .build()
                     .show();

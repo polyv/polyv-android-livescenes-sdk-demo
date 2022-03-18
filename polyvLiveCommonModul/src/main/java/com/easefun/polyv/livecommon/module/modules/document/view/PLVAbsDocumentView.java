@@ -43,6 +43,11 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
     }
 
     @Override
+    public void onUserPermissionChange() {
+        // Not implemented.
+    }
+
+    @Override
     public void onPptPageChange(int autoId, int pageId) {
         // Not implemented.
     }

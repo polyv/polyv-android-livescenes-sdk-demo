@@ -2,4 +2,7 @@
 <resources>
     <string name="plvsa_setting_enter_live">进入直播间</string>
     <string name="plvsa_setting_start_live">开始直播</string>
+
+    <string name="plvsa_streamer_notify_speaking_with_mute_audio">您已静音，请开启麦克风后发言</string>
+
 </resources>

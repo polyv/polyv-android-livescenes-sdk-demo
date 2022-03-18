@@ -2,6 +2,7 @@ package com.easefun.polyv.liveecommerce.scenes;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import androidx.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.GestureDetector;
@@ -20,12 +25,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;

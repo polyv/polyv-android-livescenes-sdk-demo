@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu;
@@ -39,6 +40,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public static final String PAYLOAD_UPDATE_CAMERA_DIRECTION = "updateCameraDirection";
     public static final String PAYLOAD_UPDATE_SOCKET_USER_DATA = "updateSocketUserData";
     public static final String PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE = "updateLinkMicMediaType";
+    public static final String PAYLOAD_UPDATE_PERMISSION_CHANGE = "updatePermissionChange";
 
     //dataList
     private List<PLVMemberItemDataBean> dataList;
@@ -187,6 +189,8 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                 }
             }
         }
+        //授权
+        updatePermissionStatus(holder, linkMicItemDataBean);
         //滑动view的设置
         if (position == 0 || isSpecialType || isGuest) {
             holder.plvlsMemberSwipeMenu.enabledSwipe(false);
@@ -348,6 +352,9 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                         }
                     }
                     break;
+                case PAYLOAD_UPDATE_PERMISSION_CHANGE:
+                    updatePermissionStatus(holder, linkMicItemDataBean);
+                    break;
                 default:
                     break;
             }
@@ -405,6 +412,10 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE);
     }
 
+    public void updatePermissionChange(){
+        notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_PERMISSION_CHANGE);
+    }
+
     //添加用户数据
     public void insertUserData(int pos) {
         notifyItemInserted(pos);
@@ -438,6 +449,28 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="列表item绑定">
+    private void updatePermissionStatus(MemberViewHolder holder, PLVLinkMicItemDataBean linkMicItemDataBean) {
+        if(isGuest){
+            //嘉宾无法控制授权
+            holder.plvlsMemberGrantSpeakerIv.setVisibility(View.GONE);
+            return;
+        }
+        if(linkMicItemDataBean != null && linkMicItemDataBean.isGuest()){
+            if(linkMicItemDataBean.isRtcJoinStatus()){
+                holder.plvlsMemberGrantSpeakerIv.setVisibility(View.VISIBLE);
+            } else {
+                holder.plvlsMemberGrantSpeakerIv.setVisibility(View.GONE);
+            }
+        } else {
+            holder.plvlsMemberGrantSpeakerIv.setVisibility(View.GONE);
+        }
+        if (linkMicItemDataBean != null) {
+            holder.plvlsMemberGrantSpeakerIv.setSelected(linkMicItemDataBean.isHasSpeaker());
+        }
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="工具方法">
     //判断value是否在左开右闭区间：(left, right]
     private boolean intBetween(int value, int left, int right) {
@@ -466,6 +499,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         private ImageView plvlsMemberCamFrontIv;
         private ImageView plvlsMemberLinkmicControlIv;
         private ImageView plvlsMemberLinkmicConnectingIv;
+        private ImageView plvlsMemberGrantSpeakerIv;
         private TextView plvlsMemberDoBanTv;
         private TextView plvlsMemberKickTv;
         private TextView plvlsMemberBanConfirmTv;
@@ -489,6 +523,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             plvlsMemberKickTv = findViewById(R.id.plvls_member_kick_tv);
             plvlsMemberBanConfirmTv = findViewById(R.id.plvls_member_ban_confirm_tv);
             plvlsMemberKickConfirmTv = findViewById(R.id.plvls_member_kick_confirm_tv);
+            plvlsMemberGrantSpeakerIv = findViewById(R.id.plvls_member_grant_speaker_iv);
 
             AnimationDrawable animationDrawable = (AnimationDrawable) plvlsMemberLinkmicConnectingIv.getDrawable();
             animationDrawable.start();
@@ -566,6 +601,22 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     }
                 }
             });
+
+            plvlsMemberGrantSpeakerIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
+                    if(PLVDebounceClicker.tryClick(this, 1000)) {
+                        if (onViewActionListener != null) {
+                            String userId = dataList.get(pos).getSocketUserBean().getUserId();
+                            onViewActionListener.onGrantSpeakerPermission(pos, userId, !v.isSelected());
+                        }
+                    }
+                }
+            });
         }
 
         private <T extends View> T findViewById(@IdRes int id) {
@@ -632,6 +683,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
          * 用户加入或离开连麦控制
          */
         void onControlUserLinkMic(int position, boolean isAllowJoin);
+
+        /**
+         * 赋予主讲权限
+         */
+        void onGrantSpeakerPermission(int position, String userId, boolean isGrant);
     }
     // </editor-fold>
 }
