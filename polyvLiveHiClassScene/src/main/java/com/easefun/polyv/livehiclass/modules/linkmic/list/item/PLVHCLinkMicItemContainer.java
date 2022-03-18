@@ -1,7 +1,5 @@
 package com.easefun.polyv.livehiclass.modules.linkmic.list.item;
 
-import static com.plv.foundationsdk.log.PLVCommonLog.format;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +19,8 @@ import com.easefun.polyv.livehiclass.modules.linkmic.zoom.PLVHCLinkMicZoomManage
 import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.lang.ref.WeakReference;
+
+import static com.plv.foundationsdk.log.PLVCommonLog.format;
 
 /**
  * @author suhongtao

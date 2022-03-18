@@ -1087,7 +1087,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherCloseLinkMic");
             handleTeacherCloseLinkMic();
             if (rtcInvokeStrategy != null) {
-                rtcInvokeStrategy.setLeaveLinkMic();
+                //只有在连麦中才能在断开连麦时发送joinLeave消息
+                if(isJoinLinkMic()){
+                    rtcInvokeStrategy.setLeaveLinkMic();
+                }
             }
         }
 

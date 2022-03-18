@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVMultiModeRecyclerViewLayout;
@@ -42,6 +43,7 @@ import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -49,12 +51,18 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * 推流和连麦布局
  */
 public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 本地麦克风音量大小达到该阈值时，提示当前正处于静音状态
+    private static final int VOLUME_THRESHOLD_TO_NOTIFY_AUDIO_MUTED = 40;
 
     //直播间数管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -79,6 +87,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
     //退出直播间弹窗
     private PLVConfirmDialog leaveLiveConfirmDialog;
+
+    private boolean isLocalAudioMuted = false;
+    private long lastNotifyLocalAudioMutedTimestamp;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -342,12 +353,19 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         public void onUserMuteAudio(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteAudio(uid, mute, streamerListPos, memberListPos);
             streamerAdapter.updateUserMuteAudio(streamerListPos);
+
+            if (isMyselfUserId(uid)) {
+                isLocalAudioMuted = mute;
+                if (!mute) {
+                    lastNotifyLocalAudioMutedTimestamp = 0;
+                }
+            }
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             streamerAdapter.updateVolumeChanged();
+            tryNotifyLocalAudioMuted(volume);
         }
 
         @Override
@@ -716,7 +734,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                     .setRightBtnListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((Activity)getContext()).finish();
+                            ((Activity) getContext()).finish();
                             leaveLiveConfirmDialog.hide();
                         }
                     });
@@ -725,4 +743,43 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理逻辑">
+
+    private boolean isMyselfUserId(String uid) {
+        final String myUserId = nullable(new PLVSugarUtil.Supplier<String>() {
+            @Override
+            public String get() {
+                return liveRoomDataManager.getConfig().getUser().getViewerId();
+            }
+        });
+        return myUserId != null && myUserId.equals(uid);
+    }
+
+    /**
+     * 静音麦克风时，检测用户是否正在说话，以提醒用户麦克风状态
+     * <p>
+     * 麦克风关闭时其他用户不会听到声音，但考虑到用户可能误触关闭了麦克风
+     * 而引起输入异常的情况，不会完全关闭麦克风调用，这里进行音量检测提醒
+     */
+    private void tryNotifyLocalAudioMuted(int volume) {
+        if (!isLocalAudioMuted) {
+            return;
+        }
+        if (volume < VOLUME_THRESHOLD_TO_NOTIFY_AUDIO_MUTED) {
+            return;
+        }
+        if (System.currentTimeMillis() - lastNotifyLocalAudioMutedTimestamp <= TimeUnit.MINUTES.toMillis(3)) {
+            return;
+        }
+        lastNotifyLocalAudioMutedTimestamp = System.currentTimeMillis();
+
+        PLVToast.Builder.context(getContext())
+                .setText(R.string.plvsa_streamer_notify_speaking_with_mute_audio)
+                .longDuration()
+                .show();
+    }
+
+    // </editor-fold>
+
 }

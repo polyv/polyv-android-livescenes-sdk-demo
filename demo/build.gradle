@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: "polyv_loadparams.gradle"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -53,6 +54,10 @@ android {
     }
     sourceSets {
         main {
+            java {
+                //将下面的路径也放入到编译路径内，这样才能将动态生成的登录文件加入编译中
+                srcDir project.ext.get("PLVGeneratorPath")
+            }
             res.srcDirs (
                     'src/main/res',
                     'src/main/res/layouts/hiclass'

@@ -249,8 +249,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
         }
 

@@ -598,7 +598,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(PLVAppUtils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_kicked_streamer)
                         .build()
                         .show();

@@ -346,7 +346,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
+        public void onLocalUserMicVolumeChanged(int volume) {
             updateVolumeChanged();
         }
 

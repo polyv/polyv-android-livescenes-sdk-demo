@@ -31,6 +31,7 @@ import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -348,6 +349,20 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onControlUserLinkMic(int position, boolean isAllowJoin) {
                 plvlsStreamerLy.controlUserLinkMic(position, isAllowJoin);
+            }
+
+            @Override
+            public void onGrantSpeakerPermission(int position, String userId, final boolean isGrant) {
+                plvlsStreamerLy.getStreamerPresenter().setUserPermissionSpeaker(userId, isGrant, new IPLVLinkMicEventSender.PLVSMainCallAck() {
+                    @Override
+                    public void onCall(Object... args) {
+                        String text = isGrant ? "已授予主讲权限" : "已收回主讲权限";
+                        PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
+                                .setText(text)
+                                .build()
+                                .show();
+                    }
+                });
             }
 
             @Override

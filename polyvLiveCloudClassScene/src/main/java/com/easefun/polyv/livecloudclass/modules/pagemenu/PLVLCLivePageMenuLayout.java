@@ -523,7 +523,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(Utils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_been_kicked)
                         .build()
                         .show();
@@ -541,7 +541,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
             PLVToast.Builder.context(Utils.getApp())
-                    .duration(2000)
+                    .shortDuration()
                     .setText(R.string.plv_chat_toast_account_login_elsewhere)
                     .build()
                     .show();

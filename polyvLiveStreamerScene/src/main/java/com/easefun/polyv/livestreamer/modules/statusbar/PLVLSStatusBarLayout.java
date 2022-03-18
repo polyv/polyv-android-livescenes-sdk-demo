@@ -5,6 +5,7 @@ import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLV
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -39,8 +40,11 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -87,6 +91,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
      * 请勿改为局部变量，否则会被gc回收，引起无法响应Presenter调用
      */
     private PLVAbsDocumentView documentMvpView;
+
+    private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
 
     private int lastAutoId;
     // 最后一次打开的非白板文档ID和对应的页面ID
@@ -164,6 +170,9 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         initSettingLayout();
         initMemberLayout();
         initDocumentMvpView();
+        initOnUserAbilityChangeListener();
+
+        checkUserDocumentPermission();
     }
 
     private void initCountDownView() {
@@ -275,6 +284,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
+            public void onGrantSpeakerPermission(int position, String userId, boolean isGrant) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onGrantSpeakerPermission(position, userId, isGrant);
+                }
+            }
+
+            @Override
             public void closeAllUserLinkMic() {
                 if (onViewActionListener != null) {
                     onViewActionListener.closeAllUserLinkMic();
@@ -298,13 +314,10 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
             @Override
             public void onSwitchShowMode(PLVDocumentMode showMode) {
+                plvlsStatusBarWhiteboardIv.setSelected(showMode == PLVDocumentMode.WHITEBOARD);
+                plvlsStatusBarDocumentIv.setSelected(showMode != PLVDocumentMode.WHITEBOARD);
                 if (showMode == PLVDocumentMode.WHITEBOARD) {
-                    plvlsStatusBarWhiteboardIv.setSelected(true);
-                    plvlsStatusBarDocumentIv.setSelected(false);
                     lastAutoId = AUTO_ID_WHITE_BOARD;
-                } else {
-                    plvlsStatusBarWhiteboardIv.setSelected(false);
-                    plvlsStatusBarDocumentIv.setSelected(true);
                 }
             }
 
@@ -315,10 +328,27 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     lastOpenNotWhiteBoardAutoId = autoId;
                     lastOpenNotWhiteBoardPageId = pageId;
                 }
+
+                plvlsStatusBarWhiteboardIv.setSelected(autoId == AUTO_ID_WHITE_BOARD);
+                plvlsStatusBarDocumentIv.setSelected(autoId != AUTO_ID_WHITE_BOARD);
             }
         };
 
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
+    }
+
+    /**
+     * 初始化用户角色能力变化监听
+     */
+    private void initOnUserAbilityChangeListener() {
+        this.onUserAbilityChangeCallback = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                checkUserDocumentPermission();
+            }
+        };
+
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
     }
     // </editor-fold>
 
@@ -331,8 +361,6 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
             plvlsStatusBarClassControlTv.setVisibility(GONE);
             plvlsStatusBarLinkmicIv.setVisibility(GONE);
-            plvlsStatusBarDocumentIv.setVisibility(GONE);
-            plvlsStatusBarWhiteboardIv.setVisibility(GONE);
         }
         updateLinkMicShowType(liveRoomDataManager.isOnlyAudio());
     }
@@ -420,6 +448,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     @Override
     public void destroy() {
+        onUserAbilityChangeCallback = null;
         channelInfoLayout.destroy();
         settingLayout.destroy();
         memberLayout.destroy();
@@ -482,14 +511,35 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="音频开播控制">
-    private void updateLinkMicShowType(boolean isOnlyAudio){
+    private void updateLinkMicShowType(boolean isOnlyAudio) {
         linkMicShowType = isOnlyAudio ? 1 : 0;
     }
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="文档选择处理">
 
+    private void checkUserDocumentPermission() {
+        final boolean canUseDocument = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_PPT_WHITEBOARD);
+        final int color = canUseDocument ? Color.TRANSPARENT : Color.GRAY;
+        if (plvlsStatusBarDocumentIv != null) {
+            plvlsStatusBarDocumentIv.setColorFilter(color);
+        }
+        if (plvlsStatusBarWhiteboardIv != null) {
+            plvlsStatusBarWhiteboardIv.setColorFilter(color);
+        }
+    }
+
     private void processSelectDocument() {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_PPT_WHITEBOARD)
+                || PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plvls_document_usage_not_permeitted)
+                    .show();
+            return;
+        }
+
+        PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.PPT.ordinal());
+        PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
         if (lastAutoId == AUTO_ID_WHITE_BOARD && lastOpenNotWhiteBoardAutoId != AUTO_ID_WHITE_BOARD) {
             // 如果当前是白板模式，上次已经打开过PPT文档，直接切到上次的PPT文档
             PLVDocumentPresenter.getInstance().changePptPage(lastOpenNotWhiteBoardAutoId, lastOpenNotWhiteBoardPageId);
@@ -498,6 +548,19 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 pptListLayout.open(true);
             }
         }
+    }
+
+    private void processSelectWhiteBoard() {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_PPT_WHITEBOARD)) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plvls_document_usage_not_permeitted)
+                    .show();
+            return;
+        }
+
+        PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.WHITEBOARD.ordinal());
+        PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
+        PLVDocumentPresenter.getInstance().changeToWhiteBoard();
     }
 
     // </editor-fold>
@@ -548,13 +611,9 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             v.setSelected(!v.isSelected());
             linkMicControlWindow.show(v, linkMicControlWindow.getShowType());
         } else if (id == R.id.plvls_status_bar_document_iv) {
-            PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.PPT.ordinal());
-            PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.PPT);
             processSelectDocument();
         } else if (id == R.id.plvls_status_bar_whiteboard_iv) {
-            PLVLiveLocalActionHelper.getInstance().updatePptType(PLVDocumentMode.WHITEBOARD.ordinal());
-            PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
-            PLVDocumentPresenter.getInstance().changeToWhiteBoard();
+            processSelectWhiteBoard();
         }
     }
     // </editor-fold>

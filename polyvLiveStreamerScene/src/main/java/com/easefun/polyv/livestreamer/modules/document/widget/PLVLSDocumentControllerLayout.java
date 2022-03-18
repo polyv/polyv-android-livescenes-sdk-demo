@@ -21,6 +21,8 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -258,12 +260,13 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
      */
     private void initPptPageSelector() {
         // 首次进入只有1个白板
+        currentAutoId = AUTO_ID_WHITE_BOARD;
         currentPageIndex = 0;
         autoId2PageCountMap.put(AUTO_ID_WHITE_BOARD, 1);
 
         // 只有1个白板时不显示白板页面指示和上下页切换按钮
         plvlsDocumentPageIndicateTv.setVisibility(GONE);
-        setPageSelectorVisibility(false);
+        updatePageSelectorVisibility();
 
         plvlsDocumentWhiteboardAddIv.setOnClickListener(new OnClickListener() {
             @Override
@@ -353,7 +356,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                 boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
                 //添加白板控件和画笔控件
                 if (isWhiteBoard) {
-                    if (!isShowByGuest) {
+                    if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_WHITE_BOARD_ADD)) {
                         plvlsDocumentWhiteboardAddIv.setVisibility(VISIBLE);
                     }
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_active);
@@ -362,6 +365,11 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                     plvlsDocumentWhiteboardAddIv.setVisibility(GONE);
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_inactive);
                 }
+            }
+
+            @Override
+            public void onUserPermissionChange() {
+                updatePageSelectorVisibility();
             }
         };
 
@@ -497,25 +505,29 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     //更新页面指示器
     private void updatePageIndicator(int autoId, int pageIndex) {
         //翻页控件
-        int pageCount = autoId2PageCountMap.get(autoId, 1);
-        //pageId+1是因为返回的每次是数组index，要+1才正常。
+        final int pageCount = getDocumentPageCount(autoId);
+        final boolean showIndicateText = pageCount > 1;
+        //pageIndex+1是因为返回的每次是数组index，要+1才正常。
         plvlsDocumentPageIndicateTv.setText(String.format(Locale.getDefault(), "%d/%d", pageIndex + 1, pageCount));
-        if (pageCount > 1) {
-            plvlsDocumentPageIndicateTv.setVisibility(VISIBLE);
-            setPageSelectorVisibility(true);
-        } else {
-            plvlsDocumentPageIndicateTv.setVisibility(GONE);
-            setPageSelectorVisibility(false);
-        }
+        plvlsDocumentPageIndicateTv.setVisibility(showIndicateText ? View.VISIBLE : View.GONE);
+        updatePageSelectorVisibility();
         updatePageSelectorEnabledType(pageIndex, pageCount);
     }
 
-    //设置翻页指示器可见性
-    private void setPageSelectorVisibility(boolean show) {
-        if (!isShowByGuest) {
-            plvlsDocumentLastPageIv.setVisibility(show ? VISIBLE : GONE);
-            plvlsDocumentNextPageIv.setVisibility(show ? VISIBLE : GONE);
-        }
+    // 更新翻页指示器可见性
+    private void updatePageSelectorVisibility() {
+        boolean isShow = getCurrentDocumentPageCount() > 1 && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_TURN_PAGE);
+        plvlsDocumentLastPageIv.setVisibility(isShow ? VISIBLE : GONE);
+        plvlsDocumentNextPageIv.setVisibility(isShow ? VISIBLE : GONE);
+    }
+
+    private int getDocumentPageCount(int autoId) {
+        // 默认至少有1页
+        return autoId2PageCountMap.get(autoId, 1);
+    }
+
+    private int getCurrentDocumentPageCount() {
+        return getDocumentPageCount(currentAutoId);
     }
 
     // </editor-fold>

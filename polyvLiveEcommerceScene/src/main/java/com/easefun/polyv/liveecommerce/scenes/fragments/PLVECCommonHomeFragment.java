@@ -101,6 +101,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void updateLikesInfo(String likesString) {
     }
 
+    //更新观看数量
+    protected void updateWatchCount(long times){
+    }
+
     //处理商品打开
     protected void acceptOpenCommodity() {
     }
@@ -190,7 +194,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(Utils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_been_kicked)
                         .build()
                         .show();
@@ -208,7 +212,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
             PLVToast.Builder.context(Utils.getApp())
-                    .duration(2000)
+                    .shortDuration()
                     .setText(R.string.plv_chat_toast_account_login_elsewhere)
                     .build()
                     .show();
@@ -289,6 +293,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable Long l) {
                 //观看热度
+                updateWatchCount(l);
             }
         });
         chatroomPresenter.getData().getOnlineCountData().observe(this, new Observer<Integer>() {

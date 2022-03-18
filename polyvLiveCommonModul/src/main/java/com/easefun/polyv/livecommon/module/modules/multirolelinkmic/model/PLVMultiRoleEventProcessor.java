@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
-
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -41,6 +39,8 @@ import com.plv.socket.user.PLVSocketUserConstant;
 import java.util.Map;
 
 import io.socket.client.Socket;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * socket、rtc事件处理器

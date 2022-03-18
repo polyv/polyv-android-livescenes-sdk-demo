@@ -9,8 +9,11 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
+
+import io.socket.client.Ack;
 
 /**
  * mvp-推流和连麦契约协议
@@ -62,7 +65,7 @@ public interface IPLVStreamerContract {
         /**
          * 响应本地用户麦克风音量变化
          */
-        void onLocalUserMicVolumeChanged();
+        void onLocalUserMicVolumeChanged(int volume);
 
         /**
          * 响应远端用户麦克风音量变化
@@ -179,6 +182,11 @@ public interface IPLVStreamerContract {
          * 嘉宾多媒体状态改变
          */
         void onGuestMediaStatusChanged(int pos);
+
+        /**
+         * 权限响应
+         */
+        void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user);
     }
     // </editor-fold>
 
@@ -386,6 +394,14 @@ public interface IPLVStreamerContract {
          * 嘉宾尝试上麦
          */
         void guestTryJoinLinkMic();
+
+        /**
+         * 设置用户主讲权限
+         * @param position
+         * @param isSetPermission
+         * @param ack
+         */
+        void setUserPermissionSpeaker(String userId, boolean isSetPermission, Ack ack);
 
         /**
          * 获取推流和连麦的数据

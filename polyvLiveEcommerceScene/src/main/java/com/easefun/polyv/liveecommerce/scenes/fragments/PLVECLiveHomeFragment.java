@@ -66,6 +66,7 @@ import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.NetworkUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.ArrayList;
@@ -222,7 +223,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     @Override
-    protected void updateWatchInfo(long watchCount) {
+    protected void updateWatchCount(long watchCount) {
         watchInfoLy.updateWatchCount(watchCount);
     }
 
@@ -673,11 +674,16 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             @Override
             public void onRewardClick(View view, PLVCustomGiftBean giftBean) {
                 rewardPopupView.hide();
-                String nickName = PolyvSocketWrapper.getInstance().getLoginVO().getNickName();
-                showRewardGiftAnimView(nickName + "(我)", giftBean);
-                addCustomGiftToChatList(nickName + "(我)", giftBean.getGiftName(), giftBean.getGiftType(), true);
-                //通过自定义信息事件发送礼物信息至聊天室
-                chatroomPresenter.sendCustomGiftMessage(giftBean, nickName + " 赠送了" + giftBean.getGiftName());
+                //点击礼物时现判断一下网络情况
+                if(NetworkUtils.isConnected()){
+                    String nickName = PolyvSocketWrapper.getInstance().getLoginVO().getNickName();
+                    showRewardGiftAnimView(nickName + "(我)", giftBean);
+                    addCustomGiftToChatList(nickName + "(我)", giftBean.getGiftName(), giftBean.getGiftType(), true);
+                    //通过自定义信息事件发送礼物信息至聊天室
+                    chatroomPresenter.sendCustomGiftMessage(giftBean, nickName + " 赠送了" + giftBean.getGiftName());
+                }else {
+                    ToastUtils.showShort("发送失败");
+                }
             }
         });
     }

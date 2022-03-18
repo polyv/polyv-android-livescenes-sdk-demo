@@ -25,14 +25,17 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
-import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentInputWidget;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import java.util.List;
 
 import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
@@ -70,6 +73,9 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     // 文档布局切换全屏外部回调监听
     private OnSwitchFullScreenListener onSwitchFullScreenListener;
 
+    @Nullable
+    private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
+
     // 当前PPT文档ID
     private int autoId;
     // 最后一次打开的非白板文档ID
@@ -101,6 +107,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         findView();
         initLayoutSize();
         initMvpView();
+        initOnUserAbilityChangeListener();
     }
 
     private void findView() {
@@ -184,6 +191,25 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         };
 
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
+    }
+
+    /**
+     * 初始化用户角色能力变化监听
+     */
+    private void initOnUserAbilityChangeListener() {
+        this.onUserAbilityChangeCallback = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+                    // 不再有文档权限时，如果当前频道是白板模式，则本地显示切换回白板模式
+                    if (PLVLSDocumentLayout.this.autoId == AUTO_ID_WHITE_BOARD) {
+                        PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
+                    }
+                }
+            }
+        };
+
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
     }
 
     // </editor-fold>
@@ -332,6 +358,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     public void destroy() {
         PLVDocumentPresenter.getInstance().destroy();
         onSwitchFullScreenListener = null;
+        onUserAbilityChangeCallback = null;
     }
 
     // </editor-fold>

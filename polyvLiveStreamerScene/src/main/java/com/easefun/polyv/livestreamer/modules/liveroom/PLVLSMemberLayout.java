@@ -27,6 +27,8 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.liveroom.adapter.PLVLSMemberAdapter;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -118,6 +120,13 @@ public class PLVLSMemberLayout extends FrameLayout {
             public void onControlUserLinkMic(int position, boolean isAllowJoin) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
+                }
+            }
+
+            @Override
+            public void onGrantSpeakerPermission(int position, String userId, boolean isGrant) {
+                if(onViewActionListener != null){
+                    onViewActionListener.onGrantSpeakerPermission(position, userId, isGrant);
                 }
             }
         });
@@ -339,8 +348,7 @@ public class PLVLSMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
         }
 
@@ -395,6 +403,14 @@ public class PLVLSMemberLayout extends FrameLayout {
                         }
                     })
                     .show();
+        }
+
+        @Override
+        public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+            super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
+            if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER)) {
+                memberAdapter.updatePermissionChange();
+            }
         }
     };
     // </editor-fold>
