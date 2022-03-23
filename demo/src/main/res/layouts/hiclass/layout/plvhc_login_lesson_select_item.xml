@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+        <com.plv.livecommon.ui.widget.roundview.PLVRoundImageView
             android:id="@+id/plvhc_login_lesson_item_image_iv"
             android:layout_width="88dp"
             android:layout_height="66dp"

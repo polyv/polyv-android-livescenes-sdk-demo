@@ -163,61 +163,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/plvls_login_read_protocol_ly"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        app:layout_constraintLeft_toLeftOf="@id/plvls_login_remember_password_ll"
-        app:layout_constraintTop_toBottomOf="@+id/plvls_login_remember_password_ll">
-
-        <CheckBox
-            android:id="@+id/plvls_login_agree_contract_cb"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:button="@null"
-            android:padding="6dp"
-            android:drawableLeft="@drawable/plv_checkbox_selector"
-            android:layout_gravity="center_vertical" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="已阅读并同意"
-            android:textColor="#99F0F1F5"
-            android:textSize="12sp"
-            android:singleLine="true"
-            android:layout_gravity="center_vertical" />
-
-        <TextView
-            android:id="@+id/plvls_login_private_policy_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="《隐私政策》"
-            android:textColor="#F0F1F5"
-            android:textSize="12sp"
-            android:singleLine="true"
-            android:layout_gravity="center_vertical" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="和"
-            android:textColor="#99F0F1F5"
-            android:textSize="12sp"
-            android:layout_gravity="center_vertical" />
-
-        <TextView
-            android:id="@+id/plvls_login_usage_contract_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="《使用协议》"
-            android:textColor="#F0F1F5"
-            android:textSize="12sp"
-            android:singleLine="true"
-            android:layout_gravity="center_vertical" />
-    </LinearLayout>
-
     <ProgressBar
         android:id="@+id/plvls_login_loading_pb"
         android:layout_width="wrap_content"

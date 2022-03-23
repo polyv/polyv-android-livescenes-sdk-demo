@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:background="#171A38">
 
-    <com.easefun.polyv.livedemo.hiclass.fragments.viewpager.PLVHCNoTouchViewPager
+    <com.plv.livedemo.hiclass.fragments.viewpager.PLVHCNoTouchViewPager
         android:id="@+id/plvhc_login_vp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

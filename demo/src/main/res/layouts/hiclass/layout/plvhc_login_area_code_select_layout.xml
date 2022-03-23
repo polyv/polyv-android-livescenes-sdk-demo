@@ -5,7 +5,7 @@
     android:background="#BF000000"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+    <com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:radius="16dp"
@@ -45,6 +45,6 @@
             android:layout_below="@id/plvhc_login_area_code_label_tv"
             android:layout_alignParentBottom="true" />
 
-    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+    </com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
 </android.support.constraint.ConstraintLayout>

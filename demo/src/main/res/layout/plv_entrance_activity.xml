@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".PLVEntranceActivity">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+    <com.plv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/plv_entrance_bg" />
@@ -37,7 +37,8 @@
             style="@style/plv_entrance_button_style"
             android:layout_marginTop="-16dp"
             android:onClick="onClick"
-            android:background="@drawable/plv_entrance_hi_class_bg" />
+            android:background="@drawable/plv_entrance_hi_class_bg"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+    <com.plv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
         android:id="@+id/plvhc_student_login_bg_iv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        <com.plv.livecommon.ui.widget.PLVRoundRectGradientTextView
             android:id="@+id/plvhc_login_label_student_tv"
             android:layout_width="48dp"
             android:layout_height="24dp"

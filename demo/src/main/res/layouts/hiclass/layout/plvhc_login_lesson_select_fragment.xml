@@ -8,7 +8,7 @@
     android:focusableInTouchMode="true"
     android:background="#171A38">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+    <com.plv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/plvhc_login_bg" />
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            <com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout
                 android:id="@+id/plvhc_login_current_lesson_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -119,7 +119,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <com.easefun.polyv.livedemo.hiclass.fragments.share.item.PLVHCLoginLessonItemView
+                <com.plv.livedemo.hiclass.fragments.share.item.PLVHCLoginLessonItemView
                     android:id="@+id/plvhc_login_current_lesson_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -127,9 +127,9 @@
                     android:layout_marginTop="16dp"
                     android:layout_below="@id/plvhc_login_current_lesson_label_tv" />
 
-            </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+            </com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
-            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            <com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout
                 android:id="@+id/plvhc_login_other_lesson_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -157,7 +157,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_below="@id/plvhc_login_other_lesson_label_tv" />
 
-            </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+            </com.plv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
         </LinearLayout>
 

@@ -1,7 +1,7 @@
 include ':demo',
-        ':polyvLiveCommonModul',
-        ':polyvLiveEcommerceScene',
-        ':polyvLiveCloudClassScene',
-        ':polyvLiveStreamerScene', 
-        ':polyvStreamerAloneScene',
-        ':polyvLiveHiClassScene'
+        ':plvLiveCommonModul',
+        ':plvLiveEcommerceScene',
+        ':plvLiveCloudClassScene',
+        ':plvLiveStreamerScene',
+        ':plvStreamerAloneScene',
+        ':plvLiveHiClassScene'

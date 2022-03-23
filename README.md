@@ -49,7 +49,7 @@ polyv-android-livescenes-sdk-demo
 
 ### 2 体验 Demo
 
-Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
+Demo [下载链接](https://www.pgyer.com/FKKi) （密码：polyv）
 
 ### 3 文档
 #### 3.1 wiki文档

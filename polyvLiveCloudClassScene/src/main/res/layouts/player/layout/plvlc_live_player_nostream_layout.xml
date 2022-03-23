@@ -1,9 +1,0 @@
-<com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/no_stream_ly"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="gone"
-    tools:visibility="visible">
-</com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView>

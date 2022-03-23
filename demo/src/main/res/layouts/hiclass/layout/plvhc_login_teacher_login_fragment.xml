@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
+    <com.plv.livecommon.ui.widget.PLVAlignTopFillWidthImageView
         android:id="@+id/plvhc_teacher_login_bg_iv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        <com.plv.livecommon.ui.widget.PLVRoundRectGradientTextView
             android:id="@+id/plvhc_login_label_teacher_tv"
             android:layout_width="48dp"
             android:layout_height="24dp"
@@ -267,7 +267,7 @@
 
         </LinearLayout>
 
-        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+        <com.plv.livecommon.ui.widget.PLVTriangleIndicateLayout
             android:id="@+id/plvhc_login_teacher_agree_contract_indicate_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -295,7 +295,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-        </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+        </com.plv.livecommon.ui.widget.PLVTriangleIndicateLayout>
 
     </android.support.constraint.ConstraintLayout>
 
@@ -312,7 +312,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.easefun.polyv.livedemo.hiclass.fragments.teacher.widget.PLVHCLoginAreaCodeSelectLayout
+    <com.plv.livedemo.hiclass.fragments.teacher.widget.PLVHCLoginAreaCodeSelectLayout
         android:id="@+id/plvhc_login_area_code_select_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
