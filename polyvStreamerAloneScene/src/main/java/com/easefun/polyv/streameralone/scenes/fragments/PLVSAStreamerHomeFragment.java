@@ -192,6 +192,10 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         hideUserRequestTips();
     }
 
+    public void closeMemberLayout(){
+        memberLayout.closeAndHideWindow();
+    }
+
     public IPLVStreamerContract.IStreamerView getMoreLayoutStreamerView() {
         return moreLayout == null ? null : moreLayout.getStreamerView();
     }

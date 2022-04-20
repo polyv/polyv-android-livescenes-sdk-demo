@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
 
-import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
@@ -30,13 +29,12 @@ import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
-import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,17 +132,13 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         //model
         actionAfterLinkMicEngineCreated = new ArrayList<>();
         linkMicManager = PolyvLinkMicManagerFactory.createNewLinkMicManager();
-        int channelId = 0;
-        try {
-            channelId = Integer.parseInt(liveRoomDataManager.getConfig().getChannelId());
-        } catch (NumberFormatException e) {
-            String tips = Utils.getApp().getString(R.string.plv_linkmic_toast_invalid_channel_format)
-                    + liveRoomDataManager.getConfig().getChannelId();
-            PLVCommonLog.d(TAG, tips);
-            ToastUtils.showShort(tips);
-            return;
-        }
-        linkMicManager.initEngine(channelId, new PolyvLinkMicListener() {
+
+        final PLVLinkMicEngineParam param = new PLVLinkMicEngineParam()
+                .setChannelId(liveRoomDataManager.getConfig().getChannelId())
+                .setViewerId(liveRoomDataManager.getConfig().getUser().getViewerId())
+                .setViewerType(liveRoomDataManager.getConfig().getUser().getViewerType())
+                .setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+        linkMicManager.initEngine(param, new PolyvLinkMicListener() {
             @Override
             public void onLinkMicEngineCreatedSuccess() {
                 PLVCommonLog.d(TAG, "连麦初始化成功");
@@ -694,7 +688,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 PLVCommonLog.d(TAG, "第一画面:" + firstScreenLinkMicId);
 
                 if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
-                    rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId);
+                    rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId, isMuteAllVideo);
                     if (linkMicView != null) {
                         //位置传递-1表示不需要对新旧位置的View渲染更新，只记录第一画面的id即可。
                         linkMicView.updateFirstScreenChanged(firstScreenLinkMicId, -1, -1);
@@ -1180,7 +1174,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 return;
             }
             if (rtcInvokeStrategy != null) {
-                rtcInvokeStrategy.setFirstScreenLinkMicId(linkMicId);
+                rtcInvokeStrategy.setFirstScreenLinkMicId(linkMicId, isMuteAllVideo);
             }
             //将[linkMicId]切换到连麦列表的第一画面
             if (linkMicList.isEmpty()) {

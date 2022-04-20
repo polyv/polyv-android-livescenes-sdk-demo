@@ -2,6 +2,7 @@ package com.easefun.polyv.liveecommerce.modules.player;
 
 import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
@@ -89,9 +90,15 @@ public interface IPLVECVideoLayout {
 
     /**
      * view 是否设置为浮窗显示
+     *
      * @param isFloating
      */
     void setFloatingWindow(boolean isFloating);
+
+    /**
+     * @see View#dispatchTouchEvent(MotionEvent)
+     */
+    boolean dispatchTouchEvent(MotionEvent ev);
 
     /**
      * videoView父控件从videoLayout中分离出来

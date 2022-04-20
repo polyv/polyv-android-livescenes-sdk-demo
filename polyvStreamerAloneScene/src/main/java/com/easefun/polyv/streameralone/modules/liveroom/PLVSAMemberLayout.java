@@ -30,12 +30,16 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
+
+import io.socket.client.Ack;
 
 /**
  * 成员列表布局
@@ -127,6 +131,26 @@ public class PLVSAMemberLayout extends FrameLayout {
                     streamerPresenter.controlUserLinkMic(position, isAllowJoin);
                 }
             }
+
+            @Override
+            public void onGrantUserSpeakerPermission(int position, final PLVSocketUserBean user, final boolean isGrant) {
+                if(streamerPresenter != null && user != null){
+                    streamerPresenter.setUserPermissionSpeaker(user.getUserId(), isGrant, new Ack() {
+                        @Override
+                        public void call(Object... objects) {
+                            String text;
+                            if(isGrant){
+                                text = user.getNick() + "成为主讲人";
+                            } else {
+                                text = user.getNick() + "的主讲权限已移除";
+                            }
+                            PLVToast.Builder.context(getContext())
+                                    .setText(text)
+                                    .show();
+                        }
+                    });
+                }
+            }
         });
         plvsaMemberListRv.setAdapter(memberAdapter);
     }
@@ -182,6 +206,15 @@ public class PLVSAMemberLayout extends FrameLayout {
     }
 
     public void close() {
+        if (menuDrawer != null) {
+            menuDrawer.closeMenu();
+        }
+    }
+
+    public void closeAndHideWindow(){
+        if(memberAdapter != null){
+            memberAdapter.hideControlWindow();
+        }
         if (menuDrawer != null) {
             menuDrawer.closeMenu();
         }
@@ -318,6 +351,16 @@ public class PLVSAMemberLayout extends FrameLayout {
                         }
                     })
                     .show();
+        }
+
+        @Override
+        public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+            super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
+            if(PLVPPTAuthentic.PermissionType.TEACHER.equals(type)){
+                if(user != null && !user.isTeacher()){
+                    memberAdapter.setHasSpeakerUser(isGranted ? user : null);
+                }
+            }
         }
     };
     // </editor-fold>

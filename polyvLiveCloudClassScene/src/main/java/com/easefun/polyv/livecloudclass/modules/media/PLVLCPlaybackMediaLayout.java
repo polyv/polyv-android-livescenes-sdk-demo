@@ -207,7 +207,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 danmuWrapper.dispatchDanmuSwitchOnClicked(v);
                 mediaController.dispatchDanmuSwitchOnClicked(v);
                 if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
-                    chatLandscapeLayout.setVisibility(danmuSwitchView.isSelected() ? View.GONE : View.VISIBLE);
+                    final boolean showChatLayout = !danmuSwitchView.isSelected();
+                    chatLandscapeLayout.toggle(showChatLayout);
                 }
             }
         });

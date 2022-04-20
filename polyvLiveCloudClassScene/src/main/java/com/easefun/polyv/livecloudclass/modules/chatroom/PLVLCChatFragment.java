@@ -34,6 +34,8 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPersonalListAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatFunctionListener;
+import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
@@ -52,12 +54,13 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
-import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
+import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
+import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -100,19 +103,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     //下拉加载历史记录控件
     private SwipeRefreshLayout swipeLoadView;
 
-    //更多布局
-    private ViewGroup moreLy;
-    //只看讲师/查看全部
-    private ViewGroup changeMessageTypeLy;
-    private TextView messageTypeTv;
-    //发送图片
-    private ViewGroup sendImgLy;
-    //拍摄
-    private ViewGroup openCameraLy;
-    //公告
-    private ViewGroup showBulletinLy;
-    //占位view，用于保持布局间的间距
-    private View moreEmptyView;
+    private PLVLCChatMoreLayout chatMoreLayout;
+    //是否选择只看讲师
+    private boolean isSelectOnlyTeacher;
 
     //表情布局
     private ViewGroup emojiLy;
@@ -245,21 +238,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             }
         }
 
-        //更多布局
-        moreLy = findViewById(R.id.more_ly);
-        changeMessageTypeLy = findViewById(R.id.change_message_type_ly);
-        changeMessageTypeLy.setOnClickListener(this);
-        messageTypeTv = findViewById(R.id.message_type_tv);
-        sendImgLy = findViewById(R.id.send_img_ly);
-        sendImgLy.setOnClickListener(this);
-        openCameraLy = findViewById(R.id.open_camera_ly);
-        openCameraLy.setOnClickListener(this);
-        moreEmptyView = findViewById(R.id.more_empty_view);
-        showBulletinLy = findViewById(R.id.show_bulletin_ly);
-        showBulletinLy.setOnClickListener(this);
-        if (!isLiveType) {
-            showBulletinLy.setVisibility(View.INVISIBLE);
-        }
+        initChatMoreLayout();
 
         //表情布局
         emojiLy = findViewById(R.id.emoji_ly);
@@ -304,12 +283,57 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         addPopupLayout(emojiLy);
 
         addPopupButton(toggleMoreIv);
-        addPopupLayout(moreLy);
+        addPopupLayout(chatMoreLayout);
 
         //观察聊天室功能开关数据
         observeFunctionSwitchData();
         //观察聊天室个性表情更新
         observeEmotionImages();
+    }
+
+    private void initChatMoreLayout(){
+        chatMoreLayout = findViewById(R.id.plvlc_chat_more_layout);
+        if (!isLiveType) {
+            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_BULLETIN, false);
+        }
+        chatMoreLayout.setFunctionListener(new PLVLCChatFunctionListener() {
+            @Override
+            public void onFunctionCallback(int type) {
+
+                switch(type){
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER:
+                        isSelectOnlyTeacher = !isSelectOnlyTeacher;
+                        PLVChatFunctionVO onlyTeacherFunction = chatMoreLayout.getFunctionByType(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER);
+                        onlyTeacherFunction.setSelected(isSelectOnlyTeacher);
+                        onlyTeacherFunction.setName(isSelectOnlyTeacher ? getString(R.string.plv_chat_view_all_message) : getString(R.string.plv_chat_view_special_message));
+                        chatMoreLayout.updateFunctionStatus(onlyTeacherFunction);
+                        if (chatCommonMessageList != null) {
+                            chatCommonMessageList.changeDisplayType(isSelectOnlyTeacher);
+                        }
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE:
+                        requestSelectImg();
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA:
+                        requestOpenCamera();
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_BULLETIN:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowBulletinAction();
+                        }
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowMessageAction();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
     // </editor-fold>
 
@@ -697,9 +721,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 当前是否是只看讲师">
     public boolean isDisplaySpecialType() {
-        return changeMessageTypeLy != null && changeMessageTypeLy.isSelected();
+        return isSelectOnlyTeacher;
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 更新消息状态">
+    public void updateInteractStatus(boolean isShow, boolean hasNew){
+        chatMoreLayout.updateFunctionNew(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE, isShow, hasNew);
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="输入框 - 文本改变监听器">
     private TextWatcher inputTextWatcher = new TextWatcher() {
@@ -822,9 +852,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     switch (dataBean.getType()) {
                         //观众发送图片开关
                         case PolyvChatFunctionSwitchVO.TYPE_VIEWER_SEND_IMG_ENABLED:
-                            sendImgLy.setVisibility(isSwitchEnabled ? View.VISIBLE : View.GONE);
-                            openCameraLy.setVisibility(isSwitchEnabled ? View.VISIBLE : View.GONE);
-                            moreEmptyView.setVisibility(isSwitchEnabled ? View.GONE : View.VISIBLE);
+                            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE, isSwitchEnabled);
+                            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA, isSwitchEnabled);
                             break;
                         //欢迎语开关
                         case PolyvChatFunctionSwitchVO.TYPE_WELCOME:
@@ -893,26 +922,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         if (id == R.id.toggle_emoji_iv) {
             togglePopupLayout(toggleEmojiIv, emojiLy);
         } else if (id == R.id.toggle_more_iv) {
-            togglePopupLayout(toggleMoreIv, moreLy);
+            togglePopupLayout(toggleMoreIv, chatMoreLayout);
         } else if (id == R.id.delete_msg_iv) {
             PLVChatroomUtils.deleteEmoText(inputEt);
         } else if (id == R.id.send_msg_tv) {
             sendChatMessage(inputEt.getText().toString());
-        } else if (id == R.id.change_message_type_ly) {
-            changeMessageTypeLy.setSelected(!changeMessageTypeLy.isSelected());
-            messageTypeTv.setText(changeMessageTypeLy.isSelected() ? R.string.plv_chat_view_all_message : R.string.plv_chat_view_special_message);
-            if (chatCommonMessageList != null) {
-                chatCommonMessageList.changeDisplayType(changeMessageTypeLy.isSelected());
-            }
-        } else if (id == R.id.show_bulletin_ly) {
-            hideSoftInputAndPopupLayout();
-            if (onViewActionListener != null) {
-                onViewActionListener.onShowBulletinAction();
-            }
-        } else if (id == R.id.send_img_ly) {
-            requestSelectImg();
-        } else if (id == R.id.open_camera_ly) {
-            requestOpenCamera();
         } else if (id == R.id.likes_view) {
             if (chatroomPresenter != null) {
                 chatroomPresenter.sendLikeMessage();
@@ -935,6 +949,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public interface OnViewActionListener {
         void onShowBulletinAction();
+
+        void onShowMessageAction();
     }
     // </editor-fold>
 }

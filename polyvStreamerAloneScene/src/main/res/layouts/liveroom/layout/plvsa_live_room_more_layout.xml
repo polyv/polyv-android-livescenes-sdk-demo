@@ -36,7 +36,8 @@
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:layout_marginRight="6dp"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -50,7 +51,7 @@
                 android:id="@+id/plvsa_more_camera_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="摄像头"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
@@ -63,8 +64,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -78,7 +80,7 @@
                 android:id="@+id/plvsa_more_mic_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="麦克风"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
@@ -91,8 +93,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -106,7 +109,7 @@
                 android:id="@+id/plvsa_more_camera_switch_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="翻转"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
@@ -119,8 +122,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -134,7 +138,7 @@
                 android:id="@+id/plvsa_more_mirror_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="镜像"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
@@ -147,8 +151,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -162,8 +167,38 @@
                 android:id="@+id/plvsa_more_flashlight_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="闪光灯"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plvsa_more_share_screen_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginBottom="6dp"
+            android:gravity="center|top"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/plvsa_more_share_screen_iv"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:padding="10dp"
+                android:src="@drawable/plvsa_streamer_share_screen_selector" />
+
+            <TextView
+                android:id="@+id/plvsa_more_share_screen_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:text="屏幕共享"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
 
@@ -175,8 +210,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -190,7 +226,7 @@
                 android:id="@+id/plvsa_more_bitrate_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="高清"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
@@ -204,8 +240,9 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_marginBottom="6dp"
-            android:gravity="center"
+            android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
@@ -219,7 +256,7 @@
                 android:id="@+id/plvsa_more_close_room_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="center|top"
                 android:text="开启全体禁言"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />

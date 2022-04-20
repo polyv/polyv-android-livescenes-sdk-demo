@@ -26,7 +26,9 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -343,10 +345,10 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             linkMicLayout.init(liveRoomDataManager, linkMicControlBar);
             linkMicLayout.hideAll();
 
-            // 互动应用布局
+            // 互动应用布局 - v2
             ViewStub interactLayoutViewStub = findViewById(R.id.plvlc_ppt_interact_layout);
-            interactLayout = (IPLVInteractLayout) interactLayoutViewStub.inflate();
-            interactLayout.init();
+            interactLayout = (PLVInteractLayout2) interactLayoutViewStub.inflate();
+            interactLayout.init(liveRoomDataManager);
         } else {
             // 播放器布局
             videoLyViewStub.setLayoutResource(R.layout.plvlc_playback_media_layout_view_stub);
@@ -500,12 +502,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     switch (playerState) {
                         case PREPARED:
                             floatingPPTLayout.show();
-                            livePageMenuLayout.updateLiveStatusWithLive();
+                            livePageMenuLayout.updateLiveStatus(PLVLiveStateEnum.LIVE);
                             if (linkMicLayout != null) {
                                 linkMicLayout.showAll();
                             }
                             break;
                         case LIVE_STOP:
+                            if (liveRoomDataManager.getConfig().isPPTChannelType()) {
+                                //对于三分屏频道，直播结束，将PPT和播放器各自切回到各自的位置
+                                if (!floatingPPTLayout.isPPTInFloatingLayout()) {
+                                    pptViewSwitcher.switchView();
+                                }
+                            }
+                            floatingPPTLayout.hide();
+                            livePageMenuLayout.updateLiveStatus(PLVLiveStateEnum.STOP);
+                            if (linkMicLayout != null) {
+                                linkMicLayout.setLiveEnd();
+                                linkMicLayout.hideAll();
+                            }
+                            break;
                         case NO_LIVE:
                         case LIVE_END:
                             if (liveRoomDataManager.getConfig().isPPTChannelType()) {
@@ -515,7 +530,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                 }
                             }
                             floatingPPTLayout.hide();
-                            livePageMenuLayout.updateLiveStatusWithNoLive();
+                            livePageMenuLayout.updateLiveStatus(PLVLiveStateEnum.END);
                             if (linkMicLayout != null) {
                                 linkMicLayout.setLiveEnd();
                                 linkMicLayout.hideAll();
@@ -629,6 +644,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             @Override
             public void onSeekToAction(int progress) {
                 mediaLayout.seekTo(progress * 1000, mediaLayout.getDuration());
+            }
+
+            @Override
+            public void onShowMessageAction() {
+                if (interactLayout != null) {
+                    interactLayout.showMessage();
+                }
             }
         });
         //当前页面 监听 聊天室数据中的观看热度变化

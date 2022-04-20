@@ -171,13 +171,13 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     }
 
     @Override
-    public void setFirstScreenLinkMicId(String linkMicId) {
+    public void setFirstScreenLinkMicId(String linkMicId, boolean mute) {
         if (PolyvLinkMicConfig.getInstance().isPureRtcOnlySubscribeMainScreenVideo()) {
             //mute掉原先的第一画面的视频
             linkMicManager.muteRemoteVideo(firstScreenLinkMicId, true);
             firstScreenLinkMicId = linkMicId;
             //订阅新的第一画面的视频
-            linkMicManager.muteRemoteVideo(firstScreenLinkMicId, false);
+            linkMicManager.muteRemoteVideo(firstScreenLinkMicId, mute);
         }
     }
     // </editor-fold>

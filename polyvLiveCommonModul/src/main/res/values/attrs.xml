@@ -15,10 +15,17 @@
 
     <declare-styleable name="PLVRoundRectLayout">
         <attr name="radius" format="dimension" />
-        <attr name="mode">
-            <enum name="none" value="0" />
-            <enum name="all" value="1" />
-            <enum name="top" value="3" />
+        <attr name="mode" format="flags">
+            <flag name="none" value="0" />
+            <flag name="leftTop" value="1" />
+            <flag name="leftBottom" value="2" />
+            <flag name="rightTop" value="4" />
+            <flag name="rightBottom" value="8" />
+            <flag name="left" value="3" />
+            <flag name="top" value="5" />
+            <flag name="bottom" value="10" />
+            <flag name="right" value="12" />
+            <flag name="all" value="15" />
         </attr>
     </declare-styleable>
 
@@ -290,6 +297,20 @@
 
             <flag name="multiTouch" value="0x0100" />
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="PLVRedPointImageView">
+        <attr name="plvRedPointPos" format="enum">
+            <enum name="leftTop" value="0" />
+            <enum name="rightTop" value="1" />
+            <enum name="rightBottom" value="2" />
+            <enum name="leftBottom" value="3" />
+        </attr>
+        <attr name="plvRedPointMarginHorizontal" format="dimension" />
+        <attr name="plvRedPointMarginVertical" format="dimension" />
+        <attr name="plvRedPointRadius" format="dimension" />
+        <attr name="plvRedPointColor" format="color" />
+        <attr name="plvDrawRedPoint" format="boolean" />
     </declare-styleable>
 
 </resources>

@@ -51,6 +51,9 @@ public class PLVLinkMicItemDataBean {
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
 
+    //[我]是否在屏幕共享
+    private boolean isScreenSharedForMe = false;
+
     //linkMic status
     private String status = STATUS_IDLE;
     private Map<Integer, MuteMedia> muteVideoInRtcJoinListMap = new HashMap<>();
@@ -253,6 +256,15 @@ public class PLVLinkMicItemDataBean {
         this.userId = userId;
     }
 
+
+    public boolean isScreenSharedForMe() {
+        return isScreenSharedForMe;
+    }
+
+    public void setScreenSharedForMe(boolean screenSharedForMe) {
+        isScreenSharedForMe = screenSharedForMe;
+    }
+
     public static class MuteMedia {
         boolean isMute;
         int streamType;
@@ -319,6 +331,7 @@ public class PLVLinkMicItemDataBean {
                 ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
+                ", isScreenSharedForMe=" + isScreenSharedForMe +
                 '}';
     }
 }

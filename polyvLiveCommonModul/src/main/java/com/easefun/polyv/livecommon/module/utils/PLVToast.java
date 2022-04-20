@@ -50,7 +50,7 @@ public class PLVToast {
 
         final TextView textView = new AppCompatTextView(param.context);
         textView.setMinWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 158));
+        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 228));
         textView.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         textView.setMaxLines(4);
         textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -60,7 +60,7 @@ public class PLVToast {
         int verticalPadding = PLVUIUtil.dip2px(param.context, 10);
 
         if (param.drawableResId != 0) {
-            textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 196));
+            textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 228));
             textView.setPadding(PLVUIUtil.dip2px(param.context, 8), 0, 0, 0);
 
             ImageView imageView = new AppCompatImageView(param.context);

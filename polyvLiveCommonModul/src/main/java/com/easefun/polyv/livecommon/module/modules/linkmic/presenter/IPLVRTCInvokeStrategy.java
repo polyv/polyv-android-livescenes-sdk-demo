@@ -69,7 +69,7 @@ public interface IPLVRTCInvokeStrategy {
      *
      * @param linkMicId 第一画面连麦ID
      */
-    void setFirstScreenLinkMicId(String linkMicId);
+    void setFirstScreenLinkMicId(String linkMicId, boolean mute);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4. 设置监听器">

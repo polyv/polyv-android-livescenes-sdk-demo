@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.ui.window;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -22,17 +20,43 @@ import java.util.List;
  */
 public class PLVBaseActivity extends AppCompatActivity {
     // <editor-fold defaultstate="collapsed" desc="成员变量">
-    private  static final String TAG = "PLVBaseActivity";
-    private  static final int APP_STATUS_KILLED = 0; // 表示应用是被杀死后在启动的
-    private  static final int APP_STATUS_RUNNING = 1; // 表示应用时正常的启动流程
+    private static final String TAG = "PLVBaseActivity";
+    private static final int APP_STATUS_KILLED = 0; // 表示应用是被杀死后在启动的
+    private static final int APP_STATUS_RUNNING = 1; // 表示应用时正常的启动流程
     private static int APP_STATUS = APP_STATUS_KILLED; // 记录App的启动状态
-    protected boolean isCreateSuccess;
     // 页面方向管理器
     private PLVOrientationManager orientationManager;
     private PLVRotationObserver rotationObserver;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="处理异常启动时的相关方法">
+    private void stopOnAbnormalLaunch() {
+        PLVCommonLog.e(TAG, "App stop on abnormal launch");
+        if (isLaunchActivityInheritFromBase() && restartApp()) {
+            return;
+        }
+        stopApp();
+    }
+
+    private boolean restartApp() {
+        try {
+            Intent intent = new Intent(this, Class.forName(getLaunchActivityName()));
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+            stopApp();
+            return true;
+        } catch (Exception e) {
+            PLVCommonLog.e(TAG, "restartApp:" + e.getMessage());
+        }
+        return false;
+    }
+
+    private static void stopApp() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0);
+    }
+
     private String getLaunchActivityName() {
         Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
         resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -44,31 +68,11 @@ public class PLVBaseActivity extends AppCompatActivity {
         return null;
     }
 
-    private int getTaskActivityCount() {
-        ActivityManager am = (ActivityManager) getSystemService(Activity.ACTIVITY_SERVICE);
-        if (am == null)
-            return -1;
+    private boolean isLaunchActivityInheritFromBase() {
         try {
-            // getBusinessProtocol the info from the currently running task
-            List<ActivityManager.RunningTaskInfo> taskInfos = am.getRunningTasks(1);
-            if (taskInfos != null && !taskInfos.isEmpty()) {
-                return taskInfos.get(0).numActivities;
-            }
+            return getLaunchActivityName() != null && PLVBaseActivity.class.isAssignableFrom(Class.forName(getLaunchActivityName()));
         } catch (Exception e) {
-            PLVCommonLog.e(TAG, "getTaskActivityCount:" + e.getMessage());
-        }
-        return -1;
-    }
-
-    public boolean restartApp() {
-        try {
-            Intent intent = new Intent(this, Class.forName(getLaunchActivityName()));
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        } catch (Exception e) {
-            PLVCommonLog.e(TAG, "restartApp:" + e.getMessage());
+            PLVCommonLog.exception(e);
         }
         return false;
     }
@@ -77,25 +81,17 @@ public class PLVBaseActivity extends AppCompatActivity {
     // <editor-fold defaultstate="collapsed" desc="Activity方法">
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null && APP_STATUS == APP_STATUS_KILLED) {
+            // 非正常启动流程，直接重新初始化应用界面
+            stopOnAbnormalLaunch();
+            return;
+        }
         if (savedInstanceState != null) {
             savedInstanceState.putParcelable("android:support:fragments", null);
             savedInstanceState.putParcelable("android:fragments", null);
         }
         super.onCreate(savedInstanceState);
-        isCreateSuccess = false;
-        boolean launchActivityItBaseActivity = false;
-        try {
-            launchActivityItBaseActivity = getLaunchActivityName() != null && PLVBaseActivity.class.isAssignableFrom(Class.forName(getLaunchActivityName()));//父/等
-        } catch (ClassNotFoundException e) {
-            PLVCommonLog.e(TAG, "isAssignableFrom:" + e.getMessage());
-        }
-        if (!launchActivityItBaseActivity || (getClass().getName().equals(getLaunchActivityName()) && getTaskActivityCount() < 2)) {
-            APP_STATUS = APP_STATUS_RUNNING;
-        }
-        if (APP_STATUS == APP_STATUS_KILLED && restartApp()) { // 非正常启动流程，直接重新初始化应用界面
-            return;
-        }
-        isCreateSuccess = true;
+        APP_STATUS = APP_STATUS_RUNNING;
 
         initOrientationManager();
     }
@@ -122,7 +118,6 @@ public class PLVBaseActivity extends AppCompatActivity {
         if (orientationManager != null) {
             orientationManager.removeRotationObserver(rotationObserver);
         }
-        isCreateSuccess = false;
     }
 
     @Override

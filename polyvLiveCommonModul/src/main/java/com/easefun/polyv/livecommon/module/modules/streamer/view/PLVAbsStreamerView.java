@@ -134,6 +134,11 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
+    public void onScreenShareChange(int position, boolean isShare, int extra) {
+
+    }
+
+    @Override
     public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
 
     }

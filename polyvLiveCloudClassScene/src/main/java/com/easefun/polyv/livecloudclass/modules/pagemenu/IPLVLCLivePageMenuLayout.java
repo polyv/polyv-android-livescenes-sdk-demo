@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 
@@ -58,14 +59,9 @@ public interface IPLVLCLivePageMenuLayout {
     void addOnViewerCountListener(IPLVOnDataChangedListener<Long> listener);
 
     /**
-     * 更新直播状态为直播中
+     * 更新直播状态
      */
-    void updateLiveStatusWithLive();
-
-    /**
-     * 更新直播状态为未直播中
-     */
-    void updateLiveStatusWithNoLive();
+    void updateLiveStatus(PLVLiveStateEnum liveStateEnum);
 
     /**
      * 是否拦截返回事件，拦截的情况有：
@@ -115,6 +111,11 @@ public interface IPLVLCLivePageMenuLayout {
          */
         void onSeekToAction(int progress);
 
+
+        /**
+         * 显示消息
+         */
+        void onShowMessageAction();
     }
     // </editor-fold>
 }
