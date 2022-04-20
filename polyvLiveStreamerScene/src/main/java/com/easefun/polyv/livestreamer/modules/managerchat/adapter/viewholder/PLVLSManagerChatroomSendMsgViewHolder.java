@@ -3,11 +3,7 @@ package com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.arch.lifecycle.ViewModelStoreOwner;
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.annotation.Px;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +11,11 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVManagerChatViewModel;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;

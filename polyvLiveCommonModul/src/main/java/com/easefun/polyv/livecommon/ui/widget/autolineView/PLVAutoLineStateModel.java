@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.ui.widget.autolineView;
 
-import android.support.annotation.IdRes;
+import androidx.annotation.IdRes;
 
 public class PLVAutoLineStateModel {
 

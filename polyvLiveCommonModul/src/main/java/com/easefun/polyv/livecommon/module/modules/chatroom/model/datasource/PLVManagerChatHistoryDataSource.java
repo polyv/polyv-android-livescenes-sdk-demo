@@ -1,7 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.model.datasource;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.model.vo.PLVManagerChatHistoryLoadStatus;

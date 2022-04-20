@@ -11,8 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.rom.HuaweiUtils;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.rom.MeizuUtils;

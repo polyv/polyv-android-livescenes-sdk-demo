@@ -2,12 +2,13 @@ package com.easefun.polyv.livecommon.module.modules.chatroom.presenter;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Pair;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;

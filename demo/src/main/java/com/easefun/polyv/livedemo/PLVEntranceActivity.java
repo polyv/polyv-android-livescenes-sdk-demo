@@ -3,9 +3,10 @@ package com.easefun.polyv.livedemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livedemo.hiclass.PLVLoginHiClassActivity;

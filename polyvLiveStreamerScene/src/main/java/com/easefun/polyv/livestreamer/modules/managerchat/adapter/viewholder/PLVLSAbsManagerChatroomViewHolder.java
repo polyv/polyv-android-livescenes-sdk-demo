@@ -4,11 +4,12 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;

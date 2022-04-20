@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter.usecase;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;
 
