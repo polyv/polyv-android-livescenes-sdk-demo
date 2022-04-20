@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
@@ -234,6 +235,18 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         PLVECFloatingWindowService.unbindService(this, floatingWindowConnection);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(floatingWindowReceiver);
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="手势事件拦截">
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (videoLayout != null) {
+            videoLayout.dispatchTouchEvent(ev);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
@@ -462,8 +475,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if(interactLayout == null) {
             // 互动应用布局
             ViewStub interactLayoutViewStub = findViewById(R.id.plvec_ppt_interact_layout);
-            interactLayout = (IPLVInteractLayout) interactLayoutViewStub.inflate();
-            interactLayout.init();
+            interactLayout = (PLVInteractLayout2) interactLayoutViewStub.inflate();
+            interactLayout.init(liveRoomDataManager);
         }
     }
     // </editor-fold >

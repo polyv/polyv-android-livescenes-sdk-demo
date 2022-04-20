@@ -58,6 +58,7 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     public static final String ANSWER_USER_IMG_URL = "answer_user_img_url";
     public static final String ANSWER_USER_IMG_WIDTH = "answer_user_img_width";
     public static final String ANSWER_USER_IMG_HEIGHT = "answer_user_img_height";
+    public static final String SHOW_EMOTION_TAB = "show_emotion_tab";
 
     //params
     private String answerUserName;
@@ -65,6 +66,7 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
     private String answerUserImgUrl;
     private double answerUserImgWidth;
     private double answerUserImgHeight;
+    private boolean showEmotionTab;
 
     //--
     private boolean isInitEmotion = false;
@@ -126,6 +128,7 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         answerUserImgUrl = intent.getStringExtra(ANSWER_USER_IMG_URL);
         answerUserImgWidth = intent.getDoubleExtra(ANSWER_USER_IMG_WIDTH, 0);
         answerUserImgHeight = intent.getDoubleExtra(ANSWER_USER_IMG_HEIGHT, 0);
+        showEmotionTab = intent.getBooleanExtra(SHOW_EMOTION_TAB, true);
         if (answerUserImgWidth == 0) {
             answerUserImgWidth = ConvertUtils.dp2px(40);
         }
@@ -289,6 +292,9 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
                     }
                 });
         plvlsChatroomEmojiIndicatorView.bindViewPager(plvlsChatroomEmotionVp);
+
+        plvlsEmojiTabPersonalIv.setVisibility(showEmotionTab ? View.VISIBLE : View.GONE);
+
         isInitEmotion = true;
     }
 
@@ -419,6 +425,9 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
             } else {
                 plvlsChatroomChatMsgSendTv.setSelected(false);
             }
+            if (inputListener instanceof MessageSendListener) {
+                ((MessageSendListener) inputListener).afterTextChanged(s);
+            }
         }
     };
     // </editor-fold>
@@ -433,6 +442,8 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
          * 发送个性表情
          */
         boolean onSendEmotion(PLVEmotionImageVO.EmotionImage emotionImage);
+
+        void afterTextChanged(Editable s);
     }
     // </editor-fold>
 }

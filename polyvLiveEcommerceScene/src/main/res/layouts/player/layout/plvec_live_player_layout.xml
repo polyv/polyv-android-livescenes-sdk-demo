@@ -65,16 +65,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center" />
+
+        <!--logo 显示 -->
+        <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+            android:id="@+id/logo_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </FrameLayout>
-    <!--logo 显示 -->
-    <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
-        android:id="@+id/logo_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp" />
+
     <!--视频暂停和继续播放的按钮 -->
     <ImageView
         android:id="@+id/play_center"

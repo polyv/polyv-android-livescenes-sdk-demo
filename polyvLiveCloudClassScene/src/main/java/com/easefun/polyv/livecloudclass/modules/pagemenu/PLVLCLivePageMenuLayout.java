@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -59,6 +60,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -281,6 +283,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         initSocketLoginManager();
         observeClassDetailVO();
+        observeInteractData();
     }
 
     @Override
@@ -309,16 +312,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
-    public void updateLiveStatusWithLive() {
+    public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
         if (liveDescFragment != null) {
-            liveDescFragment.updateStatusViewWithLive();
-        }
-    }
-
-    @Override
-    public void updateLiveStatusWithNoLive() {
-        if (liveDescFragment != null) {
-            liveDescFragment.updateStatusViewWithNoLive();
+            liveDescFragment.updateLiveStatus(liveStateEnum);
         }
     }
 
@@ -422,6 +418,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onShowBulletinAction() {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowBulletinAction();
+                }
+            }
+
+            @Override
+            public void onShowMessageAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowMessageAction();
                 }
             }
         });
@@ -618,6 +621,21 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         });
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 互动应用消息">
+    private void observeInteractData(){
+        liveRoomDataManager.getInteractStatusData().observe((LifecycleOwner) getContext(), new Observer<PLVWebviewUpdateAppStatusVO>() {
+            @Override
+            public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO plvWebviewUpdateAppStatusVO) {
+                if(chatFragment != null && plvWebviewUpdateAppStatusVO != null){
+                    if(plvWebviewUpdateAppStatusVO.getEvent().equals("SHOW_LOTTERY_RECORD") && plvWebviewUpdateAppStatusVO.getValue() != null) {
+                        chatFragment.updateInteractStatus(plvWebviewUpdateAppStatusVO.getValue().getIsShow(), plvWebviewUpdateAppStatusVO.getValue().getHasNew());
+                    }
+                }
+            }
+        });
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听回放视频的信息：vid变更，seek跳转">
     private void observerPreviousData() {

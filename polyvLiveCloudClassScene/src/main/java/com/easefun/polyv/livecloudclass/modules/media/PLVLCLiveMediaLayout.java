@@ -597,7 +597,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 danmuWrapper.dispatchDanmuSwitchOnClicked(v);
                 mediaController.dispatchDanmuSwitchOnClicked(v);
                 if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
-                    chatLandscapeLayout.setVisibility(danmuSwitchView.isSelected() ? View.GONE : View.VISIBLE);
+                    final boolean showChatLayout = !danmuSwitchView.isSelected();
+                    chatLandscapeLayout.toggle(showChatLayout);
                 }
             }
         });
@@ -1049,12 +1050,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             //否则不预留右边距
             showLandscapeRTCLayout(false);
         }
-        post(new Runnable() {
-            @Override
-            public void run() {
-                chatLandscapeLayout.setVisibility(danmuWrapper.getToggleDanmuStatus() ? View.VISIBLE : View.GONE);
-            }
-        });
     }
 
     private void setPortrait() {

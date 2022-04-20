@@ -21,13 +21,16 @@ import android.view.WindowManager;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
+import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.IPLVSASettingLayout;
@@ -35,6 +38,7 @@ import com.easefun.polyv.streameralone.modules.liveroom.PLVSACleanUpLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
 import com.easefun.polyv.streameralone.modules.streamer.IPLVSAStreamerLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayout;
+import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFullscreenLayout;
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAEmptyFragment;
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAStreamerHomeFragment;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
@@ -77,6 +81,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     // 清屏指引布局
     @Nullable
     private PLVSACleanUpLayout cleanUpLayout;
+    //全屏布局
+    private PLVSAStreamerFullscreenLayout fullscreenLayout;
+
     // 直播结束布局
     private PLVSAStreamerFinishLayout streamerFinishLayout;
     // 摄像头上层的viewpager布局
@@ -176,6 +183,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         observeStreamerLayout();
         observeCleanUpLayout();
         observeLinkmicRequestLayout();
+        observeFullscreenLayout();
     }
 
     private void setStatusBarColor() {
@@ -300,6 +308,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         topLayerViewPager = findViewById(R.id.plvsa_top_layer_view_pager);
         linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
 
+        fullscreenLayout = findViewById(R.id.plvsa_fullscreen_view);
+
         //初始化推流和连麦布局
         streamerLayout.init(liveRoomDataManager);
 
@@ -403,6 +413,15 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             @Override
             public void onRestartLiveAction() {
                 recreate();
+            }
+
+            @Override
+            public void onFullscreenAction(PLVLinkMicItemDataBean itemDataBean, PLVSwitchViewAnchorLayout switchItemView) {
+                //已经全屏时，不自动响应全屏动作
+                if(fullscreenLayout != null && !fullscreenLayout.isFullScreened()) {
+                    fullscreenLayout.changeViewToFullscreen(switchItemView, itemDataBean);
+                    homeFragment.closeMemberLayout();
+                }
             }
         });
         //监听因断网延迟20s断流的状态
@@ -568,6 +587,20 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     }
 
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 全屏布局">
+    private void observeFullscreenLayout() {
+        if (streamerLayout != null && fullscreenLayout != null) {
+            streamerLayout.getStreamerPresenter().registerView(fullscreenLayout.getStreamerView());
+            fullscreenLayout.setOnViewActionListener(new PLVSAStreamerFullscreenLayout.OnViewActionListener() {
+                @Override
+                public void onExitFullscreen(PLVLinkMicItemDataBean linkmicItem, PLVViewSwitcher fullscreenSwitcher) {
+                    streamerLayout.clearFullscreenState(linkmicItem);
+                }
+            });
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="设置直播恢复">
 

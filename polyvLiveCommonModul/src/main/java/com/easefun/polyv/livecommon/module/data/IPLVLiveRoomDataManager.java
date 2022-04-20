@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.data;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
@@ -9,6 +10,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 
 /**
  * 直播间数据管理器的接口
@@ -57,6 +59,11 @@ public interface IPLVLiveRoomDataManager {
     LiveData<PLVStatefulData<PLVLiveRoomDataManager.LiveStatus>> getLiveStatusData();
 
     /**
+     * 获取互动应用状态
+     */
+    MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData();
+
+    /**
      * 获取有状态的互动学堂课节详情LiveData
      */
     LiveData<PLVStatefulData<PLVHiClassDataBean>> getFulHiClassDataBean();
@@ -70,6 +77,11 @@ public interface IPLVLiveRoomDataManager {
      * 获取仅音频模式开关
      */
     LiveData<Boolean> getIsOnlyAudioEnabled();
+
+    /**
+     * 订阅SessionId
+     */
+    LiveData<String> getSessionIdLiveData();
 
     /**
      * 获取回放频道的详细信息LiveData

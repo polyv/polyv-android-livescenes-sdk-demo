@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvlc_chat_more_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:background="#2B2C35"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:ignore="MissingDefaultResource">
+
+    <ImageView
+        android:id="@+id/plvlc_chat_more_item_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/plvlc_chatroom_btn_view_message_selector" />
+
+    <ImageView
+        android:id="@+id/plvlc_chat_more_item_new"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_alignTop="@id/plvlc_chat_more_item_icon"
+        android:layout_alignRight="@id/plvlc_chat_more_item_icon"
+        android:src="@drawable/plv_icon_red_point"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/plvlc_chat_more_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/plvlc_chat_more_item_icon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="@string/plv_chat_view_special_message"
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+</RelativeLayout>

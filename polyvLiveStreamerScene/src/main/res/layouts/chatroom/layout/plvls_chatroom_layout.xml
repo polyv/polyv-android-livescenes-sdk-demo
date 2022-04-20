@@ -46,14 +46,47 @@
             tools:visibility="visible" />
     </FrameLayout>
 
-    <!--聊天室信息布局的显示/隐藏控制按钮-->
-    <ImageView
-        android:id="@+id/plvls_chatroom_control_iv"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvls_chatroom_control_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/plvls_chatroom_chat_msg_ly"
         android:layout_marginTop="8dp"
-        android:src="@drawable/plvls_chatroom_control_iv_selector" />
+        android:background="#661B202D"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        app:radius="18dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!--聊天室信息布局的显示/隐藏控制按钮-->
+            <ImageView
+                android:id="@+id/plvls_chatroom_control_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/plvls_chatroom_control_iv_selector" />
+
+            <!--管理员私聊按钮-->
+            <com.easefun.polyv.livecommon.ui.widget.imageview.PLVRedPointImageView
+                android:id="@+id/plvls_chatroom_manager_chat_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/plvls_chatroom_manager_chat_icon"
+                android:visibility="gone"
+                app:plvDrawRedPoint="false"
+                app:plvRedPointColor="#FF6363"
+                app:plvRedPointMarginHorizontal="6dp"
+                app:plvRedPointMarginVertical="6dp"
+                app:plvRedPointPos="rightTop"
+                app:plvRedPointRadius="3dp"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
     <!--聊天工具栏布局-->
     <com.easefun.polyv.livecommon.ui.widget.expandmenu.widget.PLVHorizontalExpandMenu
@@ -62,7 +95,7 @@
         android:layout_below="@+id/plvls_chatroom_chat_msg_ly"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@+id/plvls_chatroom_control_iv"
+        android:layout_toRightOf="@+id/plvls_chatroom_control_layout"
         app:back_color="#661B202D"
         app:button_style="left"
         app:corner_radius="30dp"
@@ -107,9 +140,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:singleLine="true"
                 android:clickable="true"
                 android:focusable="true"
+                android:singleLine="true"
                 android:text="有话要说&#046;&#046;&#046;"
                 android:textColor="#99F0F1F5"
                 android:textSize="14sp" />

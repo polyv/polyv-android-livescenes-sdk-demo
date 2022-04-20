@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="android.widget.RelativeLayout">
+
+    <!--全屏容器-->
+    <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+        android:id="@+id/plvsa_streamer_fullscreen_view"
+        android:layout_centerInParent="true"
+        android:background="@drawable/plvsa_streamer_page_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--占位View，PLVSwitchViewAnchorLayout 的 child 不能为 0，否则无法切换  -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <ImageView
+        android:id="@+id/plvsa_streamer_exit_fullscreen_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="12dp"
+        android:src="@drawable/plvsa_streamer_exit_fullscreen" />
+
+</merge>

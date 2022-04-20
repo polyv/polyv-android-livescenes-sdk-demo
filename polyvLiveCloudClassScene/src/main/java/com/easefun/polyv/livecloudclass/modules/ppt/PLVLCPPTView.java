@@ -28,8 +28,6 @@ import com.plv.foundationsdk.web.PLVWebview;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
-import static com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog.PPTEvent.PPT_SEND_WEB_MESSAGE;
-
 /**
  * date: 2020/8/6
  * author: hwj
@@ -125,7 +123,6 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     @Override
     public void sendWebMessage(String event, String message) {
         if (pptWebView != null) {
-            PolyvELogSender.send(PolyvPPTElog.class, PPT_SEND_WEB_MESSAGE, "send web message :" + message);
             pptWebView.callMessage(event, message);
         }
     }
@@ -249,7 +246,6 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     @Override
     public void sendMsgToWebView(String message) {
         if (pptWebView != null) {
-            PolyvELogSender.send(PolyvPPTElog.class, PPT_SEND_WEB_MESSAGE, "send web message :" + message);
             pptWebView.callUpdateWebView(message);
         }
     }

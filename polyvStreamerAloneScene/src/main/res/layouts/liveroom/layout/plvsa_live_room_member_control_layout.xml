@@ -20,7 +20,7 @@
         android:paddingLeft="14dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingRight="4dp"
+        android:paddingRight="14dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp">
 
@@ -70,10 +70,33 @@
             android:visibility="visible" />
 
         <ImageView
-            android:id="@+id/plvsa_member_kick_iv"
+            android:id="@+id/plvsa_member_grant_speaker_iv"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_below="@+id/plvsa_member_mic_iv"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_streamer_speaker"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_member_grant_speaker_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_grant_speaker_iv"
+            android:layout_alignBottom="@id/plvsa_member_grant_speaker_iv"
+            android:layout_toRightOf="@+id/plvsa_member_grant_speaker_iv"
+            android:gravity="center|left"
+            android:minEms="4"
+            android:text="授予主讲权限"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_kick_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/plvsa_member_grant_speaker_iv"
             android:padding="10dp"
             android:src="@drawable/plvsa_member_kick" />
 

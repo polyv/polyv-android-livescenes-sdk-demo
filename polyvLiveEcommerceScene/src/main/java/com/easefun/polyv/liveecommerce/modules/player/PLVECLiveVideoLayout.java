@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +26,13 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
-import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVEmptyMediaController;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
@@ -229,6 +228,15 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             }
 
             @Override
+            public void onUpdatePlayInfo() {
+                if (isPlaying()) {
+                    hidePlayCenterView();
+                } else {
+                    showPlayCenterView();
+                }
+            }
+
+            @Override
             public void acceptNetworkQuality(int quality) {
                 if (onViewActionListener != null) {
                     onViewActionListener.acceptNetworkQuality(quality);
@@ -288,11 +296,13 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public void pause() {
         livePlayerPresenter.pause();
+        rtcVideoLayout.pause();
     }
 
     @Override
     public void resume() {
         livePlayerPresenter.resume();
+        rtcVideoLayout.resume();
     }
 
     @Override
@@ -302,7 +312,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public boolean isPlaying() {
-        return livePlayerPresenter.isPlaying();
+        if (!isLowLatency) {
+            return livePlayerPresenter.isPlaying();
+        } else {
+            return !rtcVideoLayout.isPausing();
+        }
     }
 
     @Override
@@ -670,8 +684,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         @Override
         public void updatePlayInfo(com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO playInfoVO) {
-            if (playInfoVO != null && isInPlaybackState()
-                    && !playInfoVO.isPlaying()) {
+            if (!isPlaying()) {
                 showPlayCenterView();
             } else {
                 hidePlayCenterView();

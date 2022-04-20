@@ -76,6 +76,14 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <!--连麦item全屏布局-->
+    <com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFullscreenLayout
+        android:id="@+id/plvsa_fullscreen_view"
+        android:background="@drawable/plvsa_streamer_page_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
     <!--直播结束布局-->
     <com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayout
         android:id="@+id/plvsa_streamer_finish_layout"

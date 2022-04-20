@@ -8,11 +8,13 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
 import com.easefun.polyv.livecommon.module.modules.linkmic.view.PLVAbsLinkMicView;
+import com.easefun.polyv.liveecommerce.R;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 import java.util.List;
@@ -35,20 +37,42 @@ public class PLVECLiveRtcVideoLayout extends FrameLayout implements IPLVECLiveRt
     private SurfaceView rtcRenderView;
     private View.OnLayoutChangeListener onLayoutChangeListener;
 
+    private ImageView pausingPlaceHolderIv;
+    private boolean isPausing = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造方法">
 
     public PLVECLiveRtcVideoLayout(@NonNull Context context) {
         super(context);
+        initView();
     }
 
     public PLVECLiveRtcVideoLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        initView();
     }
 
     public PLVECLiveRtcVideoLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initView();
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化方法">
+
+    private void initView() {
+        setupPausingPlaceholderImageView();
+    }
+
+    private void setupPausingPlaceholderImageView() {
+        pausingPlaceHolderIv = new ImageView(getContext());
+        pausingPlaceHolderIv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        pausingPlaceHolderIv.setImageResource(R.drawable.plvec_player_rtc_pause_placeholder);
+        addView(pausingPlaceHolderIv, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        pausingPlaceHolderIv.setVisibility(View.GONE);
     }
 
     // </editor-fold>
@@ -83,8 +107,37 @@ public class PLVECLiveRtcVideoLayout extends FrameLayout implements IPLVECLiveRt
     }
 
     @Override
-    public void requestLayout() {
-        super.requestLayout();
+    public void pause() {
+        isPausing = true;
+        if (linkMicPresenter == null) {
+            return;
+        }
+        linkMicPresenter.muteAllVideo(true);
+        linkMicPresenter.muteAllAudio(true);
+        pausingPlaceHolderIv.bringToFront();
+        pausingPlaceHolderIv.setVisibility(View.VISIBLE);
+        if (onViewActionListener != null) {
+            onViewActionListener.onUpdatePlayInfo();
+        }
+    }
+
+    @Override
+    public boolean isPausing() {
+        return isPausing;
+    }
+
+    @Override
+    public void resume() {
+        isPausing = false;
+        if (linkMicPresenter == null) {
+            return;
+        }
+        linkMicPresenter.muteAllVideo(false);
+        linkMicPresenter.muteAllAudio(false);
+        pausingPlaceHolderIv.setVisibility(View.GONE);
+        if (onViewActionListener != null) {
+            onViewActionListener.onUpdatePlayInfo();
+        }
     }
 
     @Override
@@ -121,7 +174,9 @@ public class PLVECLiveRtcVideoLayout extends FrameLayout implements IPLVECLiveRt
         @Override
         public void onSwitchFirstScreen(String linkMicId) {
             rtcLinkMicId = linkMicId;
-            resetRtcRenderView(rtcLinkMicId);
+            if (!isPausing) {
+                resetRtcRenderView(rtcLinkMicId);
+            }
         }
 
         @Override
@@ -134,7 +189,9 @@ public class PLVECLiveRtcVideoLayout extends FrameLayout implements IPLVECLiveRt
         @Override
         public void updateFirstScreenChanged(String firstScreenLinkMicId, int oldPos, int newPos) {
             rtcLinkMicId = firstScreenLinkMicId;
-            updateRtcRenderView(rtcLinkMicId);
+            if (!isPausing) {
+                updateRtcRenderView(rtcLinkMicId);
+            }
         }
 
         @Override

@@ -32,8 +32,15 @@ public class PLVMultiModeRecyclerViewLayout extends RelativeLayout {
      */
     public static final int MODE_PLACEHOLDER = 2;
 
+    /**
+     * 全屏模式，控制某个item全屏
+     */
+    public static final int MODE_ITEM_FULLSCREEN = 3;
+
     private FrameLayout frameLayout;
     private PLVNoInterceptTouchRecyclerView recyclerView;
+
+
 
     private int currentMode = MODE_TILED;
 
@@ -57,8 +64,9 @@ public class PLVMultiModeRecyclerViewLayout extends RelativeLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化">
     private void init( AttributeSet attrs) {
         LayoutInflater.from(getContext()).inflate(R.layout.plv_multi_mode_recyclerview_layout, this);
-        frameLayout = findViewById(R.id.frame_layout);
-        recyclerView = findViewById(R.id.recycler_view);
+        frameLayout = findViewById(R.id.plv_frame_layout);
+        recyclerView = findViewById(R.id.plv_recycler_view);
+
 
     }
     // </editor-fold >

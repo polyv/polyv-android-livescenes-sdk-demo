@@ -24,22 +24,22 @@ import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
-import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
-import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkCommonController;
-import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkTextVO;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkCommonController;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkTextVO;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVLiveVideoParams;
-import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -746,8 +746,11 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     if (TextUtils.isEmpty(logoImage)) {
                         return;
                     }
-                    PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
-                            .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage);
+                    final PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam()
+                            .setWidth(0.14F).setHeight(0.25F).setAlpha(logoAlpha)
+                            .setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition)
+                            .setResUrl(logoImage)
+                            .setLogoHref(logoHref);
                     IPLVLivePlayerContract.ILivePlayerView view = getView();
                     if (view != null) {
                         logoView = view.getLogo();

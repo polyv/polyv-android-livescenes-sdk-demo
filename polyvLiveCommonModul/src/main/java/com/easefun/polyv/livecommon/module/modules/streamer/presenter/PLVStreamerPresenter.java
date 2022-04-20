@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,9 +29,11 @@ import com.plv.linkmic.model.PLVJoinInfoEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
+import com.plv.linkmic.screenshare.IPLVScreenShareListener;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
 import com.plv.livescenes.model.PLVListUsersVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -227,7 +230,13 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             //嘉宾要等直播中的时候才加入频道，创建引擎后不要自动加入频道
             streamerManager.disableAutoJoinChannel();
         }
-        streamerManager.initEngine(new PLVStreamerListener() {
+
+        final PLVLinkMicEngineParam param = new PLVLinkMicEngineParam()
+                .setChannelId(liveRoomDataManager.getConfig().getChannelId())
+                .setViewerId(liveRoomDataManager.getConfig().getUser().getViewerId())
+                .setViewerType(liveRoomDataManager.getConfig().getUser().getViewerType())
+                .setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+        streamerManager.initEngine(param, new PLVStreamerListener() {
             @Override
             public void onStreamerEngineCreatedSuccess() {
                 PLVCommonLog.d(TAG, "推流和连麦初始化成功");
@@ -299,6 +308,53 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 }
             }
         });
+
+        //屏幕共享监听
+        streamerManager.setShareScreenListener(new IPLVScreenShareListener() {
+            @Override
+            public void onScreenShare(final boolean isShare) {
+                //发送消息通知
+                if(currentSocketUserBean != null) {
+                    PLVLinkMicEventSender.getInstance().sendScreenShareEvent(currentSocketUserBean, liveRoomDataManager.getSessionId(), isShare, null);
+                }
+
+                streamerData.postEnableShareScreen(isShare);
+                Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithLinkMicId(streamerManager.getLinkMicUid());
+                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getStreamerItemWithLinkMicId(streamerManager.getLinkMicUid());
+                if(memberItem != null){
+                    memberItem.second.getLinkMicItemDataBean().setScreenSharedForMe(isShare);
+                }
+                if(streamerItem != null){
+                    streamerItem.second.setScreenSharedForMe(isShare);
+                }
+                final int pos = streamerItem == null ? 0 : streamerItem.first;
+
+                callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onScreenShareChange(pos, isShare, IPLVScreenShareListener.PLV_SCREEN_SHARE_OK);
+                    }
+                });
+                updateMixLayoutWhenScreenShare(isShare, streamerItem.second.getLinkMicId());
+            }
+
+            @Override
+            public void onScreenShareError(final int errorCode) {
+                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getStreamerItemWithLinkMicId(streamerManager.getLinkMicUid());
+                final int pos = streamerItem.first;
+                streamerItem.second.setScreenSharedForMe(false);
+                callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onScreenShareChange(pos, false, errorCode);
+                    }
+                });
+                updateMixLayoutWhenScreenShare(false, streamerItem.second.getLinkMicId() );
+                streamerData.postEnableShareScreen(false);
+
+            }
+        });
+
     }
 
     @Override
@@ -494,10 +550,31 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         if(currentSpeakerPermissionUser != null && currentSocketUserBean != null &&
                 !currentSpeakerPermissionUser.getUserId().equals(currentSocketUserBean.getUserId())){
             setUserPermissionSpeaker(currentSpeakerPermissionUser.getUserId(), false, null);
+
         }
         //关闭连麦
         PLVLinkMicEventSender.getInstance().closeLinkMic();
         PLVLinkMicEventSender.getInstance().emitFinishClassEvent(streamerManager.getLinkMicUid());
+    }
+
+
+    @Override
+    public void exitShareScreen() {
+        if(streamerManager.isScreenSharing()) {
+            streamerManager.exitScreenCapture();
+        }
+    }
+
+    @Override
+    public void requestShareScreen(Activity activity) {
+        if(!streamerManager.isScreenSharing()) {
+            streamerManager.requestScreenCapture(activity);
+        }
+    }
+
+    @Override
+    public boolean isScreenSharing() {
+        return streamerManager.isScreenSharing();
     }
 
     @Override
@@ -692,14 +769,17 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 if(isSetPermission) {
                     currentSpeakerPermissionUser.setUserId(newPermissionUser.getUserId());
                     //3、新授予用户主讲权限
-                    PLVLinkMicEventSender.getInstance().setSpeakerPermission(currentSpeakerPermissionUser, sessionId, true, null);
+                    PLVLinkMicEventSender.getInstance().setSpeakerPermission(currentSpeakerPermissionUser, sessionId, true, ack);
                 } else {
                     //3、收回权限时，把权限重新授给自己
                     currentSpeakerPermissionUser.setUserId(currentSocketUserBean.getUserId());
+                    if(ack != null) {
+                        ack.call(objects);
+                    }
                 }
 
                 //4、切换用户到第一画面
-                PLVLinkMicEventSender.getInstance().setSwitchFirstView(currentSpeakerPermissionUser, ack);
+                PLVLinkMicEventSender.getInstance().setSwitchFirstView(currentSpeakerPermissionUser, null);
 
             }
         });
@@ -1102,6 +1182,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         List<PLVRTCMixUser> mixUserList = new ArrayList<>();
         for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : streamerList) {
             PLVRTCMixUser mixUser = new PLVRTCMixUser();
+            mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenSharedForMe());
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
             mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
             mixUserList.add(mixUser);
@@ -1109,8 +1190,46 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerManager.updateMixLayoutUsers(mixUserList);
     }
 
+    /**
+     * 更新屏幕共享时，混流用户状态，需要和以下的调用保持同步：
+     * view.onScreenShareChange
+     */
+    void updateMixLayoutWhenScreenShare(boolean isShare, String linkmicId){
+        List<PLVRTCMixUser> mixUserList = new ArrayList<>();
+        for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : streamerList) {
+            PLVRTCMixUser mixUser = new PLVRTCMixUser();
+            if(plvLinkMicItemDataBean.getLinkMicId().equals(linkmicId)){
+                mixUser.setScreenShare(isShare);
+            } else {
+                mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenSharedForMe());
+            }
+            //屏幕共享时，当前用户的混流摄像头不能为mute，否则CDN混流无画面
+            mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
+            mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
+            mixUserList.add(mixUser);
+        }
+        streamerManager.updateMixLayoutUsers(mixUserList);
+    }
+
     void updateLinkMicCount(){
         streamerData.postLinkMicCount(streamerList.size());
+    }
+
+    private void updateUserPermissionStatus(PLVLinkMicItemDataBean linkMicItemDataBean, PLVJoinInfoEvent joinInfoEvent) {
+        Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithLinkMicId(linkMicItemDataBean.getLinkMicId());
+        if(memberItem != null){
+            final boolean speaker = joinInfoEvent.getClassStatus().isSpeaker();
+            if(memberItem.second.getLinkMicItemDataBean().isHasSpeaker() != speaker) {
+                memberItem.second.getLinkMicItemDataBean().setHasSpeaker(speaker);
+                final PLVSocketUserBean socketUser = memberItem.second.getSocketUserBean();
+                callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onSetPermissionChange(PLVPPTAuthentic.PermissionType.TEACHER, speaker, true, socketUser);
+                    }
+                });
+            }
+        }
     }
 
     private boolean updateMemberListLinkMicStatus(List<PLVJoinInfoEvent> joinList, List<PLVLinkMicJoinStatus.WaitListBean> waitList) {
@@ -1219,23 +1338,6 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 }
             }
         });
-    }
-
-    private void updateUserPermissionStatus(PLVLinkMicItemDataBean linkMicItemDataBean, PLVJoinInfoEvent joinInfoEvent){
-        Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithLinkMicId(linkMicItemDataBean.getLinkMicId());
-        if(memberItem != null){
-            final boolean speaker = joinInfoEvent.getClassStatus().isSpeaker();
-            if(memberItem.second.getLinkMicItemDataBean().isHasSpeaker() != speaker) {
-                memberItem.second.getLinkMicItemDataBean().setHasSpeaker(speaker);
-                final PLVSocketUserBean socketUser = memberItem.second.getSocketUserBean();
-                callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onSetPermissionChange(PLVPPTAuthentic.PermissionType.TEACHER, speaker, true, socketUser);
-                    }
-                });
-            }
-        }
     }
     // </editor-fold>
 
@@ -1372,6 +1474,17 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 return new Pair<>(i, linkMicItemDataBean);
             }
 
+        }
+        return null;
+    }
+
+    Pair<Integer, PLVLinkMicItemDataBean> getStreamerItemWithLinkMicId(String linkMicId) {
+        for (int i = 0; i < streamerList.size(); i++) {
+            PLVLinkMicItemDataBean itemDataBean = streamerList.get(i);
+            String linkMicIdForIndex = itemDataBean.getLinkMicId();
+            if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
+                return new Pair<>(i, itemDataBean);
+            }
         }
         return null;
     }

@@ -1,5 +1,9 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.desc;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,14 +17,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSafeWebView;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * 直播介绍tab页
@@ -50,6 +60,8 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     private TextView startTimeTv;
     //直播状态
     private TextView statusTv;
+
+    private PLVLiveStateEnum currentLiveState;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -125,15 +137,6 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             } else {
                 updateLikesCount(0);
             }
-/**
- *  设置观看热度
- *             if (viewerCount == 0) {
- *                 int viewerCount = classDetailVO.getData().getPageView();
- *                 updateViewerCount(viewerCount);
- *             } else {
- *                 updateViewerCount(0);
- *             }
- */
 
             //设置介绍内容
             setDescContent();
@@ -172,40 +175,78 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
 
     // <editor-fold defaultstate="collapsed" desc="直播状态 - 更新状态view">
     private void updateStatusViewWithClassDetail() {
-        if (classDetailVO != null) {
-            if (classDetailVO.getData().isLiveStatus()) {
-                updateStatusViewWithLive();
-            } else if (classDetailVO.getData().isPlaybackStatus()
-                    || classDetailVO.getData().isEndStatus()) {
-                updateStatusViewWithNoLive();
+        if (classDetailVO != null && classDetailVO.getData() != null) {
+            updateStatusInner(PLVLiveStateEnum.parse(classDetailVO.getData().getWatchStatus()));
+        }
+    }
+
+    public void updateLiveStatus(PLVLiveStateEnum liveState) {
+        updateStatusInner(liveState);
+    }
+
+    private static final Map<PLVLiveStateEnum, Integer> STATUS_COLOR_MAP = mapOf(
+            pair(PLVLiveStateEnum.UNSTART, R.color.text_gray),
+            pair(PLVLiveStateEnum.LIVE, R.color.text_red),
+            pair(PLVLiveStateEnum.STOP, R.color.text_green),
+            pair(PLVLiveStateEnum.END, R.color.text_gray),
+            pair(PLVLiveStateEnum.WAITING, R.color.colorPortage),
+            pair(PLVLiveStateEnum.PLAYBACK, R.color.text_red)
+    );
+
+    private static final Map<PLVLiveStateEnum, Integer> STATUS_BACKGROUND_MAP = mapOf(
+            pair(PLVLiveStateEnum.UNSTART, R.drawable.plvlc_live_status_noactive),
+            pair(PLVLiveStateEnum.LIVE, R.drawable.plvlc_live_status_live),
+            pair(PLVLiveStateEnum.STOP, R.drawable.plvlc_live_status_stop),
+            pair(PLVLiveStateEnum.END, R.drawable.plvlc_live_status_noactive),
+            pair(PLVLiveStateEnum.WAITING, R.drawable.plvlc_live_status_waitting),
+            pair(PLVLiveStateEnum.PLAYBACK, R.drawable.plvlc_live_status_live)
+    );
+
+    private void updateStatusInner(final PLVLiveStateEnum stateEnum) {
+        final PLVLiveStateEnum mergedState = mergeEndOrWaitingState(stateEnum, classDetailVO.getData().getStartTime());
+        if (currentLiveState == null) {
+            currentLiveState = mergedState;
+        } else {
+            currentLiveState = currentLiveState.toState(mergedState);
+        }
+
+        if (statusTv == null) {
+            return;
+        }
+        final String text = getOrDefault(currentLiveState.getDescription(), currentLiveState.getStatus());
+        final int colorResId = getOrDefault(STATUS_COLOR_MAP.get(currentLiveState), R.color.text_gray);
+        final int backgroundResId = getOrDefault(STATUS_BACKGROUND_MAP.get(currentLiveState), R.drawable.plvlc_live_status_noactive);
+        statusTv.setText(text);
+        statusTv.setTextColor(getResources().getColor(colorResId));
+        statusTv.setBackgroundResource(backgroundResId);
+    }
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    private static PLVLiveStateEnum mergeEndOrWaitingState(PLVLiveStateEnum liveStateEnum, String startTime) {
+        if (liveStateEnum != PLVLiveStateEnum.END
+                && liveStateEnum != PLVLiveStateEnum.WAITING
+                // 直播页面不支持回放
+                && liveStateEnum != PLVLiveStateEnum.PLAYBACK) {
+            return liveStateEnum;
+        }
+        // 未设置开始时间
+        if (TextUtils.isEmpty(startTime)) {
+            return PLVLiveStateEnum.WAITING;
+        }
+
+        try {
+            final Date startTimeDate = DATE_FORMAT.parse(startTime);
+            final Date nowDate = new Date();
+            if (nowDate.after(startTimeDate)) {
+                return PLVLiveStateEnum.END;
             } else {
-                updateStatusViewWithWaiting();
+                return PLVLiveStateEnum.WAITING;
             }
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
         }
-    }
-
-    public void updateStatusViewWithNoLive() {
-        if (statusTv != null) {
-            statusTv.setText("暂无直播");
-            statusTv.setTextColor(getResources().getColor(R.color.text_gray));
-            statusTv.setBackgroundResource(R.drawable.plvlc_live_status_noactive);
-        }
-    }
-
-    public void updateStatusViewWithLive() {
-        if (statusTv != null) {
-            statusTv.setText("直播中");
-            statusTv.setTextColor(getResources().getColor(R.color.text_red));
-            statusTv.setBackgroundResource(R.drawable.plvlc_live_status_live);
-        }
-    }
-
-    public void updateStatusViewWithWaiting() {
-        if (statusTv != null) {
-            statusTv.setText("等待中");
-            statusTv.setTextColor(getResources().getColor(R.color.text_green));
-            statusTv.setBackgroundResource(R.drawable.plvlc_live_status_waitting);
-        }
+        return liveStateEnum;
     }
     // </editor-fold>
 

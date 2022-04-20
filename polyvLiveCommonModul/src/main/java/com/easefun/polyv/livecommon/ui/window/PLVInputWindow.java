@@ -50,13 +50,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
     public static void show(Activity packageActivity, Class<? extends PLVInputWindow> cls, InputListener listener) {
-        if (System.currentTimeMillis() - lastStartTime > ALLOW_SHOW_INTERVAL) {
-            lastStartTime = System.currentTimeMillis();
-            inputListener = listener;
-            Intent intent = new Intent(packageActivity, cls);
-            packageActivity.startActivity(intent);
-            packageActivity.overridePendingTransition(0, 0);
-        }
+        show(packageActivity, new Intent(packageActivity, cls), listener);
     }
 
     public static void show(Activity packageActivity, Intent intent, InputListener listener) {

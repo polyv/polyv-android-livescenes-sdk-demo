@@ -5,26 +5,25 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
+import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectSpan;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
@@ -32,8 +31,11 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgTipsWindow;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVManagerChatEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -111,7 +113,10 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             chatMsgTv.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    boolean onlyShowCopyItem = prohibitedWordVO != null;//严禁词的信息不能回复
+                    final boolean isManagerChatMessage = messageData instanceof IPLVManagerChatEvent && ((IPLVManagerChatEvent) messageData).isManagerChatMsg();
+                    final boolean isProhibited = prohibitedWordVO != null;
+                    // 严禁词、管理员私聊的信息不能回复
+                    boolean onlyShowCopyItem = isProhibited || isManagerChatMessage;
                     PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, onlyShowCopyItem, chatMsgTv.getText().toString(), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -303,30 +308,43 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         super.processData(data, position);
         resetView();
         //是否是特殊身份类型
-        boolean isSpecialType = PLVEventHelper.isSpecialType(userType);//管理员、讲师、助教、嘉宾都视为特殊身份类型
+        final boolean isSpecialType = PLVEventHelper.isSpecialType(userType);//管理员、讲师、助教、嘉宾都视为特殊身份类型
+        final boolean isManagerChatMsg = data.getData() instanceof PLVBaseEvent && PLVEventHelper.isManagerChatMsg(((PLVBaseEvent) data.getData()));
+        final boolean isMsgSendByMyself = userId != null && userId.equals(PLVSocketWrapper.getInstance().getLoginVO().getUserId());
         //设置昵称
-        String setNickName = nickName;
+        final PLVSpannableStringBuilder textSpan = new PLVSpannableStringBuilder();
+        final int textColor = Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF");
+        if (isManagerChatMsg) {
+            textSpan.appendExclude("私聊",
+                    new PLVRoundRectSpan()
+                            .backgroundColor(Color.parseColor("#57A2FF"))
+                            .textColor(Color.parseColor("#313540"))
+                            .textSize(10)
+                            .paddingLeft(6)
+                            .paddingRight(6)
+                            .radius(7)
+                            .marginRight(4)
+            );
+        }
+        if (actor != null) {
+            textSpan.appendExclude(actor + "-", new ForegroundColorSpan(textColor));
+        }
+        textSpan.appendExclude(nickName, new ForegroundColorSpan(textColor));
+        if (isMsgSendByMyself) {
+            textSpan.appendExclude("(我)", new ForegroundColorSpan(textColor));
+        }
+        textSpan.appendExclude(": ", new ForegroundColorSpan(textColor));
         if (nickName != null) {
-            if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
-                setNickName = nickName + "(我)";
-            }
-            if (actor != null) {
-                setNickName = actor + "-" + setNickName;
-            }
             if (chatNickTv != null && chatImgUrl != null) {
                 chatNickTv.setVisibility(View.VISIBLE);
-                chatNickTv.setText(setNickName + ": ");
-                chatNickTv.setTextColor(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF"));
+                chatNickTv.setText(textSpan);
             }
         }
         //设置发言文本信息
         if (speakMsg != null) {
             if (chatMsgTv != null) {
                 chatMsgTv.setVisibility(View.VISIBLE);
-                SpannableStringBuilder nickSpan = new SpannableStringBuilder(setNickName);
-                nickSpan.append(": ");
-                nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                chatMsgTv.setTextInner(nickSpan.append(speakMsg), isSpecialType);
+                chatMsgTv.setTextInner(textSpan.append(speakMsg), isSpecialType);
             }
         }
         //设置图片信息

@@ -62,7 +62,6 @@ public class PLVHorizontalExpandMenu extends RelativeLayout {
     private float leftButtonLeft;//左按钮矩形区域left值
     private float leftButtonRight;//左按钮矩形区域right值
 
-    private boolean isFirstLayout;//是否第一次测量位置，主要用于初始化menuLeft和menuRight的值
     private boolean isExpand;//菜单是否展开，默认为展开
     private boolean isAnimEnd;//动画是否结束
     private float downX = -1;
@@ -115,7 +114,6 @@ public class PLVHorizontalExpandMenu extends RelativeLayout {
 
         typedArray.recycle();
 
-        isFirstLayout = true;
         isExpand = true;
         isAnimEnd = false;
 
@@ -168,12 +166,9 @@ public class PLVHorizontalExpandMenu extends RelativeLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        //如果子View数量为0时，onLayout后getLeft()和getRight()才能获取相应数值，menuLeft和menuRight保存menu初始的left和right值
-        if (isFirstLayout) {
-            menuLeft = getLeft();
-            menuRight = getRight();
-            isFirstLayout = false;
-        }
+        menuLeft = getLeft();
+        menuRight = getRight();
+
         if (getChildCount() > 0) {
             childView = getChildAt(0);
             if (isExpand) {

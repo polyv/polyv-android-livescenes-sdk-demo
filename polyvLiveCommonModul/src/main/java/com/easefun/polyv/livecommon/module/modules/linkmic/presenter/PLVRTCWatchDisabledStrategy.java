@@ -137,7 +137,7 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
     }
 
     @Override
-    public void setFirstScreenLinkMicId(String linkMicId) {
+    public void setFirstScreenLinkMicId(String linkMicId, boolean mute) {
 
     }
     // </editor-fold>

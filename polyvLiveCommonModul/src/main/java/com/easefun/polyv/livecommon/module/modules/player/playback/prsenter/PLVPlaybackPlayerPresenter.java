@@ -23,7 +23,6 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
-import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
@@ -36,8 +35,8 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livescenes.model.PolyvPlaybackVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
-import com.easefun.polyv.mediasdk.player.IMediaPlayer;
 import com.easefun.polyv.livescenes.playback.video.api.IPolyvPlaybackListenerEvent;
+import com.easefun.polyv.mediasdk.player.IMediaPlayer;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.config.PLVPlayOption;
@@ -737,8 +736,11 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         logoView = view.getLogo();
                         if (logoView != null) {
                             logoView.removeAllLogo();
-                            logoView.addLogo(new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
-                                    .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage));
+                            logoView.addLogo(new PLVPlayerLogoView.LogoParam()
+                                    .setWidth(0.14F).setHeight(0.25F).setAlpha(logoAlpha)
+                                    .setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition)
+                                    .setResUrl(logoImage)
+                                    .setLogoHref(logoHref));
                         }
                     }
                 }

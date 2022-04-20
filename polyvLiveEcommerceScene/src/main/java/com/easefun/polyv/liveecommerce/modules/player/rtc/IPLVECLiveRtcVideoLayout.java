@@ -24,6 +24,21 @@ public interface IPLVECLiveRtcVideoLayout {
      */
     void setLiveEnd();
 
+    /**
+     * 暂停播放
+     */
+    void pause();
+
+    /**
+     * 是否正在暂停
+     */
+    boolean isPausing();
+
+    /**
+     * 恢复播放
+     */
+    void resume();
+
     void requestLayout();
 
     /**
@@ -52,6 +67,11 @@ public interface IPLVECLiveRtcVideoLayout {
          * 播放器布局尺寸变更
          */
         void onSizeChanged(int width, int height);
+
+        /**
+         * 更新播放状态回调
+         */
+        void onUpdatePlayInfo();
 
         /**
          * 网络质量回调

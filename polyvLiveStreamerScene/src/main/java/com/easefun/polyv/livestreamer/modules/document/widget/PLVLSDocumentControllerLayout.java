@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.document.widget;
 
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,8 +29,6 @@ import com.plv.livescenes.access.PLVUserAbilityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 文档区域控制栏布局

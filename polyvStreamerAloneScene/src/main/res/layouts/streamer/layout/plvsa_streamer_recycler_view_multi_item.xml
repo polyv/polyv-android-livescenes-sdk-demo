@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+    android:id="@+id/plvsa_streamer_anchor_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_width="200dp">
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -38,6 +46,33 @@
                 android:layout_gravity="center"
                 android:src="@drawable/plvsa_streamer_mute_video" />
         </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/plvsa_streamer_screen_share_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvsa_streamer_item_ly_bg_shape"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/plvsa_streamer_screen_share_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:src="@drawable/plvsa_streamer_screen_sharing_placeholder" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/plvsa_streamer_screen_share_iv"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="您正在共享屏幕"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp" />
+        </RelativeLayout>
 
         <!-- 昵称和logo-->
         <LinearLayout
@@ -95,7 +130,20 @@
             android:text="未连麦"
             android:textColor="#FFF0F1F5"
             android:textSize="11sp"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_grant_speaker_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/plvsa_streamer_guest_link_status_tv"
+            android:src="@drawable/plvsa_streamer_grant_speaker"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
 
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </android.support.constraint.ConstraintLayout>
+</com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>

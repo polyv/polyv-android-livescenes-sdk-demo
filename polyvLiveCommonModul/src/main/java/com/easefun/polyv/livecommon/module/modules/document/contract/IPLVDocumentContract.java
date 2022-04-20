@@ -71,6 +71,13 @@ public interface IPLVDocumentContract {
 
         /**
          * 回调 授权变化
+         * @param type 授权类型，如主讲权限、画笔权限
+         * @param isGrant 是否授权
+         */
+        void onSetPermission(String type, boolean isGrant);
+
+        /**
+         * 回调 授权变化
          */
         void onUserPermissionChange();
 

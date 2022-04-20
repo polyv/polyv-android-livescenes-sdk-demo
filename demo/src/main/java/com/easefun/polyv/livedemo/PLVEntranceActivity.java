@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livedemo.hiclass.PLVLoginHiClassActivity;
 
 /**
  * @author suhongtao
  */
-public class PLVEntranceActivity extends AppCompatActivity implements View.OnClickListener {
+public class PLVEntranceActivity extends PLVBaseActivity implements View.OnClickListener {
 
     private static final SparseArray<Class<? extends Activity>> MAP_VIEW_ID_TO_ACTIVITY_CLASS =
             new SparseArray<Class<? extends Activity>>() {{

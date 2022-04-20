@@ -4,20 +4,18 @@
     android:layout_height="match_parent">
 
 
-
     <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView
-        android:layout_alignParentRight="true"
-        android:id="@+id/recycler_view"
+        android:id="@+id/plv_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true" />
 
     <!--主讲模式下的容器-->
     <FrameLayout
-        android:id="@+id/frame_layout"
-        android:layout_toLeftOf="@id/recycler_view"
+        android:id="@+id/plv_frame_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@id/plv_recycler_view" />
 
-    </FrameLayout>
 
-</RelativeLayout >
+</RelativeLayout>

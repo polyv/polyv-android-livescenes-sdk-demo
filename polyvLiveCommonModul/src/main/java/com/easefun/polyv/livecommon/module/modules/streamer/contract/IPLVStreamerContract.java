@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.SurfaceView;
@@ -187,6 +188,14 @@ public interface IPLVStreamerContract {
          * 权限响应
          */
         void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user);
+
+        /**
+         * 屏幕共享状态变更
+         * @param position
+         * @param isShare 是否开始屏幕共享
+         * @param extra 附加信息，如错误码
+         */
+        void onScreenShareChange(int position, boolean isShare, int extra);
     }
     // </editor-fold>
 
@@ -333,6 +342,23 @@ public interface IPLVStreamerContract {
         void stopLiveStream();
 
         /**
+         * 停止屏幕共享
+         */
+        void exitShareScreen();
+
+        /**
+         * 请求屏幕共享
+         * @param activity
+         */
+        void requestShareScreen(Activity activity);
+
+        /**
+         * 是否正在屏幕共享
+         */
+        boolean isScreenSharing();
+
+
+        /**
          * 控制成员列表中的用户加入或离开连麦
          *
          * @param position    成员列表中的位置
@@ -397,7 +423,7 @@ public interface IPLVStreamerContract {
 
         /**
          * 设置用户主讲权限
-         * @param position
+         * @param userId 用户的userId
          * @param isSetPermission
          * @param ack
          */

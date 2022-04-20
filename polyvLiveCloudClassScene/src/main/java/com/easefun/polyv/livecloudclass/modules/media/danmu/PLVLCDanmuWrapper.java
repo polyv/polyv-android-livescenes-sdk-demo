@@ -1,14 +1,14 @@
 package com.easefun.polyv.livecloudclass.modules.media.danmu;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 /**
  * 弹幕包装器
@@ -91,13 +91,7 @@ public class PLVLCDanmuWrapper {
             }
         }
     }
-    /**
-     * 获取弹幕开关的状态
-     * true->打开;false->关闭
-     * */
-    public boolean getToggleDanmuStatus() {
-        return isDanmuToggleOpen;
-    }
+
     // </editor-fold>
 
     public void setOnServerDanmuOpen(boolean isServerDanmuOpen) {

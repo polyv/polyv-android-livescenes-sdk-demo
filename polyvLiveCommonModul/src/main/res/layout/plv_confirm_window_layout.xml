@@ -27,14 +27,14 @@
         android:id="@+id/plv_confirm_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        tools:text="Content"
+        android:layout_below="@id/plv_confirm_title"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:layout_below="@id/plv_confirm_title"
-        android:layout_centerHorizontal="true" />
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        tools:text="Content" />
 
     <View
         android:id="@+id/plv_confirm_separator_line"

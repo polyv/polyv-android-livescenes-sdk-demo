@@ -166,11 +166,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="236dp" />
 
-            <include
-                android:id="@+id/more_ly"
-                layout="@layout/plvlc_chatroom_more_layout"
+            <com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout
+                android:id="@+id/plvlc_chat_more_layout"
                 android:layout_width="match_parent"
-                android:layout_height="116dp" />
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </FrameLayout>
 </RelativeLayout>

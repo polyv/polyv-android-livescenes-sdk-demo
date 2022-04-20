@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+
 /**
  * date: 2020/10/9
  * author: HWilliamgo
@@ -11,12 +13,17 @@ public interface IPLVInteractLayout {
     /**
      * 初始化
      */
-    void init();
+    void init(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
      * 显示公告
      */
     void showBulletin();
+
+    /**
+     * 显示消息
+     */
+    void showMessage();
 
     /**
      * 销毁
