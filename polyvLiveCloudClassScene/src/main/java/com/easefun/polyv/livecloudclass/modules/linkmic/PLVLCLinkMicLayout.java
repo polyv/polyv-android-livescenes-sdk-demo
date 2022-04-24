@@ -41,13 +41,13 @@ import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
-import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -270,6 +270,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         initLinkMicControlBar(linkMicControlBar);
+        updatePushResolution(curIsLandscape);
         observeOnAudioState(liveRoomDataManager);
     }
 
@@ -909,6 +910,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     //转到横屏
     @SuppressLint("RtlHardcoded")
     private void onLandscape() {
+        updatePushResolution(true);
         //root
         ConstraintLayout.LayoutParams lpOfRoot = (ConstraintLayout.LayoutParams) getLayoutParams();
         lpOfRoot.topToBottom = ConstraintLayout.LayoutParams.UNSET;
@@ -950,6 +952,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     //转到竖屏
     @SuppressLint("RtlHardcoded")
     private void onPortrait() {
+        updatePushResolution(false);
         //root
         ConstraintLayout.LayoutParams lpOfRoot = (ConstraintLayout.LayoutParams) getLayoutParams();
         lpOfRoot.width = LayoutParams.MATCH_PARENT;
@@ -986,6 +989,14 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //竖屏时，如果讲师打开了连麦，就显示连麦控制条
         if (linkMicPresenter.isTeacherOpenLinkMic()) {
             linkMicControlBar.show();
+        }
+    }
+
+    private void updatePushResolution(boolean isLandscape) {
+        if (linkMicPresenter != null) {
+            linkMicPresenter.setPushPictureResolutionType(isLandscape ?
+                    PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE :
+                    PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
         }
     }
     // </editor-fold>
