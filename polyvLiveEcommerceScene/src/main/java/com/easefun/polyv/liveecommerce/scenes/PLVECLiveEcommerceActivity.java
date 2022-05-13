@@ -1,5 +1,8 @@
 package com.easefun.polyv.liveecommerce.scenes;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.Observer;
@@ -54,8 +57,10 @@ import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -160,12 +165,12 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param vid           视频ID
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
-     * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType}
+     * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar,int videoListType) {
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar, PLVPlaybackListType videoListType) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动直播带货回放页失败！");
         }
@@ -268,9 +273,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
         // 根据不同模式，设置对应参数
         if (!isLive) { // 回放模式
-            int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PolyvPlaybackListType.PLAYBACK);
+            PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
             PLVLiveChannelConfigFiller.setupVid(intent.getStringExtra(EXTRA_VID));
-            PLVLiveChannelConfigFiller.setupVideoListType(videoListType);
+            PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
         }
     }
     // </editor-fold>
@@ -358,7 +363,12 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         String vid = liveRoomDataManager.getConfig().getVid();
         if (!liveRoomDataManager.getConfig().isLive()) {
             if (!TextUtils.isEmpty(vid)) {
+                // 已填写vid，使用指定的视频播放
                 videoLayout.startPlay();
+            } else {
+                // 未填写vid，后台配置了使用直播暂存或者列表回放
+                startPlaybackOnHasRecordFile();
+                observePreviousPage();
             }
         } else {
             videoLayout.startPlay();
@@ -468,11 +478,57 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         commonHomeFragment.init(liveRoomDataManager);
     }
 
+    /**
+     * 单个回放视频 - 暂存列表最新视频
+     */
+    private void startPlaybackOnHasRecordFile() {
+        liveRoomDataManager.getClassDetailVO().observe(this, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                if (statefulData == null || !statefulData.isSuccess() || statefulData.getData() == null || statefulData.getData().getData() == null) {
+                    return;
+                }
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                final PLVLiveClassDetailVO liveClassDetailVO = statefulData.getData();
+                final boolean hasRecordFile = liveClassDetailVO.getData().isPlaybackEnabled() && liveClassDetailVO.getData().getRecordFileSimpleModel() != null;
+                if (hasRecordFile) {
+                    videoLayout.startPlay();
+                }
+            }
+        });
+    }
+
+    /**
+     * 列表回放
+     */
+    private void observePreviousPage() {
+        liveRoomDataManager.getClassDetailVO().observe(this, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable final PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                final List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenus = nullable(new PLVSugarUtil.Supplier<List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean>>() {
+                    @Override
+                    public List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> get() {
+                        return statefulData.getData().getData().getChannelMenus();
+                    }
+                });
+                final List<String> channelMenuTypes = transformList(channelMenus, new PLVSugarUtil.Function<PLVLiveClassDetailVO.DataBean.ChannelMenusBean, String>() {
+                    @Override
+                    public String apply(PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+                        return channelMenusBean.getMenuType();
+                    }
+                });
+                if (channelMenuTypes != null && commonHomeFragment != null) {
+                    commonHomeFragment.onHasPreviousPage(channelMenuTypes.contains(PLVLiveClassDetailVO.MENUTYPE_PREVIOUS));
+                }
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 互动应用">
-    private void setupInteractLayout(){
-        if(interactLayout == null) {
+    private void setupInteractLayout() {
+        if (interactLayout == null) {
             // 互动应用布局
             ViewStub interactLayoutViewStub = findViewById(R.id.plvec_ppt_interact_layout);
             interactLayout = (PLVInteractLayout2) interactLayoutViewStub.inflate();

@@ -1,13 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.chatmore;
 
 import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.widget.FrameLayout;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;

@@ -8,15 +8,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -251,6 +250,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     @Override
     public void destroy() {
+        Utils.getApp().unregisterActivityLifecycleCallbacks(callbacks);
         originContentParentVG = null;
         contentView = null;
     }

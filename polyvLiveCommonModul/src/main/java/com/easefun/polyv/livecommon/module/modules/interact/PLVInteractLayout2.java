@@ -1,8 +1,12 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
 import android.app.Activity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,11 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -224,6 +223,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             nativeAppParams.userInfo.pic = liveRoomDataManager.getConfig().getUser().getViewerAvatar();
             nativeAppParams.appId = liveRoomDataManager.getConfig().getAccount().getAppId();
             nativeAppParams.appSecret = liveRoomDataManager.getConfig().getAccount().getAppSecret();
+            //todo 自定义参数p4 p5
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";

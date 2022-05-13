@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.login.model.PLVLoginVO;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -32,7 +33,7 @@ public class PLVLiveChannelConfig {
     /**
      * 回放视频所在的列表类型
      */
-    private int videoListType;
+    private PLVPlaybackListType videoListType;
 
     /**
      * 当前是否是直播，true为直播，false为回放。
@@ -175,7 +176,7 @@ public class PLVLiveChannelConfig {
     /**
      * 配置回放视频所在的列表的类型
      */
-    public void setupVideoListType(int videoListType) {
+    public void setupVideoListType(PLVPlaybackListType videoListType) {
         this.videoListType = videoListType;
     }
 
@@ -254,7 +255,7 @@ public class PLVLiveChannelConfig {
         return vid;
     }
 
-    public int getVideoListType() {
+    public PLVPlaybackListType getVideoListType() {
         return videoListType;
     }
 

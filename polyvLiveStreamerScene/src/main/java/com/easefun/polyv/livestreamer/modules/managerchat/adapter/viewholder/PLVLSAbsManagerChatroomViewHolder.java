@@ -1,15 +1,11 @@
 package com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
-
 import android.graphics.Color;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
@@ -18,6 +14,9 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectSpan;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.util.Map;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
 /**
  * @author Hoshiiro

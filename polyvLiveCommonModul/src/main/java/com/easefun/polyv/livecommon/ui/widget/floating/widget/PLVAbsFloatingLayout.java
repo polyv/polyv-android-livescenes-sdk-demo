@@ -2,12 +2,11 @@ package com.easefun.polyv.livecommon.ui.widget.floating.widget;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 

@@ -104,6 +104,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
 
     @Override
     public void destroy() {
+        mainAnimator.removeAllListeners();
         mainAnimator = null;
     }
 

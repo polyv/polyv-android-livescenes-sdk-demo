@@ -1,13 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.player.live.enums;
 
-import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
-
 import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.R;
 
 import java.util.List;
+
+import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * @author Hoshiiro

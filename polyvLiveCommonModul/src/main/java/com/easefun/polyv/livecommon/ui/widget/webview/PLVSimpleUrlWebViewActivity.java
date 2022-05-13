@@ -2,7 +2,6 @@ package com.easefun.polyv.livecommon.ui.widget.webview;
 
 import android.content.Context;
 import android.content.Intent;
-
 import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewActivity;

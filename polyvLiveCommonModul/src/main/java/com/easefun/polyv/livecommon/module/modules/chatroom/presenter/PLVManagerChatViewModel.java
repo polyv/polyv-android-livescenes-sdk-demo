@@ -1,14 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
-import android.text.TextUtils;
-import android.util.Pair;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Pair;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
@@ -40,6 +37,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * @author Hoshiiro

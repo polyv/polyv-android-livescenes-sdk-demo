@@ -3,11 +3,10 @@ package com.easefun.polyv.livecommon.ui.widget.floating.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
-import android.util.AttributeSet;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.util.AttributeSet;
+import android.view.View;
 
 //TODO 应用内悬浮窗，待实现
 public class PLVAppFloatingLayout extends PLVAbsFloatingLayout {

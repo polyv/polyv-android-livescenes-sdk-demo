@@ -1,23 +1,22 @@
 package com.easefun.polyv.livecommon.module.utils.network;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
-
+import androidx.lifecycle.GenericLifecycleObserver;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-
 import androidx.annotation.Nullable;
-import androidx.lifecycle.GenericLifecycleObserver;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
 
 /**
  * @author Hoshiiro

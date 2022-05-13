@@ -1,13 +1,12 @@
 package com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder;
 
 import android.graphics.drawable.Drawable;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressListener;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;

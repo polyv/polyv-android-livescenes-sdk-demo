@@ -133,6 +133,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     public void setPlaybackPlayInfo(PLVPlayInfoVO playInfoVO) {
     }
 
+    public void onHasPreviousPage(boolean hasPreviousPage) {
+
+    }
+
     //设置view交互事件监听器
     public void setOnViewActionListener(OnViewActionListener listener) {
     }

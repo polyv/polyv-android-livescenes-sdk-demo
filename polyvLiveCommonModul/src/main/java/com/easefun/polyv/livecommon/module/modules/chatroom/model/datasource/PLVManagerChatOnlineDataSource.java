@@ -1,11 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.model.datasource;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
-
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -25,6 +22,8 @@ import com.plv.socket.event.chat.PLVSpeakEvent;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
 /**
  * @author Hoshiiro

@@ -1,9 +1,10 @@
 package com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
-
+import androidx.lifecycle.ViewModelStoreOwner;
 import android.content.Context;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +12,6 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.Px;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVManagerChatViewModel;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;
@@ -44,6 +40,9 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * @author Hoshiiro

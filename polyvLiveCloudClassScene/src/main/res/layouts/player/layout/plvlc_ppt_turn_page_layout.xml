@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true"
         android:text="点击回到当前页"
         android:visibility="invisible"
-        android:textColor="#000000" />
+        android:textColor="#000" />
 
     <LinearLayout
         android:layout_below="@id/plvlc_ppt_turn_page_tip_tv"

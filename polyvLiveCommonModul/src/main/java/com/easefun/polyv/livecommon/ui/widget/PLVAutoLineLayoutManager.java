@@ -1,8 +1,7 @@
 package com.easefun.polyv.livecommon.ui.widget;
 
-import android.view.View;
-
 import androidx.recyclerview.widget.RecyclerView;
+import android.view.View;
 
 public class PLVAutoLineLayoutManager extends RecyclerView.LayoutManager {
 

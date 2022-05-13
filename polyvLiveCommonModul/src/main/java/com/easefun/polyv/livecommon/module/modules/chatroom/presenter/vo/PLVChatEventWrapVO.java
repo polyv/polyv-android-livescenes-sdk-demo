@@ -1,11 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
-
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * @author Hoshiiro

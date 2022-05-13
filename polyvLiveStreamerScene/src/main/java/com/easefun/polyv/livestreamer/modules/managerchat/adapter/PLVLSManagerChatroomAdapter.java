@@ -1,9 +1,8 @@
 package com.easefun.polyv.livestreamer.modules.managerchat.adapter;
 
-import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import android.view.ViewGroup;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVChatEventWrapVO;
 import com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder.PLVLSAbsManagerChatroomViewHolder;
