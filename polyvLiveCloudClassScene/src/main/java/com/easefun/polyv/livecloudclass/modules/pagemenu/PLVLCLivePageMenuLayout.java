@@ -470,12 +470,18 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     private void refreshPageMenuTabAdapter() {
+        pageMenuTabAdapter.notifyDataSetChanged();
+        pageMenuTabIndicator.getNavigator().notifyDataSetChanged();
+
         if (pageMenuTabAdapter.getCount() > 0) {
-            pageMenuTabAdapter.notifyDataSetChanged();
             pageMenuTabIndicator.setBackgroundColor(Color.parseColor("#3E3E4E"));
-            pageMenuTabIndicator.getNavigator().notifyDataSetChanged();
             findViewById(R.id.split_view).setVisibility(View.VISIBLE);
-            pageMenuTabViewPager.setOffscreenPageLimit(pageMenuTabAdapter.getCount() - 1);
+            pageMenuTabViewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    pageMenuTabViewPager.setOffscreenPageLimit(pageMenuTabAdapter.getCount() - 1);
+                }
+            });
         }
     }
     // </editor-fold>

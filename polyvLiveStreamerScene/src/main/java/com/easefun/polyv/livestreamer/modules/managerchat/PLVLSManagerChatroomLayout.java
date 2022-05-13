@@ -1,7 +1,5 @@
 package com.easefun.polyv.livestreamer.modules.managerchat;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -55,6 +53,8 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * @author Hoshiiro

@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -39,6 +37,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * @author Hoshiiro

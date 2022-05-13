@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.module.utils.network;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
-
 import android.arch.lifecycle.GenericLifecycleObserver;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
@@ -17,6 +15,8 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
 
 /**
  * @author Hoshiiro

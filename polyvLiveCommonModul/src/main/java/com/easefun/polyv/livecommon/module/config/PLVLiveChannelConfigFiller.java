@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.config;
 
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -112,7 +113,7 @@ public class PLVLiveChannelConfigFiller {
     /**
      * 配置回放视频所在的列表的类型
      */
-    public static void setupVideoListType(int videoListType) {
+    public static void setupVideoListType(PLVPlaybackListType videoListType) {
         channelConfig.setupVideoListType(videoListType);
     }
 

@@ -1,8 +1,5 @@
 package com.easefun.polyv.livestreamer.modules.managerchat.adapter.viewholder;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
-
 import android.arch.lifecycle.ViewModelStoreOwner;
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -43,6 +40,9 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * @author Hoshiiro

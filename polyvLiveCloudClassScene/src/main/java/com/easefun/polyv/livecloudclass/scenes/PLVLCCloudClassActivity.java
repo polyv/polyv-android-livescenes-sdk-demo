@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.scenes;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -25,6 +26,7 @@ import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -39,12 +41,13 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
-import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackListType;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -152,7 +155,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param vid           视频ID
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
-     * @param videoListType 回放视频类型，参考{@link PolyvPlaybackListType},新接口请参考{@link PLVPlaybackListType}
+     * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -164,7 +167,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                                  @NonNull String viewerId,
                                                  @NonNull String viewerName,
                                                  @NonNull String viewerAvatar,
-                                                 int videoListType) {
+                                                 PLVPlaybackListType videoListType) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动云课堂回放页失败！");
         }
@@ -289,13 +292,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         // 根据不同模式，设置对应参数
         if (!isLive) { // 回放模式
             String vid = intent.getStringExtra(EXTRA_VID);
-            int videoListType = intent.getIntExtra(EXTRA_VIDEO_LIST_TYPE, PLVPlaybackListType.PLAYBACK);
+            PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
             //注意vid为null的情况
             if (vid != null) {
                 PLVLiveChannelConfigFiller.setupVid(vid);
-
             }
-            PLVLiveChannelConfigFiller.setupVideoListType(videoListType);
+            PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
         }
     }
     // </editor-fold>
@@ -357,7 +359,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout.setPPTView(floatingPPTLayout.getPPTView().getPlaybackPPTViewToBindInPlayer());
             String vid = liveRoomDataManager.getConfig().getVid();
             if (!TextUtils.isEmpty(vid)) {
+                // 已填写vid，使用指定的视频播放
                 mediaLayout.startPlay();
+            } else {
+                // 未填写vid，后台配置了使用直播暂存，使用直播暂存播放
+                startPlaybackOnHasRecordFile();
             }
         }
 
@@ -380,6 +386,23 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             PLVScreenUtils.enterLandscape(this);
         }
         plvPlayerLogoView = mediaLayout.getLogoView();
+    }
+
+    private void startPlaybackOnHasRecordFile() {
+        liveRoomDataManager.getClassDetailVO().observe(this, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                if (statefulData == null || !statefulData.isSuccess() || statefulData.getData() == null || statefulData.getData().getData() == null) {
+                    return;
+                }
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                final PLVLiveClassDetailVO liveClassDetailVO = statefulData.getData();
+                final boolean hasRecordFile = liveClassDetailVO.getData().isPlaybackEnabled() && liveClassDetailVO.getData().getRecordFileSimpleModel() != null;
+                if (hasRecordFile) {
+                    mediaLayout.startPlay();
+                }
+            }
+        });
     }
     // </editor-fold>
 

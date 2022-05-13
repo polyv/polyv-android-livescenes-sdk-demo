@@ -250,6 +250,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     @Override
     public void destroy() {
+        Utils.getApp().unregisterActivityLifecycleCallbacks(callbacks);
         originContentParentVG = null;
         contentView = null;
     }

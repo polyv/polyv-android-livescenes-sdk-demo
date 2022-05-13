@@ -15,9 +15,7 @@ import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
-import com.easefun.polyv.businesssdk.model.video.PolyvBaseVideoParams;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
-import com.easefun.polyv.businesssdk.model.video.PolyvPlaybackVideoParams;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
@@ -38,6 +36,8 @@ import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.playback.video.api.IPolyvPlaybackListenerEvent;
 import com.easefun.polyv.mediasdk.player.IMediaPlayer;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
+import com.plv.business.model.video.PLVBaseVideoParams;
+import com.plv.business.model.video.PLVPlaybackVideoParams;
 import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -117,17 +117,18 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void startPlay() {
-        PolyvPlaybackVideoParams playbackVideoParams = new PolyvPlaybackVideoParams(
+        PLVPlaybackVideoParams playbackVideoParams = new PLVPlaybackVideoParams(
                 getConfig().getVid(),
                 getConfig().getChannelId(),
                 getConfig().getAccount().getUserId(),
                 getConfig().getUser().getViewerId()
         );
-        playbackVideoParams.buildOptions(PolyvBaseVideoParams.MARQUEE, true)
-                .buildOptions(PolyvBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
-                .buildOptions(PolyvBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
-                .buildOptions(PolyvPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
-                .buildOptions(PolyvPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType());
+        playbackVideoParams.buildOptions(PLVBaseVideoParams.MARQUEE, true)
+                .buildOptions(PLVBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
+                .buildOptions(PLVBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
+                .buildOptions(PLVPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
+                .buildOptions(PLVPlaybackVideoParams.ENABLE_AUTO_PLAY_TEMP_STORE_VIDEO, true)
+                .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType());
         if (videoView != null) {
             videoView.playByMode(playbackVideoParams, PLVPlayOption.PLAYMODE_VOD);
         }

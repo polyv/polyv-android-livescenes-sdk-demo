@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,9 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomV
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
-import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
+import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
@@ -69,6 +68,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //更多回放视频的presenter
     private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPresenter;
     private PLVPreviousView plvPreviousView;
+
+    private Boolean hasPreviousPage = null;
+    private boolean hasInitPreviousView = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -103,16 +105,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         moreIv.setOnClickListener(this);
         moreVideoListIv = findViewById(R.id.more_video_list_iv);
         moreVideoListIv.setVisibility(View.GONE);
-        //当进入的时候没有vid才会开启回放列表的功能
-        if (TextUtils.isEmpty(liveRoomDataManager.getConfig().getVid())) {
-            moreVideoListIv.setOnClickListener(this);
-            moreVideoListIv.setVisibility(View.VISIBLE);
-        }
         morePopupView = new PLVECMorePopupView();
 
         previousPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
         previousPopupView = new PLVECPreviousDialogFragment();
-        initPreviousView();
         dataList = new ArrayList<>();
     }
 
@@ -190,6 +186,21 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
+    public void onHasPreviousPage(boolean hasPreviousPage) {
+        if (this.hasPreviousPage != null && this.hasPreviousPage == hasPreviousPage) {
+            return;
+        }
+        this.hasPreviousPage = hasPreviousPage;
+        if (hasPreviousPage) {
+            moreVideoListIv.setOnClickListener(this);
+            moreVideoListIv.setVisibility(View.VISIBLE);
+            initPreviousView();
+        } else {
+            moreVideoListIv.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
     public void setOnViewActionListener(PLVECCommonHomeFragment.OnViewActionListener listener) {
         this.onViewActionListener = (OnViewActionListener) listener;
     }
@@ -227,6 +238,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
      * 设置PreviousView的参数
      */
     private void initPreviousView() {
+        if (hasInitPreviousView) {
+            return;
+        }
+        hasInitPreviousView = true;
+
         PLVPreviousView.Builder builder = new PLVPreviousView.Builder(getContext());
         //创建PLVPreviousView
         plvPreviousView = builder.create();

@@ -223,6 +223,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             nativeAppParams.userInfo.pic = liveRoomDataManager.getConfig().getUser().getViewerAvatar();
             nativeAppParams.appId = liveRoomDataManager.getConfig().getAccount().getAppId();
             nativeAppParams.appSecret = liveRoomDataManager.getConfig().getAccount().getAppSecret();
+            //todo 自定义参数p4 p5
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";
