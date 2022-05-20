@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.ui.widget.floating.PLVFloatingWindowManager;
+import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
@@ -68,10 +69,14 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
 
         view = LayoutInflater.from(context).inflate(R.layout.plvsa_widget_floating_screen_share, null, false);
 
-        PLVFloatingWindowManager.getInstance().buildWindow((Activity) context, true);
-        PLVFloatingWindowManager.getInstance().setContentView(view);
-        PLVFloatingWindowManager.getInstance().updateFloatSize(ViewGroup.LayoutParams.WRAP_CONTENT, ConvertUtils.dp2px(72));
-        PLVFloatingWindowManager.getInstance().updateFloatLocation(ScreenUtils.getScreenWidth() - ConvertUtils.dp2px(98), (int) (ScreenUtils.getScreenHeight() / 2.5));
+        PLVFloatingWindowManager.getInstance().createNewWindow((Activity) context)
+                .setIsSystemWindow(true)
+                .setContentView(view)
+                .setSize(ViewGroup.LayoutParams.WRAP_CONTENT, ConvertUtils.dp2px(72))
+                .setFloatLocation(ScreenUtils.getScreenWidth() - ConvertUtils.dp2px(98), (int) (ScreenUtils.getScreenHeight() / 2.5))
+                .setShowType(PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND)
+                .setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT)
+                .build();
 
         plvsaStreamerWindowRoot = view.findViewById(R.id.plvsa_streamer_window_root);
         plvsaStreamerWindowFold = view.findViewById(R.id.plvsa_streamer_window_fold);
@@ -87,7 +92,7 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         plvsaStreamerWindowStatusIv.setOnClickListener(this);
         plvsaStreamerWindowStatusTv.setOnClickListener(this);
 
-        receiver = new HomeKeyEventBroadCastReceiver(new WeakReference<PLVSAStreamerFloatWindow>(this));
+        receiver = new HomeKeyEventBroadCastReceiver(new WeakReference<>(this));
         IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 
         context.registerReceiver(receiver, homeFilter);

@@ -27,9 +27,13 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicRingButton;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
@@ -502,6 +506,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                     PLVCommonLog.w(TAG, "net work not available");
                     return;
                 }
+                if (toastWhenFloatingPlayerShowing()) {
+                    return;
+                }
                 btnRingActionPortrait.setRingOffState();
                 tvRequestTip.setText(R.string.plv_linkmic_tip_requesting_link_mic);
 
@@ -521,6 +528,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         break;
                 }
                 state = PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC;
+
+                // 连麦时不允许小窗播放
+                PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
 
                 if (onPLCLinkMicControlBarListener != null) {
                     onPLCLinkMicControlBarListener.onClickRingUpLinkMic();
@@ -662,6 +672,16 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             onPLCLinkMicControlBarListener.onClickRingOffLinkMic();
         }
         startAutoHideCountDown();
+    }
+
+    private boolean toastWhenFloatingPlayerShowing() {
+        if (PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
+            PLVToast.Builder.context(getContext())
+                    .setText("小窗播放中，不支持连麦")
+                    .show();
+            return true;
+        }
+        return false;
     }
     // </editor-fold>
 

@@ -1,8 +1,11 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments.widget;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -15,10 +18,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.plv.business.model.video.PLVMediaPlayMode;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 import java.util.List;
@@ -37,6 +43,9 @@ public class PLVECMorePopupView {
     private LinearLayout liveMoreLatencyLl;
     private ImageView liveMoreLatencyIv;
     private TextView liveMoreLatencyTv;
+    private LinearLayout liveMoreFloatingLl;
+    private ImageView liveMoreFloatingIv;
+    private TextView liveMoreFloatingTv;
     //直播切换线路布局
     private PopupWindow linesChangePopupWindow;
     private ViewGroup changeLinesLy;
@@ -97,6 +106,9 @@ public class PLVECMorePopupView {
             liveMoreLatencyLl = view.findViewById(R.id.plvec_live_more_latency_ll);
             liveMoreLatencyIv = view.findViewById(R.id.plvec_live_more_latency_iv);
             liveMoreLatencyTv = view.findViewById(R.id.plvec_live_more_latency_tv);
+            liveMoreFloatingLl = view.findViewById(R.id.plvec_live_more_floating_ll);
+            liveMoreFloatingIv = view.findViewById(R.id.plvec_live_more_floating_iv);
+            liveMoreFloatingTv = view.findViewById(R.id.plvec_live_more_floating_tv);
 
             ((ViewGroup) playModeIv.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -139,7 +151,16 @@ public class PLVECMorePopupView {
                     latencyPopupView.show(clickListener.isCurrentLowLatencyMode());
                 }
             });
+            liveMoreFloatingLl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
+                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                    hideAll();
+                }
+            });
             updateSubViewVisibility();
+            observeFloatingPlayer(view.getContext());
         }
         playModeIv.setSelected(!isCurrentVideoMode);
         playModeTv.setText(!playModeIv.isSelected() ? "音频模式" : "视频模式");
@@ -351,6 +372,18 @@ public class PLVECMorePopupView {
         }
         return root;
     }
+
+    private void observeFloatingPlayer(final Context context) {
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                .observe((LifecycleOwner) context, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+                        if (aBoolean != null) {
+                            updateSubViewVisibility();
+                        }
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部处理 - UI显示">
@@ -360,6 +393,7 @@ public class PLVECMorePopupView {
         updateLineViewVisibility();
         updateDefinitionViewVisibility();
         updateLatencyLayoutVisibility();
+        updateFloatingControlVisibility();
     }
 
     private void updatePlayModeVisibility() {
@@ -397,8 +431,17 @@ public class PLVECMorePopupView {
         }
         final boolean supportLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
         final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
-        final boolean showLatencyLayout = supportLowLatencyWatch && mediaPlaying;
+        final boolean isFloatingPlayerShowing = PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
+        final boolean showLatencyLayout = supportLowLatencyWatch && mediaPlaying && !isFloatingPlayerShowing;
         liveMoreLatencyLl.setVisibility(showLatencyLayout ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateFloatingControlVisibility() {
+        if (liveMoreFloatingLl == null) {
+            return;
+        }
+        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
+        liveMoreFloatingLl.setVisibility(mediaPlaying ? View.VISIBLE : View.GONE);
     }
 
     // </editor-fold>

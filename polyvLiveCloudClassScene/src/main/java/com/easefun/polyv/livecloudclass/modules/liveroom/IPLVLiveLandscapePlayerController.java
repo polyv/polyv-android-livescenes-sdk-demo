@@ -75,6 +75,8 @@ public interface IPLVLiveLandscapePlayerController {
      */
     ImageView getSwitchView();
 
+    ImageView getFloatingControlView();
+
     /**
      * 获取信息发送器
      */
@@ -84,6 +86,11 @@ public interface IPLVLiveLandscapePlayerController {
      * 获取更多按钮
      */
     ImageView getMoreView();
+
+    /**
+     * 获取打赏按钮
+     */
+    ImageView getRewardView();
 
     /**
      * 获取ppt翻页控件

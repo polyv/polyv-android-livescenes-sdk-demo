@@ -461,6 +461,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public void updateWhenLinkMicOpenStatusChanged(boolean isOpen) {
+
+    }
+
+    @Override
+    public void updateWhenRequestJoinLinkMic(boolean requestJoin) {
+
+    }
+
+    @Override
     public void notifyRTCPrepared() {
 
     }
@@ -502,6 +512,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     @Override
     public void setHideLandscapeRTCLayout() {
+
+    }
+
+    @Override
+    public void setLandscapeRewardEffectVisibility(boolean isShow) {
 
     }
     // </editor-fold>

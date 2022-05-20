@@ -90,7 +90,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         }
         this.linkmicItem = linkmicItem;
         changeSurfaceViewOnZMediaOverlay(switchViewAnchorLayout, true);
-        fullscreenSwitcher.registerSwitchVew(switchViewAnchorLayout, plvsaStreamerFullscreenView);
+        fullscreenSwitcher.registerSwitchView(switchViewAnchorLayout, plvsaStreamerFullscreenView);
         fullscreenSwitcher.switchView();
         setVisibility(View.VISIBLE);
         isFullscreened = true;

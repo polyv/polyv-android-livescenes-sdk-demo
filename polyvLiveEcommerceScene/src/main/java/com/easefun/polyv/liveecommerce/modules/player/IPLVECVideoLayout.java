@@ -10,6 +10,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 import java.util.List;
 
@@ -100,19 +101,7 @@ public interface IPLVECVideoLayout {
      */
     boolean dispatchTouchEvent(MotionEvent ev);
 
-    /**
-     * videoView父控件从videoLayout中分离出来
-     *
-     * @return videoView父控件
-     */
-    View detachVideoViewParent();
-
-    /**
-     * 把videoView父控件附加到videoLayout里
-     *
-     * @param view videoView父控件
-     */
-    void attachVideoViewParent(View view);
+    PLVSwitchViewAnchorLayout getPlayerSwitchAnchorLayout();
 
     /**
      * 销毁，销毁播放器及相关资源

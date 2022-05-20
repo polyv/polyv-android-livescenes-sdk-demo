@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.ui.widget.floating.widget;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,12 +12,12 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -37,14 +38,12 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     private Handler handler = new Handler(Looper.getMainLooper());
 
-
-    private int showType = PLV_WINDOW_SHOW_ONLY_BACKGROUND;
-
     private boolean isNeedShow = false;
 
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
+
     public PLVSystemFloatingLayout(@NonNull Context context) {
         this(context, null);
     }
@@ -58,8 +57,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
         initWindowManager();
     }
 
-
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化">
     private void initWindowManager() {
@@ -74,28 +72,42 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
             wmLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
 
-        wmLayoutParams.flags =
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        wmLayoutParams.format = PixelFormat.RGBA_8888;
+        wmLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
         wmLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
     }
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="重写方法">
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if(handler != null){
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
     }
 
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="activity 生命周期回调">
-    Application.ActivityLifecycleCallbacks callbacks = new Application.ActivityLifecycleCallbacks() {
+    private final Application.ActivityLifecycleCallbacks callbacks = new Application.ActivityLifecycleCallbacks() {
+
+        private void updateContentViewAttach() {
+            final boolean needShowOnScreen = isNeedShow && currentFitShowType();
+            if (needShowOnScreen && !isShowing) {
+                attachContentViewToWindow();
+                isShowing = true;
+            } else if (!needShowOnScreen && isShowing) {
+                detachContentViewFromWindow();
+                isShowing = false;
+            }
+        }
+
         @Override
         public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
@@ -103,17 +115,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
         @Override
         public void onActivityStarted(Activity activity) {
-            if(isNeedShow && !isShow) {//需要显示但是还没有显示
-                if(showType != PLVAbsFloatingLayout.PLV_WINDOW_SHOW_ONLY_BACKGROUND){
-                    attachContentViewToWindow();
-                    isShow = true;
-                }
-            } else if(isShow){
-                if(showType == PLVAbsFloatingLayout.PLV_WINDOW_SHOW_ONLY_BACKGROUND){
-                    detachContentViewFromWindow();
-                    isShow = false;
-                }
-            }
+            updateContentViewAttach();
         }
 
         @Override
@@ -128,31 +130,13 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
         @Override
         public void onActivityStopped(Activity activity) {
-            if(isNeedShow && !isShow){//需要显示但是还没有显示
-                handler.removeCallbacksAndMessages(null);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(showType == PLVAbsFloatingLayout.PLV_WINDOW_SHOW_ONLY_BACKGROUND){
-                            if(!AppUtils.isAppForeground()){
-                                attachContentViewToWindow();
-                                isShow = true;
-                            } else {
-                                Log.d(TAG, "onActivityStopped in foreground");
-                            }
-                        } else if(showType == PLV_WINDOW_SHOW_EVERYWHERE){
-                            attachContentViewToWindow();
-                            isShow = true;
-                        }
-                    }
-                }, 200);
-
-            } else if(isShow){
-                if(!AppUtils.isAppForeground()){
-                    detachContentViewFromWindow();
-                    isShow = false;
+            handler.removeCallbacksAndMessages(null);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateContentViewAttach();
                 }
-            }
+            }, 200);
         }
 
         @Override
@@ -165,7 +149,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
         }
     };
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="接口实现">
 
@@ -187,33 +171,26 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
     @Override
     public void show(Activity activity) {
         isNeedShow = true;
-        if (isShow()) {
-            Log.d(TAG, "call show window but already show");
+        if (isShowing()) {
+            PLVCommonLog.d(TAG, "call show window but already show");
             return;
         }
-        if(showType == PLV_WINDOW_SHOW_ONLY_BACKGROUND){
-            if(AppUtils.isAppForeground()){
-                return;
-            }
-        } else if(showType == PLV_WINDOW_SHOW_ONLY_FOREGROUND){
-            if(!AppUtils.isAppForeground()){
-                return;
-            }
+        if (!currentFitShowType()) {
+            return;
         }
 
         attachContentViewToWindow();
-        isShow = true;
-
+        isShowing = true;
     }
 
     @Override
     public void hide() {
         isNeedShow = false;
-        if (!isShow()) {
+        if (!isShowing()) {
             return;
         }
         detachContentViewFromWindow();
-        isShow = false;
+        isShowing = false;
     }
 
     @Override
@@ -222,7 +199,7 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
         wmLayoutParams.height = height;
         floatWindowWidth = width;
         floatWindowHeight = height;
-        if (windowManager != null && isShow()) {
+        if (windowManager != null && isShowing()) {
             windowManager.updateViewLayout(this, wmLayoutParams);
         }
     }
@@ -230,21 +207,19 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     @Override
     public void updateFloatLocation(int x, int y) {
-
-
+        x = fitInsideScreenX(x);
+        y = fitInsideScreenY(y);
         floatingLocationX = x;
         floatingLocationY = y;
         wmLayoutParams.x = x;
         wmLayoutParams.y = y;
-        if (windowManager != null && isShow()) {
-            Log.d("Testt", "updateFloatLocation "+floatingLocationX);
+        if (windowManager != null && isShowing()) {
             windowManager.updateViewLayout(this, wmLayoutParams);
         }
     }
 
     @Override
     public Point getFloatLocation() {
-        Log.d("Testt", "getFloatLocation "+floatingLocationX);
         return new Point(floatingLocationX, floatingLocationY);
     }
 
@@ -255,13 +230,13 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
         contentView = null;
     }
 
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="私有方法">
-    private void attachContentViewToWindow(){
+    private void attachContentViewToWindow() {
         if (originContentParentVG == null) {
             originContentParentVG = (ViewGroup) contentView.getParent();
-            if(originContentParentVG != null) {
+            if (originContentParentVG != null) {
                 originContentParentVG.removeView(contentView);
             }
             addView(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -270,9 +245,23 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
         windowManager.addView(this, wmLayoutParams);
     }
 
-    private void detachContentViewFromWindow(){
+    private void detachContentViewFromWindow() {
         windowManager.removeView(this);
     }
-    // </editor-fold >
+
+    private boolean currentFitShowType() {
+        switch (showType) {
+            case SHOW_ALWAYS:
+                return true;
+            case SHOW_ONLY_BACKGROUND:
+                return AppUtils.isAppBackground();
+            case SHOW_ONLY_FOREGROUND:
+                return AppUtils.isAppForeground();
+            default:
+        }
+        return false;
+    }
+
+    // </editor-fold>
 
 }

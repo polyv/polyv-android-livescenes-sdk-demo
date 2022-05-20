@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic.adapter;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -853,6 +856,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private PLVLSNetworkQualityWidget qualityWidget;
         private ImageView coverImageView;
         private PLVPlayerLogoView plvPlayerLogoView;
+        private TextView liveLinkmicFloatingPlayingPlaceholderTv;
+
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -871,12 +876,27 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             qualityWidget = itemView.findViewById(R.id.plvlc_link_mic_net_quality_view);
             coverImageView = itemView.findViewById(R.id.plvlc_link_mic_iv_cover_image);
             plvPlayerLogoView = itemView.findViewById(R.id.plvlc_link_mic_logo_view);
+            liveLinkmicFloatingPlayingPlaceholderTv = itemView.findViewById(R.id.plvlc_live_linkmic_floating_playing_placeholder_tv);
+
             qualityWidget.shouldShowNoNetworkHint(false);
             qualityWidget.setNetQualityRes(
                     R.drawable.plv_network_signal_watcher_good,
                     R.drawable.plv_network_signal_watcher_middle,
                     R.drawable.plv_network_signal_watcher_poor
             );
+
+            observeFloatingPlayer();
+        }
+
+        private void observeFloatingPlayer() {
+            PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                    .observe((LifecycleOwner) itemView.getContext(), new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(@Nullable Boolean isShowingBoolean) {
+                            final boolean isShowing = isShowingBoolean != null && isShowingBoolean;
+                            liveLinkmicFloatingPlayingPlaceholderTv.setVisibility(isShowing ? View.VISIBLE : View.GONE);
+                        }
+                    });
         }
     }
     // </editor-fold>

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRewardViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -60,6 +61,12 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             case PLVChatMessageItemType.ITEMTYPE_EMOTION:
                 viewHolder = new PLVLCMessageViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_message_landscape_item : R.layout.plvlc_chatroom_message_portrait_item, parent, false), this);
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_REWARD:
+                viewHolder = new PLVLCRewardViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_reward_landscape_item : R.layout.plvlc_chatroom_reward_item,parent, false),
+                        this
+                );
                 break;
             default:
                 PLVCommonLog.exception(new RuntimeException("itemType error"));

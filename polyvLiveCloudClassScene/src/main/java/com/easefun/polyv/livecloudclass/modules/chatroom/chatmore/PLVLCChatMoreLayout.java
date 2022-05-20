@@ -38,6 +38,12 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      * 消息
      */
     public static final int CHAT_FUNCTION_TYPE_MESSAGE = 5;
+    /**
+     * 屏蔽/展示 特效
+     */
+    public static final int CHAT_FUNCTION_TYPE_EFFECT = 6;
+
+
     //每行显示的功能模块数量
     public static final int LAYOUT_SPAN_COUNT = 4;
 
@@ -48,7 +54,8 @@ public class PLVLCChatMoreLayout extends FrameLayout {
                     new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_SEND_IMAGE, R.drawable.plvlc_chatroom_btn_img_send, "发送图片", false),
                     new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_OPEN_CAMERA, R.drawable.plvlc_chatroom_btn_camera, "拍摄", false),
                     new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_BULLETIN, R.drawable.plvlc_chatroom_btn_bulletin_show, "公告", true),
-                    new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, "消息", false)
+                    new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, "消息", false),
+                    new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, "屏蔽特效", false)
             )
     );
 

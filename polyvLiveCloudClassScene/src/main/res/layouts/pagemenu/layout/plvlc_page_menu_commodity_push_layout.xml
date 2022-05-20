@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="114dp"
+    android:background="#FFFFFF"
+    android:paddingStart="12dp"
+    android:paddingEnd="0dp"
+    app:radius="4dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvlc_commodity_cover_ly"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="10dp">
+
+        <ImageView
+            android:id="@+id/plvlc_commodity_cover_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/plvlc_chatroom_btn_like_9" />
+
+        <TextView
+            android:id="@+id/plvlc_commodity_cover_number_tv"
+            android:layout_width="27dp"
+            android:layout_height="16dp"
+            android:background="#59000000"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            tools:text="3" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <LinearLayout
+        android:id="@+id/plvlc_commodity_name_ll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="22dp"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_commodity_cover_ly"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvlc_commodity_name_number_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="10dp"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:plvGradientColors="#59000000"
+            app:plvRadius="6dp"
+            tools:text="3" />
+
+        <TextView
+            android:id="@+id/plvlc_commodity_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            tools:text="这是一个商品名称" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/plvlc_commodity_feature_tag_ll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="22dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_commodity_cover_ly"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_commodity_name_ll" />
+
+    <TextView
+        android:id="@+id/plvlc_commodity_product_desc_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="22dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="#99333333"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_commodity_cover_ly"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_commodity_feature_tag_ll"
+        tools:text="商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="22dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/plvlc_commodity_enter_iv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_commodity_cover_ly"
+        app:layout_constraintTop_toTopOf="@+id/plvlc_commodity_enter_iv">
+
+        <TextView
+            android:id="@+id/plvlc_commodity_real_price_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="center_vertical"
+            android:textColor="#FF473A"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="¥999999999" />
+
+        <TextView
+            android:id="@+id/plvlc_commodity_src_price_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="#ADADC0"
+            android:textSize="12sp"
+            tools:text="¥999999999" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/plvlc_commodity_dialog_close_iv"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:padding="8dp"
+        android:src="@drawable/plvlc_commodity_push_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvlc_commodity_enter_iv"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/plvlc_commodity_enter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

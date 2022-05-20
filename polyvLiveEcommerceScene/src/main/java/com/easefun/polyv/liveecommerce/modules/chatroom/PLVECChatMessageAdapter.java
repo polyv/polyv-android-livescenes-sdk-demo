@@ -114,8 +114,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                         this
                 );
                 break;
-            case PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT:
-                viewHolder = new PLVECChatMessageCustomGiftViewHolder(
+            case PLVChatMessageItemType.ITEMTYPE_REWARD:
+                viewHolder = new PLVECChatMessageRewardViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_custom_gift_item, parent, false),
                         this
                 );

@@ -43,5 +43,12 @@
             android:layout_height="match_parent"
             android:inflatedId="@+id/plvec_ppt_interact_layout"
             android:layout="@layout/plv_interact_layout_view_stub" />
+
+        <ViewStub
+            android:id="@+id/plvec_popover_layout"
+            android:inflatedId="@+id/plvec_float_layout"
+            android:layout="@layout/plv_popover_layout_stub"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </FrameLayout>
 </FrameLayout>

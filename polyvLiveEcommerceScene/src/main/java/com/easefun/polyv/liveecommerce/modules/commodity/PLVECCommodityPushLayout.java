@@ -13,8 +13,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.liveecommerce.R;
-
-import java.text.NumberFormat;
+import com.plv.socket.event.commodity.PLVProductContentBean;
 
 /**
  * 商品推送布局
@@ -69,16 +68,15 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
-    public void updateView(int productId, int showId, String cover, String name, double realPrice, double srcPrice) {
-        this.productId = productId;
-        commodityNumberTv.setText(String.valueOf(showId));
-        PLVImageLoader.getInstance().loadImage(cover, commodityCoverIv);
-        commodityNameTv.setText(name);
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setGroupingUsed(false);
-        commoditySrcPriceTv.setVisibility((Math.abs(realPrice - srcPrice) < 0.0000001 || srcPrice == 0) ? View.GONE : View.VISIBLE);
-        commoditySrcPriceTv.setText("¥" + trimZero(nf.format(srcPrice)));
-        commodityRealPriceTv.setText(realPrice == 0 ? "免费" : ("¥" + trimZero(nf.format(realPrice))));
+    public void updateView(PLVProductContentBean productContentBean) {
+        this.productId = productContentBean.getProductId();
+        commodityNumberTv.setText(String.valueOf(productContentBean.getShowId()));
+        PLVImageLoader.getInstance().loadImage(productContentBean.getCover(), commodityCoverIv);
+        commodityNameTv.setText(productContentBean.getName());
+        commoditySrcPriceTv.setVisibility(
+                (productContentBean.isRealPriceEqualsPrice() || productContentBean.isSrcPriceZero()) ? GONE : VISIBLE);
+        commoditySrcPriceTv.setText("¥" + productContentBean.getPrice());
+        commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? "免费" : ("¥" + productContentBean.getRealPrice()));
     }
 
     public void show() {
@@ -100,18 +98,6 @@ public class PLVECCommodityPushLayout extends FrameLayout implements View.OnClic
 
     public int getProductId() {
         return productId;
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="内部工具方法">
-    private String trimZero(String s) {
-        if (s != null && s.indexOf('.') > 0) {
-            // 去掉多余的0
-            s = s.replaceAll("0+?$", "");
-            // 如最后一位是.则去掉
-            s = s.replaceAll("[.]$", "");
-        }
-        return s;
     }
     // </editor-fold>
 

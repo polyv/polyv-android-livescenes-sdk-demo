@@ -11,6 +11,7 @@ import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.socket.event.chat.PLVRewardEvent;
 
 /**
  * 直播间数据管理器的接口
@@ -57,6 +58,16 @@ public interface IPLVLiveRoomDataManager {
      * 获取直播状态LiveData
      */
     LiveData<PLVStatefulData<PLVLiveRoomDataManager.LiveStatus>> getLiveStatusData();
+
+    /**
+     * 获取积分打赏开关MutableLiveData
+     */
+    MutableLiveData<PLVStatefulData<Boolean>> getPointRewardEnableData();
+
+    /**
+     * 获取积分打赏事件数据
+     */
+    MutableLiveData<PLVRewardEvent> getRewardEventData();
 
     /**
      * 获取互动应用状态

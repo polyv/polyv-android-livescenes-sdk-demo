@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * 打赏弹层view
  */
+@Deprecated
 public class PLVECRewardPopupView {
     private PopupWindow popupWindow;
     private PLVECRewardGiftAdapter giftAdapter;

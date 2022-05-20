@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
@@ -292,6 +293,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录直播">
     private void loginLive() {
+        PLVFloatingPlayerManager.getInstance().clear();
+
         final String appId = etLiveAppId.getText().toString();
         final String appSecret = etLiveAppSecert.getText().toString();
         final String userId = etLiveUserId.getText().toString();

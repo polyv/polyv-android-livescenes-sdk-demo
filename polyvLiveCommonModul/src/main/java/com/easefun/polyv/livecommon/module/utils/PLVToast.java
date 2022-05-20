@@ -1,10 +1,11 @@
 package com.easefun.polyv.livecommon.module.utils;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.requireNotNull;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Looper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -20,13 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
 /**
  * @author suhongtao
  */
 public class PLVToast {
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private static Toast lastShowToast = null;
 
     private ToastParam param;
@@ -35,7 +36,7 @@ public class PLVToast {
 
     private PLVToast(ToastParam param) {
         this.param = param;
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 initToast();
@@ -109,20 +110,22 @@ public class PLVToast {
     }
 
     public void show() {
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 if (lastShowToast != null) {
                     lastShowToast.cancel();
                 }
-                toast.show();
+                if (toast != null) {
+                    toast.show();
+                }
                 lastShowToast = toast;
             }
         });
     }
 
     public void cancel() {
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 if (toast != null) {
@@ -158,6 +161,10 @@ public class PLVToast {
             param.textColor = DEFAULT_TEXT_COLOR;
             param.backgroundColor = DEFAULT_BACKGROUND_COLOR;
             param.showDuration = DEFAULT_SHOW_DURATION;
+        }
+
+        public static Builder create() {
+            return context(requireNotNull(PLVAppUtils.getApp()));
         }
 
         public static Builder context(@NonNull Context context) {

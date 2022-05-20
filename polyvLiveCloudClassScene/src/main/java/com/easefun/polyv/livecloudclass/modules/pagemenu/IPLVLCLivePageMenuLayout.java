@@ -116,6 +116,16 @@ public interface IPLVLCLivePageMenuLayout {
          * 显示消息
          */
         void onShowMessageAction();
+
+        /**
+         * 显示积分打赏弹窗
+         */
+        void onShowRewardAction();
+
+        /**
+         * 是否显示特效
+         */
+        void onShowEffectAction(boolean isShow);
     }
     // </editor-fold>
 }

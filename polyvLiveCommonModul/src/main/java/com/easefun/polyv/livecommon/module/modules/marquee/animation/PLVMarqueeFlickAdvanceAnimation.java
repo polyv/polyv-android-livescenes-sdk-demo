@@ -94,6 +94,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
     @Override
     public void destroy() {
         super.destroy();
+        stopSecondAnimator();
         secondFlickObjectAnimator1 = null;
         secondFlickObjectAnimator2 = null;
     }
@@ -201,10 +202,14 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
     }
 
     private void stopSecondAnimator() {
-        secondFlickObjectAnimator1.cancel();
-        secondFlickObjectAnimator1.end();
-        secondFlickObjectAnimator2.cancel();
-        secondFlickObjectAnimator2.end();
+        if (secondFlickObjectAnimator1 != null) {
+            secondFlickObjectAnimator1.cancel();
+            secondFlickObjectAnimator1.end();
+        }
+        if (secondFlickObjectAnimator2 != null) {
+            secondFlickObjectAnimator2.cancel();
+            secondFlickObjectAnimator2.end();
+        }
         isSetSecondParams = false;
     }
     // </editor-fold>

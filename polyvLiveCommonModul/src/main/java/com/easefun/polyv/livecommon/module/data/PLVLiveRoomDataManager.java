@@ -13,6 +13,7 @@ import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
+import com.plv.socket.event.chat.PLVRewardEvent;
 
 /**
  * 直播间数据管理器，实现IPLVLiveRoomDataManager接口。
@@ -39,6 +40,10 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<PolyvCommodityVO>> commodityVO = new MutableLiveData<>();
     //直播状态
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
+    //积分打赏开关状态
+    private MutableLiveData<PLVStatefulData<Boolean>> pointRewardEnableData = new MutableLiveData<>();
+    //积分打赏事件
+    private MutableLiveData<PLVRewardEvent> pointRewardEventData = new MutableLiveData<>();
     //频道名称
     private MutableLiveData<PLVStatefulData<String>> channelNameData = new MutableLiveData<>();
     //互动应用icon状态
@@ -99,6 +104,16 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<LiveStatus>> getLiveStatusData() {
         return liveStatusData;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<Boolean>> getPointRewardEnableData() {
+        return pointRewardEnableData;
+    }
+
+    @Override
+    public MutableLiveData<PLVRewardEvent> getRewardEventData() {
+        return pointRewardEventData;
     }
 
     @Override

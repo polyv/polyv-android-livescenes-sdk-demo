@@ -71,10 +71,10 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     /**
      * 当子播放器点击唤起控制栏时，更新布局
      */
-    void updateWhenSubVideoViewClick();
+    void updateWhenSubVideoViewClick(boolean mainVideoViewPlaying);
 
     /**
-     * 当主播放器准备完成后，更新布局，对应{@link #updateWhenSubVideoViewClick()}的更新
+     * 当主播放器准备完成后，更新布局，对应{@link #updateWhenSubVideoViewClick(boolean)}的更新
      */
     void updateWhenVideoViewPrepared();
 
@@ -89,6 +89,10 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * 离开rtc时更新布局
      */
     void updateWhenLeaveRtc();
+
+    void updateWhenRequestJoinLinkMic(boolean isRequestJoinLinkMic);
+
+    void updateWhenLinkMicOpenOrClose(boolean isOpenLinkMic);
 
     /**
      * 当加入连麦时，更新布局
@@ -133,6 +137,14 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * 释放
      */
     void clean();
+
+    /**
+     * 更新积分打赏按钮视图，控制是否显示
+     * @param enable
+     */
+    void updateRewardView(boolean enable);
+
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 控制栏布局中UI控件 触发的交互事件的回调方法">
@@ -157,6 +169,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * 打开公告
          */
         void onShowBulletinAction();
+
+        /**
+         * 打开打赏弹窗
+         */
+        void onShowRewardView();
 
         /**
          * 发送点赞
@@ -191,6 +208,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * rtc观看是否正在暂停
          */
         boolean isRtcPausing();
+
+        /**
+         * 小窗点击事件
+         */
+        void onClickFloating();
     }
     // </editor-fold>
 }

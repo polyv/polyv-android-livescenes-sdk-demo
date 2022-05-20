@@ -18,13 +18,14 @@
         android:layout_alignParentBottom="true"
         android:clickable="true"
         android:orientation="horizontal"
-        android:paddingTop="42dp"
-        android:paddingRight="20dp">
+        android:paddingTop="54dp"
+        android:weightSum="5">
 
         <LinearLayout
             android:id="@+id/plvec_live_more_change_mode_ll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
             android:minWidth="72dp"
             android:orientation="vertical"
@@ -49,9 +50,9 @@
 
         <LinearLayout
             android:id="@+id/plvec_live_more_change_lines_ll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:minWidth="72dp"
             android:orientation="vertical"
@@ -76,9 +77,9 @@
 
         <LinearLayout
             android:id="@+id/plvec_live_more_definition_ll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:minWidth="72dp"
             android:orientation="vertical"
@@ -103,9 +104,9 @@
 
         <LinearLayout
             android:id="@+id/plvec_live_more_latency_ll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:minWidth="72dp"
             android:orientation="vertical"
@@ -127,6 +128,34 @@
                 android:textColor="#CDCDCD"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plvec_live_more_floating_ll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minWidth="72dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/plvec_live_more_floating_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/plvec_live_more_floating_icon" />
+
+            <TextView
+                android:id="@+id/plvec_live_more_floating_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="小窗播放"
+                android:textColor="#CDCDCD"
+                android:textSize="12sp" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <ImageView

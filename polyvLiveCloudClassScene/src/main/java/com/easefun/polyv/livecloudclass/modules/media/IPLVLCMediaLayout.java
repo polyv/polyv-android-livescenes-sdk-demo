@@ -173,6 +173,10 @@ public interface IPLVLCMediaLayout {
      */
     void updateWhenLeaveRTC();
 
+    void updateWhenLinkMicOpenStatusChanged(boolean isOpen);
+
+    void updateWhenRequestJoinLinkMic(boolean requestJoin);
+
     /**
      * 加入连麦
      */
@@ -215,6 +219,11 @@ public interface IPLVLCMediaLayout {
      * 隐藏横屏RTC布局。
      */
     void setHideLandscapeRTCLayout();
+
+    /**
+     * 设置横屏打赏特效显示
+     */
+    void setLandscapeRewardEffectVisibility(boolean isShow);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -307,6 +316,11 @@ public interface IPLVLCMediaLayout {
          * 显示公告动作（直播独有）
          */
         void onShowBulletinAction();
+
+        /**
+         * 显示打赏动作（直播独有）
+         */
+        void onShowRewardAction();
 
         /**
          * 发送点赞动作
