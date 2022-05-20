@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
@@ -133,6 +134,52 @@ public class PLVRoundRectGradientTextView extends AppCompatTextView {
         } else {
             super.draw(canvas);
         }
+    }
+
+    public void updateBackgroundColor(@ColorInt int... colors) {
+        if (colors == null) {
+            return;
+        }
+        final List<Integer> colorList = new ArrayList<>(colors.length);
+        for (int color : colors) {
+            colorList.add(color);
+        }
+        if (colorList.size() == 0) {
+            colorList.add(Color.TRANSPARENT);
+        }
+        if (colorList.size() == 1) {
+            colorList.add(colorList.get(0));
+        }
+        final int[] colorArray = new int[colorList.size()];
+        for (int i = 0; i < colorList.size(); ++i) {
+            colorArray[i] = colorList.get(i);
+        }
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setOrientation(orientationMapper.get(orientation));
+        gradientDrawable.setColors(colorArray);
+
+        setBackground(gradientDrawable);
+    }
+
+    public void updateRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) {
+        radiusTopLeft = topLeft;
+        radiusTopRight = topRight;
+        radiusBottomRight = bottomRight;
+        radiusBottomLeft = bottomLeft;
+
+        if (radiusPath == null) {
+            radiusPath = new Path();
+        } else {
+            radiusPath.reset();
+        }
+
+        radiusPath.addRoundRect(
+                new RectF(0, 0, width, height),
+                new float[]{radiusTopLeft, radiusTopLeft,
+                        radiusTopRight, radiusTopRight,
+                        radiusBottomRight, radiusBottomRight,
+                        radiusBottomLeft, radiusBottomLeft},
+                Path.Direction.CCW);
     }
 
     private void parseColors(List<Integer> colorList, TypedArray typedArray) {

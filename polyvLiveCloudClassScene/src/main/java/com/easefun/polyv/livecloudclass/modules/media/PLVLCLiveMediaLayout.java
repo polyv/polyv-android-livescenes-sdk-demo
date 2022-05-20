@@ -39,6 +39,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessa
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
@@ -48,10 +49,12 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -63,10 +66,14 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.opensource.svgaplayer.SVGAImageView;
+import com.opensource.svgaplayer.SVGAParser;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -147,6 +154,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     //倒计时
     private TextView timeCountDownTv;
+    private TextView livePlayerFloatingPlayingPlaceholderTv;
     //开始时间倒计时器
     private CountDownTimer startTimeCountDown;
     //直播开始时间
@@ -165,11 +173,19 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private boolean isShowLandscapeRTCLayout = false;
     private boolean isLandscape;
 
+    //打赏动画
+    private SVGAImageView rewardSvgaView;
+    //打赏动画辅助类
+    private SVGAParser svgaParser;
+    private PLVRewardSVGAHelper svgaHelper;
+    private boolean isRewardEffectShow = true;
+
     private boolean isOnlyAudio = false;
     private String coverImage = DEFAULT_COVER_IMAGE;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
+    private PLVLCFloatingWindow floatingWindow;
 
     //Listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
@@ -212,9 +228,18 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         timeCountDownTv = findViewById(R.id.time_count_down_tv);
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
+        rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
+
+        //初始化
+        svgaParser = new SVGAParser(getContext());
+        svgaHelper = new PLVRewardSVGAHelper();
+        svgaHelper.init(rewardSvgaView, svgaParser);
+
+
         coverImageView = findViewById(R.id.plvlc_cover_image_view);
         watermarkView = findViewById(R.id.polyv_watermark_view);
         networkTipsView = (PLVLCNetworkTipsView) findViewById(R.id.network_tips_view);
+        livePlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvlc_live_player_floating_playing_placeholder_tv);
 
         // 底部占位图
         PLVPlaceHolderView placeHolderView = new PLVPlaceHolderView(getContext());
@@ -230,6 +255,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         initSwitchView();
         initNetworkTipsLayout();
         initLayoutWH();
+
+        initFloatingPlayer();
     }
 
     private void initVideoView() {
@@ -303,6 +330,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             }
 
             @Override
+            public void onShowRewardView() {
+                if(onViewActionListener != null){
+                    onViewActionListener.onShowRewardAction();
+                }
+            }
+
+            @Override
             public void onSendLikesAction() {
                 if (onViewActionListener != null) {
                     onViewActionListener.onSendLikesAction();
@@ -344,6 +378,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     return onViewActionListener.isRtcPausing();
                 }
                 return false;
+            }
+
+            @Override
+            public void onClickFloating() {
+                if (floatingWindow != null) {
+                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                }
             }
         });
     }
@@ -450,18 +491,46 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         });
     }
 
+    private void initFloatingPlayer() {
+        floatingWindow = PLVDependManager.getInstance().get(PLVLCFloatingWindow.class);
+        floatingWindow.bindContentView(playerSwitchAnchor);
+
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean isShowingBoolean) {
+                        final boolean isShowing = isShowingBoolean != null && isShowingBoolean;
+                        livePlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? View.VISIBLE : View.GONE);
+                    }
+                });
+    }
+
+    private void observeLinkMicStatus(IPLVLivePlayerContract.ILivePlayerPresenter presenter) {
+        presenter.getData().getLinkMicState().observe((LifecycleOwner) getContext(), new Observer<Pair<Boolean, Boolean>>() {
+            @Override
+            public void onChanged(@Nullable Pair<Boolean /*openLinkMic*/, Boolean /*audioLinkMic*/> pair) {
+                if (pair == null || pair.first == null) {
+                    return;
+                }
+                updateWhenLinkMicOpenStatusChanged(pair.first);
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的common方法">
     @Override
     public void init(@NonNull IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        floatingWindow.setLiveRoomData(liveRoomDataManager);
 
         observeLiveRoomData();
 
         livePlayerPresenter = new PLVLivePlayerPresenter(liveRoomDataManager);
         livePlayerPresenter.registerView(livePlayerView);
         livePlayerPresenter.init();
+        observeLinkMicStatus(livePlayerPresenter);
 
         mediaController.setLivePlayerPresenter(livePlayerPresenter);
     }
@@ -642,6 +711,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public void updateWhenLinkMicOpenStatusChanged(boolean isOpen) {
+        mediaController.updateWhenLinkMicOpenOrClose(isOpen);
+    }
+
+    @Override
     public void updateWhenLeaveRTC() {
         isJoinRTC = false;
         landscapeMarginRightForLinkMicLayout = 0;
@@ -661,6 +735,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         } else {
             setLandscape();
         }
+    }
+
+    @Override
+    public void updateWhenRequestJoinLinkMic(boolean requestJoin) {
+        mediaController.updateWhenRequestJoinLinkMic(requestJoin);
     }
 
     @Override
@@ -725,6 +804,17 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         } else {
             //如果此时是竖屏，右边距已经是0了，那么不做操作。
             PLVCommonLog.d(TAG, "PLVLCLiveMediaLayout.setHideLandscapeRTCLayout-->isLandscape=false. We do noting when it is portrait");
+        }
+    }
+
+    @Override
+    public void setLandscapeRewardEffectVisibility(boolean isShow) {
+        isRewardEffectShow = isShow;
+        if(!isShow){
+            svgaHelper.clear();
+            rewardSvgaView.setVisibility(INVISIBLE);
+        } else {
+            rewardSvgaView.setVisibility(VISIBLE);
         }
     }
     // </editor-fold>
@@ -823,7 +913,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onSubVideoViewClick(mainPlayerIsPlaying);
 
             if (!mainPlayerIsPlaying) {
-                mediaController.updateWhenSubVideoViewClick();
+                mediaController.updateWhenSubVideoViewClick(mainPlayerIsPlaying);
                 if (mediaController.isShowing()) {
                     mediaController.hide();
                 } else {
@@ -876,9 +966,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onPrepared(mediaPlayMode);
             hideScreenShotView();
             stopLiveCountDown();
-            if (!isJoinRTC) {
-                mediaController.updateWhenVideoViewPrepared();
-            }
+            mediaController.updateWhenVideoViewPrepared();
             mediaController.show();
         }
 
@@ -1014,7 +1102,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             coverImage = DEFAULT_COVER_IMAGE;
         }
 
-        if(coverImage.startsWith("//")){
+        if (coverImage.startsWith("//")) {
             coverImage = "https:" + coverImage;
         }
 
@@ -1050,6 +1138,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             //否则不预留右边距
             showLandscapeRTCLayout(false);
         }
+        //横屏时显示播放器区域的打赏动画
+        rewardSvgaView.setVisibility(VISIBLE);
     }
 
     private void setPortrait() {
@@ -1147,6 +1237,30 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 isOnlyAudio = onlyAudio;
                 //更新封面图
                 updateCoverImage(isOnlyAudio, coverImage);
+            }
+        });
+
+        //订阅积分打赏开关
+        liveRoomDataManager.getPointRewardEnableData().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<Boolean>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<Boolean> booleanPLVStatefulData) {
+                liveRoomDataManager.getPointRewardEnableData().removeObserver(this);
+                if(mediaController != null){
+                    mediaController.updateRewardView(booleanPLVStatefulData.getData());
+                }
+
+            }
+        });
+
+        //订阅积分打赏事件
+        liveRoomDataManager.getRewardEventData().observe((LifecycleOwner) getContext(), new Observer<PLVRewardEvent>() {
+            @Override
+            public void onChanged(@Nullable PLVRewardEvent event) {
+                if(event == null || !isLandscape || !isRewardEffectShow){
+                    return;
+                }
+                //添加到svga
+                svgaHelper.addEvent(event);
             }
         });
     }

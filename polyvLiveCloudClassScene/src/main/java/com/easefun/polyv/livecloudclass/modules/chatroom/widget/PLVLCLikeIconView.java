@@ -79,7 +79,7 @@ public class PLVLCLikeIconView extends RelativeLayout {
         LayoutParams bgLp = new LayoutParams((int) d, (int) d);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        bgLp.bottomMargin = ConvertUtils.dp2px(5);
+//        bgLp.bottomMargin = ConvertUtils.dp2px(5);
         /**
          * ///暂时保留，以后有必要时再使用
          *  bgLp.addRule(Gravity.CENTER);

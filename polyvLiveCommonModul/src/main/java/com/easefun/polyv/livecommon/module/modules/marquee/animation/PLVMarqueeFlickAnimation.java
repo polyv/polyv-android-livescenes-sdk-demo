@@ -114,14 +114,12 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = STOP;
-        flickObjectAnimator1.cancel();
-        flickObjectAnimator1.end();
-        flickObjectAnimator2.cancel();
-        flickObjectAnimator2.end();
+        stopAnimation();
     }
 
     @Override
     public void destroy() {
+        stopAnimation();
         flickObjectAnimator1 = null;
         flickObjectAnimator2 = null;
     }
@@ -229,5 +227,20 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         layoutParams.topMargin = (int) (Math.random() * (screenHeight - Math.min(screenHeight, viewHeight)));
         layoutParams.leftMargin = (int) (Math.random() * (screenWidth - Math.min(screenWidth, viewWidth)));
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理">
+
+    private void stopAnimation() {
+        if (flickObjectAnimator1 != null) {
+            flickObjectAnimator1.cancel();
+            flickObjectAnimator1.end();
+        }
+        if (flickObjectAnimator2 != null) {
+            flickObjectAnimator2.cancel();
+            flickObjectAnimator2.end();
+        }
+    }
+
     // </editor-fold>
 }

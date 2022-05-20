@@ -51,7 +51,7 @@ public class PLVAppFloatingLayout extends PLVAbsFloatingLayout {
     }
 
     @Override
-    public boolean isShow() {
+    public boolean isShowing() {
         return false;
     }
 

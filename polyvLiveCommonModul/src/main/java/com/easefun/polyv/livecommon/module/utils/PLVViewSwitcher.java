@@ -42,7 +42,7 @@ public class PLVViewSwitcher {
      * @param switchViewA View A
      * @param switchViewB View B
      */
-    public void registerSwitchVew(PLVSwitchViewAnchorLayout switchViewA, PLVSwitchViewAnchorLayout switchViewB) {
+    public void registerSwitchView(PLVSwitchViewAnchorLayout switchViewA, PLVSwitchViewAnchorLayout switchViewB) {
         this.switchViewAwr = new WeakReference<>(switchViewA);
         this.switchViewBwr = new WeakReference<>(switchViewB);
     }

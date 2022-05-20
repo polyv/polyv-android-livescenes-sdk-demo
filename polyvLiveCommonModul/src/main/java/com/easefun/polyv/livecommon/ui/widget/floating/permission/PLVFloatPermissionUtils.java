@@ -49,7 +49,6 @@ public class PLVFloatPermissionUtils {
     public static boolean checkPermission(Activity activity) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (RomUtils.checkIsHuaweiRom()) return huaweiPermissionCheck(activity);
-            if (RomUtils.checkIsHuaweiRom()) return huaweiPermissionCheck(activity);
             if (RomUtils.checkIsMiuiRom()) return miuiPermissionCheck(activity);
             if (RomUtils.checkIsOppoRom()) return oppoROMPermissionCheck(activity);
             if (RomUtils.checkIsMeizuRom()) return meizuPermissionCheck(activity);
@@ -119,8 +118,9 @@ public class PLVFloatPermissionUtils {
             } else {
                 Log.i(TAG, "原生 Android 6.0 以下无需权限申请");
             }
-        } else commonROMPermissionApply(fragment);
-
+        } else {
+            commonROMPermissionApply(fragment);
+        }
     }
 
     /**

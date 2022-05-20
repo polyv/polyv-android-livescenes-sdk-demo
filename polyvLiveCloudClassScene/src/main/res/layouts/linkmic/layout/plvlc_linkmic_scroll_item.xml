@@ -144,5 +144,16 @@
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/plvlc_live_linkmic_floating_playing_placeholder_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#2B3045"
+            android:gravity="center"
+            android:text="小窗播放中..."
+            android:textColor="#E4E4E4"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </android.support.constraint.ConstraintLayout>

@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
 /**
  * date: 2019-12-06
  * author: hwj
@@ -51,7 +53,7 @@ public class PLVRewardStrokeTextView extends android.support.v7.widget.AppCompat
         //自定义描边效果
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePaint.setColor(Color.WHITE);
-        strokePaint.setStrokeWidth(4);
+        strokePaint.setStrokeWidth(ConvertUtils.dp2px(3));
 
         String text = getText().toString();
 

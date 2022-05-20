@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.graphics.Point;
 import android.view.View;
 
+import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
+
 /**
  * 悬浮窗Layout - 对外接口定义
  */
@@ -36,9 +38,18 @@ public interface IPLVFloatingLayout {
 
     /**
      * 悬浮窗是否正在显示
+     *
      * @return
      */
-    boolean isShow();
+    boolean isShowing();
+
+    void setShowType(PLVFloatingEnums.ShowType showType);
+
+    void setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType autoEdgeType);
+
+    void setEnableDrag(boolean enableDrag);
+
+    void setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove);
 
     /**
      * 更新悬浮窗尺寸

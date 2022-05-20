@@ -98,13 +98,17 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = STOP;
-        mainAnimator.cancel();
-        mainAnimator.end();
+        if (mainAnimator != null) {
+            mainAnimator.cancel();
+            mainAnimator.end();
+        }
     }
 
     @Override
     public void destroy() {
-        mainAnimator.removeAllListeners();
+        if (mainAnimator != null) {
+            mainAnimator.removeAllListeners();
+        }
         mainAnimator = null;
     }
 

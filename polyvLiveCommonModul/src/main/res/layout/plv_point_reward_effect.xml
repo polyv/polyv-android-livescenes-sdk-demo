@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:paddingTop="10dp">
+
+        <RelativeLayout
+            android:id="@+id/rl_point_reward_effect_top"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <View
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:background="#FFEB5145" />
+
+            <View
+                android:id="@+id/plv_v_point_reward_effect_bg_1"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="120dp"
+                android:background="@drawable/plv_point_reward_gradient_effect_bg" />
+
+            <TextView
+                android:id="@+id/plv_tv_point_reward_effect_nickname_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/plv_v_point_reward_effect_bg_1"
+                android:layout_alignRight="@+id/plv_iv_point_reward_effect_1"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="56dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingRight="1dp"
+                android:textColor="#FFFCF2A6"
+                android:textSize="14sp"
+                tools:text="广州观众笔芯笔芯笔芯笔芯" />
+
+            <TextView
+                android:id="@+id/tv_point_reward_effect_reward_content_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="13dp"
+                android:layout_marginBottom="5dp"
+                android:includeFontPadding="false"
+                android:textColor="#FFFFFFFF"
+                android:textSize="10sp"
+                tools:text="赠送  掌声" />
+
+            <ImageView
+                android:id="@+id/plv_iv_point_reward_effect_1"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="150dp"
+                android:scaleType="centerCrop" />
+
+
+            <LinearLayout
+                android:id="@+id/plv_ll_point_reward_count_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@id/plv_iv_point_reward_effect_1"
+                android:orientation="horizontal">
+
+                <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardStrokeTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="x"
+                    android:textColor="#FFF57C00"
+                    android:textSize="20dp" />
+
+                <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardStrokeTextView
+                    android:id="@+id/plv_tv_point_reward_effect_count_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textColor="#FFF57C00"
+                    android:textSize="28dp"
+                    tools:text="666" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:paddingTop="10dp">
+
+        <RelativeLayout
+            android:id="@+id/rl_point_reward_effect_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <View
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:background="#FFEB5145" />
+
+            <View
+                android:id="@+id/plv_v_point_reward_effect_bg_2"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="120dp"
+                android:background="@drawable/plv_point_reward_gradient_effect_bg" />
+
+            <TextView
+                android:id="@+id/plv_tv_point_reward_effect_nickname_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/plv_v_point_reward_effect_bg_2"
+                android:layout_alignRight="@+id/plv_iv_point_reward_effect_2"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="56dp"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingRight="1dp"
+                android:textColor="#FFFCF2A6"
+                android:textSize="14sp"
+                tools:text="广州观众笔芯笔芯笔芯笔芯" />
+
+            <TextView
+                android:id="@+id/tv_point_reward_effect_reward_content_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="13dp"
+                android:layout_marginBottom="5dp"
+                android:includeFontPadding="false"
+                android:textColor="#FFFFFFFF"
+                android:textSize="10sp"
+                tools:text="赠送  掌声" />
+
+            <ImageView
+                android:id="@+id/plv_iv_point_reward_effect_2"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="150dp"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout
+                android:id="@+id/plv_ll_point_reward_count_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@id/plv_iv_point_reward_effect_2"
+                android:orientation="horizontal">
+
+                <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardStrokeTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="x"
+                    android:textColor="#FFF57C00"
+                    android:textSize="20dp" />
+
+                <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardStrokeTextView
+                    android:id="@+id/plv_tv_point_reward_effect_count_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textColor="#FFF57C00"
+                    android:textSize="28dp"
+                    tools:text="666" />
+            </LinearLayout>
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>

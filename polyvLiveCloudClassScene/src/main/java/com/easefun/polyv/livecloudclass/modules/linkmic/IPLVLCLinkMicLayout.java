@@ -181,6 +181,12 @@ public interface IPLVLCLinkMicLayout {
          */
         void onLeaveRtcChannel();
 
+        void onChannelLinkMicOpenStatusChanged(boolean isOpen);
+
+        void onRequestJoinLinkMic();
+
+        void onCancelRequestJoinLinkMic();
+
         void onJoinLinkMic();
 
         void onLeaveLinkMic();

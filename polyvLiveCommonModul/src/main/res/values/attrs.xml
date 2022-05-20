@@ -213,6 +213,13 @@
         <attr name="rectRadius" />
     </declare-styleable>
 
+    <declare-styleable name="PolyvBeadWidget">
+        <attr name="bead_margin" format="dimension" />
+        <attr name="bead_radius" format="dimension" />
+        <attr name="selected_bead_color" format="color" />
+        <attr name="unselected_bead_color" format="color" />
+    </declare-styleable>
+
     <declare-styleable name="PLVTriangleIndicateLayout">
         <attr name="triangleWidth" />
         <attr name="triangleHeight" />

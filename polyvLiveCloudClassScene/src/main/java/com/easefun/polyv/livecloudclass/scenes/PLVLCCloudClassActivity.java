@@ -20,18 +20,21 @@ import com.easefun.polyv.livecloudclass.modules.linkmic.IPLVLCLinkMicLayout;
 import com.easefun.polyv.livecloudclass.modules.linkmic.PLVLCLinkMicControlBar;
 import com.easefun.polyv.livecloudclass.modules.liveroom.PLVLCLiveLandscapeChannelController;
 import com.easefun.polyv.livecloudclass.modules.media.IPLVLCMediaLayout;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindowModule;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCFloatingPPTLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
+import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
-import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
+import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -43,6 +46,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -85,9 +89,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     // 连麦布局
     @Nullable
     private IPLVLCLinkMicLayout linkMicLayout;
-    // 互动应用布局
-    @Nullable
-    private IPLVInteractLayout interactLayout;
+
+    //弹窗布局
+    private IPLVPopoverLayout popoverLayout;
 
     // 悬浮PPT布局 和 播放器布局 的切换器
     private PLVViewSwitcher pptViewSwitcher = new PLVViewSwitcher();
@@ -205,6 +209,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        injectDependency();
         setContentView(R.layout.plvlc_cloudclass_activity);
         initParams();
         initLiveRoomManager();
@@ -219,29 +224,35 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mediaLayout != null) {
-            mediaLayout.destroy();
-        }
-        if (linkMicLayout != null) {
-            linkMicLayout.destroy();
-        }
-        if (livePageMenuLayout != null) {
-            livePageMenuLayout.destroy();
-        }
-        if (interactLayout != null) {
-            interactLayout.destroy();
-        }
-        if (floatingPPTLayout != null) {
-            floatingPPTLayout.destroy();
-        }
-        if (liveRoomDataManager != null) {
-            liveRoomDataManager.destroy();
-        }
+        PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
+            @Override
+            public void run() {
+                PLVFloatingPlayerManager.getInstance().clear();
+                if (mediaLayout != null) {
+                    mediaLayout.destroy();
+                }
+                if (linkMicLayout != null) {
+                    linkMicLayout.destroy();
+                }
+                if (livePageMenuLayout != null) {
+                    livePageMenuLayout.destroy();
+                }
+                if(popoverLayout != null){
+                    popoverLayout.destroy();
+                }
+                if (floatingPPTLayout != null) {
+                    floatingPPTLayout.destroy();
+                }
+                if (liveRoomDataManager != null) {
+                    liveRoomDataManager.destroy();
+                }
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
-        if (interactLayout != null && interactLayout.onBackPress()) {
+        if (popoverLayout != null && popoverLayout.onBackPress()) {
             return;
         } else if (mediaLayout != null && mediaLayout.onBackPressed()) {
             return;
@@ -270,6 +281,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
+
+    private void injectDependency() {
+        PLVDependManager.getInstance()
+                .switchStore(this)
+                .addModule(PLVLCFloatingWindowModule.instance);
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
     private void initParams() {
         // 获取输入数据
@@ -289,8 +310,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
+        PLVFloatingPlayerManager.getInstance().saveIntent(intent);
         // 根据不同模式，设置对应参数
-        if (!isLive) { // 回放模式
+        if (isLive) {
+            PLVFloatingPlayerManager.getInstance().setTag(channelId + "_live");
+        } else { // 回放模式
             String vid = intent.getStringExtra(EXTRA_VID);
             PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
             //注意vid为null的情况
@@ -298,6 +322,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 PLVLiveChannelConfigFiller.setupVid(vid);
             }
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
+
+            PLVFloatingPlayerManager.getInstance().setTag(channelId + "_" + (vid == null ? "playback" : vid));
         }
     }
     // </editor-fold>
@@ -347,10 +373,17 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             linkMicLayout.init(liveRoomDataManager, linkMicControlBar);
             linkMicLayout.hideAll();
 
-            // 互动应用布局 - v2
-            ViewStub interactLayoutViewStub = findViewById(R.id.plvlc_ppt_interact_layout);
-            interactLayout = (PLVInteractLayout2) interactLayoutViewStub.inflate();
-            interactLayout.init(liveRoomDataManager);
+            //弹窗布局(包括积分打赏、互动应用)
+
+            ViewStub floatViewStub = findViewById(R.id.plvlc_popover_layout);
+            popoverLayout = (IPLVPopoverLayout) floatViewStub.inflate();
+            popoverLayout.init(PLVLiveScene.CLOUDCLASS, liveRoomDataManager);
+            popoverLayout.setOnPointRewardListener(new OnPointRewardListener() {
+                @Override
+                public void pointRewardEnable(boolean enable) {
+                    liveRoomDataManager.getPointRewardEnableData().postValue(PLVStatefulData.success(enable));
+                }
+            });
         } else {
             // 播放器布局
             videoLyViewStub.setLayoutResource(R.layout.plvlc_playback_media_layout_view_stub);
@@ -377,7 +410,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         livePageMenuLayout.getChatroomPresenter().registerView(chatLandscapeLayout.getChatroomView());
 
         // 注册 悬浮PPT布局 和 播放器布局 的切换器
-        pptViewSwitcher.registerSwitchVew(floatingPPTLayout.getPPTSwitchView(), mediaLayout.getPlayerSwitchView());
+        pptViewSwitcher.registerSwitchView(floatingPPTLayout.getPPTSwitchView(), mediaLayout.getPlayerSwitchView());
 
         // 初始化 屏幕方向
         if (ScreenUtils.isPortrait()) {
@@ -460,8 +493,15 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
             @Override
             public void onShowBulletinAction() {
-                if (liveRoomDataManager.getConfig().isLive() && interactLayout != null) {
-                    interactLayout.showBulletin();
+                if (liveRoomDataManager.getConfig().isLive() && popoverLayout != null) {
+                    popoverLayout.getPLVInteractLayout().showBulletin();
+                }
+            }
+
+            @Override
+            public void onShowRewardAction() {
+                if (liveRoomDataManager.getConfig().isLive() && popoverLayout != null) {
+                    popoverLayout.getPLVRewardView().showPointRewardDialog(true);
                 }
             }
 
@@ -649,8 +689,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         livePageMenuLayout.setOnViewActionListener(new IPLVLCLivePageMenuLayout.OnViewActionListener() {
             @Override
             public void onShowBulletinAction() {
-                if (interactLayout != null) {
-                    interactLayout.showBulletin();
+                if (popoverLayout != null) {
+                    popoverLayout.getPLVInteractLayout().showBulletin();
                 }
             }
 
@@ -671,8 +711,23 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
             @Override
             public void onShowMessageAction() {
-                if (interactLayout != null) {
-                    interactLayout.showMessage();
+                if (popoverLayout != null) {
+                    popoverLayout.getPLVInteractLayout().showMessage();
+                }
+            }
+
+            @Override
+            public void onShowRewardAction() {
+                if(popoverLayout != null){
+                    popoverLayout.getPLVRewardView().showPointRewardDialog(true);
+                }
+            }
+
+            @Override
+            public void onShowEffectAction(boolean isShow) {
+                //控制横屏时的打赏特效显示
+                if(mediaLayout != null){
+                    mediaLayout.setLandscapeRewardEffectVisibility(isShow);
                 }
             }
         });
@@ -818,6 +873,21 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onChannelLinkMicOpenStatusChanged(boolean isOpen) {
+                mediaLayout.updateWhenLinkMicOpenStatusChanged(isOpen);
+            }
+
+            @Override
+            public void onRequestJoinLinkMic() {
+                mediaLayout.updateWhenRequestJoinLinkMic(true);
+            }
+
+            @Override
+            public void onCancelRequestJoinLinkMic() {
+                mediaLayout.updateWhenRequestJoinLinkMic(false);
+            }
+
+            @Override
             public void onJoinLinkMic() {
                 mediaLayout.updateWhenJoinLinkMic();
             }
@@ -843,7 +913,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
             @Override
             public void onChangeTeacherLocation(PLVViewSwitcher viewSwitcher, PLVSwitchViewAnchorLayout switchView) {
-                viewSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
+                viewSwitcher.registerSwitchView(switchView, mediaLayout.getPlayerSwitchView());
                 viewSwitcher.switchView();
                 mediaLayout.getPlayerSwitchView().post(new Runnable() {
                     @Override
@@ -858,18 +928,18 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
             @Override
             public void onClickSwitchWithMediaOnce(PLVSwitchViewAnchorLayout switchView) {
-                linkMicItemSwitcher.registerSwitchVew(switchView, mediaLayout.getPlayerSwitchView());
+                linkMicItemSwitcher.registerSwitchView(switchView, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
             }
 
             @Override
             public void onClickSwitchWithMediaTwice(PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
                 //先将PPT从连麦列表切到主屏幕
-                linkMicItemSwitcher.registerSwitchVew(switchViewHasMedia, mediaLayout.getPlayerSwitchView());
+                linkMicItemSwitcher.registerSwitchView(switchViewHasMedia, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
 
                 //再将要切到主屏幕的item和PPT交换位置
-                linkMicItemSwitcher.registerSwitchVew(switchViewGoMainScreen, mediaLayout.getPlayerSwitchView());
+                linkMicItemSwitcher.registerSwitchView(switchViewGoMainScreen, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
             }
 

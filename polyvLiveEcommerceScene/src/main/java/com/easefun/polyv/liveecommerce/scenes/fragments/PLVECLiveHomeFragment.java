@@ -1,16 +1,13 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ImageSpan;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +17,16 @@ import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
-import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
-import com.easefun.polyv.livecommon.module.utils.span.PLVRelativeImageSpan;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
@@ -42,21 +42,20 @@ import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailAct
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
-import com.easefun.polyv.liveecommerce.modules.reward.PLVECRewardGiftAdapter;
-import com.easefun.polyv.liveecommerce.modules.reward.PLVECRewardPopupView;
-import com.easefun.polyv.liveecommerce.modules.reward.widget.PLVECRewardGiftAnimView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.opensource.svgaplayer.SVGAImageView;
+import com.opensource.svgaplayer.SVGAParser;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
@@ -66,7 +65,7 @@ import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import com.plv.thirdpart.blankj.utilcode.util.NetworkUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.ArrayList;
@@ -111,8 +110,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     //打赏
     private ImageView rewardIv;
 
-    private PLVECRewardPopupView rewardPopupView;
-    private PLVECRewardGiftAnimView rewardGiftAnimView;
+    //是否打开了积分打赏
+    private boolean isOpenPointReward = false;
+    //积分打赏事件队列
+    private IPLVPointRewardEventProducer pointRewardEventProducer;
+    //积分打赏动画item
+    private PLVPointRewardEffectWidget polyvPointRewardEffectWidget;
+    //积分打赏svg动画
+    private SVGAImageView rewardSvgImage;
+    private SVGAParser svgaParser;
+    private PLVRewardSVGAHelper svgaHelper;
+
     // 网络较差提示
     private PLVECNetworkTipsView networkTipsView;
     //监听器
@@ -136,6 +144,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
         calculateLiveVideoViewRect();
         startLikeAnimationTask(5000);
+
+        //订阅是否打开积分打赏
+        observeRewardData();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(isOpenPointReward) {
+            destroyPointRewardEffectQueue();
+        }
     }
 
     // </editor-fold>
@@ -176,11 +195,17 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         commodityPushLayout = findViewById(R.id.commodity_push_ly);
         rewardIv = findViewById(R.id.reward_iv);
         rewardIv.setOnClickListener(this);
-        rewardGiftAnimView = findViewById(R.id.reward_ly);
         morePopupView = new PLVECMorePopupView();
         commodityPopupView = new PLVECCommodityPopupView();
-        rewardPopupView = new PLVECRewardPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
+
+        //打赏动画特效
+        polyvPointRewardEffectWidget = findViewById(R.id.plvec_point_reward_effect);
+        rewardSvgImage = findViewById(R.id.plvec_reward_svg);
+        svgaParser = new SVGAParser(getContext());
+        svgaHelper = new PLVRewardSVGAHelper();
+        svgaHelper.init(rewardSvgImage, svgaParser);
+
         networkTipsView = findViewById(R.id.plvec_live_network_tips_layout);
 
         initNetworkTipsLayout();
@@ -298,6 +323,40 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 打赏动画控制">
+    /**
+     * 初始化积分打赏动画特效item
+     */
+    private void initPointRewardEffectQueue(){
+        if(pointRewardEventProducer == null) {
+            pointRewardEventProducer = new PLVPointRewardEffectQueue();
+            polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+        }
+    }
+
+    /**
+     * 销毁积分打赏动效队列
+     */
+    private void destroyPointRewardEffectQueue(){
+        if (pointRewardEventProducer != null) {
+            pointRewardEventProducer.destroy();
+        }
+        svgaHelper.clear();
+    }
+
+    private void acceptPointRewardMessage(PLVRewardEvent rewardEvent){
+        if (pointRewardEventProducer != null) {
+            //横屏不处理积分打赏事件
+            if (ScreenUtils.isPortrait()) {
+                //添加到队列后，自动加载动画特效
+                pointRewardEventProducer.addEvent(rewardEvent);
+                //添加到svga
+                svgaHelper.addEvent(rewardEvent);
+            }
+        }
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 公告控制">
     private void acceptBulletinMessage(final PolyvBulletinVO bulletinVO) {
         bulletinLy.acceptBulletinMessage(bulletinVO);
@@ -400,6 +459,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
 
         @Override
+        public void onRewardEvent(@NonNull PLVRewardEvent rewardEvent) {
+            super.onRewardEvent(rewardEvent);
+            acceptPointRewardMessage(rewardEvent);
+        }
+
+        @Override
         public void onRemoveBulletinEvent() {
             super.onRemoveBulletinEvent();
             removeBulletin();
@@ -453,8 +518,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         @Override
         public void onCustomGiftEvent(@NonNull PolyvCustomEvent.UserBean userBean, @NonNull PLVCustomGiftBean customGiftBean) {
-            showRewardGiftAnimView(userBean.getNick(), customGiftBean);
-            addCustomGiftToChatList(userBean.getNick(), customGiftBean.getGiftName(), customGiftBean.getGiftType(), false);
+            //自定义礼物消息已移除，统一通过onRewardEvent实现打赏
         }
 
         @Override
@@ -615,7 +679,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                             acceptBuyCommodityClick(contentBean);
                         }
                     });
-                    commodityPushLayout.updateView(contentBean.getProductId(), contentBean.getShowId(), contentBean.getCover(), contentBean.getName(), contentBean.getRealPrice(), contentBean.getPrice());
+                    commodityPushLayout.updateView(contentBean);
                     commodityPushLayout.show();
                 } else if (productControlEvent.isNewly()) {//新增
                     commodityPopupView.add(contentBean, true);
@@ -658,61 +722,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     private void acceptBuyCommodityClick(PLVProductContentBean contentBean) {
-        String link = contentBean.isNormalLink() ? contentBean.getLink() : contentBean.getMobileAppLink();
+        final String link = contentBean.getLinkByType();
         if (TextUtils.isEmpty(link)) {
             ToastUtils.showShort(R.string.plv_commodity_toast_empty_link);
             return;
         }
         lastJumpBuyCommodityLink = link;
         jumpBuyCommodity();
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="打赏 - 布局显示，动画view显示">
-    private void showRewardLayout(View v) {
-        rewardPopupView.showRewardLayout(v, new PLVECRewardGiftAdapter.OnViewActionListener() {
-            @Override
-            public void onRewardClick(View view, PLVCustomGiftBean giftBean) {
-                rewardPopupView.hide();
-                //点击礼物时现判断一下网络情况
-                if(NetworkUtils.isConnected()){
-                    String nickName = PolyvSocketWrapper.getInstance().getLoginVO().getNickName();
-                    showRewardGiftAnimView(nickName + "(我)", giftBean);
-                    addCustomGiftToChatList(nickName + "(我)", giftBean.getGiftName(), giftBean.getGiftType(), true);
-                    //通过自定义信息事件发送礼物信息至聊天室
-                    chatroomPresenter.sendCustomGiftMessage(giftBean, nickName + " 赠送了" + giftBean.getGiftName());
-                }else {
-                    ToastUtils.showShort("发送失败");
-                }
-            }
-        });
-    }
-
-    private void showRewardGiftAnimView(String userName, PLVCustomGiftBean giftBean) {
-        int giftDrawableId = getResources().getIdentifier("plvec_gift_" + giftBean.getGiftType(), "drawable", getContext().getPackageName());
-        rewardGiftAnimView.acceptRewardGiftMessage(
-                new PLVECRewardGiftAnimView.RewardGiftInfo(userName, giftBean.getGiftName(), giftDrawableId)
-        );
-    }
-
-    private void addCustomGiftToChatList(String userName, String giftName, String giftType, boolean isScrollEnd) {
-        PLVCustomGiftEvent customGiftEvent = generateCustomGiftEvent(userName, giftName, giftType);
-        List<PLVBaseViewData> dataList = new ArrayList<>();
-        dataList.add(new PLVBaseViewData<>(customGiftEvent, PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT));
-        addChatMessageToList(dataList, isScrollEnd);
-    }
-
-    private PLVCustomGiftEvent generateCustomGiftEvent(String userName, String giftName, String giftType) {
-        SpannableStringBuilder span = new SpannableStringBuilder(userName + " 赠送了 " + giftName + " p");
-        int giftDrawableId = getResources().getIdentifier("plvec_gift_" + giftType, "drawable", getContext().getPackageName());
-        Drawable drawable = getResources().getDrawable(giftDrawableId);
-        ImageSpan imageSpan = new PLVRelativeImageSpan(drawable, PLVRelativeImageSpan.ALIGN_CENTER);
-        int textSize = ConvertUtils.dp2px(12);
-        drawable.setBounds(0, 0, (int) (textSize * 1.5), (int) (textSize * 1.5));
-        span.setSpan(imageSpan, span.length() - 1, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        PLVCustomGiftEvent plvCustomGiftEvent = new PLVCustomGiftEvent(span);
-        plvCustomGiftEvent.setTime(System.currentTimeMillis());
-        return plvCustomGiftEvent;
     }
     // </editor-fold>
 
@@ -806,6 +822,23 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 是否打开积分打赏">
+    private void observeRewardData(){
+        liveRoomDataManager.getPointRewardEnableData().observe(this, new Observer<PLVStatefulData<Boolean>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<Boolean> booleanPLVStatefulData) {
+                liveRoomDataManager.getPointRewardEnableData().removeObserver(this);
+                if( booleanPLVStatefulData != null && booleanPLVStatefulData.getData() != null){
+                    isOpenPointReward = booleanPLVStatefulData.getData();
+                    if(isOpenPointReward) {
+                        initPointRewardEffectQueue();
+                    }
+                }
+            }
+        });
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
@@ -820,7 +853,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         } else if (id == R.id.commodity_iv) {
             showCommodityLayout(v);
         } else if (id == R.id.reward_iv) {
-            showRewardLayout(v);
+            if(isOpenPointReward){
+                //回调显示积分打赏弹窗
+                if(onViewActionListener != null){
+                    onViewActionListener.onShowRewardAction();
+                }
+            }
         }
     }
     // </editor-fold>
@@ -853,6 +891,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         //设置播放器的位置
         void onSetVideoViewRectAction(Rect videoViewRect);
+
+        //显示积分选择弹窗
+        void onShowRewardAction();
 
         /**
          * 当前是否无延迟模式

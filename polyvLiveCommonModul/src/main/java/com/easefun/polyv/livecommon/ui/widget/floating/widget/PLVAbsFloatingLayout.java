@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.ui.widget.floating.widget;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.clamp;
+
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
+import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 
@@ -17,22 +20,12 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFloatingLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private String TAG = this.getClass().getSimpleName();
-
-
-    //仅前台显示
-    public static int PLV_WINDOW_SHOW_ONLY_FOREGROUND = 22;
-    //仅后台显示
-    public static int PLV_WINDOW_SHOW_ONLY_BACKGROUND = 23;
-    //总是显示
-    public static int PLV_WINDOW_SHOW_EVERYWHERE = 24;
+    private final String TAG = this.getClass().getSimpleName();
 
     protected Context context;
 
     private int x;
     private int y;
-    //判断悬浮窗口是否移动，这里做个标记，防止移动后松手触发了点击事件
-    private boolean isMove;
 
     //悬浮窗坐标
     protected int floatingLocationX;
@@ -42,15 +35,18 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
     protected int floatWindowWidth;
     protected int floatWindowHeight;
 
-    //悬浮窗显示状态
-    protected boolean isShow = false;
+    protected boolean enableDrag = true;
+    protected boolean consumeTouchEventOnMove = true;
+    protected PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND;
+    protected PLVFloatingEnums.AutoEdgeType autoEdgeType = PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT;
 
-    //是否允许自动贴边
-    protected boolean enableAutoMoveToEdge = true;
-    //是否允许滑动
-    protected boolean enableDrag;
+    // 悬浮窗显示状态
+    protected boolean isShowing = false;
 
-    // </editor-fold >
+    // 判断悬浮窗口是否移动
+    private boolean isMove;
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVAbsFloatingLayout(@NonNull Context context) {
@@ -66,47 +62,81 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
         init();
     }
 
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化">
-    protected void init(){
-        //做初始化
+    protected void init() {
+        // 初始化
     }
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="贴边动画">
 
     private void autoMoveToEdge() {
-        if(!enableAutoMoveToEdge){
+        if (!enableDrag || autoEdgeType == PLVFloatingEnums.AutoEdgeType.NO_AUTO_MOVE) {
             return;
         }
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(floatingLocationX, ScreenUtils.getScreenWidth());
-        //动画执行时间
+        final int targetLeft;
+        switch (autoEdgeType) {
+            case AUTO_MOVE_TO_LEFT:
+                targetLeft = 0;
+                break;
+            case AUTO_MOVE_TO_RIGHT:
+                targetLeft = ScreenUtils.getScreenWidth() - floatWindowWidth;
+                break;
+            case AUTO_MOVE_TO_NEAREST_EDGE:
+                targetLeft = floatingLocationX + floatWindowWidth / 2 < ScreenUtils.getScreenWidth() / 2 ? 0 : ScreenUtils.getScreenWidth() - floatWindowWidth;
+                break;
+            default:
+                targetLeft = floatingLocationX;
+        }
+        final ValueAnimator valueAnimator = ValueAnimator.ofInt(floatingLocationX, targetLeft);
+        // 动画执行
         valueAnimator.setDuration(100);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                int x = (int) animation.getAnimatedValue();
-
-                updateFloatLocation(x, floatingLocationY);
+                int left = (int) animation.getAnimatedValue();
+                updateFloatLocation(left, floatingLocationY);
             }
         });
         valueAnimator.start();
     }
-    // </editor-fold >
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="接口实现">
+
     @Override
-    public boolean isShow() {
-        return isShow;
+    public boolean isShowing() {
+        return isShowing;
     }
-    // </editor-fold >
+
+    @Override
+    public void setShowType(PLVFloatingEnums.ShowType showType) {
+        this.showType = showType;
+    }
+
+    @Override
+    public void setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType autoEdgeType) {
+        this.autoEdgeType = autoEdgeType;
+    }
+
+    @Override
+    public void setEnableDrag(boolean enableDrag) {
+        this.enableDrag = enableDrag;
+    }
+
+    @Override
+    public void setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove) {
+        this.consumeTouchEventOnMove = consumeTouchEventOnMove;
+    }
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="touch事件处理">
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 x = (int) event.getRawX();
@@ -114,24 +144,26 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
                 isMove = false;
                 break;
             case MotionEvent.ACTION_MOVE:
-
                 int nowX = (int) event.getRawX();
                 int nowY = (int) event.getRawY();
                 int movedX = nowX - x;
                 int movedY = nowY - y;
                 x = nowX;
                 y = nowY;
-                updateFloatLocation(floatingLocationX +movedX, floatingLocationY +movedY);
+                if (enableDrag) {
+                    updateFloatLocation(fitInsideScreenX(floatingLocationX + movedX), fitInsideScreenY(floatingLocationY + movedY));
+                }
                 if (Math.abs(movedX) >= 5 || Math.abs(movedY) >= 5) {
                     isMove = true;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if (isMove) {
-                    autoMoveToEdge();
                     isMove = false;
-                } else {
-                    //点击
+                    autoMoveToEdge();
+                    if (consumeTouchEventOnMove) {
+                        return true;
+                    }
                 }
                 break;
             default:
@@ -139,6 +171,15 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
         }
         return super.onInterceptTouchEvent(event);
     }
-    // </editor-fold >
+
+    protected int fitInsideScreenX(int x) {
+        return clamp(x, 0, ScreenUtils.getScreenWidth() - floatWindowWidth);
+    }
+
+    protected int fitInsideScreenY(int y) {
+        return clamp(y, 0, ScreenUtils.getScreenHeight() - floatWindowHeight);
+    }
+
+    // </editor-fold>
 
 }

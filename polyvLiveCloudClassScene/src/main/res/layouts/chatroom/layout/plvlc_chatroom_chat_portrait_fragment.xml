@@ -38,6 +38,7 @@
     </FrameLayout>
 
     <RelativeLayout
+        android:id="@+id/greeting_fl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bulletin_ly"
@@ -87,6 +88,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
+    <!--    积分打赏动画-->
+    <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget
+        android:id="@+id/plvlc_point_reward_effect"
+        android:layout_below="@id/greeting_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!--   积分打赏动画特效 -->
+    <com.opensource.svgaplayer.SVGAImageView
+        android:id="@+id/plvlc_reward_svg"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:layout_height="306dp"
+        android:layout_width="match_parent"
+        app:source="posche.svga"
+        app:autoPlay="true"/>
 
     <!--marginTop/(like_iv height) unreadView outOfSight or immerse&fitsSystemWindows cover-->
     <com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView

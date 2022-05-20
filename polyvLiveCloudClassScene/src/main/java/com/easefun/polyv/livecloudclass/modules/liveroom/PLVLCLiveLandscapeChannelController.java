@@ -102,6 +102,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public ImageView getFloatingControlView() {
+        return findViewById(R.id.plvlc_live_control_floating_land_iv);
+    }
+
+    @Override
     public TextView getMessageSender() {
         return findViewById(R.id.start_send_message_land_tv);
     }
@@ -109,6 +114,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     @Override
     public ImageView getMoreView() {
         return findViewById(R.id.more_land_iv);
+    }
+
+    @Override
+    public ImageView getRewardView() {
+        return findViewById(R.id.plvlc_iv_show_point_reward);
     }
 
     @Override

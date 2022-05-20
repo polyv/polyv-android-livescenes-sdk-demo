@@ -4,13 +4,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Outline;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.os.Build;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.widget.RelativeLayout;
 
 import com.easefun.polyv.livecommon.R;
@@ -53,6 +49,7 @@ public class PLVRoundRectLayout extends RelativeLayout {
 
     public PLVRoundRectLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setWillNotDraw(false);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVRoundRectLayout, defStyleAttr, 0);
         int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectLayout_radius, 10);
@@ -62,19 +59,6 @@ public class PLVRoundRectLayout extends RelativeLayout {
         mRoundMode = mode;
         setCornerRadius(radius);
         init();
-
-        if (Build.VERSION.SDK_INT >= 21 && mRoundMode == MODE_ALL) {
-            mRoundMode = MODE_NONE;
-            setOutlineProvider(new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        outline.setRoundRect(0, 0, getWidth(), getHeight(), mRadius);
-                    }
-                }
-            });
-            setClipToOutline(true);
-        }
     }
 
     private void init() {
@@ -142,7 +126,6 @@ public class PLVRoundRectLayout extends RelativeLayout {
 
     @Override
     public void draw(Canvas canvas) {
-
         if (mRoundMode != MODE_NONE) {
             int saveCount = canvas.save();
 

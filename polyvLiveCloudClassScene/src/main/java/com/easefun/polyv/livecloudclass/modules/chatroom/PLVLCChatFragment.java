@@ -45,6 +45,10 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
+import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
@@ -57,6 +61,8 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.opensource.svgaplayer.SVGAImageView;
+import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
@@ -66,11 +72,13 @@ import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
+import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -127,6 +135,20 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private TextView likesCountTv;
     private long likesCount;
 
+    //打赏按钮
+    @Nullable
+    private ImageView rewardIv;
+    //积分打赏事件队列
+    private IPLVPointRewardEventProducer pointRewardEventProducer;
+    //积分打赏动画item
+    private PLVPointRewardEffectWidget polyvPointRewardEffectWidget;
+    //积分打赏svg动画
+    private SVGAImageView rewardSvgImage;
+    private SVGAParser svgaParser;
+    private PLVRewardSVGAHelper svgaHelper;
+    //是否选择屏蔽特效
+    private boolean isSelectCloseEffect = false;
+
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
     private boolean isShowGreeting;//是否显示欢迎语
@@ -143,6 +165,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //是否是直播类型
     private boolean isLiveType;
+    //是否打开积分打赏按钮
+    private boolean isOpenPointReward = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -174,6 +198,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             }
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(isOpenPointReward) {
+            destroyPointRewardEffectQueue();
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
@@ -184,6 +217,18 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     //设置是否是直播类型，如果不是直播类型，则隐藏公告(互动功能相关)按钮
     public void setIsLiveType(boolean isLiveType) {
         this.isLiveType = isLiveType;
+    }
+
+    /**
+     * 设置是否开启积分打赏按钮
+     */
+    public void setOpenPointReward(boolean open) {
+        isOpenPointReward = open;
+        if (rewardIv != null) {
+            rewardIv.setVisibility(open ? View.VISIBLE : View.GONE);
+        }
+        updateRewardEffectBtnVisibility(isOpenPointReward);
+        initPointRewardEffectQueue();
     }
     // </editor-fold>
 
@@ -273,6 +318,19 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             likesCountTv.setText(likesString);
         }
 
+        //打赏
+        rewardIv = findViewById(R.id.plvlc_iv_show_point_reward);
+        rewardIv.setOnClickListener(this);
+        rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
+        //打赏svga动画
+        rewardSvgImage = findViewById(R.id.plvlc_reward_svg);
+        svgaParser = new SVGAParser(getContext());
+        svgaHelper = new PLVRewardSVGAHelper();
+        svgaHelper.init(rewardSvgImage, svgaParser);
+
+        //打赏横幅动画特效
+        polyvPointRewardEffectWidget = findViewById(R.id.plvlc_point_reward_effect);
+
         //欢迎语
         greetingTv = findViewById(R.id.greeting_tv);
 
@@ -327,6 +385,25 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         hideSoftInputAndPopupLayout();
                         if (onViewActionListener != null) {
                             onViewActionListener.onShowMessageAction();
+                        }
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT:
+                        hideSoftInputAndPopupLayout();
+                        isSelectCloseEffect = !isSelectCloseEffect;
+                        PLVChatFunctionVO effectFunction = chatMoreLayout.getFunctionByType(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT);
+                        effectFunction.setSelected(isSelectCloseEffect);
+                        effectFunction.setName(isSelectCloseEffect ?  getString(R.string.plv_chat_view_show_effect) : getString(R.string.plv_chat_view_close_effect));
+                        chatMoreLayout.updateFunctionStatus(effectFunction);
+                        if(isSelectCloseEffect){
+                            polyvPointRewardEffectWidget.hideAndReleaseEffect();
+                            svgaHelper.clear();
+                            rewardSvgImage.setVisibility(View.INVISIBLE);
+                        } else {
+                            polyvPointRewardEffectWidget.showAndPrepareEffect();
+                            rewardSvgImage.setVisibility(View.VISIBLE);
+                        }
+                        if(onViewActionListener != null){
+                            onViewActionListener.onShowEffectAction(!isSelectCloseEffect);
                         }
                         break;
                     default:
@@ -408,6 +485,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         @Override
         public void onRemoveBulletinEvent() {
             super.onRemoveBulletinEvent();
+        }
+
+        @Override
+        public void onRewardEvent(@NonNull PLVRewardEvent rewardEvent) {
+            super.onRewardEvent(rewardEvent);
+            acceptPointRewardMessage(rewardEvent);
         }
 
         @Override
@@ -550,6 +633,39 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         }
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 积分打赏动画特效">
+    /**
+     * 初始化积分打赏动画特效item
+     */
+    private void initPointRewardEffectQueue(){
+        if(pointRewardEventProducer == null) {
+            pointRewardEventProducer = new PLVPointRewardEffectQueue();
+            polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+        }
+    }
+
+    /**
+     * 销毁积分打赏动效队列
+     */
+    private void destroyPointRewardEffectQueue(){
+        if (pointRewardEventProducer != null) {
+            pointRewardEventProducer.destroy();
+        }
+    }
+
+    private void acceptPointRewardMessage(final PLVRewardEvent rewardEvent){
+        if (pointRewardEventProducer != null) {
+            //横屏 ｜ 屏蔽特效  不处理积分打赏事件
+            if (ScreenUtils.isPortrait() && !isSelectCloseEffect) {
+                //添加到队列后，自动加载动画特效
+                pointRewardEventProducer.addEvent(rewardEvent);
+                //添加到svga
+                svgaHelper.addEvent(rewardEvent);
+            }
+        }
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 列表数据更新">
     private void addChatMessageToList(final List<PLVBaseViewData> chatMessageDataList, final boolean isScrollEnd) {
@@ -725,9 +841,19 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 更新消息状态">
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 按钮状态">
+    /**
+     * 更新消息记录状态
+     */
     public void updateInteractStatus(boolean isShow, boolean hasNew){
         chatMoreLayout.updateFunctionNew(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE, isShow, hasNew);
+    }
+
+    /**
+     * 更新特效开关
+     */
+    public void updateRewardEffectBtnVisibility(boolean isShow){
+        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, isShow);
     }
     // </editor-fold >
 
@@ -936,6 +1062,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             changeEmojiTab(true);
         } else if(id == R.id.plvlc_emoji_tab_personal_iv){
             changeEmojiTab(false);
+        } else if(id == R.id.plvlc_iv_show_point_reward){
+            if(onViewActionListener != null){
+                onViewActionListener.onShowRewardAction();
+            }
         }
     }
     // </editor-fold>
@@ -948,9 +1078,25 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
 
     public interface OnViewActionListener {
+        /**
+         * 显示公告
+         */
         void onShowBulletinAction();
 
+        /**
+         * 显示积分打赏弹窗
+         */
+        void onShowRewardAction();
+
+        /**
+         * 显示消息记录
+         */
         void onShowMessageAction();
+
+        /**
+         * 显示特效
+         */
+        void onShowEffectAction(boolean isShow);
     }
     // </editor-fold>
 }

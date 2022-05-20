@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
@@ -42,6 +43,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -235,6 +237,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             @Override
             public void onClickRingUpLinkMic() {
                 linkMicPresenter.requestJoinLinkMic();
+                if (onPLVLinkMicLayoutListener != null) {
+                    onPLVLinkMicLayoutListener.onRequestJoinLinkMic();
+                }
             }
 
             @Override
@@ -243,6 +248,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                     linkMicPresenter.leaveLinkMic();
                 } else {
                     linkMicPresenter.cancelRequestJoinLinkMic();
+                    if (onPLVLinkMicLayoutListener != null) {
+                        onPLVLinkMicLayoutListener.onCancelRequestJoinLinkMic();
+                    }
                 }
             }
 
@@ -493,12 +501,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public void onTeacherOpenLinkMic() {
         //教师打开连麦
         linkMicControlBar.setIsTeacherOpenLinkMic(true);
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onChannelLinkMicOpenStatusChanged(true);
+        }
     }
 
     @Override
     public void onTeacherCloseLinkMic() {
         //教师关闭连麦
         linkMicControlBar.setIsTeacherOpenLinkMic(false);
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onChannelLinkMicOpenStatusChanged(false);
+        }
     }
 
     @Override
@@ -617,6 +631,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //我，加入频道成功
         PLVCommonLog.d(TAG, "onJoinLinkMic");
         ToastUtils.showShort("上麦成功");
+        // 连麦时不允许小窗播放
+        PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
         // 连麦成功不再暂停rtc观看
         resume();
         //更新连麦控制器

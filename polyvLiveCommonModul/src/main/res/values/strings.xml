@@ -44,6 +44,8 @@
     <string name="plv_chat_toast_history_load_failed">历史记录加载失败</string>
     <string name="plv_chat_view_all_message">查看全部</string>
     <string name="plv_chat_view_special_message">只看主持</string>
+    <string name="plv_chat_view_close_effect">屏蔽特效</string>
+    <string name="plv_chat_view_show_effect">展示特效</string>
     <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
     <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
     <string name="plv_chat_chooser_sel_img">选择图片</string>
@@ -52,7 +54,7 @@
     <string name="plv_chat_cannot_retrieve_selected_image">不能检索到选择的图片</string>
     <string name="plv_chat_connect_fail_and_cannot_input">聊天室连接失败，请尝试刷新解\n决。如无法解决请联系管理员。</string>
     <!--商品-->
-    <string name="plv_commodity_toast_empty_link">暂不支持移动端购买</string>
+    <string name="plv_commodity_toast_empty_link">APP内不支持购买</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">连麦错误</string>
@@ -98,6 +100,9 @@
     <!--回放-章节-->
     <string name="tab_chapter">章节</string>
 
+    <!--  打赏  -->
+    <string name="plv_reward_make_fail">打赏失败</string>
+
     <!--通用-->
     <string name="plv_common_dialog_click_wrong">按错了</string>
     <string name="plv_common_dialog_exit">退出</string>
@@ -105,7 +110,6 @@
     <string name="plv_common_dialog_cancel">取消</string>
     <string name="plv_common_dialog_confirm">确认</string>
     <string name="plv_common_dialog_alright">好的</string>
-
 
 
 </resources>

@@ -1,9 +1,10 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -33,6 +35,7 @@ import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
@@ -56,6 +59,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private boolean isAllowOpenAdhead = true;
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVSwitchViewAnchorLayout playbackPlayerSwitchAnchorLayout;
     //播放器渲染视图view
     private PolyvPlaybackVideoView videoView;
     //子播放器渲染视图view
@@ -79,12 +83,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     //watermark view
     private PLVWatermarkView watermarkView;
 
-    //主播放器父控件的父控件
-    private ViewGroup videoViewParentParent;
-    //主播放器父控件在父控件中的位置索引
-    private int videoViewParentIndexInParent;
-    //主播放器父控件是否已经从VideoLayout中分离出来
-    private boolean isVideoViewParentDetachVideoLayout;
+    private TextView playbackPlayerFloatingPlayingPlaceholderTv;
+
+    //播放器是否小窗播放状态
+    private boolean isVideoViewPlayingInFloatWindow;
     //播放器及其布局在VideoLayout中设置的适配方式
     private int fitMode = PLVECFitMode.FIT_NONE;
 
@@ -111,6 +113,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvec_playback_player_layout, this, true);
+
+        playbackPlayerSwitchAnchorLayout = findViewById(R.id.plvec_playback_player_switch_anchor_layout);
         videoView = findViewById(R.id.plvec_playback_video_item);
         subVideoView = findViewById(R.id.sub_video_view);
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
@@ -118,8 +122,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         llAuxiliaryCountDown.setVisibility(GONE);
         closeFloatingView = findViewById(R.id.close_floating_iv);
         closeFloatingView.setOnClickListener(this);
-        videoViewParentParent = (ViewGroup) videoView.getParent().getParent();
-        videoViewParentIndexInParent = videoViewParentParent.indexOfChild((View) videoView.getParent());
         videoView.setSubVideoView(subVideoView);
 
         playCenterView = findViewById(R.id.play_center);
@@ -131,7 +133,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         watermarkView = findViewById(R.id.plvec_watermark_view);
         marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
 
+        playbackPlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_playback_player_floating_playing_placeholder_tv);
+
         initSubVideoViewChangeListener();
+        observeFloatingPlayer();
     }
 
     private void initSubVideoViewChangeListener() {
@@ -157,6 +162,20 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
                 }
             }
         };
+    }
+
+    private void observeFloatingPlayer() {
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean isShowingBoolean) {
+                        final boolean isShowing = isShowingBoolean != null && isShowingBoolean;
+                        isVideoViewPlayingInFloatWindow = isShowing;
+                        videoView.setNeedGestureDetector(!isShowing);
+                        subVideoView.setNeedGestureDetector(!isShowing);
+                        playbackPlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? VISIBLE : GONE);
+                    }
+                });
     }
     // </editor-fold>
 
@@ -227,41 +246,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
-    public View detachVideoViewParent() {
-        //调整播放器及其布局的适配方式
-        videoView.setAspectRatio(PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT);
-        subVideoView.setAspectRatio(PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT);
-        //调整手势配置
-        videoView.setNeedGestureDetector(false);
-        subVideoView.setNeedGestureDetector(false);
-        //调整背景色
-        videoView.setBackgroundColor(Color.parseColor("#6F6F6F"));
-        subVideoView.setBackgroundColor(Color.parseColor("#6F6F6F"));
-
-        videoViewParentParent.removeView((View) videoView.getParent());
-        closeFloatingView.setVisibility(View.VISIBLE);
-        isVideoViewParentDetachVideoLayout = true;
-        return (View) videoView.getParent();
-    }
-
-    @Override
-    public void attachVideoViewParent(View view) {
-        //添加view之后再还原配置
-        videoViewParentParent.addView(view, videoViewParentIndexInParent);
-
-        //还原播放器及其布局的适配方式
-        if (fitMode == PLVECFitMode.FIT_VIDEO_RATIO_VIDEOVIEW) {
-            PLVVideoSizeUtils.fitVideoRatio(videoView);
-        }
-        //调整手势配置
-        videoView.setNeedGestureDetector(true);
-        subVideoView.setNeedGestureDetector(true);
-        //调整背景色
-        videoView.setBackgroundColor(Color.TRANSPARENT);
-        subVideoView.setBackgroundColor(Color.TRANSPARENT);
-
-        closeFloatingView.setVisibility(View.GONE);
-        isVideoViewParentDetachVideoLayout = false;
+    public PLVSwitchViewAnchorLayout getPlayerSwitchAnchorLayout() {
+        return playbackPlayerSwitchAnchorLayout;
     }
 
     @Override
@@ -415,7 +401,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onPrepared() {
             super.onPrepared();
             fitMode = PLVECFitMode.FIT_VIDEO_RATIO_VIDEOVIEW;
-            if (!isVideoViewParentDetachVideoLayout) {
+            if (!isVideoViewPlayingInFloatWindow) {
                 PLVVideoSizeUtils.fitVideoRatio(videoView);
             }
             //需要将水印与视频区域大小匹配
@@ -452,7 +438,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         @Override
         public void onSubVideoViewPlay(boolean isFirst) {
             super.onSubVideoViewPlay(isFirst);
-            if (!isVideoViewParentDetachVideoLayout) {
+            if (!isVideoViewPlayingInFloatWindow) {
                 PLVVideoSizeUtils.fitVideoRatio(subVideoView);
             }
         }

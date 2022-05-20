@@ -1,8 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter;
 
 import android.arch.lifecycle.Observer;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -17,8 +20,10 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.IPolyvOnlineCountListener;
@@ -44,8 +49,8 @@ import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
-import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
+import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -650,15 +655,38 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     } else if (PLVHistoryConstant.MSGSOURCE_REWARD.equals(messageSource)) {
                         //打赏信息
                         PLVRewardEvent.ContentBean rewardContentsBean = PolyvEventHelper.gson.fromJson(jsonObject_content.toString(), PLVRewardEvent.ContentBean.class);
-                        PLVRewardEvent rewardEvent = new PLVRewardEvent();
+                        PLVRewardEvent historyRewardEvent = new PLVRewardEvent();
                         if (rewardContentsBean != null) {
-                            rewardEvent.setContent(rewardContentsBean);
-                            rewardEvent.setRoomId(jsonObject_user.optInt("roomId"));
+                            historyRewardEvent.setContent(rewardContentsBean);
+                            historyRewardEvent.setRoomId(jsonObject_user.optInt("roomId"));
 
-                            PLVCustomGiftEvent customGiftEvent = PLVCustomGiftEvent.generateCustomGiftEvent(rewardEvent);
+                            PLVCustomGiftEvent customGiftEvent = PLVCustomGiftEvent.generateCustomGiftEvent(historyRewardEvent);
                             PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(customGiftEvent, PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT);
                             if (isHistoryContainRewardEvent) {
                                 tempChatItems.add(0, itemData);
+                            }
+                        }
+                        //todo 处理打赏，积分打赏和普通打赏，都是同一个event，且都不为空，无法判断类型
+                        PLVRewardEvent rewardEvent = PolyvEventHelper.gson.fromJson(jsonObject.toString(), PLVRewardEvent.class);
+                        if(rewardEvent != null){
+                            if (jsonObject_user != null) {
+                                rewardEvent.setRoomId(jsonObject_user.optInt("roomId"));
+                                PLVCustomGiftEvent customGiftEvent = PLVCustomGiftEvent.generateCustomGiftEvent(rewardEvent);
+                                PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(customGiftEvent, PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT);
+                                if (isHistoryContainRewardEvent) {
+                                    tempChatItems.add(0, itemData);
+                                    continue;
+                                }
+                                String goodImage = rewardEvent.getContent().getGimg();
+                                String nickName = rewardEvent.getContent().getUnick();
+                                int goodNum = rewardEvent.getContent().getGoodNum();
+                                Spannable rewardSpan = generateRewardSpan(nickName, goodImage, goodNum);
+                                if (rewardSpan != null) {
+                                    rewardEvent.setObjects(rewardSpan);
+                                    int itemType = PLVChatMessageItemType.ITEMTYPE_REWARD;
+                                    PLVBaseViewData chatTypeItem = new PLVBaseViewData<>(rewardEvent, itemType, false);
+                                    tempChatItems.add(0, chatTypeItem);
+                                }
                             }
                         }
                     }
@@ -968,8 +996,20 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     //打赏事件
                     case PLVEventConstant.Chatroom.EVENT_REWARD:
                         final PLVRewardEvent rewardEvent = PLVEventHelper.toMessageEventModel(message, PLVRewardEvent.class);
-                        if (rewardEvent != null) {
+                        if(rewardEvent != null){
+                            if (rewardEvent.getContent() != null) {
+                                String goodImage = rewardEvent.getContent().getGimg();
+                                String nickName = rewardEvent.getContent().getUnick();
+                                int goodNum = rewardEvent.getContent().getGoodNum();
+                                Spannable rewardSpan = generateRewardSpan(nickName, goodImage, goodNum);
+                                if (rewardSpan != null) {
+                                    rewardEvent.setObjects(rewardSpan);
+                                }
+                            }
+                            itemType = PLVChatMessageItemType.ITEMTYPE_REWARD;
+                            chatMessage = rewardEvent;
                             chatroomData.postRewardEvent(rewardEvent);
+                            liveRoomDataManager.getRewardEventData().postValue(rewardEvent);
                             callbackToView(new ViewRunnable() {
                                 @Override
                                 public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
@@ -1100,6 +1140,26 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             }
         });
         chatroomData.postSpeakMessageData((CharSequence) textMessage.getObjects()[0], true);
+    }
+
+    private Spannable generateRewardSpan(String nickName, String goodImageUrl, int goodNum) {
+        if(goodImageUrl.startsWith("//")){
+            goodImageUrl = "https:"+goodImageUrl;
+        }
+        SpannableStringBuilder span = new SpannableStringBuilder(nickName + " 赠送 p");
+        int drawableSpanStart = span.length() - 1;
+        int drawableSpanEnd = span.length();
+        if (goodNum != 1) {
+            span.append(" x" + goodNum);
+        }
+        Drawable drawable = PLVImageLoader.getInstance().getImageAsDrawable(Utils.getApp(), goodImageUrl);
+        if (drawable == null) {
+            return null;
+        }
+        int textSize = ConvertUtils.dp2px(12);
+        drawable.setBounds(0, 0, textSize * 2, textSize * 2);
+        span.setSpan(new RelativeImageSpan(drawable, RelativeImageSpan.ALIGN_CENTER), drawableSpanStart, drawableSpanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return span;
     }
 
     private void acceptEmotionMessage(final PLVChatEmotionEvent emotionEvent, String messageId){

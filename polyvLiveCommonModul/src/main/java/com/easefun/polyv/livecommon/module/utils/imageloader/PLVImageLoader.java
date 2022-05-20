@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.utils.imageloader;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -104,5 +105,13 @@ public class PLVImageLoader {
     @WorkerThread
     public File saveImageAsFile(Context context, String url, Object urlTag) throws ExecutionException, InterruptedException {
         return loadEngine.saveImageAsFile(context, url, urlTag);
+    }
+
+    /**
+     * 将Url转化成Drawable返回
+     */
+    @WorkerThread
+    public Drawable getImageAsDrawable(Context context, String url) {
+        return loadEngine.getImageAsDrawable(context, url);
     }
 }

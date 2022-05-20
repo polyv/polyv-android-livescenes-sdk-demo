@@ -24,6 +24,7 @@ import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
@@ -211,19 +212,23 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     private String getNativeAppPramsInfo(){
-        if(liveRoomDataManager != null){
-            NativeAppParams nativeAppParams = new NativeAppParams();
-            nativeAppParams.sessionId = liveRoomDataManager.getSessionId();
-            nativeAppParams.channelInfo = new NativeAppParams.ChannelInfoDTO();
-            nativeAppParams.channelInfo.channelId = liveRoomDataManager.getConfig().getChannelId();
-            nativeAppParams.channelInfo.roomId = liveRoomDataManager.getConfig().getChannelId();
-            nativeAppParams.userInfo = new NativeAppParams.UserInfoDTO();
-            nativeAppParams.userInfo.nick = liveRoomDataManager.getConfig().getUser().getViewerName();
-            nativeAppParams.userInfo.userId = liveRoomDataManager.getConfig().getUser().getViewerId();
-            nativeAppParams.userInfo.pic = liveRoomDataManager.getConfig().getUser().getViewerAvatar();
-            nativeAppParams.appId = liveRoomDataManager.getConfig().getAccount().getAppId();
-            nativeAppParams.appSecret = liveRoomDataManager.getConfig().getAccount().getAppSecret();
-            //todo 自定义参数p4 p5
+        if(liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = new PLVInteractNativeAppParams()
+                    .setAppId(liveRoomDataManager.getConfig().getAccount().getAppId())
+                    .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
+                    .setSessionId(liveRoomDataManager.getSessionId())
+                    .setChannelInfo(
+                            new PLVInteractNativeAppParams.ChannelInfoDTO()
+                                    .setChannelId(liveRoomDataManager.getConfig().getChannelId())
+                                    .setRoomId(liveRoomDataManager.getConfig().getChannelId())
+                    )
+                    .setUserInfo(
+                            new PLVInteractNativeAppParams.UserInfoDTO()
+                                    .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
+                                    .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
+                                    .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
+                    );
+
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";
@@ -242,31 +247,6 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVOrientationManager.getInstance().setPortrait(topActivity);
         }
         PLVOrientationManager.getInstance().lockOrientation();
-    }
-    // </editor-fold >
-
-    // <editor-fold defaultstate="collapsed" desc="内部类 - bean结构">
-
-    static class NativeAppParams{
-
-        private UserInfoDTO userInfo;
-        private ChannelInfoDTO channelInfo;
-        private String sessionId;
-        private String appId;
-        private String appSecret;
-
-
-        public static class UserInfoDTO {
-            private String nick;
-            private String pic;
-            private String userId;
-        }
-
-
-        public static class ChannelInfoDTO {
-            private String channelId;
-            private String roomId;
-        }
     }
     // </editor-fold >
 

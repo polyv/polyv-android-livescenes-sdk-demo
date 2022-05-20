@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
@@ -27,10 +29,12 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackChapterFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackPreviousFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
@@ -38,6 +42,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
@@ -58,9 +63,11 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVColorTransitionPagerTitleView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVSimplePagerTitleView;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -85,6 +92,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+    private IPLVChatroomContract.IChatroomView chatroomMvpView;
 
     //回放Presenter
     private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPlaybackPresenter;
@@ -104,6 +112,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //直播页面菜单tab标题列表
     private List<String> pageMenuTabTitleList;
 
+    private PLVLCCommodityPushLayout commodityPushLayout;
+
     //tab
     private PLVLCLiveDescFragment liveDescFragment; //直播介绍tab页
     private PLVLCTextFragment textFragment;//自定义图文菜单tab页
@@ -114,6 +124,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCQAFragment questionsAndAnswersFragment;//问答tab页
     private PLVLCPlaybackPreviousFragment previousFragment;//往期视频tab页
     private PLVLCPlaybackChapterFragment chapterFragment;//章节tab页
+    private PLVLCProductFragment productFragment;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -189,6 +200,45 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         chatCommonMessageList = new PLVLCChatCommonMessageList(getContext());
         restoreChatTabForMessageList(chatCommonMessageList);
+
+        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_layout);
+    }
+
+    private void initChatroomMvpView(IPLVChatroomContract.IChatroomPresenter presenter) {
+        chatroomMvpView = new PLVAbsChatroomView() {
+            @Override
+            public void onProductMenuSwitchEvent(@NonNull final PLVProductMenuSwitchEvent productMenuSwitchEvent) {
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        final boolean enable = getNullableOrDefault(new PLVSugarUtil.Supplier<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                return productMenuSwitchEvent.getContent().isEnabled();
+                            }
+                        }, false);
+                        final String menuName = getNullableOrDefault(new PLVSugarUtil.Supplier<String>() {
+                            @Override
+                            public String get() {
+                                return productMenuSwitchEvent.getContent().getName();
+                            }
+                        }, "");
+
+                        final boolean needUpdate;
+                        if (enable) {
+                            needUpdate = addBuyProductTab(menuName);
+                        } else {
+                            needUpdate = removeBuyProductTab();
+                        }
+                        if (needUpdate) {
+                            refreshPageMenuTabAdapter();
+                        }
+                    }
+                });
+            }
+        };
+
+        presenter.registerView(chatroomMvpView);
     }
     // </editor-fold>
 
@@ -278,12 +328,15 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.init();
+        initChatroomMvpView(chatroomPresenter);
         restoreChatTabForPresenter(chatroomPresenter);
         restoreQuizTabForPresenter(chatroomPresenter);
 
         initSocketLoginManager();
         observeClassDetailVO();
+        observePointRewardOpen();
         observeInteractData();
+        observeCommodityPush();
     }
 
     @Override
@@ -427,6 +480,20 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     onViewActionListener.onShowMessageAction();
                 }
             }
+
+            @Override
+            public void onShowRewardAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowRewardAction();
+                }
+            }
+
+            @Override
+            public void onShowEffectAction(boolean isShow) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowEffectAction(isShow);
+                }
+            }
         });
         pageMenuTabFragmentList.add(chatFragment);
     }
@@ -452,6 +519,34 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         observerPreviousData();
     }
 
+    /**
+     * @return {@code true} -> 需要更新列表
+     */
+    private boolean addBuyProductTab(String menuName) {
+        if (productFragment != null && pageMenuTabFragmentList.contains(productFragment)) {
+            return false;
+        }
+        if (productFragment == null) {
+            productFragment = new PLVLCProductFragment();
+        }
+        productFragment.init(liveRoomDataManager);
+        pageMenuTabTitleList.add(menuName);
+        pageMenuTabFragmentList.add(productFragment);
+        return true;
+    }
+
+    /**
+     * @return {@code true} -> 需要更新列表
+     */
+    private boolean removeBuyProductTab() {
+        if (productFragment == null) {
+            return false;
+        }
+        pageMenuTabTitleList.remove(pageMenuTabFragmentList.indexOf(productFragment));
+        pageMenuTabFragmentList.remove(productFragment);
+        productFragment = null;
+        return true;
+    }
 
     /**
      * 插入章节Fragment
@@ -473,6 +568,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabAdapter.notifyDataSetChanged();
         pageMenuTabIndicator.getNavigator().notifyDataSetChanged();
 
+        if (pageMenuTabViewPager.getCurrentItem() >= pageMenuTabFragmentList.size()
+                && pageMenuTabAdapter.getCount() > 0) {
+            pageMenuTabViewPager.setCurrentItem(0);
+            pageMenuTabIndicator.onPageSelected(0);
+        }
         if (pageMenuTabAdapter.getCount() > 0) {
             pageMenuTabIndicator.setBackgroundColor(Color.parseColor("#3E3E4E"));
             findViewById(R.id.split_view).setVisibility(View.VISIBLE);
@@ -557,11 +657,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if ((Activity)getContext() != null) {
-                        ((Activity)getContext()).finish();
+                    if ((Activity) getContext() != null) {
+                        ((Activity) getContext()).finish();
                     }
                 }
-            },3000);
+            }, 3000);
         }
     };
 
@@ -629,19 +729,27 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 互动应用消息">
-    private void observeInteractData(){
+    private void observeInteractData() {
         liveRoomDataManager.getInteractStatusData().observe((LifecycleOwner) getContext(), new Observer<PLVWebviewUpdateAppStatusVO>() {
             @Override
             public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO plvWebviewUpdateAppStatusVO) {
-                if(chatFragment != null && plvWebviewUpdateAppStatusVO != null){
-                    if(plvWebviewUpdateAppStatusVO.getEvent().equals("SHOW_LOTTERY_RECORD") && plvWebviewUpdateAppStatusVO.getValue() != null) {
+                if (chatFragment != null && plvWebviewUpdateAppStatusVO != null) {
+                    if (plvWebviewUpdateAppStatusVO.getEvent().equals("SHOW_LOTTERY_RECORD") && plvWebviewUpdateAppStatusVO.getValue() != null) {
                         chatFragment.updateInteractStatus(plvWebviewUpdateAppStatusVO.getValue().getIsShow(), plvWebviewUpdateAppStatusVO.getValue().getHasNew());
                     }
                 }
             }
         });
     }
-    // </editor-fold >
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 商品推送布局">
+
+    private void observeCommodityPush() {
+        chatroomPresenter.registerView(commodityPushLayout.chatroomView);
+    }
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听回放视频的信息：vid变更，seek跳转">
     private void observerPreviousData() {
@@ -719,35 +827,53 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     return;
                 }
                 //直播详情中的直播菜单列表
-                List<PolyvLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = liveClassDetail.getData().getChannelMenus();
+                List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = liveClassDetail.getData().getChannelMenus();
                 if (channelMenusBeans != null) {
-                    for (PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
+                    for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
                         if (channelMenusBean == null) {
                             continue;
                         }
-                        if (PolyvLiveClassDetailVO.MENUTYPE_DESC.equals(channelMenusBean.getMenuType())) {
+                        if (PLVLiveClassDetailVO.MENUTYPE_DESC.equals(channelMenusBean.getMenuType())) {
                             addDescTab(liveClassDetail, channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_CHAT.equals(channelMenusBean.getMenuType())) {
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_CHAT.equals(channelMenusBean.getMenuType())) {
                             addChatTab(channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
                             addQuizTab(channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_TEXT.equals(channelMenusBean.getMenuType())) {
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_TEXT.equals(channelMenusBean.getMenuType())) {
                             addTextTab(channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_IFRAME.equals(channelMenusBean.getMenuType())) {
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_IFRAME.equals(channelMenusBean.getMenuType())) {
                             addIFrameTab(channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_TUWEN.equals(channelMenusBean.getMenuType())) {
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_TUWEN.equals(channelMenusBean.getMenuType())) {
                             addTuWenTab(channelMenusBean);
                         } else if (PLVLiveClassDetailVO.MENUTYPE_QA.equals(channelMenusBean.getMenuType())) {
                             addQATab(channelMenusBean);
-                        } else if (PolyvLiveClassDetailVO.MENUTYPE_PREVIOUS.equals(channelMenusBean.getMenuType())
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_PREVIOUS.equals(channelMenusBean.getMenuType())
                                 && !liveRoomDataManager.getConfig().isLive()
                                 && liveRoomDataManager.getConfig().getVid().isEmpty()) {
                             addPreviousTab(channelMenusBean);
+                        } else if (PLVLiveClassDetailVO.MENUTYPE_BUY.equals(channelMenusBean.getMenuType())) {
+                            addBuyProductTab(channelMenusBean.getName());
                         }
                     }
                     refreshPageMenuTabAdapter();
                     observeChatroomData();
+                    observePointRewardOpen();
                 }
+            }
+        });
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听积分打赏是否开启">
+    private void observePointRewardOpen() {
+        liveRoomDataManager.getPointRewardEnableData().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<Boolean>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<Boolean> booleanPLVStatefulData) {
+                liveRoomDataManager.getPointRewardEnableData().removeObserver(this);
+                if (chatFragment != null && booleanPLVStatefulData != null && booleanPLVStatefulData.getData() != null) {
+                    chatFragment.setOpenPointReward(booleanPLVStatefulData.getData());
+                }
+
             }
         });
     }
