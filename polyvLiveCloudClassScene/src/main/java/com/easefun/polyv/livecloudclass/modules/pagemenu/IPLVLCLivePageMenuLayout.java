@@ -111,12 +111,6 @@ public interface IPLVLCLivePageMenuLayout {
          */
         void onSeekToAction(int progress);
 
-
-        /**
-         * 显示消息
-         */
-        void onShowMessageAction();
-
         /**
          * 显示积分打赏弹窗
          */
@@ -126,6 +120,13 @@ public interface IPLVLCLivePageMenuLayout {
          * 是否显示特效
          */
         void onShowEffectAction(boolean isShow);
+
+        /**
+         * 点击了聊天室更多-动态功能按钮
+         * @param event 功能event
+         */
+        void onClickChatMoreDynamicFunction(String event);
+
     }
     // </editor-fold>
 }

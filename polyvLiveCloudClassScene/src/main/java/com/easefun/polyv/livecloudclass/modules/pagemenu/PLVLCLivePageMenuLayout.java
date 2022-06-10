@@ -475,9 +475,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             }
 
             @Override
-            public void onShowMessageAction() {
+            public void onClickDynamicFunction(String event) {
                 if (onViewActionListener != null) {
-                    onViewActionListener.onShowMessageAction();
+                    onViewActionListener.onClickChatMoreDynamicFunction(event);
                 }
             }
 
@@ -729,14 +729,12 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 互动应用消息">
-    private void observeInteractData() {
+    private void observeInteractData(){
         liveRoomDataManager.getInteractStatusData().observe((LifecycleOwner) getContext(), new Observer<PLVWebviewUpdateAppStatusVO>() {
             @Override
             public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO plvWebviewUpdateAppStatusVO) {
                 if (chatFragment != null && plvWebviewUpdateAppStatusVO != null) {
-                    if (plvWebviewUpdateAppStatusVO.getEvent().equals("SHOW_LOTTERY_RECORD") && plvWebviewUpdateAppStatusVO.getValue() != null) {
-                        chatFragment.updateInteractStatus(plvWebviewUpdateAppStatusVO.getValue().getIsShow(), plvWebviewUpdateAppStatusVO.getValue().getHasNew());
-                    }
+                    chatFragment.updateChatMoreFunction(plvWebviewUpdateAppStatusVO);
                 }
             }
         });

@@ -349,9 +349,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             //横屏不处理积分打赏事件
             if (ScreenUtils.isPortrait()) {
                 //添加到队列后，自动加载动画特效
-                pointRewardEventProducer.addEvent(rewardEvent);
+//                pointRewardEventProducer.addEvent(rewardEvent);
                 //添加到svga
-                svgaHelper.addEvent(rewardEvent);
+//                svgaHelper.addEvent(rewardEvent);
             }
         }
     }

@@ -90,6 +90,31 @@
         android:textColor="#ffffff"
         android:textSize="12sp" />
 
+    <!--购物车按钮-->
+    <ImageView
+        android:contentDescription="@string/playback_commodity_desc"
+        android:id="@+id/playback_commodity_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/plvec_margin_common"
+        android:layout_toStartOf="@+id/more_iv"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:src="@drawable/plvec_shopping_trolley" />
+
+    <!--商品推送布局-->
+    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout
+        android:id="@+id/playback_commodity_push_ly"
+        android:layout_width="match_parent"
+        android:layout_height="86dp"
+        android:layout_above="@+id/playback_commodity_iv"
+        android:layout_marginStart="@dimen/plvec_margin_common"
+        android:layout_marginEnd="94dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
     <!--更多按钮-->
     <ImageView
         android:id="@+id/more_iv"

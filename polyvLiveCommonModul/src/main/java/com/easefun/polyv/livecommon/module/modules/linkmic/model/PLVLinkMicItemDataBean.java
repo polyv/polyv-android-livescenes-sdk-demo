@@ -51,8 +51,10 @@ public class PLVLinkMicItemDataBean {
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
 
-    //[我]是否在屏幕共享
-    private boolean isScreenSharedForMe = false;
+    //是否在屏幕共享
+    private boolean isScreenShare = false;
+    // 是否全屏观看
+    private transient boolean isFullScreen = false;
 
     //linkMic status
     private String status = STATUS_IDLE;
@@ -257,12 +259,21 @@ public class PLVLinkMicItemDataBean {
     }
 
 
-    public boolean isScreenSharedForMe() {
-        return isScreenSharedForMe;
+    public boolean isScreenShare() {
+        return isScreenShare;
     }
 
-    public void setScreenSharedForMe(boolean screenSharedForMe) {
-        isScreenSharedForMe = screenSharedForMe;
+    public void setScreenShare(boolean screenShared) {
+        isScreenShare = screenShared;
+    }
+
+    public PLVLinkMicItemDataBean setFullScreen(boolean fullScreen) {
+        isFullScreen = fullScreen;
+        return this;
+    }
+
+    public boolean isFullScreen() {
+        return isFullScreen;
     }
 
     public static class MuteMedia {
@@ -331,7 +342,7 @@ public class PLVLinkMicItemDataBean {
                 ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
-                ", isScreenSharedForMe=" + isScreenSharedForMe +
+                ", isScreenShare=" + isScreenShare +
                 '}';
     }
 }

@@ -67,6 +67,7 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -356,15 +357,17 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         }
         chatMoreLayout.setFunctionListener(new PLVLCChatFunctionListener() {
             @Override
-            public void onFunctionCallback(int type) {
+            public void onFunctionCallback(String type, String data) {
 
                 switch(type){
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER:
                         isSelectOnlyTeacher = !isSelectOnlyTeacher;
                         PLVChatFunctionVO onlyTeacherFunction = chatMoreLayout.getFunctionByType(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER);
-                        onlyTeacherFunction.setSelected(isSelectOnlyTeacher);
-                        onlyTeacherFunction.setName(isSelectOnlyTeacher ? getString(R.string.plv_chat_view_all_message) : getString(R.string.plv_chat_view_special_message));
-                        chatMoreLayout.updateFunctionStatus(onlyTeacherFunction);
+                        if (onlyTeacherFunction != null) {
+                            onlyTeacherFunction.setSelected(isSelectOnlyTeacher);
+                            onlyTeacherFunction.setName(isSelectOnlyTeacher ? getString(R.string.plv_chat_view_all_message) : getString(R.string.plv_chat_view_special_message));
+                            chatMoreLayout.updateFunctionStatus(onlyTeacherFunction);
+                        }
                         if (chatCommonMessageList != null) {
                             chatCommonMessageList.changeDisplayType(isSelectOnlyTeacher);
                         }
@@ -381,20 +384,22 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             onViewActionListener.onShowBulletinAction();
                         }
                         break;
-                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE:
+                    default:
                         hideSoftInputAndPopupLayout();
                         if (onViewActionListener != null) {
-                            onViewActionListener.onShowMessageAction();
+                            onViewActionListener.onClickDynamicFunction(data);
                         }
                         break;
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT:
                         hideSoftInputAndPopupLayout();
                         isSelectCloseEffect = !isSelectCloseEffect;
                         PLVChatFunctionVO effectFunction = chatMoreLayout.getFunctionByType(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT);
-                        effectFunction.setSelected(isSelectCloseEffect);
-                        effectFunction.setName(isSelectCloseEffect ?  getString(R.string.plv_chat_view_show_effect) : getString(R.string.plv_chat_view_close_effect));
-                        chatMoreLayout.updateFunctionStatus(effectFunction);
-                        if(isSelectCloseEffect){
+                        if (effectFunction != null) {
+                            effectFunction.setSelected(isSelectCloseEffect);
+                            effectFunction.setName(isSelectCloseEffect ? getString(R.string.plv_chat_view_show_effect) : getString(R.string.plv_chat_view_close_effect));
+                            chatMoreLayout.updateFunctionStatus(effectFunction);
+                        }
+                        if (isSelectCloseEffect) {
                             polyvPointRewardEffectWidget.hideAndReleaseEffect();
                             svgaHelper.clear();
                             rewardSvgImage.setVisibility(View.INVISIBLE);
@@ -402,11 +407,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             polyvPointRewardEffectWidget.showAndPrepareEffect();
                             rewardSvgImage.setVisibility(View.VISIBLE);
                         }
-                        if(onViewActionListener != null){
+                        if (onViewActionListener != null) {
                             onViewActionListener.onShowEffectAction(!isSelectCloseEffect);
                         }
-                        break;
-                    default:
                         break;
                 }
             }
@@ -659,9 +662,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             //横屏 ｜ 屏蔽特效  不处理积分打赏事件
             if (ScreenUtils.isPortrait() && !isSelectCloseEffect) {
                 //添加到队列后，自动加载动画特效
-                pointRewardEventProducer.addEvent(rewardEvent);
+//                pointRewardEventProducer.addEvent(rewardEvent);
                 //添加到svga
-                svgaHelper.addEvent(rewardEvent);
+//                svgaHelper.addEvent(rewardEvent);
             }
         }
     }
@@ -841,7 +844,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 按钮状态">
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 更新消息状态">
     /**
      * 更新消息记录状态
      */
@@ -849,11 +852,18 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         chatMoreLayout.updateFunctionNew(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE, isShow, hasNew);
     }
 
+    public void updateChatMoreFunction(PLVWebviewUpdateAppStatusVO functionsVO) {
+        if (chatMoreLayout != null) {
+            chatMoreLayout.updateFunctionView(functionsVO);
+        }
+    }
+
+
     /**
      * 更新特效开关
      */
     public void updateRewardEffectBtnVisibility(boolean isShow){
-        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, isShow);
+//        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, isShow);
     }
     // </editor-fold >
 
@@ -1089,14 +1099,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         void onShowRewardAction();
 
         /**
-         * 显示消息记录
-         */
-        void onShowMessageAction();
-
-        /**
          * 显示特效
          */
         void onShowEffectAction(boolean isShow);
+
+        /**
+         * 点击了动态功能控件
+         * @param event 动态功能的event data
+         */
+        void onClickDynamicFunction(String event);
     }
     // </editor-fold>
 }

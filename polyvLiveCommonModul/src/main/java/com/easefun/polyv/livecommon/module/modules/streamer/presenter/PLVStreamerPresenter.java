@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -24,6 +26,7 @@ import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
@@ -320,12 +323,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
                 streamerData.postEnableShareScreen(isShare);
                 Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithLinkMicId(streamerManager.getLinkMicUid());
-                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getStreamerItemWithLinkMicId(streamerManager.getLinkMicUid());
+                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getLinkMicItemWithLinkMicId(streamerManager.getLinkMicUid());
                 if(memberItem != null){
-                    memberItem.second.getLinkMicItemDataBean().setScreenSharedForMe(isShare);
+                    memberItem.second.getLinkMicItemDataBean().setScreenShare(isShare);
                 }
                 if(streamerItem != null){
-                    streamerItem.second.setScreenSharedForMe(isShare);
+                    streamerItem.second.setScreenShare(isShare);
                 }
                 final int pos = streamerItem == null ? 0 : streamerItem.first;
 
@@ -340,9 +343,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
             @Override
             public void onScreenShareError(final int errorCode) {
-                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getStreamerItemWithLinkMicId(streamerManager.getLinkMicUid());
+                Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getLinkMicItemWithLinkMicId(streamerManager.getLinkMicUid());
                 final int pos = streamerItem.first;
-                streamerItem.second.setScreenSharedForMe(false);
+                streamerItem.second.setScreenShare(false);
                 callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -844,6 +847,40 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     timerToShowNetBroken.resetWhenHasConnection();
                 }
             }
+
+            @Override
+            public void onRemoteStreamOpen(final String uid, int streamType) {
+                final PLVLinkMicItemDataBean itemDataBean = nullable(new PLVSugarUtil.Supplier<PLVLinkMicItemDataBean>() {
+                    @Override
+                    public PLVLinkMicItemDataBean get() {
+                        return getLinkMicItemWithLinkMicId(uid).second;
+                    }
+                });
+                if (itemDataBean == null) {
+                    return;
+                }
+                if (streamType == PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN) {
+                    itemDataBean.setScreenShare(true);
+                    updateMixLayoutWhenScreenShare(true, uid);
+                }
+            }
+
+            @Override
+            public void onRemoteStreamClose(final String uid, int streamType) {
+                final PLVLinkMicItemDataBean itemDataBean = nullable(new PLVSugarUtil.Supplier<PLVLinkMicItemDataBean>() {
+                    @Override
+                    public PLVLinkMicItemDataBean get() {
+                        return getLinkMicItemWithLinkMicId(uid).second;
+                    }
+                });
+                if (itemDataBean == null) {
+                    return;
+                }
+                if (streamType == PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN) {
+                    itemDataBean.setScreenShare(false);
+                    updateMixLayoutWhenScreenShare(false, uid);
+                }
+            }
         });
 
         //推流开始
@@ -1182,7 +1219,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         List<PLVRTCMixUser> mixUserList = new ArrayList<>();
         for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : streamerList) {
             PLVRTCMixUser mixUser = new PLVRTCMixUser();
-            mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenSharedForMe());
+            mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenShare());
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
             mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
             mixUserList.add(mixUser);
@@ -1201,7 +1238,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             if(plvLinkMicItemDataBean.getLinkMicId().equals(linkmicId)){
                 mixUser.setScreenShare(isShare);
             } else {
-                mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenSharedForMe());
+                mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenShare());
             }
             //屏幕共享时，当前用户的混流摄像头不能为mute，否则CDN混流无画面
             mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
@@ -1430,10 +1467,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     Pair<Integer, PLVLinkMicItemDataBean> getLinkMicItemWithLinkMicId(String linkMicId) {
         for (int i = 0; i < streamerList.size(); i++) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = streamerList.get(i);
-            String linkMicIdForIndex = linkMicItemDataBean.getLinkMicId();
-            if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
-                return new Pair<>(i, linkMicItemDataBean);
+            final PLVLinkMicItemDataBean itemDataBean = streamerList.get(i);
+            if (linkMicId != null && linkMicId.equals(itemDataBean.getLinkMicId())) {
+                return new Pair<>(i, itemDataBean);
             }
         }
         return null;
@@ -1462,28 +1498,6 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 if (userId != null && userId.equals(userIdForIndex)) {
                     return new Pair<>(i, memberItemDataBean);
                 }
-            }
-        }
-        return null;
-    }
-
-    Pair<Integer, PLVLinkMicItemDataBean> getStreamerItemWithLinkId(String linkId) {
-        for (int i = 0; i < streamerList.size(); i++) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = streamerList.get(i);
-            if(linkId != null && linkId.equals(linkMicItemDataBean.getLinkMicId())){
-                return new Pair<>(i, linkMicItemDataBean);
-            }
-
-        }
-        return null;
-    }
-
-    Pair<Integer, PLVLinkMicItemDataBean> getStreamerItemWithLinkMicId(String linkMicId) {
-        for (int i = 0; i < streamerList.size(); i++) {
-            PLVLinkMicItemDataBean itemDataBean = streamerList.get(i);
-            String linkMicIdForIndex = itemDataBean.getLinkMicId();
-            if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
-                return new Pair<>(i, itemDataBean);
             }
         }
         return null;

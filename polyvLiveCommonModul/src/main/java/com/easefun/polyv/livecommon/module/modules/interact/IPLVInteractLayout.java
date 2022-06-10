@@ -21,9 +21,10 @@ public interface IPLVInteractLayout {
     void showBulletin();
 
     /**
-     * 显示消息
+     * 回调动态东
+     * @param event
      */
-    void showMessage();
+    void onCallDynamicFunction(String event);
 
     /**
      * 销毁

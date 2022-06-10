@@ -13,20 +13,26 @@
         <attr name="blurOverlayColor" format="color" />
     </declare-styleable>
 
+    <attr name="radius" format="dimension" />
+    <attr name="mode" format="flags">
+        <flag name="none" value="0" />
+        <flag name="leftTop" value="1" />
+        <flag name="leftBottom" value="2" />
+        <flag name="rightTop" value="4" />
+        <flag name="rightBottom" value="8" />
+        <flag name="left" value="3" />
+        <flag name="top" value="5" />
+        <flag name="bottom" value="10" />
+        <flag name="right" value="12" />
+        <flag name="all" value="15" />
+    </attr>
     <declare-styleable name="PLVRoundRectLayout">
-        <attr name="radius" format="dimension" />
-        <attr name="mode" format="flags">
-            <flag name="none" value="0" />
-            <flag name="leftTop" value="1" />
-            <flag name="leftBottom" value="2" />
-            <flag name="rightTop" value="4" />
-            <flag name="rightBottom" value="8" />
-            <flag name="left" value="3" />
-            <flag name="top" value="5" />
-            <flag name="bottom" value="10" />
-            <flag name="right" value="12" />
-            <flag name="all" value="15" />
-        </attr>
+        <attr name="radius" />
+        <attr name="mode" />
+    </declare-styleable>
+    <declare-styleable name="PLVRoundRectConstraintLayout">
+        <attr name="radius" />
+        <attr name="mode" />
     </declare-styleable>
 
     <declare-styleable name="PLVRoundImageView">
@@ -56,22 +62,22 @@
         <attr name="cpv_progressNormalSize" format="dimension" />
         <attr name="cpv_progressReachSize" format="dimension" />
         <attr name="cpv_radius" format="dimension" />
-        <attr name="cpv_progressTextVisible" format="boolean"/>
-        <attr name="cpv_progressStartArc" format="integer"/>
-        <attr name="cpv_progressTextSkewX" format="dimension"/>
-        <attr name="cpv_progressTextPrefix" format="string"/>
-        <attr name="cpv_progressTextSuffix" format="string"/>
-        <attr name="cpv_innerBackgroundColor" format="color"/>
+        <attr name="cpv_progressTextVisible" format="boolean" />
+        <attr name="cpv_progressStartArc" format="integer" />
+        <attr name="cpv_progressTextSkewX" format="dimension" />
+        <attr name="cpv_progressTextPrefix" format="string" />
+        <attr name="cpv_progressTextSuffix" format="string" />
+        <attr name="cpv_innerBackgroundColor" format="color" />
         <attr name="cpv_progressStyle" format="enum">
-            <enum name="Normal" value="0"/>
-            <enum name="FillInner" value="1"/>
-            <enum name="FillInnerArc" value="2"/>
+            <enum name="Normal" value="0" />
+            <enum name="FillInner" value="1" />
+            <enum name="FillInnerArc" value="2" />
         </attr>
-        <attr name="cpv_innerProgressColor" format="color"/>
-        <attr name="cpv_innerPadding" format="dimension"/>
-        <attr name="cpv_outerColor" format="color"/>
-        <attr name="cpv_outerSize" format="dimension"/>
-        <attr name="cpv_reachCapRound" format="boolean"/>
+        <attr name="cpv_innerProgressColor" format="color" />
+        <attr name="cpv_innerPadding" format="dimension" />
+        <attr name="cpv_outerColor" format="color" />
+        <attr name="cpv_outerSize" format="dimension" />
+        <attr name="cpv_reachCapRound" format="boolean" />
     </declare-styleable>
 
     <!-- Reference to a style for the menu drawer. -->
@@ -143,8 +149,8 @@
         <attr name="stroke_color" format="color"></attr>
         <attr name="corner_radius" format="dimension"></attr>
         <attr name="button_style">
-            <enum name="right" value="0"/>
-            <enum name="left" value="1"/>
+            <enum name="right" value="0" />
+            <enum name="left" value="1" />
         </attr>
         <attr name="button_icon_size" format="dimension"></attr>
         <attr name="button_icon_stroke_width" format="dimension"></attr>
@@ -318,6 +324,10 @@
         <attr name="plvRedPointRadius" format="dimension" />
         <attr name="plvRedPointColor" format="color" />
         <attr name="plvDrawRedPoint" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVBeautySeekBar">
+        <attr name="plvDrawShadow" format="boolean" />
     </declare-styleable>
 
 </resources>

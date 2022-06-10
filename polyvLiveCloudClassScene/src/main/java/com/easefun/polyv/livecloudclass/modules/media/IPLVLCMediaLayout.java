@@ -5,7 +5,7 @@ import android.util.Pair;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -147,7 +147,7 @@ public interface IPLVLCMediaLayout {
      *
      * @param landscapeControllerView 横屏控制器
      */
-    void setLandscapeControllerView(@NonNull IPLVLiveLandscapePlayerController landscapeControllerView);
+    void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView);
 
     /**
      * 更新观看热度

@@ -1,7 +1,10 @@
 package com.easefun.polyv.livestreamer.modules.document;
 
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +32,7 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentInputWidget;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -36,8 +40,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
-
-import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 /**
  * 文档布局
@@ -277,24 +279,25 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
             public void onChangeMarkTool(@PLVDocumentMarkToolType.Range final String markToolType) {
                 if (PLVDocumentMarkToolType.CLEAR.equals(markToolType)) {
                     if (plvClearMarkConfirmWindow == null) {
-                        plvClearMarkConfirmWindow = new PLVConfirmDialog(getContext())
+                        plvClearMarkConfirmWindow = PLVLSConfirmDialog.Builder.context(getContext())
                                 .setTitleVisibility(GONE)
                                 .setContent("清屏后笔迹将无法恢复，确定清屏吗")
                                 .setLeftButtonText("按错了")
                                 .setRightButtonText("确定")
-                                .setLeftBtnListener(new OnClickListener() {
+                                .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
-                                    public void onClick(View v) {
+                                    public void onClick(DialogInterface dialog, View v) {
                                         plvClearMarkConfirmWindow.hide();
                                     }
                                 })
-                                .setRightBtnListener(new OnClickListener() {
+                                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
-                                    public void onClick(View v) {
+                                    public void onClick(DialogInterface dialog, View v) {
                                         documentPresenter.changeMarkToolType(markToolType);
                                         plvClearMarkConfirmWindow.hide();
                                     }
-                                });
+                                })
+                                .build();
                     }
                     plvClearMarkConfirmWindow.show();
                 } else {

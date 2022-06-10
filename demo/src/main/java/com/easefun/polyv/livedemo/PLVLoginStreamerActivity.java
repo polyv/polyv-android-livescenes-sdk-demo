@@ -48,18 +48,19 @@ import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * 手机开播登录页面
  */
 public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private static final String TAG = PLVLoginStreamerActivity.class.getSimpleName();
 
     /**
      * 提供给外部跳转调用的scheme，应根据实际情况配置
@@ -207,10 +208,6 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                     .show();
             return;
         }
-        if (!checkAudioPermission()) {
-            requireAudioPermissionBeforeLogin();
-            return;
-        }
         updateLoginViewStatus(true);
         final String channelId = plvlsLoginInputChannelEt.getText().toString();
         final String nick = plvlsLoginInputNickEt.getText().toString().trim();
@@ -241,39 +238,57 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                 PLVLiveChannelType liveChannelType = loginVO.getLiveChannelTypeNew();
                 if (PLVLiveChannelType.PPT.equals(liveChannelType)) {
                     //进入手机开播三分屏场景
-                    boolean isOpenCamera = "N".equals(loginVO.getIsOnlyAudio());
-                    PLVLaunchResult launchResult = PLVLSLiveStreamerActivity.launchStreamer(
-                            PLVLoginStreamerActivity.this,
-                            loginVO.getChannelId(),
-                            loginVO.getInteractUid(),
-                            loginNick,
-                            loginVO.getTeacherAvatar(),
-                            loginVO.getTeacherActor(),
-                            loginVO.getRole(),
-                            loginVO.getColinMicType(),
-                            true,
+                    final boolean isOpenCamera = "N".equals(loginVO.getIsOnlyAudio());
+                    requireStreamerPermissionThenRun(
                             isOpenCamera,
-                            true
+                            true,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    PLVLaunchResult launchResult = PLVLSLiveStreamerActivity.launchStreamer(
+                                            PLVLoginStreamerActivity.this,
+                                            loginVO.getChannelId(),
+                                            loginVO.getInteractUid(),
+                                            loginNick,
+                                            loginVO.getTeacherAvatar(),
+                                            loginVO.getTeacherActor(),
+                                            loginVO.getRole(),
+                                            loginVO.getColinMicType(),
+                                            true,
+                                            isOpenCamera,
+                                            true
+                                    );
+                                    if (!launchResult.isSuccess()) {
+                                        onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());
+                                    }
+                                }
+                            }
                     );
-                    if (!launchResult.isSuccess()) {
-                        onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());
-                    }
                 } else if (PLVLiveChannelType.ALONE.equals(liveChannelType)) {
                     //进入手机开播纯视频场景
-                    PLVLaunchResult launchResult = PLVSAStreamerAloneActivity.launchStreamer(
-                            PLVLoginStreamerActivity.this,
-                            loginVO.getChannelId(),
-                            loginVO.getInteractUid(),
-                            loginNick,
-                            loginVO.getTeacherAvatar(),
-                            loginVO.getTeacherActor(),
-                            loginVO.getChannelName(),
-                            loginVO.getRole(),
-                            loginVO.getColinMicType()
+                    requireStreamerPermissionThenRun(
+                            true,
+                            true,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    PLVLaunchResult launchResult = PLVSAStreamerAloneActivity.launchStreamer(
+                                            PLVLoginStreamerActivity.this,
+                                            loginVO.getChannelId(),
+                                            loginVO.getInteractUid(),
+                                            loginNick,
+                                            loginVO.getTeacherAvatar(),
+                                            loginVO.getTeacherActor(),
+                                            loginVO.getChannelName(),
+                                            loginVO.getRole(),
+                                            loginVO.getColinMicType()
+                                    );
+                                    if (!launchResult.isSuccess()) {
+                                        onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());
+                                    }
+                                }
+                            }
                     );
-                    if (!launchResult.isSuccess()) {
-                        onLoginFailed(launchResult.getErrorMessage(), launchResult.getError());
-                    }
                 } else {
                     String errorMsg = getResources().getString(R.string.plv_scene_login_toast_streamer_no_support_type);
                     onLoginFailed(errorMsg, new Throwable(errorMsg));
@@ -340,6 +355,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         // #F0F1F5
         plvlsLoginEnterBtn.setTextColor(Color.argb(255, 240, 241, 245));
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部方法">
@@ -377,27 +393,49 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
 
     // <editor-fold defaultstate="collapsed" desc="内部方法 - 权限检查">
 
-    private boolean checkAudioPermission() {
-        return PLVFastPermission.hasPermission(this, Manifest.permission.RECORD_AUDIO);
-    }
+    private void requireStreamerPermissionThenRun(
+            final boolean camera,
+            final boolean audio,
+            final Runnable runnable
+    ) {
+        final List<String> permissions = new ArrayList<>();
+        if (camera) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+        if (audio) {
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (permissions.isEmpty() || PLVFastPermission.hasPermission(this, permissions)) {
+            runnable.run();
+            return;
+        }
 
-    private void requireAudioPermissionBeforeLogin() {
-        PLVFastPermission.getInstance().start(this, listOf(Manifest.permission.RECORD_AUDIO), new PLVOnPermissionCallback() {
+        PLVFastPermission.getInstance().start(this, permissions, new PLVOnPermissionCallback() {
             @Override
             public void onAllGranted() {
-                loginStreamer();
+                runnable.run();
             }
 
             @Override
             public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+                final boolean hasCameraPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.CAMERA);
                 final boolean hasAudioPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.RECORD_AUDIO);
-                if (hasAudioPermission) {
-                    // should not be here
+                if (hasCameraPermission && hasAudioPermission) {
+                    runnable.run();
                     return;
                 }
+                final String notGrantedPermissionDescription;
+                if (hasCameraPermission) {
+                    notGrantedPermissionDescription = "麦克风";
+                } else if (hasAudioPermission) {
+                    notGrantedPermissionDescription = "摄像头";
+                } else {
+                    notGrantedPermissionDescription = "摄像头和麦克风";
+                }
+
                 new PLVLoginStreamerConfirmDialog(PLVLoginStreamerActivity.this)
-                        .setTitle("麦克风权限被禁止")
-                        .setContent("参与直播需要麦克风权限，请前往系统设置开启权限")
+                        .setTitle(notGrantedPermissionDescription + "权限被禁止")
+                        .setContent("参与直播需要" + notGrantedPermissionDescription + "权限，请前往系统设置开启权限")
                         .setLeftButtonText("取消")
                         .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                             @Override

@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -31,7 +30,7 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      *
      * @param landscapeController 横屏控制器
      */
-    void setLandscapeController(@NonNull IPLVLiveLandscapePlayerController landscapeController);
+    void setLandscapeController(@NonNull IPLVLCLiveLandscapePlayerController landscapeController);
 
     /**
      * 设置点赞是否开启/关闭

@@ -29,7 +29,7 @@
         android:paddingTop="28dp"
         android:paddingRight="24dp"
         android:paddingBottom="33dp"
-        app:layout_constraintBottom_toTopOf="@+id/plvsa_setting_start_live_btn">
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_setting_btn_ll">
 
         <EditText
             android:id="@+id/plvsa_setting_live_title_tv"
@@ -148,18 +148,57 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <Button
-        android:id="@+id/plvsa_setting_start_live_btn"
+    <LinearLayout
+        android:id="@+id/plvsa_setting_btn_ll"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/plvsa_setting_start_live_bg_selector"
-        android:gravity="center"
-        android:text="开始直播"
-        android:textColor="#ffffff"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:id="@+id/plvsa_setting_beauty_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:background="#FFFFFF"
+            android:paddingHorizontal="25dp"
+            android:visibility="gone"
+            app:radius="25dp">
+
+            <ImageView
+                android:id="@+id/plvsa_setting_beauty_iv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/plvsa_live_room_setting_beauty_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/plvsa_setting_beauty_iv"
+                android:text="美颜"
+                android:textColor="#0382FF"
+                android:textSize="16sp" />
+
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+        <Button
+            android:id="@+id/plvsa_setting_start_live_btn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/plvsa_setting_start_live_bg_selector"
+            android:gravity="center"
+            android:text="开始直播"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>

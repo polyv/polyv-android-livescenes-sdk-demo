@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.document.popuplist;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,6 +48,7 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.enums.PLVLSPptV
 import com.easefun.polyv.livestreamer.modules.document.popuplist.holder.PLVLSPptListViewHolder;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSDocumentDeleteArrow;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -292,34 +294,37 @@ public class PLVLSPptListLayout extends FrameLayout {
      * 初始化PPT转码选择视图
      */
     private void initPptConvertSelectDialog() {
-        pptConvertSelectDialog = new PLVConfirmDialog(getContext())
+        pptConvertSelectDialog = PLVLSConfirmDialog.Builder.context(getContext())
                 .setTitle(getResources().getString(R.string.plvls_document_upload_choose_convert_type))
-                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint));
+                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint))
+                .build();
     }
 
     /**
      * 初始化删除PPT前提示弹窗
      */
     private void initPptDeleteConfirmDialog() {
-        documentDeleteConfirmDialog = new PLVConfirmDialog(getContext())
+        documentDeleteConfirmDialog = PLVLSConfirmDialog.Builder.context(getContext())
                 .setTitleVisibility(View.GONE)
                 .setContent("删除后文档将无法恢复")
                 .setLeftButtonText("按错了")
-                .setLeftBtnListener(new OnClickListener() {
+                .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, View v) {
                         documentDeleteConfirmDialog.hide();
                     }
                 })
-                .setRightButtonText("确定");
+                .setRightButtonText("确定")
+                .build();
     }
 
     /**
      * 初始化重新上传PPT前提示弹窗
      */
     private void initPptUploadAgainConfirmDialog() {
-        documentUploadAgainConfirmDialog = new PLVConfirmDialog(getContext())
-                .setTitleVisibility(View.GONE);
+        documentUploadAgainConfirmDialog = PLVLSConfirmDialog.Builder.context(getContext())
+                .setTitleVisibility(View.GONE)
+                .build();
     }
 
     /**

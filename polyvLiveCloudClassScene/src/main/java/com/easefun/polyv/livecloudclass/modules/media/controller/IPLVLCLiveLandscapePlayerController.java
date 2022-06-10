@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecloudclass.modules.liveroom;
+package com.easefun.polyv.livecloudclass.modules.media.controller;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLay
  * 定义了：
  * 1. 外部直接调用的方法
  */
-public interface IPLVLiveLandscapePlayerController {
+public interface IPLVLCLiveLandscapePlayerController {
 
     // <editor-fold defaultstate="collapsed" desc="1. 外部直接调用的方法">
 

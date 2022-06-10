@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#1B202D">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#BF1B202D" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvls_more_setting_select_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_separator">
+
+        <TextView
+            android:id="@+id/plvls_more_setting_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:text="@string/plvls_more_setting_title"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/plvls_more_setting_title_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:background="#1AF0F1F5"
+            app:layout_constraintTop_toBottomOf="@+id/plvls_more_setting_title_tv" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:columnCount="4"
+            app:layout_constraintTop_toBottomOf="@id/plvls_more_setting_title_separator">
+
+            <LinearLayout
+                android:id="@+id/plvls_more_setting_beauty_item_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_setting_beauty_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="12sp"
+                    android:text="@string/plvls_beauty_title"
+                    android:textColor="#99F0F1F5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvls_more_setting_bitrate_item_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_setting_bitrate_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="12sp"
+                    android:text="@string/plvls_bitrate_title"
+                    android:textColor="#99F0F1F5" />
+
+            </LinearLayout>
+
+            <!--  placeholder  -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1" />
+
+            <!--  placeholder  -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1" />
+
+            <!--  placeholder  -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1" />
+
+        </GridLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSBitrateLayout
+        android:id="@+id/plvls_more_setting_bitrate_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_separator" />
+
+    <View
+        android:id="@+id/plvls_more_setting_exit_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="#0DF0F1F5"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_tv" />
+
+    <TextView
+        android:id="@+id/plvls_more_setting_exit_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:drawableLeft="@drawable/plvls_setting_exit"
+        android:drawablePadding="6dp"
+        android:padding="6dp"
+        android:text="退出登录"
+        android:textColor="#FF6363"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+</android.support.constraint.ConstraintLayout>

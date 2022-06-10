@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.chatroom.chatmore;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -39,8 +41,7 @@ public class PLVLCChatMoreAdapter extends RecyclerView.Adapter<PLVLCChatMoreAdap
 
     public void updateFunctionList(@NonNull List<PLVChatFunctionVO> functionList) {
         List<PLVChatFunctionVO> newList = new ArrayList<>();
-        for (int i = 0; i < functionList.size(); i++) {
-            PLVChatFunctionVO functionVO = functionList.get(i);
+        for (PLVChatFunctionVO functionVO : functionList) {
             if (functionVO.isShow()) {
                 newList.add(functionVO);
             }
@@ -64,10 +65,14 @@ public class PLVLCChatMoreAdapter extends RecyclerView.Adapter<PLVLCChatMoreAdap
     @Override
     public void onBindViewHolder(@NonNull ChatMoreViewHolder chatMoreViewHolder, int i) {
         final PLVChatFunctionVO functionVO = functionList.get(i);
-        chatMoreViewHolder.iconIv.setImageResource(functionVO.getImageResourceId());
+        if(TextUtils.isEmpty(functionVO.getIcon())){
+            chatMoreViewHolder.iconIv.setImageResource(functionVO.getImageResourceId());
+        } else {
+            PLVImageLoader.getInstance().loadImage(functionVO.getIcon(), chatMoreViewHolder.iconIv);
+        }
         chatMoreViewHolder.iconIv.setSelected(functionVO.isSelected());
         chatMoreViewHolder.nameTv.setText(functionVO.getName());
-        chatMoreViewHolder.newIv.setVisibility(functionVO.isHasNew() ? View.VISIBLE : View.INVISIBLE);
+        chatMoreViewHolder.newIv.setVisibility(View.INVISIBLE);
         chatMoreViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +105,6 @@ public class PLVLCChatMoreAdapter extends RecyclerView.Adapter<PLVLCChatMoreAdap
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int type);
+        void onItemClick(String type);
     }
 }

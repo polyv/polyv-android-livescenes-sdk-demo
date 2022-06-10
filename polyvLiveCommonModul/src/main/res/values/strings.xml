@@ -91,6 +91,7 @@
     <string name="plv_live_state_end">已结束</string>
     <string name="plv_live_state_waiting">等待中</string>
     <string name="plv_live_state_playback">回放中</string>
+    <string name="plv_live_state_playback_cached">已缓存</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
     <!--回放-往期-->
@@ -111,5 +112,17 @@
     <string name="plv_common_dialog_confirm">确认</string>
     <string name="plv_common_dialog_alright">好的</string>
 
+    <!--美颜-->
+    <string name="plv_beauty_whiten">美白</string>
+    <string name="plv_beauty_sharp">锐化</string>
+    <string name="plv_beauty_smooth">磨皮</string>
+    <string name="plv_beauty_deform_overall">瘦脸</string>
+    <string name="plv_beauty_deform_eye">大眼</string>
+    <string name="plv_beauty_deform_nose">瘦鼻</string>
+    <string name="plv_beauty_deform_zoom_mouth">嘴巴</string>
+    <string name="plv_beauty_deform_forehead">额头</string>
+    <string name="plv_beauty_deform_zoom_jawbone">下颌</string>
+    <string name="plv_beauty_whiten_teeth">美牙</string>
+    <string name="plv_beauty_brighten_eye">亮眼</string>
 
 </resources>

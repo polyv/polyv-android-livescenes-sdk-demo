@@ -70,12 +70,12 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     }
 
     @Override
-    public IPLVInteractLayout getPLVInteractLayout() {
+    public IPLVInteractLayout getInteractLayout() {
         return plvLayoutInteract;
     }
 
     @Override
-    public PLVPointRewardLayout getPLVRewardView() {
+    public PLVPointRewardLayout getRewardView() {
         return plvLayoutReward;
     }
 

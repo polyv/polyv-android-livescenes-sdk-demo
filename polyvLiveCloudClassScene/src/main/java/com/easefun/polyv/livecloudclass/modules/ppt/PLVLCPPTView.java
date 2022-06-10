@@ -1,11 +1,13 @@
 package com.easefun.polyv.livecloudclass.modules.ppt;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
@@ -22,6 +24,7 @@ import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
+import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.web.PLVWebview;
@@ -211,7 +214,21 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
                 PLVCommonLog.d(TAG, "PLVLCPPTView.pptPrepare=" + message);
                 hideLoading();
                 if (pptWebView != null) {
+                    pptWebView.loadWeb();
                     pptWebView.callPPTParams(message);
+                }
+            }
+
+            @Override
+            public void onLoadLocalPpt(@NonNull PLVPPTLocalCacheVO localCacheVO) {
+                PLVCommonLog.d(TAG, "PLVLCPPTView.onLoadLocalPpt=" + localCacheVO);
+                hideLoading();
+                if (pptWebView != null) {
+                    final WebSettings pptWebSetting = pptWebView.getSettings();
+                    pptWebSetting.setAllowFileAccess(true);
+                    pptWebSetting.setAllowFileAccessFromFileURLs(true);
+
+                    pptWebView.loadLocalPpt(localCacheVO);
                 }
             }
 

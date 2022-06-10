@@ -17,6 +17,7 @@
     <color name="top_layout_color_white">#ffffff</color>
     <color name="top_text_color_black">#000000</color>
     <color name="center_view_color_blue">#2196f3</color>
+    <color name="plvlc_live_desc_playback_cached_text_color">#ADADC0</color>
     <color name="text_gray">#666666</color>
     <color name="text_red">#F1453D</color>
     <color name="text_green">#8BC34A</color>

@@ -47,7 +47,9 @@ import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayo
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -448,6 +450,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         }
         this.isLowLatency = isLowLatencyMode;
         startPlay();
+        if (this.isLowLatency) {
+            PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_NO_DELAY, " isLowLatency: " + this.isLowLatency);
+        } else {
+            PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_DELAY, " isLowLatency: " + this.isLowLatency);
+        }
         if (onViewActionListener != null) {
             onViewActionListener.acceptOnLowLatencyChange(this.isLowLatency);
         }

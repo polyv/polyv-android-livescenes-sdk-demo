@@ -28,6 +28,9 @@ import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
+import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.config.PLVPlaybackCacheVideoConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
@@ -53,10 +56,12 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -251,6 +256,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     private void injectDependency() {
         PLVDependManager.getInstance().switchStore(this)
+                .addModule(PLVPlaybackCacheModule.instance)
                 .addModule(PLVECFloatingWindowModule.instance);
     }
 
@@ -259,12 +265,14 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
     private void initParams() {
         // 获取输入数据
-        Intent intent = getIntent();
-        boolean isLive = intent.getBooleanExtra(EXTRA_IS_LIVE, true);
-        String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
-        String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
-        String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
-        String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
+        final Intent intent = getIntent();
+        final boolean isLive = intent.getBooleanExtra(EXTRA_IS_LIVE, true);
+        final String channelId = intent.getStringExtra(EXTRA_CHANNEL_ID);
+        final String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
+        final String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
+        final String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
+        final String vid = intent.getStringExtra(EXTRA_VID);
+        final PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
@@ -278,12 +286,36 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if (isLive) {
             PLVFloatingPlayerManager.getInstance().setTag(channelId + "_live");
         } else { // 回放模式
-            final String vid = intent.getStringExtra(EXTRA_VID);
-            final PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
             PLVLiveChannelConfigFiller.setupVid(vid);
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
             PLVFloatingPlayerManager.getInstance().setTag(channelId + "_" + (vid == null ? "playback" : vid));
         }
+
+        initPlaybackParam(vid, channelId, viewerId, viewerName, viewerAvatar, PLVLiveChannelType.ALONE, videoListType);
+    }
+
+    private void initPlaybackParam(
+            final String vid,
+            final String channelId,
+            final String viewerId,
+            final String viewerName,
+            final String viewerAvatar,
+            final PLVLiveChannelType channelType,
+            final PLVPlaybackListType playbackListType
+    ) {
+        PLVDependManager.getInstance().get(PLVPlaybackCacheConfig.class)
+                .setApplicationContext(getApplicationContext())
+                .setDatabaseNameByViewerId(viewerId)
+                .setDownloadRootDirectory(new File(PLVPlaybackCacheConfig.defaultPlaybackCacheDownloadDirectory(this)));
+        PLVDependManager.getInstance().get(PLVPlaybackCacheVideoConfig.class)
+                .setVid(vid)
+                .setVideoPoolIdByVid(vid)
+                .setChannelId(channelId)
+                .setViewerId(viewerId)
+                .setViewerName(viewerName)
+                .setViewerAvatar(viewerAvatar)
+                .setChannelType(channelType)
+                .setPlaybackListType(playbackListType);
     }
     // </editor-fold>
 
@@ -595,13 +627,14 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         });
 
         // 当前页面 监听 回放播放器数据对象中的播放信息变化
-        if (videoLayout.getPlaybackPlayInfoVO() != null)
+        if (videoLayout.getPlaybackPlayInfoVO() != null) {
             videoLayout.getPlaybackPlayInfoVO().observe(this, new Observer<PLVPlayInfoVO>() {
                 @Override
                 public void onChanged(@Nullable PLVPlayInfoVO playInfoVO) {
                     commonHomeFragment.setPlaybackPlayInfo(playInfoVO);
                 }
             });
+        }
     }
     // </editor-fold>
 
@@ -670,7 +703,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onShowRewardAction() {
             if(popoverLayout != null){
-                popoverLayout.getPLVRewardView().showPointRewardDialog(true);
+                popoverLayout.getRewardView().showPointRewardDialog(true);
             }
         }
 
