@@ -1,3 +1,35 @@
+## [v1.9.3] - 2022-06-20
+### 观看端（云课堂场景）
+
+新增：
+1. 【播放器】支持播放本地缓存的视频 [Scenes、Common、SDK]
+2. 【聊天室】回放视频支持聊天重放 [Scenes、Common、SDK]
+
+优化：
+1. 【SDK】优化日志发送规则 [Scenes、Common、SDK]
+2. 【播放器】优化网络异常场景下的重试机制 [SDK]
+3. 【互动】修复公告嵌入链接无法跳转的问题 [Common]
+4. 【连麦】优化连麦权限申请 [Common、SDK]
+
+### 观看端（直播带货场景）
+
+新增：
+1. 【营销】回放页面显示商品库 [Scenes]
+2. 【聊天室】回放视频支持聊天重放 [Scenes、Common、SDK]
+
+优化：
+1. 【播放器】优化网络异常场景下的重试机制 [SDK]
+
+### 开播端
+
+新增：
+1. 【美颜】新增美颜功能 [Scenes、Common、SDK]
+
+优化：
+1. 【连麦】修复网页开播嘉宾共享屏幕后，混流仍显示为摄像头画面的问题 [Scenes、Common、SDK]
+2. 【连麦】修复连麦全屏后图层显示异常的问题 [Scenes、Common]
+3. 【推流】修复部分频道停止屏幕共享后，摄像头画面异常的问题 [SDK]
+
 ## [v1.9.1.1] - 2022-05-20
 ### 观看端（云课堂场景）
 
@@ -260,7 +292,7 @@ api 'net.polyv.android:polyvSDKLiveScenes:1.7.2'
 ```
 
 3. 根据 [git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/487183b7447a32acc310d0478a53e57d19a893cf) 进行demo的代码升级。
-  
+
 ## [v1.7.1] - 2021-11-01
 
 ### 观看端（云课堂）场景
@@ -307,7 +339,7 @@ allprojects {
 api 'net.polyv.android:polyvSDKLiveScenes:1.7.1'
 ```
 3. 根据 [git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/56f00f58e0f516f23a580af1a3d30a22bf95e865) 进行demo的代码升级。
-  
+
 ## [v1.7.0] - 2021-10-21
 
 ### 互动学堂场景
@@ -344,7 +376,7 @@ allprojects {
 api 'net.polyv.android:polyvSDKLiveScenes:1.7.0'
 ```
 3. 根据 [git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/6fb7690e868f00ed42663ac595881a58a9b6d999) 进行demo的代码升级。
-  
+
 ## [v1.6.3] - 2021-10-14
 
 ### 观看端场景（云课堂、直播带货）
@@ -392,7 +424,7 @@ allprojects {
 api 'net.polyv.android:polyvSDKLiveScenes:1.6.3'
 ```
 3. 根据 [git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/39e2fabcae02e5cb5732eba8336d639cfaaa0517) 进行demo的代码升级。
-  
+
 ## [v1.6.0-bugfix1] - 2021-09-17
 
 ### 手机开播场景
@@ -468,7 +500,7 @@ allprojects {
 api 'net.polyv.android:polyvSDKLiveScenes:1.6.0'
 ```
 3. 根据 [git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/34e1096705bfa0a4f45619a5ec94a33cc820c128) 进行demo的代码升级。
-  
+
 ## [v1.5.3] - 2021-07-28
 
 
@@ -545,7 +577,7 @@ allprojects {
 2. 更新SDK版本。
 api 'net.polyv.android:polyvSDKLiveScenes:1.5.3'
 3. 根据[git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/defbabe26627d70a2e703680b66eb29d04361480)进行demo的代码升级。
-  
+
 ## [v1.5.2] - 2021-07-13
 
 ### 优化与修复
@@ -573,7 +605,7 @@ allprojects {
 2. 更新SDK版本。
 api 'net.polyv.android:polyvSDKLiveScenes:1.5.2'
 3. 根据[git commit diff](https://github.com/polyv/polyv-android-livescenes-sdk-demo/commit/defbabe26627d70a2e703680b66eb29d04361480)进行demo的代码升级。
-  
+
 ## [v1.5.1.1] - 2021-07-02
 
 #### 优化与修复  
@@ -768,7 +800,7 @@ api 'com.easefun.polyv:polyvSDKLiveScenes:1.3.0'
   2.  从 其他版本（1.2.0、1.2.1）升级至 1.2.3，【建议】更新 Demo 层源码 （推荐更新，但可选择不更新；评估请见各版本升级内容）
   3.  从 其他更低版本（低于 1.2.0）升级至 1.2.4，【必需】更新 Demo 层源码 
   4.  build.gradle 文件中语句，可更新为：`api 'com.easefun.polyv:polyvSDKLiveScenes:1.2.3'`
-    
+
 ## [v1.2.2] - 2021-03-18
 
 ### 【云课堂场景】

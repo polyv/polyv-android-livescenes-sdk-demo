@@ -1,7 +1,11 @@
 package com.easefun.polyv.livedemo;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
@@ -20,11 +24,18 @@ import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
+import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackCacheListViewModel;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.liveecommerce.scenes.PLVECLiveEcommerceActivity;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
@@ -33,6 +44,8 @@ import com.plv.livescenes.feature.login.PLVPlaybackLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
+
+import java.io.File;
 
 /**
  * date: 2020-04-29
@@ -101,12 +114,16 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         }
     };
 
+    private PLVPlaybackCacheListViewModel playbackCacheListViewModel;
+    private Observer<Event<PLVPlaybackCacheVideoVO>> playbackCacheLaunchObserver;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        injectDependency();
         setContentView(R.layout.plv_login_watcher_activity);
 
         //初始化登录管理器
@@ -119,10 +136,26 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     @Override
     protected void onDestroy() {
+        if (playbackCacheListViewModel != null && playbackCacheLaunchObserver != null) {
+            playbackCacheListViewModel
+                    .getOnRequestLaunchDownloadedPlaybackLiveData()
+                    .removeObserver(playbackCacheLaunchObserver);
+        }
+
         super.onDestroy();
         loginManager.destroy();
         loginProgressDialog.dismiss();
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
+
+    private void injectDependency() {
+        PLVDependManager.getInstance()
+                .switchStore(this)
+                .addModule(PLVPlaybackCacheModule.instance);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化View">
@@ -135,6 +168,10 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         initDialog();
         //默认选择直播
         rlLiveGroupLayout.performClick();
+
+        initPlaybackCacheConfig();
+        initPlaybackCacheViewModel();
+        observePlaybackCacheLaunch();
     }
 
     private void findAllView() {
@@ -256,6 +293,43 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
             }
         });
     }
+
+    private void initPlaybackCacheConfig() {
+        PLVDependManager.getInstance().get(PLVPlaybackCacheConfig.class)
+                .setApplicationContext(getApplicationContext())
+                .setDatabaseNameByViewerId(getViewerId())
+                .setDownloadRootDirectory(new File(PLVPlaybackCacheConfig.defaultPlaybackCacheDownloadDirectory(this)));
+    }
+
+    private void initPlaybackCacheViewModel() {
+        playbackCacheListViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheListViewModel.class);
+    }
+
+    private void observePlaybackCacheLaunch() {
+        if (playbackCacheLaunchObserver != null) {
+            playbackCacheListViewModel.getOnRequestLaunchDownloadedPlaybackLiveData().removeObserver(playbackCacheLaunchObserver);
+        }
+        playbackCacheListViewModel
+                .getOnRequestLaunchDownloadedPlaybackLiveData()
+                .observeForever(playbackCacheLaunchObserver = new Observer<Event<PLVPlaybackCacheVideoVO>>() {
+                    @Override
+                    public void onChanged(@Nullable Event<PLVPlaybackCacheVideoVO> event) {
+                        final PLVPlaybackCacheVideoVO vo = nullable(new PLVSugarUtil.Supplier<PLVPlaybackCacheVideoVO>() {
+                            @Override
+                            public PLVPlaybackCacheVideoVO get() {
+                                return event.get();
+                            }
+                        });
+                        if (vo == null) {
+                            return;
+                        }
+                        final Intent clearTop = new Intent(PLVLoginWatcherActivity.this, PLVLoginWatcherActivity.class);
+                        clearTop.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        PLVLoginWatcherActivity.this.startActivity(clearTop);
+                        loginPlayback(vo.getViewerInfoVO().getChannelId(), vo.getViewerInfoVO().getVid(), vo.getVideoPoolId());
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置测试数据">
@@ -345,11 +419,16 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录回放">
     private void loginPlayback() {
+        final String channelId = etPlaybackChannelId.getText().toString();
+        final String vid = etPlaybackVideoId.getText().toString();
+        loginPlayback(channelId, vid, null);
+    }
+
+    private void loginPlayback(final String channelId, final String vid, final String tempStoreFileId) {
         final String appId = etPlaybackAppId.getText().toString();
         final String appSecret = etPlaybackAppSecret.getText().toString();
         final String userId = etPlaybackUserId.getText().toString();
-        final String channelId = etPlaybackChannelId.getText().toString();
-        final String vid = etPlaybackVideoId.getText().toString();
+
         loginManager.loginPlaybackNew(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
             @Override
             public void onLoginSuccess(PLVPlaybackLoginResult plvPlaybackLoginResult) {
@@ -364,8 +443,15 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     //进入云课堂场景
                     case CLOUDCLASS:
                         if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId, channelType,
-                                    vid, getViewerId(), getViewerName(),getViewerAvatar(),
+                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(
+                                    PLVLoginWatcherActivity.this,
+                                    channelId,
+                                    channelType,
+                                    vid,
+                                    tempStoreFileId,
+                                    getViewerId(),
+                                    getViewerName(),
+                                    getViewerAvatar(),
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
                             );
                             if (!launchResult.isSuccess()) {

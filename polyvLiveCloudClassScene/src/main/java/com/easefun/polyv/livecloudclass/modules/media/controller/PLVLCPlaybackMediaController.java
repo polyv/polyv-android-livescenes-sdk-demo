@@ -289,6 +289,19 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled) {
+        if (tvStartSendMessageLand != null) {
+            if (isChatPlaybackEnabled) {
+                tvStartSendMessageLand.setText("聊天室暂时关闭");
+                tvStartSendMessageLand.setEnabled(false);
+            } else {
+                tvStartSendMessageLand.setText("跟大家聊点什么吧~");
+                tvStartSendMessageLand.setEnabled(true);
+            }
+        }
+    }
+
+    @Override
     public void clean() {
         if (moreLayout != null) {
             moreLayout.hide();

@@ -168,6 +168,44 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         return false;
     }
 
+    public boolean addDataListChangedAtHead(List<PLVBaseViewData> list) {
+        int oldSize = dataList.size();
+        fullDataList.addAll(0, list);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = list.get(i);
+            if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+                specialDataList.add(0, baseViewData);
+            }
+        }
+        if (dataList.size() != oldSize) {
+            notifyItemRangeInserted(0, dataList.size() - oldSize);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeDataChanged(int startPosition, int count) {
+        if (startPosition < 0 || count <= 0) {
+            return false;
+        }
+        int oldSize = dataList.size();
+        List<PLVBaseViewData> removeList = new ArrayList<>();
+        int removeCount = count;
+        while (removeCount > 0) {
+            removeList.add(fullDataList.remove(startPosition));
+            removeCount--;
+        }
+        specialDataList.removeAll(removeList);
+        if (dataList.size() != oldSize) {
+            if (isDisplaySpecialType) {
+                notifyDataSetChanged();
+            } else {
+                notifyItemRangeRemoved(startPosition, count);
+            }
+        }
+        return true;
+    }
+
     public boolean removeDataChanged(String id) {
         if (TextUtils.isEmpty(id)) {
             return false;

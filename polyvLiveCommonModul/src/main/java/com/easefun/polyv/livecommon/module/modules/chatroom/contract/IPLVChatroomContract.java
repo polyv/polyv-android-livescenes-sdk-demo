@@ -337,6 +337,11 @@ public interface IPLVChatroomContract {
         void requestChatHistory(int viewIndex);
 
         /**
+         * 获取聊天发言的表情图片的大小
+         */
+        int[] getSpeakEmojiSizes();
+
+        /**
          * 请求被踢出的用户列表
          */
         void requestKickUsers();

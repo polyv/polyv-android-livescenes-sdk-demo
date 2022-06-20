@@ -18,10 +18,13 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVQuoteEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
+import com.plv.socket.event.chat.PLVChatImgContent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -93,18 +96,33 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
         return show(activity, imgTagList, imgPosition, containerViewId);
     }
 
-    public static PLVChatImageViewerFragment show(AppCompatActivity activity, PLVBaseViewData<PLVBaseEvent> selData, int containerViewId) {
+    public static PLVChatImageViewerFragment show(AppCompatActivity activity, PLVBaseViewData selData, int containerViewId) {
         List<PLVUrlTag> imgTagList = new ArrayList<>();
-        PLVBaseEvent baseEvent = selData.getData();
-        if (baseEvent instanceof IPLVQuoteEvent) {
-            IPLVQuoteEvent quoteEvent = (IPLVQuoteEvent) baseEvent;
-            if (quoteEvent.getQuote() != null && quoteEvent.getQuote().getImage() != null) {
-                if (baseEvent.getObj3() instanceof PLVUrlTag) {
-                    imgTagList.add((PLVUrlTag) baseEvent.getObj3());
+        if (selData.getData() instanceof PLVBaseEvent) {
+            PLVBaseEvent baseEvent = (PLVBaseEvent) selData.getData();
+            if (baseEvent instanceof IPLVQuoteEvent) {
+                IPLVQuoteEvent quoteEvent = (IPLVQuoteEvent) baseEvent;
+                if (quoteEvent.getQuote() != null && quoteEvent.getQuote().getImage() != null) {
+                    if (baseEvent.getObj3() instanceof PLVUrlTag) {
+                        imgTagList.add((PLVUrlTag) baseEvent.getObj3());
+                    } else {
+                        String imageUrl = quoteEvent.getQuote().getImage().getUrl();
+                        PLVUrlTag urlTag = new PLVUrlTag(imageUrl, baseEvent);
+                        baseEvent.setObj3(urlTag);
+                        imgTagList.add(urlTag);
+                    }
+                }
+            }
+        } else if (selData.getData() instanceof PLVChatPlaybackData) {
+            PLVChatPlaybackData chatPlaybackData = ((PLVChatPlaybackData) selData.getData());
+            PLVChatQuoteVO chatQuoteVO = ((PLVChatPlaybackData) selData.getData()).getChatQuoteVO();
+            if (chatQuoteVO != null && chatQuoteVO.getImage() != null) {
+                if (chatPlaybackData.getObj3() instanceof PLVUrlTag) {
+                    imgTagList.add((PLVUrlTag) chatPlaybackData.getObj3());
                 } else {
-                    String imageUrl = quoteEvent.getQuote().getImage().getUrl();
-                    PLVUrlTag urlTag = new PLVUrlTag(imageUrl, baseEvent);
-                    baseEvent.setObj3(urlTag);
+                    String imageUrl = chatQuoteVO.getImage().getUrl();
+                    PLVUrlTag urlTag = new PLVUrlTag(imageUrl, chatPlaybackData);
+                    chatPlaybackData.setObj3(urlTag);
                     imgTagList.add(urlTag);
                 }
             }
@@ -181,11 +199,23 @@ public class PLVChatImageViewerFragment extends PLVBaseFragment {
             } else if (baseEvent instanceof PLVChatEmotionEvent) {
                 PLVChatEmotionEvent emotionEvent = (PLVChatEmotionEvent) baseEvent;
                 imgUrl = PLVFaceManager.getInstance().getEmotionUrl(emotionEvent.getId());
-                if (emotionEvent.getObj2() instanceof PLVUrlTag){
-                    urlTag= (PLVUrlTag) emotionEvent.getObj2();
-                }else{
-                    urlTag=new PLVUrlTag(imgUrl,baseEvent);
+                if (emotionEvent.getObj2() instanceof PLVUrlTag) {
+                    urlTag = (PLVUrlTag) emotionEvent.getObj2();
+                } else {
+                    urlTag = new PLVUrlTag(imgUrl, baseEvent);
                     emotionEvent.setObj2(urlTag);
+                }
+            } else if (baseEvent instanceof PLVChatPlaybackData) {
+                PLVChatPlaybackData chatPlaybackData = (PLVChatPlaybackData) baseEvent;
+                PLVChatImgContent chatImgContent = chatPlaybackData.getChatImgContent();
+                if (chatImgContent != null) {
+                    imgUrl = chatImgContent.getUploadImgUrl();
+                    if (chatPlaybackData.getObj2() instanceof PLVUrlTag) {
+                        urlTag = (PLVUrlTag) chatPlaybackData.getObj2();
+                    } else {
+                        urlTag = new PLVUrlTag(imgUrl, baseEvent);
+                        chatPlaybackData.setObj2(urlTag);
+                    }
                 }
             } else {
                 continue;

@@ -285,6 +285,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         return videoView == null ? 0 : videoView.getLinesPos();
     }
 
+
     @Override
     public int getBitratePos() {
         return videoView == null ? 0 : videoView.getBitratePos();

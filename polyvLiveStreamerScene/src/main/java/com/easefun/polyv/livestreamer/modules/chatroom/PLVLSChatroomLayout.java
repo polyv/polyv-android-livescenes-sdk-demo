@@ -27,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
@@ -57,6 +59,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapt
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
 import com.easefun.polyv.livestreamer.modules.managerchat.PLVLSManagerChatroomLayout;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.viewmodel.PLVViewModels;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
@@ -125,6 +128,10 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean isDocumentMarkToolExpand = false;
+    private boolean isDocumentLayoutFullScreen = false;
+    private boolean isBeautyLayoutShowing = false;
 
     private long lastTimeClickFrontCameraControl = 0;
     private int unreadManagerChatMessageCount = 0;
@@ -244,6 +251,20 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
             }
         });
+
+        observeBeautyLayoutStatus();
+    }
+
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVLSChatroomLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
     }
     // </editor-fold>
 
@@ -291,6 +312,18 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     @Override
     public void setFrontCameraViewStatus(boolean isFront) {
         plvlsChatroomToolbarFrontCameraControlIv.setTag(isFront ? null : "back");
+    }
+
+    @Override
+    public void notifyDocumentMarkToolExpand(boolean isExpand) {
+        isDocumentMarkToolExpand = isExpand;
+        updateVisibility();
+    }
+
+    @Override
+    public void notifyDocumentLayoutFullScreen(boolean isFullScreen) {
+        isDocumentLayoutFullScreen = isFullScreen;
+        updateVisibility();
     }
 
     @Override
@@ -765,6 +798,26 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         });
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理 - UI更新">
+
+    private void updateVisibility() {
+        if (isBeautyLayoutShowing) {
+            setVisibility(GONE);
+            return;
+        }
+        if (isDocumentMarkToolExpand) {
+            setVisibility(GONE);
+            return;
+        }
+        if (isDocumentLayoutFullScreen) {
+            setVisibility(GONE);
+            return;
+        }
+        setVisibility(VISIBLE);
+    }
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="管理员私聊">
 

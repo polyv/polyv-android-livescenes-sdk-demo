@@ -1,6 +1,7 @@
 package com.easefun.polyv.streameralone.ui.widget;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.streameralone.R;
@@ -9,6 +10,23 @@ import com.easefun.polyv.streameralone.R;
  * @author suhongtao
  */
 public class PLVSAConfirmDialog extends PLVConfirmDialog {
+
+    public static class Builder extends PLVConfirmDialog.Builder {
+
+        protected Builder(@NonNull Context context) {
+            super(context);
+        }
+
+        public static Builder context(@NonNull Context context) {
+            return new Builder(context);
+        }
+
+        @Override
+        public PLVConfirmDialog build() {
+            return param.initTo(new PLVSAConfirmDialog(param.context));
+        }
+
+    }
 
     public PLVSAConfirmDialog(Context context) {
         super(context);

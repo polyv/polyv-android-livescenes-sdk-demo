@@ -10,6 +10,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 import java.util.List;
@@ -104,19 +105,19 @@ public interface IPLVECVideoLayout {
     PLVSwitchViewAnchorLayout getPlayerSwitchAnchorLayout();
 
     /**
+     * 设置播放器区域位置
+     *
+     * @param videoViewRect 区域
+     */
+    void setVideoViewRect(Rect videoViewRect);
+
+    /**
      * 销毁，销毁播放器及相关资源
      */
     void destroy();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - live部分，定义 直播播放器布局 独有的方法">
-
-    /**
-     * 设置播放器区域位置
-     *
-     * @param videoViewRect 区域
-     */
-    void setVideoViewRect(Rect videoViewRect);
 
     /**
      * 获取线路索引
@@ -204,6 +205,13 @@ public interface IPLVECVideoLayout {
     int getDuration();
 
     /**
+     * 获取视频当前播放时间
+     *
+     * @return 视频当前播放时间，单位：毫秒
+     */
+    int getVideoCurrentPosition();
+
+    /**
      * 根据progress占max的百分比，跳转到视频总时间的该百分比进度
      *
      * @param progress 进度
@@ -226,6 +234,13 @@ public interface IPLVECVideoLayout {
     float getSpeed();
 
     /**
+     * 添加seek完成监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 获取回放播放器数据中的播放信息
      *
      * @return 播放信息数据
@@ -240,10 +255,15 @@ public interface IPLVECVideoLayout {
 
     /**
      * 改变回放视频vid并且立即播放
+     *
      * @param vid
      */
     void changePlaybackVidAndPlay(String vid);
 
+    /**
+     * 获取sessionId
+     */
+    String getSessionId();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">

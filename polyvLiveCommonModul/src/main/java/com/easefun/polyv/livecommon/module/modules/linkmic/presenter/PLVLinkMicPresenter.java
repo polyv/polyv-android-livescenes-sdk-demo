@@ -1,10 +1,15 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
@@ -20,8 +25,12 @@ import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicListener;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicManagerFactory;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
+import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
@@ -30,13 +39,17 @@ import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
+import com.plv.livescenes.log.linkmic.PLVLinkMicELog;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
+import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -354,12 +367,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     @Override
     public void requestJoinLinkMic() {
-        pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
-            @Override
-            public void run() {
-                linkMicManager.sendJoinRequestMsg();
-            }
-        });
+        requestPermissionAndJoin();
     }
 
     @Override
@@ -1262,6 +1270,61 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             //socket消息，早于连麦，缓存下来后更新刚进来时的连麦状态
             PLVLinkMicPresenter.this.avConnectMode = avConnectMode;
         }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="请求权限">
+    //请求权限，成功获取权限的话就申请连麦，否则不申请
+    private void requestPermissionAndJoin() {
+
+        Activity activity = ActivityUtils.getTopActivity();
+        ArrayList<String> permissions = new ArrayList<>(Arrays.asList(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+        ));
+        PLVFastPermission.getInstance()
+                .start(activity, permissions, new PLVOnPermissionCallback() {
+                    @Override
+                    public void onAllGranted() {
+                        pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
+                            @Override
+                            public void run() {
+                                linkMicManager.sendJoinRequestMsg();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+                        IPLVLinkMicTraceLogSender iplvLinkMicTraceLogSender = new PLVLinkMicTraceLogSender();
+                        iplvLinkMicTraceLogSender.setLogModuleClass(PLVLinkMicELog.class);
+                        iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.PERMISSION_DENIED," deniedPermissions: "+deniedPermissions+" deniedForeverP: "+deniedForeverP);
+                        if (deniedForeverP == null) {
+                            linkMicView.onLeaveLinkMic();
+                        } else {
+                            showRequestPermissionDialog();
+                        }
+                    }
+                });
+    }
+
+    private void showRequestPermissionDialog() {
+        new AlertDialog.Builder(ActivityUtils.getTopActivity()).setTitle("提示")
+                .setMessage("通话所需的相机权限和麦克风权限被拒绝，请到应用设置的权限管理中恢复")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PLVFastPermission.getInstance().jump2Settings(ActivityUtils.getTopActivity());
+                        linkMicView.onLeaveLinkMic();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(ActivityUtils.getTopActivity(), "权限不足，申请发言失败", Toast.LENGTH_SHORT).show();
+                        linkMicView.onLeaveLinkMic();
+                    }
+                }).setCancelable(false).show();
     }
     // </editor-fold>
 }

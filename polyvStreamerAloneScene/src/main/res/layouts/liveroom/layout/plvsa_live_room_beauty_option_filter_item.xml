@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvsa_beauty_option_filter_item_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/plvsa_beauty_option_filter_item_iv"
+            android:layout_width="56dp"
+            android:layout_height="72dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:radius_iv="9dp"
+            tools:src="@color/colorAccent" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="18dp"
+            android:background="@drawable/plvsa_beauty_option_filter_item_text_mask"
+            app:layout_constraintBottom_toBottomOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintEnd_toEndOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintStart_toStartOf="@id/plvsa_beauty_option_filter_item_iv" />
+
+        <ImageView
+            android:id="@+id/plvsa_beauty_option_filter_item_selected_mask_iv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/plvsa_beauty_option_filter_item_selected_mask"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="40dp"
+            android:src="@drawable/plvsa_live_room_beauty_filter_adjust_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintEnd_toEndOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintStart_toStartOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintTop_toTopOf="@id/plvsa_beauty_option_filter_item_iv"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_beauty_option_filter_item_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="原图" />
+
+        <View
+            android:id="@+id/plvsa_beauty_option_filter_item_enabled_mask_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/plvsa_beauty_option_filter_item_enabled_mask"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintEnd_toEndOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintStart_toStartOf="@id/plvsa_beauty_option_filter_item_iv"
+            app:layout_constraintTop_toTopOf="@id/plvsa_beauty_option_filter_item_iv"
+            tools:visibility="gone" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

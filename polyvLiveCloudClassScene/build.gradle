@@ -30,7 +30,8 @@ android {
                     'src/main/res/layouts/player',
                     'src/main/res/layouts/ppt',
                     'src/main/res/layouts/liveroom',
-                    'src/main/res/layouts/previous'
+                    'src/main/res/layouts/previous',
+                    'src/main/res/layouts/download'
             ]
         }
     }

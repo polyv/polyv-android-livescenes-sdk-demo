@@ -36,7 +36,9 @@ public class PLVChatroomUtils {
         emojiListAdapter.setOnViewActionListener(new PLVLCEmojiListAdapter.OnViewActionListener() {
             @Override
             public void onEmojiViewClick(String emoKey) {
-                appendEmo(emoKey, inputEt);
+                if (inputEt.isEnabled()) {
+                    appendEmo(emoKey, inputEt);
+                }
             }
         });
         emojiRv.setAdapter(emojiListAdapter);

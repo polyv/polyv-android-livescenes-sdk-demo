@@ -354,7 +354,7 @@ public class PLVMessageRecyclerView extends RecyclerView {
             if (parent.getChildLayoutPosition(view) == 0) {
                 outRect.top = firstTop;
             } else {
-                outRect.top = space;
+                outRect.top = view instanceof PLVEmptyViewGroup ? 0 : space;
             }
         }
     }

@@ -18,6 +18,9 @@ public class PLVPlaybackPlayerData {
     //播放信息，每隔一秒回调一次
     private MutableLiveData<PLVPlayInfoVO> playInfoVO = new MutableLiveData<>();
 
+    //seek完成
+    private MutableLiveData<Integer> seekCompleteVO = new MutableLiveData<>();
+
     // <editor-fold defaultstate="collapsed" desc="播放状态">
     public void postPrepared() {
         playerState.postValue(PLVPlayerState.PREPARED);
@@ -45,6 +48,16 @@ public class PLVPlaybackPlayerData {
 
     public LiveData<PLVPlayInfoVO> getPlayInfoVO() {
         return playInfoVO;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="seek完成">
+    public void postSeekComplete(int time) {
+        seekCompleteVO.postValue(time);
+    }
+
+    public LiveData<Integer> getSeekCompleteVO() {
+        return seekCompleteVO;
     }
     // </editor-fold>
 }

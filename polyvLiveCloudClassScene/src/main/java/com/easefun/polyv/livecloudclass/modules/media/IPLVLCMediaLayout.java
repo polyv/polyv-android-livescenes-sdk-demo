@@ -5,7 +5,7 @@ import android.util.Pair;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -147,7 +147,7 @@ public interface IPLVLCMediaLayout {
      *
      * @param landscapeControllerView 横屏控制器
      */
-    void setLandscapeControllerView(@NonNull IPLVLiveLandscapePlayerController landscapeControllerView);
+    void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView);
 
     /**
      * 更新观看热度
@@ -236,6 +236,13 @@ public interface IPLVLCMediaLayout {
     int getDuration();
 
     /**
+     * 获取视频当前播放时间
+     *
+     * @return 视频当前播放时间，单位：毫秒
+     */
+    int getVideoCurrentPosition();
+
+    /**
      * 根据progress占max的百分比，跳转到视频总时间的该百分比进度
      *
      * @param progress 进度
@@ -272,16 +279,35 @@ public interface IPLVLCMediaLayout {
     void addOnPlayInfoVOListener(IPLVOnDataChangedListener<PLVPlayInfoVO> listener);
 
     /**
+     * 添加seek完成监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 更换回放视频的vid
+     *
      * @param vid 回放视频的vid
      */
     void updatePlayBackVideVid(String vid);
 
     /**
      * 更换回放视频vid并且立即播放
+     *
      * @param vid 回放视频的vid
      */
     void updatePlayBackVideVidAndPlay(String vid);
+
+    /**
+     * 获取sessionId
+     */
+    String getSessionId();
+
+    /**
+     * 设置聊天回放是否可用
+     */
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">
