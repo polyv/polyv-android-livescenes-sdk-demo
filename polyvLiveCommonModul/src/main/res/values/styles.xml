@@ -23,6 +23,19 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="plv_style_reward_radio_btn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:background">@drawable/plv_selecotr_point_reward_point_to_send_selector
+        </item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">36dp</item>
+        <item name="android:textColor">@drawable/plv_selector_text_point_reward_point_to_send</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="Widget" />
 
     <!-- Base theme for the menu drawer. -->

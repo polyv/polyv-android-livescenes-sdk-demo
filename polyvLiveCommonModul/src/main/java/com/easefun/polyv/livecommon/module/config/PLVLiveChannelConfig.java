@@ -3,8 +3,9 @@ package com.easefun.polyv.livecommon.module.config;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
-import com.easefun.polyv.livescenes.config.PolyvLiveChannelType;
-import com.easefun.polyv.livescenes.feature.login.model.PLVSLoginVO;
+import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.login.model.PLVLoginVO;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -32,7 +33,7 @@ public class PLVLiveChannelConfig {
     /**
      * 回放视频所在的列表类型
      */
-    private int videoListType;
+    private PLVPlaybackListType videoListType;
 
     /**
      * 当前是否是直播，true为直播，false为回放。
@@ -42,7 +43,7 @@ public class PLVLiveChannelConfig {
     /**
      * 频道类型
      */
-    private PolyvLiveChannelType channelType;
+    private PLVLiveChannelType channelType;
 
     /**
      * 频道名称
@@ -53,6 +54,10 @@ public class PLVLiveChannelConfig {
      * 嘉宾连麦类型
      */
     private String colinMicType;
+    /**
+     * 是否跳过自动连麦
+     */
+    private boolean isSkipAutoLinkMic = false;
 
     /**
      * 互动学堂课堂信息
@@ -122,11 +127,29 @@ public class PLVLiveChannelConfig {
      * @param actor        用户的头衔，一般观看场景不需填写，开播场景从登录接口获取
      */
     public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor) {
+        setupUser(viewerId, viewerName, viewerAvatar, viewerType, actor, "", "");
+    }
+
+    /**
+     *
+     * 配置用户参数
+     *
+     * @param viewerId     用户的userId，用于登录socket、发送日志
+     * @param viewerName   用户昵称，用于登录socket、发送日志
+     * @param viewerAvatar 用户的头像url，用于登录socket、发送日志
+     * @param viewerType   用户的类型，用于登录socket，需要为指定的类型，例如：{@link PLVSocketUserConstant#USERTYPE_STUDENT}， {@link PLVSocketUserConstant#USERTYPE_SLICE}
+     * @param actor        用户的头衔，一般观看场景不需填写，开播场景从登录接口获取
+     * @param param4       自定义统计参数4
+     * @param param5       自定义统计参数5
+     */
+    public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor, String param4, String param5){
         user.viewerId = TextUtils.isEmpty(viewerId) ? PLVSystemUtils.getAndroidId(Utils.getApp()) + "" : viewerId;
         user.viewerName = TextUtils.isEmpty(viewerName) ? "观众" + PLVSystemUtils.getAndroidId(Utils.getApp()) : viewerName;
         user.viewerAvatar = TextUtils.isEmpty(viewerAvatar) ? PLVSocketUserConstant.STUDENT_AVATAR_URL : viewerAvatar;
         user.viewerType = TextUtils.isEmpty(viewerType) ? PLVSocketUserConstant.USERTYPE_STUDENT : viewerType;
         user.actor = actor;
+        user.param4 = param4;
+        user.param5= param5;
     }
 
     /**
@@ -153,7 +176,7 @@ public class PLVLiveChannelConfig {
     /**
      * 配置回放视频所在的列表的类型
      */
-    public void setupVideoListType(int videoListType) {
+    public void setupVideoListType(PLVPlaybackListType videoListType) {
         this.videoListType = videoListType;
     }
 
@@ -169,7 +192,7 @@ public class PLVLiveChannelConfig {
     /**
      * 设置频道类型
      */
-    public void setChannelType(PolyvLiveChannelType channelType) {
+    public void setChannelType(PLVLiveChannelType channelType) {
         this.channelType = channelType;
     }
 
@@ -200,6 +223,15 @@ public class PLVLiveChannelConfig {
     public void setLiveStreamingWhenLogin(boolean liveStreamingWhenLogin) {
         isLiveStreamingWhenLogin = liveStreamingWhenLogin;
     }
+
+    /**
+     * 设置嘉宾跳过自动连麦，设置后即使开启了自动连麦，嘉宾也不会自动上麦
+     * 默认为false
+     */
+    public void setSkipAutoLinkMic(boolean skipAutoLinkMic) {
+        isSkipAutoLinkMic = skipAutoLinkMic;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -223,7 +255,7 @@ public class PLVLiveChannelConfig {
         return vid;
     }
 
-    public int getVideoListType() {
+    public PLVPlaybackListType getVideoListType() {
         return videoListType;
     }
 
@@ -232,7 +264,7 @@ public class PLVLiveChannelConfig {
     }
 
     //获取频道类型
-    public PolyvLiveChannelType getChannelType() {
+    public PLVLiveChannelType getChannelType() {
         return channelType;
     }
 
@@ -242,17 +274,17 @@ public class PLVLiveChannelConfig {
 
     //是否是三分屏频道类型
     public boolean isPPTChannelType() {
-        return channelType == PolyvLiveChannelType.PPT;
+        return channelType == PLVLiveChannelType.PPT;
     }
 
     //是否是纯视频频道类型
     public boolean isAloneChannelType() {
-        return channelType == PolyvLiveChannelType.ALONE;
+        return channelType == PLVLiveChannelType.ALONE;
     }
 
     //嘉宾是否是自动上麦
     public boolean isAutoLinkToGuest() {
-        return TextUtils.isEmpty(colinMicType) || PLVSLoginVO.COLINMICTYPE_AUTO.equals(colinMicType);
+        return TextUtils.isEmpty(colinMicType) || (PLVLoginVO.COLINMICTYPE_AUTO.equals(colinMicType) && !isSkipAutoLinkMic);
     }
 
     /**
@@ -317,6 +349,8 @@ public class PLVLiveChannelConfig {
             viewerAvatar = old.viewerAvatar;
             viewerType = old.viewerType;
             actor = old.actor;
+            param4 = old.param4;
+            param5 = old.param5;
         }
 
         /**
@@ -340,6 +374,14 @@ public class PLVLiveChannelConfig {
          * 用户的头衔，用于登录socket
          */
         private String actor;
+        /**
+         * 自定义统计参数4
+         */
+        private String param4;
+        /**
+         * 自定义统计参数5
+         */
+        private String param5;
 
         public String getViewerId() {
             return viewerId;
@@ -359,6 +401,14 @@ public class PLVLiveChannelConfig {
 
         public String getActor() {
             return actor;
+        }
+
+        public String getParam4() {
+            return param4;
+        }
+
+        public String getParam5() {
+            return param5;
         }
 
         @Override

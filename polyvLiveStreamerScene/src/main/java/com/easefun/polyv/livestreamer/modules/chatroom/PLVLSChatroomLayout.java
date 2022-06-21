@@ -1,7 +1,11 @@
 package com.easefun.polyv.livestreamer.modules.chatroom;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelStoreOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -20,14 +25,17 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVManagerChatViewModel;
+import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.vo.PLVManagerChatUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
@@ -38,7 +46,9 @@ import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListe
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
+import com.easefun.polyv.livecommon.ui.widget.imageview.PLVRedPointImageView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
@@ -48,7 +58,13 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
+import com.easefun.polyv.livestreamer.modules.managerchat.PLVLSManagerChatroomLayout;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.viewmodel.PLVViewModels;
+import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -64,12 +80,19 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * 聊天室布局
  */
 public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private static final int NOTIFY_UNREAD_MANAGER_CHAT_MESSAGE_INTERVAL = (int) TimeUnit.SECONDS.toMillis(30);
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
@@ -88,18 +111,33 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     private PLVSimpleSwipeRefreshLayout plvlsChatroomSwipeLoadView;
     private PLVMessageRecyclerView plvlsChatroomChatMsgRv;
     private TextView plvlsChatroomUnreadMsgTv;
+    private PLVRoundRectLayout plvlsChatroomControlLayout;
     private ImageView plvlsChatroomControlIv;
+    private PLVRedPointImageView plvlsChatroomManagerChatIv;
     private ImageView plvlsChatroomToolbarMicControlIv;
     private ImageView plvlsChatroomToolbarCameraControlIv;
     private ImageView plvlsChatroomToolbarFrontCameraControlIv;
     private TextView plvlsChatroomToolbarOpenInputWindowTv;
+
+    // 管理员私聊布局
+    @Nullable
+    private PLVLSManagerChatroomLayout managerChatroomLayout;
 
     //listener
     private OnViewActionListener onViewActionListener;
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean isDocumentMarkToolExpand = false;
+    private boolean isDocumentLayoutFullScreen = false;
+    private boolean isBeautyLayoutShowing = false;
+
     private long lastTimeClickFrontCameraControl = 0;
+    private int unreadManagerChatMessageCount = 0;
+    private int notifiedUnreadManagerChatMessageCount = 0;
+
+    private Disposable unreadManagerChatNotifyTimerDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -126,7 +164,9 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         plvlsChatroomSwipeLoadView = findViewById(R.id.plvls_chatroom_swipe_load_view);
         plvlsChatroomChatMsgRv = findViewById(R.id.plvls_chatroom_chat_msg_rv);
         plvlsChatroomUnreadMsgTv = findViewById(R.id.plvls_chatroom_unread_msg_tv);
+        plvlsChatroomControlLayout = findViewById(R.id.plvls_chatroom_control_layout);
         plvlsChatroomControlIv = findViewById(R.id.plvls_chatroom_control_iv);
+        plvlsChatroomManagerChatIv = findViewById(R.id.plvls_chatroom_manager_chat_iv);
         plvlsChatroomToolbarMicControlIv = findViewById(R.id.plvls_chatroom_toolbar_mic_control_iv);
         plvlsChatroomToolbarCameraControlIv = findViewById(R.id.plvls_chatroom_toolbar_camera_control_iv);
         plvlsChatroomToolbarFrontCameraControlIv = findViewById(R.id.plvls_chatroom_toolbar_front_camera_control_iv);
@@ -134,6 +174,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
         //初始化按钮点击事件
         plvlsChatroomControlIv.setOnClickListener(this);
+        plvlsChatroomManagerChatIv.setOnClickListener(this);
         plvlsChatroomToolbarMicControlIv.setOnClickListener(this);
         plvlsChatroomToolbarCameraControlIv.setOnClickListener(this);
         plvlsChatroomToolbarFrontCameraControlIv.setOnClickListener(this);
@@ -184,6 +225,11 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                     public boolean onSendMsg(String message) {
                         return sendChatMessage(message);
                     }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
                 });
             }
         });
@@ -205,6 +251,20 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
             }
         });
+
+        observeBeautyLayoutStatus();
+    }
+
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVLSChatroomLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
     }
     // </editor-fold>
 
@@ -221,6 +281,11 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
         initSocketLoginManager();
         showLinkMicType(liveRoomDataManager.isOnlyAudio());
+
+        initManagerChatroomLayout(liveRoomDataManager, chatroomPresenter);
+        observeManagerChatEnableStatus();
+        observeManagerChatNewMessageStatus();
+        updateManagerChatVisibility();
     }
 
     @Override
@@ -250,6 +315,18 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     }
 
     @Override
+    public void notifyDocumentMarkToolExpand(boolean isExpand) {
+        isDocumentMarkToolExpand = isExpand;
+        updateVisibility();
+    }
+
+    @Override
+    public void notifyDocumentLayoutFullScreen(boolean isFullScreen) {
+        isDocumentLayoutFullScreen = isFullScreen;
+        updateVisibility();
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (chatImageViewerFragment != null && chatImageViewerFragment.isVisible()) {
             chatImageViewerFragment.hide();
@@ -260,6 +337,14 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     @Override
     public void destroy() {
+        if (unreadManagerChatNotifyTimerDisposable != null) {
+            unreadManagerChatNotifyTimerDisposable.dispose();
+            unreadManagerChatNotifyTimerDisposable = null;
+        }
+        onChannelFeatureChangeListener = null;
+        if (managerChatroomLayout != null) {
+            managerChatroomLayout.destroy();
+        }
         destroySocketLoginManager();
         if (chatroomPresenter != null) {
             chatroomPresenter.destroy();
@@ -564,11 +649,11 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(PLVAppUtils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_kicked_streamer)
                         .build()
                         .show();
-                ((Activity)getContext()).finish();
+                ((Activity) getContext()).finish();
             }
         }
 
@@ -606,7 +691,8 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         int id = v.getId();
         if (id == R.id.plvls_chatroom_control_iv) {
             v.setSelected(!v.isSelected());
-            plvlsChatroomChatMsgLy.setVisibility(v.isSelected() ? View.INVISIBLE : View.VISIBLE);
+            final boolean showChatMsgLayout = !v.isSelected();
+            plvlsChatroomChatMsgLy.setVisibility(showChatMsgLayout ? View.VISIBLE : View.INVISIBLE);
         } else if (id == R.id.plvls_chatroom_toolbar_mic_control_iv) {
             if (onViewActionListener != null) {
                 onViewActionListener.onMicControl(!v.isSelected());
@@ -628,6 +714,10 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             }
         } else if (id == R.id.plvls_chatroom_toolbar_open_input_window_tv) {
             clickInputWindow();
+        } else if (id == plvlsChatroomManagerChatIv.getId()) {
+            if (managerChatroomLayout != null) {
+                managerChatroomLayout.show();
+            }
         }
     }
     // </editor-fold>
@@ -643,7 +733,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="连麦控制">
-    private void showLinkMicType(boolean isOnlyAudio){
+    private void showLinkMicType(boolean isOnlyAudio) {
         plvlsChatroomToolbarCameraControlIv.setVisibility(isOnlyAudio ? View.GONE : VISIBLE);
         plvlsChatroomToolbarFrontCameraControlIv.setVisibility(isOnlyAudio ? View.GONE : VISIBLE);
     }
@@ -653,11 +743,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
     /**
      * 改变输入框状态
+     *
      * @param isEnableInput 是否允许输入
      */
-    private void changeInputWindowState(boolean isEnableInput){
+    private void changeInputWindowState(boolean isEnableInput) {
         plvlsChatroomToolbarOpenInputWindowTv.setFocusable(isEnableInput);
-        if(isEnableInput){
+        if (isEnableInput) {
             plvlsChatroomToolbarOpenInputWindowTv.setText("有话要说...");
         } else {
             //聊天室断开无法连接时，不允许输入
@@ -668,12 +759,12 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     /**
      * 点击输入框
      */
-    private void clickInputWindow(){
+    private void clickInputWindow() {
 
-        if(!plvlsChatroomToolbarOpenInputWindowTv.isFocusable()){
+        if (!plvlsChatroomToolbarOpenInputWindowTv.isFocusable()) {
             PLVToast.Builder.context(getContext())
                     .setText(getResources().getString(R.string.plv_chat_connect_fail_and_cannot_input))
-                    .duration(Toast.LENGTH_LONG)
+                    .longDuration()
                     .build()
                     .show();
             return;
@@ -699,7 +790,127 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             public boolean onSendMsg(String message) {
                 return sendChatMessage(message);
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理 - UI更新">
+
+    private void updateVisibility() {
+        if (isBeautyLayoutShowing) {
+            setVisibility(GONE);
+            return;
+        }
+        if (isDocumentMarkToolExpand) {
+            setVisibility(GONE);
+            return;
+        }
+        if (isDocumentLayoutFullScreen) {
+            setVisibility(GONE);
+            return;
+        }
+        setVisibility(VISIBLE);
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="管理员私聊">
+
+    private void initManagerChatroomLayout(
+            IPLVLiveRoomDataManager liveRoomDataManager,
+            IPLVChatroomContract.IChatroomPresenter chatroomPresenter) {
+        managerChatroomLayout = new PLVLSManagerChatroomLayout(getContext());
+        managerChatroomLayout.init(liveRoomDataManager, chatroomPresenter);
+        createTimerForUnreadManagerChatMessageNotify();
+    }
+
+    private PLVChannelFeatureManager.OnChannelFeatureChangeListener onChannelFeatureChangeListener = new PLVChannelFeatureManager.OnChannelFeatureChangeListener() {
+        @Override
+        public void onChannelFeatureChange(@Nullable String channelId, @NonNull PLVChannelFeature channelFeature) {
+            if (channelFeature == PLVChannelFeature.LIVE_CHATROOM_MANAGER_CHAT) {
+                updateManagerChatVisibility();
+            }
+        }
+    };
+
+    private void observeManagerChatEnableStatus() {
+        if (liveRoomDataManager == null) {
+            return;
+        }
+        PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .addOnChannelFeatureChangeListener(onChannelFeatureChangeListener);
+    }
+
+    private void observeManagerChatNewMessageStatus() {
+        PLVViewModels.on((ViewModelStoreOwner) getContext()).get(PLVManagerChatViewModel.class)
+                .getUiStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVManagerChatUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVManagerChatUiState uiState) {
+                        if (uiState == null || managerChatroomLayout == null) {
+                            return;
+                        }
+                        if (uiState.getUnreadMessageCount() < unreadManagerChatMessageCount) {
+                            notifiedUnreadManagerChatMessageCount = 0;
+                        }
+                        unreadManagerChatMessageCount = uiState.getUnreadMessageCount();
+                        final boolean hasNewMessage = uiState.getUnreadMessageCount() > 0;
+                        plvlsChatroomManagerChatIv.setDrawRedPoint(hasNewMessage && !managerChatroomLayout.isShowing());
+                    }
+                });
+    }
+
+    private void updateManagerChatVisibility() {
+        if (liveRoomDataManager == null) {
+            return;
+        }
+        if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_MANAGER_CHAT)) {
+            plvlsChatroomManagerChatIv.setVisibility(VISIBLE);
+            final int paddingHorizon = ConvertUtils.dp2px(6);
+            plvlsChatroomControlLayout.setPadding(paddingHorizon, 0, paddingHorizon, 0);
+        } else {
+            plvlsChatroomManagerChatIv.setVisibility(GONE);
+            plvlsChatroomControlLayout.setPadding(0, 0, 0, 0);
+        }
+    }
+
+    private void createTimerForUnreadManagerChatMessageNotify() {
+        if (unreadManagerChatNotifyTimerDisposable != null) {
+            unreadManagerChatNotifyTimerDisposable.dispose();
+            unreadManagerChatNotifyTimerDisposable = null;
+        }
+
+        unreadManagerChatNotifyTimerDisposable = PLVRxTimer.timer(
+                NOTIFY_UNREAD_MANAGER_CHAT_MESSAGE_INTERVAL,
+                NOTIFY_UNREAD_MANAGER_CHAT_MESSAGE_INTERVAL,
+                new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        final int needNotifyCount = unreadManagerChatMessageCount - notifiedUnreadManagerChatMessageCount;
+                        notifiedUnreadManagerChatMessageCount = unreadManagerChatMessageCount;
+
+                        if (needNotifyCount <= 0 || getContext() == null) {
+                            return;
+                        }
+                        final boolean isChatLayoutShowing = plvlsChatroomChatMsgLy.getVisibility() == View.VISIBLE;
+                        final boolean isManagerChatShowing = managerChatroomLayout != null && managerChatroomLayout.isShowing();
+                        final boolean needNotifyManagerChat = !isChatLayoutShowing && !isManagerChatShowing;
+                        if (!needNotifyManagerChat) {
+                            return;
+                        }
+
+                        PLVToast.Builder.context(getContext())
+                                .setText(format(getContext().getString(R.string.plvls_manager_chatroom_unread_message_notify), needNotifyCount))
+                                .longDuration()
+                                .show();
+                    }
+                });
+    }
+
+    // </editor-fold>
 }

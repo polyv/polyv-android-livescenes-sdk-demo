@@ -69,6 +69,32 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         notifyItemRangeInserted(0, dataList.size());
     }
 
+    public boolean addDataListChangedAtHead(List<PLVBaseViewData> list) {
+        int oldSize = dataList.size();
+        dataList.addAll(0, list);
+        if (dataList.size() != oldSize) {
+            notifyItemRangeInserted(0, dataList.size() - oldSize);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeDataChanged(int startPosition, int count) {
+        if (startPosition < 0 || count <= 0) {
+            return false;
+        }
+        int oldSize = dataList.size();
+        int removeCount = count;
+        while (removeCount > 0) {
+            dataList.remove(startPosition);
+            removeCount--;
+        }
+        if (dataList.size() != oldSize) {
+            notifyItemRangeRemoved(startPosition, count);
+        }
+        return true;
+    }
+
     public void removeDataChanged(String id) {
         if (TextUtils.isEmpty(id)) {
             return;
@@ -114,8 +140,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                         this
                 );
                 break;
-            case PLVChatMessageItemType.ITEMTYPE_CUSTOM_GIFT:
-                viewHolder = new PLVECChatMessageCustomGiftViewHolder(
+            case PLVChatMessageItemType.ITEMTYPE_REWARD:
+                viewHolder = new PLVECChatMessageRewardViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_custom_gift_item, parent, false),
                         this
                 );

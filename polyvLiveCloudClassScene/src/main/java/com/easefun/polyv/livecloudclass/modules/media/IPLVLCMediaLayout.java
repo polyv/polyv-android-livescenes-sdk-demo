@@ -5,13 +5,15 @@ import android.util.Pair;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -98,6 +100,13 @@ public interface IPLVLCMediaLayout {
     PLVLCChatLandscapeLayout getChatLandscapeLayout();
 
     /**
+     * 获取播放器自定义水印
+     *
+     * @return logoview
+     */
+    PLVPlayerLogoView getLogoView();
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器
@@ -138,7 +147,7 @@ public interface IPLVLCMediaLayout {
      *
      * @param landscapeControllerView 横屏控制器
      */
-    void setLandscapeControllerView(@NonNull IPLVLiveLandscapePlayerController landscapeControllerView);
+    void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView);
 
     /**
      * 更新观看热度
@@ -146,6 +155,11 @@ public interface IPLVLCMediaLayout {
      * @param viewerCount 热度数
      */
     void updateViewerCount(long viewerCount);
+
+    /**
+     * 更新ppt状态数据变更
+     */
+    void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
 
     /**
      * 当加入RTC时，更新布局
@@ -158,6 +172,25 @@ public interface IPLVLCMediaLayout {
      * 当离开RTC时，更新布局
      */
     void updateWhenLeaveRTC();
+
+    void updateWhenLinkMicOpenStatusChanged(boolean isOpen);
+
+    void updateWhenRequestJoinLinkMic(boolean requestJoin);
+
+    /**
+     * 加入连麦
+     */
+    void updateWhenJoinLinkMic();
+
+    /**
+     * 离开连麦
+     */
+    void updateWhenLeaveLinkMic();
+
+    /**
+     * 更新网络质量
+     */
+    void acceptNetworkQuality(int quality);
 
     void notifyRTCPrepared();
 
@@ -186,6 +219,11 @@ public interface IPLVLCMediaLayout {
      * 隐藏横屏RTC布局。
      */
     void setHideLandscapeRTCLayout();
+
+    /**
+     * 设置横屏打赏特效显示
+     */
+    void setLandscapeRewardEffectVisibility(boolean isShow);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -196,6 +234,13 @@ public interface IPLVLCMediaLayout {
      * @return 视频总时长，单位：毫秒
      */
     int getDuration();
+
+    /**
+     * 获取视频当前播放时间
+     *
+     * @return 视频当前播放时间，单位：毫秒
+     */
+    int getVideoCurrentPosition();
 
     /**
      * 根据progress占max的百分比，跳转到视频总时间的该百分比进度
@@ -232,6 +277,37 @@ public interface IPLVLCMediaLayout {
      * @param listener 监听器
      */
     void addOnPlayInfoVOListener(IPLVOnDataChangedListener<PLVPlayInfoVO> listener);
+
+    /**
+     * 添加seek完成监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
+     * 更换回放视频的vid
+     *
+     * @param vid 回放视频的vid
+     */
+    void updatePlayBackVideVid(String vid);
+
+    /**
+     * 更换回放视频vid并且立即播放
+     *
+     * @param vid 回放视频的vid
+     */
+    void updatePlayBackVideVidAndPlay(String vid);
+
+    /**
+     * 获取sessionId
+     */
+    String getSessionId();
+
+    /**
+     * 设置聊天回放是否可用
+     */
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">
@@ -268,9 +344,39 @@ public interface IPLVLCMediaLayout {
         void onShowBulletinAction();
 
         /**
+         * 显示打赏动作（直播独有）
+         */
+        void onShowRewardAction();
+
+        /**
          * 发送点赞动作
          */
         void onSendLikesAction();
+
+        /**
+         * PPT翻页（直播独有）
+         */
+        void onPPTTurnPage(String type);
+
+        /**
+         * 修改无延迟观看模式
+         *
+         * @param watchLowLatency 是否无延迟观看
+         */
+        void onWatchLowLatency(boolean watchLowLatency);
+
+        /**
+         * rtc观看切换暂停和恢复播放
+         *
+         * @param toPause 是否切换到暂停状态
+         */
+        void onRtcPauseResume(boolean toPause);
+
+        /**
+         * rtc观看是否正在暂停
+         */
+        boolean isRtcPausing();
+
     }
     // </editor-fold>
 

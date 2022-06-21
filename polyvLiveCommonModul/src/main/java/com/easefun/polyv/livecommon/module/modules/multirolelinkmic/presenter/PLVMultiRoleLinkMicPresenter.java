@@ -10,9 +10,9 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import android.view.SurfaceView;
+import android.text.TextUtils;
+import android.view.View;
 
-import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
@@ -23,35 +23,43 @@ import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.da
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.IPLVHiClassManager;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.PLVHiClassManager;
 import com.plv.livescenes.hiclass.PLVHiClassManagerFactory;
+import com.plv.livescenes.hiclass.api.PLVHCApiManager;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.linkmic.listener.PLVLinkMicEventListener;
 import com.plv.livescenes.linkmic.listener.PLVLinkMicListener;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicManagerFactory;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.livescenes.streamer.linkmic.PLVLinkMicEventSender;
 import com.plv.socket.event.linkmic.PLVJoinResponseAckResult;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.user.PLVClassStatusBean;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -63,6 +71,7 @@ import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model
 import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATED;
 import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATING;
 import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_UNINITIATED;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * mvp-多角色连麦presenter层实现，实现 IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicPresenter 接口
@@ -70,6 +79,7 @@ import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model
 public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicPresenter {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVMultiRoleLinkMicPresenter";
+    private static final long JOIN_DISCUSS_COUNTDOWN_TIME = 3000;
     private static final long CAN_SWITCH_CAMERA_AFTER_INIT = 1200;
     /**** Model ****/
     //直播间数据管理器
@@ -111,6 +121,18 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     private boolean isTeacherType;
     //是否前置摄像头预览镜像
     private boolean isFrontPreviewMirror = false;
+    //当前连麦清晰度
+    private int currentBitrate = PLVLinkMicConstant.Bitrate.BITRATE_STANDARD;
+    //分组讨论的分组Id
+    private String groupId;
+    //分组Id对应的组名
+    private String groupName;
+    //是否是切换分组
+    private boolean isGroupChanged;
+    //是否是切换组长
+    private boolean isLeaderChanged;
+    //是否触发了加入讨论
+    private boolean isCallJoinDiscuss;
 
     /**** View ****/
     //连麦mvp模式的view
@@ -118,6 +140,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
 
     //disposable
     private Disposable getMemberListLessDisposable;
+    private Disposable getGroupNameDisposable;
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
     // </editor-fold>
@@ -190,18 +213,14 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         if (!checkSelMediaPermission()) {
             return;
         }
-        int channelId;
-        try {
-            channelId = Integer.parseInt(liveRoomDataManager.getConfig().getChannelId());
-        } catch (NumberFormatException e) {
-            String tips = Utils.getApp().getString(R.string.plv_linkmic_toast_invalid_channel_format)
-                    + liveRoomDataManager.getConfig().getChannelId();
-            PLVCommonLog.d(TAG, tips);
-            ToastUtils.showShort(tips);
-            return;
-        }
         linkMicInitState = LINK_MIC_INITIATING;
-        linkMicManager.initEngine(channelId, new PLVLinkMicListener() {
+        final PLVLinkMicEngineParam param = new PLVLinkMicEngineParam()
+                .setChannelId(liveRoomDataManager.getConfig().getChannelId())
+                .setGroupId(groupId)
+                .setViewerId(liveRoomDataManager.getConfig().getUser().getViewerId())
+                .setViewerType(liveRoomDataManager.getConfig().getUser().getViewerType())
+                .setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+        linkMicManager.initEngine(param, new PLVLinkMicListener() {
             @Override
             public void onLinkMicEngineCreatedSuccess() {
                 PLVCommonLog.d(TAG, "连麦初始化成功");
@@ -273,7 +292,6 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
 
     @Override
     public void leaveChannel() {
-        linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
         linkMicManager.leaveChannel();
     }
 
@@ -351,22 +369,30 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     }
 
     @Override
+    public void setPushPictureResolutionType(int type) {
+        if (linkMicManager == null) {
+            return;
+        }
+        linkMicManager.setPushPictureResolutionType(type);
+    }
+
+    @Override
     public void requestMemberList() {
         memberList.requestData();
     }
 
     @Override
-    public SurfaceView createRenderView(Context context) {
-        return linkMicManager.createRendererView(context);
+    public View createRenderView(Context context) {
+        return linkMicManager.createTextureRenderView(context);
     }
 
     @Override
-    public void releaseRenderView(SurfaceView renderView) {
+    public void releaseRenderView(View renderView) {
         linkMicManager.releaseRenderView(renderView);
     }
 
     @Override
-    public void setupRenderView(SurfaceView renderView, String linkMicId) {
+    public void setupRenderView(View renderView, String linkMicId) {
         if (isMyLinkMicId(linkMicId)) {
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
@@ -375,7 +401,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     }
 
     @Override
-    public void setupRenderView(SurfaceView renderView, String linkMicId, int streamType) {
+    public void setupRenderView(View renderView, String linkMicId, int streamType) {
         if (isMyLinkMicId(linkMicId)) {
             linkMicManager.setupLocalVideo(renderView, linkMicId);
         } else {
@@ -551,6 +577,11 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         return hiClassManager.getLimitLinkNumber();
     }
 
+    @Override
+    public boolean isJoinDiscuss() {
+        return !TextUtils.isEmpty(groupId);
+    }
+
     @NonNull
     @Override
     public PLVMultiRoleLinkMicData getData() {
@@ -569,11 +600,12 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         }
         handler.removeCallbacksAndMessages(null);
         dispose(getMemberListLessDisposable);
-        linkMicManager.destroy();
+        dispose(getGroupNameDisposable);
         eventProcessor.destroy();
         linkMicList.destroy();
         memberList.destroy();
         hiClassManager.destroy();
+        linkMicManager.destroy();
         PLVLinkMicConfig.getInstance().clear();
     }
     // </editor-fold>
@@ -636,6 +668,115 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="分组讨论 - 逻辑处理">
+    private void acceptJoinDiscuss(final String groupId, boolean isInClass, final String leaderId, final PLVSwitchRoomEvent switchRoomEvent) {
+        if (this.groupId != null
+                && this.groupId.equals(groupId)) {
+            if (isMyLinkMicId(leaderId)) {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        //需要回调自己获得组长，因为重连后讲师会回收画笔权限
+                        view.onUserHasGroupLeader(true, liveRoomDataManager.getConfig().getUser().getViewerName(), false, true, groupName, leaderId);
+                    }
+                });
+            }
+            return;
+        }
+        isGroupChanged = isJoinDiscuss();
+        this.groupId = groupId;
+        if (!isGroupChanged) {
+            linkMicList.removeMyItemToLinkMicList();
+            switchRoleToAudience();
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onWillJoinDiscuss(JOIN_DISCUSS_COUNTDOWN_TIME);
+                }
+            });
+        }
+        isLeaderChanged = false;
+        isCallJoinDiscuss = false;
+        isInClassStatus = isInClass;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dispose(getGroupNameDisposable);
+                getGroupNameDisposable = PLVHCApiManager.getInstance().getGroupName(groupId).subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(final String groupName) throws Exception {
+                        callJoinDiscuss(groupName, leaderId, switchRoomEvent);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        callJoinDiscuss("", leaderId, switchRoomEvent);
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+            }
+        }, isGroupChanged ? 0 : JOIN_DISCUSS_COUNTDOWN_TIME);
+    }
+
+    private void callJoinDiscuss(final String groupName, String leaderId, final PLVSwitchRoomEvent switchRoomEvent) {
+        //1.先回调到上层releaseRenderView后，再创建新的linkMicManager
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                view.onJoinDiscuss(groupId, groupName, switchRoomEvent);
+            }
+        });
+        this.groupName = groupName;
+        isCallJoinDiscuss = true;
+        handleDiscussChanged(leaderId);
+    }
+
+    private void acceptLeaveDiscuss(final PLVSwitchRoomEvent switchRoomEvent) {
+        if (groupId == null) {
+            return;
+        }
+        groupId = null;
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                view.onLeaveDiscuss(switchRoomEvent);
+            }
+        });
+        isInClassStatus = false;
+        handleDiscussChanged(null);
+    }
+
+    private void handleDiscussChanged(String leaderId) {
+        linkMicInitState = LINK_MIC_UNINITIATED;
+        joinChannelStatus = JOIN_CHANNEL_UN;
+        initiatedTasks.clear();
+        autoLinkResponseList.clear();
+        handler.removeCallbacksAndMessages(null);
+        dispose(getMemberListLessDisposable);
+        dispose(getGroupNameDisposable);
+        //1.销毁memberList、linkMicList
+        memberList.destroy();
+        linkMicList.destroy();
+        //初始化连麦列表
+        initLinkMicList();
+        //初始化成员列表
+        initMemberList(linkMicList);
+        memberList.setGroupId(groupId);
+        memberList.setLeaderId(leaderId);
+        //2.销毁linkMicManager
+        linkMicManager.destroy();
+        //create linkMicManager
+        linkMicManager = PLVLinkMicManagerFactory.createNewLinkMicManager();
+        init();
+        joinChannel();//加入频道
+        requestMemberList();//请求成员列表
+        //由于linkMicManager初始化为前置摄像头镜像，所以这里要保存之前的状态
+        boolean isCameraFront = curCameraFront;
+        curCameraFront = true;
+        switchCamera(isCameraFront);
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部方法">
     private void acceptSwitchCameraTask(Runnable runnable) {
         if (linkMicList.getLinkMicItemWithLinkMicId(myLinkMicId) != null) {
@@ -668,6 +809,10 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         }
     }
 
+    private String getRoomIdCombineDiscuss() {
+        return isJoinDiscuss() ? groupId : liveRoomDataManager.getConfig().getChannelId();
+    }
+
     private boolean isMySocketUserId(String userId) {
         return userId != null && userId.equals(liveRoomDataManager.getConfig().getUser().getViewerId());
     }
@@ -688,6 +833,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         memberList.observeRTCEvent(linkMicManager);
         linkMicList.observeRTCEvent(linkMicManager);
         eventProcessor.observeRTCEvent(linkMicManager);
+        registerOnRejoinRoomListener();
     }
 
     private boolean checkSelMediaPermission() {
@@ -714,15 +860,36 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
             }
         });
     }
+
+    private void onMyMicSiteChanged(boolean zoomIn) {
+        final Integer serverRtcMaxResolution = nullable(new PLVSugarUtil.Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return liveRoomDataManager.getHiClassDataBean().getValue().getRtcMaxResolution();
+            }
+        });
+        if (serverRtcMaxResolution == null || serverRtcMaxResolution == 0) {
+            return;
+        }
+
+        int targetBitrate;
+        if (zoomIn) {
+            targetBitrate = PLVLinkMicConstant.Bitrate.mapFromServerResolution(serverRtcMaxResolution);
+        } else {
+            targetBitrate = PLVLinkMicConstant.Bitrate.BITRATE_STANDARD;
+        }
+        if (targetBitrate != currentBitrate) {
+            linkMicManager.setBitrate(targetBitrate);
+            currentBitrate = targetBitrate;
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - socket、rtc事件接收器">
     private class OnEventProcessorListenerImpl implements PLVMultiRoleEventProcessor.OnEventProcessorListener {
         @Override
         public void onAcceptMyJoinLeave(boolean isByTeacherControl) {
-            isInClassStatus = false;
-            switchRoleToAudience();//切换rtc身份
-            if (isByTeacherControl) {
+            if (isByTeacherControl && isInClassStatus) {
                 callbackToView(new ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
@@ -730,6 +897,8 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                     }
                 });
             }
+            isInClassStatus = false;
+            switchRoleToAudience();//切换rtc身份
         }
 
         @Override
@@ -738,7 +907,14 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
             if (!isInClassStatus) {
                 switchRoleToAudience();//切换rtc身份
             } else {
-                switchRoleToBroadcaster();//切换rtc身份
+                if (isJoinDiscuss()) {
+                    if (isCallJoinDiscuss) {
+                        switchRoleToBroadcaster();//切换rtc身份
+                        linkMicList.addMyItemToLinkMicList(curEnableLocalVideo, curEnableLocalAudio);
+                    }
+                } else {
+                    switchRoleToBroadcaster();//切换rtc身份
+                }
             }
         }
 
@@ -831,6 +1007,134 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                 }
             });
         }
+
+        @Override
+        public void onTeacherInfo(final String nick) {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onTeacherInfo(nick);
+                }
+            });
+        }
+
+        @Override
+        public void onResponseJoinForDiscuss() {
+            if (isJoinDiscuss() && !isInClassStatus) {
+                isInClassStatus = true;
+                if (isCallJoinDiscuss) {
+                    switchRoleToBroadcaster();
+                    linkMicList.addMyItemToLinkMicList(curEnableLocalVideo, curEnableLocalAudio);
+                }
+            }
+        }
+
+        @Override
+        public void onJoinDiscuss(final String groupId, boolean isInClass, @Nullable String leaderId, PLVSwitchRoomEvent switchRoomEvent) {
+            acceptJoinDiscuss(groupId, isInClass, leaderId, switchRoomEvent);
+        }
+
+        @Override
+        public void onLeaveDiscuss(PLVSwitchRoomEvent switchRoomEvent) {
+            acceptLeaveDiscuss(switchRoomEvent);
+        }
+
+        @Override
+        public void onTeacherJoinDiscuss(final boolean isJoin) {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onTeacherJoinDiscuss(isJoin);
+                }
+            });
+        }
+
+        @Override
+        public void onTeacherSendBroadcast(final String content) {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onTeacherSendBroadcast(content);
+                }
+            });
+        }
+
+        @Override
+        public void onLeaderRequestHelp() {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onLeaderRequestHelp();
+                }
+            });
+        }
+
+        @Override
+        public void onLeaderCancelHelp() {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onLeaderCancelHelp();
+                }
+            });
+        }
+
+        @Override
+        public void onUpdateLinkMicZoom(final PLVUpdateMicSiteEvent updateMicSiteEvent) {
+            if (myLinkMicId != null && myLinkMicId.equals(updateMicSiteEvent.getLinkMicIdFromEventId())) {
+                onMyMicSiteChanged(true);
+            }
+            if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.HI_CLASS_ZOOM_NEED_REACT_UPDATE_EVENT)) {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        view.onUpdateLinkMicZoom(updateMicSiteEvent);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onRemoveLinkMicZoom(final PLVRemoveMicSiteEvent removeMicSiteEvent) {
+            if (myLinkMicId != null && myLinkMicId.equals(removeMicSiteEvent.getLinkMicIdFromEventId())) {
+                onMyMicSiteChanged(false);
+            }
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onRemoveLinkMicZoom(removeMicSiteEvent);
+                }
+            });
+        }
+
+        @Override
+        public void onChangeLinkMicZoom(@Nullable final Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap) {
+            final boolean isMyselfZoomIn = myLinkMicId != null && updateMicSiteEventMap != null && updateMicSiteEventMap.containsKey(myLinkMicId);
+            onMyMicSiteChanged(isMyselfZoomIn);
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onChangeLinkMicZoom(updateMicSiteEventMap);
+                }
+            });
+        }
+    }
+
+    private void registerOnRejoinRoomListener() {
+        if (linkMicManager == null) {
+            return;
+        }
+        linkMicManager.addEventHandler(new PLVLinkMicEventListener() {
+            @Override
+            public void onRejoinChannelSuccess(String channel, String uid) {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        view.onRejoinRoomSuccess();
+                    }
+                });
+            }
+        });
     }
     // </editor-fold>
 
@@ -1038,6 +1342,23 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                 }
             });
         }
+
+        @Override
+        public void onUserHasGroupLeader(final boolean isHasGroupLeader, final String nick, @Nullable final String leaderId) {
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                    view.onUserHasGroupLeader(isHasGroupLeader, nick, isGroupChanged, isLeaderChanged, groupName, leaderId);
+                }
+            });
+            isLeaderChanged = true;
+            linkMicList.notifyLeaderChanged(leaderId);
+        }
+
+        @Override
+        public void onLeaveDiscuss() {
+            acceptLeaveDiscuss(null);
+        }
     }
     // </editor-fold>
 
@@ -1082,6 +1403,15 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
                     view.onLessonEnd(inClassTime, isFromApi, dataVO);
                 }
             });
+            if (!isTeacherType) {
+                //下课后收回画笔权限
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicView view) {
+                        view.onUserHasPaint(true, false, -1, -1);
+                    }
+                });
+            }
         }
 
         @Override

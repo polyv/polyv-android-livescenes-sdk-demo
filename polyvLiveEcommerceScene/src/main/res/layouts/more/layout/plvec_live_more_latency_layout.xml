@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/colorEbonyClay"
+    tools:layout_gravity="bottom"
+    tools:layout_height="130dp">
+
+    <include
+        layout="@layout/plvec_widget_blur_top_radius_layout"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_alignParentBottom="true" />
+
+    <LinearLayout
+        android:id="@+id/plvec_live_more_latency_ly"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/plvec_margin_common"
+        android:paddingTop="20dp"
+        android:paddingRight="@dimen/plvec_margin_common">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/plvec_live_more_latency_back_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="8dp"
+                android:src="@drawable/plvec_live_more_latency_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="模式"
+                android:textColor="#ffffff"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plvec_live_more_latency_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/plvec_live_more_low_latency_tv"
+                android:layout_width="66dp"
+                android:layout_height="26dp"
+                android:background="@drawable/plvec_route_corner_bg_sel"
+                android:gravity="center"
+                android:text="无延迟"
+                android:textColor="@color/plvec_route_fg"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plvec_live_more_normal_latency_tv"
+                android:layout_width="66dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="16dp"
+                android:background="@drawable/plvec_route_corner_bg_sel"
+                android:gravity="center"
+                android:text="正常延迟"
+                android:textColor="@color/plvec_route_fg"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/plvec_live_more_latency_close_iv"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_alignTop="@+id/plvec_live_more_latency_ly"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="6dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/plvec_popup_close" />
+</RelativeLayout>

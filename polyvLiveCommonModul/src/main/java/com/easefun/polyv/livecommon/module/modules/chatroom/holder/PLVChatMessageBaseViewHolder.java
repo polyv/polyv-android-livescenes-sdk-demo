@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.chatroom.holder;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.easefun.polyv.businesssdk.model.chat.PolyvAnswerVO;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -12,6 +13,8 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgContent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -142,6 +145,19 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromUser(tAnswerEvent.getUser());
             int validIndex = Math.min(tAnswerEvent.getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) tAnswerEvent.getObjects()[validIndex];
+            //如msgType为image类型说明发送的speakMsg为json串
+            if(tAnswerEvent.getMsgType()!=null && tAnswerEvent.getMsgType().equalsIgnoreCase(PLVTAnswerEvent.TYPE_IMAGE)){
+                String msg  = speakMsg.toString();
+                PolyvAnswerVO imgAnswerEvent = PLVGsonUtil.fromJson(PolyvAnswerVO.class,msg);
+                if(imgAnswerEvent!=null){
+                    chatImgUrl = imgAnswerEvent.getUrl();
+                    chatImgWidth = (int) imgAnswerEvent.getWidth();
+                    chatImgHeight =(int) imgAnswerEvent.getHeight();
+                    tAnswerEvent.setObj1(chatImgUrl);
+                    speakMsg = null;
+                }
+            }
+
         } else if (messageData instanceof PLVSpeakHistoryEvent) {//历史发言信息
             PLVSpeakHistoryEvent speakHistoryEvent = (PLVSpeakHistoryEvent) messageData;
             fillFieldFromUser(speakHistoryEvent.getUser());
@@ -173,7 +189,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             giftDrawableId = ((PLVCustomGiftEvent) messageData).getGiftDrawableId();
         } else if (messageData instanceof PLVChatEmotionEvent){ // 个性图片表情消息
             PLVChatEmotionEvent emotionEvent = (PLVChatEmotionEvent) messageData;
-            if(emotionEvent.getUser() == null) {
+            if (emotionEvent.getUser() == null) {
                 fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             } else {
                 fillFieldFromUser(emotionEvent.getUser());
@@ -182,6 +198,36 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
 
             chatImgWidth = ConvertUtils.dp2px(80);
             chatImgHeight = ConvertUtils.dp2px(80);
+        } else if (messageData instanceof PLVChatPlaybackData) { // 聊天回放数据
+            PLVChatPlaybackData chatPlaybackData = (PLVChatPlaybackData) messageData;
+            userType = chatPlaybackData.getUserType();
+            nickName = chatPlaybackData.getNick();
+            userId = chatPlaybackData.getUserId();
+            avatar = chatPlaybackData.getPic();
+            actor = chatPlaybackData.getActor();
+            if (chatPlaybackData.getObjects() != null) {
+                int validIndex = Math.min(chatPlaybackData.getObjects().length - 1, msgIndex);
+                speakMsg = (CharSequence) chatPlaybackData.getObjects()[validIndex];
+                chatQuoteVO = chatPlaybackData.getChatQuoteVO();
+                if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
+                    if (chatQuoteVO.getObjects() != null) {
+                        quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                    }
+                }
+            }
+            PLVChatImgContent chatImgContent = chatPlaybackData.getChatImgContent();
+            if (chatImgContent != null) {
+                chatImgUrl = chatImgContent.getUploadImgUrl();
+                if (chatImgContent.getSize() != null) {
+                    chatImgWidth = (int) chatImgContent.getSize().getWidth();
+                    chatImgHeight = (int) chatImgContent.getSize().getHeight();
+                }
+                if ("emotion".equals(chatImgContent.getType())) {
+                    //图片表情要80
+                    chatImgWidth = ConvertUtils.dp2px(80);
+                    chatImgHeight = ConvertUtils.dp2px(80);
+                }
+            }
         }
     }
 

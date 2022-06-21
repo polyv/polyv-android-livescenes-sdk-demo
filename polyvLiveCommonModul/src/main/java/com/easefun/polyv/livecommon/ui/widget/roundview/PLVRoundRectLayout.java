@@ -4,13 +4,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Outline;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.os.Build;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.widget.RelativeLayout;
 
 import com.easefun.polyv.livecommon.R;
@@ -27,12 +23,17 @@ public class PLVRoundRectLayout extends RelativeLayout {
     private int mHeight;
     private int mLastRadius;
 
+    public static final int MODE_LEFT_TOP = 1;
+    public static final int MODE_LEFT_BOTTOM = 2;
+    public static final int MODE_RIGHT_TOP = 4;
+    public static final int MODE_RIGHT_BOTTOM = 8;
+
     public static final int MODE_NONE = 0;
-    public static final int MODE_ALL = 1;
-    public static final int MODE_LEFT = 2;
-    public static final int MODE_TOP = 3;
-    public static final int MODE_RIGHT = 4;
-    public static final int MODE_BOTTOM = 5;
+    public static final int MODE_ALL = MODE_LEFT_TOP | MODE_LEFT_BOTTOM | MODE_RIGHT_TOP | MODE_RIGHT_BOTTOM;
+    public static final int MODE_LEFT = MODE_LEFT_TOP | MODE_LEFT_BOTTOM;
+    public static final int MODE_TOP = MODE_LEFT_TOP | MODE_RIGHT_TOP;
+    public static final int MODE_RIGHT = MODE_RIGHT_TOP | MODE_RIGHT_BOTTOM;
+    public static final int MODE_BOTTOM = MODE_LEFT_BOTTOM | MODE_RIGHT_BOTTOM;
 
     private int mRoundMode = MODE_ALL;
 
@@ -48,6 +49,7 @@ public class PLVRoundRectLayout extends RelativeLayout {
 
     public PLVRoundRectLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setWillNotDraw(false);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVRoundRectLayout, defStyleAttr, 0);
         int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectLayout_radius, 10);
@@ -57,19 +59,6 @@ public class PLVRoundRectLayout extends RelativeLayout {
         mRoundMode = mode;
         setCornerRadius(radius);
         init();
-
-        if (Build.VERSION.SDK_INT >= 21 && mRoundMode == MODE_ALL) {
-            mRoundMode = MODE_NONE;
-            setOutlineProvider(new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        outline.setRoundRect(0, 0, getWidth(), getHeight(), mRadius);
-                    }
-                }
-            });
-            setClipToOutline(true);
-        }
     }
 
     private void init() {
@@ -122,39 +111,21 @@ public class PLVRoundRectLayout extends RelativeLayout {
 
         mPath.reset();
 
-        switch (mRoundMode) {
-            case MODE_ALL:
-                mPath.addRoundRect(new RectF(0, 0, mWidth, mHeight), mRadius, mRadius, Path.Direction.CW);
-                break;
-            case MODE_LEFT:
-                mPath.addRoundRect(new RectF(0, 0, mWidth, mHeight),
-                        new float[]{mRadius, mRadius, 0, 0, 0, 0, mRadius, mRadius},
-                        Path.Direction.CW);
-                break;
-            case MODE_TOP:
-                mPath.addRoundRect(new RectF(0, 0, mWidth, mHeight),
-                        new float[]{mRadius, mRadius, mRadius, mRadius, 0, 0, 0, 0},
-                        Path.Direction.CW);
-                break;
-            case MODE_RIGHT:
-                mPath.addRoundRect(new RectF(0, 0, mWidth, mHeight),
-                        new float[]{0, 0, mRadius, mRadius, mRadius, mRadius, 0, 0},
-                        Path.Direction.CW);
-                break;
-            case MODE_BOTTOM:
-                mPath.addRoundRect(new RectF(0, 0, mWidth, mHeight),
-                        new float[]{0, 0, 0, 0, mRadius, mRadius, mRadius, mRadius},
-                        Path.Direction.CW);
-                break;
-            default:
-                break;
-        }
+        final float radiusLeftTop = (mRoundMode & MODE_LEFT_TOP) != 0 ? mRadius : 0;
+        final float radiusLeftBottom = (mRoundMode & MODE_LEFT_BOTTOM) != 0 ? mRadius : 0;
+        final float radiusRightTop = (mRoundMode & MODE_RIGHT_TOP) != 0 ? mRadius : 0;
+        final float radiusRightBottom = (mRoundMode & MODE_RIGHT_BOTTOM) != 0 ? mRadius : 0;
+
+        mPath.addRoundRect(
+                new RectF(0, 0, mWidth, mHeight),
+                new float[]{radiusLeftTop, radiusLeftTop, radiusRightTop, radiusRightTop, radiusRightBottom, radiusRightBottom, radiusLeftBottom, radiusLeftBottom},
+                Path.Direction.CCW
+        );
 
     }
 
     @Override
     public void draw(Canvas canvas) {
-
         if (mRoundMode != MODE_NONE) {
             int saveCount = canvas.save();
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.net.Uri;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
@@ -22,9 +23,10 @@ import com.easefun.polyv.livescenes.document.model.PLVSEditTextInfo;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVMessageBaseEvent;
@@ -101,6 +103,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     @Nullable
     private PLVPptUploadLocalRepository plvPptUploadLocalRepository;
 
+    @Nullable
+    private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
+
     /**
      * 标志位 是否正在推流
      * 非推流状态不上传画笔数据
@@ -120,6 +125,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                      PLVSDocumentWebProcessor documentWebProcessor) {
         isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
         initRepository(liveRoomDataManager, documentWebProcessor);
+        initOnUserAbilityChangeListener();
         initSocketListener();
 
         observeRefreshPptMessage(lifecycleOwner);
@@ -159,11 +165,29 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     }
 
     /**
+     * 初始化用户角色能力变化监听
+     */
+    private void initOnUserAbilityChangeListener() {
+        this.onUserAbilityChangeCallback = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
+                    IPLVDocumentContract.View view = viewWeakReference.get();
+                    if (view != null) {
+                        view.onUserPermissionChange();
+                    }
+                }
+            }
+        };
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+    }
+
+    /**
      * 初始化Socket监听
      * 监听助教切换PPT页面socket事件
      */
     private void initSocketListener() {
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(new PLVSocketMessageObserver.OnMessageListener() {
+        PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
                 if (!PLVEventConstant.Ppt.ON_ASSISTANT_CONTROL.equals(event)) {
@@ -494,6 +518,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         isInitialized = false;
         viewWeakReferenceList.clear();
         compositeDisposable.dispose();
+        onUserAbilityChangeCallback = null;
         INSTANCE = null;
     }
 

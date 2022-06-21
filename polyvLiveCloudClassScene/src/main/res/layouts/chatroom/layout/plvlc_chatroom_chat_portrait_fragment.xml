@@ -38,6 +38,7 @@
     </FrameLayout>
 
     <RelativeLayout
+        android:id="@+id/greeting_fl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bulletin_ly"
@@ -85,8 +86,42 @@
             android:layout_centerInParent="true"
             android:src="@drawable/plvlc_chatroom_welcome_start_right"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/plvlc_chat_playback_tips_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bulletin_ly"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/plvlc_chatroom_playback_v_bg"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="聊天重放功能已开启，将会显示历史消息"
+        android:textColor="#FF333333"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <!--    积分打赏动画-->
+    <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget
+        android:id="@+id/plvlc_point_reward_effect"
+        android:layout_below="@id/greeting_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--   积分打赏动画特效 -->
+    <com.opensource.svgaplayer.SVGAImageView
+        android:id="@+id/plvlc_reward_svg"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:layout_height="306dp"
+        android:layout_width="match_parent"
+        app:source="posche.svga"
+        app:autoPlay="true"/>
 
     <!--marginTop/(like_iv height) unreadView outOfSight or immerse&fitsSystemWindows cover-->
     <com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView
@@ -166,11 +201,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="236dp" />
 
-            <include
-                android:id="@+id/more_ly"
-                layout="@layout/plvlc_chatroom_more_layout"
+            <com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout
+                android:id="@+id/plvlc_chat_more_layout"
                 android:layout_width="match_parent"
-                android:layout_height="116dp" />
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </FrameLayout>
 </RelativeLayout>

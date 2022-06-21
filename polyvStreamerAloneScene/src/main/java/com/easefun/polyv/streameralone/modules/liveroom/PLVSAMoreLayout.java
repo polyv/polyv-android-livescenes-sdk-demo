@@ -2,7 +2,12 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -15,8 +20,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -27,7 +35,11 @@ import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 /**
  * 更多布局
@@ -69,6 +81,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreBitrateTv;
     private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreCloseRoomTv;
+    private View plvsaMoreCloseRoomLayout;
+    private View plvsaMoreShareScreenLl;
+    private ImageView plvsaMoreShareScreenIv;
+    private TextView plvsaMoreShareScreenTv;
+    private LinearLayout moreBeautyLl;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -86,6 +103,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private boolean switchBitrateByUser = false;
     // 标记位
     private boolean attachedToWindow = false;
+
+    private boolean isEnableVideo = true;
 
     private long lastClickCameraSwitchViewTime;
 
@@ -132,6 +151,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreBitrateTv = (TextView) findViewById(R.id.plvsa_more_bitrate_tv);
         plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreCloseRoomTv = (TextView) findViewById(R.id.plvsa_more_close_room_tv);
+        plvsaMoreCloseRoomLayout = findViewById(R.id.plvsa_more_close_room_layout);
+        plvsaMoreShareScreenLl = findViewById(R.id.plvsa_more_share_screen_ll);
+        plvsaMoreShareScreenIv = findViewById(R.id.plvsa_more_share_screen_iv);
+        plvsaMoreShareScreenTv = findViewById(R.id.plvsa_more_share_screen_tv);
+        moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
+
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -147,9 +172,15 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreBitrateTv.setOnClickListener(this);
         plvsaMoreCloseRoomIv.setOnClickListener(this);
         plvsaMoreCloseRoomTv.setOnClickListener(this);
+        plvsaMoreShareScreenLl.setOnClickListener(this);
+        moreBeautyLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+
+        if(!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
+            plvsaMoreSettingsLayout.removeView(plvsaMoreShareScreenLl);
+        }
 
         //init bitrateLayout
         bitrateLayout = new PLVSABitrateLayout(getContext());
@@ -168,6 +199,38 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 }
             }
         });
+
+        observeBeautyModuleInitResult();
+    }
+
+    private void observeBeautyModuleInitResult() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    private Boolean lastShowBeautyLayout = null;
+
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        if (beautyUiState == null) {
+                            return;
+                        }
+                        final boolean isBeautySupport = beautyUiState.isBeautySupport;
+                        final boolean isInitSuccess = beautyUiState.isBeautyModuleInitSuccess;
+                        final boolean showBeautyLayout = isBeautySupport && isInitSuccess;
+
+                        if (lastShowBeautyLayout != null && lastShowBeautyLayout == showBeautyLayout) {
+                            return;
+                        }
+                        lastShowBeautyLayout = showBeautyLayout;
+
+                        moreBeautyLl.setVisibility(showBeautyLayout ? View.VISIBLE : View.GONE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) moreBeautyLl.getLayoutParams();
+                            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, showBeautyLayout ? 1 : 0, 1F);
+                            moreBeautyLl.setLayoutParams(lp);
+                        }
+                    }
+                });
     }
     // </editor-fold>
 
@@ -226,6 +289,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         }
     }
 
+    public void updateCloseRoomLayout(boolean hide){
+        plvsaMoreCloseRoomLayout.setVisibility(hide ? View.GONE : View.VISIBLE);
+    }
+
     public void setOnDrawerStateChangeListener(PLVMenuDrawer.OnDrawerStateChangeListener listener) {
         this.onDrawerStateChangeListener = listener;
     }
@@ -253,7 +320,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private PLVAbsStreamerView streamerView = new PLVAbsStreamerView() {
 
         @Override
-        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+        public void setPresenter(@NonNull final IPLVStreamerContract.IStreamerPresenter presenter) {
             super.setPresenter(presenter);
             streamerPresenter = presenter;
 
@@ -307,16 +374,18 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             });
             presenter.getData().getEnableVideo().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
                 @Override
-                public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean == null) {
+                public void onChanged(@Nullable Boolean enableVideo) {
+                    if (enableVideo == null) {
                         return;
                     }
-                    plvsaMoreCameraIv.setSelected(!aBoolean);
-                    plvsaMoreCameraSwitchIv.setEnabled(aBoolean);
-                    plvsaMoreMirrorIv.setEnabled(aBoolean && !plvsaMoreCameraSwitchIv.isSelected());
+                    PLVSAMoreLayout.this.isEnableVideo = enableVideo;
+
+                    plvsaMoreCameraIv.setSelected(!enableVideo);
+                    plvsaMoreCameraSwitchIv.setEnabled(enableVideo);
+                    plvsaMoreMirrorIv.setEnabled(enableVideo && !plvsaMoreCameraSwitchIv.isSelected());
 
                     if (attachedToWindow) {
-                        String toastText = "已" + (aBoolean ? "开启" : "关闭") + "摄像头";
+                        String toastText = "已" + (enableVideo ? "开启" : "关闭") + "摄像头";
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -346,6 +415,33 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     plvsaMoreMirrorIv.setSelected(!aBoolean);
                 }
             });
+            presenter.getData().getIsStartShareScreen().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isStartShare) {
+                    if (isStartShare == null) {
+                        return;
+                    }
+                    plvsaMoreShareScreenIv.setSelected(isStartShare);
+                    plvsaMoreShareScreenTv.setText(isStartShare ? getContext().getString(R.string.plvsa_streamer_sharescreen_exit) : getContext().getString(R.string.plvsa_streamer_sharescreen_start));
+                    //去掉摄像头可选项
+                    plvsaMoreCameraIv.setClickable(!isStartShare);
+                    plvsaMoreCameraTv.setClickable(!isStartShare);
+                    plvsaMoreCameraSwitchIv.setClickable(!isStartShare);
+                    plvsaMoreCameraSwitchTv.setClickable(!isStartShare);
+                    plvsaMoreMirrorIv.setClickable(!isStartShare);
+                    plvsaMoreMirrorTv.setClickable(!isStartShare);
+                    //置灰
+                    if(isStartShare) {
+                        plvsaMoreCameraIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                        plvsaMoreCameraSwitchIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                        plvsaMoreMirrorIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    } else {
+                        plvsaMoreCameraIv.clearColorFilter();
+                        plvsaMoreCameraSwitchIv.clearColorFilter();
+                        plvsaMoreMirrorIv.clearColorFilter();
+                    }
+                }
+            });
         }
     };
     // </editor-fold>
@@ -359,6 +455,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         }
         return true;
     }
+
     @Override
     public void onClick(final View v) {
         int id = v.getId();
@@ -421,6 +518,45 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                             .show();
                 }
             });
+        } else if (id == R.id.plvsa_more_share_screen_ll){
+            close();
+            if(!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_GRANT_PERMISSION_SHARE_SCREEN)){
+                PLVToast.Builder.context(getContext())
+                        .setText(getContext().getString(R.string.plvsa_streamer_sharescreen_need_permission))
+                        .build()
+                        .show();
+                return;
+            }
+
+            LiveData<Boolean> enableVideo = streamerPresenter.getData().getEnableVideo();
+            if(enableVideo != null && enableVideo.getValue() != null){
+                if(!enableVideo.getValue()){
+                    //屏幕共享需要打开摄像头
+                    PLVToast.Builder.context(getContext())
+                            .setText(getContext().getString(R.string.plvsa_streamer_sharescreen_need_video_first))
+                            .build()
+                            .show();
+                    return;
+                }
+            }
+
+            //开始屏幕共享
+            if (streamerPresenter != null) {
+                if (!plvsaMoreShareScreenIv.isSelected()) {
+                    streamerPresenter.requestShareScreen((Activity) getContext());
+                } else {
+                    streamerPresenter.exitShareScreen();
+                }
+            }
+        } else if (id == moreBeautyLl.getId()) {
+            close();
+            if (!isEnableVideo) {
+                PLVToast.Builder.context(getContext())
+                        .setText(getContext().getString(R.string.plvsa_beauty_need_open_camera))
+                        .show();
+                return;
+            }
+            PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
         }
     }
     // </editor-fold>

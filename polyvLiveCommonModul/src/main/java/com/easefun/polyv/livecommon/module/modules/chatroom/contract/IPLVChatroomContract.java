@@ -337,6 +337,11 @@ public interface IPLVChatroomContract {
         void requestChatHistory(int viewIndex);
 
         /**
+         * 获取聊天发言的表情图片的大小
+         */
+        int[] getSpeakEmojiSizes();
+
+        /**
          * 请求被踢出的用户列表
          */
         void requestKickUsers();
@@ -368,6 +373,18 @@ public interface IPLVChatroomContract {
          * @param listener 监听器
          */
         void toggleRoom(final boolean isClose, final IPolyvChatroomManager.RequestApiListener<String> listener);
+
+        /**
+         * 加入讨论
+         *
+         * @param groupId 分组Id
+         */
+        void onJoinDiscuss(String groupId);
+
+        /**
+         * 离开讨论
+         */
+        void onLeaveDiscuss();
 
         /**
          * 获取聊天室的数据

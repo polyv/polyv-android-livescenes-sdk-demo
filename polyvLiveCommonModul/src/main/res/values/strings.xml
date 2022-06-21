@@ -3,6 +3,7 @@
     <string name="plv_scene_login_toast_cloudclass_no_support_type">云课堂场景仅支持三分屏和纯视频频道类型</string>
     <string name="plv_scene_login_toast_cloudclass_login_live_failed">启动云课堂直播失败</string>
     <string name="plv_scene_login_toast_cloudclass_login_playback_failed">启动云课堂回放失败</string>
+    <string name="plv_scene_login_toast_cloudclass_loing_no_support_vod_playback">三分屏回放不支持点播列表回放</string>
 
     <string name="plv_scene_login_toast_liveecommerce_no_support_type">直播带货场景仅支持纯视频频道类型</string>
     <string name="plv_scene_login_toast_liveecommerce_login_live_failed">启动直播带货直播失败</string>
@@ -31,10 +32,11 @@
     <string name="plv_chat_toast_login_failed">聊天室连接失败</string>
     <string name="plv_chat_toast_been_kicked">您已被管理员踢出聊天室！</string>
     <string name="plv_chat_toast_kicked_streamer">频道已被禁止直播</string>
-    <string name="plv_chat_toast_account_login_elsewhere">该账号已在其他设备登录！</string>
+    <string name="plv_chat_toast_account_login_elsewhere">账号在异地登录，您将被强制退出观看！</string>
     <string name="plv_chat_toast_send_msg_success">发言成功</string>
     <string name="plv_chat_toast_post_msg_success">提交成功</string>
     <string name="plv_chat_toast_send_msg_failed">发言失败</string>
+    <string name="plv_chat_toast_send_msg_failed_param">发言失败：{}</string>
     <string name="plv_chat_toast_send_quiz_success">提问成功</string>
     <string name="plv_chat_toast_send_quiz_failed">提问失败</string>
     <string name="plv_chat_toast_send_text_empty">发送内容不能为空！</string>
@@ -42,6 +44,8 @@
     <string name="plv_chat_toast_history_load_failed">历史记录加载失败</string>
     <string name="plv_chat_view_all_message">查看全部</string>
     <string name="plv_chat_view_special_message">只看主持</string>
+    <string name="plv_chat_view_close_effect">屏蔽特效</string>
+    <string name="plv_chat_view_show_effect">展示特效</string>
     <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
     <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
     <string name="plv_chat_chooser_sel_img">选择图片</string>
@@ -50,7 +54,7 @@
     <string name="plv_chat_cannot_retrieve_selected_image">不能检索到选择的图片</string>
     <string name="plv_chat_connect_fail_and_cannot_input">聊天室连接失败，请尝试刷新解\n决。如无法解决请联系管理员。</string>
     <!--商品-->
-    <string name="plv_commodity_toast_empty_link">暂不支持移动端购买</string>
+    <string name="plv_commodity_toast_empty_link">APP内不支持购买</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">连麦错误</string>
@@ -81,8 +85,24 @@
     <!--直播间-->
     <string name="plv_live_room_dialog_exit_confirm_ask">确认退出直播间</string>
     <string name="plv_live_room_dialog_steamer_exit_confirm_ask">确认结束直播吗？</string>
+    <string name="plv_live_state_un_start">未开始</string>
+    <string name="plv_live_state_live">直播中</string>
+    <string name="plv_live_state_stop">暂停中</string>
+    <string name="plv_live_state_end">已结束</string>
+    <string name="plv_live_state_waiting">等待中</string>
+    <string name="plv_live_state_playback">回放中</string>
+    <string name="plv_live_state_playback_cached">已缓存</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
+    <!--回放-往期-->
+    <string name="plv_previous_no_more_data">没有数据</string>
+    <string name="plv_previous_load_error">加载失败，请点击重试"</string>
+    <string name="plv_previous_request_error">内容加载失败,请下拉刷新重试</string>
+    <!--回放-章节-->
+    <string name="tab_chapter">章节</string>
+
+    <!--  打赏  -->
+    <string name="plv_reward_make_fail">打赏失败</string>
 
     <!--通用-->
     <string name="plv_common_dialog_click_wrong">按错了</string>
@@ -92,5 +112,17 @@
     <string name="plv_common_dialog_confirm">确认</string>
     <string name="plv_common_dialog_alright">好的</string>
 
+    <!--美颜-->
+    <string name="plv_beauty_whiten">美白</string>
+    <string name="plv_beauty_sharp">锐化</string>
+    <string name="plv_beauty_smooth">磨皮</string>
+    <string name="plv_beauty_deform_overall">瘦脸</string>
+    <string name="plv_beauty_deform_eye">大眼</string>
+    <string name="plv_beauty_deform_nose">瘦鼻</string>
+    <string name="plv_beauty_deform_zoom_mouth">嘴巴</string>
+    <string name="plv_beauty_deform_forehead">额头</string>
+    <string name="plv_beauty_deform_zoom_jawbone">下颌</string>
+    <string name="plv_beauty_whiten_teeth">美牙</string>
+    <string name="plv_beauty_brighten_eye">亮眼</string>
 
 </resources>

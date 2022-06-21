@@ -4,7 +4,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
-import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
+import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
 
 /**
  * 状态布局的接口定义、
@@ -101,7 +101,7 @@ public interface IPLVLSStatusBarLayout {
      * view交互事件监听器
      */
     interface OnViewActionListener extends PLVLSMemberLayout.OnViewActionListener
-            , PLVLSSettingLayout.OnViewActionListener, PLVLSLinkMicControlWindow.OnViewActionListener {
+            , PLVLSMoreSettingLayout.OnViewActionListener, PLVLSLinkMicControlWindow.OnViewActionListener {
         /**
          * 上下课控制
          *

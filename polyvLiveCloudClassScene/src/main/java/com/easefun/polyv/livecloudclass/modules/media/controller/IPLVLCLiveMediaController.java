@@ -6,9 +6,9 @@ import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
  * 直播播放器控制栏接口，继承于直播播放器所需设置的 IPolyvMediaController 接口
@@ -32,7 +32,7 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      *
      * @param landscapeController 横屏控制器
      */
-    void setLandscapeController(@NonNull IPLVLiveLandscapePlayerController landscapeController);
+    void setLandscapeController(@NonNull IPLVLCLiveLandscapePlayerController landscapeController);
 
     /**
      * 设置点赞是否开启/关闭
@@ -72,12 +72,28 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     /**
      * 当子播放器点击唤起控制栏时，更新布局
      */
-    void updateWhenSubVideoViewClick();
+    void updateWhenSubVideoViewClick(boolean mainVideoViewPlaying);
 
     /**
-     * 当主播放器准备完成后，更新布局，对应{@link #updateWhenSubVideoViewClick()}的更新
+     * 当主播放器准备完成后，更新布局，对应{@link #updateWhenSubVideoViewClick(boolean)}的更新
      */
     void updateWhenVideoViewPrepared();
+
+    /**
+     * 加入rtc时更新布局
+     *
+     * @param isHideRefreshButton 是否要隐藏刷新按钮 {@link #updateWhenJoinLinkMic(boolean)}
+     */
+    void updateWhenJoinRtc(boolean isHideRefreshButton);
+
+    /**
+     * 离开rtc时更新布局
+     */
+    void updateWhenLeaveRtc();
+
+    void updateWhenRequestJoinLinkMic(boolean isRequestJoinLinkMic);
+
+    void updateWhenLinkMicOpenOrClose(boolean isOpenLinkMic);
 
     /**
      * 当加入连麦时，更新布局
@@ -102,6 +118,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateOnClickCloseFloatingView();
 
     /**
+     * 更新PPT状态信息
+     */
+    void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
+
+    /**
      * 弹幕切换按钮点击回调
      *
      * @param v danmuView
@@ -109,9 +130,22 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void dispatchDanmuSwitchOnClicked(View v);
 
     /**
+     * 更新无延迟观看模式
+     */
+    void notifyLowLatencyUpdate(boolean isLowLatency);
+
+    /**
      * 释放
      */
     void clean();
+
+    /**
+     * 更新积分打赏按钮视图，控制是否显示
+     * @param enable
+     */
+    void updateRewardView(boolean enable);
+
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 控制栏布局中UI控件 触发的交互事件的回调方法">
@@ -138,6 +172,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
         void onShowBulletinAction();
 
         /**
+         * 打开打赏弹窗
+         */
+        void onShowRewardView();
+
+        /**
          * 发送点赞
          */
         void onSendLikesAction();
@@ -148,6 +187,33 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * @param show true 表示显示，false表示隐藏
          */
         void onShow(boolean show);
+
+        /**
+         * ppt翻页
+         */
+        void onPPTTurnPage(String type);
+
+        /**
+         * 切换无延迟观看模式
+         */
+        void onChangeLowLatencyMode(boolean isLowLatency);
+
+        /**
+         * rtc观看切换暂停和恢复播放
+         *
+         * @param toPause 是否切换到暂停状态
+         */
+        void onRtcPauseResume(boolean toPause);
+
+        /**
+         * rtc观看是否正在暂停
+         */
+        boolean isRtcPausing();
+
+        /**
+         * 小窗点击事件
+         */
+        void onClickFloating();
     }
     // </editor-fold>
 }

@@ -3,33 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--播放器的父控件，也为浮窗显示的内容-->
-    <FrameLayout
+    <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+        android:id="@+id/plvec_playback_player_switch_anchor_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- 回放播放器 -->
-        <com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView
-            android:id="@+id/plvec_playback_video_item"
+        <!--播放器的父控件，也为浮窗显示的内容-->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-        <!--子播放器view-->
-        <include
-            layout="@layout/plvec_playback_player_sub_video_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <!-- 回放播放器 -->
+            <com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView
+                android:id="@+id/plvec_playback_video_item"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <!--浮窗关闭按钮-->
-        <ImageView
-            android:id="@+id/close_floating_iv"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="right"
-            android:padding="8dp"
-            android:src="@drawable/plvec_commodity_push_close"
-            android:visibility="gone" />
-    </FrameLayout>
+            <!--子播放器view-->
+            <include
+                layout="@layout/plvec_playback_player_sub_video_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!--浮窗关闭按钮-->
+            <ImageView
+                android:id="@+id/close_floating_iv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="right"
+                android:padding="8dp"
+                android:src="@drawable/plvec_commodity_push_close"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <!--watermark view-->
+    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
+        android:id="@+id/plvec_watermark_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
     <!--logo 显示 -->
     <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
         android:id="@+id/logo_view"
@@ -39,6 +53,18 @@
         android:layout_marginTop="30dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/plvec_playback_player_floating_playing_placeholder_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2B3045"
+        android:gravity="center"
+        android:text="小窗播放中..."
+        android:textColor="#E4E4E4"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
     <!--视频暂停和继续播放的按钮 -->
     <ImageView
         android:id="@+id/play_center"

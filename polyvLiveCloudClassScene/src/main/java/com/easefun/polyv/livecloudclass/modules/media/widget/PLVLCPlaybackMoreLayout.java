@@ -1,9 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.media.widget;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
@@ -16,8 +19,12 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecloudclass.modules.download.layout.PLVLCPlaybackCachePopupLayout;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackCacheVideoViewModel;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -47,6 +54,8 @@ public class PLVLCPlaybackMoreLayout {
     private TextView portraitSpeedTv;
 
     private TextView landscapeSpeedTv;
+    private LinearLayout playbackCacheLl;
+    private PLVLCPlaybackCachePopupLayout playbackCachePopupLayout;
 
     //callback
     private OnSpeedSelectedListener onSpeedSelectedListener;
@@ -141,6 +150,32 @@ public class PLVLCPlaybackMoreLayout {
         portraitSpeedTv = root.findViewById(R.id.portrait_speed_tv);
 
         landscapeSpeedTv = root.findViewById(R.id.landscape_speed_tv);
+
+        playbackCacheLl = root.findViewById(R.id.plvlc_playback_cache_ll);
+        playbackCachePopupLayout = new PLVLCPlaybackCachePopupLayout(root.getContext());
+        playbackCacheLl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playbackCachePopupLayout.show();
+                PLVLCPlaybackMoreLayout.this.hide();
+            }
+        });
+
+        observePlaybackCacheEnable((LifecycleOwner) root.getContext());
+    }
+
+    private void observePlaybackCacheEnable(@NonNull LifecycleOwner lifecycleOwner) {
+        final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
+        playbackCacheVideoViewModel.getPlaybackCacheUpdateLiveData().observe(lifecycleOwner, new Observer<PLVPlaybackCacheVideoVO>() {
+            @Override
+            public void onChanged(@Nullable PLVPlaybackCacheVideoVO vo) {
+                if (vo == null) {
+                    return;
+                }
+                final boolean enableDownload = vo.isEnableDownload() != null && vo.isEnableDownload();
+                playbackCacheLl.setVisibility(enableDownload ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     // </editor-fold>
@@ -197,10 +232,6 @@ public class PLVLCPlaybackMoreLayout {
 
     // <editor-fold defaultstate="collapsed" desc="切换横竖屏">
     private void onLandscape() {
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) llMoreVertical.getLayoutParams();
-        lp.gravity = Gravity.TOP;
-        llMoreVertical.setLayoutParams(lp);
-
         FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) containerLy.getLayoutParams();
         flp.width = -2;
         flp.height = -1;
@@ -221,10 +252,6 @@ public class PLVLCPlaybackMoreLayout {
     }
 
     private void onPortrait() {
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) llMoreVertical.getLayoutParams();
-        lp.gravity = Gravity.CENTER;
-        llMoreVertical.setLayoutParams(lp);
-
         FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) containerLy.getLayoutParams();
         flp.width = -1;
         flp.height = portraitHeight;

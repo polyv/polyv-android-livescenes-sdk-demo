@@ -214,11 +214,16 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.registerView(chatroomView);
         this.chatroomPresenter.init();
+
+        initSocketLoginManager();
+    }
+
+    @Override
+    public void loginAndLoadHistory() {
+        socketLoginManager.login();
         //请求一次历史记录
         chatroomPresenter.setHistoryContainRewardEvent(true);
         chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
-
-        initSocketLoginManager();
     }
 
     @Override
@@ -547,7 +552,6 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         socketLoginManager = new PLVSocketLoginManager(liveRoomDataManager);
         socketLoginManager.init();
         socketLoginManager.setOnSocketEventListener(onSocketEventListener);
-        socketLoginManager.login();
     }
 
     private void destroySocketLoginManager() {
@@ -594,7 +598,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(PLVAppUtils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_kicked_streamer)
                         .build()
                         .show();

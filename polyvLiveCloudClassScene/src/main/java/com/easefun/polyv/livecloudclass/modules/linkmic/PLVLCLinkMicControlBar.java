@@ -27,13 +27,20 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicRingButton;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
+import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
+import com.plv.livescenes.log.linkmic.PLVLinkMicELog;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -85,6 +92,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
 
     //State
     private PLVLCLinkMicControllerState state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE;
+
     private boolean isCameraOpen = false;
     private boolean isCameraFront = true;
     private boolean isMicrophoneOpen = true;
@@ -319,6 +327,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         isCameraOpen = false;
         isCameraFront = true;
         isMicrophoneOpen = true;
+
         //更新竖屏UI
         tvRequestTip.setVisibility(VISIBLE);
         tvRequestTip.setText(R.string.plv_linkmic_tip_request_link_mic);
@@ -502,6 +511,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                     PLVCommonLog.w(TAG, "net work not available");
                     return;
                 }
+                if (toastWhenFloatingPlayerShowing()) {
+                    return;
+                }
                 btnRingActionPortrait.setRingOffState();
                 tvRequestTip.setText(R.string.plv_linkmic_tip_requesting_link_mic);
 
@@ -522,6 +534,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                 }
                 state = PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC;
 
+                // 连麦时不允许小窗播放
+                PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
+
                 if (onPLCLinkMicControlBarListener != null) {
                     onPLCLinkMicControlBarListener.onClickRingUpLinkMic();
                 }
@@ -536,6 +551,13 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                IPLVLinkMicTraceLogSender iplvLinkMicTraceLogSender = new PLVLinkMicTraceLogSender();
+                                iplvLinkMicTraceLogSender.setLogModuleClass(PLVLinkMicELog.class);
+                                if (state.equals(PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC)) {
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);
+                                } else {
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);
+                                }
                                 handleRingOff();
                                 dialog.dismiss();
                             }
@@ -662,6 +684,16 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             onPLCLinkMicControlBarListener.onClickRingOffLinkMic();
         }
         startAutoHideCountDown();
+    }
+
+    private boolean toastWhenFloatingPlayerShowing() {
+        if (PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
+            PLVToast.Builder.context(getContext())
+                    .setText("小窗播放中，不支持连麦")
+                    .show();
+            return true;
+        }
+        return false;
     }
     // </editor-fold>
 

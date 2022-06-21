@@ -70,6 +70,11 @@ public interface IPLVSASettingLayout {
         void onStartLiveAction();
 
         /**
+         * 进入直播间
+         */
+        void onEnterLiveAction();
+
+        /**
          * 获取当前网络质量
          *
          * @return 网络质量常量

@@ -24,6 +24,11 @@ public interface IPLVLCFloatingPPTLayout {
     void setServerEnablePPT(boolean enable);
 
     /**
+     * 设置是否正在无延迟观看
+     */
+    void setIsLowLatencyWatch(boolean isLowLatencyWatch);
+
+    /**
      * 显示
      */
     void show();

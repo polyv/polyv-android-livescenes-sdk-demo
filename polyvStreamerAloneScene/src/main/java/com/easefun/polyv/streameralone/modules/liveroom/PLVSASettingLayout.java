@@ -19,9 +19,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
@@ -29,13 +32,15 @@ import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -86,6 +91,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private TextView plvsaSettingMirrorTv;
     private TextView plvsaSettingBitrateTv;
     private TextView plvsaSettingScreenOrientationTv;
+    private LinearLayout plvsaSettingBtnLl;
+    private PLVRoundRectLayout plvsaSettingBeautyLayout;
+    private ImageView plvsaSettingBeautyIv;
     private Button plvsaSettingStartLiveBtn;
 
     private String liveTitle;
@@ -95,6 +103,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     //listener
     private OnViewActionListener onViewActionListener;
+
+    private boolean isSettingFinished = false;
+    private boolean isBeautyLayoutShowing = false;
 
     private long lastClickCameraSwitchViewTime;
     // </editor-fold>
@@ -130,9 +141,13 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingMirrorTv = findViewById(R.id.plvsa_setting_mirror_tv);
         plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
         plvsaSettingScreenOrientationTv = findViewById(R.id.plvsa_setting_screen_orientation_tv);
+        plvsaSettingBtnLl = findViewById(R.id.plvsa_setting_btn_ll);
+        plvsaSettingBeautyLayout = findViewById(R.id.plvsa_setting_beauty_layout);
+        plvsaSettingBeautyIv = findViewById(R.id.plvsa_setting_beauty_iv);
         plvsaSettingStartLiveBtn = findViewById(R.id.plvsa_setting_start_live_btn);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
+        plvsaSettingBeautyLayout.setOnClickListener(this);
         plvsaSettingStartLiveBtn.setOnClickListener(this);
         plvsaSettingCameraOrientIv.setOnClickListener(this);
         plvsaSettingCameraOrientTv.setOnClickListener(this);
@@ -147,6 +162,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         initBitrateLayout();
         initTitleTextOnClickListener();
         initBeginCountDownWindow();
+
+        observeBeautyModuleInitResult();
+        observeBeautyLayoutStatus();
     }
 
     /**
@@ -231,6 +249,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isGuest()){
+                    return;
+                }
                 ViewGroup.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 removeView(titleInputLayout);
                 addView(titleInputLayout, layoutParams);
@@ -245,20 +266,67 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             @Override
             public void onCountDownFinished() {
                 // 倒计时结束，隐藏设置布局，更新直播标题，开始直播
-                setVisibility(View.GONE);
+                isSettingFinished = true;
+                updateVisibility();
                 liveRoomDataManager.getConfig().setupChannelName(liveTitle);
                 liveRoomDataManager.requestUpdateChannelName();
                 if (onViewActionListener != null) {
-                    onViewActionListener.onStartLiveAction();
+                    if (isGuest()) {
+                        onViewActionListener.onEnterLiveAction();
+                    } else {
+                        onViewActionListener.onStartLiveAction();
+                    }
                 }
             }
 
             @Override
             public void onCountDownCanceled() {
                 // 倒计时取消，重新显示设置布局
-                setVisibility(View.VISIBLE);
+                isSettingFinished = false;
+                updateVisibility();
             }
         });
+    }
+
+    private void observeBeautyModuleInitResult() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        if (beautyUiState == null) {
+                            return;
+                        }
+                        final boolean isBeautySupport = beautyUiState.isBeautySupport;
+                        final boolean isInitSuccess = beautyUiState.isBeautyModuleInitSuccess;
+                        final boolean showBeautyLayout = isBeautySupport && isInitSuccess;
+                        plvsaSettingBeautyLayout.setVisibility(showBeautyLayout ? View.VISIBLE : View.GONE);
+                    }
+                });
+    }
+
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVSASettingLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
+    }
+
+    private void initStartLiveBtnText() {
+        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plvsa_setting_start_live));
+    }
+
+    /**
+     * 判断当前用户类型是否是嘉宾
+     */
+    private boolean isGuest() {
+        String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+        return PLVSocketUserConstant.USERTYPE_GUEST.equals(userType);
     }
     // </editor-fold>
 
@@ -270,6 +338,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         this.liveTitle = liveRoomDataManager.getConfig().getChannelName();
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
+        initStartLiveBtnText();
     }
 
     @Override
@@ -281,6 +350,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             if (bitrateInfo != null) {
                 plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrateInfo.second));
                 updateBitrateIcon(bitrateInfo.second);
+                PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrateInfo.second);
             }
         }
 
@@ -324,7 +394,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     public void liveStart() {
         if (onViewActionListener != null) {
             int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-            if (currentNetworkQuality == PLVSStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            if (currentNetworkQuality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
                 //如果断网，则不直播，显示弹窗。
                 showAlertDialogNoNetwork();
                 return;
@@ -337,6 +407,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                     .show();
             return;
         }
+        //标记默认的布局方向
+        PLVLiveLocalActionHelper.getInstance().updateOrientation(PLVScreenUtils.isPortrait(getContext()));
+        //检查权限并开始直播
         checkPermissionToStartCountDown();
     }
 
@@ -400,21 +473,21 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         super.onConfigurationChanged(newConfig);
 
         MarginLayoutParams settingConfigLayoutParam = (MarginLayoutParams) plvsaSettingConfigLy.getLayoutParams();
-        MarginLayoutParams startLiveButtonParam = (MarginLayoutParams) plvsaSettingStartLiveBtn.getLayoutParams();
+        MarginLayoutParams settingButtonLayoutParam = (MarginLayoutParams) plvsaSettingBtnLl.getLayoutParams();
         int liveTitleMaxLines;
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND;
-            startLiveButtonParam.leftMargin = startLiveButtonParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_LAND;
+            settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_LAND;
             liveTitleMaxLines = LIVE_TITLE_MAX_LINES_LAND;
         } else {
             settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT;
-            startLiveButtonParam.leftMargin = startLiveButtonParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_PORT;
+            settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_PORT;
             liveTitleMaxLines = LIVE_TITLE_MAX_LINES_PORT;
         }
 
         plvsaSettingConfigLy.setLayoutParams(settingConfigLayoutParam);
-        plvsaSettingStartLiveBtn.setLayoutParams(startLiveButtonParam);
+        plvsaSettingBtnLl.setLayoutParams(settingButtonLayoutParam);
         plvsaSettingLiveTitleTv.setMaxLines(liveTitleMaxLines);
     }
 
@@ -452,6 +525,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == plvsaSettingScreenOrientationIv.getId()
                 || id == plvsaSettingScreenOrientationTv.getId()) {
             changeScreenOrientation();
+        } else if (id == plvsaSettingBeautyLayout.getId()) {
+            PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
         }
     }
     // </editor-fold>
@@ -470,7 +545,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             @Override
             public void onAllGranted() {
                 // 检查权限通过，隐藏设置布局，开始倒计时
-                setVisibility(View.GONE);
+                isSettingFinished = true;
+                updateVisibility();
                 countDownWindow.startCountDown();
             }
 
@@ -547,6 +623,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             ScreenUtils.setPortrait((Activity) getContext());
             PLVLiveLocalActionHelper.getInstance().updateOrientation(true);
         }
+    }
+
+    private void updateVisibility() {
+        // 美颜布局显示时，不显示设置布局
+        if (isBeautyLayoutShowing) {
+            setVisibility(View.GONE);
+            return;
+        }
+        // 设置结束后隐藏
+        if (isSettingFinished) {
+            setVisibility(View.GONE);
+            return;
+        }
+        setVisibility(View.VISIBLE);
     }
 
     // </editor-fold>

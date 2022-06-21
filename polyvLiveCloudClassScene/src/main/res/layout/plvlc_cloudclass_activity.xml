@@ -63,8 +63,13 @@
         app:layout_constraintBottom_toBottomOf="@id/plvlc_video_viewstub"
         app:layout_constraintLeft_toLeftOf="@id/plvlc_video_viewstub"
         app:layout_constraintRight_toRightOf="@id/plvlc_video_viewstub"
-        app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub"
-        />
+        app:layout_constraintTop_toTopOf="@id/plvlc_video_viewstub" />
+
+    <!--直播间弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvlc_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout
@@ -78,13 +83,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- 互动应用 -->
+
         <ViewStub
-            android:id="@+id/plvlc_ppt_interact_layout"
+            android:id="@+id/plvlc_popover_layout"
+            android:inflatedId="@+id/plvlc_popover_layout"
+            android:layout="@layout/plv_popover_layout_stub"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inflatedId="@+id/plvlc_ppt_interact_layout"
-            android:layout="@layout/plv_interact_layout_view_stub" />
+            android:layout_height="match_parent"/>
 
     </FrameLayout>
 

@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
         android:id="@+id/plvlc_playback_switch_anchor_player"
         android:layout_width="match_parent"
-        android:background="@color/black"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/black">
 
         <FrameLayout
             android:id="@+id/plvlc_playback_fl_player_switch_view_parent"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <TextView
+        android:id="@+id/plvlc_live_player_floating_playing_placeholder_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2B3045"
+        android:gravity="center"
+        android:text="小窗播放中..."
+        android:textColor="#E4E4E4"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
     <!-- 主播放器view -->
     <com.easefun.polyv.livescenes.video.PolyvLiveVideoView
@@ -62,12 +74,27 @@
 
     </com.easefun.polyv.livescenes.video.PolyvLiveVideoView>
 
+    <!-- 网络状态较差提示条布局 -->
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView
+        android:id="@+id/network_tips_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- 子播放器布局 -->
     <include
         layout="@layout/plvlc_live_player_sub_video_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!-- 防盗水印 -->
+    <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
+        android:id="@+id/polyv_watermark_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintLeft_toLeftOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintRight_toRightOf="@id/plvlc_playback_switch_anchor_player"
+        app:layout_constraintTop_toTopOf="@id/plvlc_playback_switch_anchor_player" />
 
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
@@ -118,4 +145,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
+
+    <!--    打赏动画  -->
+    <com.opensource.svgaplayer.SVGAImageView
+        android:id="@+id/plvlc_reward_svg"
+        android:layout_marginTop="90dp"
+        android:layout_marginBottom="90dp"
+        android:layout_gravity="center"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        app:source="posche.svga"
+        app:autoPlay="true"/>
+
 </merge>

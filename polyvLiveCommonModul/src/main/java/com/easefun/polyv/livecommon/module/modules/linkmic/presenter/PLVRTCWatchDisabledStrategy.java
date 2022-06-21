@@ -3,9 +3,10 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
 import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
-import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
+import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.linkmic.listener.PLVLinkMicEventListener;
 
 /**
  * date: 2020/12/23
@@ -24,6 +25,8 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
     private PLVLinkMicPresenter linkMicPresenter;
     private IPolyvLinkMicManager linkMicManager;
     private IPLVLiveRoomDataManager liveRoomDataManager;
+
+    private PLVLinkMicEventListener linkMicEventListener;
 
     /**** Listener ****/
     private OnJoinLinkMicListener onJoinLinkMicListener;
@@ -47,15 +50,18 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
         linkMicPresenter.pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
             @Override
             public void run() {
-                linkMicManager.addEventHandler(new PolyvLinkMicEventListener() {
+                linkMicManager.addEventHandler(linkMicEventListener = new PLVLinkMicEventListener() {
                     @Override
                     public void onJoinChannelSuccess(String uid) {
                         isJoinLinkMic = true;
                         linkMicManager.switchRoleToBroadcaster();
-                        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
                         PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onJoinChannelSuccess");
-                        PLVLinkMicJoinSuccess joinSuccess = linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
-                        onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+                        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId(), new IPLVLinkMicManager.OnSendJoinSuccessMsgListener() {
+                            @Override
+                            public void onSendJoinSuccessMsg(PLVLinkMicJoinSuccess joinSuccess) {
+                                onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+                            }
+                        });
                     }
                 });
             }
@@ -131,9 +137,29 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
     }
 
     @Override
-    public void setFirstScreenLinkMicId(String linkMicId) {
+    public void setFirstScreenLinkMicId(String linkMicId, boolean mute) {
 
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="销毁">
+
+    @Override
+    public void destroy() {
+        if (linkMicEventListener != null) {
+            linkMicManager.removeEventHandler(linkMicEventListener);
+            linkMicEventListener = null;
+        }
+
+        linkMicPresenter = null;
+        linkMicManager = null;
+        liveRoomDataManager = null;
+
+        onJoinLinkMicListener = null;
+        onLeaveLinkMicListener = null;
+        onBeforeJoinChannelListener = null;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 设置监听器">

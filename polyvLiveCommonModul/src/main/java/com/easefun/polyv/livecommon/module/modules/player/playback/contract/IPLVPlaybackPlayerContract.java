@@ -10,6 +10,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 
@@ -64,6 +65,13 @@ public interface IPLVPlaybackPlayerContract {
          * @return
          */
        IPLVMarqueeView getMarqueeView();
+
+        /**
+         * 获取水印view
+         *
+         * @return
+         */
+        IPLVWatermarkView getWatermarkView();
 
         /**
          * 播放器准备完成回调
@@ -239,6 +247,18 @@ public interface IPLVPlaybackPlayerContract {
         int getDuration();
 
         /**
+         * 获取时间当前播放时间
+         *
+         * @return
+         */
+        int getVideoCurrentPosition();
+
+        /**
+         * 获取sessionId
+         */
+        String getSessionId();
+
+        /**
          * 跳转到指定的视频时间
          *
          * @param duration 时间，单位：ms
@@ -302,6 +322,19 @@ public interface IPLVPlaybackPlayerContract {
          * @param volume 音量值，范围：[0,100]
          */
         void setPlayerVolume(int volume);
+
+        /**
+         * 设置播放器需要播放视频的vid(用于更换回放视频，不设置默认是config中的vid)
+         * 注意这个方法仅是切换vid，没有播放视频，若需播放视频需要调用startPlay()
+         * @param vid 回放视频的vid
+         */
+        void setPlayerVid(String vid);
+
+        /**
+         * 切换播放器播放视频的vid并且立即播放视频
+         * @param vid 回放视频的vid
+         */
+        void setPlayerVidAndPlay(String vid);
 
         /**
          * 绑定PPTView

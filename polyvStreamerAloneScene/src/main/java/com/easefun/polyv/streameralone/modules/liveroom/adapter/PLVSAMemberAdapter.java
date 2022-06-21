@@ -48,8 +48,12 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     //streamerStatus
     private boolean isStartedStatus;
     private boolean isGuestAutoLinkMic;
+    //是否有全县控制连麦和更多操作
+    private boolean isHasPermission = true;
 
     private PLVSAMemberControlWindow lastShowControlWindow;
+
+    private PLVSocketUserBean speakerUser;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -175,10 +179,29 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    //设置有主讲权限的用户
+    public void setHasSpeakerUser(PLVSocketUserBean user){
+        speakerUser = user;
+    }
+
     //设置view交互事件监听器
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
+
+    /**
+     * 赋予主讲权限
+     */
+    public void setTeacherPermission(boolean grant) {
+        isHasPermission = grant;
+    }
+
+    public void hideControlWindow(){
+        if(lastShowControlWindow != null && lastShowControlWindow.isShowing()){
+            lastShowControlWindow.dismiss();
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新成员控制弹层">
@@ -209,10 +232,12 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 boolean isOpenMic = linkMicItemDataBean == null || !linkMicItemDataBean.isMuteAudio();
                 boolean isBan = socketUserBean.isBanned();
                 boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
+                boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
+                boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
                 if (isSpecialType && !isRTCJoin) {
                     lastShowControlWindow.dismiss();
                 } else {
-                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType);
+                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
                 }
             }
         }
@@ -404,6 +429,18 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
 
                 @Override
+                public void onClickGrantSpeaker(boolean isGrant) {
+                    final int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return ;
+                    }
+
+                    if(onViewActionListener != null){
+                        onViewActionListener.onGrantUserSpeakerPermission(pos, dataBeanList.get(pos).getSocketUserBean(), isGrant);
+                    }
+                }
+
+                @Override
                 public String getNick() {
                     final int pos = getAdapterPosition();
                     if (pos < 0) {
@@ -429,9 +466,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             boolean isOpenMic = linkMicItemDataBean == null || !linkMicItemDataBean.isMuteAudio();
             boolean isBan = socketUserBean.isBanned();
             boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
+            boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
+            boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
             String userId = socketUserBean.getUserId();
             memberControlWindow.bindData(userId, pos);
-            memberControlWindow.show(plvsaMemberMoreIv, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType);
+            memberControlWindow.show(plvsaMemberMoreIv, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
             lastShowControlWindow = memberControlWindow;
         }
 
@@ -480,7 +519,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //设置禁言显示状态
             plvsaMemberBanIv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
             //设置连麦按钮的状态
-            if (isMyself) {
+            if (isMyself || !isHasPermission) {
+                //自己和无主讲权限时，不需要显示
                 plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
                 plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
                 connectingAnimator.cancel();
@@ -580,6 +620,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
          * 用户加入或离开连麦控制
          */
         void onControlUserLinkMic(int position, boolean isAllowJoin);
+
+        /**
+         * 授予用户主讲权限
+         */
+        void onGrantUserSpeakerPermission(int position, PLVSocketUserBean user, boolean isGrant);
     }
     // </editor-fold>
 }

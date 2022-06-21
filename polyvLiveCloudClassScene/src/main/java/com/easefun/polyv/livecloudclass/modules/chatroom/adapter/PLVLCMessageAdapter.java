@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRewardViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -60,6 +61,12 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             case PLVChatMessageItemType.ITEMTYPE_EMOTION:
                 viewHolder = new PLVLCMessageViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_message_landscape_item : R.layout.plvlc_chatroom_message_portrait_item, parent, false), this);
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_REWARD:
+                viewHolder = new PLVLCRewardViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_reward_landscape_item : R.layout.plvlc_chatroom_reward_item,parent, false),
+                        this
+                );
                 break;
             default:
                 PLVCommonLog.exception(new RuntimeException("itemType error"));
@@ -159,6 +166,44 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             return true;
         }
         return false;
+    }
+
+    public boolean addDataListChangedAtHead(List<PLVBaseViewData> list) {
+        int oldSize = dataList.size();
+        fullDataList.addAll(0, list);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = list.get(i);
+            if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+                specialDataList.add(0, baseViewData);
+            }
+        }
+        if (dataList.size() != oldSize) {
+            notifyItemRangeInserted(0, dataList.size() - oldSize);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeDataChanged(int startPosition, int count) {
+        if (startPosition < 0 || count <= 0) {
+            return false;
+        }
+        int oldSize = dataList.size();
+        List<PLVBaseViewData> removeList = new ArrayList<>();
+        int removeCount = count;
+        while (removeCount > 0) {
+            removeList.add(fullDataList.remove(startPosition));
+            removeCount--;
+        }
+        specialDataList.removeAll(removeList);
+        if (dataList.size() != oldSize) {
+            if (isDisplaySpecialType) {
+                notifyDataSetChanged();
+            } else {
+                notifyItemRangeRemoved(startPosition, count);
+            }
+        }
+        return true;
     }
 
     public boolean removeDataChanged(String id) {

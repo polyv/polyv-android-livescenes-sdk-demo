@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractAnswer;
 import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractBulletin;
 import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractCommonControl;
@@ -38,7 +39,9 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
  * author: HWilliamgo
  * description: 互动应用布局。是多个场景都可以共用的一个功能模块，
  * 包含了如下互动应用：答题，问卷，公告，抽奖，签到。
+ * 过时，请使用{@link PLVInteractLayout2}
  */
+@Deprecated
 public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
@@ -99,7 +102,7 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法">
     @Override
-    public void init() {
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         if (interactWebView == null) {
             return;
         }
@@ -119,6 +122,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
         if (interactBulletin != null) {
             interactBulletin.showBulletin();
         }
+    }
+
+    @Override
+    public void onCallDynamicFunction(String event) {
+
     }
 
     @Override

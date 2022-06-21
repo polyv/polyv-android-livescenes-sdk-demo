@@ -108,6 +108,35 @@ public class PLVLCChatCommonMessageList {
                 chatMsgRv.scrollToPosition(0);
             }
         }
+
+    }
+
+    public void addChatMessageToListHead(final List<PLVBaseViewData> chatMessageDataList, final boolean isScrollEnd, boolean isLandscapeLayout) {
+        if (chatMsgRv.getParent() == null) {
+            return;
+        }
+        if (this.isLandscapeLayout != isLandscapeLayout) {
+            return;
+        }
+        boolean result = messageAdapter.addDataListChangedAtHead(chatMessageDataList);
+        if (result) {
+            if (isScrollEnd) {
+                chatMsgRv.scrollToPosition(messageAdapter.getItemCount() - 1);
+            } else {
+                chatMsgRv.scrollToPosition(0);
+            }
+        }
+
+    }
+
+    public void removeChatMessage(int startPosition, int count, boolean isLandscapeLayout) {
+        if (chatMsgRv.getParent() == null) {
+            return;
+        }
+        if (this.isLandscapeLayout != isLandscapeLayout) {
+            return;
+        }
+        messageAdapter.removeDataChanged(startPosition, count);
     }
 
     public void removeChatMessage(String id, boolean isLandscapeLayout) {
@@ -132,6 +161,14 @@ public class PLVLCChatCommonMessageList {
 
     public void changeDisplayType(boolean isDisplaySpecialType) {
         messageAdapter.changeDisplayType(isDisplaySpecialType);
+    }
+
+    public int getItemCount() {
+        return messageAdapter.getItemCount();
+    }
+
+    public void scrollToPosition(int position) {
+        chatMsgRv.scrollToPosition(position);
     }
     // </editor-fold>
 
@@ -215,6 +252,10 @@ public class PLVLCChatCommonMessageList {
     //当前聊天列表是否是附在横屏的layout中
     public boolean isLandscapeLayout() {
         return isLandscapeLayout;
+    }
+
+    public boolean canScrollVertically(int direction) {
+        return chatMsgRv.canScrollVertically(direction);
     }
     // </editor-fold>
 

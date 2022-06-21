@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.data;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
@@ -8,6 +9,9 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
+import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.socket.event.chat.PLVRewardEvent;
 
 /**
  * 直播间数据管理器的接口
@@ -56,6 +60,21 @@ public interface IPLVLiveRoomDataManager {
     LiveData<PLVStatefulData<PLVLiveRoomDataManager.LiveStatus>> getLiveStatusData();
 
     /**
+     * 获取积分打赏开关MutableLiveData
+     */
+    MutableLiveData<PLVStatefulData<Boolean>> getPointRewardEnableData();
+
+    /**
+     * 获取积分打赏事件数据
+     */
+    MutableLiveData<PLVRewardEvent> getRewardEventData();
+
+    /**
+     * 获取互动应用状态
+     */
+    MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData();
+
+    /**
      * 获取有状态的互动学堂课节详情LiveData
      */
     LiveData<PLVStatefulData<PLVHiClassDataBean>> getFulHiClassDataBean();
@@ -69,6 +88,17 @@ public interface IPLVLiveRoomDataManager {
      * 获取仅音频模式开关
      */
     LiveData<Boolean> getIsOnlyAudioEnabled();
+
+    /**
+     * 订阅SessionId
+     */
+    LiveData<String> getSessionIdLiveData();
+
+    /**
+     * 获取回放频道的详细信息LiveData
+     * @return
+     */
+    LiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> getPlaybackChannelData();
 
     /**
      * 获取请求商品接口的rank
@@ -114,6 +144,12 @@ public interface IPLVLiveRoomDataManager {
      * 是否需要恢复流直播
      */
     boolean isNeedStreamRecover();
+
+    /**
+     * 设置config里面的vid
+     * @param vid 回放视频的vid
+     */
+    public void setConfigVid(String vid);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">
@@ -159,6 +195,11 @@ public interface IPLVLiveRoomDataManager {
      * 获取详情课节数据
      */
     void requestLessonDetail();
+
+    /**
+     * 请求回放频道的详细信息
+     */
+    void requestPlaybackChannelStatus();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

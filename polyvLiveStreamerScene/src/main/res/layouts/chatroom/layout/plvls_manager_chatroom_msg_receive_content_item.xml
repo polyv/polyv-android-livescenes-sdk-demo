@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="#313540"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="bottom|rightTop"
+        app:radius="8dp">
+
+        <TextView
+            android:id="@+id/plvls_manager_chatroom_receive_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="contentcontent"
+            tools:visibility="visible" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvls_manager_chatroom_receive_image_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                tools:src="@drawable/plvls_ic_launcher"
+                tools:visibility="visible" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVCircleProgressView
+                android:id="@+id/plvls_manager_chatroom_receive_image_loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:max="100"
+                android:progress="0"
+                android:visibility="gone"
+                app:cpv_innerPadding="2dp"
+                app:cpv_outerColor="#E5ffffff"
+                app:cpv_outerSize="1dp"
+                app:cpv_progressNormalColor="#00000000"
+                app:cpv_progressReachColor="#E5ffffff"
+                app:cpv_progressStyle="FillInnerArc"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

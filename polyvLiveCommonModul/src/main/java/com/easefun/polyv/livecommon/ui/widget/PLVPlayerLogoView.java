@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.ui.widget.webview.PLVSimpleUrlWebViewActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,10 @@ import java.util.List;
  * 播放器logo布局
  */
 public class PLVPlayerLogoView extends FrameLayout {
-    private List<LogoParam> logoParams = new ArrayList<>();
+
+    private final List<LogoParam> logoParams = new ArrayList<>();
+
+    private OnClickLogoListener onClickLogoListener = new OnClickLogoListener();
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVPlayerLogoView(@NonNull Context context) {
@@ -43,9 +48,21 @@ public class PLVPlayerLogoView extends FrameLayout {
         addLogo(logoParam, false);
     }
 
+    public LogoParam getParamZero() {
+        if (logoParams.size() >= 1) {
+            return logoParams.get(0);
+        }
+        return null;
+    }
+
+    public void setOnClickLogoListener(OnClickLogoListener onClickLogoListener) {
+        this.onClickLogoListener = onClickLogoListener;
+    }
+
     private void addLogo(final LogoParam logoParam, boolean posted) {
-        if (logoParam == null)
+        if (logoParam == null) {
             return;
+        }
         if (!posted && (logoParam.width < 1 || logoParam.height < 1)) {
             if (getWidth() == 0 || getHeight() == 0) {
                 post(new Runnable() {
@@ -105,6 +122,14 @@ public class PLVPlayerLogoView extends FrameLayout {
                 LayoutParams flp = makeLPForLogo(logoParam, trimmedWidth, trimmedHeight);
 
                 imageView.setLayoutParams(flp);
+                imageView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (onClickLogoListener != null) {
+                            onClickLogoListener.onClickLogo(v, logoParam);
+                        }
+                    }
+                });
                 addView(imageView);
 
                 //加载图片
@@ -238,6 +263,7 @@ public class PLVPlayerLogoView extends FrameLayout {
         private int alpha = 100;//透明度(0-100)，0即完全透明
         private float offsetX = 0;//logo偏移，支持像素和百分比两种单位。<=1则是百分比
         private float offsetY = 0;
+        private String logoHref;
 
         public LogoParam() {
         }
@@ -313,6 +339,26 @@ public class PLVPlayerLogoView extends FrameLayout {
             this.offsetY = offsetY;
             return this;
         }
+
+        public String getLogoHref() {
+            return logoHref;
+        }
+
+        public LogoParam setLogoHref(String logoHref) {
+            this.logoHref = logoHref;
+            return this;
+        }
+    }
+
+    public static class OnClickLogoListener {
+
+        public void onClickLogo(final View v, @NonNull final LogoParam logoParam) {
+            if (TextUtils.isEmpty(logoParam.getLogoHref())) {
+                return;
+            }
+            PLVSimpleUrlWebViewActivity.start(v.getContext(), logoParam.getLogoHref());
+        }
+
     }
 
     private interface OnGetBitmapSizeCallback {

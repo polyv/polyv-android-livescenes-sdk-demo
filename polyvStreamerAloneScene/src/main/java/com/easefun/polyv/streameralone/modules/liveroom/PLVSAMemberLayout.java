@@ -30,11 +30,16 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserBean;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
+
+import io.socket.client.Ack;
 
 /**
  * 成员列表布局
@@ -102,6 +107,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         //init memberListRv
         plvsaMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         memberAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+        memberAdapter.setTeacherPermission(!isGuest());//嘉宾默认无权限，需要隐藏控制相关按钮
         memberAdapter.setOnViewActionListener(new PLVSAMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
@@ -123,6 +129,26 @@ public class PLVSAMemberLayout extends FrameLayout {
             public void onControlUserLinkMic(int position, boolean isAllowJoin) {
                 if (streamerPresenter != null) {
                     streamerPresenter.controlUserLinkMic(position, isAllowJoin);
+                }
+            }
+
+            @Override
+            public void onGrantUserSpeakerPermission(int position, final PLVSocketUserBean user, final boolean isGrant) {
+                if(streamerPresenter != null && user != null){
+                    streamerPresenter.setUserPermissionSpeaker(user.getUserId(), isGrant, new Ack() {
+                        @Override
+                        public void call(Object... objects) {
+                            String text;
+                            if(isGrant){
+                                text = user.getNick() + "成为主讲人";
+                            } else {
+                                text = user.getNick() + "的主讲权限已移除";
+                            }
+                            PLVToast.Builder.context(getContext())
+                                    .setText(text)
+                                    .show();
+                        }
+                    });
                 }
             }
         });
@@ -185,6 +211,15 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
     }
 
+    public void closeAndHideWindow(){
+        if(memberAdapter != null){
+            memberAdapter.hideControlWindow();
+        }
+        if (menuDrawer != null) {
+            menuDrawer.closeMenu();
+        }
+    }
+
     public boolean isOpen() {
         return menuDrawer != null && menuDrawer.isMenuVisible();
     }
@@ -225,11 +260,11 @@ public class PLVSAMemberLayout extends FrameLayout {
 
             presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
                 @Override
-                public void onChanged(@Nullable Boolean aBoolean) {
-                    if (aBoolean == null) {
+                public void onChanged(@Nullable Boolean isStartedStatus) {
+                    if (isStartedStatus == null) {
                         return;
                     }
-                    memberAdapter.setStreamerStatus(aBoolean);
+                    memberAdapter.setStreamerStatus(isStartedStatus);
                 }
             });
         }
@@ -247,8 +282,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
         }
 
@@ -318,6 +352,16 @@ public class PLVSAMemberLayout extends FrameLayout {
                     })
                     .show();
         }
+
+        @Override
+        public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+            super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
+            if(PLVPPTAuthentic.PermissionType.TEACHER.equals(type)){
+                if(user != null && !user.isTeacher()){
+                    memberAdapter.setHasSpeakerUser(isGranted ? user : null);
+                }
+            }
+        }
     };
     // </editor-fold>
 
@@ -386,6 +430,13 @@ public class PLVSAMemberLayout extends FrameLayout {
                 .setText("摄像头" + (isMute ? "关闭" : "开启"))
                 .build()
                 .show();
+    }
+
+    private boolean isGuest(){
+        if(liveRoomDataManager != null){
+            return PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+        }
+        return false;
     }
     // </editor-fold>
 }

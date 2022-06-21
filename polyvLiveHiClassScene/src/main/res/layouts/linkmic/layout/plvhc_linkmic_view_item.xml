@@ -11,6 +11,15 @@
     tools:layout_width="160dp">
 
     <ImageView
+        android:id="@+id/plvhc_linkmic_teacher_place_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/plvhc_linkmic_teacher_place_ic"
+        android:translationY="-4dp"
+        android:visibility="gone" />
+
+    <ImageView
         android:id="@+id/plvhc_linkmic_teacher_avatar_placeholder_iv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

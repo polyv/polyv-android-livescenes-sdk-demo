@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#202127">
+
+    <ImageView
+        android:id="@+id/plv_playback_cache_back_iv"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:padding="12dp"
+        android:src="@drawable/plv_playback_cache_back_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator
+        android:id="@+id/plv_playback_cache_tab"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        app:layout_constraintBottom_toBottomOf="@+id/plv_playback_cache_back_iv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plv_playback_cache_back_iv"
+        app:layout_constraintTop_toTopOf="@+id/plv_playback_cache_back_iv" />
+
+    <View
+        android:id="@+id/plv_playback_cache_separate_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000"
+        app:layout_constraintTop_toBottomOf="@+id/plv_playback_cache_back_iv" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/plv_playback_cache_vp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plv_playback_cache_separate_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

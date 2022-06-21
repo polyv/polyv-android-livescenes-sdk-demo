@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -25,10 +24,15 @@ import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.view.PLVAbsM
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livehiclass.R;
-import com.easefun.polyv.livehiclass.modules.linkmic.item.IPLVHCLinkMicItemLayout;
-import com.easefun.polyv.livehiclass.modules.linkmic.item.PLVHCLinkMicItemView;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.IPLVHCLinkMicItemLayout;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.item.IPLVHCLinkMicItem;
+import com.easefun.polyv.livehiclass.modules.linkmic.list.item.PLVHCLinkMicItemContainer;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCJoinDiscussCountDownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCLinkMicInvitationCountdownWindow;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCReceiveBroadcastDialog;
+import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCSeminarCountdownWindow;
 import com.easefun.polyv.livehiclass.modules.linkmic.widget.PLVHCTeacherScreenStreamLayout;
+import com.easefun.polyv.livehiclass.modules.linkmic.zoom.PLVHCLinkMicZoomManager;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCClassStopHasNextDialog;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCClassStopNoNextDialog;
 import com.easefun.polyv.livehiclass.modules.liveroom.PLVHCLinkMicUserControlDialog;
@@ -38,17 +42,22 @@ import com.easefun.polyv.livehiclass.ui.widget.PLVHCToast;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.PLVHiClassConstant;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.net.IPLVDataRequestListener;
 import com.plv.livescenes.streamer.IPLVStreamerManager;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import io.socket.client.Ack;
 
@@ -69,8 +78,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
     private PLVHCClassStopHasNextDialog classStopHasNextDialog;
     private PLVHCLinkMicInvitationCountdownWindow linkMicInvitationCountdownWindow;
     private PLVHCTeacherScreenStreamLayout teacherScreenStreamLayout;
+    //dialog
+    private PLVHCReceiveBroadcastDialog teacherSendBroadcastDialog;
 
+    private String teacherNick;
     private boolean isHasPaintPermission;
+    private boolean isGroupLeader;
 
     //run task after init linkMicItemLayout
     private List<Runnable> initiatedTasks = new ArrayList<>();
@@ -103,8 +116,6 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
 
         //启动前台服务，防止在后台被杀
         PLVForegroundService.startForegroundService(PLVHCLiveHiClassActivity.class, "POLYV互动学堂", R.drawable.plvhc_ic_launcher);
-        //防止自动息屏、锁屏
-        setKeepScreenOn(true);
     }
 
     private void initLinkMicItemLayout(boolean isLittleLayout) {
@@ -120,8 +131,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         if (linkMicItemLayout != null) {
             linkMicItemLayout.setOnViewActionListener(new IPLVHCLinkMicItemLayout.OnViewActionListener() {
                 @Override
-                public void onClickItemView(final int position, final PLVLinkMicItemDataBean linkMicItemDataBean) {
-                    if (linkMicItemDataBean == null || !linkMicPresenter.isTeacherType()) {
+                public void onClickItemView(final int position, final IPLVHCLinkMicItem linkMicItem) {
+                    final PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItem.getLinkMicItemDataBean();
+                    if (linkMicItemDataBean == null || (!linkMicPresenter.isTeacherType() && !isGroupLeader)) {
+                        return;
+                    }
+                    if (isGroupLeader && linkMicItemDataBean.isTeacher()) {
                         return;
                     }
                     final boolean isMyself = linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId());
@@ -153,27 +168,46 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
                         public void onClickCameraOrient() {
                             linkMicPresenter.switchCamera();
                         }
+
+                        @Override
+                        public void onClickZoom() {
+                            final boolean toZoom = !PLVHCLinkMicZoomManager.getInstance().isZoomIn(linkMicItemDataBean);
+                            if (toZoom && !PLVHCLinkMicZoomManager.getInstance().canZoomInItem()) {
+                                PLVHCToast.Builder.context(getContext())
+                                        .setText("放大已达上限")
+                                        .build().show();
+                                return;
+                            }
+                            if (toZoom) {
+                                PLVHCLinkMicItemContainer container = linkMicItem.findContainerParent();
+                                if (container != null) {
+                                    PLVHCLinkMicZoomManager.getInstance().zoom(container, true);
+                                }
+                            } else {
+                                PLVHCLinkMicZoomManager.getInstance().zoomOut(linkMicItem.getLinkMicId());
+                            }
+                        }
                     });
-                    linkMicUserControlDialog.bindViewData(linkMicItemDataBean, isMyself);
+                    linkMicUserControlDialog.bindViewData(linkMicItemDataBean, isMyself, isGroupLeader);
                     linkMicUserControlDialog.show();
                 }
             });
-            linkMicItemLayout.setOnRenderViewCallback(new PLVHCLinkMicItemView.OnRenderViewCallback() {
+            linkMicItemLayout.setOnRenderViewCallback(new IPLVHCLinkMicItem.OnRenderViewCallback() {
                 @Override
-                public SurfaceView createLinkMicRenderView() {
+                public View createLinkMicRenderView() {
                     return linkMicPresenter.createRenderView(getContext());
                 }
 
                 @Override
-                public void releaseLinkMicRenderView(SurfaceView renderView) {
+                public void releaseLinkMicRenderView(View renderView) {
                     linkMicPresenter.releaseRenderView(renderView);
                 }
 
                 @Override
-                public void setupRenderView(SurfaceView surfaceView, String linkMicId, int streamType) {
-                    linkMicPresenter.setupRenderView(surfaceView, linkMicId, streamType);
+                public void setupRenderView(View renderView, String linkMicId, int streamType) {
+                    linkMicPresenter.setupRenderView(renderView, linkMicId, streamType);
                     if (onViewActionListener != null) {
-                        onViewActionListener.onSetupLinkMicRenderView(surfaceView, linkMicId, streamType);
+                        onViewActionListener.onSetupLinkMicRenderView(renderView, linkMicId, streamType);
                     }
                 }
             });
@@ -255,6 +289,7 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
 
     @Override
     public void stopLesson(IPLVDataRequestListener<String> listener) {
+        PLVHCLinkMicZoomManager.getInstance().zoomOutAll();
         linkMicPresenter.stopLesson(listener);
     }
 
@@ -283,6 +318,9 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         if (linkMicPresenter != null) {
             linkMicPresenter.destroy();
         }
+        if (linkMicItemLayout != null) {
+            linkMicItemLayout.destroy();
+        }
         PLVForegroundService.stopForegroundService();
     }
     // </editor-fold>
@@ -300,6 +338,21 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
                         return;
                     }
                     initLinkMicItemLayout(integer <= 6);
+                }
+            });
+        }
+
+        @Override
+        public void onLinkMicEngineCreatedSuccess() {
+            super.onLinkMicEngineCreatedSuccess();
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (linkMicPresenter == null) {
+                        return;
+                    }
+                    // 互动学堂固定横屏推流
+                    linkMicPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE);
                 }
             });
         }
@@ -337,9 +390,10 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
             runTaskAfterInitItemLayout(new Runnable() {
                 @Override
                 public void run() {
-                    linkMicItemLayout.bindData(linkMicList);
-                    if (!linkMicPresenter.isTeacherType()) {
+                    linkMicItemLayout.bindData(linkMicList, linkMicPresenter.isJoinDiscuss());
+                    if (!linkMicPresenter.isTeacherType() && !linkMicPresenter.isJoinDiscuss()) {
                         PLVLinkMicItemDataBean placeLinkMicItem = new PLVLinkMicItemDataBean();
+                        placeLinkMicItem.setNick(teacherNick);
                         linkMicItemLayout.setPlaceLinkMicItem(placeLinkMicItem, false);
                     }
                 }
@@ -363,6 +417,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
             runTaskAfterInitItemLayout(new Runnable() {
                 @Override
                 public void run() {
+                    if (linkMicItemDataBean != null
+                            && linkMicItemDataBean.getLinkMicId() != null
+                            && PLVHCLinkMicZoomManager.getInstance().isZoomIn(linkMicItemDataBean.getLinkMicId())) {
+                        PLVHCLinkMicZoomManager.getInstance().zoomOut(linkMicItemDataBean.getLinkMicId());
+                    }
+
                     linkMicItemLayout.onUserLeave(linkMicItemDataBean, position);
                     checkHideControlWindow();
                 }
@@ -383,15 +443,14 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         @Override
         public void onTeacherScreenStream(PLVLinkMicItemDataBean linkMicItemDataBean, boolean isOpen) {
             if (isOpen) {
-                SurfaceView surfaceView = linkMicPresenter.createRenderView(getContext());
-                surfaceView.setZOrderMediaOverlay(true);
-                linkMicPresenter.setupRenderView(surfaceView, linkMicItemDataBean.getLinkMicId(), PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN);
-                teacherScreenStreamLayout.show(linkMicItemDataBean.getLinkMicId(), surfaceView);
+                View renderView = linkMicPresenter.createRenderView(getContext());
+                linkMicPresenter.setupRenderView(renderView, linkMicItemDataBean.getLinkMicId(), PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_SCREEN);
+                teacherScreenStreamLayout.show(linkMicItemDataBean.getLinkMicId(), renderView);
             } else {
-                teacherScreenStreamLayout.hide(linkMicItemDataBean.getLinkMicId(), new PLVHCTeacherScreenStreamLayout.CallParamRunnable<SurfaceView>() {
+                teacherScreenStreamLayout.hide(linkMicItemDataBean.getLinkMicId(), new PLVHCTeacherScreenStreamLayout.CallParamRunnable<View>() {
                     @Override
-                    public void run(SurfaceView surfaceView) {
-                        linkMicPresenter.releaseRenderView(surfaceView);
+                    public void run(View renderView) {
+                        linkMicPresenter.releaseRenderView(renderView);
                     }
                 });
             }
@@ -568,6 +627,13 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         }
 
         @Override
+        public void onRejoinRoomSuccess() {
+            if (linkMicItemLayout != null) {
+                linkMicItemLayout.notifyRejoinRoom();
+            }
+        }
+
+        @Override
         public void onNetworkQuality(int quality) {
             if (onViewActionListener != null) {
                 onViewActionListener.onNetworkQuality(quality);
@@ -589,12 +655,24 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         }
 
         @Override
+        public void onTeacherInfo(String nick) {
+            teacherNick = nick;
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.updatePlaceLinkMicItemNick(teacherNick);
+                }
+            });
+        }
+
+        @Override
         public void onLessonPreparing(long serverTime, long lessonStartTime) {
             runTaskAfterInitItemLayout(new Runnable() {
                 @Override
                 public void run() {
-                    if (!linkMicPresenter.isTeacherType()) {
+                    if (!linkMicPresenter.isTeacherType() && !linkMicPresenter.isJoinDiscuss()) {
                         PLVLinkMicItemDataBean placeLinkMicItem = new PLVLinkMicItemDataBean();
+                        placeLinkMicItem.setNick(teacherNick);
                         linkMicItemLayout.setPlaceLinkMicItem(placeLinkMicItem, true);
                     }
                 }
@@ -654,6 +732,139 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
                     .setText("拖堂时间过长，" + timeMinute + "分钟后将强制下课")
                     .build()
                     .show();
+        }
+
+        @Override
+        public void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable final String leaderId) {
+            isGroupLeader = isHasGroupLeader;
+            hideControlWindow();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.onUserHasLeader(leaderId);
+                }
+            });
+            new PLVHCSeminarCountdownWindow(PLVHCLinkMicLayout.this).acceptOnUserHasGroupLeader(isHasGroupLeader, nick, isGroupChanged, isLeaderChanged, groupName);
+            if (onViewActionListener != null) {
+                onViewActionListener.onUserHasGroupLeader(isHasGroupLeader);
+            }
+        }
+
+        @Override
+        public void onWillJoinDiscuss(long countdownTimeMs) {
+            // 加入分组前，清空摄像头放大区域
+            PLVHCLinkMicZoomManager.getInstance().zoomOutAll();
+            // 倒计时提示即将加入分组
+            new PLVHCJoinDiscussCountDownWindow(PLVHCLinkMicLayout.this).acceptOnWillJoinDiscuss(countdownTimeMs);
+        }
+
+        @Override
+        public void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent) {
+            isGroupLeader = false;
+            hideControlWindow();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.clearData(true);
+                }
+            });
+            if (onViewActionListener != null) {
+                onViewActionListener.onJoinDiscuss(groupId, groupName, switchRoomEvent);
+            }
+        }
+
+        @Override
+        public void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent) {
+            isGroupLeader = false;
+            hideControlWindow();
+            new PLVHCSeminarCountdownWindow(PLVHCLinkMicLayout.this).acceptOnLeaveDiscuss();
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.clearData(false);
+                }
+            });
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaveDiscuss(switchRoomEvent);
+            }
+        }
+
+        @Override
+        public void onTeacherJoinDiscuss(boolean isJoin) {
+            if (isJoin) {
+                PLVHCToast.Builder.context(getContext())
+                        .setText("老师已进入分组")
+                        .build()
+                        .show();
+            }
+        }
+
+        @Override
+        public void onTeacherSendBroadcast(String content) {
+            if (teacherSendBroadcastDialog != null) {
+                teacherSendBroadcastDialog.hide();
+            }
+            teacherSendBroadcastDialog = new PLVHCReceiveBroadcastDialog(getContext());
+            teacherSendBroadcastDialog.setContent(content);
+            teacherSendBroadcastDialog.show();
+        }
+
+        @Override
+        public void onLeaderRequestHelp() {
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaderRequestHelp();
+            }
+        }
+
+        @Override
+        public void onLeaderCancelHelp() {
+            if (onViewActionListener != null) {
+                onViewActionListener.onLeaderCancelHelp();
+            }
+        }
+
+        @Override
+        public void onUpdateLinkMicZoom(final PLVUpdateMicSiteEvent updateMicSiteEvent) {
+            if (updateMicSiteEvent == null || !updateMicSiteEvent.checkIsValid()) {
+                return;
+            }
+            final String linkMicId = updateMicSiteEvent.getLinkMicIdFromEventId();
+            if (PLVHCLinkMicZoomManager.getInstance().isZoomIn(linkMicId)) {
+                PLVHCLinkMicZoomManager.getInstance().notifyUpdateMicSite(updateMicSiteEvent);
+            } else {
+                runTaskAfterInitItemLayout(new Runnable() {
+                    @Override
+                    public void run() {
+                        linkMicItemLayout.onUserUpdateZoom(updateMicSiteEvent);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onRemoveLinkMicZoom(final PLVRemoveMicSiteEvent removeMicSiteEvent) {
+            if (removeMicSiteEvent == null || removeMicSiteEvent.getLinkMicIdFromEventId() == null) {
+                return;
+            }
+            runTaskAfterInitItemLayout(new Runnable() {
+                @Override
+                public void run() {
+                    linkMicItemLayout.onUserRemoveZoom(removeMicSiteEvent);
+                }
+            });
+            PLVHCLinkMicZoomManager.getInstance().zoomOut(removeMicSiteEvent.getLinkMicIdFromEventId());
+        }
+
+        @Override
+        public void onChangeLinkMicZoom(@Nullable final Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap) {
+            Map<String, PLVUpdateMicSiteEvent> changeMap = updateMicSiteEventMap;
+            if (updateMicSiteEventMap == null || updateMicSiteEventMap.isEmpty()) {
+                changeMap = Collections.emptyMap();
+            }
+            PLVHCLinkMicZoomManager.getInstance().zoomOutAllExcept(changeMap.keySet());
+            for (final PLVUpdateMicSiteEvent updateMicSiteEvent : changeMap.values()) {
+                onUpdateLinkMicZoom(updateMicSiteEvent);
+            }
         }
     };
     // </editor-fold>
@@ -746,6 +957,12 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新成员控制弹层">
+    private void hideControlWindow() {
+        if (linkMicUserControlDialog != null && linkMicUserControlDialog.isShowing()) {
+            linkMicUserControlDialog.hide();
+        }
+    }
+
     private void checkHideControlWindow() {
         if (linkMicItemLayout == null) {
             return;
@@ -768,7 +985,7 @@ public class PLVHCLinkMicLayout extends FrameLayout implements IPLVHCLinkMicLayo
         if (pos >= 0 && linkMicUserControlDialog != null && linkMicUserControlDialog.isShowing()) {
             PLVLinkMicItemDataBean linkMicItemDataBean = linkMicItemLayout.getDataBeanList().get(pos);
             if (linkMicItemDataBean.getLinkMicId() != null && linkMicItemDataBean.getLinkMicId().equals(linkMicUserControlDialog.getLinkMicUid())) {
-                linkMicUserControlDialog.bindViewData(linkMicItemDataBean, linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId()));
+                linkMicUserControlDialog.bindViewData(linkMicItemDataBean, linkMicPresenter.isMyLinkMicId(linkMicItemDataBean.getLinkMicId()), isGroupLeader);
             }
         }
     }

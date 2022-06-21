@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="4dp"
+    tools:background="#1B202D">
+
+    <LinearLayout
+        android:id="@+id/plvls_manager_chatroom_receive_msg_user_info_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/plvls_manager_chatroom_receive_msg_avatar_iv"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            tools:src="@drawable/plvls_ic_launcher" />
+
+        <TextView
+            android:id="@+id/plvls_manager_chatroom_receive_msg_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:singleLine="true"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            tools:text="username" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/plvls_manager_chatroom_receive_msg_list_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/plvls_manager_chatroom_receive_msg_user_info_ll" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

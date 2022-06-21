@@ -11,6 +11,14 @@
     android:paddingRight="16dp"
     android:paddingBottom="8dp">
 
+    <ImageView
+        android:visibility="gone"
+        android:layout_marginRight="8dp"
+        android:id="@+id/plvlc_iv_show_point_reward"
+        android:src="@drawable/plvlc_iv_show_point_reward"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
+
     <com.easefun.polyv.livecommon.ui.widget.gif.GifEditText
         android:id="@+id/input_et"
         android:layout_width="0dp"

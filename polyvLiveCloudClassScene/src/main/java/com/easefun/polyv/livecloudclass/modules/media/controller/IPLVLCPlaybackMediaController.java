@@ -73,6 +73,11 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     void dispatchDanmuSwitchOnClicked(View v);
 
     /**
+     * 设置聊天回放是否可用
+     */
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
+
+    /**
      * 释放
      */
     void clean();

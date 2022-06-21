@@ -37,6 +37,11 @@ public class PLVStreamerData {
 
     //当前设置的码率
     private MutableLiveData<Integer> curBitrate = new MutableLiveData<>();
+
+    //当前连麦人数
+    private MutableLiveData<Integer> curLinkMicCount = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> enableShareScreen = new MutableLiveData<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流状态">
@@ -133,5 +138,24 @@ public class PLVStreamerData {
     public LiveData<Boolean> getIsFrontMirrorMode() {
         return isFrontMirrorMode;
     }
+
+
+    public void postEnableShareScreen(boolean isStartShareScreen){
+        enableShareScreen.postValue(isStartShareScreen);
+    }
+
+    public  LiveData<Boolean> getIsStartShareScreen() {
+        return enableShareScreen;
+    }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="连麦人数">
+    public void postLinkMicCount(int count){
+        curLinkMicCount.postValue(count);
+    }
+
+    public LiveData<Integer> getLinkMicCount(){
+        return curLinkMicCount;
+    }
+    // </editor-fold >
 }

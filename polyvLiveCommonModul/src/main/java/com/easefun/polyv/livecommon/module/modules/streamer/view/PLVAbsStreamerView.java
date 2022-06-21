@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onLocalUserMicVolumeChanged() {
+    public void onLocalUserMicVolumeChanged(int volume) {
 
     }
 
@@ -129,6 +130,16 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
 
     @Override
     public void onGuestMediaStatusChanged(int pos) {
+
+    }
+
+    @Override
+    public void onScreenShareChange(int position, boolean isShare, int extra) {
+
+    }
+
+    @Override
+    public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
 
     }
 }

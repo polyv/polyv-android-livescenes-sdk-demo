@@ -69,7 +69,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/close_iv"
+        android:id="@+id/plvec_playback_more_dialog_close_iv"
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:layout_alignParentRight="true"

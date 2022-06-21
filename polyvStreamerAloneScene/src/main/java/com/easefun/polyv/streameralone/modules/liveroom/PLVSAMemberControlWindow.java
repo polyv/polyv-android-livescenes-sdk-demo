@@ -14,6 +14,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -35,6 +36,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     private TextView plvsaMemberBanTv;
     private View plvsaMemberBottomTriangleView;
     private View plvsaMemberTopTriangleView;
+    private ImageView plvsaMemberGrantSpeakerIv;
+    private TextView plvsaMemberGrantSpeakerTv;
     //window parentView
     private View windowParentView;
     //data
@@ -42,6 +45,9 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     private String userId;
     //listener
     private OnViewActionListener onViewActionListener;
+
+    private boolean isNeedPermissionDialogShow = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -62,6 +68,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberKickTv = (TextView) contentView.findViewById(R.id.plvsa_member_kick_tv);
         plvsaMemberBanIv = (ImageView) contentView.findViewById(R.id.plvsa_member_ban_iv);
         plvsaMemberBanTv = (TextView) contentView.findViewById(R.id.plvsa_member_ban_tv);
+        plvsaMemberGrantSpeakerIv = contentView.findViewById(R.id.plvsa_member_grant_speaker_iv);
+        plvsaMemberGrantSpeakerTv = contentView.findViewById(R.id.plvsa_member_grant_speaker_tv);
         plvsaMemberBottomTriangleView = contentView.findViewById(R.id.plvsa_member_bottom_triangle_view);
         plvsaMemberTopTriangleView = contentView.findViewById(R.id.plvsa_member_top_triangle_view);
 
@@ -73,6 +81,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberKickTv.setOnClickListener(this);
         plvsaMemberBanIv.setOnClickListener(this);
         plvsaMemberBanTv.setOnClickListener(this);
+        plvsaMemberGrantSpeakerIv.setOnClickListener(this);
+        plvsaMemberGrantSpeakerTv.setOnClickListener(this);
     }
     // </editor-fold>
 
@@ -82,13 +92,15 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         this.userId = userId;
     }
 
-    public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType) {
+    public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType, boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
         this.windowParentView = view;
         int mediaViewVisibility = isRTCJoin ? View.VISIBLE : View.GONE;
         plvsaMemberCameraIv.setVisibility(mediaViewVisibility);
         plvsaMemberCameraTv.setVisibility(mediaViewVisibility);
         plvsaMemberMicIv.setVisibility(mediaViewVisibility);
         plvsaMemberMicTv.setVisibility(mediaViewVisibility);
+        plvsaMemberGrantSpeakerTv.setVisibility(mediaViewVisibility);
+        plvsaMemberGrantSpeakerIv.setVisibility(mediaViewVisibility);
 
         int kickBanViewVisibility = isSpecialType ? View.GONE : View.VISIBLE;
         plvsaMemberKickIv.setVisibility(kickBanViewVisibility);
@@ -100,6 +112,20 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberMicIv.setSelected(!isOpenMic);
         plvsaMemberBanIv.setSelected(isBan);
         plvsaMemberBanTv.setText(isBan ? "取消禁言" : "禁言");
+
+        //主讲权限
+        int speakerViewVisibility = isGuest ? View.VISIBLE : View.GONE;
+        plvsaMemberGrantSpeakerTv.setVisibility(speakerViewVisibility);
+        plvsaMemberGrantSpeakerIv.setVisibility(speakerViewVisibility);
+        plvsaMemberGrantSpeakerIv.setSelected(isHasSpeaker);
+        plvsaMemberGrantSpeakerTv.setSelected(isHasSpeaker);
+        plvsaMemberGrantSpeakerTv.setText(isHasSpeaker ? "移除主讲权限" : "授予主讲权限");
+        if(isHasSpeaker){
+            //FIXME 屏幕共享中应该提示，目前没有状态判断
+            isNeedPermissionDialogShow = false;
+        } else {
+            isNeedPermissionDialogShow = speakerUser != null;
+        }
 
         final int maxScreenLength = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         final int minScreenLength = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
@@ -142,11 +168,11 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         }
     }
 
-    public void update(boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType) {
+    public void update(boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType,boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
         if (windowParentView == null) {
             return;
         }
-        show(windowParentView, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType);
+        show(windowParentView, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType, isGuest, isHasSpeaker, speakerUser);
     }
 
     public boolean isShowing() {
@@ -228,6 +254,40 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
                     onViewActionListener.onClickBan(false);
                 }
             }
+        } else if (id == R.id.plvsa_member_grant_speaker_iv
+                || id == R.id.plvsa_member_grant_speaker_tv){
+            popupWindow.dismiss();
+            boolean isGrant = plvsaMemberGrantSpeakerIv.isSelected();
+            if(!isNeedPermissionDialogShow){
+                if (onViewActionListener != null) {
+                    onViewActionListener.onClickGrantSpeaker(!plvsaMemberGrantSpeakerIv.isSelected());
+                }
+                plvsaMemberGrantSpeakerIv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
+                plvsaMemberGrantSpeakerTv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
+                plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? "移除主讲权限" : "授予主讲权限");
+                return;
+            }
+            String title = isGrant ? "确定移除ta的":"确定授予ta" ;
+            String content = isGrant ? "移除后主讲人的屏幕共享将会自动结束":"当前已有主讲人，确认后将替换为新的主讲人";
+            new PLVSAConfirmDialog(v.getContext())
+                    .setTitle(title+ "主讲权限吗？")
+                    .setContent(content)
+                    .setLeftButtonText("取消")
+                    .setRightButtonText("确定")
+                    .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, View v) {
+                            dialog.dismiss();
+                            if (onViewActionListener != null) {
+                                onViewActionListener.onClickGrantSpeaker(!plvsaMemberGrantSpeakerIv.isSelected());
+                            }
+                            plvsaMemberGrantSpeakerIv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
+                            plvsaMemberGrantSpeakerTv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
+                            plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? "移除主讲权限" : "授予主讲权限");
+
+                        }
+                    })
+                    .show();
         }
     }
     // </editor-fold>
@@ -241,6 +301,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         void onClickKick();
 
         void onClickBan(boolean isWillBan);
+
+        void onClickGrantSpeaker(boolean isGrant);
 
         String getNick();
     }

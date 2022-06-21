@@ -164,8 +164,10 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
     }
 
     private void stopSecondAnimator() {
-        secondAnimator.cancel();
-        secondAnimator.end();
+        if (secondAnimator != null) {
+            secondAnimator.cancel();
+            secondAnimator.end();
+        }
         isSetSecondParams = false;
     }
     // </editor-fold>

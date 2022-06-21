@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.streamer;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.app.AlertDialog;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -34,17 +36,27 @@ import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTrans
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 推流和连麦布局
  */
 public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    // 本地麦克风音量大小达到该阈值时，提示当前正处于静音状态
+    private static final int VOLUME_THRESHOLD_TO_NOTIFY_AUDIO_MUTED = 40;
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //推流和连麦presenter
@@ -55,6 +67,9 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
 
     //适配器
     private PLVLSStreamerAdapter streamerAdapter;
+
+    private boolean isLocalAudioMuted = false;
+    private long lastNotifyLocalAudioMutedTimestamp;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -266,12 +281,19 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         public void onUserMuteAudio(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteAudio(uid, mute, streamerListPos, memberListPos);
             streamerAdapter.updateVolumeChanged();
+
+            if (isMyselfUserId(uid)) {
+                isLocalAudioMuted = mute;
+                if (!mute) {
+                    lastNotifyLocalAudioMutedTimestamp = 0;
+                }
+            }
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             streamerAdapter.updateVolumeChanged();
+            tryNotifyLocalAudioMuted(volume);
         }
 
         @Override
@@ -293,32 +315,37 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onStreamerError(int errorCode, Throwable throwable) {
+        public void onStreamerError(final int errorCode, final Throwable throwable) {
             super.onStreamerError(errorCode, throwable);
-            if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
-                String tips = throwable.getMessage();
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setMessage(tips)
-                        .setPositiveButton("设置", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PLVFastPermission.getInstance().jump2Settings(getContext());
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .create();
-                dialog.show();
-            } else {
-                PLVToast.Builder.context(getContext())
-                        .setText(throwable.getMessage())
-                        .build()
-                        .show();
-            }
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (errorCode == IPLVSStreamerManager.ERROR_PERMISSION_DENIED) {
+                        String tips = throwable.getMessage();
+                        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                .setMessage(tips)
+                                .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PLVFastPermission.getInstance().jump2Settings(getContext());
+                                    }
+                                })
+                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create();
+                        dialog.show();
+                    } else {
+                        PLVToast.Builder.context(getContext())
+                                .setText(throwable.getMessage())
+                                .build()
+                                .show();
+                    }
+                }
+            });
         }
 
         @Override
@@ -329,6 +356,28 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         @Override
         public void onGuestMediaStatusChanged(int pos) {
             streamerAdapter.updateGuestStatus(pos);
+        }
+
+        @Override
+        public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+            super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
+            if(isCurrentUser){
+                //提示当前用户的权限变更
+                if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER) && !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                    String message;
+                    if(PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)){
+                        message = getContext().getString(R.string.plvls_member_speaker_permission_already_grant);
+                    } else {
+                        message = getContext().getString(R.string.plvls_member_speaker_permission_already_remove);
+                    }
+                    PLVToast.Builder.context(getContext())
+                            .setText(message)
+                            .build()
+                            .show();
+                }
+            }
+
+            streamerAdapter.updatePermissionChange();
         }
     };
     // </editor-fold>
@@ -353,11 +402,49 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     /**
      * 更新讲师的封面图
      */
-    private void updateTeacherCameraCoverImage(String coverImage){
-        if(streamerAdapter != null){
+    private void updateTeacherCameraCoverImage(String coverImage) {
+        if (streamerAdapter != null) {
             streamerAdapter.updateCoverImage(coverImage);
         }
 
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理逻辑">
+
+    private boolean isMyselfUserId(String uid) {
+        final String myUserId = nullable(new PLVSugarUtil.Supplier<String>() {
+            @Override
+            public String get() {
+                return liveRoomDataManager.getConfig().getUser().getViewerId();
+            }
+        });
+        return myUserId != null && myUserId.equals(uid);
+    }
+
+    /**
+     * 静音麦克风时，检测用户是否正在说话，以提醒用户麦克风状态
+     * <p>
+     * 麦克风关闭时其他用户不会听到声音，但考虑到用户可能误触关闭了麦克风
+     * 而引起输入异常的情况，不会完全关闭麦克风调用，这里进行音量检测提醒
+     */
+    private void tryNotifyLocalAudioMuted(int volume) {
+        if (!isLocalAudioMuted) {
+            return;
+        }
+        if (volume < VOLUME_THRESHOLD_TO_NOTIFY_AUDIO_MUTED) {
+            return;
+        }
+        if (System.currentTimeMillis() - lastNotifyLocalAudioMutedTimestamp <= TimeUnit.MINUTES.toMillis(3)) {
+            return;
+        }
+        lastNotifyLocalAudioMutedTimestamp = System.currentTimeMillis();
+
+        PLVToast.Builder.context(getContext())
+                .setText(R.string.plvls_streamer_notify_speaking_with_mute_audio)
+                .longDuration()
+                .show();
+    }
+
+    // </editor-fold>
 }

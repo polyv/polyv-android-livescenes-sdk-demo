@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    tools:background="#202127">
+
+    <TextView
+        android:id="@+id/plv_playback_cache_downloaded_video_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:singleLine="true"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/plv_playback_cache_downloaded_delete_iv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="这里是视频的标题名称这里是视频的标题名称这里是视频的标题名称这里是视频的标题名称" />
+
+    <TextView
+        android:id="@+id/plv_playback_cache_downloaded_size_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#ADADC0"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plv_playback_cache_downloaded_video_title_tv"
+        tools:text="0.0M/0.0M" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+        android:id="@+id/plv_playback_cache_downloaded_delete_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:background="#1AD8D8D8"
+        android:src="@drawable/plv_playback_cache_delete_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius_iv="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#4D000000"
+        app:layout_constraintTop_toBottomOf="@+id/plv_playback_cache_downloaded_size_tv" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,6 +32,8 @@ import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVSpeakEvent;
@@ -288,6 +290,8 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
 
                 //设置直播介绍webView加载的内容
                 setDescContent(dataBean);
+
+                PLVChannelFeatureManager.onChannel(channelId).set(PLVChannelFeature.LIVE_CHATROOM_MANAGER_CHAT, dataBean.isRemindEnabled());
             }
         });
     }

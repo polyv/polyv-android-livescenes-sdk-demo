@@ -77,11 +77,11 @@
                 android:id="@+id/plvls_member_mic_iv"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:padding="3dp"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:layout_toLeftOf="@+id/plvls_member_cam_iv"
                 android:background="@drawable/plvls_member_iv_bg_shape"
+                android:padding="3dp"
                 android:src="@drawable/plvls_member_mic_iv_selector" />
 
             <ImageView
@@ -89,10 +89,21 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="16dp"
-                android:layout_toLeftOf="@+id/plvls_member_right_side_ly"
+                android:layout_marginLeft="16dp"
+                android:layout_toLeftOf="@+id/plvls_member_grant_speaker_iv"
                 android:background="@drawable/plvls_member_iv_bg_shape"
                 android:src="@drawable/plvls_chatroom_toolbar_camera_iv_selector" />
+
+            <ImageView
+                android:id="@+id/plvls_member_grant_speaker_iv"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_toLeftOf="@+id/plvls_member_right_side_ly"
+                android:background="@drawable/plvls_member_iv_bg_shape"
+                android:src="@drawable/plvls_chatroom_toolbar_grant_speaker_iv_selector"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/plvls_member_right_side_ly"
@@ -106,6 +117,7 @@
                     android:id="@+id/plvls_member_cam_front_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
+                    android:layout_marginLeft="16dp"
                     android:background="@drawable/plvls_member_iv_bg_shape"
                     android:src="@drawable/plvls_chatroom_toolbar_front_iv_selector" />
 
@@ -113,6 +125,7 @@
                     android:id="@+id/plvls_member_linkmic_control_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
+                    android:layout_marginLeft="16dp"
                     android:src="@drawable/plvls_member_linkmic_control_selector"
                     android:visibility="gone" />
 
@@ -120,6 +133,7 @@
                     android:id="@+id/plvls_member_linkmic_connecting_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
+                    android:layout_marginLeft="16dp"
                     android:src="@drawable/plvls_member_linkmic_connecting_animation"
                     android:visibility="gone" />
             </LinearLayout>

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/plvec_margin_common"
     android:paddingTop="@dimen/plvec_margin_top">
 
@@ -22,8 +23,8 @@
         android:layout_height="24dp"
         android:layout_below="@+id/watch_info_ly"
         android:layout_marginLeft="@dimen/plvec_margin_common"
-        android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_marginTop="@dimen/plvec_margin_common"
+        android:layout_marginRight="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
     <!--播放控制按钮-->
@@ -31,10 +32,9 @@
         android:id="@+id/play_control_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
         android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
         android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:layout_marginBottom="63dp"
         android:src="@drawable/plvec_play_control_sel" />
 
     <!--播放时间-->
@@ -42,9 +42,8 @@
         android:id="@+id/play_time_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:layout_toRightOf="@+id/play_control_iv"
         android:gravity="center"
@@ -56,10 +55,10 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
         android:layout_toLeftOf="@+id/total_time_tv"
-        android:layout_toRightOf="@+id/play_time_tv"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignTop="@+id/more_iv">
+        android:layout_toRightOf="@+id/play_time_tv">
 
         <SeekBar
             android:id="@+id/play_progress_sb"
@@ -82,23 +81,123 @@
         android:id="@+id/total_time_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/more_iv"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/more_iv"
+        android:layout_alignTop="@+id/play_control_iv"
+        android:layout_alignBottom="@+id/play_control_iv"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
-        android:layout_toLeftOf="@+id/more_iv"
+        android:layout_marginLeft="14dp"
         android:gravity="center"
-        android:text="00:00"
+        android:text="00:00:00"
         android:textColor="#ffffff"
         android:textSize="12sp" />
 
+    <!--欢迎语布局-->
+    <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView
+        android:id="@+id/greet_ly"
+        android:layout_width="258dp"
+        android:layout_height="22dp"
+        android:layout_above="@+id/swipe_load_view"
+        android:layout_marginBottom="16dp"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/plvlc_chat_playback_tips_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/swipe_load_view"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/plvec_chatroom_playback_v_bg"
+        android:gravity="center"
+        android:minWidth="258dp"
+        android:padding="8dp"
+        android:text="聊天重放功能已开启，将会显示历史消息"
+        android:textColor="#FF333333"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_load_view"
+        android:layout_width="244dp"
+        android:layout_height="152dp"
+        android:layout_above="@+id/play_control_iv"
+        android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:layout_marginBottom="16dp">
+
+        <!--聊天信息列表-->
+        <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+            android:id="@+id/chat_msg_rv"
+            android:layout_width="244dp"
+            android:layout_height="152dp"
+            android:fadingEdgeLength="32dp"
+            android:overScrollMode="never"
+            android:requiresFadingEdge="vertical"
+            app:fastScrollEnabled="false" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/unread_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/swipe_load_view"
+        android:layout_alignBottom="@+id/swipe_load_view"
+        android:layout_gravity="bottom"
+        android:background="@drawable/plvec_chatroom_view_more_bg"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="查看新信息"
+        android:textColor="#FFA611"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <!--购物车按钮-->
+    <ImageView
+        android:contentDescription="@string/playback_commodity_desc"
+        android:id="@+id/playback_commodity_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/plvec_margin_common"
+        android:layout_toStartOf="@+id/more_iv"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:src="@drawable/plvec_shopping_trolley" />
+
+    <!--商品推送布局-->
+    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout
+        android:id="@+id/playback_commodity_push_ly"
+        android:layout_width="match_parent"
+        android:layout_height="86dp"
+        android:layout_above="@+id/playback_commodity_iv"
+        android:layout_marginStart="@dimen/plvec_margin_common"
+        android:layout_marginEnd="94dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
     <!--更多按钮-->
     <ImageView
         android:id="@+id/more_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
+        android:layout_marginBottom="15dp"
         android:src="@drawable/plvec_more" />
+
+    <!--回放列表-->
+    <ImageView
+        android:id="@+id/more_video_list_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="15dp"
+        android:src="@drawable/plvec_playback_list"/>
+
 </RelativeLayout>

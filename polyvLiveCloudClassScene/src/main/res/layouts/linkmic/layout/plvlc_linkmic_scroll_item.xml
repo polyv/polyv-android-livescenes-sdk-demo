@@ -43,7 +43,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/black"
-                    tools:visibility="invisible" />
+                    tools:visibility="invisible">
+
+                    <ImageView
+                        android:id="@+id/plvlc_link_mic_render_view_pause_placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/plvlc_linkmic_pause_placeholder"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
                 <!-- 封面图（仅音频模式时展示）-->
                 <ImageView
@@ -58,6 +68,11 @@
                     android:layout_height="24dp"
                     android:layout_gravity="bottom"
                     android:background="@drawable/plvlc_linkmic_bg_link_item_bottom_shadow" />
+                <!--logoview-->
+                <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+                    android:id="@+id/plvlc_link_mic_logo_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
                 <!-- 昵称和logo-->
                 <LinearLayout
@@ -129,5 +144,16 @@
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/plvlc_live_linkmic_floating_playing_placeholder_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#2B3045"
+            android:gravity="center"
+            android:text="小窗播放中..."
+            android:textColor="#E4E4E4"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

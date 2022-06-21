@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="98dp"
+    android:id="@+id/plvsa_streamer_window_root"
+    android:clickable="true"
+    android:background="@drawable/plvsa_streamer_window_bg_selector"
+    android:layout_height="72dp">
+
+    <ImageView
+        android:id="@+id/plvsa_streamer_window_fold"
+        android:layout_width="24dp"
+        android:layout_height="72dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/plvsa_streamer_window_fold_selector" />
+
+    <LinearLayout
+        android:id="@+id/plvsa_streamer_window_content"
+        android:layout_toRightOf="@id/plvsa_streamer_window_fold"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="74dp"
+        android:layout_height="72dp">
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_window_status_iv"
+            android:src="@drawable/plvsa_streamer_share_screen_selected"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+
+        <TextView
+            android:id="@+id/plvsa_streamer_window_status_tv"
+            android:layout_marginTop="5dp"
+            android:text="结束共享"
+            android:textColor="#fff"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+
+
+
+</RelativeLayout>

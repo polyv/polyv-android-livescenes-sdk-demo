@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.document.popuplist;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +48,9 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.enums.PLVLSPptV
 import com.easefun.polyv.livestreamer.modules.document.popuplist.holder.PLVLSPptListViewHolder;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSDocumentDeleteArrow;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -154,6 +158,9 @@ public class PLVLSPptListLayout extends FrameLayout {
     // PPT文档上传监听接口实现
     private OnPLVSDocumentUploadListener documentUploadListener;
 
+    @Nullable
+    private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造方法">
@@ -188,6 +195,7 @@ public class PLVLSPptListLayout extends FrameLayout {
         PLVBlurUtils.initBlurView(plvlsBlurView);
 
         initMvpView();
+        initOnUserAbilityChangeListener();
     }
 
     private void findView() {
@@ -225,6 +233,9 @@ public class PLVLSPptListLayout extends FrameLayout {
         pptListAdapter.setOnPptItemClickListener(new PLVLSPptListViewHolder.OnPptItemClickListener() {
             @Override
             public void onClick(int id) {
+                if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+                    return;
+                }
                 if (pptListAdapter.getRealViewType() == PLVLSPptViewType.COVER) {
                     // 显示为PPT文档列表
                     if (currentAutoId == id) {
@@ -261,6 +272,9 @@ public class PLVLSPptListLayout extends FrameLayout {
                                     .setRightBtnListener(new OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
+                                            if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_DELETE_PPT)) {
+                                                return;
+                                            }
                                             PLVDocumentPresenter.getInstance().deleteDocument(fileId);
                                             documentDeleteConfirmDialog.hide();
                                         }
@@ -280,34 +294,37 @@ public class PLVLSPptListLayout extends FrameLayout {
      * 初始化PPT转码选择视图
      */
     private void initPptConvertSelectDialog() {
-        pptConvertSelectDialog = new PLVConfirmDialog(getContext())
+        pptConvertSelectDialog = PLVLSConfirmDialog.Builder.context(getContext())
                 .setTitle(getResources().getString(R.string.plvls_document_upload_choose_convert_type))
-                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint));
+                .setContent(getResources().getString(R.string.plvls_document_upload_choose_convert_type_hint))
+                .build();
     }
 
     /**
      * 初始化删除PPT前提示弹窗
      */
     private void initPptDeleteConfirmDialog() {
-        documentDeleteConfirmDialog = new PLVConfirmDialog(getContext())
+        documentDeleteConfirmDialog = PLVLSConfirmDialog.Builder.context(getContext())
                 .setTitleVisibility(View.GONE)
                 .setContent("删除后文档将无法恢复")
                 .setLeftButtonText("按错了")
-                .setLeftBtnListener(new OnClickListener() {
+                .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, View v) {
                         documentDeleteConfirmDialog.hide();
                     }
                 })
-                .setRightButtonText("确定");
+                .setRightButtonText("确定")
+                .build();
     }
 
     /**
      * 初始化重新上传PPT前提示弹窗
      */
     private void initPptUploadAgainConfirmDialog() {
-        documentUploadAgainConfirmDialog = new PLVConfirmDialog(getContext())
-                .setTitleVisibility(View.GONE);
+        documentUploadAgainConfirmDialog = PLVLSConfirmDialog.Builder.context(getContext())
+                .setTitleVisibility(View.GONE)
+                .build();
     }
 
     /**
@@ -332,6 +349,9 @@ public class PLVLSPptListLayout extends FrameLayout {
         plvlsDocumentRefreshTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_PULL_PPT)) {
+                    return;
+                }
                 PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
             }
         });
@@ -385,6 +405,9 @@ public class PLVLSPptListLayout extends FrameLayout {
 
             @Override
             public boolean requestSelectUploadFileConvertType(final Uri fileUri) {
+                if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_UPLOAD_PPT)) {
+                    return true;
+                }
                 if (fileUri == null) {
                     Log.w(TAG, "file uri is null.");
                     PLVToast.Builder.context(getContext())
@@ -454,6 +477,13 @@ public class PLVLSPptListLayout extends FrameLayout {
                         .setRightBtnListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_UPLOAD_PPT)) {
+                                    // 没有对应权限，取消上传
+                                    PLVDocumentPresenter.getInstance().removeUploadCache(cacheVOS);
+                                    documentUploadAgainConfirmDialog.hide();
+                                    return;
+                                }
+
                                 for (PLVPptUploadLocalCacheVO localCacheVO : cacheVOS) {
                                     File file = new File(localCacheVO.getFilePath());
                                     if (!file.exists()) {
@@ -503,6 +533,22 @@ public class PLVLSPptListLayout extends FrameLayout {
         };
 
         PLVDocumentPresenter.getInstance().registerView(mvpView);
+    }
+
+    /**
+     * 初始化用户角色能力变化监听
+     */
+    private void initOnUserAbilityChangeListener() {
+        this.onUserAbilityChangeCallback = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+                    close();
+                }
+            }
+        };
+
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
     }
 
     // </editor-fold>
@@ -712,7 +758,10 @@ public class PLVLSPptListLayout extends FrameLayout {
      * 打开弹层
      */
     public void open(boolean refresh) {
-        if(refresh){
+        if (!checkHasDocumentPermissionOrToast(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+            return;
+        }
+        if (refresh) {
             PLVDocumentPresenter.getInstance().requestGetPptCoverList(true);
         }
         final int landscapeHeight = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
@@ -787,6 +836,7 @@ public class PLVLSPptListLayout extends FrameLayout {
      * 销毁方法
      */
     public void destroy() {
+        onUserAbilityChangeCallback = null;
         stopUpdateBlurViewTimer();
     }
 
@@ -880,6 +930,16 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
             }, 3000);
         }
+    }
+
+    private boolean checkHasDocumentPermissionOrToast(PLVUserAbility documentAbility) {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(documentAbility)) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plvls_document_usage_not_permeitted)
+                    .show();
+            return false;
+        }
+        return true;
     }
 
     // </editor-fold>

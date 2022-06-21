@@ -4,8 +4,10 @@ import android.util.Pair;
 import android.view.MotionEvent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 
 /**
@@ -40,6 +42,11 @@ public interface IPLVSAStreamerLayout {
      * @param isMirror true：镜像，false：取消
      */
     void setMirrorMode(boolean isMirror);
+
+    /**
+     * 切换连麦布局类型
+     */
+    void changeLinkMicLayoutType();
 
     /**
      * 设置推流码率
@@ -98,6 +105,13 @@ public interface IPLVSAStreamerLayout {
     void addStreamerTimeListener(IPLVOnDataChangedListener<Integer> listener);
 
     /**
+     * 添加连麦人数监听器
+     *
+     * @param listener 监听器
+     */
+    void addLinkMicCountListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 开始直播
      */
     void startLive();
@@ -106,6 +120,16 @@ public interface IPLVSAStreamerLayout {
      * 暂停直播
      */
     void stopLive();
+
+    /**
+     * 进入直播间
+     */
+    void enterLive();
+
+    /**
+     * 清除全屏状态
+     */
+    void clearFullscreenState(PLVLinkMicItemDataBean linkmicItem);
 
     /**
      * 获取推流和连麦presenter
@@ -139,5 +163,10 @@ public interface IPLVSAStreamerLayout {
          * 重新开播
          */
         void onRestartLiveAction();
+
+        /**
+         * 全屏
+         */
+        void onFullscreenAction(PLVLinkMicItemDataBean itemDataBean, PLVSwitchViewAnchorLayout switchItemView);
     }
 }

@@ -6,14 +6,15 @@ import com.easefun.polyv.businesssdk.model.ppt.PolyvPPTAuthentic;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
+import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 
 import io.reactivex.disposables.Disposable;
@@ -77,7 +78,7 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                     final PLVLoginEvent loginEvent = PLVEventHelper.toMessageEventModel(message, PLVLoginEvent.class);
                     if (loginEvent != null &&
                             loginEvent.getUser().getUserId().
-                                    equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId())) {
+                                    equals(PLVSocketWrapper.getInstance().getLoginVO().getUserId())) {
                         dispose(delaySendLoginEventDisposable);
                         delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
                             @Override
@@ -107,7 +108,7 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                 }
             }
         };
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
+        PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
 
         followTeacherPptVideoLocationListener = new PLVSocketMessageObserver.OnMessageListener() {
             @Override
@@ -117,7 +118,6 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                     if (eventVo == null) {
                         return;
                     }
-                    PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(this);
                     if (!eventVo.isInClass()) {
                         // 非正在直播状态，不同步主副屏
                         return;
@@ -127,33 +127,47 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
                     }
                 }
+                if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event)) {
+                    PLVOnSliceStartEvent eventVo = PLVEventHelper.toMessageEventModel(message, PLVOnSliceStartEvent.class);
+                    if (eventVo == null) {
+                        return;
+                    }
+                    if (view != null) {
+                        view.switchPPTViewLocation(eventVo.isPptOnMainScreen());
+                    }
+                }
+                if (PLVEventConstant.Class.FINISH_CLASS.equals(event)) {
+                    // 下课时，将PPT切回悬浮窗
+                    if (view != null) {
+                        view.switchPPTViewLocation(false);
+                    }
+                }
             }
         };
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(followTeacherPptVideoLocationListener);
+        PLVSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(followTeacherPptVideoLocationListener);
     }
 
     @Override
-    public void removeMsgDelayTime() {
-        delayTime = 0;
-    }
-
-    @Override
-    public void recoverMsgDelayTime() {
-        delayTime = MSG_DELAY_TIME;
+    public void notifyIsWatchLowLatency(boolean isLowLatency) {
+        if (isLowLatency) {
+            delayTime = 500;
+        } else {
+            delayTime = MSG_DELAY_TIME;
+        }
     }
 
     @Override
     public void sendPPTBrushMsg(String message) {
         PolyvELogSender.send(PolyvPPTElog.class, PPT_RECEIVE_WEB_MESSAGE, "event " + SEND_SOCKET_EVENT + "receive web message :" + message);
         //发送画笔事件
-        PolyvSocketWrapper.getInstance().emit(PLVEventConstant.MESSAGE_EVENT, message);
+        PLVSocketWrapper.getInstance().emit(PLVEventConstant.MESSAGE_EVENT, message);
     }
 
 
     @Override
     public void destroy() {
-        PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
-        PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(followTeacherPptVideoLocationListener);
+        PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
+        PLVSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(followTeacherPptVideoLocationListener);
         dispose(delaySendLoginEventDisposable);
         view = null;
     }

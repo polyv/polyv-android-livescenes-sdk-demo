@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+    android:id="@+id/plvsa_streamer_anchor_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_width="200dp">
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,32 +20,66 @@
         android:layout_height="0dp"
         android:background="@drawable/plvsa_streamer_item_ly_bg_shape"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="H,9:16"
+        app:layout_constraintDimensionRatio="H,2:3"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:mode="none">
-
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:src="@drawable/plvsa_streamer_mute_video" />
 
         <FrameLayout
             android:id="@+id/plvsa_streamer_render_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <FrameLayout
+            android:id="@+id/plvsa_no_streamer_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvsa_streamer_item_ly_bg_shape"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:src="@drawable/plvsa_streamer_mute_video" />
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/plvsa_streamer_screen_share_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvsa_streamer_item_ly_bg_shape"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/plvsa_streamer_screen_share_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:src="@drawable/plvsa_streamer_screen_sharing_placeholder" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/plvsa_streamer_screen_share_iv"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="您正在共享屏幕"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
         <!-- 昵称和logo-->
         <LinearLayout
             android:id="@+id/plvsa_streamer_bottom_left_ly"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:layout_toLeftOf="@+id/plvsa_streamer_mic_state_iv"
             android:orientation="horizontal">
@@ -45,21 +87,29 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@drawable/plvsa_streamer_item_bg_shape"
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
+                    android:visibility="gone"
                     android:id="@+id/plvsa_streamer_avatar_iv"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:src="@drawable/plvsa_member_student_missing_face" />
+
+                <ImageView
+                    android:layout_marginLeft="6dp"
+                    android:id="@+id/plvsa_streamer_mic_state_iv"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/plvsa_streamer_mic_open" />
 
                 <TextView
                     android:id="@+id/plvsa_streamer_nick_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginLeft="3dp"
                     android:layout_marginRight="10dp"
                     android:ellipsize="end"
                     android:singleLine="true"
@@ -69,14 +119,31 @@
             </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/plvsa_streamer_guest_link_status_tv"
+            android:layout_width="41dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/plvsa_linkmic_guest_status_selector"
+            android:gravity="center"
+            android:text="未连麦"
+            android:textColor="#FFF0F1F5"
+            android:textSize="11sp"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
         <ImageView
-            android:id="@+id/plvsa_streamer_mic_state_iv"
+            android:id="@+id/plvsa_streamer_grant_speaker_iv"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/plvsa_streamer_mic_open" />
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/plvsa_streamer_guest_link_status_tv"
+            android:src="@drawable/plvsa_streamer_grant_speaker"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+</com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>

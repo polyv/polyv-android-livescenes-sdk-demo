@@ -30,6 +30,9 @@ allprojects {
         maven{
             url 'https://maven.aliyun.com/repository/public'
         }
+        maven {//maven central snapshots 地址
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
         //保利威阿里云效
         maven {
             credentials {
@@ -42,11 +45,11 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 30
     minSdkVersion = 21
-    targetSdkVersion = 28
-    versionCode = 171
-    versionName = "1.7.1"
+    targetSdkVersion = 27
+    versionCode = 193
+    versionName = "1.9.3"
 }
 
 task clean(type: Delete) {

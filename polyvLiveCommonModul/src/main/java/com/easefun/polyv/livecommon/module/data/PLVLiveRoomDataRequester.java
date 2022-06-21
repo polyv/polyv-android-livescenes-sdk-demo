@@ -21,6 +21,8 @@ import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.api.PLVHCApiManager;
 import com.plv.livescenes.hiclass.vo.PLVHCLessonDetailVO;
+import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.net.PLVApiManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.EncryptUtils;
 
@@ -57,6 +59,7 @@ public class PLVLiveRoomDataRequester {
     private Disposable getLiveStatusDisposable;
     private Disposable updateChannelNameDisposable;
     private Disposable lessonDetailDisposable;
+    private Disposable playbackChannelDetail;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -94,7 +97,7 @@ public class PLVLiveRoomDataRequester {
         paramMap.put("times", String.valueOf(times));
         String sign = PLVSignCreator.createSign(appSecret, paramMap);
         pageViewerDisposable = PLVResponseExcutor.excuteDataBean(
-                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, times),
+                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, PLVSignCreator.getSignatureMethod(), times),
                 Integer.class, new PLVrResponseCallback<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
@@ -222,9 +225,9 @@ public class PLVLiveRoomDataRequester {
         String sign = PLVSignCreator.createSign(appSecret, map);
         Observable<PolyvCommodityVO> commodityVOObservable;
         if (rank > -1) {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, rank, sign);
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, rank, sign, PLVSignCreator.getSignatureMethod());
         } else {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, sign);
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, sign, PLVSignCreator.getSignatureMethod());
         }
         productListDisposable = commodityVOObservable.retryWhen(new PLVRxBaseRetryFunction(3, 3000))
                 .compose(new PLVRxBaseTransformer<PolyvCommodityVO, PolyvCommodityVO>())
@@ -394,6 +397,41 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="获取回放频道的信息 - 请求、取消">
+    void requestPlaybackChannelDetail(final IPLVNetRequestListener<PLVPlaybackChannelDetailVO> listener){
+        disposePlayBackChannelDetail();
+        String channelId = getConfig().getChannelId();
+        long ptime = System.currentTimeMillis();
+        playbackChannelDetail = PLVApiManager.getPlvChannelStatusApi().getPlaybackChannelDetail(channelId, String.valueOf(ptime))
+                .compose(new PLVRxBaseTransformer<PLVPlaybackChannelDetailVO, PLVPlaybackChannelDetailVO>())
+                .subscribe(new Consumer<PLVPlaybackChannelDetailVO>() {
+                    @Override
+                    public void accept(PLVPlaybackChannelDetailVO detailVO) throws Exception {
+                        if (listener != null) {
+                            if (detailVO.getData() == null) {
+                                String errormsg = detailVO.getMessage();
+                                listener.onFailed(errormsg, new Throwable(errormsg));
+                            }
+                            listener.onSuccess(detailVO);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposePlayBackChannelDetail(){
+        if(playbackChannelDetail != null){
+            playbackChannelDetail.dispose();
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -403,6 +441,7 @@ public class PLVLiveRoomDataRequester {
         disposeGetLiveStatus();
         disposeUpdateChannelName();
         disposeLessonDetail();
+        disposePlayBackChannelDetail();
     }
     // </editor-fold>
 

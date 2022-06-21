@@ -13,13 +13,26 @@
         <attr name="blurOverlayColor" format="color" />
     </declare-styleable>
 
+    <attr name="radius" format="dimension" />
+    <attr name="mode" format="flags">
+        <flag name="none" value="0" />
+        <flag name="leftTop" value="1" />
+        <flag name="leftBottom" value="2" />
+        <flag name="rightTop" value="4" />
+        <flag name="rightBottom" value="8" />
+        <flag name="left" value="3" />
+        <flag name="top" value="5" />
+        <flag name="bottom" value="10" />
+        <flag name="right" value="12" />
+        <flag name="all" value="15" />
+    </attr>
     <declare-styleable name="PLVRoundRectLayout">
-        <attr name="radius" format="dimension" />
-        <attr name="mode">
-            <enum name="none" value="0" />
-            <enum name="all" value="1" />
-            <enum name="top" value="3" />
-        </attr>
+        <attr name="radius" />
+        <attr name="mode" />
+    </declare-styleable>
+    <declare-styleable name="PLVRoundRectConstraintLayout">
+        <attr name="radius" />
+        <attr name="mode" />
     </declare-styleable>
 
     <declare-styleable name="PLVRoundImageView">
@@ -49,22 +62,22 @@
         <attr name="cpv_progressNormalSize" format="dimension" />
         <attr name="cpv_progressReachSize" format="dimension" />
         <attr name="cpv_radius" format="dimension" />
-        <attr name="cpv_progressTextVisible" format="boolean"/>
-        <attr name="cpv_progressStartArc" format="integer"/>
-        <attr name="cpv_progressTextSkewX" format="dimension"/>
-        <attr name="cpv_progressTextPrefix" format="string"/>
-        <attr name="cpv_progressTextSuffix" format="string"/>
-        <attr name="cpv_innerBackgroundColor" format="color"/>
+        <attr name="cpv_progressTextVisible" format="boolean" />
+        <attr name="cpv_progressStartArc" format="integer" />
+        <attr name="cpv_progressTextSkewX" format="dimension" />
+        <attr name="cpv_progressTextPrefix" format="string" />
+        <attr name="cpv_progressTextSuffix" format="string" />
+        <attr name="cpv_innerBackgroundColor" format="color" />
         <attr name="cpv_progressStyle" format="enum">
-            <enum name="Normal" value="0"/>
-            <enum name="FillInner" value="1"/>
-            <enum name="FillInnerArc" value="2"/>
+            <enum name="Normal" value="0" />
+            <enum name="FillInner" value="1" />
+            <enum name="FillInnerArc" value="2" />
         </attr>
-        <attr name="cpv_innerProgressColor" format="color"/>
-        <attr name="cpv_innerPadding" format="dimension"/>
-        <attr name="cpv_outerColor" format="color"/>
-        <attr name="cpv_outerSize" format="dimension"/>
-        <attr name="cpv_reachCapRound" format="boolean"/>
+        <attr name="cpv_innerProgressColor" format="color" />
+        <attr name="cpv_innerPadding" format="dimension" />
+        <attr name="cpv_outerColor" format="color" />
+        <attr name="cpv_outerSize" format="dimension" />
+        <attr name="cpv_reachCapRound" format="boolean" />
     </declare-styleable>
 
     <!-- Reference to a style for the menu drawer. -->
@@ -136,8 +149,8 @@
         <attr name="stroke_color" format="color"></attr>
         <attr name="corner_radius" format="dimension"></attr>
         <attr name="button_style">
-            <enum name="right" value="0"/>
-            <enum name="left" value="1"/>
+            <enum name="right" value="0" />
+            <enum name="left" value="1" />
         </attr>
         <attr name="button_icon_size" format="dimension"></attr>
         <attr name="button_icon_stroke_width" format="dimension"></attr>
@@ -206,6 +219,13 @@
         <attr name="rectRadius" />
     </declare-styleable>
 
+    <declare-styleable name="PolyvBeadWidget">
+        <attr name="bead_margin" format="dimension" />
+        <attr name="bead_radius" format="dimension" />
+        <attr name="selected_bead_color" format="color" />
+        <attr name="unselected_bead_color" format="color" />
+    </declare-styleable>
+
     <declare-styleable name="PLVTriangleIndicateLayout">
         <attr name="triangleWidth" />
         <attr name="triangleHeight" />
@@ -243,6 +263,71 @@
         <attr name="plvMainRadius" format="dimension" />
         <attr name="plvMainColor" format="color" />
         <attr name="plvBackgroundColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVDragScaleLayout">
+        <attr name="plvMinX" format="dimension" />
+        <attr name="plvMaxX" format="dimension" />
+        <attr name="plvMinY" format="dimension" />
+        <attr name="plvMaxY" format="dimension" />
+        <attr name="plvDrag" format="flags">
+            <flag name="cornerRightTop" value="0x01" />
+            <flag name="cornerLeftTop" value="0x02" />
+            <flag name="cornerLeftBottom" value="0x04" />
+            <flag name="cornerRightBottom" value="0x08" />
+            <flag name="cornerLeft" value="0x06" />
+            <flag name="cornerRight" value="0x09" />
+            <flag name="cornerTop" value="0x03" />
+            <flag name="cornerBottom" value="0x0c" />
+            <flag name="cornerAll" value="0x0f" />
+
+            <flag name="edgeRight" value="0x10" />
+            <flag name="edgeTop" value="0x20" />
+            <flag name="edgeLeft" value="0x40" />
+            <flag name="edgeBottom" value="0x80" />
+            <flag name="edgeAll" value="0xf0" />
+
+            <flag name="multiTouch" value="0x0100" />
+
+            <flag name="center" value="0x1000" />
+        </attr>
+        <attr name="plvScale" format="flags">
+            <flag name="cornerRightTop" value="0x01" />
+            <flag name="cornerLeftTop" value="0x02" />
+            <flag name="cornerLeftBottom" value="0x04" />
+            <flag name="cornerRightBottom" value="0x08" />
+            <flag name="cornerLeft" value="0x06" />
+            <flag name="cornerRight" value="0x09" />
+            <flag name="cornerTop" value="0x03" />
+            <flag name="cornerBottom" value="0x0c" />
+            <flag name="cornerAll" value="0x0f" />
+
+            <flag name="edgeRight" value="0x10" />
+            <flag name="edgeTop" value="0x20" />
+            <flag name="edgeLeft" value="0x40" />
+            <flag name="edgeBottom" value="0x80" />
+            <flag name="edgeAll" value="0xf0" />
+
+            <flag name="multiTouch" value="0x0100" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="PLVRedPointImageView">
+        <attr name="plvRedPointPos" format="enum">
+            <enum name="leftTop" value="0" />
+            <enum name="rightTop" value="1" />
+            <enum name="rightBottom" value="2" />
+            <enum name="leftBottom" value="3" />
+        </attr>
+        <attr name="plvRedPointMarginHorizontal" format="dimension" />
+        <attr name="plvRedPointMarginVertical" format="dimension" />
+        <attr name="plvRedPointRadius" format="dimension" />
+        <attr name="plvRedPointColor" format="color" />
+        <attr name="plvDrawRedPoint" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVBeautySeekBar">
+        <attr name="plvDrawShadow" format="boolean" />
     </declare-styleable>
 
 </resources>

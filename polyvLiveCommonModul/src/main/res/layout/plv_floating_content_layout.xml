@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#6F6F6F"
+    app:mode="all"
+    app:radius="8dp"
+    tools:layout_height="90dp"
+    tools:layout_width="160dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+        android:id="@+id/plv_floating_content_switch_anchor_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Space
+            android:id="@+id/plv_floating_placeholder_space"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <ImageView
+        android:id="@+id/plv_floating_close_iv"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:padding="4dp"
+        android:src="@drawable/plv_floating_close_icon" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

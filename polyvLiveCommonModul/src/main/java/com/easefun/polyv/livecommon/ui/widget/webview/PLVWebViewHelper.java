@@ -130,7 +130,7 @@ public class PLVWebViewHelper {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (!isUseActionView) {
-                return false;
+                view.loadUrl(url);
             } else {
                 if (url.startsWith("yy://")) {
                     view.loadUrl(url);

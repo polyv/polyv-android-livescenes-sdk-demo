@@ -21,6 +21,8 @@ public class PLVOrientationManager {
     // 页面方向改变之后的监听器
     private List<OnConfigurationChangedListener> configurationChangedListeners;
 
+    private boolean isStartObserving = false;
+
     private PLVOrientationManager() {
         rotationObservers = new ArrayList<>();
         orientationListeners = new ArrayList<>();
@@ -59,6 +61,7 @@ public class PLVOrientationManager {
     // 移除重力感应旋转观察者，离开页面时，需要移除RotationObserver
     public void removeRotationObserver(PLVRotationObserver observer) {
         rotationObservers.remove(observer);
+        observer.stop(true);
         updateLastRationObserver();
     }
 
@@ -68,6 +71,9 @@ public class PLVOrientationManager {
         } else {
             lastRotationObserver = null;
         }
+        if (isStartObserving) {
+            start();
+        }
     }
 
     // 开启重力感应旋屏
@@ -75,6 +81,7 @@ public class PLVOrientationManager {
         if (lastRotationObserver != null) {
             lastRotationObserver.start();
         }
+        isStartObserving = true;
     }
 
     // 停止重力感应旋屏
@@ -87,6 +94,7 @@ public class PLVOrientationManager {
         if (lastRotationObserver != null) {
             lastRotationObserver.stop(isLifecycleStop);
         }
+        isStartObserving = false;
     }
 
     // 锁定屏幕旋转

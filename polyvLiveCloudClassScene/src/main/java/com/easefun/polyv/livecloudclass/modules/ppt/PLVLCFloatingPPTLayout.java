@@ -20,9 +20,9 @@ import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVLiveFloating
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVLiveFloatingPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
-import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 /**
@@ -62,6 +62,8 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
 
     //服务端的ppt开关
     private boolean isServerEnablePPT = false;
+    // 是否正在无延迟观看
+    private boolean isLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
 
     //Listener
     private OnClickListener onFloatingViewClickListener;
@@ -145,9 +147,18 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
     }
 
     @Override
+    public void setIsLowLatencyWatch(boolean isLowLatencyWatch) {
+        this.isLowLatencyWatch = isLowLatencyWatch;
+        if (getPPTView() != null) {
+            getPPTView().setIsLowLatencyWatch(isLowLatencyWatch);
+        }
+    }
+
+    @Override
     public void show() {
         PLVCommonLog.d(TAG, "show");
-        if (isServerEnablePPT && !PolyvLinkMicConfig.getInstance().isPureRtcWatchEnabled()) {
+        final boolean isRtcWatching = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() && isLowLatencyWatch;
+        if (isServerEnablePPT && !isRtcWatching) {
             setVisibility(VISIBLE);
         }
     }

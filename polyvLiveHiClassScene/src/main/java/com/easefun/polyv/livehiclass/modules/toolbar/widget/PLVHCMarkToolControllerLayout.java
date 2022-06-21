@@ -64,6 +64,7 @@ public class PLVHCMarkToolControllerLayout extends FrameLayout {
     private OnChangeMarkToolStateListener onChangeMarkToolStateListener;
 
     private boolean isTeacherType = false;
+    private boolean isLeader = false;
 
     private int addBottomMargin;
     // </editor-fold>
@@ -182,7 +183,7 @@ public class PLVHCMarkToolControllerLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="初始化方法 - 外部调用">
 
-    public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
+    public void init(final IPLVLiveRoomDataManager liveRoomDataManager, boolean isLeader) {
         final String userType = nullable(new PLVSugarUtil.Supplier<String>() {
             @Override
             public String get() {
@@ -190,6 +191,7 @@ public class PLVHCMarkToolControllerLayout extends FrameLayout {
             }
         });
         isTeacherType = PLVSocketUserConstant.USERTYPE_TEACHER.equals(userType);
+        this.isLeader = isLeader;
 
         initControllerState();
     }
@@ -262,7 +264,7 @@ public class PLVHCMarkToolControllerLayout extends FrameLayout {
         plvhcToolbarMarkToolGroup.setVisibility(currentShowType == PLVHCMarkToolEnums.ControllerShowType.MARK_TOOL ? VISIBLE : GONE);
         plvhcToolbarMarkToolColorGroup.setVisibility(currentShowType == PLVHCMarkToolEnums.ControllerShowType.COLOR ? VISIBLE : GONE);
 
-        plvhcToolbarMarkToolMoveIv.setVisibility(isTeacherType ? VISIBLE : GONE);
+        plvhcToolbarMarkToolMoveIv.setVisibility((isTeacherType || isLeader) ? VISIBLE : GONE);
     }
 
     private void showToContainer(boolean show) {

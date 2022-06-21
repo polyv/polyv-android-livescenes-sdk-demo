@@ -48,6 +48,18 @@ public interface IPLVHCChatroomLayout {
     void onLessonEnd(long inClassTime);
 
     /**
+     * 加入讨论
+     *
+     * @param groupId 分组Id
+     */
+    void onJoinDiscuss(String groupId);
+
+    /**
+     * 离开讨论
+     */
+    void onLeaveDiscuss();
+
+    /**
      * 处理图片选择结果
      *
      * @param data 数据

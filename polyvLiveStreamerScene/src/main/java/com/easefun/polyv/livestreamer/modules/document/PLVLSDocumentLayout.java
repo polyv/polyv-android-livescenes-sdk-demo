@@ -1,7 +1,10 @@
 package com.easefun.polyv.livestreamer.modules.document;
 
+import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+
 import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,11 +32,14 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentInputWidget;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
-import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+import java.util.List;
 
 /**
  * 文档布局
@@ -69,6 +75,9 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     // 文档布局切换全屏外部回调监听
     private OnSwitchFullScreenListener onSwitchFullScreenListener;
 
+    @Nullable
+    private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
+
     // 当前PPT文档ID
     private int autoId;
     // 最后一次打开的非白板文档ID
@@ -100,6 +109,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         findView();
         initLayoutSize();
         initMvpView();
+        initOnUserAbilityChangeListener();
     }
 
     private void findView() {
@@ -185,6 +195,25 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
     }
 
+    /**
+     * 初始化用户角色能力变化监听
+     */
+    private void initOnUserAbilityChangeListener() {
+        this.onUserAbilityChangeCallback = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
+                    // 不再有文档权限时，如果当前频道是白板模式，则本地显示切换回白板模式
+                    if (PLVLSDocumentLayout.this.autoId == AUTO_ID_WHITE_BOARD) {
+                        PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
+                    }
+                }
+            }
+        };
+
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="需外部调用的初始化方法">
@@ -250,24 +279,25 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
             public void onChangeMarkTool(@PLVDocumentMarkToolType.Range final String markToolType) {
                 if (PLVDocumentMarkToolType.CLEAR.equals(markToolType)) {
                     if (plvClearMarkConfirmWindow == null) {
-                        plvClearMarkConfirmWindow = new PLVConfirmDialog(getContext())
+                        plvClearMarkConfirmWindow = PLVLSConfirmDialog.Builder.context(getContext())
                                 .setTitleVisibility(GONE)
                                 .setContent("清屏后笔迹将无法恢复，确定清屏吗")
                                 .setLeftButtonText("按错了")
                                 .setRightButtonText("确定")
-                                .setLeftBtnListener(new OnClickListener() {
+                                .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
-                                    public void onClick(View v) {
+                                    public void onClick(DialogInterface dialog, View v) {
                                         plvClearMarkConfirmWindow.hide();
                                     }
                                 })
-                                .setRightBtnListener(new OnClickListener() {
+                                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
-                                    public void onClick(View v) {
+                                    public void onClick(DialogInterface dialog, View v) {
                                         documentPresenter.changeMarkToolType(markToolType);
                                         plvClearMarkConfirmWindow.hide();
                                     }
-                                });
+                                })
+                                .build();
                     }
                     plvClearMarkConfirmWindow.show();
                 } else {
@@ -331,6 +361,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     public void destroy() {
         PLVDocumentPresenter.getInstance().destroy();
         onSwitchFullScreenListener = null;
+        onUserAbilityChangeCallback = null;
     }
 
     // </editor-fold>

@@ -76,15 +76,13 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
         if (mainView == null) {
             return;
         }
-        flickObjectAnimation1.cancel();
-        flickObjectAnimation1.end();
-        flickObjectAnimation2.cancel();
-        flickObjectAnimation2.end();
+        stopAnimation();
     }
 
     @Override
     public void destroy() {
         super.destroy();
+        stopAnimation();
         flickObjectAnimation1 = null;
         flickObjectAnimation2 = null;
     }
@@ -145,5 +143,20 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
             }
         });
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理">
+
+    private void stopAnimation() {
+        if (flickObjectAnimation1 != null) {
+            flickObjectAnimation1.cancel();
+            flickObjectAnimation1.end();
+        }
+        if (flickObjectAnimation2 != null) {
+            flickObjectAnimation2.cancel();
+            flickObjectAnimation2.end();
+        }
+    }
+
     // </editor-fold>
 }

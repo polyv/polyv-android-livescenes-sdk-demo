@@ -3,17 +3,21 @@ package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.view.SurfaceView;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter.data.PLVMultiRoleLinkMicData;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
 import com.plv.livescenes.net.IPLVDataRequestListener;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
+import java.util.Map;
 
 import io.socket.client.Ack;
 
@@ -209,6 +213,11 @@ public interface IPLVMultiRoleLinkMicContract {
         void onRepeatLogin(String desc);
 
         /**
+         * 重连rtc频道成功
+         */
+        void onRejoinRoomSuccess();
+
+        /**
          * 连麦网络变化
          *
          * @param quality 网络状态常量
@@ -228,6 +237,11 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param networkStatusVO
          */
         void onRemoteNetworkStatus(PLVNetworkStatusVO networkStatusVO);
+
+        /**
+         * 讲师昵称
+         */
+        void onTeacherInfo(String nick);
 
         /**
          * 课节准备中
@@ -254,6 +268,83 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param willAutoStopLessonTimeMs 还剩多少时间将要自动结束课节，默认10分钟
          */
         void onLessonLateTooLong(long willAutoStopLessonTimeMs);
+
+        /**
+         * 响应用户被授权组长
+         *
+         * @param isHasGroupLeader true：自己当前被授权，false：自己当前没有被授权
+         * @param nick             组长的昵称
+         * @param isGroupChanged   是否是切换分组，true：切换，false：加入
+         * @param isLeaderChanged  是否是切换组长，true：切换，false：初始设置的组长
+         * @param groupName        分组的名称
+         * @param leaderId         组长Id，为null表示分组里没有组长
+         */
+        void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable String leaderId);
+
+        /**
+         * 即将加入讨论
+         *
+         * @param countdownTimeMs 倒计时时间
+         */
+        void onWillJoinDiscuss(long countdownTimeMs);
+
+        /**
+         * 加入讨论
+         *
+         * @param groupId         分组Id
+         * @param groupName       分组名称
+         * @param switchRoomEvent 切换房间事件
+         */
+        void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 离开讨论
+         *
+         * @param switchRoomEvent 切换房间事件
+         */
+        void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent);
+
+        /**
+         * 讲师加入分组讨论
+         *
+         * @param isJoin true：加入，false：离开
+         */
+        void onTeacherJoinDiscuss(boolean isJoin);
+
+        /**
+         * 讲师发送广播通知
+         *
+         * @param content 通知内容
+         */
+        void onTeacherSendBroadcast(String content);
+
+        /**
+         * 组长请求帮助
+         */
+        void onLeaderRequestHelp();
+
+        /**
+         * 组长取消帮助
+         */
+        void onLeaderCancelHelp();
+
+        /**
+         * 更新摄像头放大位置
+         */
+        void onUpdateLinkMicZoom(PLVUpdateMicSiteEvent updateMicSiteEvent);
+
+        /**
+         * 移除放大区域的摄像头画面
+         */
+        void onRemoveLinkMicZoom(PLVRemoveMicSiteEvent removeMicSiteEvent);
+
+        /**
+         * 更新所有摄像头放大画面位置
+         *
+         * @param updateMicSiteEventMap Key:连麦id，Value:事件
+         */
+        void onChangeLinkMicZoom(@Nullable Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap);
+
     }
     // </editor-fold>
 
@@ -333,6 +424,13 @@ public interface IPLVMultiRoleLinkMicContract {
         void switchCamera(boolean front);
 
         /**
+         * 设置推流画面类型
+         *
+         * @param type 类型
+         */
+        void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
+
+        /**
          * 获取成员列表数据
          */
         void requestMemberList();
@@ -343,14 +441,14 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param context 上下文
          * @return 渲染器
          */
-        SurfaceView createRenderView(Context context);
+        View createRenderView(Context context);
 
         /**
          * 释放渲染器
          *
          * @param renderView 渲染器
          */
-        void releaseRenderView(SurfaceView renderView);
+        void releaseRenderView(View renderView);
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -358,7 +456,7 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param renderView 渲染器
          * @param linkMicId  连麦ID
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -367,7 +465,7 @@ public interface IPLVMultiRoleLinkMicContract {
          * @param linkMicId  连麦ID
          * @param streamType 流类型
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId, @PLVLinkMicConstant.RenderStreamTypeAnnotation int streamType);
+        void setupRenderView(View renderView, String linkMicId, @PLVLinkMicConstant.RenderStreamTypeAnnotation int streamType);
 
         /**
          * 发送奖杯给学员
@@ -480,6 +578,11 @@ public interface IPLVMultiRoleLinkMicContract {
          * 获取限制的连麦人数，未能获取时为0，也可用 {@link PLVMultiRoleLinkMicData#getLimitLinkNumber()} 方法监听获取
          */
         int getLimitLinkNumber();
+
+        /**
+         * 是否加入了分组讨论
+         */
+        boolean isJoinDiscuss();
 
         /**
          * 获取连麦数据

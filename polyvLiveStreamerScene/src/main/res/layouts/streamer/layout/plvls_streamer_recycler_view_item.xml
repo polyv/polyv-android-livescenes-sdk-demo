@@ -18,17 +18,27 @@
         app:mode="all"
         app:radius="8dp">
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:src="@drawable/plvls_streamer_mute_video" />
-
         <FrameLayout
             android:id="@+id/plvls_streamer_render_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <!--占位图-->
+        <FrameLayout
+            android:id="@+id/plvsa_no_streamer_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#313540"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:src="@drawable/plvls_streamer_mute_video" />
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/plvls_streamer_cover_image"
@@ -91,5 +101,16 @@
             android:text="未连麦"
             android:textColor="#FFF0F1F5"
             android:textSize="11sp" />
+
+        <ImageView
+            android:id="@+id/plvls_streamer_speaker_permission_status_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/plvls_streamer_guest_link_status_tv"
+            android:src="@drawable/plvls_streamer_speaker"
+            android:visibility="invisible" />
+
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

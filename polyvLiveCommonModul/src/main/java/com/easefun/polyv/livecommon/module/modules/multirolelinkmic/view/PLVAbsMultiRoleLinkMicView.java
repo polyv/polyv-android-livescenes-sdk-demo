@@ -7,9 +7,13 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.multirolelinkmic.contract.IPLVMultiRoleLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.document.event.PLVSwitchRoomEvent;
 import com.plv.livescenes.hiclass.vo.PLVHCStudentLessonListVO;
+import com.plv.socket.event.linkmic.PLVRemoveMicSiteEvent;
+import com.plv.socket.event.linkmic.PLVUpdateMicSiteEvent;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * mvp-多角色连麦view层抽象类
@@ -141,6 +145,11 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
     }
 
     @Override
+    public void onRejoinRoomSuccess() {
+
+    }
+
+    @Override
     public void onNetworkQuality(int quality) {
 
     }
@@ -152,6 +161,11 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
 
     @Override
     public void onRemoteNetworkStatus(PLVNetworkStatusVO networkStatusVO) {
+
+    }
+
+    @Override
+    public void onTeacherInfo(String nick) {
 
     }
 
@@ -172,6 +186,61 @@ public abstract class PLVAbsMultiRoleLinkMicView implements IPLVMultiRoleLinkMic
 
     @Override
     public void onLessonLateTooLong(long willAutoStopLessonTimeMs) {
+
+    }
+
+    @Override
+    public void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, boolean isGroupChanged, boolean isLeaderChanged, String groupName, @Nullable String leaderId) {
+
+    }
+
+    @Override
+    public void onWillJoinDiscuss(long countdownTimeMs) {
+
+    }
+
+    @Override
+    public void onJoinDiscuss(String groupId, String groupName, @Nullable PLVSwitchRoomEvent switchRoomEvent) {
+
+    }
+
+    @Override
+    public void onLeaveDiscuss(@Nullable PLVSwitchRoomEvent switchRoomEvent) {
+
+    }
+
+    @Override
+    public void onTeacherJoinDiscuss(boolean isJoin) {
+
+    }
+
+    @Override
+    public void onTeacherSendBroadcast(String content) {
+
+    }
+
+    @Override
+    public void onLeaderRequestHelp() {
+
+    }
+
+    @Override
+    public void onLeaderCancelHelp() {
+
+    }
+
+    @Override
+    public void onUpdateLinkMicZoom(PLVUpdateMicSiteEvent updateMicSiteEvent) {
+
+    }
+
+    @Override
+    public void onRemoveLinkMicZoom(PLVRemoveMicSiteEvent removeMicSiteEvent) {
+
+    }
+
+    @Override
+    public void onChangeLinkMicZoom(@Nullable Map<String, PLVUpdateMicSiteEvent> updateMicSiteEventMap) {
 
     }
 }

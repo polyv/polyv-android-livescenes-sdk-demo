@@ -3,6 +3,8 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,8 +20,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 
@@ -80,6 +85,8 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
         }
     };
 
+    private boolean isBeautyLayoutShowing = false;
+
     private OnTipsClickListener onTipsClickListener;
 
     // </editor-fold>
@@ -109,6 +116,8 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
 
         initLinkmicTipsAnimator();
         initLinkmicTipsOnClickListener();
+
+        observeBeautyLayoutStatus();
     }
 
     private void findView() {
@@ -188,6 +197,18 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
         });
     }
 
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVSALinkMicRequestTipsLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 外部调用的方法">
@@ -206,6 +227,19 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
 
     public void setOnTipsClickListener(OnTipsClickListener onTipsClickListener) {
         this.onTipsClickListener = onTipsClickListener;
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部处理">
+
+    private void updateVisibility() {
+        // 美颜布局显示时，不显示连麦提示条
+        if (isBeautyLayoutShowing) {
+            setVisibility(View.GONE);
+            return;
+        }
+        setVisibility(View.VISIBLE);
     }
 
     // </editor-fold>

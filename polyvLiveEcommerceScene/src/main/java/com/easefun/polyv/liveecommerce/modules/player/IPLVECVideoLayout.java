@@ -2,6 +2,7 @@ package com.easefun.polyv.liveecommerce.modules.player;
 
 import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
@@ -9,6 +10,8 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 import java.util.List;
 
@@ -89,23 +92,24 @@ public interface IPLVECVideoLayout {
 
     /**
      * view 是否设置为浮窗显示
+     *
      * @param isFloating
      */
     void setFloatingWindow(boolean isFloating);
 
     /**
-     * videoView父控件从videoLayout中分离出来
-     *
-     * @return videoView父控件
+     * @see View#dispatchTouchEvent(MotionEvent)
      */
-    View detachVideoViewParent();
+    boolean dispatchTouchEvent(MotionEvent ev);
+
+    PLVSwitchViewAnchorLayout getPlayerSwitchAnchorLayout();
 
     /**
-     * 把videoView父控件附加到videoLayout里
+     * 设置播放器区域位置
      *
-     * @param view videoView父控件
+     * @param videoViewRect 区域
      */
-    void attachVideoViewParent(View view);
+    void setVideoViewRect(Rect videoViewRect);
 
     /**
      * 销毁，销毁播放器及相关资源
@@ -114,13 +118,6 @@ public interface IPLVECVideoLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - live部分，定义 直播播放器布局 独有的方法">
-
-    /**
-     * 设置播放器区域位置
-     *
-     * @param videoViewRect 区域
-     */
-    void setVideoViewRect(Rect videoViewRect);
 
     /**
      * 获取线路索引
@@ -179,6 +176,18 @@ public interface IPLVECVideoLayout {
     void changeMediaPlayMode(@PolyvMediaPlayMode.Mode int mediaPlayMode);
 
     /**
+     * 当前是否无延迟观看模式
+     */
+    boolean isCurrentLowLatencyMode();
+
+    /**
+     * 切换无延迟观看模式
+     *
+     * @param isLowLatencyMode 是否无延迟观看
+     */
+    void switchLowLatencyMode(boolean isLowLatencyMode);
+
+    /**
      * 获取直播播放器数据中的播放信息
      *
      * @return 播放信息数据
@@ -194,6 +203,13 @@ public interface IPLVECVideoLayout {
      * @return 总时长，单位：ms
      */
     int getDuration();
+
+    /**
+     * 获取视频当前播放时间
+     *
+     * @return 视频当前播放时间，单位：毫秒
+     */
+    int getVideoCurrentPosition();
 
     /**
      * 根据progress占max的百分比，跳转到视频总时间的该百分比进度
@@ -218,12 +234,36 @@ public interface IPLVECVideoLayout {
     float getSpeed();
 
     /**
+     * 添加seek完成监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 获取回放播放器数据中的播放信息
      *
      * @return 播放信息数据
      */
     LiveData<PLVPlayInfoVO> getPlaybackPlayInfoVO();
 
+    /**
+     * 改变回放视频的vid
+     * @param vid
+     */
+    void changePlaybackVid(String vid);
+
+    /**
+     * 改变回放视频vid并且立即播放
+     *
+     * @param vid
+     */
+    void changePlaybackVidAndPlay(String vid);
+
+    /**
+     * 获取sessionId
+     */
+    String getSessionId();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">
@@ -236,6 +276,18 @@ public interface IPLVECVideoLayout {
          * 关闭浮窗点击事件
          */
         void onCloseFloatingAction();
+
+        /**
+         * 无延迟观看回调
+         *
+         * @param isLowLatency 是否正在无延迟观看
+         */
+        void acceptOnLowLatencyChange(boolean isLowLatency);
+
+        /**
+         * 网络质量回调
+         */
+        void acceptNetworkQuality(int networkQuality);
     }
     // </editor-fold>
 }

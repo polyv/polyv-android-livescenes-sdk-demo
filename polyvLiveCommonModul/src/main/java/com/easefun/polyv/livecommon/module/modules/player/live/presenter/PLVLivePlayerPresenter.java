@@ -17,12 +17,10 @@ import com.easefun.polyv.businesssdk.api.auxiliary.IPolyvAuxiliaryVideoViewListe
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
-import com.easefun.polyv.businesssdk.model.video.PolyvBaseVideoParams;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveLinesVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
-import com.easefun.polyv.businesssdk.model.video.PolyvLiveVideoParams;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -32,15 +30,24 @@ import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkCommonController;
+import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkTextVO;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
+import com.plv.business.model.video.PLVBaseVideoParams;
+import com.plv.business.model.video.PLVLiveVideoParams;
+import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
+import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -57,6 +64,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     private boolean isAllowOpenAdHead = false;
     //设置是否允许跑马灯运行
     private boolean isAllowMarqueeRunning = true;
+    private boolean isAllowWatermarkShow = true;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVLivePlayerData livePlayerData;
@@ -68,6 +76,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     private PolyvAuxiliaryVideoview subVideoView;
     //logo对象
     private PLVPlayerLogoView logoView;
+
+    private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
 
     private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
     // </editor-fold>
@@ -114,15 +124,22 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
 
     @Override
     public void startPlay() {
-        PolyvLiveVideoParams liveVideoParams = new PolyvLiveVideoParams(
+        startPlay(isLowLatency);
+    }
+
+    @Override
+    public void startPlay(boolean lowLatency) {
+        removeWatermark();
+        PLVLiveVideoParams liveVideoParams = new PLVLiveVideoParams(
                 getConfig().getChannelId(),
                 getConfig().getAccount().getUserId(),
                 getConfig().getUser().getViewerId()
         );
-        liveVideoParams.buildOptions(PolyvBaseVideoParams.WAIT_AD, true)
-                .buildOptions(PolyvBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
-                .buildOptions(PolyvBaseVideoParams.MARQUEE, true)
-                .buildOptions(PolyvBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName());
+        liveVideoParams.buildOptions(PLVBaseVideoParams.WAIT_AD, true)
+                .buildOptions(PLVBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
+                .buildOptions(PLVBaseVideoParams.MARQUEE, true)
+                .buildOptions(PLVBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
+                .buildOptions(PLVLiveVideoParams.LOW_LATENCY, isLowLatency = lowLatency);
         if (videoView != null) {
             videoView.playByMode(liveVideoParams, PLVPlayOption.PLAYMODE_LIVE);
         }
@@ -136,6 +153,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             view.onRestartPlay();
         }
         stopMarqueeView();
+        removeWatermark();
         startPlay();
     }
 
@@ -231,6 +249,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.changeMediaPlayMode(mediaPlayMode);
         }
         stopMarqueeView();
+        removeWatermark();
     }
 
     @Override
@@ -239,6 +258,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.changeLines(linesPos);
         }
         stopMarqueeView();
+        removeWatermark();
     }
 
     @Override
@@ -247,6 +267,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.changeBitRate(bitRate);
         }
         stopMarqueeView();
+        removeWatermark();
     }
 
     @Override
@@ -263,6 +284,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     public int getLinesPos() {
         return videoView == null ? 0 : videoView.getLinesPos();
     }
+
 
     @Override
     public int getBitratePos() {
@@ -318,6 +340,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         stopPlayProgressTimer();
         stopMarqueeView();
         unregisterView();
+        removeWatermark();
         if (logoView != null) {
             logoView.removeAllViews();
             logoView = null;
@@ -447,6 +470,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     setLogoVisibility(View.GONE);
                     stopMarqueeView();
+                    removeWatermark();
                 }
             });
             videoView.setOnNoLiveAtPresentListener(new IPolyvLiveListenerEvent.OnNoLiveAtPresentListener() {
@@ -461,6 +485,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     setLogoVisibility(View.GONE);
                     stopMarqueeView();
+                    removeWatermark();
                 }
 
                 @Override
@@ -473,6 +498,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     setLogoVisibility(View.GONE);
                     stopMarqueeView();
+                    removeWatermark();
                 }
 
                 @Override
@@ -485,6 +511,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     setLogoVisibility(View.GONE);
                     stopMarqueeView();
+                    removeWatermark();
                 }
             });
             videoView.setOnPreparedListener(new IPolyvVideoViewListenerEvent.OnPreparedListener() {
@@ -504,6 +531,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                         view.onPrepared(videoView.getMediaPlayMode());
                     }
                     setMarqueeViewRunning(true);
+                    showWatermarkView(true);
                 }
 
                 @Override
@@ -520,6 +548,22 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                         view.onLinesChanged(linesPos);
                     }
                 }
+            });
+            videoView.setOnGetWatermarkVOListener(new IPLVVideoViewListenerEvent.OnGetWatermarkVoListener() {
+                @Override
+                public void onGetWatermarkVO(final PLVWatermarkVO waterMarkVO) {
+                    PLVWatermarkCommonController.getInstance().updateWatermarkView(waterMarkVO,
+                            getConfig().getUser().getViewerName());
+                    if (!isWatermarkExisted()) {
+                        return;
+                    }
+                    if ("N".equals(waterMarkVO.watermarkRestrict)) {
+                        removeWatermark();
+                    } else {
+                        setWatermarkTextVO(waterMarkVO);
+                    }
+                }
+
             });
             videoView.setOnGetMarqueeVoListener(new IPolyvVideoViewListenerEvent.OnGetMarqueeVoListener() {
                 @Override
@@ -688,14 +732,26 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     return false;
                 }
             });
+            videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
+                @Override
+                public void onNetworkQuality(int networkQuality) {
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLowLatencyNetworkQuality(networkQuality);
+                    }
+                }
+            });
             videoView.setOnGetLogoListener(new IPolyvVideoViewListenerEvent.OnGetLogoListener() {
                 @Override
                 public void onLogo(String logoImage, int logoAlpha, int logoPosition, String logoHref) {
                     if (TextUtils.isEmpty(logoImage)) {
                         return;
                     }
-                    PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam().setWidth(0.14F).setHeight(0.25F)
-                            .setAlpha(logoAlpha).setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition).setResUrl(logoImage);
+                    final PLVPlayerLogoView.LogoParam logoParam = new PLVPlayerLogoView.LogoParam()
+                            .setWidth(0.14F).setHeight(0.25F).setAlpha(logoAlpha)
+                            .setOffsetX(0.03F).setOffsetY(0.06F).setPos(logoPosition)
+                            .setResUrl(logoImage)
+                            .setLogoHref(logoHref);
                     IPLVLivePlayerContract.ILivePlayerView view = getView();
                     if (view != null) {
                         logoView = view.getLogo();
@@ -724,6 +780,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     if (view != null) {
                         view.onOnlyAudio(isOnlyAudio);
                     }
+                }
+            });
+            videoView.setOnSessionIdChangedListener(new IPLVLiveListenerEvent.OnSessionIdChangedListener() {
+                @Override
+                public void onSessionChanged(String sessionId) {
+                    liveRoomDataManager.setSessionId(sessionId);
                 }
             });
         }
@@ -828,6 +890,64 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 水印显示控制">
+
+    private boolean isWatermarkExisted() {
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        IPLVWatermarkView watermarkView = view.getWatermarkView();
+        return watermarkView != null;
+    }
+
+    private void setWatermarkTextVO(PLVWatermarkVO plvWatermarkVO) {
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        IPLVWatermarkView watermarkView = view.getWatermarkView();
+        PLVWatermarkTextVO plvWatermarkTextVO = new PLVWatermarkTextVO();
+        switch(plvWatermarkVO.watermarkType){
+            case "fixed":
+                plvWatermarkTextVO.setContent(plvWatermarkVO.watermarkContent)
+                        .setFontSize(plvWatermarkVO.watermarkFontSize)
+                        .setFontAlpha(plvWatermarkVO.watermarkOpacity);
+                break;
+            case "nickname":
+                plvWatermarkTextVO.setContent(getConfig().getUser().getViewerName())
+                        .setFontSize(plvWatermarkVO.watermarkFontSize)
+                        .setFontAlpha(plvWatermarkVO.watermarkOpacity);
+                break;
+            default:
+                PLVCommonLog.d(TAG,"设置水印失败，默认为空");
+                break;
+        }
+
+        if (watermarkView != null) {
+            watermarkView.setPLVWatermarkVO(plvWatermarkTextVO);
+        }
+    }
+
+    private void showWatermarkView(boolean allow) {
+        if (!isAllowWatermarkShow) {
+            return;
+        }
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        IPLVWatermarkView watermarkView = view.getWatermarkView();
+        if (watermarkView != null) {
+            if (allow) {
+                watermarkView.showWatermark();
+            } else {
+                watermarkView.removeWatermark();
+            }
+        }
+    }
+
+    private void removeWatermark() {
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
+        if(view != null){
+            IPLVWatermarkView watermarkView = view.getWatermarkView();
+            if (watermarkView != null) {
+                watermarkView.removeWatermark();
+            }
+        }
+    }
+    //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部工具方法">
     private IPLVLivePlayerContract.ILivePlayerView getView() {

@@ -25,7 +25,7 @@
             android:layout_marginStart="34dp"
             android:layout_marginLeft="34dp"
             android:layout_marginTop="33dp"
-            android:text="登录账号"
+            android:text="登录课程"
             android:textColor="#FFF"
             android:textSize="26sp"
             android:textStyle="bold"
@@ -126,7 +126,7 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:button="@null"
-                android:drawableStart="@drawable/plvhc_login_checkbox_selector"
+                android:drawableLeft="@drawable/plvhc_login_checkbox_selector"
                 android:padding="6dp" />
 
             <TextView

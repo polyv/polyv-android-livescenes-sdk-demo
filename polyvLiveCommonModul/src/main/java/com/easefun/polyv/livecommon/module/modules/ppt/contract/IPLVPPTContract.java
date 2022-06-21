@@ -54,14 +54,11 @@ public interface IPLVPPTContract {
         void init(IPLVPPTView view);
 
         /**
-         * 移除消息延迟时间
+         * 设置是否无延迟观看
+         *
+         * @param isLowLatency 是否无延迟观看
          */
-        void removeMsgDelayTime();
-
-        /**
-         * 恢复消息延迟时间
-         */
-        void recoverMsgDelayTime();
+        void notifyIsWatchLowLatency(boolean isLowLatency);
 
         /**
          * 发送画笔消息

@@ -218,7 +218,7 @@
                 android:layout_height="26dp"
                 android:layout_gravity="center"
                 android:button="@null"
-                android:drawableStart="@drawable/plvhc_login_checkbox_selector"
+                android:drawableLeft="@drawable/plvhc_login_checkbox_selector"
                 android:gravity="center"
                 android:padding="6dp" />
 
@@ -247,7 +247,7 @@
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:button="@null"
-                android:drawableStart="@drawable/plvhc_login_checkbox_selector"
+                android:drawableLeft="@drawable/plvhc_login_checkbox_selector"
                 android:padding="6dp" />
 
             <TextView

@@ -5,6 +5,7 @@ import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +54,14 @@ public interface IPLVLinkMicContract {
         void onPrepareLinkMicList(String linkMicUid, PLVLinkMicListShowMode linkMicListShowMode, List<PLVLinkMicItemDataBean> linkMicList);
 
         /**
-         * 开始渲染连麦列表
+         * 加入rtc频道
          */
-        void onShowLinkMicList();
+        void onJoinRtcChannel();
 
         /**
-         * 释放连麦列表
+         * 离开rtc频道
          */
-        void onReleaseLinkMicList();
+        void onLeaveRtcChannel();
 
         /**
          * 改变连麦列表显示模式
@@ -234,9 +235,36 @@ public interface IPLVLinkMicContract {
         void muteVideo(boolean mute);
 
         /**
+         * 静音音频
+         */
+        void muteAudio(String linkMicId, boolean mute);
+
+        /**
+         * 禁用视频
+         */
+        void muteVideo(String linkMicId, boolean mute);
+
+        /**
+         * 静音音频
+         */
+        void muteAllAudio(boolean mute);
+
+        /**
+         * 禁用视频
+         */
+        void muteAllVideo(boolean mute);
+
+        /**
          * 切换前后置摄像头方向
          */
         void switchCamera();
+
+        /**
+         * 设置推流画面类型
+         *
+         * @param type 类型
+         */
+        void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
 
         /**
          * 创建渲染器
@@ -252,6 +280,13 @@ public interface IPLVLinkMicContract {
          * @return 连麦ID
          */
         String getLinkMicId();
+
+        /**
+         * 获取讲师连麦ID
+         *
+         * @return 讲师连麦ID
+         */
+        String getMainTeacherLinkMicId();
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -322,6 +357,11 @@ public interface IPLVLinkMicContract {
          * 设置直播结束
          */
         void setLiveEnd();
+
+        /**
+         * 设置是否rtc观看
+         */
+        void setWatchRtc(boolean watchRtc);
 
         /**
          * 获取RTC列表的大小

@@ -27,6 +27,9 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.liveroom.adapter.PLVLSMemberAdapter;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -120,6 +123,13 @@ public class PLVLSMemberLayout extends FrameLayout {
                     onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
                 }
             }
+
+            @Override
+            public void onGrantSpeakerPermission(int position, String userId, boolean isGrant) {
+                if(onViewActionListener != null){
+                    onViewActionListener.onGrantSpeakerPermission(position, userId, isGrant);
+                }
+            }
         });
 
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
@@ -143,7 +153,7 @@ public class PLVLSMemberLayout extends FrameLayout {
             @Override
             public void onClick(View v) {
                 if (isStartedStatus) {
-                    new PLVConfirmDialog(getContext())
+                    PLVLSConfirmDialog.Builder.context(getContext())
                             .setTitleVisibility(View.GONE)
                             .setContent(R.string.plv_linkmic_dialog_hang_all_off_confirm_ask)
                             .setRightButtonText(R.string.plv_common_dialog_confirm)
@@ -186,7 +196,7 @@ public class PLVLSMemberLayout extends FrameLayout {
                         }
                     };
                     if (!currentIsMuteAll) {
-                        new PLVConfirmDialog(getContext())
+                        PLVLSConfirmDialog.Builder.context(getContext())
                                 .setTitleVisibility(View.GONE)
                                 .setContent(R.string.plv_linkmic_dialog_mute_all_audio_confirm_ask)
                                 .setRightButtonText(R.string.plv_common_dialog_confirm)
@@ -339,8 +349,7 @@ public class PLVLSMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onLocalUserMicVolumeChanged() {
-            super.onLocalUserMicVolumeChanged();
+        public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
         }
 
@@ -383,7 +392,7 @@ public class PLVLSMemberLayout extends FrameLayout {
         @Override
         public void onReachTheInteractNumLimit() {
             super.onReachTheInteractNumLimit();
-            new PLVConfirmDialog(getContext())
+            PLVLSConfirmDialog.Builder.context(getContext())
                     .setTitleVisibility(View.GONE)
                     .setContent(R.string.plv_linkmic_dialog_reach_the_interact_num_limit)
                     .setIsNeedLeftBtn(false)
@@ -395,6 +404,14 @@ public class PLVLSMemberLayout extends FrameLayout {
                         }
                     })
                     .show();
+        }
+
+        @Override
+        public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+            super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
+            if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER)) {
+                memberAdapter.updatePermissionChange();
+            }
         }
     };
     // </editor-fold>

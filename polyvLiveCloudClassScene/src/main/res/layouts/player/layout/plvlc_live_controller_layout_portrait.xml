@@ -25,6 +25,16 @@
             android:src="@drawable/plvlc_controller_video_bottom_portrait_gradient" />
     </FrameLayout>
 
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout
+        android:id="@+id/video_ppt_turn_page_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:visibility="invisible" />
+
+
     <TextView
         android:id="@+id/video_name_port_tv"
         android:layout_width="wrap_content"
@@ -110,15 +120,31 @@
         android:padding="8dp"
         android:src="@drawable/plvlc_controller_fullscreen" />
 
-    <ImageView
-        android:id="@+id/more_port_iv"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="0dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="4dp"
-        android:padding="8dp"
-        android:src="@drawable/plvlc_controller_more" />
+    <LinearLayout
+        android:id="@+id/plvlc_live_more_control_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true">
+
+        <ImageView
+            android:id="@+id/plvlc_live_control_floating_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="8dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/plvlc_live_controller_floating_icon" />
+
+        <ImageView
+            android:id="@+id/more_port_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="8dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/plvlc_controller_more" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/plvlc_live_player_controller_tv_reopen_floating_view"

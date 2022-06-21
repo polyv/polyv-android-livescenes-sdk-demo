@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="plvsa_setting_enter_live">进入直播间</string>
+    <string name="plvsa_setting_start_live">开始直播</string>
+    <string name="plvsa_streamer_sharescreen_exit">退出共享</string>
+    <string name="plvsa_streamer_sharescreen_start">屏幕共享</string>
+    <string name="plvsa_streamer_sharescreen_start_tip">其他人现在可以看到你的屏幕</string>
+    <string name="plvsa_streamer_sharescreen_already_stop">共享已结束</string>
+    <string name="plvsa_streamer_sharescreen_error">屏幕共享失败：</string>
+    <string name="plvsa_streamer_sharescreen_need_permission">屏幕共享需讲师授权</string>
+    <string name="plvsa_streamer_sharescreen_need_video_first">请先打开摄像头</string>
+    <string name="plvsa_streamer_notify_speaking_with_mute_audio">您已静音，请开启麦克风后发言</string>
+    <string name="plvsa_streamer_grant_speaker_permission">您已被授予主讲权限</string>
+    <string name="plvsa_streamer_remove_speaker_permission">您已被移除主讲权限</string>
+    <string name="plvsa_streamer_remove_speaker_and_stop_screenshare">您已被移除主讲权限，共享已结束</string>
+    <string name="plvsa_streamer_screenshare_start">开始共享</string>
+    <string name="plvsa_streamer_screenshare_stop">结束共享</string>
+    <string name="plvsa_float_window_permission_need">为保证后台运行，需要您授权浮窗权限</string>
+    <string name="plvsa_float_window_permission_denied_and_not_show">权限受限，将不开启悬浮窗</string>
+    <string name="plvsa_streamer_double_click_enter_fullscreen">双击窗口放大</string>
+    <string name="plvsa_streamer_double_click_exit_fullscreen">双击退出全屏</string>
+
+    <string name="plvsa_beauty_title">美颜</string>
+    <string name="plvsa_beauty_selector_beauty_title">美颜</string>
+    <string name="plvsa_beauty_selector_filter_title">滤镜</string>
+    <string name="plvsa_beauty_selector_detail_title">面部细节</string>
+    <string name="plvsa_beauty_reset_title">重置</string>
+    <string name="plvsa_beauty_switch_label">美颜开关</string>
+    <string name="plvsa_beauty_need_open_camera">请开启摄像头后使用</string>
+    <string name="plvsa_beauty_reset_confirm_title">确定重置吗？</string>
+    <string name="plvsa_beauty_reset_confirm_content">重置后所有参数将恢复默认值</string>
+    <string name="plvsa_beauty_reset_confirm_cancel">取消</string>
+    <string name="plvsa_beauty_reset_confirm_reset">确定</string>
+    <string name="plvsa_beauty_reset_success">重置成功</string>
+</resources>

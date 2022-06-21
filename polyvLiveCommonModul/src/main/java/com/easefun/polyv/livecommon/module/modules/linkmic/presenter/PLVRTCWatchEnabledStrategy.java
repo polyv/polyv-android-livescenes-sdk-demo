@@ -8,9 +8,10 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
 import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
-import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
+import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.linkmic.listener.PLVLinkMicEventListener;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
@@ -30,6 +31,8 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     private PLVLinkMicPresenter linkMicPresenter;
     private IPolyvLinkMicManager linkMicManager;
     private IPLVLiveRoomDataManager liveRoomDataManager;
+
+    private PLVLinkMicEventListener linkMicEventListener;
 
     /**** Listener ****/
     private OnJoinLinkMicListener onJoinLinkMicListener;
@@ -56,7 +59,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
         linkMicPresenter.pendingActionInCaseLinkMicEngineInitializing(new Runnable() {
             @Override
             public void run() {
-                linkMicManager.addEventHandler(new PolyvLinkMicEventListener() {
+                linkMicManager.addEventHandler(linkMicEventListener = new PLVLinkMicEventListener() {
                     @Override
                     public void onJoinChannelSuccess(String uid) {
                         isJoinChannel = true;
@@ -109,8 +112,8 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
      */
     @Override
     public void setLiveStart() {
-        Activity topActivity= ActivityUtils.getTopActivity();
-        if (topActivity!=null){
+        Activity topActivity = ActivityUtils.getTopActivity();
+        if (topActivity != null) {
             topActivity.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
         if (!isJoinChannel) {
@@ -133,8 +136,12 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     public void setJoinLinkMic() {
         isJoinLinkMic = true;
         linkMicManager.switchRoleToBroadcaster();
-        PLVLinkMicJoinSuccess joinSuccess = linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId());
-        onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+        linkMicManager.sendJoinSuccessMsg(liveRoomDataManager.getSessionId(), new IPLVLinkMicManager.OnSendJoinSuccessMsgListener() {
+            @Override
+            public void onSendJoinSuccessMsg(PLVLinkMicJoinSuccess joinSuccess) {
+                onJoinLinkMicListener.onJoinLinkMic(joinSuccess);
+            }
+        });
     }
 
     /**
@@ -147,6 +154,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     @Override
     public void setLeaveLinkMic() {
         linkMicManager.switchRoleToAudience();
+        linkMicManager.muteLocalVideo(true);
         linkMicManager.sendJoinLeaveMsg(liveRoomDataManager.getSessionId());
         onLeaveLinkMicListener.onLeaveLinkMic();
         isJoinLinkMic = false;
@@ -163,13 +171,13 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     }
 
     @Override
-    public void setFirstScreenLinkMicId(String linkMicId) {
+    public void setFirstScreenLinkMicId(String linkMicId, boolean mute) {
         if (PolyvLinkMicConfig.getInstance().isPureRtcOnlySubscribeMainScreenVideo()) {
             //mute掉原先的第一画面的视频
             linkMicManager.muteRemoteVideo(firstScreenLinkMicId, true);
             firstScreenLinkMicId = linkMicId;
             //订阅新的第一画面的视频
-            linkMicManager.muteRemoteVideo(firstScreenLinkMicId, false);
+            linkMicManager.muteRemoteVideo(firstScreenLinkMicId, mute);
         }
     }
     // </editor-fold>
@@ -183,6 +191,26 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
     @Override
     public void setOnLeaveLinkMicListener(OnLeaveLinkMicListener li) {
         onLeaveLinkMicListener = li;
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="销毁">
+
+    @Override
+    public void destroy() {
+        if (linkMicEventListener != null) {
+            linkMicManager.removeEventHandler(linkMicEventListener);
+            linkMicEventListener = null;
+        }
+
+        linkMicPresenter = null;
+        linkMicManager = null;
+        liveRoomDataManager = null;
+        onBeforeJoinChannelListener = null;
+        onJoinRTCChannelWatchListener = null;
+        onJoinLinkMicListener = null;
+        onLeaveLinkMicListener = null;
     }
 
     // </editor-fold>

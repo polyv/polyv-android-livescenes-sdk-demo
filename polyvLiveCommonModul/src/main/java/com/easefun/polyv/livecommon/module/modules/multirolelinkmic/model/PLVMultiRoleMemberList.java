@@ -36,6 +36,9 @@ import com.plv.socket.event.linkmic.PLVTeacherSetPermissionEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
+import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
+import com.plv.socket.event.seminar.PLVJoinDiscussEvent;
+import com.plv.socket.event.seminar.PLVSetLeaderEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.log.PLVELogSender;
 import com.plv.socket.socketio.PLVSocketIOObservable;
@@ -84,7 +87,7 @@ public class PLVMultiRoleMemberList {
 
     //request params
     private final int memberPage = 1;
-    private final int memberLength;
+    private int memberLength;
     private boolean isRequestedData;
 
     //举手数量
@@ -98,6 +101,11 @@ public class PLVMultiRoleMemberList {
     private boolean isTeacherType;
     //是否要添加自己到成员列表中
     private boolean isAddMyMemberItem;
+    //分组Id
+    private String groupId;
+    //组长用户Id
+    private String groupLeaderId;
+    private boolean isNoGroupIdCalled;
 
     //disposable
     private Disposable listUsersDisposable;
@@ -134,8 +142,8 @@ public class PLVMultiRoleMemberList {
         }
         linkMicList.addOnLinkMicListListener(new PLVMultiRoleLinkMicList.AbsOnLinkMicListListener() {
             @Override
-            public boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList) {
-                return updateMemberItemInfo(socketUserBean, linkMicItemDataBean, isJoinList);
+            public boolean onUpdateLinkMicItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isGroupLeader) {
+                return updateMemberItemInfo(socketUserBean, linkMicItemDataBean, isJoinList, isGroupLeader);
             }
 
             @Override
@@ -177,6 +185,20 @@ public class PLVMultiRoleMemberList {
                 return updateMemberItemStatus(joinList, waitList);
             }
         });
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setLeaderId(String leaderId) {
+        if (leaderId != null) {
+            checkCallLeaderChanged(leaderId, "");
+        }
+    }
+
+    public boolean isLeader() {
+        return isMySocketUserId(groupLeaderId);
     }
 
     public void requestData() {
@@ -279,11 +301,7 @@ public class PLVMultiRoleMemberList {
         if (linkMicList != null) {
             linkMicList.disposeRequestData();
         }
-        String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
-        if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登陆时，使用频道号
-        }
-        final String roomId = loginRoomId;
+        final String roomId = getRoomIdCombineDiscuss();
         listUsersDisposable = PLVChatApiRequestHelper.getListUsers(roomId, memberPage, memberLength, liveRoomDataManager.getSessionId())
                 .retryWhen(new PLVRxBaseRetryFunction(Integer.MAX_VALUE, 3000))
                 .compose(new PLVRxBaseTransformer<PLVListUsersVO, PLVListUsersVO>())
@@ -338,12 +356,7 @@ public class PLVMultiRoleMemberList {
     }
 
     private Disposable requestMemberListApiLessInner(final Consumer<List<PLVSocketUserBean>> onNext) {
-        String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
-        if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登陆时，使用频道号
-        }
-        final String roomId = loginRoomId;
-        return PLVChatApiRequestHelper.getListUsers(roomId, 1, MEMBER_LENGTH_LESS, liveRoomDataManager.getSessionId())
+        return PLVChatApiRequestHelper.getListUsers(getRoomIdCombineDiscuss(), 1, MEMBER_LENGTH_LESS, liveRoomDataManager.getSessionId())
                 .map(new Function<PLVListUsersVO, List<PLVSocketUserBean>>() {
                     @Override
                     public List<PLVSocketUserBean> apply(PLVListUsersVO PLVListUsersVO) throws Exception {
@@ -447,6 +460,9 @@ public class PLVMultiRoleMemberList {
                 i--;
                 continue;//排除在线列表中的自己，使用本地的数据添加，socket未登陆成功时获取不到
             }
+            if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(socketUserBean.getUserType())) {
+                continue;//过滤讲师
+            }
             PLVMemberItemDataBean memberItemDataBean = new PLVMemberItemDataBean();
             memberItemDataBean.setSocketUserBean(socketUserBean);
             //给新成员列表数据添加旧成员列表中保存的一些状态信息
@@ -459,7 +475,7 @@ public class PLVMultiRoleMemberList {
                     memberItemDataBean.setLinkMicItemDataBean(linkMicItemDataBean);
                     //判断是否需要通知连麦列表更新奖杯数及画笔权限
                     PLVClassStatusBean classStatusBean = socketUserBean.getClassStatus();
-                    checkUpdatePaintAndCup(classStatusBean, linkMicItemDataBean, oldLinkMicItemHasPaint, oldLinkMicItemCupNum);
+                    checkUpdateHasPermission(classStatusBean, linkMicItemDataBean, oldLinkMicItemHasPaint, oldLinkMicItemCupNum);
                 } else {
                     //添加基础的连麦bean
                     memberItemDataBean.addBaseLinkMicBean(socketUserBean);
@@ -468,6 +484,10 @@ public class PLVMultiRoleMemberList {
                 //添加基础的连麦bean
                 memberItemDataBean.addBaseLinkMicBean(socketUserBean);
             }
+            PLVClassStatusBean classStatusBean = socketUserBean.getClassStatus();
+            if (classStatusBean != null && classStatusBean.isGroupLeader()) {
+                checkCallLeaderChanged(socketUserBean.getUserId(), socketUserBean.getNick());
+            }
             tempMemberList.add(memberItemDataBean);
         }
         memberList = tempMemberList;
@@ -475,6 +495,11 @@ public class PLVMultiRoleMemberList {
         addMyMemberItem(myClassStatusBean);
         //更新列表
         callOnMemberListChangedWithSort();
+        //处理分组里面没有组长的情况
+        if (!TextUtils.isEmpty(groupId) && groupLeaderId == null && !isNoGroupIdCalled) {
+            isNoGroupIdCalled = true;
+            callOnUserHasGroupLeader(false, "", null);
+        }
     }
 
     private void addMyMemberItem(@Nullable PLVClassStatusBean classStatusBean) {
@@ -490,16 +515,19 @@ public class PLVMultiRoleMemberList {
                 boolean oldLinkMicItemHasPaint = myLinkMicItem.isHasPaint();
                 int oldLinkMicItemCupNum = myLinkMicItem.getCupNum();
                 memberItemDataBean.setLinkMicItemDataBean(myLinkMicItem);
-                checkUpdatePaintAndCup(classStatusBean, myLinkMicItem, oldLinkMicItemHasPaint, oldLinkMicItemCupNum);
+                checkUpdateHasPermission(classStatusBean, myLinkMicItem, oldLinkMicItemHasPaint, oldLinkMicItemCupNum);
             } else {
                 //添加基础的连麦bean
                 memberItemDataBean.addBaseLinkMicBean(memberItemDataBean.getSocketUserBean());
+            }
+            if (classStatusBean != null && classStatusBean.isGroupLeader()) {
+                checkCallLeaderChanged(mySocketUserBean.getUserId(), mySocketUserBean.getNick());
             }
             memberList.add(0, memberItemDataBean);
         }
     }
 
-    private void checkUpdatePaintAndCup(PLVClassStatusBean classStatusBean, PLVLinkMicItemDataBean linkMicItemDataBean, boolean oldLinkMicItemHasPaint, int oldLinkMicItemCupNum) {
+    private void checkUpdateHasPermission(PLVClassStatusBean classStatusBean, PLVLinkMicItemDataBean linkMicItemDataBean, boolean oldLinkMicItemHasPaint, int oldLinkMicItemCupNum) {
         if (classStatusBean != null) {
             @Nullable
             Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = linkMicList == null ? null : linkMicList.getLinkMicItemWithLinkMicId(linkMicItemDataBean.getLinkMicId());
@@ -516,11 +544,14 @@ public class PLVMultiRoleMemberList {
         }
     }
 
-    private boolean updateMemberItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList) {
-        return updateMemberItemInfo(socketUserBean, linkMicItemDataBean, isJoinList, false);
+    private boolean updateMemberItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isGroupLeader) {
+        return updateMemberItemInfo(socketUserBean, linkMicItemDataBean, isJoinList, false, isGroupLeader);
     }
 
-    private boolean updateMemberItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isUpdateJoiningStatus) {
+    private boolean updateMemberItemInfo(@NonNull PLVSocketUserBean socketUserBean, @NonNull PLVLinkMicItemDataBean linkMicItemDataBean, boolean isJoinList, boolean isUpdateJoiningStatus, boolean isGroupLeader) {
+        if (isGroupLeader) {
+            checkCallLeaderChanged(linkMicItemDataBean.getLinkMicId(), linkMicItemDataBean.getNick());
+        }
         if (isMyLinkMicId(linkMicItemDataBean.getLinkMicId()) || isMySocketUserId(linkMicItemDataBean.getLinkMicId())) {
             return false;//过滤自己
         }
@@ -533,7 +564,9 @@ public class PLVMultiRoleMemberList {
             if (memberItem == null) {
                 memberItemDataBean = new PLVMemberItemDataBean();
                 memberItemDataBean.setSocketUserBean(socketUserBean);
-                memberList.add(memberItemDataBean);
+                if (!PLVSocketUserConstant.USERTYPE_TEACHER.equals(socketUserBean.getUserType())) {
+                    memberList.add(memberItemDataBean);//过滤讲师
+                }
             } else {
                 memberItemDataBean = memberItem.second;
             }
@@ -662,6 +695,18 @@ public class PLVMultiRoleMemberList {
         }
     }
 
+    private void callOnUserHasGroupLeader(boolean isHasGroupLeader, String nick, String leaderId) {
+        if (onMemberListListener != null) {
+            onMemberListListener.onUserHasGroupLeader(isHasGroupLeader, nick, leaderId);
+        }
+    }
+
+    private void callOnLeaveDiscuss() {
+        if (onMemberListListener != null) {
+            onMemberListListener.onLeaveDiscuss();
+        }
+    }
+
     private void callOnUserMuteVideo(final String uid, final boolean mute, int linkMicListPos, int memberListPos) {
         if (onMemberListListener != null) {
             onMemberListListener.onUserMuteVideo(uid, mute, linkMicListPos, memberListPos);
@@ -722,9 +767,36 @@ public class PLVMultiRoleMemberList {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="分组讨论处理">
+    private void checkCallLeaderChanged(String leaderUserId, @NonNull String nick) {
+        if (leaderUserId != null && !leaderUserId.equals(groupLeaderId) && !TextUtils.isEmpty(groupId)) {
+            boolean isHasGroupLeader = isMySocketUserId(leaderUserId);
+            groupLeaderId = leaderUserId;
+            if (!isTeacherType) {
+                memberLength = isHasGroupLeader ? MEMBER_LENGTH_MORE : MEMBER_LENGTH_LESS;
+            }
+            if (TextUtils.isEmpty(nick) && isMySocketUserId(groupLeaderId)) {
+                nick = liveRoomDataManager.getConfig().getUser().getViewerName();
+            }
+            callOnUserHasGroupLeader(isHasGroupLeader, nick, groupLeaderId);
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部方法">
     private boolean isMyLinkMicId(String linkMicId) {
         return linkMicId != null && linkMicId.equals(myLinkMicId);
+    }
+
+    private String getRoomIdCombineDiscuss() {
+        if (!TextUtils.isEmpty(groupId)) {
+            return groupId;
+        }
+        String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登陆时，使用频道号
+        }
+        return loginRoomId;
     }
 
     private boolean isMySocketUserId(String userId) {
@@ -755,6 +827,11 @@ public class PLVMultiRoleMemberList {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
                 switch (event) {
+                    //sliceId事件
+                    case PLVOnSliceIDEvent.EVENT:
+                        PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceIDEvent.class);
+                        acceptOnSliceIDEvent(onSliceIDEvent);
+                        break;
                     //禁言事件
                     case PLVBanIpEvent.EVENT:
                         PLVBanIpEvent banIpEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVBanIpEvent.class);
@@ -795,6 +872,16 @@ public class PLVMultiRoleMemberList {
                         PLVTeacherSetPermissionEvent teacherSetPermissionEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVTeacherSetPermissionEvent.class);
                         acceptTeacherSetPermissionEvent(teacherSetPermissionEvent);
                         break;
+                    //设置组长事件
+                    case PLVEventConstant.Seminar.EVENT_SET_LEADER:
+                        PLVSetLeaderEvent setLeaderEvent = PLVGsonUtil.fromJson(PLVSetLeaderEvent.class, message);
+                        acceptSetLeaderEvent(setLeaderEvent);
+                        break;
+                    //加入讨论事件
+                    case PLVEventConstant.Seminar.EVENT_JOIN_DISCUSS:
+                        PLVJoinDiscussEvent joinDiscussEvent = PLVGsonUtil.fromJson(PLVJoinDiscussEvent.class, message);
+                        acceptJoinDiscussEvent(joinDiscussEvent);
+                        break;
                 }
             }
         };
@@ -806,7 +893,20 @@ public class PLVMultiRoleMemberList {
                 PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT,
                 PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT,
                 PLVEventConstant.Class.SE_SWITCH_MESSAGE,
+                PLVEventConstant.Seminar.SEMINAR_EVENT,
                 Socket.EVENT_MESSAGE);
+    }
+
+    private void acceptOnSliceIDEvent(PLVOnSliceIDEvent onSliceIDEvent) {
+        if (onSliceIDEvent != null && !TextUtils.isEmpty(groupId)) {
+            if (!onSliceIDEvent.isInDiscuss()
+                    || (onSliceIDEvent.isInDiscuss() && TextUtils.isEmpty(onSliceIDEvent.getGroupId()))) {
+                callOnLeaveDiscuss();//断网中途，讲师停止讨论
+            } else if (groupId.equals(onSliceIDEvent.getGroupId())) {
+                String leaderId = onSliceIDEvent.getLeader();
+                checkCallLeaderChanged(leaderId, "");
+            }
+        }
     }
 
     private void acceptBanIpEvent(PLVBanIpEvent banIpEvent) {
@@ -875,6 +975,9 @@ public class PLVMultiRoleMemberList {
             if (item != null || isMySocketUserId(socketUserBean.getUserId())) {//过滤存在的用户和自己
                 return;
             }
+            if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(socketUserBean.getUserType())) {
+                return;//过滤讲师
+            }
             PLVMemberItemDataBean memberItemDataBean = new PLVMemberItemDataBean();
             memberItemDataBean.setSocketUserBean(socketUserBean);
             //添加基础的连麦bean
@@ -903,7 +1006,7 @@ public class PLVMultiRoleMemberList {
         if (joinRequestSEvent != null && joinRequestSEvent.getUser() != null) {
             PLVSocketUserBean socketUserBean = PLVLinkMicDataMapper.map2SocketUserBean(joinRequestSEvent.getUser());
             final PLVLinkMicItemDataBean linkMicItemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(joinRequestSEvent.getUser());
-            boolean hasChanged = updateMemberItemInfo(socketUserBean, linkMicItemDataBean, false, true);
+            boolean hasChanged = updateMemberItemInfo(socketUserBean, linkMicItemDataBean, false, true, false);
             //更新成员列表数据
             if (hasChanged) {
                 callOnMemberListChangedWithSort();
@@ -969,6 +1072,22 @@ public class PLVMultiRoleMemberList {
                 }
                 callOnUserHasPaint(isMyLinkMicId(linkMicItemDataBean.getLinkMicId()), linkMicItemDataBean.isHasPaint(), linkMicItemPos, memberItem.first);
             }
+        }
+    }
+
+    private void acceptSetLeaderEvent(PLVSetLeaderEvent setLeaderEvent) {
+        if (setLeaderEvent != null) {
+            String userId = setLeaderEvent.getUserId();
+            checkCallLeaderChanged(userId, setLeaderEvent.getNick());
+        }
+    }
+
+    private void acceptJoinDiscussEvent(final PLVJoinDiscussEvent joinDiscussEvent) {
+        if (joinDiscussEvent == null) {
+            return;
+        }
+        if (groupId != null && !groupId.equals(joinDiscussEvent.getGroupId())) {
+            groupId = null;//当改变分组后，之前的memberList对象需要置空groupId
         }
     }
     // </editor-fold>
@@ -1148,6 +1267,20 @@ public class PLVMultiRoleMemberList {
          * @param memberListPos  成员列表中的位置，成员列表中没有对应数据时为-1
          */
         void onUserHasPaint(boolean isMyself, boolean isHasPaint, int linkMicListPos, int memberListPos);
+
+        /**
+         * 响应用户被授权组长
+         *
+         * @param isHasGroupLeader true：自己当前被授权，false：自己当前没有被授权
+         * @param nick             被授权用户的昵称
+         * @param leaderId         组长Id，为null表示分组里没有组长
+         */
+        void onUserHasGroupLeader(boolean isHasGroupLeader, String nick, @Nullable String leaderId);
+
+        /**
+         * 离开讨论
+         */
+        void onLeaveDiscuss();
     }
     // </editor-fold>
 }

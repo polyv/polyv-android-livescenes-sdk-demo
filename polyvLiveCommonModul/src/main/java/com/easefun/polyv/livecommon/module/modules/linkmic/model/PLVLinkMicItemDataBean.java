@@ -39,6 +39,8 @@ public class PLVLinkMicItemDataBean {
     private boolean isRaiseHand;
     //画笔授权状态
     private boolean isHasPaint;
+    //主讲授权状态
+    private boolean isHasSpeaker;
     //参考[PLVSocketUserConstant]
     private String userType;
     //头衔
@@ -48,6 +50,11 @@ public class PLVLinkMicItemDataBean {
     //最大值为[MAX_VOLUME]
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
+
+    //是否在屏幕共享
+    private boolean isScreenShare = false;
+    // 是否全屏观看
+    private transient boolean isFullScreen = false;
 
     //linkMic status
     private String status = STATUS_IDLE;
@@ -177,6 +184,14 @@ public class PLVLinkMicItemDataBean {
         this.isHasPaint = hasPaint;
     }
 
+    public boolean isHasSpeaker() {
+        return isHasSpeaker;
+    }
+
+    public void setHasSpeaker(boolean hasSpeaker) {
+        isHasSpeaker = hasSpeaker;
+    }
+
     public int getCurVolume() {
         return curVolume;
     }
@@ -243,6 +258,24 @@ public class PLVLinkMicItemDataBean {
         this.userId = userId;
     }
 
+
+    public boolean isScreenShare() {
+        return isScreenShare;
+    }
+
+    public void setScreenShare(boolean screenShared) {
+        isScreenShare = screenShared;
+    }
+
+    public PLVLinkMicItemDataBean setFullScreen(boolean fullScreen) {
+        isFullScreen = fullScreen;
+        return this;
+    }
+
+    public boolean isFullScreen() {
+        return isFullScreen;
+    }
+
     public static class MuteMedia {
         boolean isMute;
         int streamType;
@@ -299,6 +332,7 @@ public class PLVLinkMicItemDataBean {
                 ", cupNum=" + cupNum +
                 ", isRaiseHand=" + isRaiseHand +
                 ", isHasPaint=" + isHasPaint +
+                ", isHasSpeaker=" + isHasSpeaker +
                 ", userType='" + userType + '\'' +
                 ", actor='" + actor + '\'' +
                 ", pic='" + pic + '\'' +
@@ -308,6 +342,7 @@ public class PLVLinkMicItemDataBean {
                 ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
+                ", isScreenShare=" + isScreenShare +
                 '}';
     }
 }

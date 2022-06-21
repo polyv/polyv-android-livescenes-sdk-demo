@@ -1,10 +1,11 @@
 package com.easefun.polyv.livecommon.module.utils;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.requireNotNull;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Looper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -20,13 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
 /**
  * @author suhongtao
  */
 public class PLVToast {
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private static Toast lastShowToast = null;
 
     private ToastParam param;
@@ -35,7 +36,7 @@ public class PLVToast {
 
     private PLVToast(ToastParam param) {
         this.param = param;
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 initToast();
@@ -50,7 +51,7 @@ public class PLVToast {
 
         final TextView textView = new AppCompatTextView(param.context);
         textView.setMinWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 158));
+        textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 228));
         textView.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         textView.setMaxLines(4);
         textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -60,7 +61,7 @@ public class PLVToast {
         int verticalPadding = PLVUIUtil.dip2px(param.context, 10);
 
         if (param.drawableResId != 0) {
-            textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 196));
+            textView.setMaxWidth(PLVUIUtil.dip2px(param.context, 228));
             textView.setPadding(PLVUIUtil.dip2px(param.context, 8), 0, 0, 0);
 
             ImageView imageView = new AppCompatImageView(param.context);
@@ -109,20 +110,22 @@ public class PLVToast {
     }
 
     public void show() {
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 if (lastShowToast != null) {
                     lastShowToast.cancel();
                 }
-                toast.show();
+                if (toast != null) {
+                    toast.show();
+                }
                 lastShowToast = toast;
             }
         });
     }
 
     public void cancel() {
-        HANDLER.post(new Runnable() {
+        postToMainThread(new Runnable() {
             @Override
             public void run() {
                 if (toast != null) {
@@ -160,6 +163,10 @@ public class PLVToast {
             param.showDuration = DEFAULT_SHOW_DURATION;
         }
 
+        public static Builder create() {
+            return context(requireNotNull(PLVAppUtils.getApp()));
+        }
+
         public static Builder context(@NonNull Context context) {
             Builder toastBuilder = new Builder();
             toastBuilder.param.context = context.getApplicationContext();
@@ -195,6 +202,20 @@ public class PLVToast {
             return this;
         }
 
+        public Builder shortDuration() {
+            param.showDuration = Toast.LENGTH_SHORT;
+            return this;
+        }
+
+        public Builder longDuration() {
+            param.showDuration = Toast.LENGTH_LONG;
+            return this;
+        }
+
+        /**
+         * @deprecated use {@link #shortDuration()} or {@link #longDuration()} instead
+         */
+        @Deprecated
         public Builder duration(int toastDuration) {
             if (toastDuration != Toast.LENGTH_SHORT
                     && toastDuration != Toast.LENGTH_LONG) {
@@ -206,6 +227,10 @@ public class PLVToast {
 
         public PLVToast build() {
             return new PLVToast(param);
+        }
+
+        public void show() {
+            build().show();
         }
     }
 }

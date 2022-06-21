@@ -69,7 +69,7 @@ public interface IPLVRTCInvokeStrategy {
      *
      * @param linkMicId 第一画面连麦ID
      */
-    void setFirstScreenLinkMicId(String linkMicId);
+    void setFirstScreenLinkMicId(String linkMicId, boolean mute);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4. 设置监听器">
@@ -87,6 +87,10 @@ public interface IPLVRTCInvokeStrategy {
      * @param li li
      */
     void setOnLeaveLinkMicListener(OnLeaveLinkMicListener li);
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="销毁">
+    void destroy();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="接口声明">

@@ -8,6 +8,11 @@
         android:id="@+id/plvec_fl_video_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <!--跑马灯-->
+    <com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView
+        android:id="@+id/plvec_marquee_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <!-- 上层的viewpager布局 -->
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/watch_info_vp"
@@ -38,5 +43,12 @@
             android:layout_height="match_parent"
             android:inflatedId="@+id/plvec_ppt_interact_layout"
             android:layout="@layout/plv_interact_layout_view_stub" />
+
+        <ViewStub
+            android:id="@+id/plvec_popover_layout"
+            android:inflatedId="@+id/plvec_float_layout"
+            android:layout="@layout/plv_popover_layout_stub"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </FrameLayout>
 </FrameLayout>

@@ -15,4 +15,33 @@
     \n动画转码：含PPT动效，速度较慢，仅支持Microsoft Office 保存的PPT
     </string>
     <string name="document_no_live_please_wait">直播尚未开始，请稍作等待</string>
+
+    <string name="plvls_document_usage_not_permeitted">被授权后才可以使用课节功能</string>
+    <string name="plvls_streamer_notify_speaking_with_mute_audio">您已静音，请开启麦克风后发言</string>
+    <string name="plvls_member_speaker_permission_already_grant">您已被授予主讲权限</string>
+    <string name="plvls_member_speaker_permission_already_remove">您已被移除主讲权限</string>
+
+    <string name="plvls_manager_chatroom_title_tv_name">管理员私聊</string>
+    <string name="plvls_manager_chatroom_more_message_scroll_to_bottom">返回底部</string>
+    <string name="plvls_manager_chatroom_more_message_has_unread_message">{}条新消息</string>
+    <string name="plvls_manager_chatroom_unread_message_notify">您当前有 {} 条私聊消息，请及时查看</string>
+    <string name="plvls_manager_chatroom_input_tv_hint">有话要说…</string>
+    <string name="plvls_manager_chatroom_input_tv_hint_network_disconnect">当前无网络，请设置网络再参与互动</string>
+    <string name="plvls_manager_chatroom_input_hint_check_network">请检查网络设置</string>
+
+    <string name="plvls_more_setting_title">更多</string>
+    <string name="plvls_beauty_title">美颜</string>
+    <string name="plvls_bitrate_title">清晰度</string>
+
+    <string name="plvls_beauty_selector_beauty_title">美颜</string>
+    <string name="plvls_beauty_selector_filter_title">滤镜</string>
+    <string name="plvls_beauty_selector_detail_title">面部细节</string>
+    <string name="plvls_beauty_reset_title">重置</string>
+    <string name="plvls_beauty_switch_label">美颜开关</string>
+    <string name="plvls_beauty_need_open_camera">请开启摄像头后使用</string>
+    <string name="plvls_beauty_reset_confirm_title">确定重置吗？</string>
+    <string name="plvls_beauty_reset_confirm_content">重置后所有参数将恢复默认值</string>
+    <string name="plvls_beauty_reset_confirm_cancel">取消</string>
+    <string name="plvls_beauty_reset_confirm_reset">确定</string>
+    <string name="plvls_beauty_reset_success">重置成功</string>
 </resources>

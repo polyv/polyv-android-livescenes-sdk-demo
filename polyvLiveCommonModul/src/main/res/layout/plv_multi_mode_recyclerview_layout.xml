@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView
+        android:id="@+id/plv_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true" />
+
+    <!--主讲模式下的容器-->
+    <FrameLayout
+        android:id="@+id/plv_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@id/plv_recycler_view" />
+
+
+</RelativeLayout>

@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -25,14 +26,16 @@ import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveMoreLayout;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -67,15 +70,20 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView videoPptSwitchPortIv;
     //点击切换到全屏按钮
     private ImageView videoScreenSwitchPortIv;
+    private LinearLayout liveMoreControlLl;
     //更多按钮
     private ImageView morePortIv;
     //顶部渐变view
     private ImageView gradientBarTopPortView;
     //重新打开悬浮窗提示
     private TextView tvReopenFloatingViewTip;
+    //打赏按钮
+    private ImageView rewardView;
+    //ppt翻页
+    private PLVLCPPTTurnPageLayout pptTurnPagePortLayout;
 
     //横屏皮肤
-    private IPLVLiveLandscapePlayerController landscapeController;
+    private IPLVLCLiveLandscapePlayerController landscapeController;
     //横屏控制栏布局
     private ViewGroup videoControllerLandLy;
     //返回
@@ -90,6 +98,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView videoRefreshLandIv;
     //显示/隐藏 浮窗/连麦布局
     private ImageView videoPptSwitchLandIv;
+    private ImageView liveControlFloatingLandIv;
     //打开信息发送器的按钮
     private TextView startSendMessageLandIv;
     //横屏弹幕开关(后台开启弹幕时)
@@ -100,6 +109,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private PLVLCLikeIconView likesLandIv;
     //更多按钮
     private ImageView moreLandIv;
+    // 小窗按钮
+    private ImageView liveControlFloatingIv;
+    //ppt 翻页
+    private PLVLCPPTTurnPageLayout pptTurnPageLandLayout;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
@@ -121,6 +134,20 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 主播放器是否正在播放
+    private boolean isMainVideoViewPlaying;
+    // 是否无延迟观看
+    private boolean isLowLatencyWatch;
+    // 是否rtc频道观看
+    private boolean isRtcChannelWatch;
+    // 频道是否已经开启连麦
+    private boolean isChannelOpenLinkMic;
+    // 是否正在请求加入连麦
+    private boolean isRequestingJoinLinkMic;
+    // 是否连麦状态
+    private boolean isLinkMic;
+    // rtc观看时是否隐藏刷新按钮
+    private boolean hideRefreshButtonInRtcChannel;
 
     //view动作监听器
     private OnViewActionListener onViewActionListener;
@@ -160,10 +187,20 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoPptSwitchPortIv.setOnClickListener(this);
         videoScreenSwitchPortIv = findViewById(R.id.video_screen_switch_port_iv);
         videoScreenSwitchPortIv.setOnClickListener(this);
+        liveMoreControlLl = findViewById(R.id.plvlc_live_more_control_ll);
         morePortIv = findViewById(R.id.more_port_iv);
         morePortIv.setOnClickListener(this);
+        liveControlFloatingIv = findViewById(R.id.plvlc_live_control_floating_iv);
+        liveControlFloatingIv.setOnClickListener(this);
         gradientBarTopPortView = findViewById(R.id.gradient_bar_top_port_view);
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_live_player_controller_tv_reopen_floating_view);
+        pptTurnPagePortLayout = findViewById(R.id.video_ppt_turn_page_layout);
+        pptTurnPagePortLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
+            @Override
+            public void onPPTTurnPage(String type) {
+                onViewActionListener.onPPTTurnPage(type);
+            }
+        });
 
         //more layout
         initMoreLayout();
@@ -174,6 +211,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         } else {
             videoControllerPortLy.setVisibility(View.INVISIBLE);
         }
+
+        observeFloatingPlayerShowingState();
     }
 
     private void initMoreLayout() {
@@ -201,6 +240,28 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 return true;
             }
         });
+        moreLayout.setOnChangeLowLatencyListener(new PLVLCLiveMoreLayout.OnChangeLowLatencyListener() {
+            @Override
+            public void accept(@NonNull Boolean isLowLatency) {
+                isLowLatencyWatch = isLowLatency;
+                if (onViewActionListener != null) {
+                    onViewActionListener.onChangeLowLatencyMode(isLowLatency);
+                }
+            }
+        });
+    }
+
+    private void observeFloatingPlayerShowingState() {
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean showing) {
+                        if (showing == null) {
+                            return;
+                        }
+                        getLiveMediaDispatcher().updateViewProperties();
+                    }
+                });
     }
     // </editor-fold>
 
@@ -261,7 +322,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
-    public void setLandscapeController(@NonNull IPLVLiveLandscapePlayerController landscapeController) {
+    public void setLandscapeController(@NonNull IPLVLCLiveLandscapePlayerController landscapeController) {
         this.landscapeController = landscapeController;
         //横屏控制栏布局
         videoControllerLandLy = landscapeController.getLandRoot();
@@ -275,6 +336,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoRefreshLandIv.setOnClickListener(this);
         videoPptSwitchLandIv = landscapeController.getSwitchView();
         videoPptSwitchLandIv.setOnClickListener(this);
+        liveControlFloatingLandIv = landscapeController.getFloatingControlView();
+        liveControlFloatingLandIv.setOnClickListener(this);
         startSendMessageLandIv = landscapeController.getMessageSender();
         startSendMessageLandIv.setOnClickListener(this);
         danmuSwitchLandIv = landscapeController.getDanmuSwitchView();
@@ -284,6 +347,15 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         likesLandIv.setOnButtonClickListener(this);
         moreLandIv = landscapeController.getMoreView();
         moreLandIv.setOnClickListener(this);
+        rewardView = landscapeController.getRewardView();
+        rewardView.setOnClickListener(this);
+        pptTurnPageLandLayout = landscapeController.getPPTTurnPageLayout();
+        pptTurnPageLandLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
+            @Override
+            public void onPPTTurnPage(String type) {
+                onViewActionListener.onPPTTurnPage(type);
+            }
+        });
 
         //choose right orientation
         if (ScreenUtils.isPortrait()) {
@@ -303,6 +375,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         this.isServerEnablePPT = enable;
         videoPptSwitchPortIv.setVisibility(enable ? View.VISIBLE : View.GONE);
         videoPptSwitchLandIv.setVisibility(enable ? View.VISIBLE : View.GONE);
+        pptTurnPagePortLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
+        pptTurnPageLandLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -317,24 +391,28 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
-    public void updateWhenSubVideoViewClick() {
+    public void updateWhenSubVideoViewClick(boolean mainVideoViewPlaying) {
+        isMainVideoViewPlaying = mainVideoViewPlaying;
         videoPausePortIv.setVisibility(GONE);
         videoPauseLandIv.setVisibility(GONE);
         videoRefreshPortIv.setVisibility(GONE);
         videoRefreshLandIv.setVisibility(GONE);
         videoPptSwitchPortIv.setVisibility(GONE);
         videoPptSwitchLandIv.setVisibility(GONE);
-        morePortIv.setVisibility(View.GONE);
-        moreLandIv.setVisibility(View.GONE);
+        liveMoreControlLl.setVisibility(View.GONE);
+        liveControlFloatingLandIv.setVisibility(GONE);
         //由于控件隐藏，因此需要调整信息发送控件的宽度
         MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
         mlp.leftMargin = ConvertUtils.dp2px(32 + 74);//74=(40+40+40+14+14)/2
         mlp.rightMargin = ConvertUtils.dp2px(38 + 74);//74=(40+40+40+14+14)/2
         startSendMessageLandIv.setLayoutParams(mlp);
+
+        getLiveMediaDispatcher().updateViewProperties();
     }
 
     @Override
     public void updateWhenVideoViewPrepared() {
+        isMainVideoViewPlaying = true;
         videoPausePortIv.setVisibility(VISIBLE);
         videoPauseLandIv.setVisibility(VISIBLE);
         videoRefreshPortIv.setVisibility(VISIBLE);
@@ -343,13 +421,15 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             videoPptSwitchPortIv.setVisibility(VISIBLE);
             videoPptSwitchLandIv.setVisibility(VISIBLE);
         }
-        morePortIv.setVisibility(View.VISIBLE);
-        moreLandIv.setVisibility(View.VISIBLE);
+        liveMoreControlLl.setVisibility(View.VISIBLE);
+        liveControlFloatingLandIv.setVisibility(VISIBLE);
         //还原信息发送控件的宽度
         MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
         mlp.leftMargin = ConvertUtils.dp2px(32);
         mlp.rightMargin = ConvertUtils.dp2px(38);
         startSendMessageLandIv.setLayoutParams(mlp);
+
+        getLiveMediaDispatcher().updateViewProperties();
     }
 
     @Override
@@ -364,37 +444,49 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
-    public void updateWhenJoinLinkMic(boolean isHideRefreshButton) {
-        moreLayout.hide();
+    public void updateWhenJoinRtc(boolean isHideRefreshButton) {
+        isRtcChannelWatch = true;
+        hideRefreshButtonInRtcChannel = isHideRefreshButton;
+        getLiveMediaDispatcher().updateViewProperties();
+    }
 
-        videoPausePortIv.setVisibility(GONE);
-        videoPauseLandIv.setVisibility(GONE);
-        if (isHideRefreshButton) {
-            videoRefreshPortIv.setVisibility(GONE);
-            videoRefreshLandIv.setVisibility(GONE);
+    @Override
+    public void updateWhenLeaveRtc() {
+        isRtcChannelWatch = false;
+        getLiveMediaDispatcher().updateViewProperties();
+    }
+
+    @Override
+    public void updateWhenRequestJoinLinkMic(boolean isRequestJoinLinkMic) {
+        isRequestingJoinLinkMic = isRequestJoinLinkMic;
+        getLiveMediaDispatcher().updateViewProperties();
+    }
+
+    @Override
+    public void updateWhenLinkMicOpenOrClose(boolean isOpenLinkMic) {
+        if (isChannelOpenLinkMic == isOpenLinkMic) {
+            return;
         }
-        morePortIv.setVisibility(View.GONE);
-        moreLandIv.setVisibility(View.GONE);
-        //由于控件隐藏，因此需要调整信息发送控件的宽度
-        MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
-        mlp.leftMargin = ConvertUtils.dp2px(32 + 47);//47=(40+40+14)/2
-        mlp.rightMargin = ConvertUtils.dp2px(38 + 47);//47=(40+40+14)/2
-        startSendMessageLandIv.setLayoutParams(mlp);
+        isChannelOpenLinkMic = isOpenLinkMic;
+        if (!isOpenLinkMic) {
+            isRequestingJoinLinkMic = false;
+            getLiveMediaDispatcher().updateViewProperties();
+        }
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic(boolean isHideRefreshButton) {
+        isLinkMic = true;
+        isRequestingJoinLinkMic = false;
+        hideRefreshButtonInRtcChannel = isHideRefreshButton;
+        getLiveMediaDispatcher().updateViewProperties();
     }
 
     @Override
     public void updateWhenLeaveLinkMic() {
-        videoPausePortIv.setVisibility(VISIBLE);
-        videoPauseLandIv.setVisibility(VISIBLE);
-        videoRefreshPortIv.setVisibility(VISIBLE);
-        videoRefreshLandIv.setVisibility(VISIBLE);
-        morePortIv.setVisibility(View.VISIBLE);
-        moreLandIv.setVisibility(View.VISIBLE);
-        //还原信息发送控件的宽度
-        MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
-        mlp.leftMargin = ConvertUtils.dp2px(32);
-        mlp.rightMargin = ConvertUtils.dp2px(38);
-        startSendMessageLandIv.setLayoutParams(mlp);
+        isLinkMic = false;
+        isRequestingJoinLinkMic = false;
+        getLiveMediaDispatcher().updateViewProperties();
     }
 
     @Override
@@ -419,8 +511,20 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void updatePPTStatusChange(PLVPPTStatus plvpptStatus) {
+        pptTurnPagePortLayout.updatePageData(plvpptStatus);
+        pptTurnPageLandLayout.updatePageData(plvpptStatus);
+    }
+
+    @Override
     public void dispatchDanmuSwitchOnClicked(View v) {
         this.onClick(v);
+    }
+
+    @Override
+    public void notifyLowLatencyUpdate(boolean isLowLatency) {
+        this.isLowLatencyWatch = isLowLatency;
+        moreLayout.updateViewWithLatency(isLowLatency);
     }
 
     @Override
@@ -431,6 +535,13 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
         dispose(bitPopupWindowTimer);
         dispose(reopenFloatingDelay);
+    }
+
+    @Override
+    public void updateRewardView(boolean enable) {
+        if(rewardView != null){
+            rewardView.setVisibility(enable ? VISIBLE : GONE);
+        }
     }
 
     // </editor-fold>
@@ -584,23 +695,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="事件监听- 监听播放信息变化">
+    // <editor-fold defaultstate="collapsed" desc="事件监听 - 监听播放信息变化">
     private void observePlayInfoVO() {
         livePlayerPresenter.getData().getPlayInfoVO().observe((LifecycleOwner) getContext(), new Observer<PLVPlayInfoVO>() {
             @Override
             public void onChanged(@Nullable PLVPlayInfoVO playInfoVO) {
-                if (playInfoVO == null) {
-                    return;
-                }
-                if (playInfoVO.isPlaying()) {
-                    videoPausePortIv.setSelected(true);
-                    videoPauseLandIv.setSelected(true);
-
-                } else {
-                    videoPausePortIv.setSelected(false);
-                    videoPauseLandIv.setSelected(false);
-
-                }
+                getLiveMediaDispatcher().acceptPlayInfo(playInfoVO);
             }
         });
     }
@@ -611,12 +711,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.video_pause_port_iv || id == R.id.video_pause_land_iv) {
-            boolean isPlaying = livePlayerPresenter.isPlaying();
-            if (isPlaying) {
-                livePlayerPresenter.pause();
-            } else {
-                livePlayerPresenter.restartPlay();
-            }
+            getLiveMediaDispatcher().changePlayPause();
         } else if (id == R.id.video_screen_switch_port_iv) {
             PLVOrientationManager.getInstance().setLandscape((Activity) getContext());
         } else if (id == R.id.video_refresh_port_iv || id == R.id.video_refresh_land_iv) {
@@ -660,8 +755,171 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             if (onViewActionListener != null) {
                 onViewActionListener.onSendLikesAction();
             }
+        } else if (id == R.id.plvlc_iv_show_point_reward){
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowRewardView();
+                hide();
+            }
+        } else if (id == liveControlFloatingIv.getId()
+                || id == liveControlFloatingLandIv.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onClickFloating();
+            }
         }
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 不同观看模式的分发">
+
+    private LiveMediaDispatcher getLiveMediaDispatcher() {
+        if (isLinkMic) {
+            return new LinkMicMediaDispatcher();
+        }
+        if (isRtcChannelWatch) {
+            return new RtcMediaDispatcher();
+        }
+        if (isLowLatencyWatch) {
+            return new LowLatencyMediaDispatcher();
+        }
+        return new VideoViewDispatcher();
+    }
+
+    private interface LiveMediaDispatcher {
+
+        void updateViewProperties();
+
+        boolean isPlaying();
+
+        void changePlayPause();
+
+        void acceptPlayInfo(@Nullable PLVPlayInfoVO playInfoVO);
+
+    }
+
+    private class VideoViewDispatcher implements LiveMediaDispatcher {
+
+        @Override
+        public void updateViewProperties() {
+            videoPausePortIv.setVisibility(VISIBLE);
+            videoPauseLandIv.setVisibility(VISIBLE);
+            videoRefreshPortIv.setVisibility(VISIBLE);
+            videoRefreshLandIv.setVisibility(VISIBLE);
+            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
+            morePortIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
+            moreLandIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
+            //还原信息发送控件的宽度
+            MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
+            mlp.leftMargin = ConvertUtils.dp2px(32);
+            mlp.rightMargin = ConvertUtils.dp2px(38);
+            startSendMessageLandIv.setLayoutParams(mlp);
+        }
+
+        @Override
+        public boolean isPlaying() {
+            return livePlayerPresenter.isPlaying();
+        }
+
+        @Override
+        public void changePlayPause() {
+            if (isPlaying()) {
+                livePlayerPresenter.pause();
+            } else {
+                livePlayerPresenter.restartPlay();
+            }
+        }
+
+        @Override
+        public void acceptPlayInfo(@Nullable PLVPlayInfoVO playInfoVO) {
+            if (playInfoVO == null) {
+                return;
+            }
+            videoPausePortIv.setSelected(playInfoVO.isPlaying());
+            videoPauseLandIv.setSelected(playInfoVO.isPlaying());
+        }
+    }
+
+    private class LowLatencyMediaDispatcher extends VideoViewDispatcher {
+
+    }
+
+    private class RtcMediaDispatcher implements LiveMediaDispatcher {
+        @Override
+        public void updateViewProperties() {
+            videoPausePortIv.setVisibility(VISIBLE);
+            videoPauseLandIv.setVisibility(VISIBLE);
+            if (hideRefreshButtonInRtcChannel) {
+                videoRefreshPortIv.setVisibility(GONE);
+                videoRefreshLandIv.setVisibility(GONE);
+            }
+            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
+            morePortIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
+            moreLandIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
+            //由于控件隐藏，因此需要调整信息发送控件的宽度
+            MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
+            mlp.leftMargin = ConvertUtils.dp2px(32 + 47);
+            mlp.rightMargin = ConvertUtils.dp2px(38 + 47);
+            startSendMessageLandIv.setLayoutParams(mlp);
+        }
+
+        @Override
+        public boolean isPlaying() {
+            if (onViewActionListener == null) {
+                return false;
+            }
+            return !onViewActionListener.isRtcPausing();
+        }
+
+        @Override
+        public void changePlayPause() {
+            if (onViewActionListener == null) {
+                return;
+            }
+            final boolean toPause = isPlaying();
+            //更新播放器本身的状态
+            if(toPause){
+                livePlayerPresenter.pause();
+            } else {
+                livePlayerPresenter.resume();
+            }
+            onViewActionListener.onRtcPauseResume(toPause);
+            acceptPlayInfo(null);
+        }
+
+        @Override
+        public void acceptPlayInfo(@Nullable PLVPlayInfoVO playInfoVO) {
+            final boolean isPlaying = isPlaying();
+            videoPausePortIv.setSelected(isPlaying);
+            videoPauseLandIv.setSelected(isPlaying);
+        }
+    }
+
+    private class LinkMicMediaDispatcher extends RtcMediaDispatcher {
+        @Override
+        public void updateViewProperties() {
+            moreLayout.hide();
+
+            videoPausePortIv.setVisibility(GONE);
+            videoPauseLandIv.setVisibility(GONE);
+            if (hideRefreshButtonInRtcChannel) {
+                videoRefreshPortIv.setVisibility(GONE);
+                videoRefreshLandIv.setVisibility(GONE);
+            }
+            liveControlFloatingIv.setVisibility(View.GONE);
+            liveControlFloatingLandIv.setVisibility(View.GONE);
+            morePortIv.setVisibility(View.GONE);
+            moreLandIv.setVisibility(View.GONE);
+            //由于控件隐藏，因此需要调整信息发送控件的宽度
+            MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
+            mlp.leftMargin = ConvertUtils.dp2px(32 + 47);
+            mlp.rightMargin = ConvertUtils.dp2px(38 + 47);
+            startSendMessageLandIv.setLayoutParams(mlp);
+        }
+    }
+
     // </editor-fold>
 
 }

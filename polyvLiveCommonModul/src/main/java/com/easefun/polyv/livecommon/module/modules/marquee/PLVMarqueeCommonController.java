@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.module.modules.marquee;
 
-import android.graphics.Color;
-
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
@@ -76,7 +74,7 @@ public class PLVMarqueeCommonController {
         if (!channelJsonMarqueeVO.marqueeType.equals(PolyvLiveMarqueeVO.MARQUEETYPE_DIYURL)) {
             defaultFontAlpha = (int) (255 * PLVFormatUtils.parseFloat(channelJsonMarqueeVO.marqueeOpacity.replace("%", "")) * 0.01F);
             defaultFontSize = Math.min(channelJsonMarqueeVO.marqueeFontSize, 66);
-            defaultFontColor = Color.parseColor(channelJsonMarqueeVO.marqueeFontColor);
+            defaultFontColor = PLVFormatUtils.parseColor(channelJsonMarqueeVO.marqueeFontColor);
             defaultSetting = PLVFormatUtils.integerValueOf(channelJsonMarqueeVO.marqueeSetting, PLVMarqueeAnimationVO.ROLL);
         }
 

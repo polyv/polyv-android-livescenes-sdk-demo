@@ -6,6 +6,7 @@ package com.easefun.polyv.livecommon.module.modules.interact;
  * description:
  */
 public class PLVInteractJSBridgeEventConst {
+    // <editor-fold defaultstate="collapsed" desc="互动应用v1通讯事件 - 过时">
     public static final String KNOW_ANSWER_METHOD = "knowAnswer";
 
     //未定义的消息
@@ -46,7 +47,31 @@ public class PLVInteractJSBridgeEventConst {
     //公告栏里的链接跳转
     public static final String BULLETIN_LINK_CLICK = "linkClick";
 
+    //消息
+    public static final String MESSAGE_INIT = "messageInit";
+    public static final String MESSAGE_SHOW = "messageShow";
+    public static final String MESSAGE_NEW_CALLBACK = "messageNewCallback";//有新消息的回调
 
     //互动应用callback（签到，抽奖，答题，问卷）
     public static final String INTERACTIVE_CALLBACK = "interactiveEventCallback";
+    // </editor-fold >
+
+
+    // <editor-fold defaultstate="collapsed" desc="互动应用v2通讯事件">
+    //--- js2native
+    public static final String V2_GET_NATIVE_APP_PARAMS_INFO = "getNativeAppParamsInfo";
+    public static final String V2_INIT_WEB_VIEW = "initWebView";
+    public static final String V2_CLOSE_WEB_VIEW = "closeWebView";
+    public static final String V2_LINK_CLICK = "linkClick";
+    public static final String V2_SHOW_WEB_VIEW = "showWebView";
+    public static final String V2_WEB_VIEW_UPDATE_APP_STATUS = "webViewUpdateAppStatus";
+    public static final String V2_LOCK_TO_PORTRAIT = "lockToPortrait";
+
+    //native2js
+    public static final String V2_UPDATE_NATIVE_APP_PARAMS_INFO = "updateNativeAppParamsInfo";
+    public static final String V2_APP_CALL_WEB_VIEW_EVENT = "appCallWebViewEvent";
+
+
+
+    // </editor-fold >
 }

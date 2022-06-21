@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
+import com.easefun.polyv.livecommon.ui.widget.PLVEmptyViewGroup;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
@@ -63,8 +64,7 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 break;
             default:
                 PLVCommonLog.exception(new RuntimeException("itemType error"));
-                viewHolder = new PLVChatMessageBaseViewHolder<>(
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plv_horizontal_linear_layout, parent, false), this);
+                viewHolder = new PLVChatMessageBaseViewHolder<>(new PLVEmptyViewGroup(parent.getContext()), this);
                 break;
         }
         viewHolder.setMsgIndex(msgIndex);

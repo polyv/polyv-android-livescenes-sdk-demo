@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 
+import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import android.view.SurfaceView;
@@ -9,8 +10,11 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
+
+import io.socket.client.Ack;
 
 /**
  * mvp-推流和连麦契约协议
@@ -62,7 +66,7 @@ public interface IPLVStreamerContract {
         /**
          * 响应本地用户麦克风音量变化
          */
-        void onLocalUserMicVolumeChanged();
+        void onLocalUserMicVolumeChanged(int volume);
 
         /**
          * 响应远端用户麦克风音量变化
@@ -179,6 +183,19 @@ public interface IPLVStreamerContract {
          * 嘉宾多媒体状态改变
          */
         void onGuestMediaStatusChanged(int pos);
+
+        /**
+         * 权限响应
+         */
+        void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user);
+
+        /**
+         * 屏幕共享状态变更
+         * @param position
+         * @param isShare 是否开始屏幕共享
+         * @param extra 附加信息，如错误码
+         */
+        void onScreenShareChange(int position, boolean isShare, int extra);
     }
     // </editor-fold>
 
@@ -325,6 +342,23 @@ public interface IPLVStreamerContract {
         void stopLiveStream();
 
         /**
+         * 停止屏幕共享
+         */
+        void exitShareScreen();
+
+        /**
+         * 请求屏幕共享
+         * @param activity
+         */
+        void requestShareScreen(Activity activity);
+
+        /**
+         * 是否正在屏幕共享
+         */
+        boolean isScreenSharing();
+
+
+        /**
          * 控制成员列表中的用户加入或离开连麦
          *
          * @param position    成员列表中的位置
@@ -381,6 +415,19 @@ public interface IPLVStreamerContract {
          * @return 推流状态常量
          */
         int getStreamerStatus();
+
+        /**
+         * 嘉宾尝试上麦
+         */
+        void guestTryJoinLinkMic();
+
+        /**
+         * 设置用户主讲权限
+         * @param userId 用户的userId
+         * @param isSetPermission
+         * @param ack
+         */
+        void setUserPermissionSpeaker(String userId, boolean isSetPermission, Ack ack);
 
         /**
          * 获取推流和连麦的数据

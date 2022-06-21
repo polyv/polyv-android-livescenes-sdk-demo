@@ -43,7 +43,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVSocketLoginManager socketLoginManager;
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -52,15 +51,17 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         super.onActivityCreated(savedInstanceState);
         //初始化聊天室
         chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
-        registerChatroomView();
         chatroomPresenter.init();
-        //请求一次历史记录
-        chatroomPresenter.setGetChatHistoryCount(10);
-        chatroomPresenter.requestChatHistory(0);
-        //初始化socket并登录
-        initSocketLoginManager();
+        if (!isPlaybackFragment()) {
+            registerChatroomView();
+            //请求一次历史记录
+            chatroomPresenter.setGetChatHistoryCount(10);
+            chatroomPresenter.requestChatHistory(0);
+        }
         //获取表情列表
         chatroomPresenter.getChatEmotionImages();
+        //初始化socket并登录
+        initSocketLoginManager();
 
         observeChatroomData();
     }
@@ -85,6 +86,11 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
+    //是否是回放fragment
+    protected boolean isPlaybackFragment() {
+        return false;
+    }
+
     //注册聊天室view
     protected void registerChatroomView() {
     }
@@ -101,12 +107,20 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void updateLikesInfo(String likesString) {
     }
 
+    //更新观看数量
+    protected void updateWatchCount(long times) {
+    }
+
     //处理商品打开
     protected void acceptOpenCommodity() {
     }
 
     //处理获取到的商品数据
     protected void acceptCommodityVO(PolyvCommodityVO commodityVO, boolean isAddOrSet) {
+    }
+
+    //处理获取到的聊天回放开关
+    protected void acceptChatPlaybackEnable(boolean isChatPlaybackEnable) {
     }
     // </editor-fold>
 
@@ -129,8 +143,37 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     public void setPlaybackPlayInfo(PLVPlayInfoVO playInfoVO) {
     }
 
+    public void onHasPreviousPage(boolean hasPreviousPage) {
+
+    }
+
     //设置view交互事件监听器
     public void setOnViewActionListener(OnViewActionListener listener) {
+    }
+
+    public void acceptOnLowLatencyChange(boolean isLowLatency) {
+
+    }
+
+    public void acceptNetworkQuality(int quality) {
+
+    }
+
+    /**
+     * 回放视频准备完成
+     *
+     * @param sessionId sessionId
+     * @param channelId 频道号
+     */
+    public void onPlaybackVideoPrepared(String sessionId, String channelId) {
+    }
+
+    /**
+     * 回放视频seek完成
+     *
+     * @param time 时间，单位：毫秒
+     */
+    public void onPlaybackVideoSeekComplete(int time) {
     }
     // </editor-fold>
 
@@ -182,7 +225,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             super.onKickEvent(kickEvent, isOwn);
             if (isOwn) {
                 PLVToast.Builder.context(Utils.getApp())
-                        .duration(3000)
+                        .shortDuration()
                         .setText(R.string.plv_chat_toast_been_kicked)
                         .build()
                         .show();
@@ -199,7 +242,19 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
             super.onReloginEvent(reloginEvent);
-            showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
+            PLVToast.Builder.context(Utils.getApp())
+                    .shortDuration()
+                    .setText(R.string.plv_chat_toast_account_login_elsewhere)
+                    .build()
+                    .show();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        (getActivity()).finish();
+                    }
+                }
+            },3000);
         }
     };
 
@@ -235,6 +290,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         if (classDetailVO.isOpenCommodity()) {
                             acceptOpenCommodity();
                         }
+                        //聊天回放开关
+                        boolean isChatPlaybackEnable = classDetailVO.getData().isChatPlaybackEnabled();
+                        acceptChatPlaybackEnable(isChatPlaybackEnable);
                     }
                 }
             }
@@ -269,6 +327,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable Long l) {
                 //观看热度
+                updateWatchCount(l);
             }
         });
         chatroomPresenter.getData().getOnlineCountData().observe(this, new Observer<Integer>() {

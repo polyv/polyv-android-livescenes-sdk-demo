@@ -3,22 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="229dp"
+    android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    tools:parentTag="android.widget.FrameLayout">
+    tools:parentTag="android.widget.FrameLayout"
+    >
 
-    <RelativeLayout
+
+    <LinearLayout
+        android:id="@+id/plvsa_streamer_control_content_view"
         android:layout_width="match_parent"
-        android:layout_height="211dp"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom"
+        android:layout_marginTop="18dp"
         android:background="@drawable/plvsa_streamer_member_control_ly_shape"
-        android:clipChildren="false">
+        android:clipChildren="false"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/plvsa_streamer_nick_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="62dp"
             android:ellipsize="end"
             android:includeFontPadding="false"
@@ -32,82 +37,23 @@
             android:id="@+id/plvsa_streamer_split_view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/plvsa_streamer_nick_tv"
+            android:layout_marginStart="24dp"
             android:layout_marginLeft="24dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp"
             android:background="#19ffffff" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/plvsa_streamer_control_rv"
+            android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/plvsa_streamer_split_view"
-            android:layout_marginTop="24dp">
+            android:layout_height="match_parent"/>
 
-            <ImageView
-                android:id="@+id/plvsa_streamer_camera_iv"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:padding="8dp"
-                android:src="@drawable/plvsa_more_camera_selector"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/plvsa_streamer_mic_iv"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/plvsa_streamer_mic_iv"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:padding="8dp"
-                android:src="@drawable/plvsa_more_mic_selector"
-                app:layout_constraintLeft_toRightOf="@+id/plvsa_streamer_camera_iv"
-                app:layout_constraintRight_toLeftOf="@+id/plvsa_streamer_down_linkmic_iv"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/plvsa_streamer_down_linkmic_iv"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:padding="8dp"
-                android:src="@drawable/plvsa_streamer_down_linkmic"
-                app:layout_constraintLeft_toRightOf="@+id/plvsa_streamer_mic_iv"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/plvsa_streamer_camera_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="摄像头"
-                android:textColor="#99ffffff"
-                android:textSize="14sp"
-                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_camera_iv"
-                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_camera_iv"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_camera_iv" />
-
-            <TextView
-                android:id="@+id/plvsa_streamer_mic_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="麦克风"
-                android:textColor="#99ffffff"
-                android:textSize="14sp"
-                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_mic_iv"
-                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_mic_iv"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_mic_iv" />
-
-            <TextView
-                android:id="@+id/plvsa_streamer_down_linkmic_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="下麦"
-                android:textColor="#99ffffff"
-                android:textSize="14sp"
-                app:layout_constraintLeft_toLeftOf="@+id/plvsa_streamer_down_linkmic_iv"
-                app:layout_constraintRight_toRightOf="@id/plvsa_streamer_down_linkmic_iv"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_down_linkmic_iv" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/plvsa_streamer_avatar_iv"

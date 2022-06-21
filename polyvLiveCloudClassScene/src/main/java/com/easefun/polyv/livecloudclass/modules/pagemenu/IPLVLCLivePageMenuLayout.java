@@ -3,7 +3,10 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
+import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 
 /**
  * 直播页面菜单布局的接口
@@ -36,6 +39,20 @@ public interface IPLVLCLivePageMenuLayout {
     IPLVChatroomContract.IChatroomPresenter getChatroomPresenter();
 
     /**
+     * 获取聊天回放管理器
+     *
+     * @return 聊天回放manager
+     */
+    IPLVChatPlaybackManager getChatPlaybackManager();
+
+    /**
+     * 获取回放的presenter
+     *
+     * @return 回放presenter
+     */
+    IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter getPreviousPresenter();
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener
@@ -50,14 +67,31 @@ public interface IPLVLCLivePageMenuLayout {
     void addOnViewerCountListener(IPLVOnDataChangedListener<Long> listener);
 
     /**
-     * 更新直播状态为直播中
+     * 回放视频准备完成
+     *
+     * @param sessionId sessionId
+     * @param channelId 频道号
      */
-    void updateLiveStatusWithLive();
+    void onPlaybackVideoPrepared(String sessionId, String channelId);
 
     /**
-     * 更新直播状态为未直播中
+     * 回放视频seek完成
+     *
+     * @param time 时间，单位：毫秒
      */
-    void updateLiveStatusWithNoLive();
+    void onPlaybackVideoSeekComplete(int time);
+
+    /**
+     * 是否是聊天回放tab
+     *
+     * @return true：聊天回放，false：在线聊天
+     */
+    boolean isChatPlaybackEnabled();
+
+    /**
+     * 更新直播状态
+     */
+    void updateLiveStatus(PLVLiveStateEnum liveStateEnum);
 
     /**
      * 是否拦截返回事件，拦截的情况有：
@@ -94,6 +128,48 @@ public interface IPLVLCLivePageMenuLayout {
          * @param message 弹幕信息
          */
         void onSendDanmuAction(CharSequence message);
+
+        /**
+         * 切换往期视频的动作
+         * @param vid 回放视频的vid
+         */
+        void onChangeVideoVidAction(String vid);
+
+        /**
+         * 跳转进度条的动作
+         *
+         * @param progress 需要切换到进度的位置 单位是秒
+         */
+        void onSeekToAction(int progress);
+
+        /**
+         * 获取视频当前播放时间
+         *
+         * @return 时间，单位：毫秒
+         */
+        int getVideoCurrentPosition();
+
+        /**
+         * 添加了聊天tab
+         */
+        void onAddedChatTab(boolean isChatPlaybackEnabled);
+
+        /**
+         * 显示积分打赏弹窗
+         */
+        void onShowRewardAction();
+
+        /**
+         * 是否显示特效
+         */
+        void onShowEffectAction(boolean isShow);
+
+        /**
+         * 点击了聊天室更多-动态功能按钮
+         * @param event 功能event
+         */
+        void onClickChatMoreDynamicFunction(String event);
+
     }
     // </editor-fold>
 }
