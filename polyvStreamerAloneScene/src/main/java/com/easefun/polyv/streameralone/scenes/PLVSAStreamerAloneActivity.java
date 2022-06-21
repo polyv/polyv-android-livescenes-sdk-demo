@@ -2,6 +2,7 @@ package com.easefun.polyv.streameralone.scenes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import androidx.lifecycle.Observer;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Group;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.MotionEvent;
@@ -21,6 +23,10 @@ import android.view.WindowManager;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.beauty.di.PLVBeautyModule;
+import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
@@ -33,6 +39,8 @@ import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.streameralone.R;
+import com.easefun.polyv.streameralone.modules.beauty.IPLVSABeautyLayout;
+import com.easefun.polyv.streameralone.modules.beauty.PLVSABeautyLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.IPLVSASettingLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSACleanUpLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
@@ -42,8 +50,13 @@ import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFullscreenL
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAEmptyFragment;
 import com.easefun.polyv.streameralone.scenes.fragments.PLVSAStreamerHomeFragment;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -54,6 +67,9 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
  */
 public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private static final String TAG = PLVSAStreamerAloneActivity.class.getSimpleName();
+
     // 参数 - 定义进入页面所需参数
     private static final String EXTRA_CHANNEL_ID = "channelId"; // 频道号
     private static final String EXTRA_VIEWER_ID = "viewerId";   // 开播者Id
@@ -90,10 +106,14 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private PLVNoInterceptTouchViewPager topLayerViewPager;
     // 有人申请连麦时 连麦提示条布局
     private PLVSALinkMicRequestTipsLayout linkMicRequestTipsLayout;
+    // 美颜布局
+    private IPLVSABeautyLayout beautyLayout;
     // 主页fragment
     private PLVSAStreamerHomeFragment homeFragment;
     // 空白fragment
     private PLVSAEmptyFragment emptyFragment;
+
+    private Group maskGroup;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -169,12 +189,14 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        injectDependency();
         setContentView(R.layout.plvsa_streamer_alone_activity);
         setStatusBarColor();
 
         initParams();
         initLiveRoomManager();
         initView();
+        initBeautyModule();
 
         checkStreamRecover();
 
@@ -184,6 +206,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         observeCleanUpLayout();
         observeLinkmicRequestLayout();
         observeFullscreenLayout();
+        observeBeautyLayoutStatus();
     }
 
     private void setStatusBarColor() {
@@ -198,8 +221,12 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PLVBeautyInitHelper.getInstance().destroy();
         if (streamerLayout != null) {
             streamerLayout.destroy();
+        }
+        if (beautyLayout != null) {
+            beautyLayout.destroy();
         }
         //last destroy socket
         if (homeFragment != null) {
@@ -232,6 +259,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             return;
         } else if (streamerLayout != null && streamerLayout.onBackPressed()) {
             return;
+        } else if (beautyLayout != null && beautyLayout.onBackPressed()) {
+            return;
         } else if (streamerFinishLayout != null && streamerFinishLayout.isShown()) {
             super.onBackPressed();
             return;
@@ -263,6 +292,16 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 })
                 .show();
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
+
+    private void injectDependency() {
+        PLVDependManager.getInstance()
+                .switchStore(this)
+                .addModule(PLVBeautyModule.instance);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面参数">
@@ -307,8 +346,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         streamerFinishLayout = findViewById(R.id.plvsa_streamer_finish_layout);
         topLayerViewPager = findViewById(R.id.plvsa_top_layer_view_pager);
         linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
-
         fullscreenLayout = findViewById(R.id.plvsa_fullscreen_view);
+        maskGroup = findViewById(R.id.plvsa_mask_group);
 
         //初始化推流和连麦布局
         streamerLayout.init(liveRoomDataManager);
@@ -327,7 +366,38 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 emptyFragment,
                 homeFragment
         );
+
+        // 初始化美颜布局
+        beautyLayout = new PLVSABeautyLayout(this);
     }
+
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe(this, new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        final boolean isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        maskGroup.setVisibility(isBeautyLayoutShowing ? View.GONE : View.VISIBLE);
+                    }
+                });
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化 - 美颜模块">
+
+    private void initBeautyModule() {
+        if (!PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_BEAUTY_ENABLE)) {
+            return;
+        }
+        PLVBeautyInitHelper.getInstance().init(this, new PLVSugarUtil.Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean success) {
+                PLVCommonLog.i(TAG, "initBeauty success: " + success);
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="屏幕旋转">

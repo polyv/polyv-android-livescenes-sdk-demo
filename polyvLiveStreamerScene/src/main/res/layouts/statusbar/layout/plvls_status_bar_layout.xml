@@ -72,7 +72,7 @@
         android:layout_width="28dp"
         android:layout_height="match_parent"
         android:layout_marginRight="16dp"
-        android:src="@drawable/plvls_status_bar_setting_iv_selector"
+        android:src="@drawable/plvls_status_bar_more_setting_icon"
         app:layout_constraintRight_toLeftOf="@+id/plvls_status_bar_share_iv" />
 
     <!--成员-->

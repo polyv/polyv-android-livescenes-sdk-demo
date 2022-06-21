@@ -165,7 +165,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        boolean isScreenShareForMe = itemDataBean.isScreenSharedForMe();
+        boolean isScreenShare = itemDataBean.isScreenShare();
         boolean isMe = linkMicId != null && linkMicId.equals(myLinkMicId);
         String actor = itemDataBean.getActor();
         String pic = itemDataBean.getPic();
@@ -218,6 +218,9 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
             holder.plvsaStreamerNickTv.setText(nickString.toString());
         }
 
+        // 更新渲染视图层级 SurfaceView
+        updateRenderViewLayer(holder.renderView, itemDataBean);
+
         if (!isAudioLinkMic) {
             //如果是视频连麦，则渲染所有用户类型
             if (holder.renderView != null && !holder.isRenderViewSetup) {
@@ -248,7 +251,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
         //更新屏幕共享占位图显示状态
         if(isMe) {
-            holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShareForMe ? View.VISIBLE : View.INVISIBLE);
+            holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
@@ -265,7 +268,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        boolean isScreenShared = itemDataBean.isScreenSharedForMe();
+        boolean isScreenShare = itemDataBean.isScreenShare();
         boolean isMe = linkMicId != null && linkMicId.equals(myLinkMicId);
 
         //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
@@ -324,9 +327,9 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         break;
                     }
                     if(itemType == ITEM_TYPE_ONE_TO_MORE && position == hideItemIndex){
-                        mainViewHolder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShared ? View.VISIBLE : View.INVISIBLE);
+                        mainViewHolder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
                     } else {
-                        holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShared ? View.VISIBLE : View.INVISIBLE);
+                        holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
                     }
                     break;
                 case PAYLOAD_UPDATE_PERMISSION_CHANGE:
@@ -627,7 +630,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     //更新嘉宾状态
     private void updateGuestViewStatus(StreamerItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean) {
-        if(getItemType() == ITEM_TYPE_ONLY_TEACHER){
+        if (getItemType() == ITEM_TYPE_ONLY_TEACHER || holder.plvsaStreamerGuestLinkStatusTv == null) {
             return;
         }
         if (itemDataBean.isGuest() && myLinkMicId.equals(itemDataBean.getLinkMicId())) {
@@ -645,10 +648,10 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     }
 
     private void updatePermissionChange(StreamerItemViewHolder holder, PLVLinkMicItemDataBean bean){
-        if(holder.plvsaStreamerGrantSpeakerIv == null){
+        if (holder.plvsaStreamerGrantSpeakerIv == null) {
             return;
         }
-        if(bean.isTeacher()){
+        if (bean.isTeacher()) {
             holder.plvsaStreamerGrantSpeakerIv.setVisibility(View.INVISIBLE);
         } else {
             holder.plvsaStreamerGrantSpeakerIv.setVisibility(
@@ -656,13 +659,20 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         }
     }
 
+    private void updateRenderViewLayer(View renderView, PLVLinkMicItemDataBean bean) {
+        if (renderView instanceof SurfaceView) {
+            ((SurfaceView) renderView).setZOrderMediaOverlay(bean.isFullScreen());
+        }
+    }
+
     /**
      * 用来绑定数据源和主讲模式第一画面ViewHolder，相当于onBindViewHolder
-     * @param holder 主讲模式下的第一画面的 ViewHolder
+     *
+     * @param holder   主讲模式下的第一画面的 ViewHolder
      * @param position 需要与adapter数据源绑定的position
      */
     private void bindMainHolderView(final StreamerItemViewHolder holder, final int position) {
-        if(holder == null){
+        if (holder == null) {
             return;
         }
         if(holder.isViewRecycled) {
@@ -687,7 +697,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        boolean isScreenShareForMe = itemDataBean.isScreenSharedForMe();
+        boolean isScreenShare = itemDataBean.isScreenShare();
+        boolean isMe = linkMicId != null && linkMicId.equals(myLinkMicId);
         String actor = itemDataBean.getActor();
         String pic = itemDataBean.getPic();
 
@@ -734,7 +745,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         updatePermissionChange(holder, itemDataBean);
 
         //更新屏幕共享占位图显示状态
-        holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShareForMe ? View.VISIBLE : View.INVISIBLE);
+        holder.plvsaScreenSharePlaceholderView.setVisibility(isMe && isScreenShare ? View.VISIBLE : View.INVISIBLE);
     }
     // </editor-fold>
 
@@ -782,6 +793,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         private ViewGroup plvsaStreamerBottomLeftLy;
         @Nullable
         private ImageView plvsaStreamerAvatarIv;
+        @Nullable
         private TextView plvsaStreamerGuestLinkStatusTv;
         @Nullable
         private SurfaceView renderView;
@@ -789,8 +801,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         private View plvsaPlaceholderView;
         //屏幕分享时的占位图
         private View plvsaScreenSharePlaceholderView;
+        @Nullable
         private ImageView plvsaStreamerGrantSpeakerIv;
-        private PLVRoundRectLayout roundRectLayout;
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 

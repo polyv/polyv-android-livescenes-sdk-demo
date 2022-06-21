@@ -14,17 +14,47 @@
             android:id="@+id/ll_more_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:layout_marginTop="24dp"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/plvlc_playback_cache_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/plvlc_playback_cache_download_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="56dp"
+                        android:text="下载"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/landscape_speed_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginTop="24dp"
                 android:gravity="center_vertical|left"
                 android:text="倍速"
                 android:textColor="#C2C2C2"
@@ -56,8 +86,7 @@
                     android:id="@+id/rv_more_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="1dp"></androidx.recyclerview.widget.RecyclerView>
+                    android:layout_marginTop="1dp" />
             </LinearLayout>
         </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
     </FrameLayout>

@@ -32,7 +32,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
 import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveMediaController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCDanmuController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessageSender;
@@ -70,9 +70,11 @@ import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -359,6 +361,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             public void onChangeLowLatencyMode(boolean isLowLatency) {
                 PLVLCLiveMediaLayout.this.isLowLatency = isLowLatency;
                 livePlayerPresenter.startPlay(isLowLatency);
+                if (isLowLatency) {
+                    PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_NO_DELAY, " isLowLatency: " + isLowLatency);
+                } else {
+                    PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_DELAY, " isLowLatency: " + isLowLatency);
+                }
                 if (onViewActionListener != null) {
                     onViewActionListener.onWatchLowLatency(isLowLatency);
                 }
@@ -657,7 +664,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的live方法">
     @Override
-    public void setLandscapeControllerView(@NonNull IPLVLiveLandscapePlayerController landscapeControllerView) {
+    public void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView) {
         mediaController.setLandscapeController(landscapeControllerView);
         final View danmuSwitchView = landscapeControllerView.getDanmuSwitchView();
         danmuSwitchView.setOnClickListener(new OnClickListener() {
@@ -826,6 +833,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public int getVideoCurrentPosition() {
+        return 0;
+    }
+
+    @Override
     public void seekTo(int progress, int max) {
 
     }
@@ -851,6 +863,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener) {
+
+    }
+
+    @Override
     public void updatePlayBackVideVid(String vid) {
 
     }
@@ -860,6 +877,15 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     }
 
+    @Override
+    public String getSessionId() {
+        return null;
+    }
+
+    @Override
+    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled) {
+
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view实现">

@@ -1,13 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.player.live.enums;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.R;
 
 import java.util.List;
-
-import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * @author Hoshiiro
@@ -19,37 +19,39 @@ public enum PLVLiveStateEnum {
     LIVE("live", getString(R.string.plv_live_state_live)) {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
-            return listOf(STOP, END, WAITING, PLAYBACK);
+            return listOf(STOP, END, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
     },
 
     STOP("stop", getString(R.string.plv_live_state_stop)) {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
-            return listOf(LIVE, END, WAITING, PLAYBACK);
+            return listOf(LIVE, END, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
     },
 
     END("end", getString(R.string.plv_live_state_end)) {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
-            return listOf(LIVE, WAITING, PLAYBACK);
+            return listOf(LIVE, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
     },
 
     WAITING("waiting", getString(R.string.plv_live_state_waiting)) {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
-            return listOf(LIVE, END, PLAYBACK);
+            return listOf(LIVE, END, PLAYBACK, PLAYBACK_CACHED);
         }
     },
 
     PLAYBACK("playback", getString(R.string.plv_live_state_playback)) {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
-            return listOf(LIVE);
+            return listOf(LIVE, PLAYBACK_CACHED);
         }
     },
+
+    PLAYBACK_CACHED("playback_cached", getString(R.string.plv_live_state_playback_cached)),
 
     ;
 

@@ -34,9 +34,10 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
-            android:layout_marginRight="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
 
@@ -63,8 +64,9 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
@@ -92,8 +94,9 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
@@ -121,8 +124,9 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
@@ -146,29 +150,29 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/plvsa_more_beauty_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/plvsa_more_flashlight_iv"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
                 android:padding="12dp"
-                android:src="@drawable/plvsa_more_flashlight_selector" />
+                android:src="@drawable/plvsa_more_beauty_icon" />
 
             <TextView
-                android:id="@+id/plvsa_more_flashlight_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center|top"
-                android:text="闪光灯"
+                android:text="@string/plvsa_beauty_title"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp" />
 
@@ -180,8 +184,9 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
@@ -209,8 +214,9 @@
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">
@@ -234,13 +240,44 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="6dp"
+            android:gravity="center|top"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/plvsa_more_flashlight_iv"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:padding="12dp"
+                android:src="@drawable/plvsa_more_flashlight_selector" />
+
+            <TextView
+                android:id="@+id/plvsa_more_flashlight_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|top"
+                android:text="闪光灯"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/plvsa_more_close_room_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="6dp"
             android:gravity="center|top"
             android:orientation="vertical">

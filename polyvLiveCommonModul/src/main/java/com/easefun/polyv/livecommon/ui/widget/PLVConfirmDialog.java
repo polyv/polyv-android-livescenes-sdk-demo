@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.expandmenu.utils.DpOrPxUtils;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -193,8 +195,8 @@ public class PLVConfirmDialog {
         return this;
     }
 
-    public PLVConfirmDialog setIsNeedLeftBtn(boolean isNeedRightBtn) {
-        if (!isNeedRightBtn) {
+    public PLVConfirmDialog setIsNeedLeftBtn(boolean isNeedLeftBtn) {
+        if (!isNeedLeftBtn) {
             if (plvSplitView != null) {
                 plvSplitView.setVisibility(View.GONE);
             }
@@ -248,6 +250,132 @@ public class PLVConfirmDialog {
 
         @Override
         public void onClick(View v) {
+        }
+    }
+
+    public static class Builder {
+
+        protected final Param param = new Param();
+
+        protected Builder(@NonNull Context context) {
+            param.context = context;
+        }
+
+        public static Builder context(@NonNull Context context) {
+            return new Builder(context);
+        }
+
+        public Builder setTitle(String title) {
+            param.title = title;
+            return this;
+        }
+
+        public Builder setTitle(int titleResId) {
+            param.title = param.context.getString(titleResId);
+            return this;
+        }
+
+        public Builder setContent(String content) {
+            param.content = content;
+            return this;
+        }
+
+        public Builder setContent(int contentResId) {
+            param.content = param.context.getString(contentResId);
+            return this;
+        }
+
+        public Builder setLeftButtonText(String leftBtnText) {
+            param.leftBtnText = leftBtnText;
+            return this;
+        }
+
+        public Builder setLeftButtonText(int leftBtnTextResId) {
+            param.leftBtnText = param.context.getString(leftBtnTextResId);
+            return this;
+        }
+
+        public Builder setRightButtonText(String rightBtnText) {
+            param.rightBtnText = rightBtnText;
+            return this;
+        }
+
+        public Builder setRightButtonText(int rightBtnTextResId) {
+            param.rightBtnText = param.context.getString(rightBtnTextResId);
+            return this;
+        }
+
+        public Builder setTitleVisibility(int visibility) {
+            param.titleVisibility = visibility;
+            return this;
+        }
+
+        public Builder setContentVisibility(int visibility) {
+            param.contentVisibility = visibility;
+            return this;
+        }
+
+        public Builder setLeftBtnListener(OnClickListener listener) {
+            param.leftBtnListener = listener;
+            return this;
+        }
+
+        public Builder setRightBtnListener(OnClickListener listener) {
+            param.rightBtnListener = listener;
+            return this;
+        }
+
+        public Builder setIsNeedLeftBtn(boolean show) {
+            param.showLeftButton = show;
+            return this;
+        }
+
+        public Builder setCancelable(boolean cancelable) {
+            param.cancelable = cancelable;
+            return this;
+        }
+
+        public PLVConfirmDialog build() {
+            return param.initTo(new PLVConfirmDialog(param.context));
+        }
+
+        public void show() {
+            build().show();
+        }
+
+        protected static class Param {
+            public Context context;
+            public String title;
+            public String content;
+            public int titleVisibility = View.VISIBLE;
+            public int contentVisibility = View.VISIBLE;
+            public String leftBtnText = PLVAppUtils.getString(R.string.plv_common_dialog_click_wrong);
+            public String rightBtnText;
+            public OnClickListener leftBtnListener = hideDialogOnClickListener;
+            public OnClickListener rightBtnListener;
+            public boolean showLeftButton = true;
+            public boolean cancelable = true;
+
+            public PLVConfirmDialog initTo(PLVConfirmDialog dialog) {
+                dialog.setTitle(title);
+                dialog.setContent(content);
+                dialog.setTitleVisibility(titleVisibility);
+                dialog.setContentVisibility(contentVisibility);
+                dialog.setLeftButtonText(leftBtnText);
+                dialog.setRightButtonText(rightBtnText);
+                dialog.setLeftBtnListener(leftBtnListener);
+                dialog.setRightBtnListener(rightBtnListener);
+                dialog.setIsNeedLeftBtn(showLeftButton);
+                dialog.setCancelable(cancelable);
+                return dialog;
+            }
+
+            private static final OnClickListener hideDialogOnClickListener = new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, View v) {
+                    dialog.dismiss();
+                }
+            };
         }
     }
 }

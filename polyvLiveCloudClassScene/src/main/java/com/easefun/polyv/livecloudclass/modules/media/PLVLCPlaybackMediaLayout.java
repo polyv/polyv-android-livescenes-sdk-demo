@@ -1,8 +1,11 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
 import android.app.Activity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
@@ -25,7 +28,7 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
 import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCPlaybackMediaController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCDanmuController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessageSender;
@@ -66,12 +69,12 @@ import java.util.List;
 /**
  * 云课堂场景下的回放播放器布局，实现 IPLVLCMediaLayout 接口
  */
-public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMediaLayout {
+public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMediaLayout, LifecycleObserver {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCPlaybackMediaLayout.class.getSimpleName();
     private static final float RATIO_WH = 16f / 9;//播放器竖屏宽高使用16:9比例
     private static final int MAX_RETRY_COUNT = 3;//断网重连重试次数
-
+    private static final boolean AUTO_PAUSE_WHEN_ENTER_BACKGROUND = false;//进入后台自动暂停
 
     /**
      * 横屏聊天布局可见性与弹幕开关同步
@@ -127,6 +130,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
     //listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
+
+    private boolean pausingOnEnterBackground = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -140,8 +145,32 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     public PLVLCPlaybackMediaLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        if (context instanceof LifecycleOwner) {
+            ((LifecycleOwner) context).getLifecycle().addObserver(this);
+        }
+
         initView();
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="生命周期">
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    public void onResume() {
+        if (pausingOnEnterBackground) {
+            resume();
+        }
+        pausingOnEnterBackground = false;
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void onPause() {
+        if (AUTO_PAUSE_WHEN_ENTER_BACKGROUND && isPlaying()) {
+            pausingOnEnterBackground = true;
+            pause();
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -436,7 +465,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的live方法，空实现">
     @Override
-    public void setLandscapeControllerView(@NonNull IPLVLiveLandscapePlayerController landscapeControllerView) {
+    public void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView) {
 
     }
 
@@ -528,6 +557,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public int getVideoCurrentPosition() {
+        return playbackPlayerPresenter.getVideoCurrentPosition();
+    }
+
+    @Override
     public void seekTo(int progress, int max) {
         playbackPlayerPresenter.seekTo(progress, max);
     }
@@ -553,6 +587,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener) {
+        playbackPlayerPresenter.getData().getSeekCompleteVO().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
     public void updatePlayBackVideVid(String vid) {
         playbackPlayerPresenter.setPlayerVid(vid);
     }
@@ -562,6 +601,15 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.setPlayerVidAndPlay(vid);
     }
 
+    @Override
+    public String getSessionId() {
+        return playbackPlayerPresenter.getSessionId();
+    }
+
+    @Override
+    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled) {
+        mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view实现">

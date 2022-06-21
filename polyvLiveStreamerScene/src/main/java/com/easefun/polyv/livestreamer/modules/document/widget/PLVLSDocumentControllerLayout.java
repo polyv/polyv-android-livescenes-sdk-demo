@@ -2,6 +2,8 @@ package com.easefun.polyv.livestreamer.modules.document.widget;
 
 import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMarkToolType;
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
@@ -23,6 +27,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTJsModel;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 
@@ -95,6 +100,8 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     private SparseArray<Integer> autoId2PageCountMap = new SparseArray<>();
     private boolean isShowByGuest;
 
+    private boolean isBeautyLayoutShowing = false;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造方法">
@@ -124,6 +131,8 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         initPptPageSelector();
         initFullScreenOnClickListener();
         initDocumentMvpView();
+
+        observeBeautyLayoutStatus();
 
         // 首次进入时收起标注工具栏
         plvlsDocumentMarkMenu.close();
@@ -376,6 +385,18 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
     }
 
+    private void observeBeautyLayoutStatus() {
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVLSDocumentControllerLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
@@ -528,6 +549,14 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
 
     private int getCurrentDocumentPageCount() {
         return getDocumentPageCount(currentAutoId);
+    }
+
+    private void updateVisibility() {
+        if (isBeautyLayoutShowing) {
+            setVisibility(GONE);
+            return;
+        }
+        setVisibility(VISIBLE);
     }
 
     // </editor-fold>

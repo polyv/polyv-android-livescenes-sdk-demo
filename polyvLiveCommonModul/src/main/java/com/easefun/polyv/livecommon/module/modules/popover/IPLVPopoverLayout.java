@@ -18,12 +18,12 @@ public interface IPLVPopoverLayout {
     /**
      * 获取互动应用布局
      */
-    IPLVInteractLayout getPLVInteractLayout();
+    IPLVInteractLayout getInteractLayout();
 
     /**
      * 获取积分打赏布局
      */
-    PLVPointRewardLayout getPLVRewardView();
+    PLVPointRewardLayout getRewardView();
 
 
     /**

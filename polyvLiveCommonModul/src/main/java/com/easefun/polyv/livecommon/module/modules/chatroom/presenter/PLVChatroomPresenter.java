@@ -49,8 +49,8 @@ import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
-import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.livescenes.model.PLVKickUsersVO;
+import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -489,6 +489,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         });
                     }
                 });
+    }
+
+    @Override
+    public int[] getSpeakEmojiSizes() {
+        return getEmojiSizes(1);
     }
 
     @Override
@@ -1085,10 +1090,6 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             loginRoomId = getConfig().getChannelId();//socket未登陆时，使用频道号
         }
         return loginRoomId;
-    }
-
-    private int[] getSpeakEmojiSizes() {
-        return getEmojiSizes(1);
     }
 
     private int[] getQuizEmojiSizes() {

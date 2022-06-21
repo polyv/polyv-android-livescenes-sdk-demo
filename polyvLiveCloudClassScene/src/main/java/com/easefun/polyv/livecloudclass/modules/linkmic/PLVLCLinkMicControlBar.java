@@ -38,6 +38,9 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
+import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
+import com.plv.livescenes.log.linkmic.PLVLinkMicELog;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -89,6 +92,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
 
     //State
     private PLVLCLinkMicControllerState state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE;
+
     private boolean isCameraOpen = false;
     private boolean isCameraFront = true;
     private boolean isMicrophoneOpen = true;
@@ -323,6 +327,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         isCameraOpen = false;
         isCameraFront = true;
         isMicrophoneOpen = true;
+
         //更新竖屏UI
         tvRequestTip.setVisibility(VISIBLE);
         tvRequestTip.setText(R.string.plv_linkmic_tip_request_link_mic);
@@ -546,6 +551,13 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                IPLVLinkMicTraceLogSender iplvLinkMicTraceLogSender = new PLVLinkMicTraceLogSender();
+                                iplvLinkMicTraceLogSender.setLogModuleClass(PLVLinkMicELog.class);
+                                if (state.equals(PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC)) {
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);
+                                } else {
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);
+                                }
                                 handleRingOff();
                                 dialog.dismiss();
                             }

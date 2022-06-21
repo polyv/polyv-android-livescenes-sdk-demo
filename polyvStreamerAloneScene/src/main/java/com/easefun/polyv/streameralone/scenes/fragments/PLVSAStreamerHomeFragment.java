@@ -1,10 +1,12 @@
 package com.easefun.polyv.streameralone.scenes.fragments;
 
+import androidx.lifecycle.Observer;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
+import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -33,6 +37,7 @@ import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMoreLayout;
 import com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
@@ -74,6 +79,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     //聊天室布局
     private IPLVSAChatroomLayout plvsaChatroomLayout;
     //view
+    private ConstraintLayout homeFragmentLayout;
     private TextView plvsaToolBarCallInputTv;
     private ImageView plvsaToolBarMoreIv;
     private ImageView plvsaToolBarMemberIv;
@@ -87,6 +93,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
     //listener
     private OnViewActionListener onViewActionListener;
+
+    private boolean isBeautyLayoutShowing = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -109,6 +117,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
+        homeFragmentLayout = findViewById(R.id.plvsa_home_fragment_layout);
         plvsaStatusBarLayout = (PLVSAStatusBarLayout) findViewById(R.id.plvsa_status_bar_layout);
         plvsaChatroomRewardLy = findViewById(R.id.plvsa_chatroom_reward_ly);
         plvsaChatroomGreetingLy = findViewById(R.id.plvsa_chatroom_greet_ly);
@@ -130,6 +139,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         initMoreLayout();
         initMemberLayout();
 
+        observeBeautyLayoutStatus();
+
         updateViewWithOrientation();
     }
 
@@ -139,6 +150,21 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
 
     private void initMemberLayout() {
         memberLayout = new PLVSAMemberLayout(view.getContext());
+    }
+
+    private void observeBeautyLayoutStatus() {
+        if (getActivity() == null) {
+            return;
+        }
+        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
+                .getUiState()
+                .observe(getActivity(), new Observer<PLVBeautyUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
+                        PLVSAStreamerHomeFragment.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
+                        updateVisibility();
+                    }
+                });
     }
     // </editor-fold>
 
@@ -251,6 +277,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新布局">
+
     /**
      * 更新嘉宾的布局
      */
@@ -260,6 +287,15 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
             updateLinkMicLayoutTypeVisibility(false);
             plvsaToolBarLinkmicIv.setVisibility(View.GONE);
         }
+    }
+
+    private void updateVisibility() {
+        // 美颜布局显示时，不显示主页布局
+        if (isBeautyLayoutShowing) {
+            homeFragmentLayout.setVisibility(View.GONE);
+            return;
+        }
+        homeFragmentLayout.setVisibility(View.VISIBLE);
     }
     // </editor-fold >
 

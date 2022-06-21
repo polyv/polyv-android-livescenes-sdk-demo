@@ -14,6 +14,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgContent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -188,7 +189,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             giftDrawableId = ((PLVCustomGiftEvent) messageData).getGiftDrawableId();
         } else if (messageData instanceof PLVChatEmotionEvent){ // 个性图片表情消息
             PLVChatEmotionEvent emotionEvent = (PLVChatEmotionEvent) messageData;
-            if(emotionEvent.getUser() == null) {
+            if (emotionEvent.getUser() == null) {
                 fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             } else {
                 fillFieldFromUser(emotionEvent.getUser());
@@ -197,6 +198,36 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
 
             chatImgWidth = ConvertUtils.dp2px(80);
             chatImgHeight = ConvertUtils.dp2px(80);
+        } else if (messageData instanceof PLVChatPlaybackData) { // 聊天回放数据
+            PLVChatPlaybackData chatPlaybackData = (PLVChatPlaybackData) messageData;
+            userType = chatPlaybackData.getUserType();
+            nickName = chatPlaybackData.getNick();
+            userId = chatPlaybackData.getUserId();
+            avatar = chatPlaybackData.getPic();
+            actor = chatPlaybackData.getActor();
+            if (chatPlaybackData.getObjects() != null) {
+                int validIndex = Math.min(chatPlaybackData.getObjects().length - 1, msgIndex);
+                speakMsg = (CharSequence) chatPlaybackData.getObjects()[validIndex];
+                chatQuoteVO = chatPlaybackData.getChatQuoteVO();
+                if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
+                    if (chatQuoteVO.getObjects() != null) {
+                        quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                    }
+                }
+            }
+            PLVChatImgContent chatImgContent = chatPlaybackData.getChatImgContent();
+            if (chatImgContent != null) {
+                chatImgUrl = chatImgContent.getUploadImgUrl();
+                if (chatImgContent.getSize() != null) {
+                    chatImgWidth = (int) chatImgContent.getSize().getWidth();
+                    chatImgHeight = (int) chatImgContent.getSize().getHeight();
+                }
+                if ("emotion".equals(chatImgContent.getType())) {
+                    //图片表情要80
+                    chatImgWidth = ConvertUtils.dp2px(80);
+                    chatImgHeight = ConvertUtils.dp2px(80);
+                }
+            }
         }
     }
 

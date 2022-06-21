@@ -4,6 +4,8 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -18,12 +20,16 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackCacheVideoViewModel;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSafeWebView;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -62,6 +68,8 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     private TextView statusTv;
 
     private PLVLiveStateEnum currentLiveState;
+
+    private boolean isCachedPlaybackVideo = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -141,6 +149,23 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             //设置介绍内容
             setDescContent();
         }
+
+        observePlaybackCacheStatus();
+    }
+
+    private void observePlaybackCacheStatus() {
+        final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
+        playbackCacheVideoViewModel.getPlaybackCacheUpdateLiveData()
+                .observe((LifecycleOwner) view.getContext(), new Observer<PLVPlaybackCacheVideoVO>() {
+                    @Override
+                    public void onChanged(@Nullable PLVPlaybackCacheVideoVO vo) {
+                        if (vo == null) {
+                            return;
+                        }
+                        PLVLCLiveDescFragment.this.isCachedPlaybackVideo = vo.getDownloadStatusEnum() == PLVPlaybackCacheDownloadStatusEnum.DOWNLOADED;
+                        updateLiveStatus(currentLiveState);
+                    }
+                });
     }
     // </editor-fold>
 
@@ -190,7 +215,8 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             pair(PLVLiveStateEnum.STOP, R.color.text_green),
             pair(PLVLiveStateEnum.END, R.color.text_gray),
             pair(PLVLiveStateEnum.WAITING, R.color.colorPortage),
-            pair(PLVLiveStateEnum.PLAYBACK, R.color.text_red)
+            pair(PLVLiveStateEnum.PLAYBACK, R.color.text_red),
+            pair(PLVLiveStateEnum.PLAYBACK_CACHED, R.color.plvlc_live_desc_playback_cached_text_color)
     );
 
     private static final Map<PLVLiveStateEnum, Integer> STATUS_BACKGROUND_MAP = mapOf(
@@ -199,7 +225,8 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             pair(PLVLiveStateEnum.STOP, R.drawable.plvlc_live_status_stop),
             pair(PLVLiveStateEnum.END, R.drawable.plvlc_live_status_noactive),
             pair(PLVLiveStateEnum.WAITING, R.drawable.plvlc_live_status_waitting),
-            pair(PLVLiveStateEnum.PLAYBACK, R.drawable.plvlc_live_status_live)
+            pair(PLVLiveStateEnum.PLAYBACK, R.drawable.plvlc_live_status_live),
+            pair(PLVLiveStateEnum.PLAYBACK_CACHED, R.drawable.plvlc_live_status_playback_cached)
     );
 
     private void updateStatusInner(final PLVLiveStateEnum stateEnum) {
@@ -213,9 +240,15 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
         if (statusTv == null) {
             return;
         }
-        final String text = getOrDefault(currentLiveState.getDescription(), currentLiveState.getStatus());
-        final int colorResId = getOrDefault(STATUS_COLOR_MAP.get(currentLiveState), R.color.text_gray);
-        final int backgroundResId = getOrDefault(STATUS_BACKGROUND_MAP.get(currentLiveState), R.drawable.plvlc_live_status_noactive);
+        final PLVLiveStateEnum showStatus;
+        if (isCachedPlaybackVideo) {
+            showStatus = PLVLiveStateEnum.PLAYBACK_CACHED;
+        } else {
+            showStatus = currentLiveState;
+        }
+        final String text = getOrDefault(showStatus.getDescription(), showStatus.getStatus());
+        final int colorResId = getOrDefault(STATUS_COLOR_MAP.get(showStatus), R.color.text_gray);
+        final int backgroundResId = getOrDefault(STATUS_BACKGROUND_MAP.get(showStatus), R.drawable.plvlc_live_status_noactive);
         statusTv.setText(text);
         statusTv.setTextColor(getResources().getColor(colorResId));
         statusTv.setBackgroundResource(backgroundResId);

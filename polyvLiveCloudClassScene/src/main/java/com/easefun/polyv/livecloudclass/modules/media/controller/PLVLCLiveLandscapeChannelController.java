@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecloudclass.modules.liveroom;
+package com.easefun.polyv.livecloudclass.modules.media.controller;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -20,7 +20,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLay
  * author: HWilliamgo
  * description: 云课堂场景下定义的横屏播放器控制器
  */
-public class PLVLCLiveLandscapeChannelController extends FrameLayout implements IPLVLiveLandscapePlayerController {
+public class PLVLCLiveLandscapeChannelController extends FrameLayout implements IPLVLCLiveLandscapePlayerController {
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVLCLiveLandscapeChannelController(@NonNull Context context) {

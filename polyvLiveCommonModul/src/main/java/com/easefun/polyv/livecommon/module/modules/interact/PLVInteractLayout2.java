@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -18,6 +20,7 @@ import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
@@ -28,8 +31,6 @@ import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,20 +40,20 @@ import java.util.List;
 public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private final String TAG = this.getClass().getSimpleName();
+    private static final String TAG = PLVInteractLayout2.class.getSimpleName();
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVInteractWebView2 plvlcInteractWeb;
 
-    private static final List<String> jsHandler = new ArrayList(Arrays.asList(
+    private static final List<String> JS_HANDLER = listOf(
             PLVInteractJSBridgeEventConst.V2_GET_NATIVE_APP_PARAMS_INFO,
             PLVInteractJSBridgeEventConst.V2_CLOSE_WEB_VIEW,
             PLVInteractJSBridgeEventConst.V2_LINK_CLICK,
             PLVInteractJSBridgeEventConst.V2_WEB_VIEW_UPDATE_APP_STATUS,
             PLVInteractJSBridgeEventConst.V2_SHOW_WEB_VIEW,
             PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT
-    ));
+    );
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -78,21 +79,21 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         plvlcInteractWeb = findViewById(R.id.plvlc_interact_web);
 
         setVisibility(View.INVISIBLE);
-        for (final String event : jsHandler) {
+        for (final String event : JS_HANDLER) {
             plvlcInteractWeb.registerMsgReceiverFromJs(event, new BridgeHandler() {
                 @Override
-                public void handler(String result, CallBackFunction callBackFunction) {
-                    Log.d(TAG, event + "result: "+ result);
-                    handlerJsCall(event, result, callBackFunction);
+                public void handler(String param, CallBackFunction callBackFunction) {
+                    Log.d(TAG, event + ", param= " + param);
+                    handlerJsCall(event, param, callBackFunction);
                 }
             });
         }
     }
 
-    private void handlerJsCall(String event, String result, CallBackFunction callBackFunction) {
-        switch(event){
+    private void handlerJsCall(String event, String param, CallBackFunction callBackFunction) {
+        switch (event) {
             case PLVInteractJSBridgeEventConst.V2_GET_NATIVE_APP_PARAMS_INFO:
-                processGetNativeAppParamsInfo(result, callBackFunction);
+                processGetNativeAppParamsInfo(param, callBackFunction);
                 break;
             case PLVInteractJSBridgeEventConst.V2_CLOSE_WEB_VIEW:
                 processWebViewVisibility(true);
@@ -101,13 +102,13 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
                 processWebViewVisibility(false);
                 break;
             case PLVInteractJSBridgeEventConst.V2_WEB_VIEW_UPDATE_APP_STATUS:
-                processWebViewUpdateAppStatus(result, callBackFunction);
+                processWebViewUpdateAppStatus(param, callBackFunction);
                 break;
             case PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT:
                 lockToPortrait();
                 break;
             case PLVInteractJSBridgeEventConst.V2_LINK_CLICK:
-                //预留
+                PLVWebUtils.openWebLink(param, getContext());
                 break;
 
         }
@@ -135,9 +136,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
-    public void showMessage() {
-        String data = "{\"event\" : \"SHOW_LOTTERY_RECORD\"}";//显示抽奖记录消息
-        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+    public void onCallDynamicFunction(String event) {
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, event, new CallBackFunction() {
             @Override
             public void onCallBack(String s) {
                 PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
@@ -190,7 +190,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
-    private void processGetNativeAppParamsInfo(String result, CallBackFunction callBackFunction) {
+    private void processGetNativeAppParamsInfo(String param, CallBackFunction callBackFunction) {
         String nativeAppPramsInfo = getNativeAppPramsInfo();
         PLVCommonLog.d(TAG, "processGetNativeAppParamsInfo= " + nativeAppPramsInfo);
         callBackFunction.onCallBack(nativeAppPramsInfo);

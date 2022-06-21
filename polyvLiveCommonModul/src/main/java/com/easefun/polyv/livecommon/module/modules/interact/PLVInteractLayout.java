@@ -125,7 +125,7 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
-    public void showMessage() {
+    public void onCallDynamicFunction(String event) {
 
     }
 

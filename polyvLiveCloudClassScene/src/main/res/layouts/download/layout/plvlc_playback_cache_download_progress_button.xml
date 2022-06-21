@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:mode="all"
+    app:radius="25dp"
+    tools:background="@color/white"
+    tools:layout_height="48dp"
+    tools:paddingHorizontal="24dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvlc_playback_cache_download_status_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:plvGradientColors="#98c1ff"
+        app:plvRadius="25dp"
+        tools:text="已下载" />
+
+    <TextView
+        android:id="@+id/plvlc_playback_cache_download_progress_background_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/plvlc_playback_cache_download_background_text_bg"
+        android:gravity="center"
+        android:textColor="#3082FE"
+        android:textSize="16sp"
+        tools:text="下载中 100%" />
+
+    <TextView
+        android:id="@+id/plvlc_playback_cache_download_progress_foreground_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/plvlc_playback_cache_download_foreground_text_bg"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        tools:text="下载中 100%" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

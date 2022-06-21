@@ -22,6 +22,8 @@ import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlaybackPlayerData;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
@@ -39,13 +41,19 @@ import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVPlaybackVideoParams;
 import com.plv.business.model.video.PLVWatermarkVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
+import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
+import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
+import com.plv.livescenes.playback.vo.PLVPlaybackLocalCacheVO;
 
 import java.lang.ref.WeakReference;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -55,6 +63,10 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVPlaybackPlayerPresen";
     private static final int WHAT_PLAY_PROGRESS = 1;
+
+    private final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
+    private final PLVPlaybackCacheListViewModel playbackCacheListViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheListViewModel.class);
+
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVPlaybackPlayerData playbackPlayerData;
     private WeakReference<IPLVPlaybackPlayerContract.IPlaybackPlayerView> vWeakReference;
@@ -126,6 +138,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         playbackVideoParams.buildOptions(PLVBaseVideoParams.MARQUEE, true)
                 .buildOptions(PLVBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
                 .buildOptions(PLVBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
+                .buildOptions(PLVPlaybackVideoParams.LOCAL_VIDEO_CACHE_LIST, getLocalCacheVideoList())
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_AUTO_PLAY_TEMP_STORE_VIDEO, true)
                 .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType());
@@ -167,6 +180,22 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         }
 
         return 0;
+    }
+
+    @Override
+    public int getVideoCurrentPosition() {
+        if (videoView != null) {
+            return videoView.getCurrentPosition();
+        }
+        return 0;
+    }
+
+    @Override
+    public String getSessionId() {
+        if (videoView != null && videoView.getPlaybackData() != null) {
+            return videoView.getPlaybackData().getChannelSessionId();
+        }
+        return null;
     }
 
     @Override
@@ -465,6 +494,12 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     removeWatermark();
                 }
             });
+            videoView.setOnSeekCompleteListener(new IPLVVideoViewListenerEvent.OnSeekCompleteListener() {
+                @Override
+                public void onSeekComplete() {
+                    playbackPlayerData.postSeekComplete(videoView.getCurrentPosition());
+                }
+            });
             videoView.setOnInfoListener(new IPolyvVideoViewListenerEvent.OnInfoListener() {
                 @Override
                 public void onInfo(int what, int extra) {
@@ -749,16 +784,24 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnRetryListener(new IPolyvPlaybackListenerEvent.OnRetryListener() {
                 @Override
                 public boolean onRetryFailed() {
-                    if(getView() != null && getView().getRetryLayout() != null){
-                        ((PLVPlayerRetryLayout)getView().getRetryLayout()).onRetryFailed("重试失败");
+                    if (getView() != null && getView().getRetryLayout() != null) {
+                        ((PLVPlayerRetryLayout) getView().getRetryLayout()).onRetryFailed("重试失败");
                     }
                     //false表示使用sdk内部逻辑重试，true表示拦截重试逻辑，开发者自己处理
                     return false;
                 }
             });
+            videoView.setOnPlaybackDataReadyListener(new IPLVPlaybackListenerEvent.OnPlaybackDataReadyListener() {
+                @Override
+                public void onPlaybackDataReady(PLVPlaybackDataVO playbackDataVO) {
+                    if (playbackDataVO == null) {
+                        return;
+                    }
+                    playbackCacheVideoViewModel.updatePlaybackVideoInfo(playbackDataVO);
+                }
+            });
         }
     }
-
 
     // </editor-fold>
 
@@ -917,6 +960,32 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     private PLVLiveChannelConfig getConfig() {
         return liveRoomDataManager.getConfig();
+    }
+
+    private List<PLVPlaybackLocalCacheVO> getLocalCacheVideoList() {
+        final List<PLVPlaybackCacheVideoVO> cacheVideos = playbackCacheListViewModel.getDownloadedListLiveData().getValue();
+        if (cacheVideos == null || cacheVideos.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<PLVPlaybackLocalCacheVO> resultList = new ArrayList<>();
+        for (PLVPlaybackCacheVideoVO vo : cacheVideos) {
+            if (vo.getDownloadStatusEnum() != PLVPlaybackCacheDownloadStatusEnum.DOWNLOADED) {
+                continue;
+            }
+            final PLVPlaybackLocalCacheVO resultVO = new PLVPlaybackLocalCacheVO()
+                    .setVideoPoolId(vo.getVideoPoolId())
+                    .setVideoId(vo.getVideoId())
+                    .setChannelId(vo.getViewerInfoVO().getChannelId())
+                    .setPlaybackListType(vo.getViewerInfoVO().getPlaybackListType())
+                    .setLiveType(vo.getLiveType())
+                    .setChannelSessionId(vo.getChannelSessionId())
+                    .setOriginSessionId(vo.getOriginSessionId())
+                    .setVideoPath(vo.getVideoPath())
+                    .setJsPath(vo.getJsPath())
+                    .setPptPath(vo.getPptPath());
+            resultList.add(resultVO);
+        }
+        return resultList;
     }
     // </editor-fold>
 }

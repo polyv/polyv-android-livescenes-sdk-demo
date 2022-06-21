@@ -247,6 +247,18 @@ public interface IPLVPlaybackPlayerContract {
         int getDuration();
 
         /**
+         * 获取时间当前播放时间
+         *
+         * @return
+         */
+        int getVideoCurrentPosition();
+
+        /**
+         * 获取sessionId
+         */
+        String getSessionId();
+
+        /**
          * 跳转到指定的视频时间
          *
          * @param duration 时间，单位：ms

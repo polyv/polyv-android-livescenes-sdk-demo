@@ -26,7 +26,6 @@ import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
-import com.easefun.polyv.livecloudclass.modules.liveroom.IPLVLiveLandscapePlayerController;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveMoreLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
@@ -84,7 +83,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private PLVLCPPTTurnPageLayout pptTurnPagePortLayout;
 
     //横屏皮肤
-    private IPLVLiveLandscapePlayerController landscapeController;
+    private IPLVLCLiveLandscapePlayerController landscapeController;
     //横屏控制栏布局
     private ViewGroup videoControllerLandLy;
     //返回
@@ -323,7 +322,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
-    public void setLandscapeController(@NonNull IPLVLiveLandscapePlayerController landscapeController) {
+    public void setLandscapeController(@NonNull IPLVLCLiveLandscapePlayerController landscapeController) {
         this.landscapeController = landscapeController;
         //横屏控制栏布局
         videoControllerLandLy = landscapeController.getLandRoot();

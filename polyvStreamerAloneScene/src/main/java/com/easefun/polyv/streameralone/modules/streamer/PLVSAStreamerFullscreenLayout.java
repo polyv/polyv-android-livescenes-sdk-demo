@@ -31,7 +31,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
     private PLVSwitchViewAnchorLayout plvsaStreamerFullscreenView;
     private ImageView plvsaStreamerExitFullscreenIv;
     //item切换全屏的切换器
-    private PLVViewSwitcher fullscreenSwitcher;
+    private final PLVViewSwitcher fullscreenSwitcher = new PLVViewSwitcher();
     //全屏的用户
     private PLVLinkMicItemDataBean linkmicItem;
 
@@ -63,8 +63,6 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_streamer_fullscreen_layout, this);
 
-        fullscreenSwitcher = new PLVViewSwitcher();
-
         plvsaStreamerFullscreenView = findViewById(R.id.plvsa_streamer_fullscreen_view);
         plvsaStreamerExitFullscreenIv = findViewById(R.id.plvsa_streamer_exit_fullscreen_iv);
 
@@ -84,11 +82,12 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         this.listener = listener;
     }
 
-    public void changeViewToFullscreen(PLVSwitchViewAnchorLayout switchViewAnchorLayout, PLVLinkMicItemDataBean linkmicItem) {
-        if(isFullScreened()){
+    public void changeViewToFullscreen(PLVSwitchViewAnchorLayout switchViewAnchorLayout, @NonNull PLVLinkMicItemDataBean linkmicItem) {
+        if (isFullScreened()) {
             return;
         }
         this.linkmicItem = linkmicItem;
+        linkmicItem.setFullScreen(true);
         changeSurfaceViewOnZMediaOverlay(switchViewAnchorLayout, true);
         fullscreenSwitcher.registerSwitchView(switchViewAnchorLayout, plvsaStreamerFullscreenView);
         fullscreenSwitcher.switchView();
@@ -99,7 +98,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
             exitFullscreenTipCount++;
             PLVToast.Builder.context(getContext())
                     .setText(R.string.plvsa_streamer_double_click_exit_fullscreen)
-                    .build().show();
+                    .show();
         }
 
     }
@@ -108,6 +107,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         if(!isFullScreened()){
             return;
         }
+        linkmicItem.setFullScreen(false);
         changeSurfaceViewOnZMediaOverlay(plvsaStreamerFullscreenView, false);
 
         if(listener != null){
@@ -123,8 +123,8 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         if(enterFullscreenTipCount < PLV_ENTER_FULLSCREEN_TIP_COUNT){
             enterFullscreenTipCount++;
             PLVToast.Builder.context(getContext())
-                    .setText("双击窗口放大")
-                    .build().show();
+                    .setText(R.string.plvsa_streamer_double_click_enter_fullscreen)
+                    .show();
         }
     }
 

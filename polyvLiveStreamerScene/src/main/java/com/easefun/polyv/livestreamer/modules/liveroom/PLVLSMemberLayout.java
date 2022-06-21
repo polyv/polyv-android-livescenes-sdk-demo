@@ -27,6 +27,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.liveroom.adapter.PLVLSMemberAdapter;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -152,7 +153,7 @@ public class PLVLSMemberLayout extends FrameLayout {
             @Override
             public void onClick(View v) {
                 if (isStartedStatus) {
-                    new PLVConfirmDialog(getContext())
+                    PLVLSConfirmDialog.Builder.context(getContext())
                             .setTitleVisibility(View.GONE)
                             .setContent(R.string.plv_linkmic_dialog_hang_all_off_confirm_ask)
                             .setRightButtonText(R.string.plv_common_dialog_confirm)
@@ -195,7 +196,7 @@ public class PLVLSMemberLayout extends FrameLayout {
                         }
                     };
                     if (!currentIsMuteAll) {
-                        new PLVConfirmDialog(getContext())
+                        PLVLSConfirmDialog.Builder.context(getContext())
                                 .setTitleVisibility(View.GONE)
                                 .setContent(R.string.plv_linkmic_dialog_mute_all_audio_confirm_ask)
                                 .setRightButtonText(R.string.plv_common_dialog_confirm)
@@ -391,7 +392,7 @@ public class PLVLSMemberLayout extends FrameLayout {
         @Override
         public void onReachTheInteractNumLimit() {
             super.onReachTheInteractNumLimit();
-            new PLVConfirmDialog(getContext())
+            PLVLSConfirmDialog.Builder.context(getContext())
                     .setTitleVisibility(View.GONE)
                     .setContent(R.string.plv_linkmic_dialog_reach_the_interact_num_limit)
                     .setIsNeedLeftBtn(false)

@@ -370,7 +370,7 @@ public class PLVStreamerMsgHandler {
         if(authentic != null){
             //memberlist和streamerlist排序可能不同
             Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
-            Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getStreamerItemWithLinkId(authentic.getUserId());
+            Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getLinkMicItemWithLinkMicId(authentic.getUserId());
 
             if (PLVPPTAuthentic.TYPE_SPEAKER.equals(authentic.getType())) {
                 if(memberItem != null && memberItem.second != null) {
@@ -381,10 +381,10 @@ public class PLVStreamerMsgHandler {
                 }
             } else if (PLVPPTAuthentic.PermissionType.SCREEN_SHARE.equals(authentic.getType())){
                 if(memberItem != null && memberItem.second != null) {
-                    memberItem.second.getLinkMicItemDataBean().setScreenSharedForMe(!authentic.hasNoAthuentic());
+                    memberItem.second.getLinkMicItemDataBean().setScreenShare(!authentic.hasNoAthuentic());
                 }
                 if(streamerItem != null && streamerItem.second != null) {
-                    streamerItem.second.setScreenSharedForMe(!authentic.hasNoAthuentic());
+                    streamerItem.second.setScreenShare(!authentic.hasNoAthuentic());
                 }
             }
             final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());

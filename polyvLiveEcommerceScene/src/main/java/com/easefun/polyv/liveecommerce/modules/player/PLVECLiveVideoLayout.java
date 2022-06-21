@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
@@ -47,7 +48,9 @@ import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayo
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -375,6 +378,14 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
+    public void setVideoViewRect(Rect videoViewRect) {
+        this.videoViewRect = videoViewRect;
+        if (!isVideoViewPlayingInFloatWindow) {
+            fitVideoRatioAndRect();
+        }
+    }
+
+    @Override
     public void destroy() {
         if (audioModeView != null) {
             audioModeView.onHide();
@@ -389,13 +400,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的live方法">
-    public void setVideoViewRect(Rect videoViewRect) {
-        this.videoViewRect = videoViewRect;
-        if (!isVideoViewPlayingInFloatWindow) {
-            fitVideoRatioAndRect();
-        }
-    }
-
     @Override
     public int getLinesPos() {
         return livePlayerPresenter.getLinesPos();
@@ -448,6 +452,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         }
         this.isLowLatency = isLowLatencyMode;
         startPlay();
+        if (this.isLowLatency) {
+            PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_NO_DELAY, " isLowLatency: " + this.isLowLatency);
+        } else {
+            PLVELogsService.getInstance().addStaticsLog(PLVPlayerElog.class, PLVPlayerElog.Event.SWITCH_TO_DELAY, " isLowLatency: " + this.isLowLatency);
+        }
         if (onViewActionListener != null) {
             onViewActionListener.acceptOnLowLatencyChange(this.isLowLatency);
         }
@@ -468,18 +477,27 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
+    public int getVideoCurrentPosition() {
+        return 0;
+    }
+
+    @Override
     public void seekTo(int progress, int max) {
-        PLVCommonLog.d(TAG,"live video cannot seek");
+        PLVCommonLog.d(TAG, "live video cannot seek");
     }
 
     @Override
     public void setSpeed(float speed) {
-        PLVCommonLog.d(TAG,"live video cannot set Speed");
+        PLVCommonLog.d(TAG, "live video cannot set Speed");
     }
 
     @Override
     public float getSpeed() {
         return 0;
+    }
+
+    @Override
+    public void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener) {
     }
 
     @Override
@@ -489,14 +507,18 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public void changePlaybackVid(String vid) {
-        PLVCommonLog.d(TAG,"live video cannot change vid");
+        PLVCommonLog.d(TAG, "live video cannot change vid");
     }
 
     @Override
     public void changePlaybackVidAndPlay(String vid) {
-        PLVCommonLog.d(TAG,"live video cannot change vid and play");
+        PLVCommonLog.d(TAG, "live video cannot change vid and play");
     }
 
+    @Override
+    public String getSessionId() {
+        return null;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view层实现">

@@ -13,9 +13,9 @@ import java.util.List;
  * viewPagerAdapter
  */
 public class PLVViewPagerAdapter extends FragmentStatePagerAdapter {
-    private List<Fragment> fragments;
+    private final List<? extends Fragment> fragments;
 
-    public PLVViewPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+    public PLVViewPagerAdapter(FragmentManager fm, List<? extends Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }
@@ -29,10 +29,6 @@ public class PLVViewPagerAdapter extends FragmentStatePagerAdapter {
             PLVCommonLog.exception(e);
             e.printStackTrace();
         }
-    }
-
-    public List<Fragment> getFragments() {
-        return fragments;
     }
 
     @Override

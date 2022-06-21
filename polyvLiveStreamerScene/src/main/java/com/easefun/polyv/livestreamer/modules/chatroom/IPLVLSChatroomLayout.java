@@ -55,11 +55,18 @@ public interface IPLVLSChatroomLayout {
     void setFrontCameraViewStatus(boolean isFront);
 
     /**
-     * 改变聊天室布局可见性
+     * 通知文档区域标注工具栏展开状态
      *
-     * @param visibility 可见性
+     * @param isExpand 是否展开
      */
-    void setVisibility(int visibility);
+    void notifyDocumentMarkToolExpand(boolean isExpand);
+
+    /**
+     * 通知文档布局全屏状态
+     *
+     * @param isFullScreen 是否全屏显示
+     */
+    void notifyDocumentLayoutFullScreen(boolean isFullScreen);
 
     /**
      * 是否拦截返回事件

@@ -34,6 +34,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPl
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
@@ -57,6 +58,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     //是否允许播放片头广告
     private boolean isAllowOpenAdhead = true;
+    //回放播放器横屏视频的播放器区域位置
+    private Rect videoViewRect;
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVSwitchViewAnchorLayout playbackPlayerSwitchAnchorLayout;
@@ -251,6 +254,14 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public void setVideoViewRect(Rect videoViewRect) {
+        this.videoViewRect = videoViewRect;
+        if (!isVideoViewPlayingInFloatWindow) {
+            fitVideoRatioAndRect();
+        }
+    }
+
+    @Override
     public void destroy() {
         if (playbackPlayerPresenter != null) {
             playbackPlayerPresenter.destroy();
@@ -259,12 +270,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVECVideoLayout定义的live方法，空实现">
-
-    @Override
-    public void setVideoViewRect(Rect videoViewRect) {
-        PLVCommonLog.d(TAG, "直播带货回放场景 暂无调整视频区域布局");
-    }
-
     @Override
     public int getLinesPos() {
         return 0;
@@ -328,6 +333,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public int getVideoCurrentPosition() {
+        return playbackPlayerPresenter.getVideoCurrentPosition();
+    }
+
+    @Override
     public void seekTo(int progress, int max) {
         playbackPlayerPresenter.seekTo(progress, max);
     }
@@ -340,6 +350,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     @Override
     public float getSpeed() {
         return playbackPlayerPresenter.getSpeed();
+    }
+
+    @Override
+    public void addOnSeekCompleteListener(IPLVOnDataChangedListener<Integer> listener) {
+        playbackPlayerPresenter.getData().getSeekCompleteVO().observe((LifecycleOwner) getContext(), listener);
     }
 
     @Override
@@ -357,6 +372,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         playbackPlayerPresenter.setPlayerVidAndPlay(vid);
     }
 
+    @Override
+    public String getSessionId() {
+        return playbackPlayerPresenter.getSessionId();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view层实现">
@@ -400,9 +419,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         @Override
         public void onPrepared() {
             super.onPrepared();
-            fitMode = PLVECFitMode.FIT_VIDEO_RATIO_VIDEOVIEW;
+            fitMode = PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_VIDEOVIEW;
             if (!isVideoViewPlayingInFloatWindow) {
-                PLVVideoSizeUtils.fitVideoRatio(videoView);
+                PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+
             }
             //需要将水印与视频区域大小匹配
             post(new Runnable() {
@@ -425,6 +445,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onPlayError(PolyvPlayError error, String tips) {
             super.onPlayError(error, tips);
             ToastUtils.showLong(tips);
+            fitMode = PLVECFitMode.FIT_VIDEO_RECT_FALSE;
+            if (!isVideoViewPlayingInFloatWindow) {
+                PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+            }
         }
 
         @Override
@@ -438,8 +462,9 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         @Override
         public void onSubVideoViewPlay(boolean isFirst) {
             super.onSubVideoViewPlay(isFirst);
+            fitMode = PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_SUB_VIDEOVIEW;
             if (!isVideoViewPlayingInFloatWindow) {
-                PLVVideoSizeUtils.fitVideoRatio(subVideoView);
+                PLVVideoSizeUtils.fitVideoRatioAndRect(subVideoView, videoView.getParent(), videoViewRect);//传主播放器viewParent
             }
         }
 
@@ -490,6 +515,18 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private void showPlayCenterView() {
         if (!isSubVideoViewShow()) {
             playCenterView.setVisibility(VISIBLE);
+        }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 适配播放器的填充模式及其布局位置">
+    private void fitVideoRatioAndRect() {
+        if (fitMode == PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_SUB_VIDEOVIEW) {
+            PLVVideoSizeUtils.fitVideoRatioAndRect(subVideoView, videoView.getParent(), videoViewRect);//传主播放器viewParent
+        } else if (fitMode == PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_VIDEOVIEW) {
+            PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+        } else if (fitMode == PLVECFitMode.FIT_VIDEO_RECT_FALSE) {
+            PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
         }
     }
     // </editor-fold>

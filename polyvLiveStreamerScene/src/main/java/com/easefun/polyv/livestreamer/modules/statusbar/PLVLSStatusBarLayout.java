@@ -39,7 +39,8 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSClassBeginCountDownW
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
-import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSettingLayout;
+import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -70,7 +71,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     //频道信息布局
     private PLVLSChannelInfoLayout channelInfoLayout;
     //设置布局
-    private PLVLSSettingLayout settingLayout;
+    private PLVLSMoreSettingLayout moreSettingLayout;
     //成员列表布局
     private PLVLSMemberLayout memberLayout;
     //连麦开关布局
@@ -149,7 +150,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         plvlsStatusBarWhiteboardIv = findViewById(R.id.plvls_status_bar_whiteboard_iv);
 
         channelInfoLayout = new PLVLSChannelInfoLayout(getContext());
-        settingLayout = new PLVLSSettingLayout(getContext());
+        moreSettingLayout = new PLVLSMoreSettingLayout(getContext());
         memberLayout = new PLVLSMemberLayout(getContext());
         linkMicControlWindow = new PLVLSLinkMicControlWindow(this);
         linkMicRequestTipsWindow = new PLVLSLinkMicRequestTipsWindow(this);
@@ -215,7 +216,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     private void initSettingLayout() {
         //初始化设置页的监听器
-        settingLayout.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
+        moreSettingLayout.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
             @Override
             public void onDrawerStateChange(int oldState, int newState) {
                 if (newState == PLVMenuDrawer.STATE_CLOSED) {
@@ -227,7 +228,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             public void onDrawerSlide(float openRatio, int offsetPixels) {
             }
         });
-        settingLayout.setOnViewActionListener(new PLVLSSettingLayout.OnViewActionListener() {
+        moreSettingLayout.setOnViewActionListener(new PLVLSMoreSettingLayout.OnViewActionListener() {
             @Override
             public Pair<Integer, Integer> getBitrateInfo() {
                 return onViewActionListener == null ? null : onViewActionListener.getBitrateInfo();
@@ -236,6 +237,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             @Override
             public void onBitrateClick(int bitrate) {
                 onViewActionListener.onBitrateClick(bitrate);
+            }
+
+            @Override
+            public boolean isCurrentLocalVideoEnable() {
+                return onViewActionListener.isCurrentLocalVideoEnable();
             }
         });
     }
@@ -441,7 +447,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     @Override
     public boolean onBackPressed() {
         return channelInfoLayout.onBackPressed()
-                || settingLayout.onBackPressed()
+                || moreSettingLayout.onBackPressed()
                 || memberLayout.onBackPressed()
                 || pptListLayout.onBackPressed();
     }
@@ -450,7 +456,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     public void destroy() {
         onUserAbilityChangeCallback = null;
         channelInfoLayout.destroy();
-        settingLayout.destroy();
+        moreSettingLayout.destroy();
         memberLayout.destroy();
         pptListLayout.destroy();
         //停止倒计时
@@ -492,7 +498,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             countDownView.startCountDown();
             plvlsStatusBarClassControlTv.setEnabled(false);
         } else {
-            new PLVConfirmDialog(getContext())
+            PLVLSConfirmDialog.Builder.context(getContext())
                     .setTitleVisibility(View.GONE)
                     .setContent(R.string.plv_streamer_dialog_stop_class_ask)
                     .setRightButtonText(R.string.plv_common_dialog_confirm)
@@ -595,7 +601,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             v.setSelected(!v.isSelected());
         } else if (id == R.id.plvls_status_bar_setting_iv) {
             v.setSelected(!v.isSelected());
-            settingLayout.open();
+            moreSettingLayout.open();
         } else if (id == R.id.plvls_status_bar_member_iv) {
             v.setSelected(!v.isSelected());
             memberLayout.open();
