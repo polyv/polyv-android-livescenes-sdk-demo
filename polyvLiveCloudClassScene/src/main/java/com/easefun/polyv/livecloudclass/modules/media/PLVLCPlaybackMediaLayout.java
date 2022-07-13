@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -56,6 +57,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
@@ -413,6 +415,21 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public ImageView getCardEnterView() {
+        return mediaController.getCardEnterView();
+    }
+
+    @Override
+    public TextView getCardEnterCdView() {
+        return mediaController.getCardEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getCardEnterTipsView() {
+        return mediaController.getCardEnterTipsView();
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
@@ -425,6 +442,18 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public void addOnPPTShowStateListener(IPLVOnDataChangedListener<Boolean> listener) {
         playbackPlayerPresenter.getData().getPPTShowState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public boolean hideController() {
+        boolean isShowing = mediaController.isShowing();
+        mediaController.hide();
+        return isShowing;
+    }
+
+    @Override
+    public void showController() {
+        mediaController.show();
     }
 
     @Override
@@ -467,6 +496,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView) {
 
+    }
+
+    @Override
+    public IPLVLCLiveLandscapePlayerController getLandscapeControllerView() {
+        return null;
     }
 
     @Override

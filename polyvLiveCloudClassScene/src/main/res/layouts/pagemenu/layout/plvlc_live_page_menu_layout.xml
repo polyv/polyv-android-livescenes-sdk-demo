@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,13 +34,16 @@
 
     <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
         android:id="@+id/plvlc_commodity_push_layout"
-        android:layout_width="match_parent"
+        android:layout_width="308dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
         android:layout_marginTop="63dp"
         android:layout_marginEnd="8dp"
         android:visibility="gone"
+        app:plv_show_on_landscape="false"
+        app:plv_show_on_portrait="true"
         tools:visibility="visible" />
 
 </RelativeLayout>

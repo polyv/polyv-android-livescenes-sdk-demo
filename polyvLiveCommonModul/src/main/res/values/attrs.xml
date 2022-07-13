@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="plv_show_on_portrait" format="boolean" />
+    <attr name="plv_show_on_landscape" format="boolean" />
     <declare-styleable name="PLVMarqueeTextView">
         <attr name="scroll_interval" format="integer" />
         <attr name="scroll_first_delay" format="integer" />
@@ -192,7 +194,9 @@
         <enum name="top" value="2" />
         <enum name="bottom" value="3" />
     </attr>
+    <attr name="triangleCenter" format="boolean" />
     <attr name="indicateColor" format="color" />
+    <attr name="indicateEndColor" format="color" />
     <attr name="rectRadius" format="dimension" />
     <attr name="plvGradientOrientation" format="enum">
         <enum name="leftRight" value="0" />
@@ -215,7 +219,9 @@
         <attr name="triangleMargin" />
         <attr name="trianglePosition" />
         <attr name="triangleMarginType" />
+        <attr name="triangleCenter" />
         <attr name="indicateColor" />
+        <attr name="indicateEndColor" />
         <attr name="rectRadius" />
     </declare-styleable>
 

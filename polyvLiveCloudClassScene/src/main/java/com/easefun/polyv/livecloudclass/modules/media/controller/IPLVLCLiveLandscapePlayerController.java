@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 
 /**
  * date: 2020/9/8
@@ -93,9 +94,29 @@ public interface IPLVLCLiveLandscapePlayerController {
     ImageView getRewardView();
 
     /**
+     * 获取商品按钮
+     */
+    ImageView getCommodityView();
+
+    /**
      * 获取ppt翻页控件
      */
     PLVLCPPTTurnPageLayout getPPTTurnPageLayout();
+
+    /**
+     * 获取卡片推送入口按钮
+     */
+    ImageView getCardEnterView();
+
+    /**
+     * 获取卡片推送入口倒计时控件
+     */
+    TextView getCardEnterCdView();
+
+    /**
+     * 获取卡片推送入口提示控件
+     */
+    PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
      * 显示

@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
@@ -37,6 +38,11 @@ public interface IPLVLCLivePageMenuLayout {
      * @return 聊天室presenter
      */
     IPLVChatroomContract.IChatroomPresenter getChatroomPresenter();
+
+    /**
+     * 获取卡片推送管理器
+     */
+    PLVCardPushManager getCardPushManager();
 
     /**
      * 获取聊天回放管理器

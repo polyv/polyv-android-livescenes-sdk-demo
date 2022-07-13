@@ -12,6 +12,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
 
@@ -66,7 +67,12 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     public void init(PLVLiveScene scene, IPLVLiveRoomDataManager roomDataManager) {
         plvLayoutReward.initChannelConfig(PLVLiveChannelConfigFiller.generateNewChannelConfig(), roomDataManager);
         plvLayoutReward.changeScene(scene);
-        plvLayoutInteract.init(roomDataManager);
+        plvLayoutInteract.init(roomDataManager, scene);
+    }
+
+    @Override
+    public void setOnOpenInsideWebViewListener(PLVInteractLayout2.OnOpenInsideWebViewListener listener) {
+        plvLayoutInteract.setOnOpenInsideWebViewListener(listener);
     }
 
     @Override

@@ -1467,6 +1467,9 @@ public abstract class PLVMenuDrawer extends ViewGroup {
      * @param params Layout parameters for the view.
      */
     public void setMenuView(View view, LayoutParams params) {
+        if (view.getParent() != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
         mMenuView = view;
         mMenuContainer.removeAllViews();
         mMenuContainer.addView(view, params);

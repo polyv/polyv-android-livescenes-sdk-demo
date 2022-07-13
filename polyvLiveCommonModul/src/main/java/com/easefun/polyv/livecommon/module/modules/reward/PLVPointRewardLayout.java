@@ -153,8 +153,11 @@ public class PLVPointRewardLayout extends FrameLayout implements IPLVPointReward
     public void initChannelConfig(@NonNull PLVLiveChannelConfig config, IPLVLiveRoomDataManager roomDataManager) {
         if(presenter != null && config != null) {
             presenter.init(config.getChannelId(), config.getUser());
-            //获取积分打赏配置
-            presenter.getPointRewardSetting();
+            // 直播才需要获取打赏配置
+            if (config.isLive()) {
+                //获取积分打赏配置
+                presenter.getPointRewardSetting();
+            }
         }
 
         if(roomDataManager != null){

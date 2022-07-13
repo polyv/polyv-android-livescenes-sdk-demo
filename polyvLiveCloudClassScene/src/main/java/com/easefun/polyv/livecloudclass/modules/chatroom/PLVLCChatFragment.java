@@ -43,6 +43,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
@@ -50,6 +51,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardS
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
@@ -75,6 +77,7 @@ import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -149,6 +152,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     //是否选择屏蔽特效
     private boolean isSelectCloseEffect = false;
 
+    //卡片推送
+    private ImageView cardEnterView;
+    private TextView cardEnterCdTv;
+    private PLVTriangleIndicateTextView cardEnterTipsView;
+    private PLVCardPushManager cardPushManager;
+
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
     private boolean isShowGreeting;//是否显示欢迎语
@@ -170,6 +179,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
+    private Runnable playbackTipsRunnable;
 
     //功能开关数据
     private List<PolyvChatFunctionSwitchVO.DataBean> functionSwitchData;
@@ -219,7 +229,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             destroyPointRewardEffectQueue();
         }
         if (chatPlaybackTipsTv != null) {
-            chatPlaybackTipsTv.removeCallbacks(null);
+            chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
 
@@ -232,6 +242,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
         this.isChatPlaybackLayout = isChatPlaybackLayout;
+    }
+
+    public void setCardPushManager(PLVCardPushManager cardPushManager) {
+        this.cardPushManager = cardPushManager;
     }
 
     //设置是否是直播类型，如果不是直播类型，则隐藏公告(互动功能相关)按钮
@@ -375,12 +389,20 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         chatPlaybackTipsTv = findViewById(R.id.plvlc_chat_playback_tips_tv);
         if (isChatPlaybackLayout) {
             chatPlaybackTipsTv.setVisibility(View.VISIBLE);
-            chatPlaybackTipsTv.postDelayed(new Runnable() {
+            chatPlaybackTipsTv.postDelayed(playbackTipsRunnable = new Runnable() {
                 @Override
                 public void run() {
                     chatPlaybackTipsTv.setVisibility(View.GONE);
                 }
             }, 5000);
+        }
+
+        //卡片推送
+        cardEnterView = findViewById(R.id.card_enter_view);
+        cardEnterCdTv = findViewById(R.id.card_enter_cd_tv);
+        cardEnterTipsView = findViewById(R.id.card_enter_tips_view);
+        if (cardPushManager != null) {
+            cardPushManager.registerView(cardEnterView, cardEnterCdTv, cardEnterTipsView);
         }
 
         addPopupButton(toggleEmojiIv);
@@ -479,6 +501,20 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     @Override
     public int attachContainerViewId() {
         return R.id.plvlc_chatroom_input_layout_container;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="卡片推送">
+    private void acceptNewsPushStartMessage(final PLVNewsPushStartEvent newsPushStartEvent) {
+        if (cardPushManager != null) {
+            cardPushManager.acceptNewsPushStartMessage(chatroomPresenter, newsPushStartEvent);
+        }
+    }
+
+    private void acceptNewsPushCancelMessage() {
+        if (cardPushManager != null) {
+            cardPushManager.acceptNewsPushCancelMessage();
+        }
     }
     // </editor-fold>
 
@@ -654,6 +690,18 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 //添加信息至列表
                 addChatMessageToList(dataList, true);
             }
+        }
+
+        @Override
+        public void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent) {
+            super.onNewsPushStartMessage(newsPushStartEvent);
+            acceptNewsPushStartMessage(newsPushStartEvent);
+        }
+
+        @Override
+        public void onNewsPushCancelMessage() {
+            super.onNewsPushCancelMessage();
+            acceptNewsPushCancelMessage();
         }
 
         @Override
@@ -1184,12 +1232,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 chatroomPresenter.sendLikeMessage();
             }
             acceptLikesMessage(1);
-        } else if(id == R.id.plvlc_emoji_tab_emoji_iv){
+        } else if (id == R.id.plvlc_emoji_tab_emoji_iv) {
             changeEmojiTab(true);
-        } else if(id == R.id.plvlc_emoji_tab_personal_iv){
+        } else if (id == R.id.plvlc_emoji_tab_personal_iv) {
             changeEmojiTab(false);
-        } else if(id == R.id.plvlc_iv_show_point_reward){
-            if(onViewActionListener != null){
+        } else if (id == R.id.plvlc_iv_show_point_reward) {
+            if (onViewActionListener != null) {
                 onViewActionListener.onShowRewardAction();
             }
         }

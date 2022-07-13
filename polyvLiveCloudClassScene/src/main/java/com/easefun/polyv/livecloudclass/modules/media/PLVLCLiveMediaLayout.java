@@ -62,6 +62,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
@@ -613,6 +614,21 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public ImageView getCardEnterView() {
+        return mediaController.getLandscapeController().getCardEnterView();
+    }
+
+    @Override
+    public TextView getCardEnterCdView() {
+        return mediaController.getLandscapeController().getCardEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getCardEnterTipsView() {
+        return mediaController.getLandscapeController().getCardEnterTipsView();
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
@@ -625,6 +641,18 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void addOnPPTShowStateListener(IPLVOnDataChangedListener<Boolean> listener) {
         livePlayerPresenter.getData().getPPTShowState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public boolean hideController() {
+        boolean isShowing = mediaController.isShowing();
+        mediaController.hide();
+        return isShowing;
+    }
+
+    @Override
+    public void showController() {
+        mediaController.show();
     }
 
     @Override
@@ -679,6 +707,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             }
         });
         danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);
+    }
+
+    @Override
+    public IPLVLCLiveLandscapePlayerController getLandscapeControllerView() {
+        return mediaController.getLandscapeController();
     }
 
     @Override

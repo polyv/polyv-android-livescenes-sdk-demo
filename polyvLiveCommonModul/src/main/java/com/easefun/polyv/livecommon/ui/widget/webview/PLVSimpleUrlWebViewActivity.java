@@ -11,7 +11,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewActivity;
  */
 public class PLVSimpleUrlWebViewActivity extends PLVSimpleWebViewActivity {
 
-    private static final String EXTRA_URL = "extra_url";
+    public static final String EXTRA_URL = "extra_url";
 
     public static void start(Context context, @NonNull String url) {
         Intent intent = new Intent(context, PLVSimpleUrlWebViewActivity.class);
