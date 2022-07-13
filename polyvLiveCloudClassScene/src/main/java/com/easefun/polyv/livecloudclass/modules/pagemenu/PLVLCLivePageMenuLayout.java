@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
@@ -27,7 +29,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
-import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackChapterFragment;
@@ -41,6 +43,7 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
@@ -64,6 +67,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
@@ -87,13 +91,14 @@ import com.plv.thirdpart.blankj.utilcode.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
-
 /**
  * 直播页面菜单布局，实现 IPLVLCLivePageMenuLayout 接口
  */
 public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePageMenuLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
@@ -103,6 +108,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
     private IPLVChatroomContract.IChatroomView chatroomMvpView;
+    //卡片推送管理器
+    private PLVCardPushManager cardPushManager = new PLVCardPushManager();
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -127,8 +134,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private List<Fragment> pageMenuTabFragmentList;
     //直播页面菜单tab标题列表
     private List<String> pageMenuTabTitleList;
-
-    private PLVLCCommodityPushLayout commodityPushLayout;
 
     //tab
     private PLVLCLiveDescFragment liveDescFragment; //直播介绍tab页
@@ -216,8 +221,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         chatCommonMessageList = new PLVLCChatCommonMessageList(getContext());
         restoreChatTabForMessageList(chatCommonMessageList);
-
-        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_layout);
     }
 
     private void initChatroomMvpView(IPLVChatroomContract.IChatroomPresenter presenter) {
@@ -289,6 +292,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (chatFragment == null) {
             return;
         }
+        chatFragment.setCardPushManager(cardPushManager);
         chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
         if (chatPlaybackManager != null) {
             chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
@@ -361,7 +365,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         observeClassDetailVO();
         observePointRewardOpen();
         observeInteractData();
-        observeCommodityPush();
     }
 
     @Override
@@ -372,6 +375,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     @Override
     public IPLVChatroomContract.IChatroomPresenter getChatroomPresenter() {
         return chatroomPresenter;
+    }
+
+    @Override
+    public PLVCardPushManager getCardPushManager() {
+        return cardPushManager;
     }
 
     @Override
@@ -448,6 +456,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     @Override
     public void destroy() {
         destroySocketLoginManager();
+        if (cardPushManager != null) {
+            cardPushManager.disposeCardPushAllTask();
+        }
         if (chatroomPresenter != null) {
             chatroomPresenter.destroy();
         }
@@ -518,6 +529,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (chatFragment == null) {
             chatFragment = new PLVLCChatFragment();
             chatFragment.init(chatCommonMessageList);
+            chatFragment.setCardPushManager(cardPushManager);
             chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
             chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
             chatroomPresenter.registerView(chatFragment.getChatroomView());
@@ -880,14 +892,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="数据监听 - 商品推送布局">
-
-    private void observeCommodityPush() {
-        chatroomPresenter.registerView(commodityPushLayout.chatroomView);
-    }
-
-    // </editor-fold>
-
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听回放视频的信息：vid变更，seek跳转">
     private void observerPreviousData() {
         if (previousPlaybackPresenter != null) {
@@ -991,6 +995,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                                 && liveRoomDataManager.getConfig().getVid().isEmpty()) {
                             addPreviousTab(channelMenusBean);
                         } else if (PLVLiveClassDetailVO.MENUTYPE_BUY.equals(channelMenusBean.getMenuType())) {
+                            commodityViewModel.notifyHasProductLayout(true);
                             addBuyProductTab(channelMenusBean.getName());
                         }
                     }

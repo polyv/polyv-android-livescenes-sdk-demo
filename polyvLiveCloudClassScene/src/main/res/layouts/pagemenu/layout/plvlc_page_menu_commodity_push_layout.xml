@@ -18,7 +18,7 @@
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="10dp">
+        app:radius="4dp">
 
         <ImageView
             android:id="@+id/plvlc_commodity_cover_iv"

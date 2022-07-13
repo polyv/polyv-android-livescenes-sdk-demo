@@ -126,6 +126,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
+    private Runnable playbackTipsRunnable;
 
     private Boolean hasPreviousPage = null;
     private boolean hasInitPreviousView = false;
@@ -161,7 +162,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             chatPlaybackManager.destroy();
         }
         if (chatPlaybackTipsTv != null) {
-            chatPlaybackTipsTv.removeCallbacks(null);
+            chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
     // </editor-fold>
@@ -289,7 +290,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
             if (chatPlaybackTipsTv != null) {
                 chatPlaybackTipsTv.setVisibility(View.VISIBLE);
-                chatPlaybackTipsTv.postDelayed(new Runnable() {
+                chatPlaybackTipsTv.postDelayed(playbackTipsRunnable = new Runnable() {
                     @Override
                     public void run() {
                         chatPlaybackTipsTv.setVisibility(View.GONE);

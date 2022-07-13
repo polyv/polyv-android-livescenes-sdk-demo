@@ -1,9 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.commodity;
 
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.thirdpart.blankj.utilcode.util.ConvertUtils.dp2px;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Paint;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -19,18 +22,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
-import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.socket.event.commodity.PLVProductContentBean;
-import com.plv.socket.event.commodity.PLVProductControlEvent;
-import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +55,16 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
     private ImageView commodityDialogCloseIv;
     private ImageView commodityEnterIv;
 
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
+
     @Nullable
     private PLVProductContentBean productContentBean;
+
+    private boolean showOnPortrait = true;
+    private boolean showOnLandscape = true;
+
+    private boolean isNeedShow = false;
+    private boolean isLandscape = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -68,17 +78,20 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
 
     public PLVLCCommodityPushLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView();
+        initView(attrs);
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
-    private void initView() {
+    private void initView(@Nullable AttributeSet attributeSet) {
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_page_menu_commodity_push_layout, this, true);
 
         findView();
+        parseAttrs(attributeSet);
 
         commoditySrcPriceTv.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG | commoditySrcPriceTv.getPaintFlags());
+
+        observeCommodityViewModel();
     }
 
     private void findView() {
@@ -99,12 +112,39 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         commodityEnterIv.setOnClickListener(this);
         this.setOnClickListener(this);
     }
+
+    private void parseAttrs(@Nullable AttributeSet attributeSet) {
+        if (attributeSet == null) {
+            return;
+        }
+        final TypedArray typedArray = getContext().obtainStyledAttributes(attributeSet, R.styleable.PLVLCCommodityPushLayout);
+        showOnPortrait = typedArray.getBoolean(R.styleable.PLVLCCommodityPushLayout_plv_show_on_portrait, showOnPortrait);
+        showOnLandscape = typedArray.getBoolean(R.styleable.PLVLCCommodityPushLayout_plv_show_on_landscape, showOnLandscape);
+        typedArray.recycle();
+    }
+
+    private void observeCommodityViewModel() {
+        commodityViewModel.getCommodityUiStateLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVCommodityUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVCommodityUiState uiState) {
+                        if (uiState == null) {
+                            return;
+                        }
+                        if (uiState.productContentBeanPushToShow != null) {
+                            updateProduct(uiState.productContentBeanPushToShow);
+                        }
+                        isNeedShow = uiState.productContentBeanPushToShow != null;
+                        checkUpdateVisibility();
+                    }
+                });
+    }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="对外API">
+    // <editor-fold defaultstate="collapsed" desc="UI更新">
 
     @MainThread
-    public void updateProduct(PLVProductContentBean productContentBean) {
+    private void updateProduct(PLVProductContentBean productContentBean) {
         this.productContentBean = productContentBean;
 
         bindCover(productContentBean);
@@ -120,50 +160,12 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
     }
 
     @MainThread
-    public void show() {
-        setVisibility(View.VISIBLE);
+    private void checkUpdateVisibility() {
+        final boolean show = isNeedShow;
+        final boolean fitOrientation = (!isLandscape && showOnPortrait) || (isLandscape && showOnLandscape);
+        final boolean needShow = show && fitOrientation;
+        setVisibility(needShow ? View.VISIBLE : View.GONE);
     }
-
-    @MainThread
-    public void hide() {
-        setVisibility(View.GONE);
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="Mvp - View">
-
-    public final IPLVChatroomContract.IChatroomView chatroomView = new PLVAbsChatroomView() {
-        @Override
-        public void onProductControlEvent(@NonNull final PLVProductControlEvent productControlEvent) {
-            if (productControlEvent.getContent() == null || !productControlEvent.isPush()) {
-                return;
-            }
-            postToMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    updateProduct(productControlEvent.getContent());
-                    show();
-                }
-            });
-        }
-
-        @Override
-        public void onProductRemoveEvent(@NonNull final PLVProductRemoveEvent productRemoveEvent) {
-            if (productRemoveEvent.getContent() == null || productContentBean == null) {
-                return;
-            }
-            postToMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    final int removeId = productRemoveEvent.getContent().getProductId();
-                    if (PLVLCCommodityPushLayout.this.productContentBean.getProductId() == removeId) {
-                        hide();
-                    }
-                }
-            });
-        }
-    };
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
@@ -171,13 +173,28 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
     public void onClick(View v) {
         int id = v.getId();
         if (id == commodityDialogCloseIv.getId()) {
-            hide();
+            isNeedShow = false;
+            commodityViewModel.onCloseProductPush();
+            checkUpdateVisibility();
         } else if (id == commodityEnterIv.getId() || v == this) {
             if (enterCommodity()) {
-                hide();
+                isNeedShow = false;
+                commodityViewModel.onCloseProductPush();
+                checkUpdateVisibility();
             }
         }
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        checkUpdateVisibility();
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部处理方法">

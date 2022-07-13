@@ -71,6 +71,16 @@
         android:layout_height="match_parent"
         android:layout_marginTop="10dp" />
 
+    <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:layout_width="308dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:plv_show_on_landscape="true"
+        app:plv_show_on_portrait="false" />
+
     <!-- 亮度手势提示 -->
     <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView
         android:id="@+id/plvlc_playback_tipsview_light"
@@ -105,10 +115,10 @@
 
     <!--重试按钮-->
     <com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout
-        android:visibility="gone"
         android:id="@+id/plvlc_playback_player_retry_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <!-- 控制栏 -->
     <com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCPlaybackMediaController

@@ -66,6 +66,7 @@ Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
 | Github仓库Tag | 依赖SDK版本 | API文档                                                      | Common层 | 观看端-云课堂场景 | 观看端-直播带货场景 | 开播端-手机开播三分屏场景 | 开播端-手机开播纯视频场景 | 互动学堂场景 |
 | ------------- | ----------- | ------------------------------------------------------------ | -------- | ----------------- | ------------------- | ------------------------- | ------------------------- | ------------ |
+| 1.9.4         | 1.9.4       | [v1.9.4 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.4/index.html) | ✅        | ✅                 |                     |                           |                           |              |
 | 1.9.3         | 1.9.3       | [v1.9.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.3/index.html) | ✅        | ✅                 | ✅                   | ✅                         | ✅                         |              |
 | 1.9.1.1       | 1.9.1.1     | [v1.9.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1.1/index.html) | ✅        | ✅                 | ✅                   |                           | ✅                         |              |
 | 1.9.1         | 1.9.1       | [v1.9.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1/index.html) | ✅        | ✅                 | ✅                   |                           |                           |              |

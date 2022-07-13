@@ -33,6 +33,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void setLandscapeController(@NonNull IPLVLCLiveLandscapePlayerController landscapeController);
 
     /**
+     * 获取横屏控制器
+     */
+    IPLVLCLiveLandscapePlayerController getLandscapeController();
+
+    /**
      * 设置点赞是否开启/关闭
      *
      * @param isSwitchEnabled

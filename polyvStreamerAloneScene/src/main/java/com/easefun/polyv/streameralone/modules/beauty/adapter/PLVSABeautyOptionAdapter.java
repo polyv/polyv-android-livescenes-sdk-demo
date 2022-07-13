@@ -16,8 +16,6 @@ import com.easefun.polyv.streameralone.modules.beauty.adapter.vo.PLVSABeautyOpti
 import com.plv.beauty.api.options.IPLVBeautyOption;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -197,7 +195,6 @@ public class PLVSABeautyOptionAdapter extends RecyclerView.Adapter<PLVSAAbsBeaut
             ItemType.TYPE_FILTER,
             ItemType.TYPE_DETAIL,
     })
-    @Retention(RetentionPolicy.SOURCE)
     public @interface ItemType {
         int TYPE_BEAUTY = 1;
         int TYPE_FILTER = 2;

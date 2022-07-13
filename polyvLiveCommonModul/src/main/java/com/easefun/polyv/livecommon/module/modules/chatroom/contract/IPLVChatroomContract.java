@@ -18,6 +18,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -30,11 +31,14 @@ import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
+
+import io.reactivex.Observable;
 
 /**
  * mvp-聊天室契约接口
@@ -183,6 +187,16 @@ public interface IPLVChatroomContract {
          * 加载个性图片表情消息
          */
         void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent);
+
+        /**
+         * 卡片推送开始消息
+         */
+        void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent);
+
+        /**
+         * 卡片推送取消消息
+         */
+        void onNewsPushCancelMessage();
 
         /**
          * 自己本地发送的图片信息
@@ -360,6 +374,13 @@ public interface IPLVChatroomContract {
          * 获取聊天室个性表情
          */
         void getChatEmotionImages();
+
+        /**
+         * 获取卡片推送信息
+         *
+         * @param cardId 卡片推送Id
+         */
+        Observable<PLVCardPushVO> getCardPushInfo(String cardId);
 
         /**
          * 是否关闭房间

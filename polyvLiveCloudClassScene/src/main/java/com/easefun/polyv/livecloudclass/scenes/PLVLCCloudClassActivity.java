@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
 
@@ -29,6 +30,9 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
@@ -56,7 +60,9 @@ import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.io.File;
@@ -300,6 +306,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         PLVDependManager.getInstance()
                 .switchStore(this)
                 .addModule(PLVPlaybackCacheModule.instance)
+                .addModule(PLVCommodityModule.instance)
                 .addModule(PLVLCFloatingWindowModule.instance);
     }
 
@@ -411,18 +418,6 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             linkMicLayout = (IPLVLCLinkMicLayout) linkmicLayoutViewStub.inflate();
             linkMicLayout.init(liveRoomDataManager, linkMicControlBar);
             linkMicLayout.hideAll();
-
-            //弹窗布局(包括积分打赏、互动应用)
-
-            ViewStub floatViewStub = findViewById(R.id.plvlc_popover_layout);
-            popoverLayout = (IPLVPopoverLayout) floatViewStub.inflate();
-            popoverLayout.init(PLVLiveScene.CLOUDCLASS, liveRoomDataManager);
-            popoverLayout.setOnPointRewardListener(new OnPointRewardListener() {
-                @Override
-                public void pointRewardEnable(boolean enable) {
-                    liveRoomDataManager.getPointRewardEnableData().postValue(PLVStatefulData.success(enable));
-                }
-            });
         } else {
             // 播放器布局
             videoLyViewStub.setLayoutResource(R.layout.plvlc_playback_media_layout_view_stub);
@@ -439,9 +434,50 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
         }
 
+        // 弹窗布局(包括积分打赏、互动应用)
+        ViewStub floatViewStub = findViewById(R.id.plvlc_popover_layout);
+        popoverLayout = (IPLVPopoverLayout) floatViewStub.inflate();
+        popoverLayout.init(PLVLiveScene.CLOUDCLASS, liveRoomDataManager);
+        popoverLayout.setOnPointRewardListener(new OnPointRewardListener() {
+            @Override
+            public void pointRewardEnable(boolean enable) {
+                liveRoomDataManager.getPointRewardEnableData().postValue(PLVStatefulData.success(enable));
+            }
+        });
+        popoverLayout.setOnOpenInsideWebViewListener(new PLVInteractLayout2.OnOpenInsideWebViewListener() {
+            boolean needShowControllerOnClosed = false;
+
+            @Override
+            public PLVInteractLayout2.OpenUrlParam onOpenWithParam(boolean isLandscape) {
+                if (isLandscape) {
+                    needShowControllerOnClosed = !needShowControllerOnClosed ? mediaLayout.hideController() : needShowControllerOnClosed;
+                }
+                return new PLVInteractLayout2.OpenUrlParam(((View) mediaLayout).getHeight() + ConvertUtils.dp2px(48), (ViewGroup) findViewById(R.id.plvlc_popup_container));
+            }
+
+            @Override
+            public void onClosed() {
+                if (needShowControllerOnClosed) {
+                    mediaLayout.showController();
+                    needShowControllerOnClosed = false;
+                }
+            }
+        });
+
         // 页面菜单布局
         livePageMenuLayout = findViewById(R.id.plvlc_live_page_menu_layout);
         livePageMenuLayout.init(liveRoomDataManager);
+
+        // 卡片推送配置
+        livePageMenuLayout.getCardPushManager().registerView(mediaLayout.getCardEnterView(), mediaLayout.getCardEnterCdView(), mediaLayout.getCardEnterTipsView());
+        livePageMenuLayout.getCardPushManager().setOnCardEnterClickListener(new PLVCardPushManager.OnCardEnterClickListener() {
+            @Override
+            public void onClick(PLVShowPushCardEvent event) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showCardPush(event);
+                }
+            }
+        });
 
         // 初始化横屏聊天室布局
         chatLandscapeLayout = mediaLayout.getChatLandscapeLayout();

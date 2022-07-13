@@ -3,4 +3,9 @@
     <declare-styleable name="PLVLCLikeIconView">
         <attr name="src_wh" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="PLVLCCommodityPushLayout">
+        <attr name="plv_show_on_portrait" />
+        <attr name="plv_show_on_landscape" />
+    </declare-styleable>
 </resources>

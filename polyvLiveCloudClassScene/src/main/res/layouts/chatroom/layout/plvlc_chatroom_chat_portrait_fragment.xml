@@ -135,6 +135,67 @@
             android:layout_height="0dp">
 
             <LinearLayout
+                android:layout_width="78dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:layout_gravity="bottom|right"
+                android:gravity="center|top"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/card_enter_view"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@drawable/plv_interact_redpack_gain"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/card_enter_cd_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/card_enter_view"
+                    android:background="@drawable/plvlc_interact_card_push_enter_cd_bg"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:text="00:00:00"
+                    android:textColor="#ADADC0"
+                    android:textSize="10sp"
+                    android:includeFontPadding="false"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="72dp" />
+            </LinearLayout>
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+                android:id="@+id/card_enter_tips_view"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="64dp"
+                android:layout_marginBottom="108dp"
+                android:paddingStart="8dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="5dp"
+                android:text="连续观看有奖励哦"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:indicateColor="#FF9D4D"
+                app:indicateEndColor="#F65F49"
+                app:rectRadius="4dp"
+                app:triangleHeight="6dp"
+                app:triangleCenter="true"
+                app:trianglePosition="right"
+                app:triangleWidth="10dp"
+                tools:visibility="visible" />
+
+            <LinearLayout
                 android:id="@+id/likes_ly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -148,7 +209,8 @@
                 <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView
                     android:id="@+id/likes_view"
                     android:layout_width="78dp"
-                    android:layout_height="180dp" />
+                    android:layout_height="180dp"
+                    app:src_wh="42dp" />
 
                 <TextView
                     android:id="@+id/likes_count_tv"

@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import androidx.appcompat.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
@@ -43,6 +45,8 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
     private int trianglePosition;
     private int triangleMarginType;
     private int indicateColor;
+    private int indicateEndColor = -1;
+    private boolean triangleCenter;
     private float radius;
 
     private Paint paint;
@@ -74,6 +78,8 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
         trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_trianglePosition, DEFAULT_TRIANGLE_POSITION);
         triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
         indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_indicateColor, DEFAULT_TRIANGLE_COLOR);
+        indicateEndColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_indicateEndColor, -1);
+        triangleCenter = typedArray.getBoolean(R.styleable.PLVTriangleIndicateTextView_triangleCenter, false);
         radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_rectRadius, 0);
 
         typedArray.recycle();
@@ -122,11 +128,23 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
         super.onDraw(canvas);
     }
 
+    public void setColor(int indicateColor, int indicateEndColor) {
+        this.indicateColor = indicateColor;
+        this.indicateEndColor = indicateEndColor;
+        paint = null;
+        path = null;
+        invalidate();
+    }
+
+    public int getTrianglePosition() {
+        return trianglePosition;
+    }
+
     private void initBackground() {
         paint = new Paint();
         paint.setColor(indicateColor);
         paint.setStyle(Paint.Style.FILL);
-        paint.setAntiAlias(true);
+        paint.setAntiAlias(indicateEndColor == -1);
 
         Point first = new Point();
         Point second = new Point();
@@ -137,6 +155,9 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
                 leftBottomX = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftBottomX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
+            }
+            if (triangleCenter) {
+                leftBottomX = (int) (getMeasuredWidth() / 2 - triangleWidth / 2);
             }
             // leftBottom
             first = new Point(leftBottomX, (int) triangleHeight);
@@ -151,6 +172,9 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
             } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftTopX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
             }
+            if (triangleCenter) {
+                leftTopX = (int) (getMeasuredWidth() / 2 - triangleWidth / 2);
+            }
             // leftTop
             first = new Point(leftTopX, (int) (getMeasuredHeight() - triangleHeight));
             // rightTop
@@ -164,6 +188,9 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
             } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
                 topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
             }
+            if (triangleCenter) {
+                topY = (int) (getMeasuredHeight() / 2 - triangleWidth / 2);
+            }
             // left
             first = new Point(0, (int) (topY + triangleWidth / 2));
             // top
@@ -176,6 +203,9 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
                 topY = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
                 topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
+            }
+            if (triangleCenter) {
+                topY = (int) (getMeasuredHeight() / 2 - triangleWidth / 2);
             }
             // top
             first = new Point((int) (getMeasuredWidth() - triangleHeight), topY);
@@ -196,6 +226,11 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
             roundRect = new RectF(0, 0, getMeasuredWidth() - triangleHeight, getMeasuredHeight());
         } else {
             roundRect = new RectF();
+        }
+
+        if (indicateEndColor != -1) {
+            LinearGradient linearGradient = new LinearGradient(0, roundRect.bottom, roundRect.right, 0, indicateColor, indicateEndColor, Shader.TileMode.CLAMP);
+            paint.setShader(linearGradient);
         }
 
         path = new Path();

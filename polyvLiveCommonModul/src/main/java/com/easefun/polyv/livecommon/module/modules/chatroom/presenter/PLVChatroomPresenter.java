@@ -49,8 +49,9 @@ import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
-import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
+import com.plv.livescenes.model.PLVKickUsersVO;
+import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -72,6 +73,7 @@ import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
 import com.plv.socket.event.history.PLVHistoryConstant;
 import com.plv.socket.event.history.PLVSpeakHistoryEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
@@ -92,6 +94,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -575,6 +578,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public Observable<PLVCardPushVO> getCardPushInfo(String cardId) {
+        return PLVChatApiRequestHelper.requestCardPushInfo(getConfig().getChannelId(), cardId);
+    }
+
+    @Override
     public boolean isCloseRoom() {
         return PolyvChatroomManager.getInstance().isCloseRoom();
     }
@@ -1053,13 +1061,33 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 if (chatMessage != null) {
                     chatMessageDataList.add(new PLVBaseViewData<>(chatMessage, itemType, isSpecialType ? new PLVSpecialTypeTag() : null));
                 }
-            } else if (PLVEventConstant.EMOTION_EVENT.equals(listenEvent)){
+            } else if (PLVEventConstant.EMOTION_EVENT.equals(listenEvent)) {
                 final PLVChatEmotionEvent emotionEvent = PLVGsonUtil.fromJson(PLVChatEmotionEvent.class, message);
-                if(emotionEvent != null){
+                if (emotionEvent != null) {
                     callbackToView(new ViewRunnable() {
                         @Override
                         public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
                             view.onLoadEmotionMessage(emotionEvent);
+                        }
+                    });
+                }
+            } else if (PLVEventConstant.Interact.NEWS_PUSH.equals(listenEvent)) {
+                //卡片推送事件
+                if (PLVEventConstant.Interact.NEWS_PUSH_START.equals(event)) {
+                    final PLVNewsPushStartEvent newsPushStartEvent = PLVGsonUtil.fromJson(PLVNewsPushStartEvent.class, message);
+                    if (newsPushStartEvent != null) {
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onNewsPushStartMessage(newsPushStartEvent);
+                            }
+                        });
+                    }
+                } else if (PLVEventConstant.Interact.NEWS_PUSH_CANCEL.equals(event)) {
+                    callbackToView(new ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                            view.onNewsPushCancelMessage();
                         }
                     });
                 }
