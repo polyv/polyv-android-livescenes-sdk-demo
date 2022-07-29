@@ -111,7 +111,7 @@ public class PLVLSDocumentControllerExpandMenu extends RelativeLayout {
     private void init() {
         TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.PLVLSDocumentControllerExpandMenu);
         defaultWidth = DpOrPxUtils.dip2px(mContext, 200);
-        defaultHeight = DpOrPxUtils.dip2px(mContext, 36);
+        defaultHeight = DpOrPxUtils.dip2px(mContext, 32);
 
         menuBackColor = typedArray.getColor(R.styleable.PLVLSDocumentControllerExpandMenu_backgroundColor, Color.WHITE);
         menuStrokeSize = typedArray.getDimension(R.styleable.PLVLSDocumentControllerExpandMenu_strokeSize, 1);

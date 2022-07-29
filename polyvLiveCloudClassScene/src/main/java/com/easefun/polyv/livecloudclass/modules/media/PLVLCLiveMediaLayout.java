@@ -257,6 +257,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         initLoadingView();
         initSwitchView();
         initNetworkTipsLayout();
+        initChatLandscapeLayout();
         initLayoutWH();
 
         initFloatingPlayer();
@@ -482,6 +483,18 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     onViewActionListener.onWatchLowLatency(false);
                 }
                 mediaController.notifyLowLatencyUpdate(false);
+            }
+        });
+    }
+
+    private void initChatLandscapeLayout() {
+        chatLandscapeLayout.setOnRoomStatusListener(new PLVLCChatLandscapeLayout.OnRoomStatusListener() {
+            @Override
+            public void onStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+                mediaController.notifyChatroomStatusChanged(isCloseRoomStatus, isFocusModeStatus);
+                if (isCloseRoomStatus || isFocusModeStatus) {
+                    landscapeMessageSender.hideMessageSender();
+                }
             }
         });
     }
@@ -856,6 +869,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         } else {
             rewardSvgaView.setVisibility(VISIBLE);
         }
+    }
+
+    @Override
+    public void onTurnPageLayoutChange(boolean toShow) {
+        mediaController.setTurnPageLayoutStatus(toShow);
     }
     // </editor-fold>
 

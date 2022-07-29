@@ -52,6 +52,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void setServerEnablePPT(boolean enable);
 
     /**
+     * 设置翻页控件状态
+     *
+     * @param isShow true表示打开翻页控件，false表示关闭翻页控件
+     */
+    void setTurnPageLayoutStatus(boolean isShow);
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器
@@ -138,6 +145,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void notifyLowLatencyUpdate(boolean isLowLatency);
 
     /**
+     * 更新聊天室房间状态
+     * @param isCloseRoomStatus 是否关闭房间状态
+     * @param isFocusModeStatus 是否专注模式状态
+     */
+    void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
+
+    /**
      * 释放
      */
     void clean();
@@ -147,7 +161,6 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * @param enable
      */
     void updateRewardView(boolean enable);
-
 
     // </editor-fold>
 

@@ -23,6 +23,7 @@ import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
@@ -108,6 +109,12 @@ public interface IPLVChatroomContract {
         void onLoginEvent(@NonNull PLVLoginEvent loginEvent);
 
         /**
+         * 登录失败回调
+         */
+        @WorkerThread
+        void onLoginError(@Nullable PLVLoginEvent loginEvent, String msg, int errorCode);
+
+        /**
          * 用户退出事件
          */
         @WorkerThread
@@ -154,6 +161,12 @@ public interface IPLVChatroomContract {
          */
         @WorkerThread
         void onCloseRoomEvent(@NonNull PLVCloseRoomEvent closeRoomEvent);
+
+        /**
+         * 专注模式事件
+         */
+        @WorkerThread
+        void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent);
 
         /**
          * 移除信息事件

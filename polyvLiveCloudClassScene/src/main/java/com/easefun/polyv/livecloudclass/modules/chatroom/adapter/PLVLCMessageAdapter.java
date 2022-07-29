@@ -27,11 +27,15 @@ import java.util.List;
  */
 public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter>> {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    public static final int DISPLAY_DATA_TYPE_FULL = 1;
+    public static final int DISPLAY_DATA_TYPE_SPECIAL = 2;
+    public static final int DISPLAY_DATA_TYPE_FOCUS_MODE = 3;
     private List<PLVBaseViewData> dataList;//adapter使用的数据列表
     private List<PLVBaseViewData> fullDataList;//全部信息的数据列表
     private List<PLVBaseViewData> specialDataList;//只看讲师信息的数据列表(包括我、讲师类型、嘉宾类型、助教类型、管理员类型的信息)
+    private List<PLVBaseViewData> focusModeDataList;//专注模式的数据列表(包括讲师类型、嘉宾类型、助教类型、管理员类型的信息)
 
-    private boolean isDisplaySpecialType;//是否只看讲师
+    private int displayDataType = DISPLAY_DATA_TYPE_FULL;//显示数据类型
 
     private int msgIndex;
 
@@ -42,7 +46,14 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     public PLVLCMessageAdapter() {
         fullDataList = new ArrayList<>();
         specialDataList = new ArrayList<>();
-        dataList = isDisplaySpecialType ? specialDataList : fullDataList;
+        focusModeDataList = new ArrayList<>();
+        if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
+            dataList = fullDataList;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+            dataList = specialDataList;
+        } else {
+            dataList = focusModeDataList;
+        }
     }
     // </editor-fold>
 
@@ -108,18 +119,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         isLandscapeLayout = landscapeLayout;
     }
 
-    public void changeDisplayType(boolean isDisplaySpecialType) {
-        if (this.isDisplaySpecialType == isDisplaySpecialType) {
+    public void changeDisplayType(int displayDataType) {
+        if (this.displayDataType == displayDataType) {
             return;
         }
-        this.isDisplaySpecialType = isDisplaySpecialType;
-        if (isDisplaySpecialType) {
-            dataList = specialDataList;
-            notifyDataSetChanged();
-        } else {
+        this.displayDataType = displayDataType;
+        if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
             dataList = fullDataList;
-            notifyDataSetChanged();
+        } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+            dataList = specialDataList;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_FOCUS_MODE) {
+            dataList = focusModeDataList;
         }
+        notifyDataSetChanged();
     }
     // </editor-fold>
 
@@ -129,6 +141,9 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         fullDataList.add(baseViewData);
         if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
             specialDataList.add(baseViewData);
+            if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                focusModeDataList.add(baseViewData);
+            }
         }
         if (dataList.size() != oldSize) {
             notifyItemInserted(dataList.size() - 1);
@@ -143,6 +158,9 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         for (PLVBaseViewData baseViewData : list) {
             if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(baseViewData);
+                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                    focusModeDataList.add(baseViewData);
+                }
             }
         }
         if (dataList.size() != oldSize) {
@@ -159,6 +177,9 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             PLVBaseViewData baseViewData = list.get(i);
             if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(0, baseViewData);
+                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                    focusModeDataList.add(0, baseViewData);
+                }
             }
         }
         if (dataList.size() != oldSize) {
@@ -175,6 +196,9 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             PLVBaseViewData baseViewData = list.get(i);
             if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(0, baseViewData);
+                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                    focusModeDataList.add(0, baseViewData);
+                }
             }
         }
         if (dataList.size() != oldSize) {
@@ -196,11 +220,12 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             removeCount--;
         }
         specialDataList.removeAll(removeList);
+        focusModeDataList.removeAll(removeList);
         if (dataList.size() != oldSize) {
-            if (isDisplaySpecialType) {
-                notifyDataSetChanged();
-            } else {
+            if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
                 notifyItemRangeRemoved(startPosition, count);
+            } else {
+                notifyDataSetChanged();
             }
         }
         return true;
@@ -211,26 +236,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             return false;
         }
         int oldSize = dataList.size();
-        int removeFullDataPosition = -1;
-        for (PLVBaseViewData baseViewData : fullDataList) {
-            removeFullDataPosition++;
-            if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
-                fullDataList.remove(baseViewData);
-                break;
-            }
-        }
-        int removeSpecialDataPosition = -1;
-        for (PLVBaseViewData baseViewData : specialDataList) {
-            removeFullDataPosition++;
-            if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
-                specialDataList.remove(baseViewData);
-                break;
-            }
-        }
+        int removeFullDataPosition = remove(id, fullDataList);
+        int removeSpecialDataPosition = remove(id, specialDataList);
+        int removeFocusModeDataPosition = remove(id, focusModeDataList);
         if (dataList.size() != oldSize) {
-            notifyItemRemoved(isDisplaySpecialType ? removeSpecialDataPosition : removeFullDataPosition);
+            int removePosition = -1;
+            if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
+                removePosition = removeFullDataPosition;
+            } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+                removePosition = removeSpecialDataPosition;
+            } else if (displayDataType == DISPLAY_DATA_TYPE_FOCUS_MODE) {
+                removePosition = removeFocusModeDataPosition;
+            }
+            notifyItemRemoved(removePosition);
             return true;
         }
         return false;
@@ -240,11 +258,27 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         int oldSize = dataList.size();
         fullDataList.clear();
         specialDataList.clear();
+        focusModeDataList.clear();
         if (dataList.size() != oldSize) {//if dataList=fullDataList or dataList=specialDataList
             notifyDataSetChanged();
             return true;
         }
         return false;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部工具方法">
+    private int remove(String id, List<PLVBaseViewData> dataList) {
+        int removeDataPosition = -1;
+        for (PLVBaseViewData baseViewData : dataList) {
+            removeDataPosition++;
+            if (baseViewData.getData() instanceof IPLVIdEvent
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
+                dataList.remove(baseViewData);
+                break;
+            }
+        }
+        return removeDataPosition;
     }
     // </editor-fold>
 

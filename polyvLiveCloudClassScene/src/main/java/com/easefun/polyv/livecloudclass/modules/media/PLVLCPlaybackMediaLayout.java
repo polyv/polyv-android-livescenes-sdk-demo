@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
+
 import android.app.Activity;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
@@ -53,16 +55,20 @@ import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -111,6 +117,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private PLVLCLightTipsView lightTipsView;
     private PLVLCVolumeTipsView volumeTipsView;
     private PLVLCProgressTipsView progressTipsView;
+    private PLVRoundRectLayout playbackAutoContinueSeekTimeHintLayout;
+    private TextView playbackAutoContinueSeekTimeTv;
 
     //横屏聊天区
     private PLVLCChatLandscapeLayout chatLandscapeLayout;
@@ -198,6 +206,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
         llAuxiliaryCountDown.setVisibility(GONE);
         watermarkView = findViewById(R.id.polyv_watermark_view);
+        playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvlc_playback_auto_continue_seek_time_hint_layout);
+        playbackAutoContinueSeekTimeTv = findViewById(R.id.plvlc_playback_auto_continue_seek_time_tv);
 
         initVideoView();
         initDanmuView();
@@ -205,6 +215,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         initLoadingView();
         initRetryView();
         initSwitchView();
+        initChatLandscapeLayout();
         initLayoutWH();
     }
 
@@ -321,6 +332,18 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                     flPlayerSwitchViewParent.removeAllViews();
                     videoView.addView(playerView, 0);
                     videoView.addView(logoView);
+                }
+            }
+        });
+    }
+
+    private void initChatLandscapeLayout() {
+        chatLandscapeLayout.setOnRoomStatusListener(new PLVLCChatLandscapeLayout.OnRoomStatusListener() {
+            @Override
+            public void onStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+                mediaController.notifyChatroomStatusChanged(isCloseRoomStatus, isFocusModeStatus);
+                if (isCloseRoomStatus || isFocusModeStatus) {
+                    landscapeMessageSender.hideMessageSender();
                 }
             }
         });
@@ -582,6 +605,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void setLandscapeRewardEffectVisibility(boolean isShow) {
 
     }
+
+    @Override
+    public void onTurnPageLayoutChange(boolean toShow) {
+
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的playback方法">
@@ -753,6 +781,12 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
+        public void onAutoContinuePlaySeeked(int seekTo) {
+            playbackAutoContinueSeekTimeTv.setText(PLVTimeUtils.generateTime(seekTo));
+            PLVViewUtil.showViewForDuration(playbackAutoContinueSeekTimeHintLayout, seconds(3).toMillis());
+        }
+
+        @Override
         public void onDoubleClick() {
             super.onDoubleClick();
             mediaController.playOrPause();
@@ -788,6 +822,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         vlp.width = ViewGroup.LayoutParams.MATCH_PARENT;
         vlp.height = ViewGroup.LayoutParams.MATCH_PARENT;
         setLayoutParams(vlp);
+
+        final MarginLayoutParams seekTimeHintLayoutLp = (MarginLayoutParams) playbackAutoContinueSeekTimeHintLayout.getLayoutParams();
+        seekTimeHintLayoutLp.bottomMargin = ConvertUtils.dp2px(92);
+        playbackAutoContinueSeekTimeHintLayout.setLayoutParams(seekTimeHintLayoutLp);
     }
 
     private void setPortrait() {
@@ -798,6 +836,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         int portraitWidth = Math.min(ScreenUtils.getScreenHeight(), ScreenUtils.getScreenWidth());
         vlp.height = (int) (portraitWidth / RATIO_WH);
         setLayoutParams(vlp);
+
+        final MarginLayoutParams seekTimeHintLayoutLp = (MarginLayoutParams) playbackAutoContinueSeekTimeHintLayout.getLayoutParams();
+        seekTimeHintLayoutLp.bottomMargin = ConvertUtils.dp2px(44);
+        playbackAutoContinueSeekTimeHintLayout.setLayoutParams(seekTimeHintLayoutLp);
     }
     // </editor-fold>
 

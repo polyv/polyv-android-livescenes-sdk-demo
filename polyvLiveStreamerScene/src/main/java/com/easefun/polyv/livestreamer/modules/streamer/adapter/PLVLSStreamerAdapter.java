@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.streamer.adapter;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +16,11 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
+import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.util.List;
@@ -38,6 +43,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     //默认的直播间封面图
     private static final String DEFAULT_LIVE_STREAM_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
 
+    private final PLVLSStreamerViewPositionManager streamerViewPositionManager;
 
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
@@ -49,8 +55,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     //当前用户的连麦ID
     private String myLinkMicId;
 
-    //rv
-    private RecyclerView streamerRv;
     @Nullable
     private SurfaceView localRenderView;
 
@@ -61,9 +65,10 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLSStreamerAdapter(RecyclerView streamerRv, OnStreamerAdapterCallback adapterCallback) {
-        this.streamerRv = streamerRv;
+    public PLVLSStreamerAdapter(OnStreamerAdapterCallback adapterCallback) {
         this.adapterCallback = adapterCallback;
+
+        this.streamerViewPositionManager = PLVDependManager.getInstance().get(PLVLSStreamerViewPositionManager.class);
     }
     // </editor-fold>
 
@@ -171,6 +176,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 //nothing
             }
         });
+
+        if (position == 0) {
+            streamerViewPositionManager.updateFirstIndexLinkMicId(linkMicId);
+        }
+        streamerViewPositionManager.updateStreamerView(linkMicId, holder.streamerItemSwitchAnchorLayout);
     }
 
     @Override
@@ -242,21 +252,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     break;
             }
         }
-    }
 
-    @Override
-    public void onViewRecycled(@NonNull StreamerItemViewHolder holder) {
-        super.onViewRecycled(holder);
-
-        //标记view重新创建
-        //如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
-        if (holder.renderView != null && holder.renderView != localRenderView) {
-            holder.isViewRecycled = true;
-            holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
-            adapterCallback.releaseLinkMicRenderView(holder.renderView);
-            holder.renderView = null;
+        if (position == 0) {
+            streamerViewPositionManager.updateFirstIndexLinkMicId(linkMicId);
         }
-        PLVCommonLog.d(TAG, "onViewRecycled pos=" + holder.getAdapterPosition() + " holder=" + holder.toString());
+        streamerViewPositionManager.updateStreamerView(linkMicId, holder.streamerItemSwitchAnchorLayout);
     }
 
     @Override
@@ -302,6 +302,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     //更新所有item
     public void updateAllItem() {
+        streamerViewPositionManager.updateFirstIndexLinkMicId(dataList.size() > 0 ? dataList.get(0).getLinkMicId() : null);
         notifyDataSetChanged();
     }
 
@@ -386,6 +387,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - LinkMicItemViewHolder定义">
     static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
+        private PLVSwitchViewAnchorLayout streamerItemSwitchAnchorLayout;
         private PLVRoundRectLayout plvlsStreamerRoundRectLy;
         private FrameLayout plvlsStreamerRenderViewContainer;
         private ImageView plvlsStreamerMicStateIv;
@@ -404,6 +406,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
         public StreamerItemViewHolder(View itemView) {
             super(itemView);
+            streamerItemSwitchAnchorLayout = itemView.findViewById(R.id.plvls_streamer_item_switch_anchor_layout);
             plvlsStreamerRoundRectLy = itemView.findViewById(R.id.plvls_streamer_round_rect_ly);
             plvlsStreamerRenderViewContainer = itemView.findViewById(R.id.plvls_streamer_render_view_container);
             plvlsStreamerMicStateIv = itemView.findViewById(R.id.plvls_streamer_mic_state_iv);
@@ -412,6 +415,35 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
             plvlsPlaceholderView = itemView.findViewById(R.id.plvsa_no_streamer_placeholder);
             plvlsStreamerSpeakerPermissionStatusIv = itemView.findViewById(R.id.plvls_streamer_speaker_permission_status_iv);
+
+            observeSwitchPositionToUpdateViewSize();
+        }
+
+        private void observeSwitchPositionToUpdateViewSize() {
+            streamerItemSwitchAnchorLayout.setOnSwitchListener(new PLVSwitchViewAnchorLayout.IPLVSwitchViewAnchorLayoutListener() {
+                @Override
+                protected void onSwitchElsewhereAfter() {
+                    updateViewSize();
+                }
+
+                @Override
+                protected void onSwitchBackAfter() {
+                    updateViewSize();
+                }
+
+                private void updateViewSize() {
+                    final View child = firstNotNull(
+                            streamerItemSwitchAnchorLayout.findViewById(R.id.plvls_streamer_round_rect_ly),
+                            streamerItemSwitchAnchorLayout.findViewById(R.id.plvls_document_layout_container)
+                    );
+                    if (child == null) {
+                        return;
+                    }
+                    final ViewGroup.LayoutParams lp = child.getLayoutParams();
+                    lp.height = 0;
+                    child.setLayoutParams(lp);
+                }
+            });
         }
     }
     // </editor-fold>

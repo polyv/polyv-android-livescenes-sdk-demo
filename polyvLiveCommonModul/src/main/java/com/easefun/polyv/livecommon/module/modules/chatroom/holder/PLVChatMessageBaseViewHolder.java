@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.holder;
 
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,7 +24,9 @@ import com.plv.socket.event.chat.PLVProhibitedWordVO;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.history.PLVChatImgHistoryEvent;
+import com.plv.socket.event.history.PLVFileShareHistoryEvent;
 import com.plv.socket.event.history.PLVSpeakHistoryEvent;
+import com.plv.socket.event.ppt.PLVPptShareFileVO;
 import com.plv.socket.net.model.PLVSocketLoginVO;
 import com.plv.socket.user.PLVAuthorizationBean;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -45,6 +48,8 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
     protected String bgColor;//头衔背景色
     protected String avatar;//头像url
     protected CharSequence speakMsg;//文本发言信息
+    @Nullable
+    protected PLVPptShareFileVO speakFileData;
 
     protected String chatImgUrl;//图片发言信息的url //vh self cache
     protected int chatImgWidth;
@@ -101,6 +106,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromUser(speakEvent.getUser());
             int validIndex = Math.min(speakEvent.getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) speakEvent.getObjects()[validIndex];
+            speakFileData = speakEvent.getFileData();
             chatQuoteVO = speakEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
                 quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
@@ -167,6 +173,16 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
                 quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
             }
+        } else if (messageData instanceof PLVFileShareHistoryEvent) {
+            PLVFileShareHistoryEvent speakHistoryEvent = (PLVFileShareHistoryEvent) messageData;
+            fillFieldFromUser(speakHistoryEvent.getUser());
+            int validIndex = Math.min(speakHistoryEvent.getObjects().length - 1, msgIndex);
+            speakMsg = (CharSequence) speakHistoryEvent.getObjects()[validIndex];
+            speakFileData = speakHistoryEvent.getFileData();
+            chatQuoteVO = speakHistoryEvent.getQuote();
+            if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+            }
         } else if (messageData instanceof PLVChatImgHistoryEvent) {//历史图片信息
             PLVChatImgHistoryEvent chatImgHistoryEvent = (PLVChatImgHistoryEvent) messageData;
             fillFieldFromUser(chatImgHistoryEvent.getUser());
@@ -177,7 +193,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
                     chatImgWidth = (int) chatImgContent.getSize().getWidth();
                     chatImgHeight = (int) chatImgContent.getSize().getHeight();
                 }
-                if ("emotion".equals(chatImgContent.getType())){
+                if ("emotion".equals(chatImgContent.getType())) {
                     //图片表情要80
                     chatImgWidth = ConvertUtils.dp2px(80);
                     chatImgHeight = ConvertUtils.dp2px(80);

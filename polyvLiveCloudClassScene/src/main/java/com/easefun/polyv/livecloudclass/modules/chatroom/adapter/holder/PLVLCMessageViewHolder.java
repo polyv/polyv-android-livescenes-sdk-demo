@@ -4,12 +4,14 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,11 +27,16 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.ppt.PLVPptShareFileVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
+
+import java.util.Map;
 
 /**
  * 聊天室通用聊天信息的viewHolder
@@ -54,6 +61,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private GifSpanTextView quoteTextMessageTv;
     //回复文本气泡框
     private View chatLayout;
+    private LinearLayout chatMsgLl;
+    private ImageView chatMsgFileShareIv;
 
     //横屏item
     //文本信息
@@ -64,6 +73,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private GifSpanTextView quoteChatMsgTv;
     //被回复人图片信息的昵称
     private TextView quoteChatNickTv;
+    private LinearLayout chatMsgLandLl;
+    private ImageView chatMsgFileShareLandIv;
 
     //横/竖屏图片信息
     private ImageView imgMessageIv;
@@ -85,12 +96,16 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         textMessageTv = (GifSpanTextView) findViewById(R.id.text_message_tv);
         quoteNickTv = (TextView) findViewById(R.id.quote_nick_tv);
         quoteTextMessageTv = (GifSpanTextView) findViewById(R.id.quote_text_message_tv);
+        chatMsgLl = findViewById(R.id.plvlc_chat_msg_ll);
+        chatMsgFileShareIv = findViewById(R.id.plvlc_chat_msg_file_share_iv);
         chatLayout = findViewById(R.id.chat_msg_ll);
         //land item
         chatMsgTv = (GifSpanTextView) findViewById(R.id.chat_msg_tv);
         chatNickTv = (TextView) findViewById(R.id.chat_nick_tv);
         quoteChatMsgTv = (GifSpanTextView) findViewById(R.id.quote_chat_msg_tv);
         quoteChatNickTv = (TextView) findViewById(R.id.quote_chat_nick_tv);
+        chatMsgLandLl = findViewById(R.id.plvlc_chat_msg_land_ll);
+        chatMsgFileShareLandIv = findViewById(R.id.plvlc_chat_msg_file_share_land_iv);
         //common item
         imgMessageIv = (ImageView) findViewById(R.id.img_message_iv);
         imgLoadingView = (ProgressBar) findViewById(R.id.img_loading_view);
@@ -295,6 +310,71 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 chatMsgTv.setTextInner(nickSpan.append(speakMsg), isSpecialType);
             }
         }
+        // ppt文件分享信息
+        if (speakFileData != null) {
+            if (textMessageTv != null) {
+                textMessageTv.setVisibility(View.VISIBLE);
+                textMessageTv.setTextColor(Color.WHITE);
+                textMessageTv.setTextInner(speakFileData.getName(), false);
+            }
+            if (chatMsgTv != null) {
+                chatMsgTv.setVisibility(View.VISIBLE);
+                SpannableStringBuilder nickSpan = new SpannableStringBuilder(nickName);
+                nickSpan.append(": ");
+                nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                chatMsgTv.setTextInner(nickSpan.append(speakFileData.getName()), false);
+            }
+            if (chatMsgLl != null) {
+                chatMsgLl.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (speakFileData != null) {
+                            PLVWebUtils.openWebLink(speakFileData.getUrl(), chatMsgLl.getContext());
+                        }
+                    }
+                });
+            }
+            if (chatMsgLandLl != null) {
+                chatMsgLandLl.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (speakFileData != null) {
+                            PLVWebUtils.openWebLink(speakFileData.getUrl(), chatMsgLandLl.getContext());
+                        }
+                    }
+                });
+            }
+            final Integer fileIconRes = getSpeakFileIconRes(speakFileData);
+            if (chatMsgFileShareIv != null) {
+                if (fileIconRes != null) {
+                    chatMsgFileShareIv.setVisibility(View.VISIBLE);
+                    chatMsgFileShareIv.setImageResource(fileIconRes);
+                } else {
+                    chatMsgFileShareIv.setVisibility(View.GONE);
+                }
+            }
+            if (chatMsgFileShareLandIv != null) {
+                if (fileIconRes != null) {
+                    chatMsgFileShareLandIv.setVisibility(View.VISIBLE);
+                    chatMsgFileShareLandIv.setImageResource(fileIconRes);
+                } else {
+                    chatMsgFileShareLandIv.setVisibility(View.GONE);
+                }
+            }
+        } else {
+            if (chatMsgFileShareIv != null) {
+                chatMsgFileShareIv.setVisibility(View.GONE);
+            }
+            if (chatMsgFileShareLandIv != null) {
+                chatMsgFileShareLandIv.setVisibility(View.GONE);
+            }
+            if (chatMsgLl != null) {
+                chatMsgLl.setOnClickListener(null);
+            }
+            if (chatMsgLandLl != null) {
+                chatMsgLandLl.setOnClickListener(null);
+            }
+        }
         //设置图片信息
         setImgMessage();
 
@@ -314,11 +394,11 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             if (chatQuoteVO.isSpeakMessage()) {
                 if (quoteTextMessageTv != null) {
                     quoteTextMessageTv.setVisibility(View.VISIBLE);
-                    quoteTextMessageTv.setText(quoteSpeakMsg);
+                    quoteTextMessageTv.setText(fixQuoteMessageForFileShare(quoteSpeakMsg));
                 }
                 if (quoteChatMsgTv != null) {
                     quoteChatMsgTv.setVisibility(View.VISIBLE);
-                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(quoteSpeakMsg));
+                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(fixQuoteMessageForFileShare(quoteSpeakMsg)));
                 }
             } else {
                 if (quoteChatNickTv != null) {
@@ -462,6 +542,43 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 imgMessageIv.setImageDrawable(drawable);
             }
         };
+    }
+
+    @Nullable
+    @DrawableRes
+    private static Integer getSpeakFileIconRes(@Nullable PLVPptShareFileVO fileData) {
+        if (fileData == null) {
+            return null;
+        }
+        switch (fileData.getSuffix()) {
+            case "ppt":
+            case "pptx":
+                return R.drawable.plvlc_chatroom_file_share_ppt_icon;
+            case "doc":
+            case "docx":
+                return R.drawable.plvlc_chatroom_file_share_doc_icon;
+            case "xls":
+            case "xlsx":
+                return R.drawable.plvlc_chatroom_file_share_xls_icon;
+            case "pdf":
+                return R.drawable.plvlc_chatroom_file_share_pdf_icon;
+            default:
+                return null;
+        }
+    }
+
+    private static CharSequence fixQuoteMessageForFileShare(CharSequence originMessage) {
+        try {
+            final String originMessageStr = originMessage.toString();
+            final Map<String, String> fileShareDataMap = PLVGsonUtil.fromJson(new TypeToken<Map<String, String>>() {}, originMessageStr);
+            if (fileShareDataMap == null) {
+                return originMessage;
+            }
+            final boolean isFileShareQuoteMessage = fileShareDataMap.size() == 2 && fileShareDataMap.containsKey("url") && fileShareDataMap.containsKey("name");
+            return isFileShareQuoteMessage ? fileShareDataMap.get("name") : originMessage;
+        } catch (Exception ignored) {
+            return originMessage;
+        }
     }
     // </editor-fold>
 }

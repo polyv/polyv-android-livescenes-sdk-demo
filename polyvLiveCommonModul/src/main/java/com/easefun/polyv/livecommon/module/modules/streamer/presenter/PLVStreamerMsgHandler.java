@@ -57,6 +57,9 @@ public class PLVStreamerMsgHandler {
     private PLVSocketMessageObserver.OnMessageListener onMessageListener;
 
     private PLVSStreamerEventListener linkMicEventHandler;
+
+    @Nullable
+    private String lastFirstScreenUserId;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -160,6 +163,15 @@ public class PLVStreamerMsgHandler {
                             streamerPresenter.callUpdateGuestMediaStatus(isMute, isAudio);
                         }
                         break;
+                    // 第一画面切换
+                    case PLVEventConstant.Class.SE_SWITCH_MESSAGE:
+                        updateFirstScreen(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
+                        break;
+                    // PPT白板和摄像头画面切换
+                    case PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE:
+                        updateDocumentStreamerViewPosition(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
+                        break;
+                    default:
                 }
             }
         };
@@ -307,6 +319,14 @@ public class PLVStreamerMsgHandler {
                 PLVStreamerInnerDataTransfer.getInstance().setPPTStatusForOnSliceStartEvent(pptStatus);
             }
 
+            // 同步主副屏切换
+            final boolean documentInMainScreen = onSliceIDEvent.getPptAndVedioPosition() == 0;
+            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onDocumentStreamerViewChange(documentInMainScreen);
+                }
+            });
         }
     }
 
@@ -399,7 +419,26 @@ public class PLVStreamerMsgHandler {
         }
 
 
+    }
 
+    private void updateFirstScreen(final PLVPPTAuthentic authentic) {
+        if (authentic == null || authentic.getUserId() == null) {
+            return;
+        }
+        streamerPresenter.onFirstScreenChange(authentic.getUserId(), !authentic.hasNoAthuentic());
+    }
+
+    private void updateDocumentStreamerViewPosition(final PLVPPTAuthentic authentic) {
+        if (authentic == null) {
+            return;
+        }
+        final boolean documentInMainScreen = "0".equals(authentic.getStatus());
+        streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                view.onDocumentStreamerViewChange(documentInMainScreen);
+            }
+        });
     }
     // </editor-fold>
 

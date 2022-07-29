@@ -26,18 +26,22 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 /**
  * 横屏的聊天布局
@@ -69,6 +73,12 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     //是否聊天回放布局
     private boolean isChatPlaybackLayout;
+
+    private OnRoomStatusListener onRoomStatusListener;
+    //聊天室开关状态
+    private boolean isCloseRoomStatus;
+    //专注模式状态
+    private boolean isFocusModeStatus;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -155,7 +165,17 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天回放">
-    private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new IPLVChatPlaybackCallDataListener() {
+    private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new PLVChatPlaybackCallDataExListener() {
+
+        @Override
+        public void onLoadPreviousEnabled(boolean enabled, boolean isByClearData) {
+            if (swipeLoadView != null) {
+                swipeLoadView.setEnabled(enabled);
+            }
+            if (!enabled && !isByClearData) {
+                ToastUtils.showShort(R.string.plv_chat_toast_history_all_loaded);
+            }
+        }
 
         @Override
         public void onHasNotAddedData() {
@@ -182,12 +202,13 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
                         || PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatPlaybackData.getUserId());
                 int itemType = chatPlaybackData.isImgMsg() ? PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG : PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
                 // 可通过userType判断是否是特别身份
-                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag() : null));
+                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag(chatPlaybackData.getUserId()) : null));
             }
             if (inHead) {
                 addChatMessageToListHead(dataList);
             } else {
-                addChatMessageToList(dataList, chatCommonMessageList.getItemCount() == 0);
+                boolean isScrollEnd = chatCommonMessageList != null && chatCommonMessageList.getItemCount() == 0;
+                addChatMessageToList(dataList, isScrollEnd);
             }
         }
 
@@ -216,6 +237,42 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="专注模式">
+    private void acceptFocusModeEvent(final PLVFocusModeEvent focusModeEvent) {
+        isFocusModeStatus = focusModeEvent.isOpen();
+        postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                if (onRoomStatusListener != null) {
+                    onRoomStatusListener.onStatusChanged(isCloseRoomStatus, isFocusModeStatus);
+                }
+                if (chatCommonMessageList != null && !chatCommonMessageList.isLandscapeLayout()) {
+                    return;
+                }
+                ToastUtils.showLong(isFocusModeStatus ? R.string.plv_chat_toast_focus_mode_open : R.string.plv_chat_toast_focus_mode_close);
+            }
+        });
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="房间开关">
+    private void acceptCloseRoomEvent(PLVCloseRoomEvent closeRoomEvent) {
+        isCloseRoomStatus = closeRoomEvent.getValue().isClosed();
+        postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                if (onRoomStatusListener != null) {
+                    onRoomStatusListener.onStatusChanged(isCloseRoomStatus, isFocusModeStatus);
+                }
+                if (chatCommonMessageList == null || !chatCommonMessageList.isLandscapeLayout()) {
+                    return;
+                }
+                ToastUtils.showLong(isCloseRoomStatus ? R.string.plv_chat_toast_chatroom_close : R.string.plv_chat_toast_chatroom_open);
+            }
+        });
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="聊天室 - MVP模式的view层实现">
     private IPLVChatroomContract.IChatroomView chatroomView = new PLVAbsChatroomView() {
         @Override
@@ -241,15 +298,16 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
             if (isChatPlaybackLayout) {
                 return;
             }
-            if (chatCommonMessageList == null || !chatCommonMessageList.isLandscapeLayout()) {
+            acceptCloseRoomEvent(closeRoomEvent);
+        }
+
+        @Override
+        public void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent) {
+            super.onFocusModeEvent(focusModeEvent);
+            if (isChatPlaybackLayout) {
                 return;
             }
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtils.showLong(closeRoomEvent.getValue().isClosed() ? R.string.plv_chat_toast_chatroom_close : R.string.plv_chat_toast_chatroom_open);
-                }
-            });
+            acceptFocusModeEvent(focusModeEvent);
         }
 
         @Override
@@ -271,7 +329,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag(localMessage.getUserId())));
             //添加信息至列表
             addChatMessageToList(dataList, true);
         }
@@ -283,7 +341,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
                 return;
             }
             List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag(localImgEvent.getUserId())));
             //添加信息至列表
             addChatMessageToList(dataList, true);
         }
@@ -338,8 +396,8 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
-            addChatMessageToList(dataList, true);
+            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, emotionEvent.isSpecialTypeOrMe() ? new PLVSpecialTypeTag(emotionEvent.getUserId()) : null));
+            addChatMessageToList(dataList, emotionEvent.isLocal());
         }
     };
 
@@ -438,6 +496,16 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         } else {
             setVisibility(View.GONE);
         }
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 聊天室房间状态监听器">
+    public void setOnRoomStatusListener(OnRoomStatusListener listener) {
+        this.onRoomStatusListener = listener;
+    }
+
+    public interface OnRoomStatusListener {
+        void onStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
     }
     // </editor-fold>
 }

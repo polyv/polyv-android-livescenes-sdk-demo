@@ -14,6 +14,7 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
 
@@ -23,6 +24,8 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
@@ -57,6 +60,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
@@ -513,6 +517,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
         // 设置LiveRoomDataManager
         commonHomeFragment.init(liveRoomDataManager);
+        // 卡片推送
+        commonHomeFragment.getCardPushManager().setOnCardEnterClickListener(new PLVCardPushManager.OnCardEnterClickListener() {
+            @Override
+            public void onClick(PLVShowPushCardEvent event) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showCardPush(event);
+                }
+            }
+        });
     }
 
     /**
@@ -565,7 +578,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="初始化弹窗Layout - 积分打赏、互动应用">
     private void setupPopoverLayout(){
-        if(popoverLayout == null){
+        if (popoverLayout == null) {
             ViewStub floatViewStub = findViewById(R.id.plvec_popover_layout);
             popoverLayout = (IPLVPopoverLayout) floatViewStub.inflate();
             popoverLayout.init(PLVLiveScene.ECOMMERCE, liveRoomDataManager);
@@ -573,6 +586,17 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 @Override
                 public void pointRewardEnable(boolean enable) {
                     liveRoomDataManager.getPointRewardEnableData().postValue(PLVStatefulData.success(enable));
+                }
+            });
+            popoverLayout.setOnOpenInsideWebViewListener(new PLVInteractLayout2.OnOpenInsideWebViewListener() {
+                @Override
+                public PLVInteractLayout2.OpenUrlParam onOpenWithParam(boolean isLandscape) {
+                    ViewGroup containerView = findViewById(R.id.plvec_popup_container);
+                    return new PLVInteractLayout2.OpenUrlParam((int) (containerView.getHeight() * 0.3f), containerView);
+                }
+
+                @Override
+                public void onClosed() {
                 }
             });
         }
@@ -792,6 +816,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onViewCreated() {
             observerDataToPlaybackHomeFragment();
+            setupPopoverLayout();
         }
     };
     // </editor-fold>

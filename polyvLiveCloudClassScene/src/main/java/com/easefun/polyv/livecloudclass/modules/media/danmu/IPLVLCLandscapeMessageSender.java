@@ -20,6 +20,12 @@ public interface IPLVLCLandscapeMessageSender {
      */
     void openMessageSender();
 
+
+    /**
+     * 隐藏消息发送器
+     */
+    void hideMessageSender();
+
     /**
      * 隐藏
      */

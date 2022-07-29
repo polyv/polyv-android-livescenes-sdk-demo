@@ -51,6 +51,8 @@ public class PLVLinkMicItemDataBean {
     @IntRange(from = 0, to = 100)
     private int curVolume = 0;
 
+    // 是否第一画面
+    private boolean isFirstScreen = false;
     //是否在屏幕共享
     private boolean isScreenShare = false;
     // 是否全屏观看
@@ -267,6 +269,15 @@ public class PLVLinkMicItemDataBean {
         isScreenShare = screenShared;
     }
 
+    public boolean isFirstScreen() {
+        return isFirstScreen;
+    }
+
+    public PLVLinkMicItemDataBean setFirstScreen(boolean firstScreen) {
+        isFirstScreen = firstScreen;
+        return this;
+    }
+
     public PLVLinkMicItemDataBean setFullScreen(boolean fullScreen) {
         isFullScreen = fullScreen;
         return this;
@@ -320,7 +331,6 @@ public class PLVLinkMicItemDataBean {
     }
     // </editor-fold>
 
-
     @Override
     public String toString() {
         return "PLVLinkMicItemDataBean{" +
@@ -337,12 +347,14 @@ public class PLVLinkMicItemDataBean {
                 ", actor='" + actor + '\'' +
                 ", pic='" + pic + '\'' +
                 ", curVolume=" + curVolume +
+                ", isFirstScreen=" + isFirstScreen +
+                ", isScreenShare=" + isScreenShare +
+                ", isFullScreen=" + isFullScreen +
                 ", status='" + status + '\'' +
                 ", muteVideoInRtcJoinListMap=" + muteVideoInRtcJoinListMap +
                 ", muteAudioInRtcJoinListMap=" + muteAudioInRtcJoinListMap +
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
-                ", isScreenShare=" + isScreenShare +
                 '}';
     }
 }

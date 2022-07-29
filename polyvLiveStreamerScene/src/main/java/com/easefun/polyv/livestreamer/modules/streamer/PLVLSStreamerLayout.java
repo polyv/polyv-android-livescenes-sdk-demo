@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.streamer;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -16,6 +17,8 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -35,10 +38,14 @@ import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
+import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
+import com.easefun.polyv.livestreamer.modules.streamer.position.vo.PLVLSStreamerViewPositionUiState;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -61,6 +68,8 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //推流和连麦presenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
+
+    private PLVLSStreamerViewPositionManager streamerViewPositionManager;
 
     //view
     private RecyclerView plvlsStreamerRv;
@@ -107,7 +116,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         //init adapter
-        streamerAdapter = new PLVLSStreamerAdapter(plvlsStreamerRv, new PLVLSStreamerAdapter.OnStreamerAdapterCallback() {
+        streamerAdapter = new PLVLSStreamerAdapter(new PLVLSStreamerAdapter.OnStreamerAdapterCallback() {
             @Override
             public SurfaceView createLinkMicRenderView() {
                 return streamerPresenter.createRenderView(Utils.getApp());
@@ -125,10 +134,56 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         });
         streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());
 
+        streamerViewPositionManager = PLVDependManager.getInstance().get(PLVLSStreamerViewPositionManager.class);
+        observeStreamerViewPositionChange();
+        observeActivityPopupViewContentChange();
+
         //启动前台服务，防止在后台被杀
         PLVForegroundService.startForegroundService(PLVLSLiveStreamerActivity.class, "POLYV开播", R.drawable.plvls_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
+    }
+
+    private void observeStreamerViewPositionChange() {
+        streamerViewPositionManager.getDocumentInMainScreenLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVLSStreamerViewPositionUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVLSStreamerViewPositionUiState viewPositionUiState) {
+                        if (viewPositionUiState == null) {
+                            return;
+                        }
+                        final boolean syncPositionToServer = viewPositionUiState.isNeedSyncUpdateToRemote()
+                                && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_WITH_FIRST_SCREEN_TO_ALL_USER);
+                        if (syncPositionToServer) {
+                            streamerPresenter.setDocumentAndStreamerViewPosition(viewPositionUiState.isDocumentInMainScreen());
+                        }
+                    }
+                });
+    }
+
+    private void observeActivityPopupViewContentChange() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                final View popupView = ((Activity) getContext()).findViewById(R.id.plvls_live_room_popup_container);
+                if (!(popupView instanceof ViewGroup)) {
+                    return;
+                }
+                ((ViewGroup) popupView).setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
+                    @Override
+                    public void onChildViewAdded(View parent, View child) {
+
+                    }
+
+                    @Override
+                    public void onChildViewRemoved(View parent, View child) {
+                        if (parent instanceof ViewGroup && ((ViewGroup) parent).getChildCount() == 0) {
+                            streamerAdapter.updateAllItem();
+                        }
+                    }
+                });
+            }
+        });
     }
     // </editor-fold>
 
@@ -272,6 +327,20 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
+        public void onStatesToStreamStarted() {
+            // 开播后，同步一次主副屏
+            final PLVLSStreamerViewPositionUiState viewPositionUiState = streamerViewPositionManager.getDocumentInMainScreenLiveData().getValue();
+            if (viewPositionUiState == null) {
+                return;
+            }
+            final boolean syncPositionToServer = viewPositionUiState.isNeedSyncUpdateToRemote()
+                    && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_WITH_FIRST_SCREEN_TO_ALL_USER);
+            if (syncPositionToServer) {
+                streamerPresenter.setDocumentAndStreamerViewPosition(viewPositionUiState.isDocumentInMainScreen());
+            }
+        }
+
+        @Override
         public void onUserMuteVideo(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteVideo(uid, mute, streamerListPos, memberListPos);
             streamerAdapter.updateUserMuteVideo(streamerListPos);
@@ -303,15 +372,17 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
-        public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
-            super.onUsersJoin(dataBeanList);
+        public void onUsersJoin(List<PLVLinkMicItemDataBean> joinUsers) {
+            streamerViewPositionManager.switchOnBeforeFirstScreenChange();
             streamerAdapter.updateAllItem();
+            streamerViewPositionManager.switchOnAfterFirstScreenChange();
         }
 
         @Override
-        public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
-            super.onUsersLeave(dataBeanList);
+        public void onUsersLeave(final List<PLVLinkMicItemDataBean> leaveUsers) {
+            streamerViewPositionManager.switchOnBeforeFirstScreenChange();
             streamerAdapter.updateAllItem();
+            streamerViewPositionManager.switchOnAfterFirstScreenChange();
         }
 
         @Override
@@ -359,13 +430,25 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
+        public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
+            streamerViewPositionManager.switchOnBeforeFirstScreenChange();
+            streamerAdapter.updateAllItem();
+            streamerViewPositionManager.switchOnAfterFirstScreenChange();
+        }
+
+        @Override
+        public void onDocumentStreamerViewChange(boolean documentInMainScreen) {
+            streamerViewPositionManager.switchMainScreen(documentInMainScreen, false);
+        }
+
+        @Override
         public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
             super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
-            if(isCurrentUser){
+            if (isCurrentUser) {
                 //提示当前用户的权限变更
-                if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER) && !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                if (type.equals(PLVPPTAuthentic.PermissionType.TEACHER) && !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
                     String message;
-                    if(PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)){
+                    if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)) {
                         message = getContext().getString(R.string.plvls_member_speaker_permission_already_grant);
                     } else {
                         message = getContext().getString(R.string.plvls_member_speaker_permission_already_remove);
@@ -383,12 +466,12 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="订阅 - 直播间信息">
-    private void observeClassDetailData(){
+    private void observeClassDetailData() {
         liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
                 liveRoomDataManager.getClassDetailVO().removeObserver(this);
-                if(liveRoomDataManager.isOnlyAudio()) {
+                if (liveRoomDataManager.isOnlyAudio()) {
                     //音频开播模式下，设置封面图
                     if (plvLiveClassDetailVOPLVStatefulData != null && plvLiveClassDetailVOPLVStatefulData.getData() != null
                             && plvLiveClassDetailVOPLVStatefulData.getData().getData() != null) {

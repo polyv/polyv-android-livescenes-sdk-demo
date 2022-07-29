@@ -1,21 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/plvec_chat_msg_corner_bg"
     android:minHeight="20dp"
-    android:paddingBottom="2dp"
-    android:paddingLeft="7.4dp"
-    android:paddingRight="8dp"
-    android:paddingTop="2dp">
+    android:orientation="horizontal"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="4dp">
 
     <TextView
         android:id="@+id/chat_msg_tv"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
         android:gravity="center_vertical"
         android:lineSpacingExtra="2dp"
-        android:text="121321312312132131231231231213213123123123123123"
         android:textColor="#ffffff"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        tools:text="121321312312132131231231231213213123123123123123" />
+
+    <ImageView
+        android:id="@+id/plvec_chat_msg_file_share_iv"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginVertical="4dp"
+        android:layout_marginStart="7dp"
+        android:visibility="gone"
+        tools:src="@drawable/plvec_chatroom_file_share_doc_icon"
+        tools:visibility="visible" />
+
 </LinearLayout>

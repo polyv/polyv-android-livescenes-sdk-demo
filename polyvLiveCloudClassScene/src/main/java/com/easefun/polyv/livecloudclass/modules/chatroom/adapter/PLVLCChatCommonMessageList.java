@@ -159,8 +159,8 @@ public class PLVLCChatCommonMessageList {
         messageAdapter.removeAllDataChanged();
     }
 
-    public void changeDisplayType(boolean isDisplaySpecialType) {
-        messageAdapter.changeDisplayType(isDisplaySpecialType);
+    public void changeDisplayType(int displayDataType) {
+        messageAdapter.changeDisplayType(displayDataType);
     }
 
     public int getItemCount() {

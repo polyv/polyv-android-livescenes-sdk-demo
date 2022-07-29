@@ -230,6 +230,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         initParams();
         initLiveRoomManager();
         initView();
+        initPptTurnPageLandLayout();
 
         observeMediaLayout();
         observeLinkMicLayout();
@@ -853,6 +854,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             @Override
             public void onClick(View v) {
                 pptViewSwitcher.switchView();
+                initPptTurnPageLandLayout();
             }
         });
         //设置关闭悬浮窗的点击监听器
@@ -871,6 +873,10 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     if (!liveRoomDataManager.getConfig().isPPTChannelType()) {
                         return;
                     }
+
+                    //ppt翻页控件显示隐藏处理
+                    mediaLayout.onTurnPageLayoutChange(toMainScreen);
+
                     if (linkMicLayout == null || !linkMicLayout.isJoinChannel()) {
                         if (toMainScreen) {
                             if (!pptViewSwitcher.isViewSwitched()) {
@@ -1073,4 +1079,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="初始化ppt翻页控件">
+    private void initPptTurnPageLandLayout() {
+        if (floatingPPTLayout.isPPTInFloatingLayout()) {
+            mediaLayout.onTurnPageLayoutChange(false);
+        } else {
+            mediaLayout.onTurnPageLayoutChange(true);
+        }
+    }
+    // </editor-fold>
 }

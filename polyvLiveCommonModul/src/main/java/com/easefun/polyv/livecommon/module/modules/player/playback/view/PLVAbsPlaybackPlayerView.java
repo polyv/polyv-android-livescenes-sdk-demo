@@ -6,7 +6,6 @@ import android.view.View;
 import com.easefun.polyv.businesssdk.api.auxiliary.PolyvAuxiliaryVideoview;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
-import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -114,6 +113,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     @Override
     public boolean onProgressChanged(int seekTime, int totalTime, boolean isEnd, boolean isRightSwipe) {
         return false;
+    }
+
+    @Override
+    public void onAutoContinuePlaySeeked(int seekTo) {
+
     }
 
     @Override

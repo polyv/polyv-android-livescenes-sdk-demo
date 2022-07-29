@@ -14,6 +14,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -43,6 +44,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVSocketLoginManager socketLoginManager;
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+    //卡片推送管理器
+    protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -71,6 +74,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         super.onDestroy();
         if (chatroomPresenter != null) {
             chatroomPresenter.destroy();
+        }
+        if (cardPushManager != null) {
+            cardPushManager.disposeCardPushAllTask();
         }
         destroySocketLoginManager();
     }
@@ -125,6 +131,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
+    public PLVCardPushManager getCardPushManager() {
+        return cardPushManager;
+    }
+
     //获取聊天室的公告信息
     public LiveData<PolyvBulletinVO> getBulletinVO() {
         return chatroomPresenter.getData().getBulletinVO();

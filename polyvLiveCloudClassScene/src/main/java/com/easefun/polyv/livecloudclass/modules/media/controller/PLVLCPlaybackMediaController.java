@@ -428,6 +428,14 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+        if (tvStartSendMessageLand != null) {
+            tvStartSendMessageLand.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
+        }
+    }
+
+    @Override
     public void clean() {
         if (moreLayout != null) {
             moreLayout.hide();

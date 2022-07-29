@@ -139,7 +139,7 @@ public class PLVBaseActivity extends AppCompatActivity {
     private void initOrientationManager() {
         rotationObserver = new PLVRotationObserver(this);
         orientationManager = PLVOrientationManager.getInstance();
-        orientationManager.addRotationObserver(rotationObserver);
+        orientationManager.addRotationObserver(rotationObserver, enableRotationObserver());
     }
 
     /**

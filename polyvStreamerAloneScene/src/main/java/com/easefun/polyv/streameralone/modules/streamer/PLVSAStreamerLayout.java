@@ -228,6 +228,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                     onViewActionListener.onFullscreenAction(itemDataBean, view);
                 }
             }
+
+            @Override
+            public void onStreamerViewScale(PLVLinkMicItemDataBean itemDataBean, float scaleFactor) {
+                scaleStreamerView(itemDataBean, scaleFactor);
+            }
         });
 
         streamerPresenter = new PLVStreamerPresenter(liveRoomDataManager);
@@ -255,11 +260,22 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
-    public void changeLinkMicLayoutType() {
-        if(plvsaStreamerRvLayout == null){
+    public void scaleStreamerView(PLVLinkMicItemDataBean itemDataBean, float scaleFactor) {
+        if (streamerPresenter == null || itemDataBean == null) {
             return;
         }
-        if(plvsaStreamerRvLayout.getCurrentMode() == PLVMultiModeRecyclerViewLayout.MODE_TILED){
+        if (!isMyselfUserId(itemDataBean.getLinkMicId())) {
+            return;
+        }
+        streamerPresenter.zoomLocalCamera(scaleFactor);
+    }
+
+    @Override
+    public void changeLinkMicLayoutType() {
+        if (plvsaStreamerRvLayout == null) {
+            return;
+        }
+        if (plvsaStreamerRvLayout.getCurrentMode() == PLVMultiModeRecyclerViewLayout.MODE_TILED) {
             changeToOneToMore();
         } else {
             changeToTiled();
@@ -365,6 +381,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     public boolean onRvSuperTouchEvent(MotionEvent ev) {
         boolean returnResult = plvsaStreamerRvLayout.getRecyclerView().onSuperTouchEvent(ev);
+        streamerAdapter.checkScaleCamera(ev);
         streamerAdapter.checkClickItemView(ev);
         return returnResult;
     }
@@ -554,6 +571,12 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                     .build().show();
 
         }
+
+        @Override
+        public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
+            updateLinkMicLayoutListOnChange();
+            streamerAdapter.updateAllItem();
+        }
     };
     // </editor-fold>
 
@@ -651,11 +674,6 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             return;
         }
 
-        int itemType = streamerAdapter.getItemCount() >= 2 ?
-                PLVSAStreamerAdapter.ITEM_TYPE_ONE_TO_MORE : PLVSAStreamerAdapter.ITEM_TYPE_DEFAULT;
-        if(streamerAdapter.getItemType() == itemType){
-            return;
-        }
         streamerAdapter.setItemType(PLVSAStreamerAdapter.ITEM_TYPE_ONE_TO_MORE);
 
         boolean isPortrait = ScreenUtils.isPortrait();
@@ -663,17 +681,18 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         boolean isOnlyTeacher = streamerAdapter.getItemCount() <= 1;
 
         //更新MainView视图
-        if(mainView == null) {
-            RecyclerView.ViewHolder viewHolder = streamerAdapter.createMainViewHolder(plvsaStreamerRvLayout.getMainContainer());
-            mainView = viewHolder.itemView;
-            //将维护的viewHolder副本添加到主布局上，实现一对多主讲模式
-            plvsaStreamerRvLayout.addViewToMain(mainView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
+        plvsaStreamerRvLayout.clearMainView();
+        streamerAdapter.releaseMainViewHolder();
+        final RecyclerView.ViewHolder viewHolder = streamerAdapter.createMainViewHolder(plvsaStreamerRvLayout.getMainContainer());
+        mainView = viewHolder.itemView;
+        //将维护的viewHolder副本添加到主布局上，实现一对多主讲模式
+        plvsaStreamerRvLayout.addViewToMain(mainView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         //修改主画面尺寸
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) plvsaStreamerRvLayout.getMainContainer().getLayoutParams();
         if (params != null) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            if(isOnlyTeacher){
+            if (isOnlyTeacher) {
                 params.topMargin = 0;
                 params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             } else {
