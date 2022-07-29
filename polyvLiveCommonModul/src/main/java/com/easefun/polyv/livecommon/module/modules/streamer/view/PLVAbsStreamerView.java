@@ -139,6 +139,16 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
+    public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
+
+    }
+
+    @Override
+    public void onDocumentStreamerViewChange(boolean documentInMainScreen) {
+
+    }
+
+    @Override
     public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
 
     }

@@ -115,6 +115,11 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         });
     }
 
+    @Override
+    public void hideMessageSender() {
+        hide();
+    }
+
     private void initView(View root) {
         llSendMessage = root.findViewById(R.id.ll_send_message);
         tvSendMessage = root.findViewById(R.id.tv_send_message);

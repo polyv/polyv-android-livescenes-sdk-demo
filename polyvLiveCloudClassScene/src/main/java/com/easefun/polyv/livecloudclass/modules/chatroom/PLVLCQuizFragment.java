@@ -158,7 +158,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
             if (questionMessage == null) {
                 return;
             }
-            final PLVBaseViewData viewData = new PLVBaseViewData<>(questionMessage, PLVChatMessageItemType.ITEMTYPE_SEND_QUIZ, new PLVSpecialTypeTag());
+            final PLVBaseViewData viewData = new PLVBaseViewData<>(questionMessage, PLVChatMessageItemType.ITEMTYPE_SEND_QUIZ, new PLVSpecialTypeTag(questionMessage.getUserId()));
             if (!isShowKeyBoard(new OnceHideKeyBoardListener() {
                 @Override
                 public void call() {
@@ -175,7 +175,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         public void onAnswerEvent(@NonNull PLVTAnswerEvent answerEvent) {
             super.onAnswerEvent(answerEvent);
             //添加信息至列表
-            addQuizMessageToList(new PLVBaseViewData<>(answerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag()));
+            addQuizMessageToList(new PLVBaseViewData<>(answerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag(answerEvent.getUserId())));
         }
     };
 
@@ -211,7 +211,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         userBean.setPic(PLVSocketUserConstant.TEACHER_AVATAR_URL);
         tAnswerEvent.setUser(userBean);
 
-        addQuizMessageToList(new PLVBaseViewData<>(tAnswerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag()));
+        addQuizMessageToList(new PLVBaseViewData<>(tAnswerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag(null)));
     }
     // </editor-fold>
 

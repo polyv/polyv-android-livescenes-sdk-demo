@@ -256,6 +256,25 @@ public class PLVUriPathHelper {
     }
 
     /**
+     * 获取文件名
+     */
+    public static String getRealFileName(final Context context, final Uri uri) {
+        String data = null;
+        Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Files.FileColumns.DISPLAY_NAME},
+                null, null, null);
+        if (null != cursor) {
+            if (cursor.moveToFirst()) {
+                int index = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                if (index > -1) {
+                    data = cursor.getString(index);
+                }
+            }
+            cursor.close();
+        }
+        return data;
+    }
+
+    /**
      * 把bitmap写入app私有目录下
      *
      * @param context 上下文

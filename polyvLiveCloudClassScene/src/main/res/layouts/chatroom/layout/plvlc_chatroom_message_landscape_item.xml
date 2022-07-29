@@ -13,17 +13,38 @@
     android:paddingRight="12dp"
     android:paddingBottom="4dp">
 
-    <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
-        android:id="@+id/chat_msg_tv"
+    <LinearLayout
+        android:id="@+id/plvlc_chat_msg_land_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:lineSpacingExtra="2dp"
-        android:text="121321312312132131231231231213213123123123123123"
-        android:textColor="#ffffff"
-        android:textSize="14sp"
-        android:visibility="visible"
-        tools:visibility="gone" />
+        android:orientation="horizontal">
+
+        <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
+            android:id="@+id/chat_msg_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:lineSpacingExtra="2dp"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:visibility="visible"
+            tools:text="121321312312132131231231231213213123123123123123"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvlc_chat_msg_file_share_land_iv"
+            android:layout_width="40dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:visibility="gone"
+            tools:src="@drawable/plvlc_chatroom_file_share_doc_icon"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -36,10 +57,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="1312111111113121111111111111111111111111111111111111111111113："
             android:textColor="#ffffff"
             android:textSize="14sp"
             android:visibility="gone"
+            tools:text="1312111111113121111111111111111111111111111111111111111111113："
             tools:visibility="visible" />
 
         <FrameLayout
@@ -91,10 +112,10 @@
         android:gravity="center_vertical"
         android:lineSpacingExtra="2dp"
         android:maxLines="2"
-        android:text="121321312312132131231231231213213123123123123123"
         android:textColor="#999999"
         android:textSize="14sp"
         android:visibility="visible"
+        tools:text="121321312312132131231231231213213123123123123123"
         tools:visibility="gone" />
 
     <!--显示被回复人发送的图片信息-->
@@ -109,10 +130,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="13121111111131211113："
             android:textColor="#999999"
             android:textSize="14sp"
             android:visibility="gone"
+            tools:text="13121111111131211113："
             tools:visibility="gone" />
 
         <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView

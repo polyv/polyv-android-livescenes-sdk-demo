@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.modules.player;
 
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
@@ -35,13 +37,16 @@ import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -87,6 +92,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private PLVWatermarkView watermarkView;
 
     private TextView playbackPlayerFloatingPlayingPlaceholderTv;
+    private PLVRoundRectLayout playbackAutoContinueSeekTimeHintLayout;
+    private TextView playbackAutoContinueSeekTimeTv;
 
     //播放器是否小窗播放状态
     private boolean isVideoViewPlayingInFloatWindow;
@@ -137,6 +144,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
 
         playbackPlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_playback_player_floating_playing_placeholder_tv);
+        playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvec_playback_auto_continue_seek_time_hint_layout);
+        playbackAutoContinueSeekTimeTv = findViewById(R.id.plvec_playback_auto_continue_seek_time_tv);
 
         initSubVideoViewChangeListener();
         observeFloatingPlayer();
@@ -493,6 +502,12 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onBufferEnd() {
             super.onBufferEnd();
             PLVCommonLog.i(TAG, "缓冲结束");
+        }
+
+        @Override
+        public void onAutoContinuePlaySeeked(int seekTo) {
+            playbackAutoContinueSeekTimeTv.setText(PLVTimeUtils.generateTime(seekTo));
+            PLVViewUtil.showViewForDuration(playbackAutoContinueSeekTimeHintLayout, seconds(3).toMillis());
         }
 
         @Override

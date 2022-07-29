@@ -189,11 +189,16 @@ public interface IPLVStreamerContract {
          */
         void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user);
 
+        void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen);
+
+        void onDocumentStreamerViewChange(boolean documentInMainScreen);
+
         /**
          * 屏幕共享状态变更
+         *
          * @param position
-         * @param isShare 是否开始屏幕共享
-         * @param extra 附加信息，如错误码
+         * @param isShare  是否开始屏幕共享
+         * @param extra    附加信息，如错误码
          */
         void onScreenShareChange(int position, boolean isShare, int extra);
     }
@@ -288,6 +293,13 @@ public interface IPLVStreamerContract {
          * @param enable true表示镜像，false表示非镜像
          */
         void setFrontCameraMirror(boolean enable);
+
+        /**
+         * 缩放本地摄像头
+         *
+         * @param scaleFactor >1表示放大，<1表示缩小
+         */
+        void zoomLocalCamera(float scaleFactor);
 
         /**
          * 设置推流画面类型
@@ -423,11 +435,14 @@ public interface IPLVStreamerContract {
 
         /**
          * 设置用户主讲权限
-         * @param userId 用户的userId
+         *
+         * @param userId          用户的userId
          * @param isSetPermission
          * @param ack
          */
         void setUserPermissionSpeaker(String userId, boolean isSetPermission, Ack ack);
+
+        void setDocumentAndStreamerViewPosition(boolean documentInMainScreen);
 
         /**
          * 获取推流和连麦的数据

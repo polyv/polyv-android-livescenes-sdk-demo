@@ -25,6 +25,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
+import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -105,6 +106,10 @@ public class PLVDocumentRepository {
                         PLVEventConstant.Ppt.ON_SLICE_OPEN_EVENT.equals(event) ||
                         PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
                     PLVCommonLog.d(TAG, "receive ppt message: delay" + message);
+                    if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(liveRoomDataManager.getConfig().getUser().getViewerType())
+                            && PLVEventConstant.Ppt.ON_SLICE_ID_EVENT.equals(event)) {
+                        return;
+                    }
                     PLVDocumentWebProcessor webProcessor = documentWebProcessorWeakReference.get();
                     if (webProcessor != null) {
                         webProcessor.getWebview().callMessage(PLVLivePPTProcessor.UPDATE_PPT, message);

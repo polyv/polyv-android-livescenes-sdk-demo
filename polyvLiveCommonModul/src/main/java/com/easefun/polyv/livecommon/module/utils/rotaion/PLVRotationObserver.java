@@ -14,6 +14,7 @@ public class PLVRotationObserver {
     private boolean isLifecycleStop;
     // 锁定旋转屏幕
     private boolean lockOrientation;
+    private boolean rotationEnabled = true;
 
     public PLVRotationObserver(Activity context) {
         this.context = context;
@@ -31,6 +32,9 @@ public class PLVRotationObserver {
 
     public void start() {
         if (lockOrientation) {
+            return;
+        }
+        if (!rotationEnabled) {
             return;
         }
         isLifecycleStop = false;
@@ -72,6 +76,10 @@ public class PLVRotationObserver {
 
     public boolean isLockOrientation() {
         return lockOrientation;
+    }
+
+    public void setRotationEnabled(boolean orientationRotationEnabled) {
+        this.rotationEnabled = orientationRotationEnabled;
     }
 
     private class RotationObserver extends ContentObserver {

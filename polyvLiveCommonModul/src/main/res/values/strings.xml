@@ -48,11 +48,14 @@
     <string name="plv_chat_view_show_effect">展示特效</string>
     <string name="plv_chat_toast_chatroom_close">聊天室已经关闭</string>
     <string name="plv_chat_toast_chatroom_open">聊天室已经打开</string>
+    <string name="plv_chat_toast_focus_mode_close">专注模式已经关闭</string>
+    <string name="plv_chat_toast_focus_mode_open">专注模式已经打开</string>
     <string name="plv_chat_chooser_sel_img">选择图片</string>
     <string name="plv_chat_send_img_error_tip_permission_denied">发送图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复</string>
     <string name="plv_chat_send_img_error_tip_permission_cancel">请允许存储权限后再发送图片</string>
     <string name="plv_chat_cannot_retrieve_selected_image">不能检索到选择的图片</string>
     <string name="plv_chat_connect_fail_and_cannot_input">聊天室连接失败，请尝试刷新解\n决。如无法解决请联系管理员。</string>
+    <string name="plv_chat_restrict_max_viewer_hint">直播间太过火爆了，请稍后再来</string>
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">APP内不支持购买</string>
 

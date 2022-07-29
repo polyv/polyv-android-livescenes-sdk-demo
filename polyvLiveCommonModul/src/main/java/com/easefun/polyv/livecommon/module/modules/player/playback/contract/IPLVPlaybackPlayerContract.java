@@ -159,6 +159,13 @@ public interface IPLVPlaybackPlayerContract {
         boolean onProgressChanged(int seekTime, int totalTime, boolean isEnd, boolean isRightSwipe);
 
         /**
+         * 触发自动续播时回调
+         *
+         * @param seekTo 自动续播跳转进度
+         */
+        void onAutoContinuePlaySeeked(int seekTo);
+
+        /**
          * 双击手势触发
          */
         void onDoubleClick();

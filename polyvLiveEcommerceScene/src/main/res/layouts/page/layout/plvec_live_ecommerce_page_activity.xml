@@ -31,6 +31,12 @@
         android:layout_marginRight="@dimen/plvec_margin_common"
         android:src="@drawable/plvec_close" />
 
+    <!--直播间弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvec_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout
         android:layout_width="match_parent"

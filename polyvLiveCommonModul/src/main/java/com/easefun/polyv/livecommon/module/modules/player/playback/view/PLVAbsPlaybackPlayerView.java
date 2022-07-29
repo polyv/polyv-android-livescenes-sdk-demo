@@ -116,6 +116,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     }
 
     @Override
+    public void onAutoContinuePlaySeeked(int seekTo) {
+
+    }
+
+    @Override
     public void onDoubleClick() {
 
     }

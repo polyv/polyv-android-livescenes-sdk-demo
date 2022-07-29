@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
+import com.plv.foundationsdk.annos.Sp;
 
 /**
  * date: 2020/9/17
@@ -80,8 +81,13 @@ public class PLVPlaceHolderView extends ConstraintLayout {
         tvPlaceholderText.setText(text);
     }
 
+    public void setPlaceHolderTextSize(@Sp float size) {
+        tvPlaceholderText.setTextSize(size);
+    }
+
     /**
      * 设置响应位置监听器状态，默认响应。
+     *
      * @param enable enable
      */
     public void enableRespondLocationSensor(boolean enable) {

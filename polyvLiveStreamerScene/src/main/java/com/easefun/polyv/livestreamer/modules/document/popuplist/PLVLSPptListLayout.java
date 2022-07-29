@@ -417,6 +417,11 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
 
                 String filePath = null;
+                PLVUriPathHelper.copyFile(getContext(), fileUri,
+                        new File(getContext().getExternalFilesDir(""),
+                                PLVUriPathHelper.getRealFileName(getContext(), fileUri)));
+                File file = new File(getContext().getExternalFilesDir(""),
+                        PLVUriPathHelper.getRealFileName(getContext(), fileUri));
                 if (fileUri.toString().startsWith("content")) {
                     filePath = PLVUriPathHelper.getPath(getContext(), fileUri);
                 } else if (fileUri.getPath() != null) {
@@ -430,7 +435,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                     return false;
                 }
 
-                final File uploadFile = new File(filePath);
+                final File uploadFile = file;
 
                 // 弹窗提示选择转码方式
                 pptConvertSelectDialog

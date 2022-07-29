@@ -417,8 +417,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         this.isServerEnablePPT = enable;
         videoPptSwitchPortIv.setVisibility(enable ? View.VISIBLE : View.GONE);
         videoPptSwitchLandIv.setVisibility(enable ? View.VISIBLE : View.GONE);
-        pptTurnPagePortLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
-        pptTurnPageLandLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setTurnPageLayoutStatus(boolean isShow) {
+        pptTurnPageLandLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        pptTurnPagePortLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -567,6 +571,14 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void notifyLowLatencyUpdate(boolean isLowLatency) {
         this.isLowLatencyWatch = isLowLatency;
         moreLayout.updateViewWithLatency(isLowLatency);
+    }
+
+    @Override
+    public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+        if (startSendMessageLandIv != null) {
+            startSendMessageLandIv.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            startSendMessageLandIv.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
+        }
     }
 
     @Override
@@ -747,6 +759,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         });
     }
     // </editor-fold>
+
+
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
@@ -965,5 +979,4 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     // </editor-fold>
-
 }

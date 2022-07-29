@@ -6,9 +6,9 @@ package com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.dat
 public class PLVPlayInfoVO {
     private int position;
     private int totalTime;
-    private int bufPercent;
-    private boolean isPlaying;
-    private boolean isSubVideoViewPlaying;
+    private transient int bufPercent;
+    private transient boolean isPlaying;
+    private transient boolean isSubVideoViewPlaying;
 
     private PLVPlayInfoVO(Builder builder) {
         position = builder.position;

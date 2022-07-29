@@ -96,6 +96,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
 
     /**
+     * 更新聊天室房间状态
+     * @param isCloseRoomStatus 是否关闭房间状态
+     * @param isFocusModeStatus 是否专注模式状态
+     */
+    void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
+
+    /**
      * 释放
      */
     void clean();

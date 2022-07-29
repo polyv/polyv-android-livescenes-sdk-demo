@@ -15,6 +15,7 @@ import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
@@ -80,6 +81,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onLoginError(@Nullable PLVLoginEvent loginEvent, String msg, int errorCode) {
+
+    }
+
+    @Override
     public void onLogoutEvent(@NonNull PLVLogoutEvent logoutEvent) {
 
     }
@@ -116,6 +122,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onCloseRoomEvent(@NonNull PLVCloseRoomEvent closeRoomEvent) {
+
+    }
+
+    @Override
+    public void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent) {
 
     }
 

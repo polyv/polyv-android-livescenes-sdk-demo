@@ -257,6 +257,13 @@ public interface IPLVLCMediaLayout {
      * 设置横屏打赏特效显示
      */
     void setLandscapeRewardEffectVisibility(boolean isShow);
+
+    /**
+     * 显示或隐藏ppt翻页控件
+     *
+     * @param toShow true：显示，false：隐藏
+     */
+    void onTurnPageLayoutChange(boolean toShow);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -409,7 +416,6 @@ public interface IPLVLCMediaLayout {
          * rtc观看是否正在暂停
          */
         boolean isRtcPausing();
-
     }
     // </editor-fold>
 

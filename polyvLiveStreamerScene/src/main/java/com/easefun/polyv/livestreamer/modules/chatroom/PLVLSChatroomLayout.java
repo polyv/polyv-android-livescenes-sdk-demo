@@ -1,7 +1,5 @@
 package com.easefun.polyv.livestreamer.modules.chatroom;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -84,6 +82,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * 聊天室布局
@@ -523,7 +523,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag(localMessage.getUserId())));
             //添加信息至列表
             addChatMessageToList(dataList, true);
         }
@@ -535,16 +535,19 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, emotionEvent.isSpecialTypeOrMe() ? new PLVSpecialTypeTag(emotionEvent.getUserId()) : null));
             //添加信息至列表
-            addChatMessageToList(dataList, true);
+            addChatMessageToList(dataList, emotionEvent.isLocal());
         }
 
         @Override
         public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
             super.onLocalImageMessage(localImgEvent);
+            if (localImgEvent == null) {
+                return;
+            }
             List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag(localImgEvent.getUserId())));
             //添加信息至列表
             addChatMessageToList(dataList, true);
         }

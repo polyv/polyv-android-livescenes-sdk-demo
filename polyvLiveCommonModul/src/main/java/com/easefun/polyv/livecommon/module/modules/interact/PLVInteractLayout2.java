@@ -155,9 +155,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     public void init(IPLVLiveRoomDataManager liveRoomDataManager, @Nullable PLVLiveScene scene) {
         this.liveScene = scene;
         this.liveRoomDataManager = liveRoomDataManager;
-        // 直播带货场景暂不支持卡片推送
-        boolean cardPushEnabled = PLVLiveScene.ECOMMERCE != scene;
-        plvlcInteractWeb.setCardPushEnabled(cardPushEnabled);
+        plvlcInteractWeb.setCardPushEnabled(true);
         // 回放暂时只支持卡片推送互动
         String watchStatus = liveRoomDataManager.getConfig().isLive() ? PLVInteractWebView2.WATCH_STATUS_LIVE : PLVInteractWebView2.WATCH_STATUS_PLAYBACK;
         plvlcInteractWeb.setWatchStatus(watchStatus);

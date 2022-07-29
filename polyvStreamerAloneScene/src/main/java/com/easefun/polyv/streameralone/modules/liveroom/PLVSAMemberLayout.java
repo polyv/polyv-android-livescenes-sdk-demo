@@ -302,6 +302,14 @@ public class PLVSAMemberLayout extends FrameLayout {
         @Override
         public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
             super.onUsersLeave(dataBeanList);
+
+            // 用户退出时，收回主讲权限
+            for (PLVLinkMicItemDataBean leaveUser : dataBeanList) {
+                if (leaveUser.isHasSpeaker()) {
+                    streamerPresenter.setUserPermissionSpeaker(leaveUser.getUserId(), false, null);
+                }
+            }
+
             memberAdapter.updateUserLeave(dataBeanList);
             toastUserLinkMicMsg(dataBeanList, false);
         }

@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
@@ -336,6 +337,16 @@ public class PLVLSMemberLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="成员列表 - MVP模式的view层实现">
     private PLVAbsStreamerView streamerView = new PLVAbsStreamerView() {
+        @Override
+        public void onUsersLeave(List<PLVLinkMicItemDataBean> leaveUsers) {
+            // 用户退出时，收回主讲权限
+            for (PLVLinkMicItemDataBean leaveUser : leaveUsers) {
+                if (leaveUser.isHasSpeaker()) {
+                    onViewActionListener.onGrantSpeakerPermission(-1, leaveUser.getUserId(), false);
+                }
+            }
+        }
+
         @Override
         public void onUserMuteVideo(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteVideo(uid, mute, streamerListPos, memberListPos);

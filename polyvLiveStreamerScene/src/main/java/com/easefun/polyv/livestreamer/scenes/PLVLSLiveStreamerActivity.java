@@ -33,6 +33,7 @@ import com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
+import com.easefun.polyv.livestreamer.modules.streamer.di.PLVLSStreamerModule;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -237,7 +238,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVBeautyModule.instance);
+                .addModule(PLVBeautyModule.instance)
+                .addModule(PLVLSStreamerModule.instance);
     }
 
     // </editor-fold>
