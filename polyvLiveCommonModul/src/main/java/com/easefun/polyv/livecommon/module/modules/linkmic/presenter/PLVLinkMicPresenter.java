@@ -46,7 +46,6 @@ import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -626,11 +625,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 //嘉宾连麦ID
                 String guestLinkMicId = "";
 
-                //嘉宾可能被挂断连麦后，还一直留在连麦列表里。不过我们可以通过他的voice字段是否=1来区分他是否有上麦。没有上麦，就从data中删掉。
+                //部分角色需要通过他的voice字段是否=1来区分他是否有上麦。没有上麦，就从data中删掉。
                 Iterator<PLVJoinInfoEvent> joinInfoEventIterator = data.getJoinList().iterator();
                 while (joinInfoEventIterator.hasNext()) {
                     PLVJoinInfoEvent plvJoinInfoEvent = joinInfoEventIterator.next();
-                    if (PLVSocketUserConstant.USERTYPE_GUEST.equals(plvJoinInfoEvent.getUserType()) && !plvJoinInfoEvent.getClassStatus().isVoice()) {
+                    if (!plvJoinInfoEvent.checkIsVoiceWithUserType()) {
                         joinInfoEventIterator.remove();
                     }
                 }
@@ -1139,6 +1138,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             }
             if (!userExistInList) {
                 muteCacheList.updateUserMuteCacheWhenJoinList(dataBean);
+                // 参与者下麦发送muteVideo=true，而上麦不会发送mute事件更新状态，因此默认认为是打开音频和摄像头
+                if (PLVSocketUserConstant.USERTYPE_VIEWER.equals(dataBean.getUserType())) {
+                    dataBean.setMuteVideo(false);
+                    dataBean.setMuteAudio(false);
+                }
                 if (dataBean.isTeacher()) {
                     // 添加讲师
                     linkMicList.add(0, dataBean);

@@ -1138,11 +1138,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         List<PLVJoinInfoEvent> joinList = data.getJoinList();
         List<PLVLinkMicJoinStatus.WaitListBean> waitList = data.getWaitList();
 
-        //嘉宾可能被挂断连麦后，还一直留在连麦列表里。不过我们可以通过他的voice字段是否=1来区分他是否有上麦。
+        //部分角色需要通过他的voice字段是否=1来区分他是否有上麦。没有上麦，就从data中删掉。
         Iterator<PLVJoinInfoEvent> joinInfoEventIterator = joinList.iterator();
         while (joinInfoEventIterator.hasNext()) {
             PLVJoinInfoEvent plvJoinInfoEvent = joinInfoEventIterator.next();
-            if (PLVSocketUserConstant.USERTYPE_GUEST.equals(plvJoinInfoEvent.getUserType()) && !plvJoinInfoEvent.getClassStatus().isVoice()) {
+            if (!plvJoinInfoEvent.checkIsVoiceWithUserType()) {
                 //没有上麦，就从joinList中移除，添加到waitList。
                 joinInfoEventIterator.remove();
                 waitList.add(PLVLinkMicDataMapper.map2WaitListBean(plvJoinInfoEvent));

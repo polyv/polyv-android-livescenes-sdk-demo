@@ -1,5 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model;
 
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.DELAY_TO_GET_LINK_MIC_LIST;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.INTERVAL_TO_GET_LINK_MIC_LIST;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -45,9 +48,6 @@ import java.util.Map;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.socket.client.Socket;
-
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.DELAY_TO_GET_LINK_MIC_LIST;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.INTERVAL_TO_GET_LINK_MIC_LIST;
 
 /**
  * 连麦列表
@@ -295,11 +295,11 @@ public class PLVMultiRoleLinkMicList {
         final List<PLVJoinInfoEvent> joinList = data.getJoinList();
         final List<PLVLinkMicJoinStatus.WaitListBean> waitList = data.getWaitList();
 
-        //嘉宾可能被挂断连麦后，还一直留在连麦列表里。不过我们可以通过他的voice字段是否=1来区分他是否有上麦。
+        //部分角色需要通过他的voice字段是否=1来区分他是否有上麦。没有上麦，就从data中删掉。
         Iterator<PLVJoinInfoEvent> joinInfoEventIterator = joinList.iterator();
         while (joinInfoEventIterator.hasNext()) {
             PLVJoinInfoEvent plvJoinInfoEvent = joinInfoEventIterator.next();
-            if (PLVSocketUserConstant.USERTYPE_GUEST.equals(plvJoinInfoEvent.getUserType()) && !plvJoinInfoEvent.getClassStatus().isVoice()) {
+            if (!plvJoinInfoEvent.checkIsVoiceWithUserType()) {
                 //没有上麦，就从joinList中移除，添加到waitList。
                 joinInfoEventIterator.remove();
                 waitList.add(PLVLinkMicDataMapper.map2WaitListBean(plvJoinInfoEvent));
