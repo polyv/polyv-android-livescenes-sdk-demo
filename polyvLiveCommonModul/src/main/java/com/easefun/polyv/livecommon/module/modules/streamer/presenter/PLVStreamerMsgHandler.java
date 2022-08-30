@@ -409,13 +409,7 @@ public class PLVStreamerMsgHandler {
             }
             final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());
             final PLVSocketUserBean bean = (memberItem != null && memberItem.second != null) ? memberItem.second.getSocketUserBean() : null;
-            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                    view.onSetPermissionChange(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
-                }
-            });
-
+            streamerPresenter.onCurrentSpeakerChanged(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
         }
 
 

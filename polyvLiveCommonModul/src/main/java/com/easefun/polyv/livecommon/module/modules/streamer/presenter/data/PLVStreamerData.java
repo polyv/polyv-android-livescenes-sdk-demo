@@ -3,6 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.streamer.presenter.data;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.plv.linkmic.PLVLinkMicConstant;
+
 /**
  * 推流和连麦的数据，主要用于提供给 非mvp的v 监听/获取推流和连麦的数据
  */
@@ -37,6 +39,9 @@ public class PLVStreamerData {
 
     //当前设置的码率
     private MutableLiveData<Integer> curBitrate = new MutableLiveData<>();
+
+    // 推流画面比例
+    private MutableLiveData<PLVLinkMicConstant.PushResolutionRatio> pushResolutionRatioLiveData = new MutableLiveData<>();
 
     //当前连麦人数
     private MutableLiveData<Integer> curLinkMicCount = new MutableLiveData<>();
@@ -150,12 +155,24 @@ public class PLVStreamerData {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="连麦人数">
-    public void postLinkMicCount(int count){
+    public void postLinkMicCount(int count) {
         curLinkMicCount.postValue(count);
     }
 
-    public LiveData<Integer> getLinkMicCount(){
+    public LiveData<Integer> getLinkMicCount() {
         return curLinkMicCount;
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="推流画面比例">
+
+    public void postPushResolutionRatio(PLVLinkMicConstant.PushResolutionRatio pushResolutionRatio) {
+        pushResolutionRatioLiveData.postValue(pushResolutionRatio);
+    }
+
+    public LiveData<PLVLinkMicConstant.PushResolutionRatio> getPushResolutionRatio() {
+        return pushResolutionRatioLiveData;
+    }
+
+    // </editor-fold>
 }

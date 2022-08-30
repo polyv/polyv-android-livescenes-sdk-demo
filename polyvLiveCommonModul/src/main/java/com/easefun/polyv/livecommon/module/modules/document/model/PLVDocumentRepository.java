@@ -55,6 +55,8 @@ public class PLVDocumentRepository {
     private final MutableLiveData<PLVStatefulData<PLVSPPTInfo>> plvsPptInfoLiveData = new MutableLiveData<>();
     // 数据 - PPT页面列表变更
     private final MutableLiveData<PLVStatefulData<PLVSPPTJsModel>> plvsPptJsModelLiveData = new MutableLiveData<>();
+    // 数据 - 文档缩放比例变更
+    private final MutableLiveData<String> documentZoomValueLiveData = new MutableLiveData<>();
     // 事件 - PPT内容变更
     private final MutableLiveData<String> refreshPptMessageLiveData = new MutableLiveData<>();
     // 事件 - PPT页面状态变更
@@ -165,6 +167,11 @@ public class PLVDocumentRepository {
             public void getEditContent(PLVSPPTPaintStatus content) {
                 super.getEditContent(content);
                 plvsPptPaintStatusLiveData.postValue(content);
+            }
+
+            @Override
+            public void onZoomChange(String zoomValue) {
+                documentZoomValueLiveData.postValue(zoomValue);
             }
         });
     }
@@ -305,6 +312,10 @@ public class PLVDocumentRepository {
 
     public LiveData<PLVStatefulData<PLVSPPTJsModel>> getPptJsModelLiveData() {
         return plvsPptJsModelLiveData;
+    }
+
+    public LiveData<String> getDocumentZoomValueLiveData() {
+        return documentZoomValueLiveData;
     }
 
     public LiveData<PLVSPPTStatus> getPptStatusLiveData() {

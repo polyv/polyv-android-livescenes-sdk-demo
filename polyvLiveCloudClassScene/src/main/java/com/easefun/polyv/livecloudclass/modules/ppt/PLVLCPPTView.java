@@ -20,15 +20,19 @@ import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
+import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
+import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
+import com.plv.business.api.common.ppt.PLVPPTWebView;
 import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.web.PLVWebview;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 /**
@@ -107,9 +111,25 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             });
         }
         PolyvELogSender.send(PolyvPPTElog.class, PolyvPPTElog.PPTEvent.PPT_LOAD_START, "load start :");
+        registerHandler();
         //加载ppt的webView
         if (pptWebView != null) {
             pptWebView.loadWeb();//"file:///android_asset/startForMobile.html"
+        }
+    }
+
+    private void registerHandler() {
+        if (pptWebView != null) {
+            //注册一些公共的事件
+            pptWebView.registerHandler(PLVPPTWebView.V2_GET_NATIVE_APP_PARAMS_INFO, new BridgeHandler() {
+                @Override
+                public void handler(String data, CallBackFunction function) {
+                    String nativeAppPramsInfo = PLVGsonUtil.toJsonSimple(new PLVInteractNativeAppParams()
+                            .setAppId(PolyvLiveSDKClient.getInstance().getAppId())
+                            .setAppSecret(PolyvLiveSDKClient.getInstance().getAppSecret()));
+                    function.onCallBack(nativeAppPramsInfo);
+                }
+            });
         }
     }
     // </editor-fold>
@@ -210,12 +230,17 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     public IPolyvPPTView getPlaybackPPTViewToBindInPlayer() {
         return new IPolyvPPTView() {
             @Override
-            public void pptPrepare(String message) {
+            public void pptPrepare(final String message) {
                 PLVCommonLog.d(TAG, "PLVLCPPTView.pptPrepare=" + message);
                 hideLoading();
                 if (pptWebView != null) {
                     pptWebView.loadWeb();
-                    pptWebView.callPPTParams(message);
+                    pptWebView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            pptWebView.callPPTParams(message);
+                        }
+                    }, 1500);
                 }
             }
 

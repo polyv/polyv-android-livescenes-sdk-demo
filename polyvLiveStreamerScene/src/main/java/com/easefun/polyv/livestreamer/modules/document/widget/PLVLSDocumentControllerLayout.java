@@ -30,6 +30,7 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
 import com.easefun.polyv.livestreamer.modules.streamer.position.vo.PLVLSStreamerViewPositionUiState;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 
@@ -52,6 +53,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
     private ImageView documentSwitchViewPositionIv;
     private ImageView plvlsDocumentLastPageIv;
     private ImageView plvlsDocumentNextPageIv;
+    private ImageView documentResetZoomIv;
     private ImageView plvlsDocumentFullscreenIv;
     private ImageView plvlsDocumentWhiteboardAddIv;
     private PLVLSDocumentControllerExpandMenu plvlsDocumentMarkMenu;
@@ -137,6 +139,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         initPptPageSelector();
         initFullScreenOnClickListener();
         initSwitchViewPositionOnClickListener();
+        initResetZoomOnClickListener();
         initDocumentMvpView();
 
         observeBeautyLayoutStatus();
@@ -151,6 +154,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         documentSwitchViewPositionIv = findViewById(R.id.plvls_document_switch_view_position_iv);
         plvlsDocumentLastPageIv = (ImageView) rootView.findViewById(R.id.plvls_document_last_page_iv);
         plvlsDocumentNextPageIv = (ImageView) rootView.findViewById(R.id.plvls_document_next_page_iv);
+        documentResetZoomIv = findViewById(R.id.plvls_document_reset_zoom_iv);
         plvlsDocumentFullscreenIv = (ImageView) rootView.findViewById(R.id.plvls_document_fullscreen_iv);
         plvlsDocumentWhiteboardAddIv = (ImageView) rootView.findViewById(R.id.plvls_document_whiteboard_add_iv);
         plvlsDocumentMarkMenu = (PLVLSDocumentControllerExpandMenu) rootView.findViewById(R.id.plvls_document_mark_menu);
@@ -355,6 +359,15 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
         });
     }
 
+    private void initResetZoomOnClickListener() {
+        documentResetZoomIv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PLVDocumentPresenter.getInstance().resetZoom();
+            }
+        });
+    }
+
     /**
      * 初始化 MVP - View
      */
@@ -367,7 +380,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                     return;
                 }
                 int pageCount = plvspptJsModel.getPPTImages().size();
-                autoId2PageCountMap.put(plvspptJsModel.getAutoId(), pageCount);
+                autoId2PageCountMap.put(plvspptJsModel.getAutoId(), Math.max(1, pageCount));
             }
 
             //用户交互操作发送到JS时，会收到来自JS的文档变化回调
@@ -375,11 +388,12 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             public void onPptStatusChange(PLVSPPTStatus pptStatus) {
                 currentAutoId = pptStatus.getAutoId();
                 currentPageIndex = pptStatus.getPageId();
-                autoId2PageCountMap.put(currentAutoId, pptStatus.getTotal());
+                autoId2PageCountMap.put(currentAutoId, Math.max(1, pptStatus.getTotal()));
 
                 updatePageIndicator(currentAutoId, currentPageIndex);
 
                 // 更新画笔和添加白板按钮状态
+                updateAddWhiteboardVisibility();
                 boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
                 if (isWhiteBoard) {
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_active);
@@ -392,6 +406,14 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             @Override
             public void onUserPermissionChange() {
                 updatePageSelectorVisibility();
+                updateAddWhiteboardVisibility();
+                updateMarkToolVisibility();
+            }
+
+            @Override
+            public void onZoomValueChanged(String zoomValue) {
+                final int value = PLVFormatUtils.integerValueOf(zoomValue, -1);
+                documentResetZoomIv.setVisibility(value == 100 ? GONE : VISIBLE);
             }
         };
 
@@ -443,23 +465,6 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
      */
     public void show() {
         rootView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * 显示嘉宾控制器
-     */
-    public void showByGuest() {
-        isShowByGuest = true;
-        show();
-        int childCount = plvlsDocumentControllerLl.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View view = plvlsDocumentControllerLl.getChildAt(i);
-            if (view != null) {
-                view.setVisibility(GONE);
-            }
-        }
-        documentSwitchViewPositionIv.setVisibility(VISIBLE);
-        plvlsDocumentFullscreenIv.setVisibility(VISIBLE);
     }
 
     /**
@@ -601,6 +606,17 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
 
     private int getCurrentDocumentPageCount() {
         return getDocumentPageCount(currentAutoId);
+    }
+
+    private void updateAddWhiteboardVisibility() {
+        final boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
+        final boolean show = isWhiteBoard && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_WHITE_BOARD_ADD);
+        plvlsDocumentWhiteboardAddIv.setVisibility(show ? VISIBLE : GONE);
+    }
+
+    private void updateMarkToolVisibility() {
+        final boolean show = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT);
+        plvlsDocumentMarkMenu.setVisibility(show ? VISIBLE : GONE);
     }
 
     private void updateVisibility() {
