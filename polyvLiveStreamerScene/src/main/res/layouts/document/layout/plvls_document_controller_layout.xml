@@ -41,6 +41,15 @@
             android:src="@drawable/plvls_document_next_page_selector" />
 
         <ImageView
+            android:id="@+id/plvls_document_reset_zoom_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/plvls_document_reset_zoom_icon"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
             android:id="@+id/plvls_document_fullscreen_iv"
             android:layout_width="32dp"
             android:layout_height="32dp"

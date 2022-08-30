@@ -19,8 +19,8 @@ import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -45,7 +45,7 @@ public class PLVECCommodityPopupView {
     private SmoothRefreshLayout smoothRefreshLy;
     private RecyclerView commodityRv;
     private PLVECCommodityAdapter commodityAdapter;
-    private PolyvCommodityVO commodityVO;
+    private PLVCommodityVO2 commodityVO;
     private int totalCommodity;//商品总数
     private boolean isNoMoreData;//是否没有更多数据
     // </editor-fold>
@@ -239,7 +239,7 @@ public class PLVECCommodityPopupView {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 商品设置、添加数据">
-    public void setCommodityVO(PolyvCommodityVO commodityVO) {
+    public void setCommodityVO(PLVCommodityVO2 commodityVO) {
         this.commodityVO = commodityVO;
 
         List<PLVBaseViewData> viewDataList = toViewDataList(commodityVO);
@@ -266,7 +266,7 @@ public class PLVECCommodityPopupView {
         updateCountMessageView();
     }
 
-    public void addCommodityVO(PolyvCommodityVO commodityVO) {
+    public void addCommodityVO(PLVCommodityVO2 commodityVO) {
         if (commodityVO == null) {
             if (smoothRefreshLy != null) {
                 smoothRefreshLy.refreshComplete();
@@ -288,7 +288,7 @@ public class PLVECCommodityPopupView {
         updateCountMessageView();
     }
 
-    private List<PLVBaseViewData> toViewDataList(PolyvCommodityVO commodityVO) {
+    private List<PLVBaseViewData> toViewDataList(PLVCommodityVO2 commodityVO) {
         List<PLVBaseViewData> viewDataList = new ArrayList<>();
         if (commodityVO != null && commodityVO.getData() != null) {
             List<PLVProductContentBean> contentsBeanList = commodityVO.getData().getContent();

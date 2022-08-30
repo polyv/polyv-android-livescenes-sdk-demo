@@ -29,7 +29,6 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
-import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackChapterFragment;
@@ -44,6 +43,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
@@ -177,6 +177,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabTitleList = new ArrayList<>();
         pageMenuTabFragmentList = new ArrayList<>();
         pageMenuTabAdapter = new PLVViewPagerAdapter(((AppCompatActivity) getContext()).getSupportFragmentManager(), pageMenuTabFragmentList);
+        pageMenuTabViewPager.setOffscreenPageLimit(Integer.MAX_VALUE);
         pageMenuTabViewPager.setAdapter(pageMenuTabAdapter);
         PLVCommonNavigator commonNavigator = new PLVCommonNavigator(getContext());
         commonNavigator.setAdapter(new PLVCommonNavigatorAdapter() {
@@ -503,6 +504,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         qaDataBean.setUserId(liveRoomDataManager.getConfig().getUser().getViewerId());
         qaDataBean.setUserPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
         qaDataBean.setUserNick(liveRoomDataManager.getConfig().getUser().getViewerName());
+        qaDataBean.setTheme(PLVLiveClassDetailVO.DataBean.QADataBean.THEME_BLACK);
         qaDataBean.setSocketMsg();
         questionsAndAnswersFragment.init(qaDataBean.getSocketMsg());
         pageMenuTabFragmentList.add(questionsAndAnswersFragment);
@@ -648,12 +650,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (pageMenuTabAdapter.getCount() > 0) {
             pageMenuTabIndicator.setBackgroundColor(Color.parseColor("#3E3E4E"));
             findViewById(R.id.split_view).setVisibility(View.VISIBLE);
-            pageMenuTabViewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    pageMenuTabViewPager.setOffscreenPageLimit(pageMenuTabAdapter.getCount() - 1);
-                }
-            });
         }
     }
     // </editor-fold>

@@ -435,10 +435,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 loginProgressDialog.dismiss();
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
                 PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
-                if(swtichPlaybackVodlistSw.isChecked() && channelType == PLVLiveChannelType.PPT){
-                    ToastUtils.showShort(R.string.plv_scene_login_toast_cloudclass_loing_no_support_vod_playback);
-                    return;
-                }
+
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:

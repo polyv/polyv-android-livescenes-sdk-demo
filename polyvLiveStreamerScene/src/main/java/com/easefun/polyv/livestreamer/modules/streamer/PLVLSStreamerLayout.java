@@ -2,7 +2,6 @@ package com.easefun.polyv.livestreamer.modules.streamer;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -17,8 +16,6 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -52,6 +49,7 @@ import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -79,6 +77,8 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
 
     private boolean isLocalAudioMuted = false;
     private long lastNotifyLocalAudioMutedTimestamp;
+
+    private PLVUserAbilityManager.OnUserRoleChangedListener onSpeakerRoleChangedListener;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -136,12 +136,36 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
 
         streamerViewPositionManager = PLVDependManager.getInstance().get(PLVLSStreamerViewPositionManager.class);
         observeStreamerViewPositionChange();
-        observeActivityPopupViewContentChange();
 
         //启动前台服务，防止在后台被杀
         PLVForegroundService.startForegroundService(PLVLSLiveStreamerActivity.class, "POLYV开播", R.drawable.plvls_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
+
+        observeSpeakerPermissionChange();
+    }
+
+    private void observeSpeakerPermissionChange() {
+        this.onSpeakerRoleChangedListener = new PLVUserAbilityManager.OnUserRoleChangedListener() {
+            @Override
+            public void onUserRoleAdded(PLVUserRole role) {
+                if (role == PLVUserRole.STREAMER_GRANTED_SPEAKER_USER) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plvls_member_speaker_permission_already_grant)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onUserRoleRemoved(PLVUserRole role) {
+                if (role == PLVUserRole.STREAMER_GRANTED_SPEAKER_USER) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plvls_member_speaker_permission_already_remove)
+                            .show();
+                }
+            }
+        };
+        PLVUserAbilityManager.myAbility().addUserRoleChangeListener(new WeakReference<>(onSpeakerRoleChangedListener));
     }
 
     private void observeStreamerViewPositionChange() {
@@ -161,30 +185,6 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                 });
     }
 
-    private void observeActivityPopupViewContentChange() {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                final View popupView = ((Activity) getContext()).findViewById(R.id.plvls_live_room_popup_container);
-                if (!(popupView instanceof ViewGroup)) {
-                    return;
-                }
-                ((ViewGroup) popupView).setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
-                    @Override
-                    public void onChildViewAdded(View parent, View child) {
-
-                    }
-
-                    @Override
-                    public void onChildViewRemoved(View parent, View child) {
-                        if (parent instanceof ViewGroup && ((ViewGroup) parent).getChildCount() == 0) {
-                            streamerAdapter.updateAllItem();
-                        }
-                    }
-                });
-            }
-        });
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLSStreamerLayout定义的方法">

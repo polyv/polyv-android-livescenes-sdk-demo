@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.scenes;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
+
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.content.DialogInterface;
@@ -66,8 +68,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.io.File;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
 
 /**
  * date: 2020/10/12
@@ -425,14 +425,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout = (IPLVLCMediaLayout) videoLyViewStub.inflate();
             mediaLayout.init(liveRoomDataManager);
             mediaLayout.setPPTView(floatingPPTLayout.getPPTView().getPlaybackPPTViewToBindInPlayer());
-            String vid = liveRoomDataManager.getConfig().getVid();
-            if (!TextUtils.isEmpty(vid)) {
-                // 已填写vid，使用指定的视频播放
-                mediaLayout.startPlay();
-            } else {
-                // 未填写vid，后台配置了使用直播暂存，使用直播暂存播放
-                startPlaybackOnHasRecordFile();
-            }
+            mediaLayout.startPlay();
         }
 
         // 弹窗布局(包括积分打赏、互动应用)

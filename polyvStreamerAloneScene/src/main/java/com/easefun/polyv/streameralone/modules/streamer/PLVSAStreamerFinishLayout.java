@@ -145,28 +145,34 @@ public class PLVSAStreamerFinishLayout extends FrameLayout {
         calendar.setTime(new Date());
         int endMinute = calendar.get(Calendar.MINUTE);
         int endHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int endSecond = calendar.get(Calendar.SECOND);
         calendar.add(Calendar.SECOND, -secondsSinceStartTiming);
         int startMinute = calendar.get(Calendar.MINUTE);
         int startHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int startSecond = calendar.get(Calendar.SECOND);
 
         String startHourStr = String.format(Locale.getDefault(), "%02d", startHour);
         String startMinuteStr = String.format(Locale.getDefault(), "%02d", startMinute);
+        String startSecondStr = String.format(Locale.getDefault(), "%02d", startSecond);
         String endHourStr = String.format(Locale.getDefault(), "%02d", endHour);
         String endMinuteStr = String.format(Locale.getDefault(), "%02d", endMinute);
+        String endSecondStr = String.format(Locale.getDefault(), "%02d", endSecond);
 
-        final String startEndText = startHourStr + ":" + startMinuteStr + "～" + endHourStr + ":" + endMinuteStr;
+        final String startEndText = startHourStr + ":" + startMinuteStr + ":" + startSecondStr + "～" + endHourStr + ":" + endMinuteStr + ":" + endSecondStr;
 
         plvsaStreamerFinishStartEndTimeTv.setText(startEndText);
     }
 
     private void initStreamTime() {
+        int seconds = secondsSinceStartTiming % 60;
         int minutes = (secondsSinceStartTiming % (60 * 60)) / 60;
         int hours = (secondsSinceStartTiming % (60 * 60 * 24)) / (60 * 60);
 
+        String secondString = String.format(Locale.getDefault(), "%02d", seconds);
         String minuteString = String.format(Locale.getDefault(), "%02d", minutes);
         String hourString = String.format(Locale.getDefault(), "%02d", hours);
 
-        final String timingText = hourString + ":" + minuteString;
+        final String timingText = hourString + ":" + minuteString + ":" + secondString;
 
         plvsaStreamerFinishStreamTimeTv.setText(timingText);
     }

@@ -123,6 +123,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         String actor = itemDataBean.getActor();
         String status = itemDataBean.getStatus();
 
+        holder.onBindLinkMicItem(itemDataBean);
+
         //昵称
         StringBuilder nickString = new StringBuilder();
         if (!TextUtils.isEmpty(actor)) {
@@ -260,6 +262,23 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     }
 
     @Override
+    public void onViewRecycled(@NonNull StreamerItemViewHolder holder) {
+        super.onViewRecycled(holder);
+
+        // 视频渲染视图回收条件
+        // 1.渲染视图非空
+        // 2.非本地的渲染视图：如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
+        // 3.非已切换到主屏的渲染视图：主屏一直显示在画面上，不要销毁以保持显示
+        if (holder.renderView != null && holder.renderView != localRenderView && !holder.streamerItemSwitchAnchorLayout.isViewSwitched()) {
+            holder.isViewRecycled = true;
+            holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
+            adapterCallback.releaseLinkMicRenderView(holder.renderView);
+            holder.renderView = null;
+        }
+        PLVCommonLog.d(TAG, "onViewRecycled pos=" + holder.getAdapterPosition() + " holder=" + holder.toString());
+    }
+
+    @Override
     public int getItemCount() {
         return dataList == null ? 0 : dataList.size();
     }
@@ -337,6 +356,17 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 holder.plvlsPlaceholderView.setVisibility(View.VISIBLE);
             } else {
                 holder.plvlsPlaceholderView.setVisibility(View.INVISIBLE);
+
+                // 摄像头开启后需要重新配置，以免出现黑屏
+                if (adapterCallback != null) {
+                    if (holder.renderView != null) {
+                        adapterCallback.releaseLinkMicRenderView(holder.renderView);
+                        holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
+                    }
+                    holder.renderView = adapterCallback.createLinkMicRenderView();
+                    holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    adapterCallback.setupRenderView(holder.renderView, linkMicId);
+                }
             }
         }
     }
@@ -359,8 +389,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     private void updatePermissionChange(StreamerItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean){
         if(!itemDataBean.isTeacher()) {
-            holder.plvlsStreamerSpeakerPermissionStatusIv.setVisibility(
-                    itemDataBean.isHasSpeaker() ? View.VISIBLE : View.GONE);
+            holder.plvlsStreamerSpeakerPermissionStatusIv.setVisibility(itemDataBean.isHasSpeaker() ? View.VISIBLE : View.GONE);
         } else {
             //讲师不需要显示主讲状态
             holder.plvlsStreamerSpeakerPermissionStatusIv.setVisibility(View.GONE);
@@ -386,7 +415,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - LinkMicItemViewHolder定义">
-    static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
+    class StreamerItemViewHolder extends RecyclerView.ViewHolder {
         private PLVSwitchViewAnchorLayout streamerItemSwitchAnchorLayout;
         private PLVRoundRectLayout plvlsStreamerRoundRectLy;
         private FrameLayout plvlsStreamerRenderViewContainer;
@@ -399,6 +428,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private TextView plvsStreamerGuestLinkStatusTv;
         private ImageView plvlsStreamerSpeakerPermissionStatusIv;
         private View plvlsPlaceholderView;
+
+        private PLVLinkMicItemDataBean linkMicItemDataBean;
+
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
 
@@ -419,11 +451,16 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             observeSwitchPositionToUpdateViewSize();
         }
 
+        private void onBindLinkMicItem(PLVLinkMicItemDataBean itemDataBean) {
+            this.linkMicItemDataBean = itemDataBean;
+        }
+
         private void observeSwitchPositionToUpdateViewSize() {
             streamerItemSwitchAnchorLayout.setOnSwitchListener(new PLVSwitchViewAnchorLayout.IPLVSwitchViewAnchorLayoutListener() {
                 @Override
                 protected void onSwitchElsewhereAfter() {
                     updateViewSize();
+                    rebindItemIfRecycled();
                 }
 
                 @Override
@@ -442,6 +479,12 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     final ViewGroup.LayoutParams lp = child.getLayoutParams();
                     lp.height = 0;
                     child.setLayoutParams(lp);
+                }
+
+                private void rebindItemIfRecycled() {
+                    if (isViewRecycled && linkMicItemDataBean != null && dataList.contains(linkMicItemDataBean)) {
+                        onBindViewHolder(StreamerItemViewHolder.this, dataList.indexOf(linkMicItemDataBean));
+                    }
                 }
             });
         }

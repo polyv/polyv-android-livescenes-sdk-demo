@@ -120,7 +120,7 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
 
         flickObjectAnimation2 = ObjectAnimator.ofFloat(mainView, "alpha", 1F, minAlpha);
         flickObjectAnimation2.setDuration(tweenTime);
-        flickObjectAnimation2.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+
         flickObjectAnimation2.setInterpolator(new LinearInterpolator());
         flickObjectAnimation2.addListener(new Animator.AnimatorListener() {
             @Override
@@ -130,6 +130,7 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (animationStatus == STARTED) {
+                    flickObjectAnimation2.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
                     flickObjectAnimation1.start();
                 }
             }

@@ -68,6 +68,11 @@ public abstract class PLVAbsDocumentView implements IPLVDocumentContract.View {
     }
 
     @Override
+    public void onZoomValueChanged(String zoomValue) {
+
+    }
+
+    @Override
     public boolean requestSelectUploadFileConvertType(Uri fileUri) {
         // Not implemented.
         return false;

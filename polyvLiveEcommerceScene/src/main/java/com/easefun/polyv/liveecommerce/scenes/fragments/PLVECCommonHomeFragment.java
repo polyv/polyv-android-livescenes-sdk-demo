@@ -25,7 +25,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -122,7 +122,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     //处理获取到的商品数据
-    protected void acceptCommodityVO(PolyvCommodityVO commodityVO, boolean isAddOrSet) {
+    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
     }
 
     //处理获取到的聊天回放开关
@@ -311,9 +311,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     private void observeCommodityVO() {
         //当前页面 监听 直播间数据管理器对象中的直播商品数据变化
-        liveRoomDataManager.getCommodityVO().observe(this, new Observer<PLVStatefulData<PolyvCommodityVO>>() {
+        liveRoomDataManager.getCommodityVO().observe(this, new Observer<PLVStatefulData<PLVCommodityVO2>>() {
             @Override
-            public void onChanged(@Nullable PLVStatefulData<PolyvCommodityVO> commodityVO) {
+            public void onChanged(@Nullable PLVStatefulData<PLVCommodityVO2> commodityVO) {
                 if (commodityVO != null && commodityVO.isSuccess()) {
                     boolean isAddOrSet = liveRoomDataManager.getCommodityRank() <= -1;
                     acceptCommodityVO(commodityVO.getData(), !isAddOrSet);

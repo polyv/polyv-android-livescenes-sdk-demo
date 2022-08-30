@@ -126,7 +126,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
         final float endX = isAlwaysShowWhenRun ? 0 : -secondView.getWidth();
         secondAnimator = ObjectAnimator.ofFloat(secondView, "translationX", startX, endX);
         secondAnimator.setDuration(duration);
-        secondAnimator.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+
         secondAnimator.setInterpolator(new LinearInterpolator());
         secondAnimator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -140,6 +140,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
                 secondView.setAlpha(0F);
                 if (animationStatus == STARTED
                         || (mainAnimator != null && mainAnimator.isStarted())) {
+                    secondAnimator.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
                     animation.start();
                 }
             }

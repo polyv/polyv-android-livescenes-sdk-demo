@@ -22,6 +22,10 @@ import com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -55,6 +59,8 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     private boolean isGuest = false;
     //是否只显示音频连麦
     private boolean isOnlyShowAudioUI = false;
+    // 是否允许嘉宾相互移交主讲权限
+    private boolean allowGuestTransferSpeaker;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -65,6 +71,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public PLVLSMemberAdapter(IPLVLiveRoomDataManager liveRoomDataManager) {
         isGuestAutoLinkMic = liveRoomDataManager.getConfig().isAutoLinkToGuest();
         isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
+        allowGuestTransferSpeaker = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_GUEST_TRANSFER_SPEAKER_ENABLE);
     }
     // </editor-fold>
 
@@ -199,7 +206,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             holder.showSwipeMenuInFirstOpenMemberLayout();
         }
         //设置是否只显示音频连麦
-        if(isOnlyShowAudioUI) {
+        if (isOnlyShowAudioUI) {
             holder.plvlsMemberCamIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
             holder.plvlsMemberCamFrontIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
         }
@@ -443,7 +450,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         notifyDataSetChanged();
     }
 
-    public void setOnlyShowAudioUI(boolean isOnlyAudio){
+    public void setOnlyShowAudioUI(boolean isOnlyAudio) {
         this.isOnlyShowAudioUI = isOnlyAudio;
         notifyDataSetChanged();
     }
@@ -451,13 +458,16 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
 
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
     private void updatePermissionStatus(MemberViewHolder holder, PLVLinkMicItemDataBean linkMicItemDataBean) {
-        if(isGuest){
-            //嘉宾无法控制授权
+        final boolean canControlSpeaker = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_MEMBER_CONTROL_SPEAKER_PERMISSION);
+        final boolean canTransferSpeaker = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_MEMBER_TRANSFER_SPEAKER_PERMISSION);
+        if (!canControlSpeaker && !canTransferSpeaker) {
             holder.plvlsMemberGrantSpeakerIv.setVisibility(View.GONE);
             return;
         }
-        if(linkMicItemDataBean != null && linkMicItemDataBean.isGuest()){
-            if(linkMicItemDataBean.isRtcJoinStatus()){
+        if (linkMicItemDataBean != null
+                && linkMicItemDataBean.isGuest()
+                && linkMicItemDataBean.isRtcJoinStatus()) {
+            if (canControlSpeaker || allowGuestTransferSpeaker) {
                 holder.plvlsMemberGrantSpeakerIv.setVisibility(View.VISIBLE);
             } else {
                 holder.plvlsMemberGrantSpeakerIv.setVisibility(View.GONE);
@@ -609,7 +619,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     if (pos < 0) {
                         return;
                     }
-                    if(PLVDebounceClicker.tryClick(this, 1000)) {
+                    if (PLVDebounceClicker.tryClick(this, 1000)) {
                         if (onViewActionListener != null) {
                             String userId = dataList.get(pos).getSocketUserBean().getUserId();
                             onViewActionListener.onGrantSpeakerPermission(pos, userId, !v.isSelected());

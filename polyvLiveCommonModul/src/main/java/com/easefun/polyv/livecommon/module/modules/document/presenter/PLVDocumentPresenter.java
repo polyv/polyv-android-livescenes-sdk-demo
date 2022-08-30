@@ -27,6 +27,8 @@ import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.document.PLVDocumentWebProcessor;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVMessageBaseEvent;
@@ -105,6 +107,8 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     @Nullable
     private PLVUserAbilityManager.OnUserAbilityChangedListener onUserAbilityChangeCallback;
+    @Nullable
+    private PLVUserAbilityManager.OnUserRoleChangedListener onUserRoleChangedListener;
 
     /**
      * 标志位 是否正在推流
@@ -126,12 +130,14 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         isGuest = liveRoomDataManager.getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST);
         initRepository(liveRoomDataManager, documentWebProcessor);
         initOnUserAbilityChangeListener();
+        initOnUserRoleChangeListener();
         initSocketListener();
 
         observeRefreshPptMessage(lifecycleOwner);
         observePptJsModel(lifecycleOwner);
         observePptStatus(lifecycleOwner);
         observePptPaintStatus(lifecycleOwner);
+        observeDocumentZoomValueChanged(lifecycleOwner);
 
         observeOnSliceStartEvent();
 
@@ -155,7 +161,7 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         userBean.setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
 
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETUSER, PLVGsonUtil.toJson(userBean));
-        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"speaker\"}");
+        updateDocumentPermission();
         if (!isGuest) {
             plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":0,\"isCamClosed\":0}");
         }
@@ -177,9 +183,30 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
                         view.onUserPermissionChange();
                     }
                 }
+
+                final boolean hasPaintPermission = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT);
+                enableMarkTool(hasPaintPermission);
             }
         };
-        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
+    }
+
+    /**
+     * 初始化用户角色变化监听
+     */
+    private void initOnUserRoleChangeListener() {
+        this.onUserRoleChangedListener = new PLVUserAbilityManager.OnUserRoleChangedListener() {
+            @Override
+            public void onUserRoleAdded(PLVUserRole role) {
+                updateDocumentPermission();
+            }
+
+            @Override
+            public void onUserRoleRemoved(PLVUserRole role) {
+                updateDocumentPermission();
+            }
+        };
+        PLVUserAbilityManager.myAbility().addUserRoleChangeListener(new WeakReference<>(onUserRoleChangedListener));
     }
 
     /**
@@ -292,6 +319,26 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     }
 
     /**
+     * 监听文档缩放比例变更
+     */
+    private void observeDocumentZoomValueChanged(LifecycleOwner lifecycleOwner) {
+        plvDocumentRepository.getDocumentZoomValueLiveData().observe(lifecycleOwner, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String value) {
+                if (value == null) {
+                    return;
+                }
+                for (WeakReference<IPLVDocumentContract.View> viewWeakReference : viewWeakReferenceList) {
+                    IPLVDocumentContract.View view = viewWeakReference.get();
+                    if (view != null) {
+                        view.onZoomValueChanged(value);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * 监听sliceStart事件，开播时触发，发送到webview
      * 会清空屏幕上的画笔数据
      */
@@ -339,7 +386,8 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
-        if (enable) {
+        final boolean hasPaintPermission = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT);
+        if (enable && hasPaintPermission) {
             plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETPAINTSTATUS, "{\"status\":\"open\"}");
         } else {
             plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.SETPAINTSTATUS, "{\"status\":\"close\"}");
@@ -376,12 +424,18 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_SWITCH_PPT_WHITEBOARD)) {
+            return;
+        }
         changeWhiteBoardPage(0);
     }
 
     @Override
     public void changeWhiteBoardPage(int pageId) {
         if (!checkInitialized()) {
+            return;
+        }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_TURN_PAGE)) {
             return;
         }
         PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(AUTO_ID_WHITE_BOARD, pageId);
@@ -391,6 +445,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
     @Override
     public void changePpt(int autoId) {
         if (!checkInitialized()) {
+            return;
+        }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_OPEN_PPT)) {
             return;
         }
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, "{\"autoId\":" + autoId + "}");
@@ -403,6 +460,9 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_TURN_PAGE)) {
+            return;
+        }
         PLVSChangePPTInfo changePptInfo = new PLVSChangePPTInfo(autoId, pageId);
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPT, PLVGsonUtil.toJson(changePptInfo));
     }
@@ -412,12 +472,18 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         if (!checkInitialized()) {
             return;
         }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_TURN_PAGE)) {
+            return;
+        }
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoPreviousStep\"}");
     }
 
     @Override
     public void changePptToNextStep() {
         if (!checkInitialized()) {
+            return;
+        }
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_TURN_PAGE)) {
             return;
         }
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.CHANGEPPTPAGE, "{\"type\":\"gotoNextStep\"}");
@@ -430,6 +496,14 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
         }
         PLVSEditTextInfo textInfo = new PLVSEditTextInfo(content);
         plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.FILLEDITTEXT, PLVGsonUtil.toJson(textInfo));
+    }
+
+    @Override
+    public void resetZoom() {
+        if (!checkInitialized()) {
+            return;
+        }
+        plvDocumentRepository.sendWebMessage(PLVDocumentWebProcessor.TO_ZOOM_RESET, "");
     }
 
     @Override
@@ -511,14 +585,15 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
 
     @Override
     public void destroy() {
+        compositeDisposable.dispose();
+        onUserAbilityChangeCallback = null;
+        onUserRoleChangedListener = null;
         if (plvDocumentRepository != null) {
             plvDocumentRepository.destroy();
         }
         PLVDocumentNetPresenter.getInstance().destroy();
         isInitialized = false;
         viewWeakReferenceList.clear();
-        compositeDisposable.dispose();
-        onUserAbilityChangeCallback = null;
         INSTANCE = null;
     }
 
@@ -539,6 +614,21 @@ public class PLVDocumentPresenter implements IPLVDocumentContract.Presenter {
             Log.w(TAG, "Call PLVLSDocumentPresenter.init() first!");
         }
         return isInitialized;
+    }
+
+    private void updateDocumentPermission() {
+        if (plvDocumentRepository == null) {
+            return;
+        }
+        final String userType;
+        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) || PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)) {
+            userType = "speaker";
+        } else if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_PAINT_USER)) {
+            userType = "paint";
+        } else {
+            userType = "whatever";
+        }
+        plvDocumentRepository.sendWebMessage(PLVSDocumentWebProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"" + userType + "\"}");
     }
 
     // </editor-fold>

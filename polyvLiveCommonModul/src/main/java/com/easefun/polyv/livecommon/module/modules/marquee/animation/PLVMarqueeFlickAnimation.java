@@ -163,7 +163,7 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         }
         flickObjectAnimator1 = ObjectAnimator.ofFloat(mainView, "alpha", minAlpha, 1f);
         flickObjectAnimator1.setDuration(tweenTime);
-        flickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+
         flickObjectAnimator1.setInterpolator(new LinearInterpolator());
         flickObjectAnimator1.addListener(new Animator.AnimatorListener() {
             @Override
@@ -177,6 +177,7 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             public void onAnimationEnd(Animator animation) {
                 mainView.setAlpha(1);
                 if (animationStatus == STARTED) {
+                    flickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
                     flickObjectAnimator2.start();
                 }
             }
@@ -192,7 +193,7 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
 
         flickObjectAnimator2 = ObjectAnimator.ofFloat(mainView, "alpha", 1f, minAlpha);
         flickObjectAnimator2.setDuration(tweenTime);
-        flickObjectAnimator2.setStartDelay(lifeTime);
+
         flickObjectAnimator2.setInterpolator(new LinearInterpolator());
         flickObjectAnimator2.addListener(new Animator.AnimatorListener() {
             @Override
@@ -205,6 +206,7 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             public void onAnimationEnd(Animator animation) {
                 mainView.setAlpha(0);
                 if (animationStatus == STARTED) {
+                    flickObjectAnimator2.setStartDelay(lifeTime);
                     flickObjectAnimator1.start();
                 }
             }

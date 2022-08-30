@@ -103,6 +103,13 @@ public interface IPLVDocumentContract {
         void onPptPaintStatus(@Nullable PLVSPPTPaintStatus pptPaintStatus);
 
         /**
+         * 回调 文档缩放比例变化
+         *
+         * @param zoomValue 缩放比例 100 - 200
+         */
+        void onZoomValueChanged(String zoomValue);
+
+        /**
          * 上传PPT文档时选择转码类型
          *
          * @param fileUri 上传的PPT文档Uri
@@ -249,6 +256,11 @@ public interface IPLVDocumentContract {
          * @param content 文本
          */
         void changeTextContent(String content);
+
+        /**
+         * 重置文档缩放为100%
+         */
+        void resetZoom();
 
         /**
          * 请求获取所有PPT文档列表

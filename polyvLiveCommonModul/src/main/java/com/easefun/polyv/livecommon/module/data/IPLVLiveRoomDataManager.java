@@ -7,9 +7,9 @@ import android.support.annotation.NonNull;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
 
@@ -52,7 +52,7 @@ public interface IPLVLiveRoomDataManager {
     /**
      * 获取直播商品数据LiveData
      */
-    LiveData<PLVStatefulData<PolyvCommodityVO>> getCommodityVO();
+    LiveData<PLVStatefulData<PLVCommodityVO2>> getCommodityVO();
 
     /**
      * 获取直播状态LiveData

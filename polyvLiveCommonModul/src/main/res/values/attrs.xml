@@ -336,4 +336,9 @@
         <attr name="plvDrawShadow" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="PLVOrientationSensibleLinearLayout">
+        <attr name="plv_show_on_landscape" />
+        <attr name="plv_show_on_portrait" />
+    </declare-styleable>
+
 </resources>

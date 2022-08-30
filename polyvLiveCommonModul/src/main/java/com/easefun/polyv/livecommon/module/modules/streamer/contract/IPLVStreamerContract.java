@@ -309,6 +309,11 @@ public interface IPLVStreamerContract {
         void setPushPictureResolutionType(@PLVLinkMicConstant.PushPictureResolutionType int type);
 
         /**
+         * 设置推流画面比例
+         */
+        void setPushResolutionRatio(PLVLinkMicConstant.PushResolutionRatio resolutionRatio);
+
+        /**
          * 设置混流画面布局类型
          *
          * @param mixLayoutType 混流布局类型
