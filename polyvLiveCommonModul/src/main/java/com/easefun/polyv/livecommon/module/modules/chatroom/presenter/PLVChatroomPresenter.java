@@ -57,7 +57,6 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
-import com.plv.livescenes.model.PLVEmotionImageVO2;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
