@@ -437,7 +437,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     public void setHasSpeakerUser(PLVSocketUserBean user) {
         if (memberControlLayout == null) {
             memberControlLayout = new PLVSAStreamerMemberControlLayout(streamerRv.getContext());
-            memberControlLayout.init(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+            memberControlLayout.init(liveRoomDataManager);
         }
         this.memberControlLayout.setHasSpeakerUser(user);
     }
@@ -475,7 +475,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         }
                         if (memberControlLayout == null) {
                             memberControlLayout = new PLVSAStreamerMemberControlLayout(streamerRv.getContext());
-                            memberControlLayout.init(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+                            memberControlLayout.init(liveRoomDataManager);
                         }
                         memberControlLayout.setOnViewActionListener(new PLVSAStreamerMemberControlLayout.OnViewActionListener() {
                             @Override

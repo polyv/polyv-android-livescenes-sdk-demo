@@ -120,7 +120,7 @@ public class PLVPlaybackCacheVideoViewModel {
         if (playbackDataVO.getPlaybackListType() == PLVPlaybackListType.TEMP_STORE) {
             playbackCacheVideoConfig.setVideoPoolId(playbackDataVO.getFileId());
         } else {
-            playbackCacheVideoConfig.setVideoPoolId(playbackDataVO.getVideoPoolId());
+            playbackCacheVideoConfig.setVideoPoolIdByVid(playbackDataVO.getVideoPoolId());
         }
         initPlaybackCache();
     }

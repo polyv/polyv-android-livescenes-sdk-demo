@@ -56,6 +56,7 @@ import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -553,7 +554,7 @@ public class PLVLSPptListLayout extends FrameLayout {
             }
         };
 
-        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
 
     // </editor-fold>

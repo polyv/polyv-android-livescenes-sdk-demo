@@ -1,5 +1,9 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -93,10 +97,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * 互动聊天tab页
@@ -398,6 +398,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
         //打赏横幅动画特效
         polyvPointRewardEffectWidget = findViewById(R.id.plvlc_point_reward_effect);
+        polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
 
         //欢迎语
         greetingTv = findViewById(R.id.greeting_tv);
@@ -904,7 +905,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private void initPointRewardEffectQueue() {
         if (pointRewardEventProducer == null) {
             pointRewardEventProducer = new PLVPointRewardEffectQueue();
-            polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+            if (polyvPointRewardEffectWidget != null) {
+                polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+            }
         }
     }
 

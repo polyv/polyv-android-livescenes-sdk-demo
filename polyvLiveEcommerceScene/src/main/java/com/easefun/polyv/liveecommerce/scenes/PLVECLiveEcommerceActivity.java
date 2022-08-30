@@ -1,5 +1,8 @@
 package com.easefun.polyv.liveecommerce.scenes;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
@@ -65,9 +68,6 @@ import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.util.List;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
 
 /**
  * 直播带货场景下定义的 直播模式、回放模式 的 共用界面。
@@ -400,19 +400,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         });
         //当前activity 可以手势操作暂停和播放
         initGesture();
-        //判断是否有输入vid进入
-        String vid = liveRoomDataManager.getConfig().getVid();
-        if (!liveRoomDataManager.getConfig().isLive()) {
-            if (!TextUtils.isEmpty(vid)) {
-                // 已填写vid，使用指定的视频播放
-                videoLayout.startPlay();
-            } else {
-                // 未填写vid，后台配置了使用直播暂存或者列表回放
-                startPlaybackOnHasRecordFile();
-                observePreviousPage();
-            }
-        } else {
-            videoLayout.startPlay();
+
+        videoLayout.startPlay();
+
+        final String vid = liveRoomDataManager.getConfig().getVid();
+        final boolean isPlayback = !liveRoomDataManager.getConfig().isLive();
+        if (isPlayback && TextUtils.isEmpty(vid)) {
+            observePreviousPage();
         }
     }
 

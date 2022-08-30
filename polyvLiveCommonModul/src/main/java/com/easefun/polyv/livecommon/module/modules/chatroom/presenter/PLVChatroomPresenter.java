@@ -57,6 +57,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
+import com.plv.livescenes.model.PLVEmotionImageVO2;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -573,9 +574,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         chatEmotionImagesDisposable = PolyvApiManager.getPolyvApichatApi().getEmotionImages(channel, accountId, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<PLVResponseApiBean2<PLVEmotionImageVO>>() {
+                .subscribe(new Consumer<PLVResponseApiBean2<com.easefun.polyv.livescenes.model.PLVEmotionImageVO>>() {
                     @Override
-                    public void accept(PLVResponseApiBean2<PLVEmotionImageVO> polyvEmotionImageVO) throws Exception {
+                    public void accept(PLVResponseApiBean2<com.easefun.polyv.livescenes.model.PLVEmotionImageVO> polyvEmotionImageVO) throws Exception {
                         if (polyvEmotionImageVO != null && polyvEmotionImageVO.getData() != null && polyvEmotionImageVO.getData().getList() != null) {
                             List<PLVEmotionImageVO.EmotionImage> emotionImages = polyvEmotionImageVO.getData().getList();
                             chatroomData.postEmotionImages(emotionImages);

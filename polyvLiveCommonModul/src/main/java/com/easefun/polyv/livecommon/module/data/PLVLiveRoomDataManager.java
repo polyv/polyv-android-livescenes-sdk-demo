@@ -8,9 +8,9 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
@@ -37,7 +37,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     //功能开关数据
     private MutableLiveData<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchVO = new MutableLiveData<>();
     //商品数据
-    private MutableLiveData<PLVStatefulData<PolyvCommodityVO>> commodityVO = new MutableLiveData<>();
+    private MutableLiveData<PLVStatefulData<PLVCommodityVO2>> commodityVO = new MutableLiveData<>();
     //直播状态
     private MutableLiveData<PLVStatefulData<LiveStatus>> liveStatusData = new MutableLiveData<>();
     //积分打赏开关状态
@@ -97,7 +97,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     }
 
     @Override
-    public MutableLiveData<PLVStatefulData<PolyvCommodityVO>> getCommodityVO() {
+    public MutableLiveData<PLVStatefulData<PLVCommodityVO2>> getCommodityVO() {
         return commodityVO;
     }
 
@@ -269,15 +269,15 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
 
     @Override
     public void requestProductList(int rank) {
-        liveRoomDataRequester.requestProductList(rank, new PLVLiveRoomDataRequester.IPLVNetRequestListener<PolyvCommodityVO>() {
+        liveRoomDataRequester.requestProductList(rank, new PLVLiveRoomDataRequester.IPLVNetRequestListener<PLVCommodityVO2>() {
             @Override
-            public void onSuccess(PolyvCommodityVO polyvCommodityVO) {
+            public void onSuccess(PLVCommodityVO2 polyvCommodityVO) {
                 commodityVO.postValue(PLVStatefulData.success(polyvCommodityVO));
             }
 
             @Override
             public void onFailed(String msg, Throwable throwable) {
-                commodityVO.postValue(PLVStatefulData.<PolyvCommodityVO>error(msg, throwable));
+                commodityVO.postValue(PLVStatefulData.<PLVCommodityVO2>error(msg, throwable));
             }
         });
     }

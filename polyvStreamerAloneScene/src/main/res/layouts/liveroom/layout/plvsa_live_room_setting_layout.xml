@@ -29,7 +29,9 @@
         android:paddingTop="28dp"
         android:paddingRight="24dp"
         android:paddingBottom="33dp"
-        app:layout_constraintBottom_toTopOf="@+id/plvsa_setting_btn_ll">
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_setting_btn_ll"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <EditText
             android:id="@+id/plvsa_setting_live_title_tv"
@@ -93,13 +95,45 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="27dp"
-            android:layout_marginEnd="23dp"
-            android:layout_marginRight="23dp"
             android:padding="8dp"
             android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon"
             app:layout_constraintLeft_toRightOf="@+id/plvsa_setting_bitrate_iv"
+            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_push_resolution_ratio_ll"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view"
+            app:layout_goneMarginEnd="23dp" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+            android:id="@+id/plvsa_setting_push_resolution_ratio_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="27dp"
+            android:layout_marginEnd="23dp"
+            android:layout_marginRight="23dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toRightOf="@id/plvsa_setting_screen_orientation_iv"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view"
+            app:plv_show_on_landscape="true"
+            app:plv_show_on_portrait="false">
+
+            <ImageView
+                android:id="@+id/plvsa_setting_push_resolution_ratio_iv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="8dp"
+                android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon" />
+
+            <TextView
+                android:id="@+id/plvsa_setting_push_resolution_ratio_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="开播比例"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
 
         <TextView
             android:id="@+id/plvsa_setting_camera_orient_tv"
@@ -156,7 +190,9 @@
         android:layout_marginRight="24dp"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
             android:id="@+id/plvsa_setting_beauty_layout"

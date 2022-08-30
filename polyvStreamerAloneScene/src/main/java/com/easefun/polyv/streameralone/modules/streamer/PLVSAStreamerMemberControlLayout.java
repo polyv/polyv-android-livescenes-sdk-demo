@@ -16,6 +16,7 @@ import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVAutoLineLayoutManager;
@@ -26,6 +27,8 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAControlAdapter;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -69,10 +72,10 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     private int CONTROL_FULLSCREEN = 4;
 
 
-
     //data
     private String linkMicUid;
     private boolean isGuestAutoLinkMic;
+    private boolean allowGuestTransferSpeaker;
 
     private boolean isNeedPermissionDialogShow = false;
 
@@ -140,31 +143,31 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
                         onViewActionListener.onClickMic(isSelected);
                     }
                     controlAdapter.updateItemSelectStatus(position, !isSelected);
-                } else if (position == CONTROL_DOWN_LINKMIC){
+                } else if (position == CONTROL_DOWN_LINKMIC) {
                     close();
                     final int pos = position;
                     final boolean isDownLinkmic = isSelected;
                     new PLVSAConfirmDialog(view.getContext())
-                    .setTitle("确定下麦吗？")
-                    .setContentVisibility(View.GONE)
-                    .setLeftButtonText("取消")
-                    .setRightButtonText("确定")
-                    .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, View v) {
-                            dialog.dismiss();
-                            if (onViewActionListener != null) {
-                                onViewActionListener.onClickDownLinkMic();
-                            }
-                            controlAdapter.updateItemSelectStatus(pos, !isDownLinkmic);
-                        }
-                    })
-                    .show();
-                } else if(position == CONTROL_GRANT_SPEAKER){
+                            .setTitle("确定下麦吗？")
+                            .setContentVisibility(View.GONE)
+                            .setLeftButtonText("取消")
+                            .setRightButtonText("确定")
+                            .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, View v) {
+                                    dialog.dismiss();
+                                    if (onViewActionListener != null) {
+                                        onViewActionListener.onClickDownLinkMic();
+                                    }
+                                    controlAdapter.updateItemSelectStatus(pos, !isDownLinkmic);
+                                }
+                            })
+                            .show();
+                } else if (position == CONTROL_GRANT_SPEAKER) {
                     close();
                     final boolean isGrant = isSelected;
                     final int pos = position;
-                    if(!isNeedPermissionDialogShow){
+                    if (!isNeedPermissionDialogShow) {
                         String text = isGrant ? "授予主讲\n权限" : "移除主讲\n权限";
                         list.set(pos, new Pair<Integer, String>(list.get(pos).first, text));
                         if (onViewActionListener != null) {
@@ -173,10 +176,10 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
                         controlAdapter.updateItemSelectStatus(pos, !isGrant);
                         return;
                     }
-                    String title = isGrant ? "确定移除ta的":"确定授予ta" ;
-                    String content = isGrant ? "移除后主讲人的屏幕共享将会自动结束":"当前已有主讲人，确认后将替换为新的主讲人";
+                    String title = isGrant ? "确定移除ta的" : "确定授予ta";
+                    String content = isGrant ? "移除后主讲人的屏幕共享将会自动结束" : "当前已有主讲人，确认后将替换为新的主讲人";
                     new PLVSAConfirmDialog(view.getContext())
-                            .setTitle(title+"主讲权限吗？")
+                            .setTitle(title + "主讲权限吗？")
                             .setContent(content)
                             .setLeftButtonText("取消")
                             .setRightButtonText("确定")
@@ -193,7 +196,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
                                 }
                             })
                             .show();
-                } else if (position == CONTROL_FULLSCREEN){
+                } else if (position == CONTROL_FULLSCREEN) {
                     close();
                     if (onViewActionListener != null) {
                         onViewActionListener.onClickFullScreen();
@@ -212,7 +215,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if(PLVScreenUtils.isPortrait(getContext())){
+        if (PLVScreenUtils.isPortrait(getContext())) {
             controlAdapter.setItemWidth(getMeasuredWidth() / 4);
         } else {
             controlAdapter.setItemWidth(getMeasuredWidth() / 3);
@@ -223,8 +226,9 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void init(boolean isGuestAutoLinkMic) {
-        this.isGuestAutoLinkMic = isGuestAutoLinkMic;
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.isGuestAutoLinkMic = liveRoomDataManager.getConfig().isAutoLinkToGuest();
+        this.allowGuestTransferSpeaker = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_GUEST_TRANSFER_SPEAKER_ENABLE);
 
         boolean isShow = PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
         //主讲才可以操作下麦等
@@ -272,27 +276,39 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
         //昵称
         String nick = linkMicItemDataBean.getNick();
         plvsaStreamerNickTv.setText(nick);
-        //媒体状态
+
+        // 媒体状态
         controlAdapter.updateItemSelectStatus(CONTROL_CAMERA, linkMicItemDataBean.isMuteVideo());
         controlAdapter.updateItemSelectStatus(CONTROL_MIC, linkMicItemDataBean.isMuteAudio());
-        //主讲权限
-        if(PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) && linkMicItemDataBean.isGuest()){
+
+        // 主讲权限
+        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) && linkMicItemDataBean.isGuest()) {
+            // 讲师授权
             String text = !linkMicItemDataBean.isHasSpeaker() ? "授予主讲\n权限" : "移除主讲\n权限";
-            list.set(CONTROL_GRANT_SPEAKER, new Pair<Integer, String>(list.get(CONTROL_GRANT_SPEAKER).first, text));
+            list.set(CONTROL_GRANT_SPEAKER, new Pair<>(list.get(CONTROL_GRANT_SPEAKER).first, text));
             controlAdapter.updateItemSelectStatus(CONTROL_GRANT_SPEAKER, linkMicItemDataBean.isHasSpeaker());
-            if(linkMicItemDataBean.isHasSpeaker()){
-                //FIXME 屏幕共享中应该提示，目前没有状态判断
+            if (linkMicItemDataBean.isHasSpeaker()) {
+                // FIXME 屏幕共享中应该提示，目前没有状态判断
                 isNeedPermissionDialogShow = false;
             } else {
                 isNeedPermissionDialogShow = speakerUser != null;
             }
             controlAdapter.updateItemVisibility(CONTROL_GRANT_SPEAKER, true);
+        } else if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)
+                && linkMicItemDataBean.isGuest()
+                && allowGuestTransferSpeaker) {
+            // 嘉宾授权
+            String text = !linkMicItemDataBean.isHasSpeaker() ? "移交主讲\n权限" : "移除主讲\n权限";
+            list.set(CONTROL_GRANT_SPEAKER, new Pair<>(list.get(CONTROL_GRANT_SPEAKER).first, text));
+            controlAdapter.updateItemSelectStatus(CONTROL_GRANT_SPEAKER, linkMicItemDataBean.isHasSpeaker());
+            controlAdapter.updateItemVisibility(CONTROL_GRANT_SPEAKER, true);
+            isNeedPermissionDialogShow = false;
         } else {
             controlAdapter.updateItemVisibility(CONTROL_GRANT_SPEAKER, false);
         }
 
-        //下麦按钮
-        if(PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)){
+        // 下麦按钮
+        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
             if (isGuestAutoLinkMic && linkMicItemDataBean.isGuest()) {
                 controlAdapter.updateItemVisibility(CONTROL_DOWN_LINKMIC, false);
             } else {
@@ -304,7 +320,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
 
     }
 
-    public void setHasSpeakerUser(PLVSocketUserBean user){
+    public void setHasSpeakerUser(PLVSocketUserBean user) {
         this.speakerUser = user;
     }
 
@@ -326,7 +342,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
             menuSize = menuDrawer.getMenuSize();
-            if(controlAdapter.getVisibilityItem() > PLVAutoLineLayoutManager.span){
+            if (controlAdapter.getVisibilityItem() > PLVAutoLineLayoutManager.span) {
                 menuDrawer.setMenuSize((int) (menuSize * 1.3));
             }
             menuDrawer.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
@@ -358,7 +374,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
             });
             menuDrawer.openMenu();
         } else {
-            if(controlAdapter.getVisibilityItem() > PLVAutoLineLayoutManager.span){
+            if (controlAdapter.getVisibilityItem() > PLVAutoLineLayoutManager.span) {
                 menuDrawer.setMenuSize((int) (menuSize * 1.3));
             } else {
                 menuDrawer.setMenuSize(menuSize);

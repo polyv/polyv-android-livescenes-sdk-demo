@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
         android:id="@+id/plvls_document_switch_anchor_layout"
@@ -58,10 +59,28 @@
 
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvls_document_zoom_value_hint_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="2dp"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:plvGradientColors="#661B202D"
+        app:plvRadius="18dp"
+        tools:text="100%"
+        tools:visibility="visible" />
+
     <com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout
         android:id="@+id/plvls_document_controller_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </android.support.constraint.ConstraintLayout>

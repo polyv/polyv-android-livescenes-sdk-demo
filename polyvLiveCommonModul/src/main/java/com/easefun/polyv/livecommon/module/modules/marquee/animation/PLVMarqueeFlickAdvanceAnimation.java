@@ -136,7 +136,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
         isSetSecondParams = true;
         secondFlickObjectAnimator1 = ObjectAnimator.ofFloat(secondView, "alpha", 0f, 1f);
         secondFlickObjectAnimator1.setDuration(tweenTime);
-        secondFlickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+
         secondFlickObjectAnimator1.setInterpolator(new LinearInterpolator());
         secondFlickObjectAnimator1.addListener(new Animator.AnimatorListener() {
             @Override
@@ -149,6 +149,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 if (animationStatus == STARTED
                         || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
                         || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
+                    secondFlickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
                     secondFlickObjectAnimator2.start();
                 }
             }
@@ -164,7 +165,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
 
         secondFlickObjectAnimator2 = ObjectAnimator.ofFloat(secondView, "alpha", 1f, 0f);
         secondFlickObjectAnimator2.setDuration(tweenTime);
-        secondFlickObjectAnimator2.setStartDelay(lifeTime);
+
         secondFlickObjectAnimator2.setInterpolator(new LinearInterpolator());
         secondFlickObjectAnimator2.addListener(new Animator.AnimatorListener() {
             @Override
@@ -176,6 +177,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 if (animationStatus == STARTED
                         || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
                         || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
+                    secondFlickObjectAnimator2.setStartDelay(lifeTime);
                     secondFlickObjectAnimator1.start();
                 }
             }

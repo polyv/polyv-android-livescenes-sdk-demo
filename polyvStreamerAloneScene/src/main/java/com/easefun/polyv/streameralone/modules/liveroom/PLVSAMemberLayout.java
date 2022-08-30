@@ -32,6 +32,8 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -134,22 +136,26 @@ public class PLVSAMemberLayout extends FrameLayout {
 
             @Override
             public void onGrantUserSpeakerPermission(int position, final PLVSocketUserBean user, final boolean isGrant) {
-                if(streamerPresenter != null && user != null){
-                    streamerPresenter.setUserPermissionSpeaker(user.getUserId(), isGrant, new Ack() {
-                        @Override
-                        public void call(Object... objects) {
-                            String text;
-                            if(isGrant){
-                                text = user.getNick() + "成为主讲人";
-                            } else {
-                                text = user.getNick() + "的主讲权限已移除";
-                            }
-                            PLVToast.Builder.context(getContext())
-                                    .setText(text)
-                                    .show();
-                        }
-                    });
+                if (streamerPresenter == null || user == null) {
+                    return;
                 }
+                streamerPresenter.setUserPermissionSpeaker(user.getUserId(), isGrant, new Ack() {
+                    @Override
+                    public void call(Object... objects) {
+                        final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
+                        final String text;
+                        if (!isGrant) {
+                            text = "已收回主讲权限";
+                        } else if (isGuestTransferPermission) {
+                            text = "已移交主讲权限";
+                        } else {
+                            text = "已授予主讲权限";
+                        }
+                        PLVToast.Builder.context(getContext())
+                                .setText(text)
+                                .show();
+                    }
+                });
             }
         });
         plvsaMemberListRv.setAdapter(memberAdapter);

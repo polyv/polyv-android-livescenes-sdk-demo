@@ -1,14 +1,10 @@
 package com.easefun.polyv.livecommon.module.data;
 
-import android.support.v4.util.ArrayMap;
-
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatApiRequestHelper;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.easefun.polyv.livescenes.model.PolyvLiveStatusVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.easefun.polyv.livescenes.net.PolyvApiManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.net.PLVResponseBean;
@@ -16,19 +12,18 @@ import com.plv.foundationsdk.net.PLVResponseExcutor;
 import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
-import com.plv.foundationsdk.sign.PLVSignCreator;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.api.PLVHCApiManager;
 import com.plv.livescenes.hiclass.vo.PLVHCLessonDetailVO;
+import com.plv.livescenes.model.PLVIncreasePageViewerVO;
+import com.plv.livescenes.model.PLVLiveStatusVO2;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.net.PLVApiManager;
 import com.plv.socket.user.PLVSocketUserConstant;
-import com.plv.thirdpart.blankj.utilcode.util.EncryptUtils;
 
 import org.json.JSONObject;
-
-import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -90,19 +85,14 @@ public class PLVLiveRoomDataRequester {
         String channelId = getConfig().getChannelId();
         int times = 1;
         long ts = System.currentTimeMillis();
-        Map<String, String> paramMap = new ArrayMap<>();
-        paramMap.put("channelId", channelId);
-        paramMap.put("appId", appId);
-        paramMap.put("timestamp", String.valueOf(ts));
-        paramMap.put("times", String.valueOf(times));
-        String sign = PLVSignCreator.createSign(appSecret, paramMap);
-        pageViewerDisposable = PLVResponseExcutor.excuteDataBean(
-                PolyvApiManager.getPolyvLiveStatusApi().increasePageViewer(PLVFormatUtils.parseInt(channelId), appId, ts, sign, PLVSignCreator.getSignatureMethod(), times),
-                Integer.class, new PLVrResponseCallback<Integer>() {
+        pageViewerDisposable = PLVResponseExcutor.excuteUndefinData(
+                PolyvApiManager.getPolyvLiveStatusApi()
+                        .increasePageViewer2(PLVFormatUtils.parseInt(channelId), appId, ts, appSecret, times)
+                , new PLVrResponseCallback<PLVIncreasePageViewerVO>() {
                     @Override
-                    public void onSuccess(Integer integer) {
+                    public void onSuccess(PLVIncreasePageViewerVO vo) {
                         if (listener != null) {
-                            listener.onSuccess(integer);
+                            listener.onSuccess(vo.getData());
                         }
                     }
 
@@ -115,7 +105,7 @@ public class PLVLiveRoomDataRequester {
                     }
 
                     @Override
-                    public void onFailure(PLVResponseBean<Integer> PLVResponseBean) {
+                    public void onFailure(PLVResponseBean<PLVIncreasePageViewerVO> PLVResponseBean) {
                         super.onFailure(PLVResponseBean);
                         if (listener != null) {
                             String errorMsg = responseBean.toString();
@@ -202,11 +192,11 @@ public class PLVLiveRoomDataRequester {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="商品信息 - 请求、取消">
-    void requestProductList(final IPLVNetRequestListener<PolyvCommodityVO> listener) {
+    void requestProductList(final IPLVNetRequestListener<PLVCommodityVO2> listener) {
         requestProductList(-1, listener);
     }
 
-    void requestProductList(int rank, final IPLVNetRequestListener<PolyvCommodityVO> listener) {
+    void requestProductList(int rank, final IPLVNetRequestListener<PLVCommodityVO2> listener) {
         this.commodityRank = rank;
         disposeProductList();
         String channelId = getConfig().getChannelId();
@@ -214,26 +204,19 @@ public class PLVLiveRoomDataRequester {
         String appSecret = getConfig().getAccount().getAppSecret();
         long timestamp = System.currentTimeMillis();
         int count = GET_COMMODITY_COUNT;
-        Map<String, String> map = new ArrayMap<>();
-        map.put("appId", appId);
-        map.put("timestamp", timestamp + "");
-        map.put("channelId", channelId);
-        map.put("count", count + "");
+        Observable<PLVCommodityVO2> commodityVOObservable;
         if (rank > -1) {
-            map.put("rank", rank + "");
-        }
-        String sign = PLVSignCreator.createSign(appSecret, map);
-        Observable<PolyvCommodityVO> commodityVOObservable;
-        if (rank > -1) {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, rank, sign, PLVSignCreator.getSignatureMethod());
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi()
+                    .getProductList2(channelId, appId, timestamp, count, rank, appSecret);
         } else {
-            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi().getProductList(channelId, appId, timestamp, count, sign, PLVSignCreator.getSignatureMethod());
+            commodityVOObservable = PolyvApiManager.getPolyvLiveStatusApi()
+                    .getProductList2(channelId, appId, timestamp, count, appSecret);
         }
         productListDisposable = commodityVOObservable.retryWhen(new PLVRxBaseRetryFunction(3, 3000))
-                .compose(new PLVRxBaseTransformer<PolyvCommodityVO, PolyvCommodityVO>())
-                .subscribe(new Consumer<PolyvCommodityVO>() {
+                .compose(new PLVRxBaseTransformer<PLVCommodityVO2, PLVCommodityVO2>())
+                .subscribe(new Consumer<PLVCommodityVO2>() {
                     @Override
-                    public void accept(PolyvCommodityVO polyvCommodityVO) throws Exception {
+                    public void accept(PLVCommodityVO2 polyvCommodityVO) throws Exception {
                         if (listener != null) {
                             listener.onSuccess(polyvCommodityVO);
                         }
@@ -263,10 +246,14 @@ public class PLVLiveRoomDataRequester {
     void requestLiveStatus(final IPLVNetRequestListener<PLVLiveRoomDataManager.LiveStatus> listener) {
         disposeGetLiveStatus();
         String channelId = getConfig().getChannelId();
-        getLiveStatusDisposable = PLVResponseExcutor.excuteUndefinData(PolyvApiManager.getPolyvLiveStatusApi().getLiveStatusJson2(channelId),
-                new PLVrResponseCallback<PolyvLiveStatusVO>() {
+        String appId = getConfig().getAccount().getAppId();
+        String appSecret = getConfig().getAccount().getAppSecret();
+        long timestamp = System.currentTimeMillis();
+        getLiveStatusDisposable = PLVResponseExcutor.excuteUndefinData(PolyvApiManager.getPolyvLiveStatusApi()
+                        .getLiveStatusJson3(channelId, timestamp + "", appId, appSecret)
+                , new PLVrResponseCallback<PLVLiveStatusVO2>() {
                     @Override
-                    public void onSuccess(PolyvLiveStatusVO statusVO) {
+                    public void onSuccess(PLVLiveStatusVO2 statusVO) {
                         if (statusVO != null && statusVO.getCode() == PLVResponseExcutor.CODE_SUCCESS) {
                             PLVLiveRoomDataManager.LiveStatus liveStatus = null;
                             String var = statusVO.getData().split(",")[0];
@@ -292,7 +279,7 @@ public class PLVLiveRoomDataRequester {
                     }
 
                     @Override
-                    public void onFailure(PLVResponseBean<PolyvLiveStatusVO> polyvResponseBean) {
+                    public void onFailure(PLVResponseBean<PLVLiveStatusVO2> polyvResponseBean) {
                         super.onFailure(polyvResponseBean);
                         if (listener != null) {
                             String errorMsg = responseBean.toString();
@@ -320,8 +307,9 @@ public class PLVLiveRoomDataRequester {
         String channelId = getConfig().getChannelId();
         final String channelName = getConfig().getChannelName();
         long ptime = System.currentTimeMillis();
-        String sign = EncryptUtils.encryptMD5ToString("APPCHANNELSET" + "channelId=" + channelId + "name=" + channelName + "APPCHANNELSET").toUpperCase();
-        updateChannelNameDisposable = PolyvApiManager.getPolyvLiveStatusApi().updateChannelName(channelId, ptime, channelName, sign)
+        String appId = PolyvLiveSDKClient.getInstance().getAppId();
+        String appSecret = PolyvLiveSDKClient.getInstance().getAppSecret();
+        updateChannelNameDisposable = PolyvApiManager.getPolyvLiveStatusApi().updateChannelSetting(channelId, ptime, appId, channelName, appSecret)
                 .compose(new PLVRxBaseTransformer<ResponseBody, ResponseBody>())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
@@ -335,7 +323,7 @@ public class PLVLiveRoomDataRequester {
                             }
                         } else {
                             if (listener != null) {
-                                String errorMsg = jsonObject.optString("msg");
+                                String errorMsg = jsonObject.optString("message");
                                 listener.onFailed(errorMsg, new Throwable(errorMsg));
                             }
                         }

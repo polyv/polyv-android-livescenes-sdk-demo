@@ -25,8 +25,10 @@ import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumen
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
+import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebView;
@@ -45,7 +47,9 @@ import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 文档布局
@@ -61,6 +65,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
     private PLVLSDocumentControllerLayout plvlsDocumentControllerLayout;
     private FrameLayout plvlsDocumentNoSelectPptLayout;
     private PLVPlaceHolderView plvlsPlaceHolderView;
+    private PLVRoundRectGradientTextView documentZoomValueHintTv;
 
     // 标注工具文本输入模式 输入弹窗
     private PLVLSDocumentInputWidget plvlsDocumentInputWidget;
@@ -131,6 +136,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         plvlsDocumentControllerLayout = (PLVLSDocumentControllerLayout) rootView.findViewById(R.id.plvls_document_controller_layout);
         plvlsDocumentNoSelectPptLayout = (FrameLayout) rootView.findViewById(R.id.plvls_document_no_select_ppt_layout);
         plvlsPlaceHolderView = rootView.findViewById(R.id.plvls_document_placeholder_view);
+        documentZoomValueHintTv = findViewById(R.id.plvls_document_zoom_value_hint_tv);
     }
 
     /**
@@ -204,6 +210,12 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
                 parent.addView(plvlsDocumentInputWidget, layoutParams);
                 plvlsDocumentInputWidget.setText(pptPaintStatus);
             }
+
+            @Override
+            public void onZoomValueChanged(String zoomValue) {
+                documentZoomValueHintTv.setText(zoomValue + "%");
+                PLVViewUtil.showViewForDuration(documentZoomValueHintTv, TimeUnit.SECONDS.toMillis(3));
+            }
         };
 
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
@@ -222,10 +234,17 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
                         PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
                     }
                 }
+                updateDocumentConsumeTouchEvent();
+            }
+
+            private void updateDocumentConsumeTouchEvent() {
+                if (plvlsDocumentWebView != null) {
+                    plvlsDocumentWebView.setNeedGestureAction(PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT));
+                }
             }
         };
 
-        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
 
     // </editor-fold>
@@ -244,7 +263,6 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
             plvlsPlaceHolderView.setPlaceHolderText(getContext().getString(R.string.document_no_live_please_wait));
             plvlsPlaceHolderView.enableRespondLocationSensor(false);
             plvlsPlaceHolderView.setVisibility(VISIBLE);
-            plvlsDocumentWebView.setNeedGestureAction(false);
         }
 
         // 进入时默认是白板状态
@@ -275,11 +293,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         // 初次进入初始化标注工具类型和颜色
         plvlsDocumentControllerLayout.initMarkToolAndColor();
         // 初次进入显示控制栏
-        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())){
-            plvlsDocumentControllerLayout.showByGuest();
-        }else {
-            plvlsDocumentControllerLayout.show();
-        }
+        plvlsDocumentControllerLayout.show();
 
         plvlsDocumentControllerLayout.setOnChangeColorListener(new PLVLSDocumentControllerLayout.OnChangeColorListener() {
             @Override

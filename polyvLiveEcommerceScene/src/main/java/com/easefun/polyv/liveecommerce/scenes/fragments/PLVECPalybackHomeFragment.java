@@ -47,9 +47,9 @@ import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVEC
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
@@ -257,7 +257,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
-    protected void acceptCommodityVO(PolyvCommodityVO commodityVO, boolean isAddOrSet) {
+    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
         if (isAddOrSet) {
             commodityPopupView.addCommodityVO(commodityVO);
         } else {
