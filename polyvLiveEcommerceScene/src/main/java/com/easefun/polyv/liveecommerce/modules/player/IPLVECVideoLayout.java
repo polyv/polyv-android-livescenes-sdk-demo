@@ -278,6 +278,11 @@ public interface IPLVECVideoLayout {
         void onCloseFloatingAction();
 
         /**
+         * 显示更多布局
+         */
+        void onShowMoreLayoutAction();
+
+        /**
          * 无延迟观看回调
          *
          * @param isLowLatency 是否正在无延迟观看

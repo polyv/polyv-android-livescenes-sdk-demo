@@ -67,6 +67,13 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
+    <!--播放失败/加载缓慢显示的view-->
+    <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView
+        android:id="@+id/plvec_play_error_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <!--视频暂停和继续播放的按钮 -->
     <ImageView
         android:id="@+id/play_center"

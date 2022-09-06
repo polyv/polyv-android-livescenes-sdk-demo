@@ -169,6 +169,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     }
 
+    public void showMorePopupWindow() {
+
+    }
+
     /**
      * 回放视频准备完成
      *

@@ -11,10 +11,10 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveChannelVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
-import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.business.api.common.player.PLVPlayerConstant;
@@ -61,6 +61,11 @@ public interface IPLVLivePlayerContract {
         View getNoStreamIndicator();
 
         /**
+         * 获取播放失败/加载缓慢显示的视图
+         */
+        View getPlayErrorIndicator();
+
+        /**
          * 获取logo
          */
         PLVPlayerLogoView getLogo();
@@ -99,15 +104,17 @@ public interface IPLVLivePlayerContract {
 
         /**
          * 子播放器倒数回调
+         *
          * @param isOpenAdHead
          * @param totalTime
          * @param remainTime
          * @param adStage
          */
-        void onSubVideoViewCountDown(boolean isOpenAdHead,int totalTime, int remainTime, int adStage);
+        void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage);
 
         /**
          * 子播放器是否可见回调
+         *
          * @param isOpenAdHead
          * @param isShow
          */
@@ -120,6 +127,14 @@ public interface IPLVLivePlayerContract {
          * @param tips  错误提示
          */
         void onPlayError(PolyvPlayError error, String tips);
+
+        /**
+         * 视频加载缓慢
+         *
+         * @param loadedTime    当前已加载的时间
+         * @param isBufferEvent 是否是缓冲事件导致的加载缓慢，true：是，false：是播放前加载缓慢导致
+         */
+        void onLoadSlow(int loadedTime, boolean isBufferEvent);
 
         /**
          * 暂无直播回调
@@ -175,6 +190,7 @@ public interface IPLVLivePlayerContract {
 
         /**
          * 更新播放信息
+         *
          * @param playInfoVO
          */
         void updatePlayInfo(PLVPlayInfoVO playInfoVO);
@@ -288,6 +304,7 @@ public interface IPLVLivePlayerContract {
 
         /**
          * 辅助视频是否正在显示（包括暖场视频和片头广告）
+         *
          * @return
          */
         boolean isSubVideoViewShow();

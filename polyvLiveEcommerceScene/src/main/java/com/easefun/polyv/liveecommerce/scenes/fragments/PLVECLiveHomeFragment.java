@@ -1,5 +1,9 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
@@ -77,10 +81,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * 直播首页：主持人信息、聊天室、点赞、更多、商品、打赏
@@ -337,6 +337,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         networkTipsView.acceptNetworkQuality(quality);
     }
 
+    @Override
+    public void showMorePopupWindow() {
+        if (moreIv != null) {
+            moreIv.performClick();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 打赏动画控制">

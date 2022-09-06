@@ -138,6 +138,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void startPlay() {
+        resetErrorViewStatus();
         PLVPlaybackVideoParams playbackVideoParams = new PLVPlaybackVideoParams(
                 getConfig().getVid(),
                 getConfig().getChannelId(),
@@ -150,7 +151,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 .buildOptions(PLVPlaybackVideoParams.LOCAL_VIDEO_CACHE_LIST, getLocalCacheVideoList())
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_AUTO_PLAY_TEMP_STORE_VIDEO, true)
-                .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType());
+                .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType())
+                .buildOptions(PLVBaseVideoParams.LOAD_SLOW_TIME, 15);
         if (videoView != null) {
             videoView.playByMode(playbackVideoParams, PLVPlayOption.PLAYMODE_VOD);
         }
@@ -449,6 +451,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     setRetryLayoutVisibility(View.GONE);
                     setAllowMarqueeViewRunning(true);
                     checkAutoContinuePlay();
+                    resetErrorViewStatus();
                 }
 
                 @Override
@@ -464,6 +467,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
                 @Override
                 public void onError(PolyvPlayError error) {
+                    setDefaultViewStatus();
                     String tips;
                     switch (error.playStage) {
                         case PolyvPlayError.PLAY_STAGE_HEADAD:
@@ -487,11 +491,23 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             error.errorDescribe +
                             "(" + error.errorCode + "-" + error.playStage + ")\n" +
                             error.playPath;
-
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onPlayError(error, tips);
+                    }
                     setLogoVisibility(View.GONE);
                     setRetryLayoutVisibility(View.VISIBLE);
                     stopMarqueeView();
                     removeWatermark();
+                }
+            });
+            videoView.setOnVideoLoadSlowListener(new IPLVVideoViewListenerEvent.OnVideoLoadSlowListener() {
+                @Override
+                public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onLoadSlow(loadedTime, isBufferEvent);
+                    }
                 }
             });
             videoView.setOnCompletionListener(new IPolyvVideoViewListenerEvent.OnCompletionListener() {
@@ -524,6 +540,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         if (view != null) {
                             view.onBufferEnd();
                         }
+                        resetErrorViewStatus();
                     }
                 }
             });
@@ -815,6 +832,23 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         }
     }
 
+    private void setDefaultViewStatus() {
+        videoView.removeRenderView();
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        if (view != null && view.getBufferingIndicator() != null) {
+            view.getBufferingIndicator().setVisibility(View.GONE);
+        }
+    }
+
+    private void resetErrorViewStatus() {
+        IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+        if (view != null && view.getNoStreamIndicator() != null) {
+            view.getNoStreamIndicator().setVisibility(View.GONE);
+        }
+        if (view != null && view.getPlayErrorIndicator() != null) {
+            view.getPlayErrorIndicator().setVisibility(View.GONE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 自动续播">
@@ -857,7 +891,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         stopPlayProgressTimer();
         if (videoView != null) {
             final PLVPlayInfoVO playInfoVO = updatePlayInfo();
-            if (playbackDataVO != null && playInfoVO.isPlaying()) {
+            if (playbackDataVO != null && videoView.isRealPlaying()) {
                 playbackPlayerRepo.updatePlaybackProgress(playbackDataVO, playInfoVO);
             }
             selfHandler.sendEmptyMessageDelayed(WHAT_PLAY_PROGRESS, 1000 - (playInfoVO.getPosition() % 1000));

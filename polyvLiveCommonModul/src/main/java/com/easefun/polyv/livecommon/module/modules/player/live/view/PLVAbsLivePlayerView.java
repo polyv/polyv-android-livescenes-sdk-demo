@@ -42,6 +42,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     }
 
     @Override
+    public View getPlayErrorIndicator() {
+        return null;
+    }
+
+    @Override
     public PLVPlayerLogoView getLogo() {
         return null;
     }
@@ -78,6 +83,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
 
     @Override
     public void onPlayError(PolyvPlayError error, String tips) {
+
+    }
+
+    @Override
+    public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
 
     }
 

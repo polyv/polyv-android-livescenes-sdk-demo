@@ -31,6 +31,16 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     }
 
     @Override
+    public View getNoStreamIndicator() {
+        return null;
+    }
+
+    @Override
+    public View getPlayErrorIndicator() {
+        return null;
+    }
+
+    @Override
     public View getBufferingIndicator() {
         return null;
     }
@@ -57,6 +67,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
 
     @Override
     public void onPlayError(PolyvPlayError error, String tips) {
+
+    }
+
+    @Override
+    public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
 
     }
 

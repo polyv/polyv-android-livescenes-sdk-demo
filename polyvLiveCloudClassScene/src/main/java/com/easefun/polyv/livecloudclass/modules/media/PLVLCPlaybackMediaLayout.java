@@ -46,6 +46,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
@@ -60,8 +61,8 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
-import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
@@ -100,6 +101,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private IPLVLCPlaybackMediaController mediaController;
     //播放失败时显示的view
     private PLVPlaceHolderView noStreamView;
+    //可自定义提示的播放失败/加载缓慢显示的占位View
+    private PLVPlaceHolderView playErrorView;
     //Switch View
     private FrameLayout flPlayerSwitchViewParent;
     private PLVSwitchViewAnchorLayout switchAnchorPlayer;
@@ -191,6 +194,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playerView = videoView.findViewById(PolyvBaseVideoView.IJK_VIDEO_ID);
         mediaController = findViewById(R.id.plvlc_playback_media_controller);
         noStreamView = findViewById(R.id.no_stream_ly);
+        playErrorView = findViewById(R.id.play_error_ly);
         logoView = findViewById(R.id.playback_logo_view);
         loadingLayout = findViewById(R.id.plvlc_playback_loading_layout);
         playerRetryLayout = findViewById(R.id.plvlc_playback_player_retry_layout);
@@ -210,6 +214,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackAutoContinueSeekTimeTv = findViewById(R.id.plvlc_playback_auto_continue_seek_time_tv);
 
         initVideoView();
+        initPlayErrorView();
         initDanmuView();
         initMediaController();
         initLoadingView();
@@ -224,7 +229,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.enableRetry(true);
         videoView.setMaxRetryCount(MAX_RETRY_COUNT);
         //设置noStreamView
-        noStreamView.setPlaceHolderImg(R.drawable.plvlc_bg_player_no_stream);
+        noStreamView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
         noStreamView.setPlaceHolderText(getResources().getString(R.string.plv_player_video_playback_no_stream));
 
         videoView.setSubVideoView(subVideoView);
@@ -233,6 +238,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.setPlayerBufferingIndicator(loadingLayout);
         //设置跑马灯
         marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
+    }
+
+    private void initPlayErrorView() {
+        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
+        playErrorView.setOnRefreshViewClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playbackPlayerPresenter.startPlay();
+            }
+        });
     }
 
     private void initDanmuView() {
@@ -693,13 +708,23 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         @Override
+        public View getNoStreamIndicator() {
+            return noStreamView;
+        }
+
+        @Override
+        public View getPlayErrorIndicator() {
+            return playErrorView;
+        }
+
+        @Override
         public View getBufferingIndicator() {
             return super.getBufferingIndicator();
         }
 
         @Override
         public View getRetryLayout(){
-            return playerRetryLayout;
+            return null;
         }
 
         @Override
@@ -727,8 +752,14 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public void onPlayError(PolyvPlayError error, String tips) {
             super.onPlayError(error, tips);
-            ToastUtils.showLong(tips);
+            PLVPlayErrorMessageUtils.showOnPlayError(playErrorView, error, liveRoomDataManager.getConfig().isLive());
             PLVCommonLog.e(TAG, tips);
+        }
+
+        @Override
+        public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
+            super.onLoadSlow(loadedTime, isBufferEvent);
+            PLVPlayErrorMessageUtils.showOnLoadSlow(playErrorView, liveRoomDataManager.getConfig().isLive());
         }
 
         @Override
