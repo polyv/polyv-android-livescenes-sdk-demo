@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVEmptyMediaController;
+import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
@@ -45,6 +46,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayout;
+import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -96,6 +98,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     //当前没有直播显示的view
     private View nostreamView;
+    //播放失败/加载失败显示的view
+    private PLVECLiveNoStreamView playErrorView;
     //浮窗关闭按钮
     private ImageView closeFloatingView;
     //播放器presenter
@@ -163,6 +167,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         audioModeView = findViewById(R.id.audio_mode_ly);
         loadingView = findViewById(R.id.loading_pb);
         nostreamView = findViewById(R.id.nostream_ly);
+        playErrorView = findViewById(R.id.plvec_play_error_ly);
         closeFloatingView = findViewById(R.id.close_floating_iv);
         closeFloatingView.setOnClickListener(this);
         mediaController = new PLVEmptyMediaController();
@@ -177,6 +182,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         livePlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_live_player_floating_playing_placeholder_tv);
 
         initVideoView();
+        initPlayErrorView();
         initRtcVideoLayout();
         initSubVideoViewChangeListener();
         observeFloatingPlayer();
@@ -250,6 +256,24 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                 if (onViewActionListener != null) {
                     onViewActionListener.acceptNetworkQuality(quality);
                 }
+            }
+        });
+    }
+
+    private void initPlayErrorView() {
+        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
+        playErrorView.setOnChangeLinesViewClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowMoreLayoutAction();
+                }
+            }
+        });
+        playErrorView.setOnRefreshViewClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                livePlayerPresenter.restartPlay();
             }
         });
     }
@@ -550,6 +574,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         }
 
         @Override
+        public View getPlayErrorIndicator() {
+            return playErrorView;
+        }
+
+        @Override
         public PLVPlayerLogoView getLogo() {
             return logoView;
         }
@@ -615,10 +644,20 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public void onPlayError(PolyvPlayError error, String tips) {
             super.onPlayError(error, tips);
-            ToastUtils.showLong(tips);
+            PLVPlayErrorMessageUtils.showOnPlayError(playErrorView, error, liveRoomDataManager.getConfig().isLive());
             fitMode = PLVECFitMode.FIT_VIDEO_RECT_FALSE;
             if (!isVideoViewPlayingInFloatWindow) {
                 PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+            }
+        }
+
+        @Override
+        public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
+            super.onLoadSlow(loadedTime, isBufferEvent);
+            PLVPlayErrorMessageUtils.showOnLoadSlow(playErrorView, liveRoomDataManager.getConfig().isLive());
+            if (isBufferEvent) {
+                // 铺满占位图
+                playErrorView.setFullLayout();
             }
         }
 
@@ -679,7 +718,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                         watermarkView.setLayoutParams(layoutParams);
                     } else {
                         ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
-                        layoutParams.height = PLVUIUtil.dip2px(getContext(),206);
+                        layoutParams.height = PLVUIUtil.dip2px(getContext(), 206);
                         watermarkView.setLayoutParams(layoutParams);
                     }
                 }

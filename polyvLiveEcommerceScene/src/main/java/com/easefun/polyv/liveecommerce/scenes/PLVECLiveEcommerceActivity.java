@@ -385,6 +385,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onShowMoreLayoutAction() {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.showMorePopupWindow();
+                }
+            }
+
+            @Override
             public void acceptOnLowLatencyChange(boolean isLowLatency) {
                 if (commonHomeFragment != null) {
                     commonHomeFragment.acceptOnLowLatencyChange(isLowLatency);

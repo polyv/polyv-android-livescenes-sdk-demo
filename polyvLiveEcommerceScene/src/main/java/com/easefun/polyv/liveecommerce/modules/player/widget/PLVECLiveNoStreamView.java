@@ -2,27 +2,39 @@ package com.easefun.polyv.liveecommerce.modules.player.widget;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.player.IPLVPlayErrorView;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.annos.Sp;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * 暂无直播view
  */
-public class PLVECLiveNoStreamView extends FrameLayout {
+public class PLVECLiveNoStreamView extends FrameLayout implements IPLVPlayErrorView {
     private ViewGroup parentLy;
     private ImageView nostreamIv;
     private TextView nostreamTv;
+
+    private TextView changeLinesTv;
+    private TextView refreshTv;
+    private boolean isShowChangeLinesView = false;
+    private boolean isShowRefreshView = false;
+
+    private boolean isSmallLayout;
+    private boolean isFullLayout;
 
     private PLVViewLocationSensor locationSensor;
     private float parentWHRatio = 1.78f;
@@ -48,6 +60,9 @@ public class PLVECLiveNoStreamView extends FrameLayout {
         parentLy = findViewById(R.id.parent_ly);
         nostreamIv = findViewById(R.id.nostream_iv);
         nostreamTv = findViewById(R.id.nostream_tv);
+
+        changeLinesTv = findViewById(com.easefun.polyv.livecommon.R.id.plv_change_lines_tv);
+        refreshTv = findViewById(com.easefun.polyv.livecommon.R.id.plv_refresh_tv);
     }
 
     private void initLocationSensor() {
@@ -84,17 +99,77 @@ public class PLVECLiveNoStreamView extends FrameLayout {
         locationSensor.onSizeChanged(w, h, oldw, oldh);
     }
 
+    @Override
+    public void setPlaceHolderImg(@DrawableRes int resId) {
+        nostreamIv.setImageResource(resId);
+    }
+
+    @Override
+    public void setPlaceHolderText(String text) {
+        nostreamTv.setText(text);
+    }
+
+    @Override
+    public void setPlaceHolderTextSize(@Sp float size) {
+        nostreamTv.setTextSize(size);
+    }
+
+    @Override
+    public void setChangeLinesViewVisibility(int visibility) {
+        changeLinesTv.setVisibility(isSmallLayout ? View.GONE : visibility);
+        isShowChangeLinesView = visibility == View.VISIBLE;
+    }
+
+    @Override
+    public void setRefreshViewVisibility(int visibility) {
+        refreshTv.setVisibility(isSmallLayout ? View.GONE : visibility);
+        isShowRefreshView = visibility == View.VISIBLE;
+    }
+
+    public void setOnChangeLinesViewClickListener(OnClickListener listener) {
+        changeLinesTv.setOnClickListener(listener);
+    }
+
+    public void setOnRefreshViewClickListener(OnClickListener listener) {
+        refreshTv.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setViewVisibility(int visibility) {
+        setVisibility(visibility);
+        isFullLayout = false;
+        updateLayoutSize();
+    }
+
+    public void setFullLayout() {
+        isFullLayout = true;
+        updateLayoutSize();
+    }
+
+    private int updateLayoutSize() {
+        if (isFullLayout) {
+            return updateLayoutSize(-1);
+        }
+        return updateLayoutSize(isSmallLayout ? (int) (getWidth() / parentWHRatio) : ConvertUtils.dp2px(210));
+    }
+
+    private int updateLayoutSize(int height) {
+        LayoutParams flp = (LayoutParams) parentLy.getLayoutParams();
+        flp.height = height;
+        flp.width = -1;
+        parentLy.setLayoutParams(flp);
+        return height;
+    }
+
     public void acceptPortraitSmall() {
         post(new Runnable() {
             @Override
             public void run() {
-                FrameLayout.LayoutParams flp = (LayoutParams) parentLy.getLayoutParams();
-                flp.height = (int) (getWidth() / parentWHRatio);
-                flp.width = -1;
-                parentLy.setLayoutParams(flp);
+                isSmallLayout = true;
+                int layoutHeight = updateLayoutSize();
 
                 LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) nostreamIv.getLayoutParams();
-                llp.height = (int) (flp.height * imageHRatio);
+                llp.height = (int) (layoutHeight * imageHRatio);
                 llp.width = (int) (llp.height * imageWRatio);
                 llp.topMargin = 0;
                 nostreamIv.setLayoutParams(llp);
@@ -104,6 +179,13 @@ public class PLVECLiveNoStreamView extends FrameLayout {
                 nostreamTv.setLayoutParams(tvLLP);
 
                 nostreamTv.setTextSize(10);
+                boolean isErrorLayout = isShowRefreshView || isShowChangeLinesView || nostreamTv.getText().length() > 10;
+                if (isErrorLayout) {
+                    nostreamTv.setVisibility(View.GONE);
+                }
+
+                changeLinesTv.setVisibility(View.GONE);
+                refreshTv.setVisibility(View.GONE);
             }
         });
     }
@@ -112,22 +194,29 @@ public class PLVECLiveNoStreamView extends FrameLayout {
         post(new Runnable() {
             @Override
             public void run() {
-                FrameLayout.LayoutParams flp = (LayoutParams) parentLy.getLayoutParams();
-                flp.height = ConvertUtils.dp2px(210);
-                flp.width = -1;
-                parentLy.setLayoutParams(flp);
+                isSmallLayout = false;
+                updateLayoutSize();
 
                 LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) nostreamIv.getLayoutParams();
                 llp.height = ConvertUtils.dp2px(116);
                 llp.width = ConvertUtils.dp2px(150);
-                llp.topMargin = ConvertUtils.dp2px(12);
+                llp.topMargin = 0;
                 nostreamIv.setLayoutParams(llp);
 
                 LinearLayout.LayoutParams tvLLP = (LinearLayout.LayoutParams) nostreamTv.getLayoutParams();
-                tvLLP.topMargin = ConvertUtils.dp2px(14);
+                boolean isErrorLayout = isShowRefreshView || isShowChangeLinesView || nostreamTv.getText().length() > 10;
+                tvLLP.topMargin = isErrorLayout ? -ConvertUtils.dp2px(16) : ConvertUtils.dp2px(12);
                 nostreamTv.setLayoutParams(tvLLP);
 
-                nostreamTv.setTextSize(14);
+                nostreamTv.setTextSize(12);
+                nostreamTv.setVisibility(View.VISIBLE);
+
+                if (isShowChangeLinesView) {
+                    changeLinesTv.setVisibility(View.VISIBLE);
+                }
+                if (isShowRefreshView) {
+                    refreshTv.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

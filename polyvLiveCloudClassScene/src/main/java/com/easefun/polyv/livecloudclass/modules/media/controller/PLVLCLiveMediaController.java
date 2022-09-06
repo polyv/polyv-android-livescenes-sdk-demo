@@ -38,6 +38,7 @@ import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -563,6 +564,19 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void showMoreLayout() {
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            if (morePortIv != null) {
+                morePortIv.performClick();
+            }
+        } else {
+            if (moreLandIv != null) {
+                moreLandIv.performClick();
+            }
+        }
+    }
+
+    @Override
     public void dispatchDanmuSwitchOnClicked(View v) {
         this.onClick(v);
     }
@@ -759,8 +773,6 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         });
     }
     // </editor-fold>
-
-
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override

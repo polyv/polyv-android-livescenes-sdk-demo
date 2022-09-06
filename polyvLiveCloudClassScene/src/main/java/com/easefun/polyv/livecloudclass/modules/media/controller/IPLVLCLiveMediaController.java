@@ -133,6 +133,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
 
     /**
+     * 显示更多布局
+     */
+    void showMoreLayout();
+
+    /**
      * 弹幕切换按钮点击回调
      *
      * @param v danmuView
