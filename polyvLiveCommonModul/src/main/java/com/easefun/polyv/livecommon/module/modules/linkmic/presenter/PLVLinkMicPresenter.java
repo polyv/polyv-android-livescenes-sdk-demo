@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +31,7 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
 import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
@@ -723,6 +726,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     if (linkMicView != null) {
                         linkMicView.onUsersJoin(newJoinUserList);
                     }
+                    subscribeUser(newJoinUserList, true);
                 }
 
                 //4. 纯视频频道类型，如果列表列表添加了讲师，则调整讲师的位置
@@ -774,6 +778,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     if (linkMicView != null) {
                         linkMicView.onUsersLeave(usersToRemove);
                     }
+                    subscribeUser(usersToRemove, false);
                     if (usersToRemove.contains(myLinkMicId)) {
                         //如果我也不在服务端的连麦列表中(长时间断网，又连上后，服务端则认为该用户离线了)，那么自己主动下麦。
                         if (linkMicView != null) {
@@ -879,6 +884,17 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         }
 
     }
+
+    private void subscribeUser(List<String> userIdList, final boolean subscribe) {
+        foreach(userIdList, new PLVSugarUtil.Consumer<String>() {
+            @Override
+            public void accept(String userId) {
+                if (!userId.equals(myLinkMicId)) {
+                    linkMicManager.subscribeRemote(userId, subscribe);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -956,6 +972,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     if (linkMicView != null) {
                         linkMicView.onUsersLeave(Collections.singletonList(uid));
                     }
+                    subscribeUser(Collections.singletonList(uid), false);
                     it.remove();
                     break;
                 }
@@ -1156,6 +1173,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 if (linkMicView != null) {
                     linkMicView.onUsersJoin(Collections.singletonList(dataBean.getLinkMicId()));
                 }
+                subscribeUser(Collections.singletonList(dataBean.getLinkMicId()), true);
             }
         }
 
