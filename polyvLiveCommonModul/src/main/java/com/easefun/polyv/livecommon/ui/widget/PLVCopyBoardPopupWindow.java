@@ -116,8 +116,14 @@ public class PLVCopyBoardPopupWindow {
         return popupWindow;
     }
 
+    public static void copy(Context context, String copyContent) {
+        copy(null, context, copyContent, null);
+    }
+
     private static void copy(PopupWindow popupWindow, Context context, String copyContent, View.OnClickListener listener) {
-        popupWindow.dismiss();
+        if (popupWindow != null) {
+            popupWindow.dismiss();
+        }
         try {
             //获取剪贴板管理器
             ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);

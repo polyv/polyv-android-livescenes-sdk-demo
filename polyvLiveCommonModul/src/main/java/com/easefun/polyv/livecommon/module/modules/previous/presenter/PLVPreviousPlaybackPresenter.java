@@ -9,7 +9,6 @@ import com.easefun.polyv.livecommon.module.modules.previous.presenter.data.PLVPr
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.livescenes.previous.PLVPreviousManager;
-import com.plv.livescenes.previous.model.PLVChapterDataVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,18 +44,14 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
     //请求往期回放视频的Disposable
     private Disposable mPreviousListDisposable;
 
-    //请求回放-章节列表的Disposable
-    private Disposable chapterListDisposable;
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVPreviousPlaybackPresenter(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.mLiveRoomDataManager = liveRoomDataManager;
         mPlvPreviousData = new PLVPreviousData();
-        //初始化数据，目前是空实现，留下空白提供给以后改动的地方
-        init();
 
+        init();
     }
     // </editor-fold>
 
@@ -81,16 +76,12 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
 
     @Override
     public void changePlaybackVideoVid(String vid) {
+        if (vid == null) {
+            return;
+        }
         mPlvPreviousData.getPlaybackVideoVidData().postValue(vid);
         //更新当前往期视频的信息
         mPlvPreviousData.update(mPlaybackList, vid);
-        //更新视频章节信息
-        requestChapterDetail();
-    }
-
-    @Override
-    public void changePlaybackVideoSeek(int position) {
-        mPlvPreviousData.getPlayBackVidoSeekData().postValue(position);
     }
 
     @Override
@@ -141,48 +132,8 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
     }
 
     @Override
-    public void requestChapterDetail() {
-        String channelId = mLiveRoomDataManager.getConfig().getChannelId();
-        PLVPlaybackListVO.DataBean.ContentsBean previousDetail = mPlvPreviousData.getPreviousDetail();
-        Consumer<List<PLVChapterDataVO>> successConsumer = new Consumer<List<PLVChapterDataVO>>() {
-            @Override
-            public void accept(final List<PLVChapterDataVO> dataVOS) throws Exception {
-                callbackToView(new ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVPreviousPlaybackContract.IPreviousPlaybackView view) {
-                        view.updateChapterList(dataVOS);
-                    }
-                });
-            }
-        };
-
-        Consumer<Throwable> failConsumer = new Consumer<Throwable>() {
-            @Override
-            public void accept(final Throwable throwable) throws Exception {
-                callbackToView(new ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVPreviousPlaybackContract.IPreviousPlaybackView view) {
-                        PLVCommonLog.exception(throwable);
-                        view.requestChapterError();
-                    }
-                });
-            }
-        };
-        if (previousDetail != null) {
-            commonRequestChaptersList(channelId, previousDetail.getVideoId(), successConsumer, failConsumer);
-        } else {
-            callbackToView(new ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVPreviousPlaybackContract.IPreviousPlaybackView view) {
-                    view.requestChapterError();
-                }
-            });
-        }
-    }
-
-    @Override
     public void init() {
-
+        requestPreviousList();
     }
 
     @Override
@@ -265,18 +216,7 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
     }
 
     @Override
-    public void onSeekChange(final int position) {
-        callbackToView(new ViewRunnable() {
-            @Override
-            public void run(@NonNull IPLVPreviousPlaybackContract.IPreviousPlaybackView view) {
-                view.onSeekChange(position);
-            }
-        });
-    }
-
-    @Override
     public void updatePlaybackCurrentPosition(PLVPlayInfoVO playInfoVO) {
-        onSeekChange(playInfoVO.getPosition() / 1000);
         if (playInfoVO.getTotalTime() > 0 && playInfoVO.getPosition() >= playInfoVO.getTotalTime()) {
             onPlayComplete();
         }
@@ -294,15 +234,6 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
                 .subscribe(successCallback, failCallback);
     }
 
-    private void commonRequestChaptersList(String channelId, String videoId,
-                                           Consumer<List<PLVChapterDataVO>> successCallback, Consumer<Throwable> failCallback) {
-        if (chapterListDisposable != null) {
-            chapterListDisposable.dispose();
-        }
-        chapterListDisposable = PLVPreviousManager.getInstance().getPLVChatApi()
-                .getChapterList(channelId, videoId)
-                .subscribe(successCallback, failCallback);
-    }
     //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view回调">

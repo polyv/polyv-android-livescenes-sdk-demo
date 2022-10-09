@@ -38,7 +38,6 @@ public class PLVLCPlaybackPreviousFragment extends PLVBaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.plvlc_previous_fragment, container, false);
         initView();
-        initData();
         return view;
     }
 
@@ -81,14 +80,6 @@ public class PLVLCPlaybackPreviousFragment extends PLVBaseFragment {
     }
 
     //</editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void initData() {
-        if (plvPreviousView != null) {
-            plvPreviousView.requestPreviousList();
-        }
-    }
-    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="提供方法">
 

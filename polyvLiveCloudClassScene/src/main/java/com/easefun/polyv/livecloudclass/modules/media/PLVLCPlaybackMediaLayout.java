@@ -44,6 +44,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLa
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
@@ -66,6 +67,8 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -141,6 +144,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
+    private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
     //listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
 
@@ -222,6 +226,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         initSwitchView();
         initChatLandscapeLayout();
         initLayoutWH();
+
+        observePlaybackChapterSeekEvent();
     }
 
     private void initVideoView() {
@@ -375,6 +381,20 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 setLayoutParams(vlp);
             }
         });
+    }
+
+    private void observePlaybackChapterSeekEvent() {
+        playbackChapterViewModel.getSeekToChapterLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<Event<Integer>>() {
+                    @Override
+                    public void onChanged(@Nullable Event<Integer> seekEvent) {
+                        final Integer seekPosition = Event.unwrap(seekEvent);
+                        if (seekPosition == null) {
+                            return;
+                        }
+                        seekTo(seekPosition, getDuration());
+                    }
+                });
     }
     // </editor-fold>
 

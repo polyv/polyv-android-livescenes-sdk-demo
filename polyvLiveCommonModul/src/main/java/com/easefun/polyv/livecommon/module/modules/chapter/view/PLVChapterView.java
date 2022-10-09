@@ -1,5 +1,7 @@
-package com.easefun.polyv.livecommon.module.modules.previous.customview;
+package com.easefun.polyv.livecommon.module.modules.chapter.view;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,9 +11,10 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.R;
-import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
-import com.easefun.polyv.livecommon.module.modules.previous.view.PLVAbsPreviousView;
+import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
+import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.previous.model.PLVChapterDataVO;
 
 import java.util.ArrayList;
@@ -26,7 +29,7 @@ public class PLVChapterView extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private RecyclerView recyclerView;
 
-    private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPresenter;
+    private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
     private PLVChapterAdapter chapterAdapter;
 
     private final List<PLVChapterDataVO> dataList = new ArrayList<>();
@@ -51,42 +54,42 @@ public class PLVChapterView extends FrameLayout {
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plv_playback_chapter_layout, this, true);
         recyclerView = findViewById(R.id.plv_chapter_rv);
+
+        observeChapterData();
+        observePlayerCurrentPosition();
     }
-    // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="回放-章节-view层的实现">
-    private final IPLVPreviousPlaybackContract.IPreviousPlaybackView chapterView = new PLVAbsPreviousView() {
-        @Override
-        public void updateChapterList(List<PLVChapterDataVO> datas) {
-            if (previousPresenter != null) {
-                dataList.clear();
-                dataList.addAll(datas);
-                if (chapterAdapter != null) {
-                    List<PLVBaseViewData> plvBaseViewData = toPlayBackList(datas);
-                    chapterAdapter.setDataList(plvBaseViewData);
-                }
-            }
-        }
+    private void observeChapterData() {
+        playbackChapterViewModel.getChapterListLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<List<PLVChapterDataVO>>() {
+                    @Override
+                    public void onChanged(@Nullable List<PLVChapterDataVO> chapterDataVOS) {
+                        if (chapterDataVOS == null) {
+                            return;
+                        }
+                        dataList.clear();
+                        dataList.addAll(chapterDataVOS);
+                        updateChapterList();
+                    }
+                });
+    }
 
-        @Override
-        public void requestChapterError() {
-            super.requestChapterError();
-        }
-
-        @Override
-        public void onSeekChange(int time) {
-            if (chapterAdapter != null) {
-                // 通过二分法来找出 适合当前的章节，他需要选中比他小的章节并且这个章节是所有小的章节中是最大的章节
-                int position = findIndex2(dataList, time);
-                chapterAdapter.updataItmeTime(position);
-            }
-        }
-
-        @Override
-        public void setPresenter(IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter presenter) {
-            previousPresenter = presenter;
-        }
-    };
+    private void observePlayerCurrentPosition() {
+        playbackChapterViewModel.getPlayInfoLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVPlayInfoVO>() {
+                    @Override
+                    public void onChanged(@Nullable PLVPlayInfoVO playInfoVO) {
+                        if (playInfoVO == null) {
+                            return;
+                        }
+                        if (chapterAdapter != null) {
+                            // 通过二分法来找出 适合当前的章节，他需要选中比他小的章节并且这个章节是所有小的章节中是最大的章节
+                            int position = findIndex2(dataList, playInfoVO.getPosition());
+                            chapterAdapter.updataItmeTime(position);
+                        }
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外提供的方法">
@@ -106,6 +109,7 @@ public class PLVChapterView extends FrameLayout {
         if (builder.adapter != null) {
             chapterAdapter = builder.adapter;
             recyclerView.setAdapter(chapterAdapter);
+            updateChapterList();
         }
     }
 
@@ -115,38 +119,9 @@ public class PLVChapterView extends FrameLayout {
      * @param timeStamp 视频进度
      */
     public void changePlaybackVideoSeek(int timeStamp) {
-        if (previousPresenter != null) {
-            previousPresenter.changePlaybackVideoSeek(timeStamp);
-        }
+        playbackChapterViewModel.seekToChapter(timeStamp);
     }
 
-    /**
-     * 将MVP-V返回出去
-     *
-     * @return
-     */
-    public IPLVPreviousPlaybackContract.IPreviousPlaybackView getPreviousView() {
-        return chapterView;
-    }
-
-    /**
-     * 请求章节列表
-     */
-    public void requestChapterList() {
-        if (previousPresenter != null) {
-            previousPresenter.requestChapterDetail();
-        }
-    }
-
-    /**
-     * 销毁view
-     */
-    public void onDestroy() {
-        if (previousPresenter != null) {
-            previousPresenter.unregisterView(chapterView);
-            previousPresenter.onDestroy();
-        }
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="自己的内部方法">
@@ -197,6 +172,13 @@ public class PLVChapterView extends FrameLayout {
             }
         }
         return playbackList;
+    }
+
+    private void updateChapterList() {
+        if (chapterAdapter == null) {
+            return;
+        }
+        chapterAdapter.setDataList(toPlayBackList(dataList));
     }
     // </editor-fold>
 

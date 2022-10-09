@@ -2,8 +2,8 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -40,6 +41,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * 更多布局
@@ -66,6 +68,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     //view
     private ConstraintLayout plvsaMoreLayout;
     private TextView plvsaMoreTextTv;
+    private ViewGroup plvsaMoreSettingsSv;
     private GridLayout plvsaMoreSettingsLayout;
     private ImageView plvsaMoreCameraIv;
     private TextView plvsaMoreCameraTv;
@@ -86,12 +89,16 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ImageView plvsaMoreShareScreenIv;
     private TextView plvsaMoreShareScreenTv;
     private LinearLayout moreBeautyLl;
+    private LinearLayout moreShareLl;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
 
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
+
+    //分享布局
+    private PLVSAShareLayout shareLayout;
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -136,6 +143,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
         plvsaMoreLayout = (ConstraintLayout) findViewById(R.id.plvsa_more_layout);
         plvsaMoreTextTv = (TextView) findViewById(R.id.plvsa_more_text_tv);
+        plvsaMoreSettingsSv = findViewById(R.id.plvsa_more_settings_sv);
         plvsaMoreSettingsLayout = (GridLayout) findViewById(R.id.plvsa_more_settings_layout);
         plvsaMoreCameraIv = (ImageView) findViewById(R.id.plvsa_more_camera_iv);
         plvsaMoreCameraTv = (TextView) findViewById(R.id.plvsa_more_camera_tv);
@@ -156,6 +164,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreShareScreenIv = findViewById(R.id.plvsa_more_share_screen_iv);
         plvsaMoreShareScreenTv = findViewById(R.id.plvsa_more_share_screen_tv);
         moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
+        moreShareLl = findViewById(R.id.plvsa_more_share_layout);
 
 
         plvsaMoreCameraIv.setOnClickListener(this);
@@ -174,6 +183,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreCloseRoomTv.setOnClickListener(this);
         plvsaMoreShareScreenLl.setOnClickListener(this);
         moreBeautyLl.setOnClickListener(this);
+        moreShareLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
@@ -199,6 +209,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 }
             }
         });
+
+        //init shareLayout
+        shareLayout = new PLVSAShareLayout(getContext());
 
         observeBeautyModuleInitResult();
     }
@@ -233,6 +246,14 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 });
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="初始化数据">
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        if (shareLayout != null) {
+            shareLayout.init(liveRoomDataManager);
+        }
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="API">
     public void open() {
@@ -291,6 +312,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     public void updateCloseRoomLayout(boolean hide){
         plvsaMoreCloseRoomLayout.setVisibility(hide ? View.GONE : View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) plvsaMoreCloseRoomLayout.getLayoutParams();
+            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, plvsaMoreCloseRoomLayout.getVisibility() == View.VISIBLE ? 1 : 0, 1F);
+            plvsaMoreCloseRoomLayout.setLayoutParams(lp);
+        }
     }
 
     public void setOnDrawerStateChangeListener(PLVMenuDrawer.OnDrawerStateChangeListener listener) {
@@ -306,6 +332,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     }
 
     public boolean onBackPressed() {
+        if (shareLayout != null && shareLayout.onBackPressed()) {
+            return true;
+        }
         if (menuDrawer != null
                 && (menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_OPEN
                 || menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_OPENING)) {
@@ -313,6 +342,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             return true;
         }
         return false;
+    }
+
+    public void destroy() {
+        if (shareLayout != null) {
+            shareLayout.destroy();
+        }
     }
     // </editor-fold>
 
@@ -557,6 +592,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 return;
             }
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
+        } else if (id == moreShareLl.getId()) {
+            close();
+            shareLayout.open();
         }
     }
     // </editor-fold>
@@ -582,6 +620,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private void updateViewWithOrientation() {
         Position menuPosition;
         FrameLayout.LayoutParams moreLayoutParam = (FrameLayout.LayoutParams) plvsaMoreLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams settingLayoutParam = (ConstraintLayout.LayoutParams) plvsaMoreSettingsSv.getLayoutParams();
 
         if (PLVScreenUtils.isPortrait(getContext())) {
             menuPosition = MENU_DRAWER_POSITION_PORT;
@@ -589,18 +628,22 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_PORT;
             plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_PORT);
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_PORT);
+            settingLayoutParam.topMargin = ConvertUtils.dp2px(10);
         } else {
             menuPosition = MENU_DRAWER_POSITION_LAND;
             moreLayoutParam.height = MORE_LAYOUT_HEIGHT_LAND;
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_LAND;
             plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_LAND);
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_LAND);
+            settingLayoutParam.topToBottom = R.id.plvsa_more_text_tv;
+            settingLayoutParam.topMargin = ConvertUtils.dp2px(plvsaMoreSettingsLayout.getChildCount() > 9 ? 48 : 0);
         }
 
         if (menuDrawer != null) {
             menuDrawer.setPosition(menuPosition);
         }
         plvsaMoreLayout.setLayoutParams(moreLayoutParam);
+        plvsaMoreSettingsSv.setLayoutParams(settingLayoutParam);
     }
 
     // </editor-fold>

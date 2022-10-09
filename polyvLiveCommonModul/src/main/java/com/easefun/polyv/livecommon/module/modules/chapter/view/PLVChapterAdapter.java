@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecommon.module.modules.previous.customview;
+package com.easefun.polyv.livecommon.module.modules.chapter.view;
 
 import android.support.annotation.NonNull;
 

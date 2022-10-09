@@ -211,6 +211,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         commodityIv.setOnClickListener(this);
         commodityPushLayout = findViewById(R.id.commodity_push_ly);
         rewardIv = findViewById(R.id.reward_iv);
+        rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
         rewardIv.setOnClickListener(this);
         morePopupView = new PLVECMorePopupView();
         commodityPopupView = new PLVECCommodityPopupView();
@@ -935,6 +936,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                     isOpenPointReward = booleanPLVStatefulData.getData();
                     if(isOpenPointReward) {
                         initPointRewardEffectQueue();
+                    }
+                    if (rewardIv != null) {
+                        rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
                     }
                 }
             }

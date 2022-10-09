@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
 import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
@@ -307,6 +308,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         PLVDependManager.getInstance()
                 .switchStore(this)
                 .addModule(PLVPlaybackCacheModule.instance)
+                .addModule(PLVPlaybackChapterModule.instance)
                 .addModule(PLVCommodityModule.instance)
                 .addModule(PLVLCFloatingWindowModule.instance);
     }

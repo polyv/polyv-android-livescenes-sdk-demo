@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvsa_share_parent_ly"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/plvsa_share_content_ly"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectFrameLayout
+            android:id="@+id/plvsa_share_poster_ly"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"
+            android:background="#80464646"
+            app:radius="8dp" />
+    </FrameLayout>
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvsa_share_layout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/plvsa_more_ly_shape"
+        android:paddingLeft="25dp"
+        android:paddingTop="16dp"
+        android:paddingRight="25dp">
+
+        <GridLayout
+            android:id="@+id/plvsa_share_settings_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:columnCount="4"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/plvsa_share_cancel_tv"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
+
+            <LinearLayout
+                android:id="@+id/plvsa_share_weixin_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="6dp"
+                android:gravity="center|top"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/plvsa_share_weixin_iv"
+                    android:layout_width="60dp"
+                    android:layout_height="52dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:src="@drawable/plsa_share_weixin" />
+
+                <TextView
+                    android:id="@+id/plvsa_share_weixin_tv"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|top"
+                    android:text="微信好友"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvsa_share_pengyouquan_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="6dp"
+                android:gravity="center|top"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/plvsa_share_pengyouquan_iv"
+                    android:layout_width="60dp"
+                    android:layout_height="52dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:src="@drawable/plsa_share_pengyouquan" />
+
+                <TextView
+                    android:id="@+id/plvsa_share_pengyouquan_tv"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|top"
+                    android:text="朋友圈"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvsa_share_save_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="6dp"
+                android:gravity="center|top"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/plvsa_share_save_iv"
+                    android:layout_width="60dp"
+                    android:layout_height="52dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:src="@drawable/plsa_share_save" />
+
+                <TextView
+                    android:id="@+id/plvsa_share_save_tv"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|top"
+                    android:text="保存图片"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvsa_share_copy_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="6dp"
+                android:gravity="center|top"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/plvsa_share_copy_iv"
+                    android:layout_width="60dp"
+                    android:layout_height="52dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:src="@drawable/plsa_share_copy" />
+
+                <TextView
+                    android:id="@+id/plvsa_share_copy_tv"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|top"
+                    android:text="复制链接"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </GridLayout>
+
+        <TextView
+            android:id="@+id/plvsa_share_cancel_tv"
+            android:layout_width="240dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="28dp"
+            android:background="@drawable/plvsa_share_cancel_tv_shape"
+            android:gravity="center"
+            android:text="取消"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>
