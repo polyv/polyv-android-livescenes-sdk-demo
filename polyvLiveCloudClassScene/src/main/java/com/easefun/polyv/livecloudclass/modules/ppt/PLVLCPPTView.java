@@ -238,7 +238,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
                     pptWebView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            pptWebView.callPPTParams(message);
+                            if (pptWebView != null) {
+                                pptWebView.callPPTParams(message);
+                            }
                         }
                     }, 1500);
                 }

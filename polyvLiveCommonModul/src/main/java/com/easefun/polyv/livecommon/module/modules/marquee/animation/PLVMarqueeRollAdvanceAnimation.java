@@ -21,7 +21,8 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
     @Nullable
     private View secondView;
 
-    protected ObjectAnimator secondAnimator = new ObjectAnimator();
+    @Nullable
+    protected ObjectAnimator secondAnimator;
 
     private boolean isSetSecondParams = false;
     // </editor-fold>
@@ -45,7 +46,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
         if (secondView == null) {
             return;
         }
-        if (animationStatus == PAUSE) {
+        if (animationStatus == PAUSE && secondAnimator != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 secondAnimator.resume();
             } else {
@@ -54,7 +55,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
             if (secondAnimator.isRunning()) {
                 secondView.setAlpha(1F);
             }
-        } else {
+        } else if (secondAnimator != null) {
             setSecondAnimation();
             secondAnimator.start();
         }
@@ -67,7 +68,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
         if (secondView == null) {
             return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && secondAnimator != null) {
             secondAnimator.pause();
         } else {
             stopSecondAnimator();
@@ -100,7 +101,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
                 screenWidth = parentView.getWidth();
                 screenHeight = parentView.getHeight();
                 secondView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                if (animationStatus == STARTED) {
+                if (animationStatus == STARTED && secondAnimator != null) {
                     stopSecondAnimator();
                     setSecondAnimation();
                     secondAnimator.start();
@@ -166,6 +167,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
 
     private void stopSecondAnimator() {
         if (secondAnimator != null) {
+            secondAnimator.removeAllListeners();
             secondAnimator.cancel();
             secondAnimator.end();
         }

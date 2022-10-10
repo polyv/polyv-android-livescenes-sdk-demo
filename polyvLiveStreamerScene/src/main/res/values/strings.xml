@@ -32,6 +32,7 @@
     <string name="plvls_more_setting_title">更多</string>
     <string name="plvls_beauty_title">美颜</string>
     <string name="plvls_bitrate_title">清晰度</string>
+    <string name="plvls_share_title">分享</string>
 
     <string name="plvls_beauty_selector_beauty_title">美颜</string>
     <string name="plvls_beauty_selector_filter_title">滤镜</string>

@@ -364,6 +364,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         channelInfoLayout.init(liveRoomDataManager);
         memberLayout.init(liveRoomDataManager);
+        moreSettingLayout.init(liveRoomDataManager);
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
             plvlsStatusBarClassControlTv.setVisibility(GONE);

@@ -326,7 +326,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         final Intent clearTop = new Intent(PLVLoginWatcherActivity.this, PLVLoginWatcherActivity.class);
                         clearTop.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         PLVLoginWatcherActivity.this.startActivity(clearTop);
-                        loginPlayback(vo.getViewerInfoVO().getChannelId(), vo.getViewerInfoVO().getVid(), vo.getVideoPoolId());
+                        loginPlaybackOffline(vo.getViewerInfoVO().getChannelId(), vo.getViewerInfoVO().getVid(), vo.getViewerInfoVO().getChannelType(), vo.getVideoPoolId());
                     }
                 });
     }
@@ -419,17 +419,74 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录回放">
     private void loginPlayback() {
+        final String appId = etPlaybackAppId.getText().toString();
+        final String appSecret = etPlaybackAppSecret.getText().toString();
+        final String userId = etPlaybackUserId.getText().toString();
         final String channelId = etPlaybackChannelId.getText().toString();
         final String vid = etPlaybackVideoId.getText().toString();
-        loginPlayback(channelId, vid, null);
+
+        loginManager.loginPlaybackNew(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
+            @Override
+            public void onLoginSuccess(PLVPlaybackLoginResult plvPlaybackLoginResult) {
+                loginProgressDialog.dismiss();
+                PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
+                PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
+
+                switch (curScene) {
+                    //进入云课堂场景
+                    case CLOUDCLASS:
+                        if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
+                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(
+                                    PLVLoginWatcherActivity.this,
+                                    channelId,
+                                    channelType,
+                                    vid,
+                                    null,
+                                    getViewerId(),
+                                    getViewerName(),
+                                    getViewerAvatar(),
+                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
+                            );
+                            if (!launchResult.isSuccess()) {
+                                ToastUtils.showShort(launchResult.getErrorMessage());
+                            }
+                        } else {
+                            ToastUtils.showShort(R.string.plv_scene_login_toast_cloudclass_no_support_type);
+                        }
+                        break;
+                    //进入直播带货场景
+                    case ECOMMERCE:
+                        if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
+                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
+                                    vid, getViewerId(), getViewerName(), getViewerAvatar(),
+                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK);
+                            if (!launchResult.isSuccess()) {
+                                ToastUtils.showShort(launchResult.getErrorMessage());
+                            }
+                        } else {
+                            ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onLoginFailed(String msg, Throwable throwable) {
+                loginProgressDialog.dismiss();
+                ToastUtils.showShort(msg);
+                PLVCommonLog.e(TAG, "loginPlayback onLoginFailed:" + throwable.getMessage());
+            }
+        });
     }
 
-    private void loginPlayback(final String channelId, final String vid, final String tempStoreFileId) {
+    private void loginPlaybackOffline(final String channelId, final String vid, final PLVLiveChannelType channelType, final String tempStoreFileId) {
         final String appId = etPlaybackAppId.getText().toString();
         final String appSecret = etPlaybackAppSecret.getText().toString();
         final String userId = etPlaybackUserId.getText().toString();
 
-        loginManager.loginPlaybackNew(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
+        loginManager.loginPlaybackOffline(appId, appSecret, userId, channelId, vid, channelType, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
             @Override
             public void onLoginSuccess(PLVPlaybackLoginResult plvPlaybackLoginResult) {
                 loginProgressDialog.dismiss();

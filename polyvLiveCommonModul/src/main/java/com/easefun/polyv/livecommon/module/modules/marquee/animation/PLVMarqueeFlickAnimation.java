@@ -30,8 +30,10 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
     @Nullable
     protected View mainView;
 
-    protected ObjectAnimator flickObjectAnimator1 = new ObjectAnimator();
-    protected ObjectAnimator flickObjectAnimator2 = new ObjectAnimator();
+    @Nullable
+    protected ObjectAnimator flickObjectAnimator1;
+    @Nullable
+    protected ObjectAnimator flickObjectAnimator2;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -47,6 +49,9 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
 
     @Override
     public void setParams(HashMap<Integer, Integer> paramMap) {
+        if (paramMap == null) {
+            return;
+        }
         this.viewWidth = paramMap.containsKey(PARAM_VIEW_WIDTH) ? paramMap.get(PARAM_VIEW_WIDTH) : 0;
         this.viewHeight = paramMap.containsKey(PARAM_VIEW_HEIGHT) ? paramMap.get(PARAM_VIEW_HEIGHT) : 0;
         this.screenWidth = paramMap.containsKey(PARAM_SCREEN_WIDTH) ? paramMap.get(PARAM_SCREEN_WIDTH) : 0;
@@ -71,19 +76,23 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         }
         if (animationStatus == PAUSE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (flickObjectAnimator1.isPaused()) {
+                if (flickObjectAnimator1 != null && flickObjectAnimator1.isPaused()) {
                     flickObjectAnimator1.resume();
-                } else if (flickObjectAnimator2.isPaused()) {
+                } else if (flickObjectAnimator2 != null && flickObjectAnimator2.isPaused()) {
                     flickObjectAnimator2.resume();
                 }
             } else {
-                flickObjectAnimator1.start();
+                if (flickObjectAnimator1 != null) {
+                    flickObjectAnimator1.start();
+                }
             }
 
             animationStatus = STARTED;
         } else {
             setAnimation();
-            flickObjectAnimator1.start();
+            if (flickObjectAnimator1 != null) {
+                flickObjectAnimator1.start();
+            }
         }
     }
 
@@ -94,10 +103,10 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         }
         animationStatus = PAUSE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (flickObjectAnimator1.isStarted()) {
+            if (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted()) {
                 flickObjectAnimator1.pause();
             }
-            if (flickObjectAnimator2.isStarted()) {
+            if (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted()) {
                 flickObjectAnimator2.pause();
             }
         } else {
@@ -177,8 +186,12 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             public void onAnimationEnd(Animator animation) {
                 mainView.setAlpha(1);
                 if (animationStatus == STARTED) {
-                    flickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
-                    flickObjectAnimator2.start();
+                    if (flickObjectAnimator1 != null) {
+                        flickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+                    }
+                    if (flickObjectAnimator2 != null) {
+                        flickObjectAnimator2.start();
+                    }
                 }
             }
 
@@ -235,10 +248,12 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
 
     private void stopAnimation() {
         if (flickObjectAnimator1 != null) {
+            flickObjectAnimator1.removeAllListeners();
             flickObjectAnimator1.cancel();
             flickObjectAnimator1.end();
         }
         if (flickObjectAnimator2 != null) {
+            flickObjectAnimator2.removeAllListeners();
             flickObjectAnimator2.cancel();
             flickObjectAnimator2.end();
         }

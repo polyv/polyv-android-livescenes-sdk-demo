@@ -2,9 +2,6 @@ package com.easefun.polyv.livecommon.module.modules.previous.view;
 
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.plv.livescenes.model.PLVPlaybackListVO;
-import com.plv.livescenes.previous.model.PLVChapterDataVO;
-
-import java.util.List;
 
 /**
  * 往期回放MVP模式View层空实现
@@ -21,17 +18,7 @@ public abstract class PLVAbsPreviousView implements IPLVPreviousPlaybackContract
     }
 
     @Override
-    public void updateChapterList(List<PLVChapterDataVO> dataList) {
-
-    }
-
-    @Override
     public void requestPreviousError() {
-
-    }
-
-    @Override
-    public void requestChapterError() {
 
     }
 
@@ -41,11 +28,6 @@ public abstract class PLVAbsPreviousView implements IPLVPreviousPlaybackContract
 
     @Override
     public void previousNoMoreData() {
-
-    }
-
-    @Override
-    public void chapterNoMoreData() {
 
     }
 
@@ -61,11 +43,6 @@ public abstract class PLVAbsPreviousView implements IPLVPreviousPlaybackContract
 
     @Override
     public void onPlayComplete() {
-
-    }
-
-    @Override
-    public void onSeekChange(int position) {
 
     }
 }

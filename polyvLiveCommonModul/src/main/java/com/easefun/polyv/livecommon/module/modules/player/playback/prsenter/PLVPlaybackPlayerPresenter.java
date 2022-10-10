@@ -21,6 +21,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
@@ -72,6 +73,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private final PLVPlaybackPlayerRepo playbackPlayerRepo = new PLVPlaybackPlayerRepo();
     private final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
     private final PLVPlaybackCacheListViewModel playbackCacheListViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheListViewModel.class);
+    private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVPlaybackPlayerData playbackPlayerData;
@@ -827,6 +829,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                     PLVPlaybackPlayerPresenter.this.playbackDataVO = playbackDataVO;
                     playbackCacheVideoViewModel.updatePlaybackVideoInfo(playbackDataVO);
+                    playbackChapterViewModel.updatePlaybackData(playbackDataVO);
                 }
             });
         }
@@ -924,6 +927,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 .build();
 
         playbackPlayerData.postPlayInfoVO(playInfoVO);
+        playbackChapterViewModel.updatePlayInfo(playInfoVO);
         IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
         if (view != null) {
             view.updatePlayInfo(playInfoVO);

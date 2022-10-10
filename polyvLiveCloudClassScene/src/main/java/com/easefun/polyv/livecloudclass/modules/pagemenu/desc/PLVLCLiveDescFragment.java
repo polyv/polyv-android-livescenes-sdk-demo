@@ -43,6 +43,9 @@ import java.util.Map;
  */
 public class PLVLCLiveDescFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
+
     //直播详情信息
     private PolyvLiveClassDetailVO classDetailVO;
 
@@ -154,7 +157,6 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     }
 
     private void observePlaybackCacheStatus() {
-        final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
         playbackCacheVideoViewModel.getPlaybackCacheUpdateLiveData()
                 .observe((LifecycleOwner) view.getContext(), new Observer<PLVPlaybackCacheVideoVO>() {
                     @Override

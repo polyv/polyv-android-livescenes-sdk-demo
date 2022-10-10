@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecloudclass.modules.pagemenu.previous.adapter;
+package com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.adapter;
 
 import android.view.View;
 import android.widget.ImageView;

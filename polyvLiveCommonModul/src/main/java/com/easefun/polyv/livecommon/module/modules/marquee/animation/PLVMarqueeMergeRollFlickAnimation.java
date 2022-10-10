@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.marquee.animation;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.os.Build;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
@@ -16,8 +17,10 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
     // <editor-fold desc="变量">
     private static final String TAG = "PLVMarqueeMergeRollFlic";
     private int tweenTime = 0;
-    private ObjectAnimator flickObjectAnimation1 = new ObjectAnimator();
-    private ObjectAnimator flickObjectAnimation2 = new ObjectAnimator();
+    @Nullable
+    private ObjectAnimator flickObjectAnimation1;
+    @Nullable
+    private ObjectAnimator flickObjectAnimation2;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -37,18 +40,22 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
         }
         if (animationStatus == PAUSE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (flickObjectAnimation1.isPaused()) {
+                if (flickObjectAnimation1 != null && flickObjectAnimation1.isPaused()) {
                     flickObjectAnimation1.resume();
-                } else if (flickObjectAnimation2.isPaused()) {
+                } else if (flickObjectAnimation2 != null && flickObjectAnimation2.isPaused()) {
                     flickObjectAnimation2.resume();
                 }
             } else {
-                flickObjectAnimation1.start();
+                if (flickObjectAnimation1 != null) {
+                    flickObjectAnimation1.start();
+                }
             }
             animationStatus = STARTED;
         } else {
             setAnimation();
-            flickObjectAnimation1.start();
+            if (flickObjectAnimation1 != null) {
+                flickObjectAnimation1.start();
+            }
         }
     }
 
@@ -59,10 +66,10 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (flickObjectAnimation1.isStarted()) {
+            if (flickObjectAnimation1 != null && flickObjectAnimation1.isStarted()) {
                 flickObjectAnimation1.pause();
             }
-            if (flickObjectAnimation2.isStarted()) {
+            if (flickObjectAnimation2 != null && flickObjectAnimation2.isStarted()) {
                 flickObjectAnimation2.pause();
             }
         } else {
@@ -104,7 +111,7 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
             @Override
             public void onAnimationEnd(Animator animation) {
                 Log.i(TAG, "onAnimationEnd: ");
-                if (animationStatus == STARTED) {
+                if (animationStatus == STARTED && flickObjectAnimation2 != null) {
                     flickObjectAnimation2.start();
                 }
             }
@@ -150,10 +157,12 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
 
     private void stopAnimation() {
         if (flickObjectAnimation1 != null) {
+            flickObjectAnimation1.removeAllListeners();
             flickObjectAnimation1.cancel();
             flickObjectAnimation1.end();
         }
         if (flickObjectAnimation2 != null) {
+            flickObjectAnimation2.removeAllListeners();
             flickObjectAnimation2.cancel();
             flickObjectAnimation2.end();
         }

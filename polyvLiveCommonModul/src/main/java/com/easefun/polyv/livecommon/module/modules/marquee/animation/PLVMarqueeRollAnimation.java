@@ -23,7 +23,8 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
     @Nullable
     protected View mainView;
 
-    protected ObjectAnimator mainAnimator = new ObjectAnimator();
+    @Nullable
+    protected ObjectAnimator mainAnimator;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -39,6 +40,9 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
 
     @Override
     public void setParams(HashMap<Integer, Integer> paramMap) {
+        if (paramMap == null) {
+            return;
+        }
         this.viewWidth = paramMap.containsKey(PARAM_VIEW_WIDTH) ? paramMap.get(PARAM_VIEW_WIDTH) : 0;
         this.viewHeight = paramMap.containsKey(PARAM_VIEW_HEIGHT) ? paramMap.get(PARAM_VIEW_HEIGHT) : 0;
         this.screenWidth = paramMap.containsKey(PARAM_SCREEN_WIDTH) ? paramMap.get(PARAM_SCREEN_WIDTH) : 0;
@@ -60,7 +64,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
         if (mainView == null) {
             return;
         }
-        if (animationStatus == PAUSE) {
+        if (animationStatus == PAUSE && mainAnimator != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mainAnimator.resume();
             } else {
@@ -70,7 +74,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             if (mainAnimator.isRunning()) {
                 mainView.setVisibility(View.VISIBLE);
             }
-        } else {
+        } else if (mainAnimator != null) {
             setAnimation();
             mainAnimator.start();
         }
@@ -82,7 +86,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = PAUSE;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mainAnimator != null) {
             mainAnimator.pause();
         } else {
             stop();
