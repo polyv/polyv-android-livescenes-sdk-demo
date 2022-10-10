@@ -64,33 +64,33 @@ Demo [下载链接](https://www.pgyer.com/Mb6m) （密码：polyv）
 
 2、该 Release 版本的发版改动，所涉及到的场景（“✅ ” 表示涉及、包含该场景下的源码更新、改动）
 
-| Github仓库Tag | 依赖SDK版本  | API文档                                                                               | Common层 | 观看端-云课堂场景 | 观看端-直播带货场景 | 开播端-手机开播三分屏场景 | 开播端-手机开播纯视频场景 | 互动学堂场景 |
-|-------------|----------|-------------------------------------------------------------------------------------|---------|-----------|------------|---------------|---------------|--------|
-| 1.10.2      | 1.10.2   | [v1.10.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.2/index.html)   | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| Github仓库Tag | 依赖SDK版本  | API文档                                                                                 | Common层 | 观看端-云课堂场景 | 观看端-直播带货场景 | 开播端-手机开播三分屏场景 | 开播端-手机开播纯视频场景 | 互动学堂场景 |
+|-------------|----------|---------------------------------------------------------------------------------------|---------|-----------|------------|---------------|---------------|--------|
+| 1.10.2      | 1.10.2   | [v1.10.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.2/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
 | 1.10.1.1    | 1.10.1.1 | [v1.10.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.1.1/index.html) | ✅        |           |            |              |              |        |
-| 1.10.1      | 1.10.1   | [v1.10.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.1/index.html)   | ✅       | ✅         | ✅          |              |              |        |
-| 1.10.0      | 1.10.0   | [v1.10.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.0/index.html)   | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.9.5       | 1.9.5    | [v1.9.5 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.5/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.9.4       | 1.9.4    | [v1.9.4 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.4/index.html)     | ✅       | ✅         |            |               |               |        |
-| 1.9.3       | 1.9.3    | [v1.9.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.3/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.9.1.1     | 1.9.1.1  | [v1.9.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1.1/index.html) | ✅       | ✅         | ✅          |               | ✅             |        |
-| 1.9.1       | 1.9.1    | [v1.9.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1/index.html)     | ✅       | ✅         | ✅          |               |               |        |
-| 1.9.0       | 1.9.0    | [v1.9.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.0/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.8.3       | 1.8.3    | [v1.8.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.3/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.8.2       | 1.8.2    | [v1.8.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.2/index.html)     | ✅       | ✅         | ✅          |               |               | ✅      |
-| 1.8.1       | 1.8.1    | [v1.8.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.1/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             | ✅      |
-| 1.8.0       | 1.8.0    | [v1.8.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.0/index.html)     | ✅       | ✅         |            |               | ✅             | ✅      |
-| 1.7.2       | 1.7.2    | [v1.7.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.2/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             | ✅      |
-| 1.7.1       | 1.7.1    | [v1.7.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.1/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.7.0       | 1.7.0    | [v1.7.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.0/index.html)     | ✅       | ✅         |            | ✅             | ✅             | ✅      |
-| 1.6.3       | 1.6.3    | [v1.6.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.2/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.6.0       | 1.6.0    | [v1.6.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.0/index.html)     | ✅       | ✅         |            | ✅             | ✅             |        |
-| 1.5.3       | 1.5.3    | [v1.5.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.3/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.5.2       | 1.5.2    | [v1.5.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.2/index.html)     | ✅       | ✅         |            | ✅             | ✅             |        |
-| 1.5.1.1     | 1.5.1.1  | [v1.5.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.1/index.html)   | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.5.0       | 1.5.0    | [v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
-| 1.4.0       | 1.4.0    | [v1.4.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.0/index.html)     | ✅       | ✅         | ✅          | ✅             |               |        |
-| 1.3.0       | 1.3.0    | [v1.3.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.3.0/index.html)     | ✅       | ✅         | ✅          |               |               |        |
+| 1.10.1      | 1.10.1   | [v1.10.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.1/index.html)     | ✅       | ✅         | ✅          |              |              |        |
+| 1.10.0      | 1.10.0   | [v1.10.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.10.0/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.9.5       | 1.9.5    | [v1.9.5 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.5/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.9.4       | 1.9.4    | [v1.9.4 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.4/index.html)       | ✅       | ✅         |            |               |               |        |
+| 1.9.3       | 1.9.3    | [v1.9.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.3/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.9.1.1     | 1.9.1.1  | [v1.9.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1.1/index.html)   | ✅       | ✅         | ✅          |               | ✅             |        |
+| 1.9.1       | 1.9.1    | [v1.9.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.1/index.html)       | ✅       | ✅         | ✅          |               |               |        |
+| 1.9.0       | 1.9.0    | [v1.9.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.9.0/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.8.3       | 1.8.3    | [v1.8.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.3/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.8.2       | 1.8.2    | [v1.8.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.2/index.html)       | ✅       | ✅         | ✅          |               |               | ✅      |
+| 1.8.1       | 1.8.1    | [v1.8.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.1/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             | ✅      |
+| 1.8.0       | 1.8.0    | [v1.8.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.8.0/index.html)       | ✅       | ✅         |            |               | ✅             | ✅      |
+| 1.7.2       | 1.7.2    | [v1.7.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.2/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             | ✅      |
+| 1.7.1       | 1.7.1    | [v1.7.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.1/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.7.0       | 1.7.0    | [v1.7.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.7.0/index.html)       | ✅       | ✅         |            | ✅             | ✅             | ✅      |
+| 1.6.3       | 1.6.3    | [v1.6.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.2/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.6.0       | 1.6.0    | [v1.6.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.6.0/index.html)       | ✅       | ✅         |            | ✅             | ✅             |        |
+| 1.5.3       | 1.5.3    | [v1.5.3 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.3/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.5.2       | 1.5.2    | [v1.5.2 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.2/index.html)       | ✅       | ✅         |            | ✅             | ✅             |        |
+| 1.5.1.1     | 1.5.1.1  | [v1.5.1.1 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.1/index.html)     | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.5.0       | 1.5.0    | [v1.5.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.5.0/index.html)       | ✅       | ✅         | ✅          | ✅             | ✅             |        |
+| 1.4.0       | 1.4.0    | [v1.4.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.4.0/index.html)       | ✅       | ✅         | ✅          | ✅             |               |        |
+| 1.3.0       | 1.3.0    | [v1.3.0 API](http://repo.polyv.net/android/livescenes/javadoc/1.3.0/index.html)       | ✅       | ✅         | ✅          |               |               |        |
 
 更多版本更新详情，可在 [版本更新列表](./CHANGELOG.md)，了解 **对应版本更新说明**，以及 **下载源码**
 
