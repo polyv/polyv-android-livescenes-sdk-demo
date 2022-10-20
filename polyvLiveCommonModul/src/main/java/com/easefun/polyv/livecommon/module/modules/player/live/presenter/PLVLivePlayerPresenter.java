@@ -37,6 +37,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.easefun.polyv.mediasdk.player.IMediaPlayer;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVLiveVideoParams;
@@ -130,6 +131,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     @Override
     public void startPlay(boolean lowLatency) {
         removeWatermark();
+        resetErrorViewStatus();
         PLVLiveVideoParams liveVideoParams = new PLVLiveVideoParams(
                 getConfig().getChannelId(),
                 getConfig().getAccount().getUserId(),
@@ -139,7 +141,8 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 .buildOptions(PLVBaseVideoParams.HEAD_AD, isAllowOpenAdHead)
                 .buildOptions(PLVBaseVideoParams.MARQUEE, true)
                 .buildOptions(PLVBaseVideoParams.PARAMS2, getConfig().getUser().getViewerName())
-                .buildOptions(PLVLiveVideoParams.LOW_LATENCY, isLowLatency = lowLatency);
+                .buildOptions(PLVLiveVideoParams.LOW_LATENCY, isLowLatency = lowLatency)
+                .buildOptions(PLVBaseVideoParams.LOAD_SLOW_TIME, 15);
         if (videoView != null) {
             videoView.playByMode(liveVideoParams, PLVPlayOption.PLAYMODE_LIVE);
         }
@@ -250,6 +253,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         }
         stopMarqueeView();
         removeWatermark();
+        resetErrorViewStatus();
     }
 
     @Override
@@ -259,6 +263,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         }
         stopMarqueeView();
         removeWatermark();
+        resetErrorViewStatus();
     }
 
     @Override
@@ -268,6 +273,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         }
         stopMarqueeView();
         removeWatermark();
+        resetErrorViewStatus();
     }
 
     @Override
@@ -473,6 +479,23 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     removeWatermark();
                 }
             });
+            videoView.setOnVideoLoadSlowListener(new IPLVVideoViewListenerEvent.OnVideoLoadSlowListener() {
+                @Override
+                public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onLoadSlow(loadedTime, isBufferEvent);
+                    }
+                }
+            });
+            videoView.setOnInfoListener(new IPolyvVideoViewListenerEvent.OnInfoListener() {
+                @Override
+                public void onInfo(int what, int extra) {
+                    if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                        resetErrorViewStatus();
+                    }
+                }
+            });
             videoView.setOnNoLiveAtPresentListener(new IPolyvLiveListenerEvent.OnNoLiveAtPresentListener() {
                 @Override
                 public void onNoLiveAtPresent() {
@@ -532,6 +555,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                     setMarqueeViewRunning(true);
                     showWatermarkView(true);
+                    resetErrorViewStatus();
                 }
 
                 @Override
@@ -797,8 +821,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         if (view != null && view.getBufferingIndicator() != null) {
             view.getBufferingIndicator().setVisibility(View.GONE);
         }
+    }
+
+    private void resetErrorViewStatus() {
+        IPLVLivePlayerContract.ILivePlayerView view = getView();
         if (view != null && view.getNoStreamIndicator() != null) {
-            view.getNoStreamIndicator().setVisibility(View.VISIBLE);
+            view.getNoStreamIndicator().setVisibility(View.GONE);
+        }
+        if (view != null && view.getPlayErrorIndicator() != null) {
+            view.getPlayErrorIndicator().setVisibility(View.GONE);
         }
     }
     // </editor-fold>

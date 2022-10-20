@@ -1,10 +1,13 @@
 package com.easefun.polyv.streameralone.modules.streamer;
 
 import android.content.Context;
+import android.graphics.PointF;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -175,17 +178,47 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             if(viewGroup.getChildAt(i) instanceof ViewGroup){
                 changeSurfaceViewOnZMediaOverlay((ViewGroup) viewGroup.getChildAt(i), zOrderMediaOverlay);
-            } else if(viewGroup.getChildAt(i) instanceof SurfaceView){
+            } else if (viewGroup.getChildAt(i) instanceof SurfaceView) {
                 SurfaceView renderView = (SurfaceView) viewGroup.getChildAt(i);
                 renderView.setZOrderMediaOverlay(zOrderMediaOverlay);
-                return;
             }
         }
     }
 
     // </editor-fold >
 
-    // <editor-fold defaultstate="collapsed" desc="点击事件">
+    // <editor-fold defaultstate="collapsed" desc="触摸点击事件">
+
+    private final PointF downPoint = new PointF();
+    private final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            if (linkmicItem != null && listener != null) {
+                final float scaleFactor = detector.getScaleFactor();
+                listener.onScaleStreamerView(linkmicItem, scaleFactor);
+            }
+            return true;
+        }
+    });
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        scaleGestureDetector.onTouchEvent(ev);
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downPoint.x = ev.getX();
+                downPoint.y = ev.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (Math.abs(ev.getX() - downPoint.x) > 1 || Math.abs(ev.getY() - downPoint.y) > 1) {
+                    return true;
+                }
+                break;
+            default:
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.plvsa_streamer_fullscreen_view) {
@@ -199,13 +232,18 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="view 交互事件监听">
+
     /**
      * view交互事件监听器
      */
     public interface OnViewActionListener {
         /**
-         *退出全屏
-         *
+         * 缩放推流画面
+         */
+        void onScaleStreamerView(PLVLinkMicItemDataBean linkMicItemDataBean, float scaleFactor);
+
+        /**
+         * 退出全屏
          */
         void onExitFullscreen(PLVLinkMicItemDataBean linkmicItem, PLVViewSwitcher fullscreenSwitcher);
     }

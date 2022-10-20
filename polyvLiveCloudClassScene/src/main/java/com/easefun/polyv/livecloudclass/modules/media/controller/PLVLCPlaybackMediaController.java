@@ -20,13 +20,20 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackMoreLayout;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
+import com.easefun.polyv.livecommon.ui.widget.imageview.IPLVVisibilityChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -39,6 +46,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVLCPlaybackMediaController";
     private static final int SHOW_TIME = 5000;//控制栏显示时间
+
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
     /**** 横屏View **/
     private ImageView ivPlayPauseLand;
@@ -53,6 +62,12 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private TextView tvStartSendMessageLand;
     private ImageView ivDanmuSwitchLand;
     private RelativeLayout rlRootLand;
+    private PLVSimpleImageView controllerCommodityLandIv;
+    private PLVSimpleImageView cardEnterLandView;
+    private TextView cardEnterCdLandTv;
+    private PLVTriangleIndicateTextView cardEnterTipsLandView;
+    private View likesReferView;
+    private View cardEnterReferView;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -124,6 +139,12 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         tvStartSendMessageLand = findViewById(R.id.plvlc_playback_controller_land_tv_start_send_message);
         ivDanmuSwitchLand = findViewById(R.id.plvlc_playback_controller_land_iv_danmu_switch);
         rlRootLand = findViewById(R.id.plvlc_playback_controller_land_rl_root);
+        controllerCommodityLandIv = findViewById(R.id.plvlc_controller_commodity_land_iv);
+        cardEnterLandView = findViewById(R.id.plvlc_card_enter_land_view);
+        cardEnterCdLandTv = findViewById(R.id.plvlc_card_enter_cd_land_tv);
+        cardEnterTipsLandView = findViewById(R.id.plvlc_card_enter_tips_land_view);
+        likesReferView = findViewById(R.id.plvlc_refer_view_1);
+        cardEnterReferView = findViewById(R.id.plvlc_refer_view_2);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -153,6 +174,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivBackPort.setOnClickListener(this);
         ivLikesLand.setOnButtonClickListener(this);
         tvStartSendMessageLand.setOnClickListener(this);
+        controllerCommodityLandIv.setOnClickListener(this);
 
         //more layout
         initMoreLayout();
@@ -163,6 +185,9 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         } else {
             setPortraitController();
         }
+
+        observeCommodityStatus();
+        observeForFitRightBottomViewLocation();
     }
 
     private void initMoreLayout() {
@@ -173,6 +198,92 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 playerPresenter.setSpeed(speed);
             }
         });
+    }
+
+    private void observeCommodityStatus() {
+        commodityViewModel.getCommodityUiStateLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVCommodityUiState>() {
+                    boolean needShowControllerOnClosed = false;
+
+                    @Override
+                    public void onChanged(@Nullable PLVCommodityUiState uiState) {
+                        if (uiState == null) {
+                            return;
+                        }
+                        controllerCommodityLandIv.setVisibility(uiState.hasProductView ? View.VISIBLE : View.GONE);
+                        if (uiState.showProductViewOnLandscape) {
+                            if (!needShowControllerOnClosed) {
+                                needShowControllerOnClosed = isShowing();
+                                hide();
+                            }
+                        } else {
+                            if (needShowControllerOnClosed) {
+                                show();
+                                needShowControllerOnClosed = false;
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void observeForFitRightBottomViewLocation() {
+        ivLikesLand.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
+            @Override
+            public void onChanged(int visibility) {
+                processRightBottomViewVisibilityChanged(visibility, true);
+            }
+        });
+        cardEnterLandView.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
+            @Override
+            public void onChanged(int visibility) {
+                processRightBottomViewVisibilityChanged(visibility, false);
+            }
+        });
+        controllerCommodityLandIv.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
+            @Override
+            public void onChanged(int visibility) {
+                processRightBottomViewVisibilityChanged(visibility, false);
+            }
+        });
+    }
+
+    private void processRightBottomViewVisibilityChanged(int visibility, boolean isLikesView) {
+        if (likesReferView.getLayoutParams() == null) {
+            return;
+        }
+        boolean isVisible = visibility == View.VISIBLE;
+        if (isLikesView) {
+            if (isVisible || !hasRightBottomViewVisibleExcludeLikesView()) {
+                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
+            } else {
+                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
+            }
+        } else {
+            if (isVisible) {
+                if (ivLikesLand.getVisibility() != View.VISIBLE) {
+                    likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
+                }
+            } else if (!hasRightBottomViewVisibleExcludeLikesView()) {
+                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
+            }
+        }
+        MarginLayoutParams mlp = (MarginLayoutParams) cardEnterLandView.getLayoutParams();
+        if (mlp != null) {
+            mlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 44 : 20);
+        }
+        MarginLayoutParams cardEnterReferMlp = (MarginLayoutParams) cardEnterReferView.getLayoutParams();
+        if (cardEnterReferMlp != null) {
+            cardEnterReferMlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 34 : 10);
+        }
+        likesReferView.requestLayout();
+    }
+
+    private boolean isRightBottomOnlyCardEnterViewVisible() {
+        return cardEnterLandView.getVisibility() == View.VISIBLE && controllerCommodityLandIv.getVisibility() != View.VISIBLE && ivLikesLand.getVisibility() != View.VISIBLE;
+    }
+
+    private boolean hasRightBottomViewVisibleExcludeLikesView() {
+        return cardEnterLandView.getVisibility() == View.VISIBLE || controllerCommodityLandIv.getVisibility() == View.VISIBLE;
     }
     // </editor-fold>
 
@@ -230,6 +341,21 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public View getLandscapeDanmuSwitchView() {
         return ivDanmuSwitchLand;
+    }
+
+    @Override
+    public ImageView getCardEnterView() {
+        return cardEnterLandView;
+    }
+
+    @Override
+    public TextView getCardEnterCdView() {
+        return cardEnterCdLandTv;
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getCardEnterTipsView() {
+        return cardEnterTipsLandView;
     }
 
     @Override
@@ -298,6 +424,14 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 tvStartSendMessageLand.setText("跟大家聊点什么吧~");
                 tvStartSendMessageLand.setEnabled(true);
             }
+        }
+    }
+
+    @Override
+    public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+        if (tvStartSendMessageLand != null) {
+            tvStartSendMessageLand.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
     }
 
@@ -481,6 +615,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             if (onViewActionListener != null) {
                 onViewActionListener.onStartSendMessageAction();
             }
+        } else if (id == controllerCommodityLandIv.getId()) {
+            commodityViewModel.showProductLayoutOnLandscape();
         }
     }
     // </editor-fold>

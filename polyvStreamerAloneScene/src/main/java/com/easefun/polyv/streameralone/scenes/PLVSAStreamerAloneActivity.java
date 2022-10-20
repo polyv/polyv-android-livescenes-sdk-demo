@@ -664,6 +664,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             streamerLayout.getStreamerPresenter().registerView(fullscreenLayout.getStreamerView());
             fullscreenLayout.setOnViewActionListener(new PLVSAStreamerFullscreenLayout.OnViewActionListener() {
                 @Override
+                public void onScaleStreamerView(PLVLinkMicItemDataBean linkMicItemDataBean, float scaleFactor) {
+                    streamerLayout.scaleStreamerView(linkMicItemDataBean, scaleFactor);
+                }
+
+                @Override
                 public void onExitFullscreen(PLVLinkMicItemDataBean linkmicItem, PLVViewSwitcher fullscreenSwitcher) {
                     streamerLayout.clearFullscreenState(linkmicItem);
                 }

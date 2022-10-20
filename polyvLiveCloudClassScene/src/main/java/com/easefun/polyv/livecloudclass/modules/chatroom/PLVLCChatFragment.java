@@ -1,5 +1,9 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -33,6 +37,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPersonalListAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatFunctionListener;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
@@ -43,13 +48,16 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
@@ -66,17 +74,21 @@ import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -102,6 +114,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //信息输入框
     private EditText inputEt;
+    //信息输入框中记录的信息
+    private Editable recordInputMessage;
 
     //表情布局开关
     private ImageView toggleEmojiIv;
@@ -149,6 +163,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     //是否选择屏蔽特效
     private boolean isSelectCloseEffect = false;
 
+    //卡片推送
+    private ImageView cardEnterView;
+    private TextView cardEnterCdTv;
+    private PLVTriangleIndicateTextView cardEnterTipsView;
+    private PLVCardPushManager cardPushManager;
+
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
     private boolean isShowGreeting;//是否显示欢迎语
@@ -170,6 +190,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
+    private Runnable playbackTipsRunnable;
 
     //功能开关数据
     private List<PolyvChatFunctionSwitchVO.DataBean> functionSwitchData;
@@ -178,8 +199,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //聊天回放tipsView
     private TextView chatPlaybackTipsTv;
-    //是否聊天回放布局
+    //是否聊天回放布局(聊天回放布局不需要响应聊天室的实时聊天信息、房间开关、专注模式等)
     private boolean isChatPlaybackLayout;
+
+    //聊天室开关状态
+    private boolean isCloseRoomStatus;
+    //专注模式状态
+    private boolean isFocusModeStatus;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -219,7 +245,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             destroyPointRewardEffectQueue();
         }
         if (chatPlaybackTipsTv != null) {
-            chatPlaybackTipsTv.removeCallbacks(null);
+            chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
 
@@ -232,6 +258,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
         this.isChatPlaybackLayout = isChatPlaybackLayout;
+    }
+
+    public void setCardPushManager(PLVCardPushManager cardPushManager) {
+        this.cardPushManager = cardPushManager;
     }
 
     //设置是否是直播类型，如果不是直播类型，则隐藏公告(互动功能相关)按钮
@@ -280,8 +310,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         toggleMoreIv = findViewById(R.id.toggle_more_iv);
         if (isChatPlaybackLayout) {
             toggleMoreIv.setVisibility(View.GONE);
+            toggleEmojiIv.setEnabled(false);
+            toggleEmojiIv.setAlpha(0.5f);
         } else {
             toggleMoreIv.setVisibility(View.VISIBLE);
+            toggleEmojiIv.setEnabled(true);
+            toggleEmojiIv.setAlpha(1f);
         }
         toggleMoreIv.setOnClickListener(this);
 
@@ -364,6 +398,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
         //打赏横幅动画特效
         polyvPointRewardEffectWidget = findViewById(R.id.plvlc_point_reward_effect);
+        polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
 
         //欢迎语
         greetingTv = findViewById(R.id.greeting_tv);
@@ -375,12 +410,20 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         chatPlaybackTipsTv = findViewById(R.id.plvlc_chat_playback_tips_tv);
         if (isChatPlaybackLayout) {
             chatPlaybackTipsTv.setVisibility(View.VISIBLE);
-            chatPlaybackTipsTv.postDelayed(new Runnable() {
+            chatPlaybackTipsTv.postDelayed(playbackTipsRunnable = new Runnable() {
                 @Override
                 public void run() {
                     chatPlaybackTipsTv.setVisibility(View.GONE);
                 }
             }, 5000);
+        }
+
+        //卡片推送
+        cardEnterView = findViewById(R.id.card_enter_view);
+        cardEnterCdTv = findViewById(R.id.card_enter_cd_tv);
+        cardEnterTipsView = findViewById(R.id.card_enter_tips_view);
+        if (cardPushManager != null) {
+            cardPushManager.registerView(cardEnterView, cardEnterCdTv, cardEnterTipsView);
         }
 
         addPopupButton(toggleEmojiIv);
@@ -393,7 +436,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         acceptEmotionImageData(emotionImages);
     }
 
-    private void initChatMoreLayout(){
+    private void initChatMoreLayout() {
         chatMoreLayout = findViewById(R.id.plvlc_chat_more_layout);
         if (!isLiveType) {
             chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_BULLETIN, false);
@@ -402,8 +445,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             @Override
             public void onFunctionCallback(String type, String data) {
 
-                switch(type){
+                switch (type) {
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER:
+                        if (isFocusModeStatus) {
+                            ToastUtils.showShort("专注模式下无法使用");
+                            return;
+                        }
                         isSelectOnlyTeacher = !isSelectOnlyTeacher;
                         PLVChatFunctionVO onlyTeacherFunction = chatMoreLayout.getFunctionByType(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER);
                         if (onlyTeacherFunction != null) {
@@ -412,7 +459,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             chatMoreLayout.updateFunctionStatus(onlyTeacherFunction);
                         }
                         if (chatCommonMessageList != null) {
-                            chatCommonMessageList.changeDisplayType(isSelectOnlyTeacher);
+                            chatCommonMessageList.changeDisplayType(isSelectOnlyTeacher ? PLVLCMessageAdapter.DISPLAY_DATA_TYPE_SPECIAL : PLVLCMessageAdapter.DISPLAY_DATA_TYPE_FULL);
                         }
                         break;
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE:
@@ -482,8 +529,32 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="卡片推送">
+    private void acceptNewsPushStartMessage(final PLVNewsPushStartEvent newsPushStartEvent) {
+        if (cardPushManager != null) {
+            cardPushManager.acceptNewsPushStartMessage(chatroomPresenter, newsPushStartEvent);
+        }
+    }
+
+    private void acceptNewsPushCancelMessage() {
+        if (cardPushManager != null) {
+            cardPushManager.acceptNewsPushCancelMessage();
+        }
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="聊天回放">
-    private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new IPLVChatPlaybackCallDataListener() {
+    private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new PLVChatPlaybackCallDataExListener() {
+
+        @Override
+        public void onLoadPreviousEnabled(boolean enabled, boolean isByClearData) {
+            if (swipeLoadView != null) {
+                swipeLoadView.setEnabled(enabled);
+            }
+            if (!enabled && !isByClearData) {
+                ToastUtils.showShort(R.string.plv_chat_toast_history_all_loaded);
+            }
+        }
 
         @Override
         public void onHasNotAddedData() {
@@ -510,12 +581,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         || PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatPlaybackData.getUserId());
                 int itemType = chatPlaybackData.isImgMsg() ? PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG : PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
                 // 可通过userType判断是否是特别身份
-                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag() : null));
+                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag(chatPlaybackData.getUserId()) : null));
             }
             if (inHead) {
                 addChatMessageToListHead(dataList);
             } else {
-                addChatMessageToList(dataList, chatCommonMessageList.getItemCount() == 0);
+                boolean isScrollEnd = chatCommonMessageList != null && chatCommonMessageList.getItemCount() == 0;
+                addChatMessageToList(dataList, isScrollEnd);
             }
         }
 
@@ -541,6 +613,65 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public IPLVChatPlaybackCallDataListener getChatPlaybackDataListener() {
         return chatPlaybackDataListener;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="专注模式">
+    private void acceptFocusModeEvent(final PLVFocusModeEvent focusModeEvent) {
+        isFocusModeStatus = focusModeEvent.isOpen();
+        postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                updateViewByRoomStatusChanged(isFocusModeStatus);
+                if (chatCommonMessageList != null) {
+                    if (isFocusModeStatus) {
+                        chatCommonMessageList.changeDisplayType(PLVLCMessageAdapter.DISPLAY_DATA_TYPE_FOCUS_MODE);
+                    } else {
+                        chatCommonMessageList.changeDisplayType(isSelectOnlyTeacher ? PLVLCMessageAdapter.DISPLAY_DATA_TYPE_SPECIAL : PLVLCMessageAdapter.DISPLAY_DATA_TYPE_FULL);
+                    }
+                }
+                if (chatCommonMessageList != null && chatCommonMessageList.isLandscapeLayout()) {
+                    return;
+                }
+                ToastUtils.showLong(isFocusModeStatus ? R.string.plv_chat_toast_focus_mode_open : R.string.plv_chat_toast_focus_mode_close);
+            }
+        });
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="房间开关">
+    private void acceptCloseRoomEvent(PLVCloseRoomEvent closeRoomEvent) {
+        isCloseRoomStatus = closeRoomEvent.getValue().isClosed();
+        postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                updateViewByRoomStatusChanged(isCloseRoomStatus);
+                if (chatCommonMessageList != null && chatCommonMessageList.isLandscapeLayout()) {
+                    return;
+                }
+                ToastUtils.showLong(isCloseRoomStatus ? R.string.plv_chat_toast_chatroom_close : R.string.plv_chat_toast_chatroom_open);
+            }
+        });
+    }
+
+    private void updateViewByRoomStatusChanged(boolean isDisabled) {
+        boolean isEnabled = !isCloseRoomStatus && !isFocusModeStatus;
+        if (isDisabled) {
+            hideSoftInputAndPopupLayout();
+            if (recordInputMessage == null) {
+                recordInputMessage = inputEt.getText();
+            }
+            inputEt.setText("");
+        } else {
+            if (recordInputMessage != null && isEnabled) {
+                inputEt.setText(recordInputMessage);
+                recordInputMessage = null;
+            }
+        }
+        inputEt.setHint(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "我也来聊几句"));
+        inputEt.setEnabled(isEnabled);
+        toggleEmojiIv.setEnabled(isEnabled);
+        toggleEmojiIv.setAlpha(isEnabled ? 1f : 0.5f);
     }
     // </editor-fold>
 
@@ -579,6 +710,23 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         }
 
         @Override
+        public void onLoginError(@Nullable PLVLoginEvent loginEvent, final String msg, final int errorCode) {
+            super.onLoginError(loginEvent, msg, errorCode);
+            postToMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    PLVToast.Builder.create()
+                            .setText(format("{}({})", msg, errorCode))
+                            .show();
+                    final Activity activity = firstNotNull(getActivity(), ActivityUtils.getTopActivity());
+                    if (activity != null) {
+                        activity.finish();
+                    }
+                }
+            });
+        }
+
+        @Override
         public void onRewardEvent(@NonNull PLVRewardEvent rewardEvent) {
             super.onRewardEvent(rewardEvent);
             acceptPointRewardMessage(rewardEvent);
@@ -590,15 +738,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             if (isChatPlaybackLayout) {
                 return;
             }
-            if (chatCommonMessageList != null && chatCommonMessageList.isLandscapeLayout()) {
+            acceptCloseRoomEvent(closeRoomEvent);
+        }
+
+        @Override
+        public void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent) {
+            super.onFocusModeEvent(focusModeEvent);
+            if (isChatPlaybackLayout) {
                 return;
             }
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtils.showLong(closeRoomEvent.getValue().isClosed() ? R.string.plv_chat_toast_chatroom_close : R.string.plv_chat_toast_chatroom_open);
-                }
-            });
+            acceptFocusModeEvent(focusModeEvent);
         }
 
         @Override
@@ -620,7 +769,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localMessage, PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK, new PLVSpecialTypeTag(localMessage.getUserId())));
             if (!isShowKeyBoard(new OnceHideKeyBoardListener() {
                 @Override
                 public void call() {
@@ -643,17 +792,21 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 return;
             }
             final List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, new PLVSpecialTypeTag()));
-            if (!isShowKeyBoard(new OnceHideKeyBoardListener() {
-                @Override
-                public void call() {
-                    //添加信息至列表
-                    addChatMessageToList(dataList, true);//如果键盘还没完全隐藏，则等待键盘隐藏后再添加到列表中，避免出现列表布局动画问题
-                }
-            })) {
+            dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, emotionEvent.isSpecialTypeOrMe() ? new PLVSpecialTypeTag(emotionEvent.getUserId()) : null));
                 //添加信息至列表
-                addChatMessageToList(dataList, true);
-            }
+            addChatMessageToList(dataList, emotionEvent.isLocal());
+        }
+
+        @Override
+        public void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent) {
+            super.onNewsPushStartMessage(newsPushStartEvent);
+            acceptNewsPushStartMessage(newsPushStartEvent);
+        }
+
+        @Override
+        public void onNewsPushCancelMessage() {
+            super.onNewsPushCancelMessage();
+            acceptNewsPushCancelMessage();
         }
 
         @Override
@@ -663,7 +816,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 return;
             }
             List<PLVBaseViewData> dataList = new ArrayList<>();
-            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag()));
+            dataList.add(new PLVBaseViewData<>(localImgEvent, PLVChatMessageItemType.ITEMTYPE_SEND_IMG, new PLVSpecialTypeTag(localImgEvent.getUserId())));
             //添加信息至列表
             addChatMessageToList(dataList, true);
         }
@@ -745,26 +898,29 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 积分打赏动画特效">
+
     /**
      * 初始化积分打赏动画特效item
      */
-    private void initPointRewardEffectQueue(){
-        if(pointRewardEventProducer == null) {
+    private void initPointRewardEffectQueue() {
+        if (pointRewardEventProducer == null) {
             pointRewardEventProducer = new PLVPointRewardEffectQueue();
-            polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+            if (polyvPointRewardEffectWidget != null) {
+                polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+            }
         }
     }
 
     /**
      * 销毁积分打赏动效队列
      */
-    private void destroyPointRewardEffectQueue(){
+    private void destroyPointRewardEffectQueue() {
         if (pointRewardEventProducer != null) {
             pointRewardEventProducer.destroy();
         }
     }
 
-    private void acceptPointRewardMessage(final PLVRewardEvent rewardEvent){
+    private void acceptPointRewardMessage(final PLVRewardEvent rewardEvent) {
         if (pointRewardEventProducer != null) {
             //横屏 ｜ 屏蔽特效  不处理积分打赏事件
             if (ScreenUtils.isPortrait() && !isSelectCloseEffect) {
@@ -866,7 +1022,21 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 打开相机、选择图片及发送">
+    private boolean checkCanSendImg() {
+        if (isCloseRoomStatus) {
+            ToastUtils.showShort("聊天室已关闭，无法发送图片");
+            return false;
+        } else if (isFocusModeStatus) {
+            ToastUtils.showShort("专注模式下无法使用");
+            return false;
+        }
+        return true;
+    }
+
     private void requestSelectImg() {
+        if (!checkCanSendImg()) {
+            return;
+        }
         ArrayList<String> permissions = new ArrayList<>(1);
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         PLVFastPermission.getInstance()
@@ -896,6 +1066,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
 
     private void requestOpenCamera() {
+        if (!checkCanSendImg()) {
+            return;
+        }
         ArrayList<String> permissions = new ArrayList<>(2);
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissions.add(Manifest.permission.CAMERA);
@@ -980,10 +1153,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 更多 - 更新消息状态">
+
     /**
      * 更新消息记录状态
      */
-    public void updateInteractStatus(boolean isShow, boolean hasNew){
+    public void updateInteractStatus(boolean isShow, boolean hasNew) {
         chatMoreLayout.updateFunctionNew(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MESSAGE, isShow, hasNew);
     }
 
@@ -997,7 +1171,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     /**
      * 更新特效开关
      */
-    public void updateRewardEffectBtnVisibility(boolean isShow){
+    public void updateRewardEffectBtnVisibility(boolean isShow) {
 //        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, isShow);
     }
     // </editor-fold >
@@ -1121,15 +1295,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="切换表情TAB">
-    private void changeEmojiTab(boolean isEmoji){
+    private void changeEmojiTab(boolean isEmoji) {
         tabEmojiIv.setSelected(isEmoji);
         tabPersonalIv.setSelected(isEmoji);
         int selectColor = Color.parseColor("#FF2B2C35");
         int unSelectColor = Color.parseColor("#FF202127");
         tabEmojiIv.setBackgroundColor(isEmoji ? selectColor : unSelectColor);
-        tabPersonalIv.setBackgroundColor(isEmoji ?  unSelectColor : selectColor);
+        tabPersonalIv.setBackgroundColor(isEmoji ? unSelectColor : selectColor);
         //切换rv的表情库
-        if(isEmoji){
+        if (isEmoji) {
             //显示emoji表情库
             emojiRv.setVisibility(View.VISIBLE);
             sendMsgTv.setVisibility(View.VISIBLE);
@@ -1184,12 +1358,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 chatroomPresenter.sendLikeMessage();
             }
             acceptLikesMessage(1);
-        } else if(id == R.id.plvlc_emoji_tab_emoji_iv){
+        } else if (id == R.id.plvlc_emoji_tab_emoji_iv) {
             changeEmojiTab(true);
-        } else if(id == R.id.plvlc_emoji_tab_personal_iv){
+        } else if (id == R.id.plvlc_emoji_tab_personal_iv) {
             changeEmojiTab(false);
-        } else if(id == R.id.plvlc_iv_show_point_reward){
-            if(onViewActionListener != null){
+        } else if (id == R.id.plvlc_iv_show_point_reward) {
+            if (onViewActionListener != null) {
                 onViewActionListener.onShowRewardAction();
             }
         }
@@ -1221,6 +1395,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
         /**
          * 点击了动态功能控件
+         *
          * @param event 动态功能的event data
          */
         void onClickDynamicFunction(String event);

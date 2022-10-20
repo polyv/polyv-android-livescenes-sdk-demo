@@ -130,6 +130,15 @@ public class PLVWebViewHelper {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (!isUseActionView) {
+                try {
+                    if (url.startsWith("weixin://")) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        ActivityUtils.startActivity(intent);
+                        return true;
+                    }
+                } catch (Exception e) {
+                    return true;//如果没有安装对应的应用就拦截不展示错误画面
+                }
                 view.loadUrl(url);
             } else {
                 if (url.startsWith("yy://")) {

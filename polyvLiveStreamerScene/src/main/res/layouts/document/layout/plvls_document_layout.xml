@@ -1,38 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.easefun.polyv.livescenes.document.PLVSDocumentWebView
-        android:id="@+id/plvls_document_web_view"
+    <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+        android:id="@+id/plvls_document_switch_anchor_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+                android:id="@+id/plvls_document_layout_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintDimensionRatio="H,16:9"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:mode="all"
+                app:radius="8dp">
+
+                <com.easefun.polyv.livescenes.document.PLVSDocumentWebView
+                    android:id="@+id/plvls_document_web_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <FrameLayout
+                    android:id="@+id/plvls_document_no_select_ppt_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#313540"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/plvls_document_no_select_ppt" />
+
+                </FrameLayout>
+
+                <!--暂无直播时，嘉宾文档区的展位图-->
+                <com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView
+                    android:id="@+id/plvls_document_placeholder_view"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvls_document_zoom_value_hint_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="2dp"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:plvGradientColors="#661B202D"
+        app:plvRadius="18dp"
+        tools:text="100%"
+        tools:visibility="visible" />
 
     <com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout
         android:id="@+id/plvls_document_controller_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <FrameLayout
-        android:id="@+id/plvls_document_no_select_ppt_layout"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#313540"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:layout_gravity="center"
-            android:src="@drawable/plvls_document_no_select_ppt" />
-
-    </FrameLayout>
-
-    <!--暂无直播时，嘉宾文档区的展位图-->
-    <com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView
-        android:id="@+id/plvls_document_placeholder_view"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -41,8 +41,9 @@ public class PLVOrientationManager {
     }
 
     // 添加重力感应旋转观察者，在页面中使用PLVOrientationManager的API，需先添加RotationObserver
-    public void addRotationObserver(final PLVRotationObserver observer) {
+    public void addRotationObserver(final PLVRotationObserver observer, boolean enableRotation) {
         if (observer != null && !rotationObservers.contains(observer)) {
+            observer.setRotationEnabled(enableRotation);
             observer.setOrientationListener(new PLVOrientationListener.OrientationListener() {
                 @Override
                 public void onOrientationChanged(PLVOrientationListener.Orientation orientation) {

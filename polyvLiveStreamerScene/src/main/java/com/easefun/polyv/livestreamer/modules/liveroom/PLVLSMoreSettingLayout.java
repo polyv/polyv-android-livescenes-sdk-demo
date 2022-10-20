@@ -20,6 +20,7 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -52,9 +53,13 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private View moreSettingTitleSeparator;
     private LinearLayout moreSettingBeautyItemLayout;
     private LinearLayout moreSettingBitrateItemLayout;
+    private LinearLayout moreSettingShareItemLayout;
     private PLVLSBitrateLayout moreSettingBitrateLayout;
     private View moreSettingExitSeparator;
     private TextView moreSettingExitTv;
+
+    // 分享布局
+    private PLVLSShareLayout shareLayout;
 
     // 布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -88,6 +93,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         findView();
 
         initBitrateLayout();
+        initShareLayout();
         observeBeautyModuleInitResult();
 
         PLVBlurUtils.initBlurView(blurLy);
@@ -101,12 +107,14 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingBeautyItemLayout = findViewById(R.id.plvls_more_setting_beauty_item_layout);
         moreSettingBitrateItemLayout = findViewById(R.id.plvls_more_setting_bitrate_item_layout);
         moreSettingBitrateLayout = findViewById(R.id.plvls_more_setting_bitrate_layout);
+        moreSettingShareItemLayout = findViewById(R.id.plvls_more_setting_share_item_layout);
         moreSettingExitSeparator = findViewById(R.id.plvls_more_setting_exit_separator);
         moreSettingExitTv = findViewById(R.id.plvls_more_setting_exit_tv);
 
         moreSettingExitTv.setOnClickListener(this);
         moreSettingBeautyItemLayout.setOnClickListener(this);
         moreSettingBitrateItemLayout.setOnClickListener(this);
+        moreSettingShareItemLayout.setOnClickListener(this);
     }
 
     private void initBitrateLayout() {
@@ -118,6 +126,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 }
             }
         });
+    }
+
+    private void initShareLayout() {
+        shareLayout = new PLVLSShareLayout(getContext());
     }
 
     private void observeBeautyModuleInitResult() {
@@ -149,6 +161,14 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 });
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="初始化数据">
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        if (shareLayout != null) {
+            shareLayout.init(liveRoomDataManager);
+        }
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="布局控制">
     public void open() {
@@ -214,6 +234,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     }
 
     public boolean onBackPressed() {
+        if (shareLayout != null && shareLayout.onBackPressed()) {
+            return true;
+        }
         if (menuDrawer != null
                 && (menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_OPEN
                 || menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_OPENING)) {
@@ -226,6 +249,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     public void destroy() {
         close();
         stopUpdateBlurViewTimer();
+        if (shareLayout != null) {
+            shareLayout.destroy();
+        }
     }
     // </editor-fold>
 
@@ -278,6 +304,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
         } else if (id == moreSettingBitrateItemLayout.getId()) {
             showLayout(moreSettingBitrateLayout);
+        } else if (id == moreSettingShareItemLayout.getId()) {
+            close();
+            shareLayout.open();
         }
     }
     // </editor-fold>

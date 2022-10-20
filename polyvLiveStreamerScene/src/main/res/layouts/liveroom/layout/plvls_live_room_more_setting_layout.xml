@@ -97,12 +97,29 @@
 
             </LinearLayout>
 
-            <!--  placeholder  -->
-            <Space
+            <LinearLayout
+                android:id="@+id/plvls_more_setting_share_item_layout"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_rowWeight="1" />
+                android:layout_rowWeight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_more_share" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="12sp"
+                    android:text="@string/plvls_share_title"
+                    android:textColor="#99F0F1F5" />
+
+            </LinearLayout>
 
             <!--  placeholder  -->
             <Space

@@ -50,7 +50,7 @@
             android:id="@+id/plvlc_cover_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
         <!-- 主播放器载入状态view -->
         <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout
@@ -96,6 +96,9 @@
         app:layout_constraintRight_toRightOf="@id/plvlc_playback_switch_anchor_player"
         app:layout_constraintTop_toTopOf="@id/plvlc_playback_switch_anchor_player" />
 
+    <!-- 播放失败/加载缓慢的占位View -->
+    <include layout="@layout/plvlc_live_player_error_layout" />
+
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
         android:id="@+id/chat_landscape_ly"
@@ -111,6 +114,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="10dp" />
+
+    <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:layout_width="308dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:plv_show_on_landscape="true"
+        app:plv_show_on_portrait="false" />
 
     <!-- 亮度手势提示 -->
     <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView
@@ -149,13 +161,13 @@
     <!--    打赏动画  -->
     <com.opensource.svgaplayer.SVGAImageView
         android:id="@+id/plvlc_reward_svg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:layout_marginTop="90dp"
         android:layout_marginBottom="90dp"
-        android:layout_gravity="center"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
         android:visibility="invisible"
-        app:source="posche.svga"
-        app:autoPlay="true"/>
+        app:autoPlay="true"
+        app:source="posche.svga" />
 
 </merge>

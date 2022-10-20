@@ -18,10 +18,12 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
@@ -30,11 +32,14 @@ import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
+
+import io.reactivex.Observable;
 
 /**
  * mvp-聊天室契约接口
@@ -104,6 +109,12 @@ public interface IPLVChatroomContract {
         void onLoginEvent(@NonNull PLVLoginEvent loginEvent);
 
         /**
+         * 登录失败回调
+         */
+        @WorkerThread
+        void onLoginError(@Nullable PLVLoginEvent loginEvent, String msg, int errorCode);
+
+        /**
          * 用户退出事件
          */
         @WorkerThread
@@ -152,6 +163,12 @@ public interface IPLVChatroomContract {
         void onCloseRoomEvent(@NonNull PLVCloseRoomEvent closeRoomEvent);
 
         /**
+         * 专注模式事件
+         */
+        @WorkerThread
+        void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent);
+
+        /**
          * 移除信息事件
          *
          * @param id          移除单条信息的id，如果是移除所有信息，那么必定为null
@@ -183,6 +200,16 @@ public interface IPLVChatroomContract {
          * 加载个性图片表情消息
          */
         void onLoadEmotionMessage(@Nullable PLVChatEmotionEvent emotionEvent);
+
+        /**
+         * 卡片推送开始消息
+         */
+        void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent);
+
+        /**
+         * 卡片推送取消消息
+         */
+        void onNewsPushCancelMessage();
 
         /**
          * 自己本地发送的图片信息
@@ -360,6 +387,13 @@ public interface IPLVChatroomContract {
          * 获取聊天室个性表情
          */
         void getChatEmotionImages();
+
+        /**
+         * 获取卡片推送信息
+         *
+         * @param cardId 卡片推送Id
+         */
+        Observable<PLVCardPushVO> getCardPushInfo(String cardId);
 
         /**
          * 是否关闭房间

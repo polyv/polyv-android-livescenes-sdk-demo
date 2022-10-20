@@ -28,13 +28,17 @@ import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveMoreLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPPTTurnPageLayout;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -53,6 +57,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private static final String TAG = "PLVLCLiveMediaController";
     //控制栏显示的时间
     private static final int SHOW_TIME = 5000;
+
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
     //竖屏控制栏布局
     private ViewGroup videoControllerPortLy;
@@ -77,8 +83,6 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView gradientBarTopPortView;
     //重新打开悬浮窗提示
     private TextView tvReopenFloatingViewTip;
-    //打赏按钮
-    private ImageView rewardView;
     //ppt翻页
     private PLVLCPPTTurnPageLayout pptTurnPagePortLayout;
 
@@ -113,6 +117,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView liveControlFloatingIv;
     //ppt 翻页
     private PLVLCPPTTurnPageLayout pptTurnPageLandLayout;
+    //打赏按钮
+    private ImageView rewardView;
+    //商品按钮
+    private ImageView commodityView;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
@@ -263,6 +271,32 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                     }
                 });
     }
+
+    private void observeCommodityStatus() {
+        commodityViewModel.getCommodityUiStateLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVCommodityUiState>() {
+                    boolean needShowControllerOnClosed = false;
+
+                    @Override
+                    public void onChanged(@Nullable PLVCommodityUiState uiState) {
+                        if (uiState == null) {
+                            return;
+                        }
+                        commodityView.setVisibility(uiState.hasProductView ? View.VISIBLE : View.GONE);
+                        if (uiState.showProductViewOnLandscape) {
+                            if (!needShowControllerOnClosed) {
+                                needShowControllerOnClosed = isShowing();
+                                hide();
+                            }
+                        } else {
+                            if (needShowControllerOnClosed) {
+                                show();
+                                needShowControllerOnClosed = false;
+                            }
+                        }
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLiveMediaController父接口IPolyvMediaController定义的方法">
@@ -349,6 +383,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         moreLandIv.setOnClickListener(this);
         rewardView = landscapeController.getRewardView();
         rewardView.setOnClickListener(this);
+        commodityView = landscapeController.getCommodityView();
+        commodityView.setOnClickListener(this);
         pptTurnPageLandLayout = landscapeController.getPPTTurnPageLayout();
         pptTurnPageLandLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
@@ -363,6 +399,13 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         } else {
             videoControllerLandLy.setVisibility(View.VISIBLE);
         }
+
+        observeCommodityStatus();
+    }
+
+    @Override
+    public IPLVLCLiveLandscapePlayerController getLandscapeController() {
+        return landscapeController;
     }
 
     @Override
@@ -375,8 +418,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         this.isServerEnablePPT = enable;
         videoPptSwitchPortIv.setVisibility(enable ? View.VISIBLE : View.GONE);
         videoPptSwitchLandIv.setVisibility(enable ? View.VISIBLE : View.GONE);
-        pptTurnPagePortLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
-        pptTurnPageLandLayout.setVisibility(enable ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void setTurnPageLayoutStatus(boolean isShow) {
+        pptTurnPageLandLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        pptTurnPagePortLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -517,6 +564,19 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void showMoreLayout() {
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            if (morePortIv != null) {
+                morePortIv.performClick();
+            }
+        } else {
+            if (moreLandIv != null) {
+                moreLandIv.performClick();
+            }
+        }
+    }
+
+    @Override
     public void dispatchDanmuSwitchOnClicked(View v) {
         this.onClick(v);
     }
@@ -525,6 +585,14 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void notifyLowLatencyUpdate(boolean isLowLatency) {
         this.isLowLatencyWatch = isLowLatency;
         moreLayout.updateViewWithLatency(isLowLatency);
+    }
+
+    @Override
+    public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+        if (startSendMessageLandIv != null) {
+            startSendMessageLandIv.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            startSendMessageLandIv.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
+        }
     }
 
     @Override
@@ -765,6 +833,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             if (onViewActionListener != null) {
                 onViewActionListener.onClickFloating();
             }
+        } else if (id == commodityView.getId()) {
+            commodityViewModel.showProductLayoutOnLandscape();
         }
     }
     // </editor-fold>
@@ -921,5 +991,4 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     // </editor-fold>
-
 }

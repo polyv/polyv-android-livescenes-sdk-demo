@@ -2,6 +2,8 @@ package com.easefun.polyv.livecloudclass.modules.media;
 
 import androidx.annotation.NonNull;
 import android.util.Pair;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
@@ -12,6 +14,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 
@@ -107,6 +110,21 @@ public interface IPLVLCMediaLayout {
     PLVPlayerLogoView getLogoView();
 
     /**
+     * 获取卡片推送入口按钮
+     */
+    ImageView getCardEnterView();
+
+    /**
+     * 获取卡片推送入口倒计时控件
+     */
+    TextView getCardEnterCdView();
+
+    /**
+     * 获取卡片推送入口提示控件
+     */
+    PLVTriangleIndicateTextView getCardEnterTipsView();
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器
@@ -126,6 +144,16 @@ public interface IPLVLCMediaLayout {
      * @param listener 监听器
      */
     void addOnPPTShowStateListener(IPLVOnDataChangedListener<Boolean> listener);
+
+    /**
+     * 隐藏控制栏
+     */
+    boolean hideController();
+
+    /**
+     * 显示控制栏
+     */
+    void showController();
 
     /**
      * 是否拦截返回事件
@@ -148,6 +176,11 @@ public interface IPLVLCMediaLayout {
      * @param landscapeControllerView 横屏控制器
      */
     void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView);
+
+    /**
+     * 获取横屏控制器
+     */
+    IPLVLCLiveLandscapePlayerController getLandscapeControllerView();
 
     /**
      * 更新观看热度
@@ -224,6 +257,13 @@ public interface IPLVLCMediaLayout {
      * 设置横屏打赏特效显示
      */
     void setLandscapeRewardEffectVisibility(boolean isShow);
+
+    /**
+     * 显示或隐藏ppt翻页控件
+     *
+     * @param toShow true：显示，false：隐藏
+     */
+    void onTurnPageLayoutChange(boolean toShow);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -376,7 +416,6 @@ public interface IPLVLCMediaLayout {
          * rtc观看是否正在暂停
          */
         boolean isRtcPausing();
-
     }
     // </editor-fold>
 

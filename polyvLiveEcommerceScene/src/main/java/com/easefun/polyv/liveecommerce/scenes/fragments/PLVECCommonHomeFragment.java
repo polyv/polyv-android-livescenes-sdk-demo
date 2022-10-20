@@ -14,6 +14,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -24,7 +25,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -43,6 +44,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVSocketLoginManager socketLoginManager;
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+    //卡片推送管理器
+    protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -71,6 +74,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         super.onDestroy();
         if (chatroomPresenter != null) {
             chatroomPresenter.destroy();
+        }
+        if (cardPushManager != null) {
+            cardPushManager.disposeCardPushAllTask();
         }
         destroySocketLoginManager();
     }
@@ -116,7 +122,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     //处理获取到的商品数据
-    protected void acceptCommodityVO(PolyvCommodityVO commodityVO, boolean isAddOrSet) {
+    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
     }
 
     //处理获取到的聊天回放开关
@@ -125,6 +131,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
+    public PLVCardPushManager getCardPushManager() {
+        return cardPushManager;
+    }
+
     //获取聊天室的公告信息
     public LiveData<PolyvBulletinVO> getBulletinVO() {
         return chatroomPresenter.getData().getBulletinVO();
@@ -156,6 +166,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     public void acceptNetworkQuality(int quality) {
+
+    }
+
+    public void showMorePopupWindow() {
 
     }
 
@@ -301,9 +315,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     private void observeCommodityVO() {
         //当前页面 监听 直播间数据管理器对象中的直播商品数据变化
-        liveRoomDataManager.getCommodityVO().observe(this, new Observer<PLVStatefulData<PolyvCommodityVO>>() {
+        liveRoomDataManager.getCommodityVO().observe(this, new Observer<PLVStatefulData<PLVCommodityVO2>>() {
             @Override
-            public void onChanged(@Nullable PLVStatefulData<PolyvCommodityVO> commodityVO) {
+            public void onChanged(@Nullable PLVStatefulData<PLVCommodityVO2> commodityVO) {
                 if (commodityVO != null && commodityVO.isSuccess()) {
                     boolean isAddOrSet = liveRoomDataManager.getCommodityRank() <= -1;
                     acceptCommodityVO(commodityVO.getData(), !isAddOrSet);

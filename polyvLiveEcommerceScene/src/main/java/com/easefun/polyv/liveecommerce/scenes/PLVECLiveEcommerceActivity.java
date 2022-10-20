@@ -1,5 +1,8 @@
 package com.easefun.polyv.liveecommerce.scenes;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.Observer;
@@ -14,6 +17,7 @@ import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
 
@@ -23,6 +27,9 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
@@ -57,13 +64,11 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.io.File;
 import java.util.List;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
 
 /**
  * 直播带货场景下定义的 直播模式、回放模式 的 共用界面。
@@ -258,6 +263,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance().switchStore(this)
                 .addModule(PLVPlaybackCacheModule.instance)
+                .addModule(PLVPlaybackChapterModule.instance)
                 .addModule(PLVECFloatingWindowModule.instance);
     }
 
@@ -381,6 +387,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onShowMoreLayoutAction() {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.showMorePopupWindow();
+                }
+            }
+
+            @Override
             public void acceptOnLowLatencyChange(boolean isLowLatency) {
                 if (commonHomeFragment != null) {
                     commonHomeFragment.acceptOnLowLatencyChange(isLowLatency);
@@ -396,19 +409,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         });
         //当前activity 可以手势操作暂停和播放
         initGesture();
-        //判断是否有输入vid进入
-        String vid = liveRoomDataManager.getConfig().getVid();
-        if (!liveRoomDataManager.getConfig().isLive()) {
-            if (!TextUtils.isEmpty(vid)) {
-                // 已填写vid，使用指定的视频播放
-                videoLayout.startPlay();
-            } else {
-                // 未填写vid，后台配置了使用直播暂存或者列表回放
-                startPlaybackOnHasRecordFile();
-                observePreviousPage();
-            }
-        } else {
-            videoLayout.startPlay();
+
+        videoLayout.startPlay();
+
+        final String vid = liveRoomDataManager.getConfig().getVid();
+        final boolean isPlayback = !liveRoomDataManager.getConfig().isLive();
+        if (isPlayback && TextUtils.isEmpty(vid)) {
+            observePreviousPage();
         }
     }
 
@@ -513,6 +520,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
         // 设置LiveRoomDataManager
         commonHomeFragment.init(liveRoomDataManager);
+        // 卡片推送
+        commonHomeFragment.getCardPushManager().setOnCardEnterClickListener(new PLVCardPushManager.OnCardEnterClickListener() {
+            @Override
+            public void onClick(PLVShowPushCardEvent event) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showCardPush(event);
+                }
+            }
+        });
     }
 
     /**
@@ -565,7 +581,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="初始化弹窗Layout - 积分打赏、互动应用">
     private void setupPopoverLayout(){
-        if(popoverLayout == null){
+        if (popoverLayout == null) {
             ViewStub floatViewStub = findViewById(R.id.plvec_popover_layout);
             popoverLayout = (IPLVPopoverLayout) floatViewStub.inflate();
             popoverLayout.init(PLVLiveScene.ECOMMERCE, liveRoomDataManager);
@@ -573,6 +589,17 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 @Override
                 public void pointRewardEnable(boolean enable) {
                     liveRoomDataManager.getPointRewardEnableData().postValue(PLVStatefulData.success(enable));
+                }
+            });
+            popoverLayout.setOnOpenInsideWebViewListener(new PLVInteractLayout2.OnOpenInsideWebViewListener() {
+                @Override
+                public PLVInteractLayout2.OpenUrlParam onOpenWithParam(boolean isLandscape) {
+                    ViewGroup containerView = findViewById(R.id.plvec_popup_container);
+                    return new PLVInteractLayout2.OpenUrlParam((int) (containerView.getHeight() * 0.3f), containerView);
+                }
+
+                @Override
+                public void onClosed() {
                 }
             });
         }
@@ -792,6 +819,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         @Override
         public void onViewCreated() {
             observerDataToPlaybackHomeFragment();
+            setupPopoverLayout();
         }
     };
     // </editor-fold>

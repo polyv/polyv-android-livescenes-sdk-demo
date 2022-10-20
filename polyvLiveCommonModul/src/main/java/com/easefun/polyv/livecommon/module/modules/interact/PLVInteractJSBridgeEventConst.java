@@ -63,6 +63,7 @@ public class PLVInteractJSBridgeEventConst {
     public static final String V2_INIT_WEB_VIEW = "initWebView";
     public static final String V2_CLOSE_WEB_VIEW = "closeWebView";
     public static final String V2_LINK_CLICK = "linkClick";
+    public static final String V2_CALL_APP_EVENT = "callAppEvent";
     public static final String V2_SHOW_WEB_VIEW = "showWebView";
     public static final String V2_WEB_VIEW_UPDATE_APP_STATUS = "webViewUpdateAppStatus";
     public static final String V2_LOCK_TO_PORTRAIT = "lockToPortrait";

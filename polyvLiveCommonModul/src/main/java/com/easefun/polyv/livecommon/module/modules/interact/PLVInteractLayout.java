@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractAnswer;
 import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractBulletin;
@@ -30,6 +31,7 @@ import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractSignI
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractAppAbs;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractWebView;
+import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -103,6 +105,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        init(liveRoomDataManager, null);
+    }
+
+    @Override
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager, @Nullable PLVLiveScene scene) {
         if (interactWebView == null) {
             return;
         }
@@ -118,10 +125,20 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void setOnOpenInsideWebViewListener(PLVInteractLayout2.OnOpenInsideWebViewListener listener) {
+
+    }
+
+    @Override
     public void showBulletin() {
         if (interactBulletin != null) {
             interactBulletin.showBulletin();
         }
+    }
+
+    @Override
+    public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
+
     }
 
     @Override

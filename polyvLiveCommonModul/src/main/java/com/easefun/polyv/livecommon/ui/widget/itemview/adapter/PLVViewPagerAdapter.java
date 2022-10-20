@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.ui.widget.itemview.adapter;
 
 import android.os.Parcelable;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -34,6 +35,12 @@ public class PLVViewPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return fragments.get(position);
+    }
+
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        final int index = fragments.indexOf(object);
+        return index < 0 ? POSITION_NONE : index;
     }
 
     @Override

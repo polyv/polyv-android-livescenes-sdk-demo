@@ -12,6 +12,7 @@ import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.pointreward.IPLVPointRewardDataSource;
 import com.plv.livescenes.feature.pointreward.PLVRewardDataSource;
+import com.plv.livescenes.feature.pointreward.vo.PLVDonateGoodResponseVO;
 import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 
 import java.lang.ref.WeakReference;
@@ -155,9 +156,9 @@ public class PLVPointRewardPresenter implements IPLVPointRewardContract.IPointRe
         }
 
         rewardManager.makeGiftCashReward(currentChannel, goodId, goodNum, currentUser.getViewerId(),
-                currentUser.getViewerName(), currentUser.getViewerAvatar(), sessionId, new IPLVPointRewardDataSource.IPointRewardListener<Integer>() {
+                currentUser.getViewerName(), currentUser.getViewerAvatar(), sessionId, new IPLVPointRewardDataSource.IPointRewardListener<PLVDonateGoodResponseVO>() {
                     @Override
-                    public void onSuccess(Integer integer) {
+                    public void onSuccess(PLVDonateGoodResponseVO vo) {
 
                     }
 

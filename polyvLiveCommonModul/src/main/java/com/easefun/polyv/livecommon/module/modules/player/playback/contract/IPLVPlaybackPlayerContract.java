@@ -50,6 +50,16 @@ public interface IPLVPlaybackPlayerContract {
         View getBufferingIndicator();
 
         /**
+         * 获取暂无直播显示的视图
+         */
+        View getNoStreamIndicator();
+
+        /**
+         * 获取播放失败/加载缓慢显示的视图
+         */
+        View getPlayErrorIndicator();
+
+        /**
          * 获取播放器断网重试视图
          * @return
          */
@@ -85,6 +95,14 @@ public interface IPLVPlaybackPlayerContract {
          * @param tips  错误提示
          */
         void onPlayError(PolyvPlayError error, String tips);
+
+        /**
+         * 视频加载缓慢
+         *
+         * @param loadedTime    当前已加载的时间
+         * @param isBufferEvent 是否是缓冲事件导致的加载缓慢，true：是，false：是播放前加载缓慢导致
+         */
+        void onLoadSlow(int loadedTime, boolean isBufferEvent);
 
         /**
          * 播放完成回调
@@ -157,6 +175,13 @@ public interface IPLVPlaybackPlayerContract {
          * @return 是否要跳转进度
          */
         boolean onProgressChanged(int seekTime, int totalTime, boolean isEnd, boolean isRightSwipe);
+
+        /**
+         * 触发自动续播时回调
+         *
+         * @param seekTo 自动续播跳转进度
+         */
+        void onAutoContinuePlaySeeked(int seekTo);
 
         /**
          * 双击手势触发

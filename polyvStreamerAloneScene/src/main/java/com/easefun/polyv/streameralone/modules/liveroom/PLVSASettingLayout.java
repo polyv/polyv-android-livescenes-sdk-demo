@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+
 import android.Manifest;
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
@@ -31,20 +33,29 @@ import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
+import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 开播设置布局
@@ -95,8 +106,13 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVRoundRectLayout plvsaSettingBeautyLayout;
     private ImageView plvsaSettingBeautyIv;
     private Button plvsaSettingStartLiveBtn;
+    private PLVOrientationSensibleLinearLayout settingPushResolutionRatioLl;
+    private ImageView settingPushResolutionRatioIv;
+    private TextView settingPushResolutionRatioTv;
 
     private String liveTitle;
+
+    private PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>> landscapeChannelPushRatioMapKV = new PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>>("plvsa_setting_push_resolution_ratio_land_key") {};
 
     // 标记位 当用户手动切换清晰度时为true 避免进入设置页时内部初始化清晰度弹出toast提示
     private boolean switchBitrateByUser = false;
@@ -145,6 +161,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingBeautyLayout = findViewById(R.id.plvsa_setting_beauty_layout);
         plvsaSettingBeautyIv = findViewById(R.id.plvsa_setting_beauty_iv);
         plvsaSettingStartLiveBtn = findViewById(R.id.plvsa_setting_start_live_btn);
+        settingPushResolutionRatioLl = findViewById(R.id.plvsa_setting_push_resolution_ratio_ll);
+        settingPushResolutionRatioIv = findViewById(R.id.plvsa_setting_push_resolution_ratio_iv);
+        settingPushResolutionRatioTv = findViewById(R.id.plvsa_setting_push_resolution_ratio_tv);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
         plvsaSettingBeautyLayout.setOnClickListener(this);
@@ -157,6 +176,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingBitrateTv.setOnClickListener(this);
         plvsaSettingScreenOrientationIv.setOnClickListener(this);
         plvsaSettingScreenOrientationTv.setOnClickListener(this);
+        settingPushResolutionRatioLl.setOnClickListener(this);
 
         initTitleInputLayout();
         initBitrateLayout();
@@ -321,6 +341,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plvsa_setting_start_live));
     }
 
+    private void initPushResolutionRatioLayout() {
+        final boolean userAllowChangeRatio = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RATIO);
+        final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
+        settingPushResolutionRatioLl.setShowOnLandscape(userAllowChangeRatio && channelAllowChangeRatio);
+    }
+
     /**
      * 判断当前用户类型是否是嘉宾
      */
@@ -339,6 +365,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
         initStartLiveBtnText();
+        initPushResolutionRatioLayout();
     }
 
     @Override
@@ -423,6 +450,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
         if (streamerPresenter != null) {
             streamerPresenter.registerView(streamerView);
+            observePushResolutionRatio();
             streamerPresenter.getData().getCurBitrate().observe((LifecycleOwner) getContext(), new Observer<Integer>() {
                 @Override
                 public void onChanged(@Nullable Integer bitrate) {
@@ -464,6 +492,33 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
     };
 
+    private void observePushResolutionRatio() {
+        if (streamerPresenter == null) {
+            return;
+        }
+        streamerPresenter.getData().getPushResolutionRatio()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVLinkMicConstant.PushResolutionRatio>() {
+                    @Override
+                    public void onChanged(@Nullable PLVLinkMicConstant.PushResolutionRatio resolutionRatio) {
+                        if (resolutionRatio == null) {
+                            return;
+                        }
+                        if (ScreenUtils.isLandscape()) {
+                            saveLandscapePushResolutionRatio(resolutionRatio);
+                        }
+                        switch (resolutionRatio) {
+                            case RATIO_16_9:
+                                settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_16_9);
+                                break;
+                            case RATIO_4_3:
+                                settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_4_3);
+                                break;
+                            default:
+                        }
+                    }
+                });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
@@ -472,15 +527,21 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
+        updatePushResolutionRatioOnOrientationChanged(newConfig);
+
         MarginLayoutParams settingConfigLayoutParam = (MarginLayoutParams) plvsaSettingConfigLy.getLayoutParams();
         MarginLayoutParams settingButtonLayoutParam = (MarginLayoutParams) plvsaSettingBtnLl.getLayoutParams();
         int liveTitleMaxLines;
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            settingConfigLayoutParam.width = ConvertUtils.dp2px(450);
+            settingButtonLayoutParam.width = ConvertUtils.dp2px(450);
             settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND;
             settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_LAND;
             liveTitleMaxLines = LIVE_TITLE_MAX_LINES_LAND;
         } else {
+            settingConfigLayoutParam.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            settingButtonLayoutParam.width = ViewGroup.LayoutParams.MATCH_PARENT;
             settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT;
             settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_PORT;
             liveTitleMaxLines = LIVE_TITLE_MAX_LINES_PORT;
@@ -489,6 +550,27 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingConfigLy.setLayoutParams(settingConfigLayoutParam);
         plvsaSettingBtnLl.setLayoutParams(settingButtonLayoutParam);
         plvsaSettingLiveTitleTv.setMaxLines(liveTitleMaxLines);
+    }
+
+    private void updatePushResolutionRatioOnOrientationChanged(Configuration newConfig) {
+        final boolean userAllowChangeRatio = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RATIO);
+        final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
+        if (!userAllowChangeRatio || !channelAllowChangeRatio) {
+            return;
+        }
+
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // 竖屏推流只支持 16:9
+            if (streamerPresenter != null) {
+                streamerPresenter.setPushResolutionRatio(PLVLinkMicConstant.PushResolutionRatio.RATIO_16_9);
+            }
+        } else {
+            // 横屏自动恢复上次选择的画面比例
+            final PLVLinkMicConstant.PushResolutionRatio lastLandscapePushResolutionRatio = readLandscapePushResolutionRatio();
+            if (streamerPresenter != null && lastLandscapePushResolutionRatio != null && streamerPresenter.getData().getPushResolutionRatio().getValue() != lastLandscapePushResolutionRatio) {
+                streamerPresenter.setPushResolutionRatio(lastLandscapePushResolutionRatio);
+            }
+        }
     }
 
     // </editor-fold>
@@ -527,6 +609,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             changeScreenOrientation();
         } else if (id == plvsaSettingBeautyLayout.getId()) {
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
+        } else if (id == settingPushResolutionRatioLl.getId()) {
+            changePushResolutionRatio();
         }
     }
     // </editor-fold>
@@ -622,6 +706,41 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             PLVScreenUtils.enterPortrait((Activity) getContext());
             ScreenUtils.setPortrait((Activity) getContext());
             PLVLiveLocalActionHelper.getInstance().updateOrientation(true);
+        }
+    }
+
+    private void saveLandscapePushResolutionRatio(@Nullable PLVLinkMicConstant.PushResolutionRatio resolutionRatio) {
+        final Map<String, PLVLinkMicConstant.PushResolutionRatio> channelRatioMap = getOrDefault(landscapeChannelPushRatioMapKV.get(), new HashMap<String, PLVLinkMicConstant.PushResolutionRatio>());
+        channelRatioMap.put(liveRoomDataManager.getConfig().getChannelId(), resolutionRatio);
+        landscapeChannelPushRatioMapKV.set(channelRatioMap);
+    }
+
+    @Nullable
+    private PLVLinkMicConstant.PushResolutionRatio readLandscapePushResolutionRatio() {
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        final Map<String, PLVLinkMicConstant.PushResolutionRatio> channelRatioMap = getOrDefault(landscapeChannelPushRatioMapKV.get(), new HashMap<String, PLVLinkMicConstant.PushResolutionRatio>());
+        final PLVLinkMicConstant.PushResolutionRatio localRatio = channelRatioMap.get(channelId);
+        if (localRatio != null) {
+            return localRatio;
+        }
+        return PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_ALONE_DEFAULT_PUSH_RESOLUTION_RATIO);
+    }
+
+    private void changePushResolutionRatio() {
+        if (streamerPresenter == null) {
+            return;
+        }
+        final boolean userAllowChangeRatio = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RATIO);
+        final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
+        if (!userAllowChangeRatio || !channelAllowChangeRatio) {
+            return;
+        }
+
+        final PLVLinkMicConstant.PushResolutionRatio currentRatio = streamerPresenter.getData().getPushResolutionRatio().getValue();
+        if (currentRatio == null) {
+            streamerPresenter.setPushResolutionRatio(PLVLinkMicConstant.PushResolutionRatio.RATIO_16_9);
+        } else {
+            streamerPresenter.setPushResolutionRatio(currentRatio.next());
         }
     }
 

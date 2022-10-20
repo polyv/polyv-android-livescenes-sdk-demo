@@ -1,4 +1,4 @@
-package com.easefun.polyv.livecloudclass.modules.pagemenu.previous;
+package com.easefun.polyv.livecloudclass.modules.pagemenu.chapter;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -9,10 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
-import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.adapter.PLVLCChapterAdapter;
-import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
-import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVChapterAdapter;
-import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVChapterView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.adapter.PLVLCChapterAdapter;
+import com.easefun.polyv.livecommon.module.modules.chapter.view.PLVChapterAdapter;
+import com.easefun.polyv.livecommon.module.modules.chapter.view.PLVChapterView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 
 /**
@@ -23,8 +22,6 @@ public class PLVLCPlaybackChapterFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="变量">
     //章节列表view
     private PLVChapterView plvChapterView;
-    //presenter
-    private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPresenter;
 
     // </editor-fold>
 
@@ -35,30 +32,10 @@ public class PLVLCPlaybackChapterFragment extends PLVBaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.plvlc_chapter_fragment, container, false);
         initView();
-        initData();
         return view;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (plvChapterView != null) {
-            plvChapterView.onDestroy();
-        }
-    }
-
     // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="初始化">
-
-    /**
-     * 初始化，将presenter传进来注册plvChapterView
-     * @param presenter presenter
-     */
-    public void init(IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter presenter) {
-        this.previousPresenter = presenter;
-    }
-    //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
@@ -77,17 +54,7 @@ public class PLVLCPlaybackChapterFragment extends PLVBaseFragment {
                 .setRecyclerViewLayoutManager(new LinearLayoutManager(getContext()));
 
         plvChapterView.setParams(builder);
-        if (previousPresenter != null) {
-            previousPresenter.registerView(plvChapterView.getPreviousView());
-        }
     }
-    // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="初始化data">
-    private void initData() {
-        if (plvChapterView != null) {
-            plvChapterView.requestChapterList();
-        }
-    }
     // </editor-fold>
 }

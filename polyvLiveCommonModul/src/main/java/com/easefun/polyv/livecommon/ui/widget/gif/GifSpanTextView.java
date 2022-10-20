@@ -60,6 +60,7 @@ public class GifSpanTextView extends GifTextView {
             setContentHttpPattern(text);
         } else {
             setText(text);
+            setMovementMethod(null);
         }
     }
 
@@ -188,9 +189,9 @@ public class GifSpanTextView extends GifTextView {
         if (hasFind) {
             setText(sp);
             setMovementMethod(LinkMovementMethod.getInstance());
-
         } else {
             setText(string);
+            setMovementMethod(null);
         }
 
     }

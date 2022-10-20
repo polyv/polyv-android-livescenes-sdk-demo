@@ -33,6 +33,7 @@ import com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
+import com.easefun.polyv.livestreamer.modules.streamer.di.PLVLSStreamerModule;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -40,6 +41,8 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -237,7 +240,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVBeautyModule.instance);
+                .addModule(PLVBeautyModule.instance)
+                .addModule(PLVLSStreamerModule.instance);
     }
 
     // </editor-fold>
@@ -411,10 +415,17 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 plvlsStreamerLy.getStreamerPresenter().setUserPermissionSpeaker(userId, isGrant, new IPLVLinkMicEventSender.PLVSMainCallAck() {
                     @Override
                     public void onCall(Object... args) {
-                        String text = isGrant ? "已授予主讲权限" : "已收回主讲权限";
+                        final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
+                        final String text;
+                        if (!isGrant) {
+                            text = "已收回主讲权限";
+                        } else if (isGuestTransferPermission) {
+                            text = "已移交主讲权限";
+                        } else {
+                            text = "已授予主讲权限";
+                        }
                         PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
                                 .setText(text)
-                                .build()
                                 .show();
                     }
                 });

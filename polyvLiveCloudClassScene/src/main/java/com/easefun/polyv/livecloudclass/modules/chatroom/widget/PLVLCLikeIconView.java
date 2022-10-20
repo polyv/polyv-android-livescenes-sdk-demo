@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.utils.PLVBezierEvaluator;
+import com.easefun.polyv.livecommon.ui.widget.imageview.IPLVVisibilityChangedListener;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -43,6 +44,8 @@ public class PLVLCLikeIconView extends RelativeLayout {
     private FrameLayout loveIconContainer;
 
     private int srcWH;
+
+    private IPLVVisibilityChangedListener visibilityChangedListener;
 
     public PLVLCLikeIconView(Context context) {
         this(context, null);
@@ -122,6 +125,18 @@ public class PLVLCLikeIconView extends RelativeLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         width = getMeasuredWidth();
         height = getMeasuredHeight();
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+        if (visibilityChangedListener != null) {
+            visibilityChangedListener.onChanged(visibility);
+        }
+    }
+
+    public void setVisibilityChangedListener(IPLVVisibilityChangedListener listener) {
+        this.visibilityChangedListener = listener;
     }
 
     private OnClickListener onButtonClickListener;

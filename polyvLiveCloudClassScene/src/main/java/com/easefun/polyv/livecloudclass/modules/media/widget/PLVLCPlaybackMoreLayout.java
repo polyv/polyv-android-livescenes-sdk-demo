@@ -40,6 +40,9 @@ import java.util.List;
 public class PLVLCPlaybackMoreLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
+
     //popupWindow
     private PopupWindow popupWindow;
     //View
@@ -165,7 +168,6 @@ public class PLVLCPlaybackMoreLayout {
     }
 
     private void observePlaybackCacheEnable(@NonNull LifecycleOwner lifecycleOwner) {
-        final PLVPlaybackCacheVideoViewModel playbackCacheVideoViewModel = PLVDependManager.getInstance().get(PLVPlaybackCacheVideoViewModel.class);
         playbackCacheVideoViewModel.getPlaybackCacheUpdateLiveData().observe(lifecycleOwner, new Observer<PLVPlaybackCacheVideoVO>() {
             @Override
             public void onChanged(@Nullable PLVPlaybackCacheVideoVO vo) {

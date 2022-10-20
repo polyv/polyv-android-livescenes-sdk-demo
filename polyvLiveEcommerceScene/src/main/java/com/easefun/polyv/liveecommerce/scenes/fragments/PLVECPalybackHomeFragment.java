@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPrevio
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
@@ -46,12 +47,13 @@ import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVEC
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.model.commodity.saas.PolyvCommodityVO;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -62,6 +64,7 @@ import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -126,6 +129,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
+    private Runnable playbackTipsRunnable;
 
     private Boolean hasPreviousPage = null;
     private boolean hasInitPreviousView = false;
@@ -161,7 +165,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             chatPlaybackManager.destroy();
         }
         if (chatPlaybackTipsTv != null) {
-            chatPlaybackTipsTv.removeCallbacks(null);
+            chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
     // </editor-fold>
@@ -223,6 +227,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         });
         //聊天回放tips
         chatPlaybackTipsTv = findViewById(R.id.plvlc_chat_playback_tips_tv);
+        //卡片推送
+        cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
     }
 
     // </editor-fold>
@@ -251,7 +257,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
-    protected void acceptCommodityVO(PolyvCommodityVO commodityVO, boolean isAddOrSet) {
+    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
         if (isAddOrSet) {
             commodityPopupView.addCommodityVO(commodityVO);
         } else {
@@ -289,7 +295,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
             if (chatPlaybackTipsTv != null) {
                 chatPlaybackTipsTv.setVisibility(View.VISIBLE);
-                chatPlaybackTipsTv.postDelayed(new Runnable() {
+                chatPlaybackTipsTv.postDelayed(playbackTipsRunnable = new Runnable() {
                     @Override
                     public void run() {
                         chatPlaybackTipsTv.setVisibility(View.GONE);
@@ -416,7 +422,17 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         needAddedChatPlaybackTask = null;
     }
 
-    IPLVChatPlaybackCallDataListener chatPlaybackCallDataListener = new IPLVChatPlaybackCallDataListener() {
+    IPLVChatPlaybackCallDataListener chatPlaybackCallDataListener = new PLVChatPlaybackCallDataExListener() {
+        @Override
+        public void onLoadPreviousEnabled(boolean enabled, boolean isByClearData) {
+            if (swipeLoadView != null) {
+                swipeLoadView.setEnabled(enabled);
+            }
+            if (!enabled && !isByClearData) {
+                ToastUtils.showShort(R.string.plv_chat_toast_history_all_loaded);
+            }
+        }
+
         @Override
         public void onHasNotAddedData() {
             if (unreadMsgTv != null) {
@@ -441,7 +457,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                         || PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatPlaybackData.getUserId());
                 int itemType = chatPlaybackData.isImgMsg() ? PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG : PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
                 // 可通过userType判断是否是特别身份
-                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag() : null));
+                dataList.add(new PLVBaseViewData<>(chatPlaybackData, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag(chatPlaybackData.getUserId()) : null));
             }
             if (inHead) {
                 addChatMessageToListHead(dataList);
@@ -475,11 +491,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                chatMessageAdapter.addDataListChanged(chatMessageDataList);
-                if (isScrollEnd) {
-                    chatMsgRv.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
-                } else {
-                    chatMsgRv.scrollToBottomOrShowMore(chatMessageDataList.size());
+                boolean result = chatMessageAdapter.addDataListChanged(chatMessageDataList);
+                if (result) {
+                    if (isScrollEnd) {
+                        chatMsgRv.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
+                    } else {
+                        chatMsgRv.scrollToBottomOrShowMore(chatMessageDataList.size());
+                    }
                 }
             }
         };
@@ -494,11 +512,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                chatMessageAdapter.addDataListChangedAtFirst(chatMessageDataList);
-                if (isScrollEnd) {
-                    chatMsgRv.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
-                } else {
-                    chatMsgRv.scrollToPosition(0);
+                boolean result = chatMessageAdapter.addDataListChangedAtFirst(chatMessageDataList);
+                if (result) {
+                    if (isScrollEnd) {
+                        chatMsgRv.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
+                    } else {
+                        chatMsgRv.scrollToPosition(0);
+                    }
                 }
             }
         };
@@ -617,6 +637,18 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
              *  boolean isEnabled = productMenuSwitchEvent.getContent().isEnabled();
              *   }
              */
+        }
+
+        @Override
+        public void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent) {
+            super.onNewsPushStartMessage(newsPushStartEvent);
+            cardPushManager.acceptNewsPushStartMessage(chatroomPresenter, newsPushStartEvent);
+        }
+
+        @Override
+        public void onNewsPushCancelMessage() {
+            super.onNewsPushCancelMessage();
+            cardPushManager.acceptNewsPushCancelMessage();
         }
     };
     // </editor-fold>

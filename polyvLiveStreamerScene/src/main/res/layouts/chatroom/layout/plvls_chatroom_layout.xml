@@ -65,15 +65,15 @@
             <!--聊天室信息布局的显示/隐藏控制按钮-->
             <ImageView
                 android:id="@+id/plvls_chatroom_control_iv"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/plvls_chatroom_control_iv_selector" />
 
             <!--管理员私聊按钮-->
             <com.easefun.polyv.livecommon.ui.widget.imageview.PLVRedPointImageView
                 android:id="@+id/plvls_chatroom_manager_chat_iv"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/plvls_chatroom_manager_chat_icon"
                 android:visibility="gone"
                 app:plvDrawRedPoint="false"
@@ -91,7 +91,7 @@
     <!--聊天工具栏布局-->
     <com.easefun.polyv.livecommon.ui.widget.expandmenu.widget.PLVHorizontalExpandMenu
         android:layout_width="290dp"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:layout_below="@+id/plvls_chatroom_chat_msg_ly"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="8dp"

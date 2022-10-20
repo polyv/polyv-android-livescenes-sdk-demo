@@ -44,6 +44,11 @@ public interface IPLVSAStreamerLayout {
     void setMirrorMode(boolean isMirror);
 
     /**
+     * 缩放推流画面
+     */
+    void scaleStreamerView(PLVLinkMicItemDataBean itemDataBean, float scaleFactor);
+
+    /**
      * 切换连麦布局类型
      */
     void changeLinkMicLayoutType();

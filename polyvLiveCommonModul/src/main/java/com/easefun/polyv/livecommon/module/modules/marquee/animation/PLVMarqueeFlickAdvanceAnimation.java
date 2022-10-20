@@ -22,8 +22,10 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
     @Nullable
     private View secondView;
 
-    protected ObjectAnimator secondFlickObjectAnimator1 = new ObjectAnimator();
-    protected ObjectAnimator secondFlickObjectAnimator2 = new ObjectAnimator();
+    @Nullable
+    protected ObjectAnimator secondFlickObjectAnimator1;
+    @Nullable
+    protected ObjectAnimator secondFlickObjectAnimator2;
 
     private boolean isSetSecondParams = false;
     // </editor-fold>
@@ -48,17 +50,21 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
         }
         if (animationStatus == PAUSE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (secondFlickObjectAnimator1.isPaused()) {
+                if (secondFlickObjectAnimator1 != null && secondFlickObjectAnimator1.isPaused()) {
                     secondFlickObjectAnimator1.resume();
-                } else if (secondFlickObjectAnimator2.isPaused()) {
+                } else if (secondFlickObjectAnimator2 != null && secondFlickObjectAnimator2.isPaused()) {
                     secondFlickObjectAnimator2.resume();
                 }
             } else {
-                secondFlickObjectAnimator1.start();
+                if (secondFlickObjectAnimator1 != null) {
+                    secondFlickObjectAnimator1.start();
+                }
             }
         } else {
             setSecondAnimation();
-            secondFlickObjectAnimator1.start();
+            if (secondFlickObjectAnimator1 != null) {
+                secondFlickObjectAnimator1.start();
+            }
         }
         super.start();
     }
@@ -70,10 +76,10 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (secondFlickObjectAnimator1.isStarted()) {
+            if (secondFlickObjectAnimator1 != null && secondFlickObjectAnimator1.isStarted()) {
                 secondFlickObjectAnimator1.pause();
             }
-            if (secondFlickObjectAnimator2.isStarted()) {
+            if (secondFlickObjectAnimator2 != null && secondFlickObjectAnimator2.isStarted()) {
                 secondFlickObjectAnimator2.pause();
             }
         } else {
@@ -115,7 +121,9 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 if (animationStatus == STARTED) {
                     stopSecondAnimator();
                     setSecondAnimation();
-                    secondFlickObjectAnimator1.start();
+                    if (secondFlickObjectAnimator1 != null) {
+                        secondFlickObjectAnimator1.start();
+                    }
                 } else if (animationStatus == PAUSE) {
                     stopSecondAnimator();
                     setSecondAnimation();
@@ -136,7 +144,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
         isSetSecondParams = true;
         secondFlickObjectAnimator1 = ObjectAnimator.ofFloat(secondView, "alpha", 0f, 1f);
         secondFlickObjectAnimator1.setDuration(tweenTime);
-        secondFlickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+
         secondFlickObjectAnimator1.setInterpolator(new LinearInterpolator());
         secondFlickObjectAnimator1.addListener(new Animator.AnimatorListener() {
             @Override
@@ -149,7 +157,12 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 if (animationStatus == STARTED
                         || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
                         || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
-                    secondFlickObjectAnimator2.start();
+                    if (secondFlickObjectAnimator1 != null) {
+                        secondFlickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
+                    }
+                    if (secondFlickObjectAnimator2 != null) {
+                        secondFlickObjectAnimator2.start();
+                    }
                 }
             }
 
@@ -164,7 +177,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
 
         secondFlickObjectAnimator2 = ObjectAnimator.ofFloat(secondView, "alpha", 1f, 0f);
         secondFlickObjectAnimator2.setDuration(tweenTime);
-        secondFlickObjectAnimator2.setStartDelay(lifeTime);
+
         secondFlickObjectAnimator2.setInterpolator(new LinearInterpolator());
         secondFlickObjectAnimator2.addListener(new Animator.AnimatorListener() {
             @Override
@@ -176,6 +189,7 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 if (animationStatus == STARTED
                         || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
                         || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
+                    secondFlickObjectAnimator2.setStartDelay(lifeTime);
                     secondFlickObjectAnimator1.start();
                 }
             }
@@ -203,10 +217,12 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
 
     private void stopSecondAnimator() {
         if (secondFlickObjectAnimator1 != null) {
+            secondFlickObjectAnimator1.removeAllListeners();
             secondFlickObjectAnimator1.cancel();
             secondFlickObjectAnimator1.end();
         }
         if (secondFlickObjectAnimator2 != null) {
+            secondFlickObjectAnimator2.removeAllListeners();
             secondFlickObjectAnimator2.cancel();
             secondFlickObjectAnimator2.end();
         }

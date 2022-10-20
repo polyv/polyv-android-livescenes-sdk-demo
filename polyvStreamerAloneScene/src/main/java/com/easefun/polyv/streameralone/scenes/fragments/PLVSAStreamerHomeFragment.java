@@ -179,6 +179,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaChatroomLayout.init(liveRoomDataManager);
         //初始化成员布局
         memberLayout.init(liveRoomDataManager);
+        //初始化更多布局
+        moreLayout.init(liveRoomDataManager);
 
         observeChatroomLayout();
         observeStatusBarLayout();
@@ -247,6 +249,9 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         }
         if (plvsaStatusBarLayout != null) {
             plvsaStatusBarLayout.destroy();
+        }
+        if (moreLayout != null) {
+            moreLayout.destroy();
         }
     }
     // </editor-fold>

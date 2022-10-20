@@ -1,8 +1,10 @@
 package com.easefun.polyv.livestreamer.modules.document;
 
 import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,8 +25,11 @@ import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumen
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
+import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
+import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebView;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
@@ -32,14 +37,19 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentInputWidget;
+import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
+import com.easefun.polyv.livestreamer.modules.streamer.position.vo.PLVLSStreamerViewPositionUiState;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 文档布局
@@ -50,15 +60,19 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
 
     // 子View
     private View rootView;
+    private PLVSwitchViewAnchorLayout documentSwitchAnchorLayout;
     private PLVSDocumentWebView plvlsDocumentWebView;
     private PLVLSDocumentControllerLayout plvlsDocumentControllerLayout;
     private FrameLayout plvlsDocumentNoSelectPptLayout;
     private PLVPlaceHolderView plvlsPlaceHolderView;
+    private PLVRoundRectGradientTextView documentZoomValueHintTv;
 
     // 标注工具文本输入模式 输入弹窗
     private PLVLSDocumentInputWidget plvlsDocumentInputWidget;
     // 清除标注确认弹窗
     private PLVConfirmDialog plvClearMarkConfirmWindow;
+
+    private final PLVLSStreamerViewPositionManager streamerViewPositionManager = PLVDependManager.getInstance().get(PLVLSStreamerViewPositionManager.class);
 
     /**
      * MVP - View
@@ -110,13 +124,19 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         initLayoutSize();
         initMvpView();
         initOnUserAbilityChangeListener();
+
+        streamerViewPositionManager.updateDocumentAnchorLayout(documentSwitchAnchorLayout);
+        observeDocumentPosition();
+        observeSwitchPositionToUpdateViewSize();
     }
 
     private void findView() {
+        documentSwitchAnchorLayout = findViewById(R.id.plvls_document_switch_anchor_layout);
         plvlsDocumentWebView = (PLVSDocumentWebView) rootView.findViewById(R.id.plvls_document_web_view);
         plvlsDocumentControllerLayout = (PLVLSDocumentControllerLayout) rootView.findViewById(R.id.plvls_document_controller_layout);
         plvlsDocumentNoSelectPptLayout = (FrameLayout) rootView.findViewById(R.id.plvls_document_no_select_ppt_layout);
         plvlsPlaceHolderView = rootView.findViewById(R.id.plvls_document_placeholder_view);
+        documentZoomValueHintTv = findViewById(R.id.plvls_document_zoom_value_hint_tv);
     }
 
     /**
@@ -190,6 +210,12 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
                 parent.addView(plvlsDocumentInputWidget, layoutParams);
                 plvlsDocumentInputWidget.setText(pptPaintStatus);
             }
+
+            @Override
+            public void onZoomValueChanged(String zoomValue) {
+                documentZoomValueHintTv.setText(zoomValue + "%");
+                PLVViewUtil.showViewForDuration(documentZoomValueHintTv, TimeUnit.SECONDS.toMillis(3));
+            }
         };
 
         PLVDocumentPresenter.getInstance().registerView(documentMvpView);
@@ -208,10 +234,17 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
                         PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);
                     }
                 }
+                updateDocumentConsumeTouchEvent();
+            }
+
+            private void updateDocumentConsumeTouchEvent() {
+                if (plvlsDocumentWebView != null) {
+                    plvlsDocumentWebView.setNeedGestureAction(PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT));
+                }
             }
         };
 
-        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(onUserAbilityChangeCallback);
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
 
     // </editor-fold>
@@ -230,7 +263,6 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
             plvlsPlaceHolderView.setPlaceHolderText(getContext().getString(R.string.document_no_live_please_wait));
             plvlsPlaceHolderView.enableRespondLocationSensor(false);
             plvlsPlaceHolderView.setVisibility(VISIBLE);
-            plvlsDocumentWebView.setNeedGestureAction(false);
         }
 
         // 进入时默认是白板状态
@@ -261,11 +293,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
         // 初次进入初始化标注工具类型和颜色
         plvlsDocumentControllerLayout.initMarkToolAndColor();
         // 初次进入显示控制栏
-        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())){
-            plvlsDocumentControllerLayout.showByGuest();
-        }else {
-            plvlsDocumentControllerLayout.show();
-        }
+        plvlsDocumentControllerLayout.show();
 
         plvlsDocumentControllerLayout.setOnChangeColorListener(new PLVLSDocumentControllerLayout.OnChangeColorListener() {
             @Override
@@ -321,6 +349,47 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
             @Override
             public boolean switchFullScreen() {
                 return PLVLSDocumentLayout.this.switchScreen();
+            }
+        });
+    }
+
+    private void observeDocumentPosition() {
+        streamerViewPositionManager.getDocumentInMainScreenLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVLSStreamerViewPositionUiState>() {
+                    @Override
+                    public void onChanged(@Nullable PLVLSStreamerViewPositionUiState viewPositionUiState) {
+                        if (viewPositionUiState == null) {
+                            return;
+                        }
+                        final float placeHolderTextSize = viewPositionUiState.isDocumentInMainScreen() ? 16 : 10;
+                        plvlsPlaceHolderView.setPlaceHolderTextSize(placeHolderTextSize);
+                    }
+                });
+    }
+
+    private void observeSwitchPositionToUpdateViewSize() {
+        documentSwitchAnchorLayout.setOnSwitchListener(new PLVSwitchViewAnchorLayout.IPLVSwitchViewAnchorLayoutListener() {
+            @Override
+            protected void onSwitchElsewhereAfter() {
+                updateViewSize();
+            }
+
+            @Override
+            protected void onSwitchBackAfter() {
+                updateViewSize();
+            }
+
+            private void updateViewSize() {
+                final View child = firstNotNull(
+                        documentSwitchAnchorLayout.findViewById(R.id.plvls_document_layout_container),
+                        documentSwitchAnchorLayout.findViewById(R.id.plvls_streamer_round_rect_ly)
+                );
+                if (child == null) {
+                    return;
+                }
+                final ViewGroup.LayoutParams lp = child.getLayoutParams();
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                child.setLayoutParams(lp);
             }
         });
     }

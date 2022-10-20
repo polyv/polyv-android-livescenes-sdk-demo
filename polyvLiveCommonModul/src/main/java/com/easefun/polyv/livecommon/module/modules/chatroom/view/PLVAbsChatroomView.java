@@ -15,6 +15,7 @@ import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
+import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
@@ -23,6 +24,7 @@ import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
+import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -79,6 +81,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onLoginError(@Nullable PLVLoginEvent loginEvent, String msg, int errorCode) {
+
+    }
+
+    @Override
     public void onLogoutEvent(@NonNull PLVLogoutEvent logoutEvent) {
 
     }
@@ -119,6 +126,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent) {
+
+    }
+
+    @Override
     public void onRemoveMessageEvent(@Nullable String id, boolean isRemoveAll) {
 
     }
@@ -145,6 +157,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
+
+    }
+
+    @Override
+    public void onNewsPushStartMessage(@NonNull PLVNewsPushStartEvent newsPushStartEvent) {
+
+    }
+
+    @Override
+    public void onNewsPushCancelMessage() {
 
     }
 

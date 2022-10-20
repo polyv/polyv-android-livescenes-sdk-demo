@@ -1,9 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 
 /**
@@ -28,6 +31,21 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * @return 横屏弹幕的开关按钮
      */
     View getLandscapeDanmuSwitchView();
+
+    /**
+     * 获取卡片推送入口按钮
+     */
+    ImageView getCardEnterView();
+
+    /**
+     * 获取卡片推送入口倒计时控件
+     */
+    TextView getCardEnterCdView();
+
+    /**
+     * 获取卡片推送入口提示控件
+     */
+    PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
      * 设置点赞是否开启/关闭
@@ -76,6 +94,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * 设置聊天回放是否可用
      */
     void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
+
+    /**
+     * 更新聊天室房间状态
+     * @param isCloseRoomStatus 是否关闭房间状态
+     * @param isFocusModeStatus 是否专注模式状态
+     */
+    void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
 
     /**
      * 释放

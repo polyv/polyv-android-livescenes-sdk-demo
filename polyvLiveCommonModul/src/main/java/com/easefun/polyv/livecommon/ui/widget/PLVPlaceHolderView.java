@@ -13,14 +13,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.modules.player.IPLVPlayErrorView;
 import com.easefun.polyv.livecommon.module.utils.PLVViewLocationSensor;
+import com.plv.foundationsdk.annos.Sp;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * date: 2020/9/17
  * author: HWilliamgo
  * description: 占位图View
  */
-public class PLVPlaceHolderView extends ConstraintLayout {
+public class PLVPlaceHolderView extends ConstraintLayout implements IPLVPlayErrorView {
 
     // <editor-fold defaultstate="collapsed" desc="静态变量">
     //图片在横屏主屏中的比例
@@ -31,12 +34,28 @@ public class PLVPlaceHolderView extends ConstraintLayout {
     //图片在小窗中的比例
     private static final float IMG_PERCENT_WIDTH_IN_SMALL = 0.6f;
 
+    private static final int RIGHT_MARGIN_IN_MAIN_LAND = ConvertUtils.dp2px(24);
+    private static final int RIGHT_MARGIN_IN_MAIN_PORT = ConvertUtils.dp2px(16);
+
+    private static final int PADDING_IN_MAIN_LAND = ConvertUtils.dp2px(8);
+    private static final int PADDING_IN_MAIN_PORT = ConvertUtils.dp2px(4);
+
+    private static final int TEXT_SIZE_IN_MAIN_LAND = 14;
+    private static final int TEXT_SIZE_IN_MAIN_PORT = 12;
+
+    private static final float VERTICAL_BIAS_LAND = 0.72f;
+    private static final float VERTICAL_BIAS_PORT = 0.80f;
 // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="实例变量">
     //View
     private ImageView ivPlaceholderImg;
     private TextView tvPlaceholderText;
+
+    private TextView changeLinesTv;
+    private TextView refreshTv;
+    private boolean isShowChangeLinesView = false;
+    private boolean isShowRefreshView = false;
 
     //位置监听器
     private PLVViewLocationSensor locationSensor;
@@ -67,6 +86,7 @@ public class PLVPlaceHolderView extends ConstraintLayout {
      *
      * @param resId 图片ID
      */
+    @Override
     public void setPlaceHolderImg(@DrawableRes int resId) {
         ivPlaceholderImg.setImageResource(resId);
     }
@@ -76,12 +96,44 @@ public class PLVPlaceHolderView extends ConstraintLayout {
      *
      * @param text 文本
      */
+    @Override
     public void setPlaceHolderText(String text) {
         tvPlaceholderText.setText(text);
     }
 
+    @Override
+    public void setPlaceHolderTextSize(@Sp float size) {
+        tvPlaceholderText.setTextSize(size);
+    }
+
+    @Override
+    public void setChangeLinesViewVisibility(int visibility) {
+        changeLinesTv.setVisibility(visibility);
+        isShowChangeLinesView = visibility == View.VISIBLE;
+    }
+
+    @Override
+    public void setRefreshViewVisibility(int visibility) {
+        refreshTv.setVisibility(visibility);
+        isShowRefreshView = visibility == View.VISIBLE;
+    }
+
+    public void setOnChangeLinesViewClickListener(OnClickListener listener) {
+        changeLinesTv.setOnClickListener(listener);
+    }
+
+    public void setOnRefreshViewClickListener(OnClickListener listener) {
+        refreshTv.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setViewVisibility(int visibility) {
+        setVisibility(visibility);
+    }
+
     /**
      * 设置响应位置监听器状态，默认响应。
+     *
      * @param enable enable
      */
     public void enableRespondLocationSensor(boolean enable) {
@@ -97,6 +149,8 @@ public class PLVPlaceHolderView extends ConstraintLayout {
 
         ivPlaceholderImg = findViewById(R.id.plvlc_iv_placeholder_img);
         tvPlaceholderText = findViewById(R.id.plvlc_tv_placeholder_text);
+        changeLinesTv = findViewById(R.id.plv_change_lines_tv);
+        refreshTv = findViewById(R.id.plv_refresh_tv);
     }
     // </editor-fold>
 
@@ -156,6 +210,23 @@ public class PLVPlaceHolderView extends ConstraintLayout {
                 lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_PORT;
                 ivPlaceholderImg.setLayoutParams(lpOfImg);
                 tvPlaceholderText.setVisibility(View.VISIBLE);
+                tvPlaceholderText.setTextSize(TEXT_SIZE_IN_MAIN_PORT);
+
+                LayoutParams lpOfRefreshTv = (LayoutParams) refreshTv.getLayoutParams();
+                lpOfRefreshTv.verticalBias = VERTICAL_BIAS_PORT;
+                LayoutParams lpOfChangeLinesTv = (LayoutParams) changeLinesTv.getLayoutParams();
+                lpOfChangeLinesTv.verticalBias = VERTICAL_BIAS_PORT;
+                lpOfChangeLinesTv.rightMargin = RIGHT_MARGIN_IN_MAIN_PORT;
+                if (isShowChangeLinesView) {
+                    changeLinesTv.setVisibility(View.VISIBLE);
+                }
+                if (isShowRefreshView) {
+                    refreshTv.setVisibility(View.VISIBLE);
+                }
+                changeLinesTv.setPadding(0, PADDING_IN_MAIN_PORT, 0, PADDING_IN_MAIN_PORT);
+                refreshTv.setPadding(0, PADDING_IN_MAIN_PORT, 0, PADDING_IN_MAIN_PORT);
+                changeLinesTv.setTextSize(TEXT_SIZE_IN_MAIN_PORT);
+                refreshTv.setTextSize(TEXT_SIZE_IN_MAIN_PORT);
             }
         });
     }
@@ -168,6 +239,9 @@ public class PLVPlaceHolderView extends ConstraintLayout {
                 lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
                 ivPlaceholderImg.setLayoutParams(lpOfImg);
                 tvPlaceholderText.setVisibility(View.GONE);
+
+                changeLinesTv.setVisibility(View.GONE);
+                refreshTv.setVisibility(View.GONE);
             }
         });
     }
@@ -180,6 +254,23 @@ public class PLVPlaceHolderView extends ConstraintLayout {
                 lpOfImg.matchConstraintPercentWidth = PERCENT_WIDTH_IN_MAIN_LAND;
                 ivPlaceholderImg.setLayoutParams(lpOfImg);
                 tvPlaceholderText.setVisibility(View.VISIBLE);
+                tvPlaceholderText.setTextSize(TEXT_SIZE_IN_MAIN_LAND);
+
+                LayoutParams lpOfRefreshTv = (LayoutParams) refreshTv.getLayoutParams();
+                lpOfRefreshTv.verticalBias = VERTICAL_BIAS_LAND;
+                LayoutParams lpOfChangeLinesTv = (LayoutParams) changeLinesTv.getLayoutParams();
+                lpOfChangeLinesTv.verticalBias = VERTICAL_BIAS_LAND;
+                lpOfChangeLinesTv.rightMargin = RIGHT_MARGIN_IN_MAIN_LAND;
+                if (isShowChangeLinesView) {
+                    changeLinesTv.setVisibility(View.VISIBLE);
+                }
+                if (isShowRefreshView) {
+                    refreshTv.setVisibility(View.VISIBLE);
+                }
+                changeLinesTv.setPadding(0, PADDING_IN_MAIN_LAND, 0, PADDING_IN_MAIN_LAND);
+                refreshTv.setPadding(0, PADDING_IN_MAIN_LAND, 0, PADDING_IN_MAIN_LAND);
+                changeLinesTv.setTextSize(TEXT_SIZE_IN_MAIN_LAND);
+                refreshTv.setTextSize(TEXT_SIZE_IN_MAIN_LAND);
             }
         });
     }
@@ -192,6 +283,9 @@ public class PLVPlaceHolderView extends ConstraintLayout {
                 lpOfImg.matchConstraintPercentWidth = IMG_PERCENT_WIDTH_IN_SMALL;
                 ivPlaceholderImg.setLayoutParams(lpOfImg);
                 tvPlaceholderText.setVisibility(View.GONE);
+
+                changeLinesTv.setVisibility(View.GONE);
+                refreshTv.setVisibility(View.GONE);
             }
         });
     }

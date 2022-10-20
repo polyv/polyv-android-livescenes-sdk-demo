@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -54,6 +55,9 @@
         app:layout_constraintRight_toRightOf="@id/plvlc_playback_switch_anchor_player"
         app:layout_constraintTop_toTopOf="@id/plvlc_playback_switch_anchor_player" />
 
+    <!-- 播放失败/加载缓慢的占位View -->
+    <include layout="@layout/plvlc_live_player_error_layout" />
+
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
         android:id="@+id/plvlc_chat_landscape_ly"
@@ -70,6 +74,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="10dp" />
+
+    <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:layout_width="308dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:plv_show_on_landscape="true"
+        app:plv_show_on_portrait="false" />
 
     <!-- 亮度手势提示 -->
     <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView
@@ -105,10 +119,10 @@
 
     <!--重试按钮-->
     <com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout
-        android:visibility="gone"
         android:id="@+id/plvlc_playback_player_retry_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <!-- 控制栏 -->
     <com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCPlaybackMediaController
@@ -116,4 +130,51 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvlc_playback_auto_continue_seek_time_hint_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="44dp"
+        android:background="#99000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="7dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:mode="all"
+        app:radius="14dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="您上次观看至 "
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/plvlc_playback_auto_continue_seek_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#5C9DFF"
+                android:textSize="12sp"
+                tools:text="00:00:00" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=", 已为您自动续播"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
