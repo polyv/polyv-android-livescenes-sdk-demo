@@ -392,7 +392,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                         if (seekPosition == null) {
                             return;
                         }
-                        seekTo(seekPosition, getDuration());
+                        seekTo(seekPosition * 1000, getDuration());
                     }
                 });
     }

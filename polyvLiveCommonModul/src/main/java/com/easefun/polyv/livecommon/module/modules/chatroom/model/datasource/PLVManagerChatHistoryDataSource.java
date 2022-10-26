@@ -29,7 +29,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 
 /**
  * @author Hoshiiro
@@ -66,13 +65,13 @@ public class PLVManagerChatHistoryDataSource {
 
     public void requestChatHistory(final String roomId, final int start, final int end) {
         updateLoadStatus(lastLoadStatus.copy().setLoading(true));
-        final Disposable disposable = PLVChatroomManager.getExtendChatHistory(roomId, start, end)
+        final Disposable disposable = PLVChatroomManager.getExtendChatHistory2(roomId, start, end)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
-                .map(new Function<ResponseBody, JSONArray>() {
+                .map(new Function<String, JSONArray>() {
                     @Override
-                    public JSONArray apply(@NonNull ResponseBody responseBody) throws Exception {
-                        return new JSONObject(responseBody.string()).optJSONArray("data");
+                    public JSONArray apply(@NonNull String responseBody) throws Exception {
+                        return new JSONArray(responseBody);
                     }
                 })
                 .doOnNext(new Consumer<JSONArray>() {
@@ -123,7 +122,7 @@ public class PLVManagerChatHistoryDataSource {
                 String messageSource = jsonObject.optString("msgSource");
                 JSONObject jsonObjectUser = jsonObject.optJSONObject("user");
                 JSONObject jsonObjectContent = jsonObject.optJSONObject("content");
-                if (!TextUtils.isEmpty(messageSource)) {
+                if (!TextUtils.isEmpty(messageSource) && !"null".equals(messageSource)) {
                     //收/发红包/图片信息/打赏信息，这里仅取图片信息
                     if (PLVHistoryConstant.MSGSOURCE_CHATIMG.equals(messageSource)) {
                         PLVChatImgHistoryEvent chatImgHistory = PLVGsonUtil.fromJson(PLVChatImgHistoryEvent.class, jsonObject.toString());

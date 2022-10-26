@@ -84,7 +84,7 @@ public class PLVChapterView extends FrameLayout {
                         }
                         if (chapterAdapter != null) {
                             // 通过二分法来找出 适合当前的章节，他需要选中比他小的章节并且这个章节是所有小的章节中是最大的章节
-                            int position = findIndex2(dataList, playInfoVO.getPosition());
+                            int position = findIndex2(dataList, playInfoVO.getPosition() / 1000);
                             chapterAdapter.updataItmeTime(position);
                         }
                     }

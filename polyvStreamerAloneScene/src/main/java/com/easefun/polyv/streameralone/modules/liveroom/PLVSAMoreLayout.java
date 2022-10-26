@@ -40,6 +40,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.chatroom.IPLVChatroomManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -105,6 +106,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
     private OnViewActionListener onViewActionListener;
+    private IPLVChatroomManager.RoomStatusListener roomStatusListener;
 
     // 标记位 当用户手动切换清晰度时为true 避免进入设置页时内部初始化清晰度弹出toast提示
     private boolean switchBitrateByUser = false;
@@ -214,6 +216,17 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         shareLayout = new PLVSAShareLayout(getContext());
 
         observeBeautyModuleInitResult();
+        observeChatroomStatus();
+    }
+
+    private void observeChatroomStatus() {
+        PolyvChatroomManager.getInstance().addOnRoomStatusListener(roomStatusListener = new IPLVChatroomManager.RoomStatusListener() {
+            @Override
+            public void onStatus(boolean isClose) {
+                plvsaMoreCloseRoomIv.setSelected(isClose);
+                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+            }
+        });
     }
 
     private void observeBeautyModuleInitResult() {
@@ -348,6 +361,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         if (shareLayout != null) {
             shareLayout.destroy();
         }
+        PolyvChatroomManager.getInstance().removeOnRoomStatusListener(roomStatusListener);
     }
     // </editor-fold>
 
@@ -533,7 +547,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             bitrateLayout.open();
         } else if (id == R.id.plvsa_more_close_room_iv
                 || id == R.id.plvsa_more_close_room_tv) {
-            PolyvChatroomManager.getInstance().toggleRoom(!plvsaMoreCloseRoomIv.isSelected(), new IPolyvChatroomManager.RequestApiListener<String>() {
+            PolyvChatroomManager.getInstance().toggleRoomByEvent(new IPolyvChatroomManager.RequestApiListener<String>() {
                 @Override
                 public void onSuccess(String s) {
                     plvsaMoreCloseRoomIv.setSelected(!plvsaMoreCloseRoomIv.isSelected());

@@ -79,7 +79,6 @@ import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackFootDataListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
-import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -942,15 +941,20 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听章节tab">
     private void observerChapters() {
         // 监听是否开启章节功能
-        playbackChapterViewModel.getPlaybackDataVOLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVPlaybackDataVO>() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @Override
-            public void onChanged(@Nullable PLVPlaybackDataVO playbackDataVO) {
-                if (playbackDataVO == null) {
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (polyvLiveClassDetailVOPLVStatefulData == null
+                        || !polyvLiveClassDetailVOPLVStatefulData.isSuccess()
+                        || polyvLiveClassDetailVOPLVStatefulData.getData() == null
+                        || polyvLiveClassDetailVOPLVStatefulData.getData().getData() == null) {
                     return;
                 }
-                final boolean sectionEnabled = "Y".equals(playbackDataVO.getSectionEnabled());
-                final boolean hasRecordFile = "Y".equals(playbackDataVO.getHasRecordFile());
-                final boolean hasPlaybackVideo = "Y".equals(playbackDataVO.getHasPlaybackVideo());
+                PLVLiveClassDetailVO.DataBean dataBean = polyvLiveClassDetailVOPLVStatefulData.getData().getData();
+                final boolean hasPlaybackVideo = dataBean.isHasPlayback();
+                final boolean sectionEnabled = "Y".equals(dataBean.getSectionEnabled());
+                final boolean hasRecordFile = dataBean.getRecordFileSimpleModel() != null;
                 if (!liveRoomDataManager.getConfig().isLive()
                         && liveRoomDataManager.getConfig().getChannelType() == PLVLiveChannelType.PPT
                         && sectionEnabled

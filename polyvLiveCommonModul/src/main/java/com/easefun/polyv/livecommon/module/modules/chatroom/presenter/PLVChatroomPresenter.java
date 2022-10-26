@@ -44,7 +44,6 @@ import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.easefun.polyv.livescenes.net.PolyvApiManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -57,7 +56,6 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
-import com.plv.livescenes.model.PLVEmotionImageVO2;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -115,7 +113,6 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.socket.client.Ack;
-import okhttp3.ResponseBody;
 
 /**
  * mvp-聊天室presenter层实现，实现 IPLVChatroomContract.IChatroomPresenter 接口
@@ -458,11 +455,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         int start = getChatHistoryTime * getChatHistoryCount;
         int end = (getChatHistoryTime + 1) * getChatHistoryCount - 1;
-        chatHistoryDisposable = PolyvApiManager.getPolyvApichatApi().getChatHistory(getRoomIdCombineDiscuss(), start, end, 1, 1)
-                .map(new Function<ResponseBody, JSONArray>() {
+        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), start, end, 1, 1)
+                .map(new Function<String, JSONArray>() {
                     @Override
-                    public JSONArray apply(ResponseBody responseBody) throws Exception {
-                        return new JSONArray(responseBody.string());
+                    public JSONArray apply(String responseBody) throws Exception {
+                        return new JSONArray(responseBody);
                     }
                 })
                 .compose(new PLVRxBaseTransformer<JSONArray, JSONArray>())
@@ -571,7 +568,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (chatEmotionImagesDisposable != null){
             chatEmotionImagesDisposable.dispose();
         }
-        chatEmotionImagesDisposable = PolyvApiManager.getPolyvApichatApi().getEmotionImages(channel, accountId, page, size)
+        chatEmotionImagesDisposable = PLVChatApiRequestHelper.getInstance().getEmotionImages(channel, accountId, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<PLVResponseApiBean2<com.easefun.polyv.livescenes.model.PLVEmotionImageVO>>() {
