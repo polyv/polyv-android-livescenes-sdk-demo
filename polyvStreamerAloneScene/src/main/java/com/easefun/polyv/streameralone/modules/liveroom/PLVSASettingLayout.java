@@ -347,6 +347,14 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingPushResolutionRatioLl.setShowOnLandscape(userAllowChangeRatio && channelAllowChangeRatio);
     }
 
+    private void setupDefaultPushResolution(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean isDefaultLandscape = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_ALONE_DEFAULT_LANDSCAPE_RESOLUTION, false);
+        if (PLVScreenUtils.isLandscape(getContext()) ^ isDefaultLandscape) {
+            changeScreenOrientation();
+        }
+    }
+
     /**
      * 判断当前用户类型是否是嘉宾
      */
@@ -366,6 +374,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         titleInputLayout.initTitle(liveTitle);
         initStartLiveBtnText();
         initPushResolutionRatioLayout();
+
+        setupDefaultPushResolution(liveRoomDataManager);
     }
 
     @Override

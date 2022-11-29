@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.interact.app;
 
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livescenes.PolyvSocketEvent;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.feature.interact.IPLVInteractJSBridge;
@@ -8,13 +9,13 @@ import com.easefun.polyv.livescenes.model.PolyvInteractiveCallbackVO;
 import com.easefun.polyv.livescenes.model.signin.PolyvSignIn2JsVO;
 import com.easefun.polyv.livescenes.model.signin.PolyvSignIn2SocketVO;
 import com.easefun.polyv.livescenes.model.signin.PolyvSignInVO;
-import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.google.gson.Gson;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
+
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
 import io.socket.client.Socket;
 

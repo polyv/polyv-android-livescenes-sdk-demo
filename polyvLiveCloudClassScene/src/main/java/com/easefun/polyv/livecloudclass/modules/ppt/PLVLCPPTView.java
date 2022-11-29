@@ -23,8 +23,6 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.business.api.common.ppt.PLVPPTWebView;
 import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
@@ -34,6 +32,9 @@ import com.plv.foundationsdk.web.PLVWebview;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
 /**
  * date: 2020/8/6

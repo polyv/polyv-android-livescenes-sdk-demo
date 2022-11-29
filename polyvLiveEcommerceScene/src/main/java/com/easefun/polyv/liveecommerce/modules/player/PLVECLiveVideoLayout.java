@@ -732,7 +732,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         @Override
         public void updatePlayInfo(com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO playInfoVO) {
-            if (!isPlaying()) {
+            if (!isPlaying() && !isSubVideoViewShow()) {
                 showPlayCenterView();
             } else {
                 hidePlayCenterView();

@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.marquee;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
@@ -144,7 +145,16 @@ public class PLVMarqueeView extends RelativeLayout implements IPLVMarqueeView {
      * 设置 副跑马灯的样式
      */
     private void setSecondTextVO(PLVMarqueeTextVO textVO) {
-        this.secondTextView.setMarqueeTextModel(textVO);
+        this.secondTextView.setMarqueeTextModel(
+                textVO.setFontAlpha((int) (0.02F * 255))
+                        .setFontColor(Color.BLACK)
+                        .setFilter(true)
+                        .setFilterStrength(1)
+                        .setFilterBlurX(0)
+                        .setFilterBlurY(0)
+                        .setFilterAlpha(0.02F * 255)
+                        .setFilterColor(Color.WHITE)
+        );
     }
 
     /**

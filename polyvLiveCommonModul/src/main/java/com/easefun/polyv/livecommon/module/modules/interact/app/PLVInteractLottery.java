@@ -8,14 +8,15 @@ import com.easefun.polyv.livescenes.feature.interact.PLVInteractAppAbs;
 import com.easefun.polyv.livescenes.model.PolyvInteractiveCallbackVO;
 import com.easefun.polyv.livescenes.model.lottery.PolyvLotteryEndVO;
 import com.easefun.polyv.livescenes.net.PolyvApiManager;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.net.PLVResponseBean;
 import com.plv.foundationsdk.net.PLVResponseExcutor;
 import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
+
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -267,6 +267,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         danmuSwitchView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaController.show();
                 danmuWrapper.dispatchDanmuSwitchOnClicked(v);
                 mediaController.dispatchDanmuSwitchOnClicked(v);
                 if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
@@ -828,6 +829,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public boolean onProgressChanged(int seekTime, int totalTime, boolean isEnd, boolean isRightSwipe) {
             progressTipsView.setProgressPercent(seekTime, totalTime, isEnd, isRightSwipe);
+            mediaController.show();
             return true;
         }
 
@@ -841,6 +843,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onDoubleClick() {
             super.onDoubleClick();
             mediaController.playOrPause();
+            mediaController.show();
         }
 
         @Override

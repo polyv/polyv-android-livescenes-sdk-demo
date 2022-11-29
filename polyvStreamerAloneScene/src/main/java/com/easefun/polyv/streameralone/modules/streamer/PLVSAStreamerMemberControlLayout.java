@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.streamer;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVAutoLineLayoutManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -26,6 +29,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAControlAdapter;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
@@ -43,7 +47,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * 管理连麦成员的布局
  */
-public class PLVSAStreamerMemberControlLayout extends FrameLayout implements View.OnClickListener {
+public class PLVSAStreamerMemberControlLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
 
     // 弹层布局位置
@@ -88,6 +92,8 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
     private OnViewActionListener onViewActionListener;
+
+    private final PLVLinkMicLocalShareData linkMicLocalShareData = PLVDependManager.getInstance().get(PLVLinkMicLocalShareData.class);
 
     // </editor-fold>
 
@@ -242,7 +248,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
-    public void bindViewData(PLVLinkMicItemDataBean linkMicItemDataBean) {
+    public void bindViewData(final PLVLinkMicItemDataBean linkMicItemDataBean) {
         if (linkMicItemDataBean == null) {
             return;
         }
@@ -318,6 +324,10 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
             controlAdapter.updateItemVisibility(CONTROL_DOWN_LINKMIC, false);
         }
 
+        // 音频连麦隐藏摄像头开关
+        final boolean myselfIsTeacher = PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
+        final boolean isVideoLinkMicType = getOrDefault(linkMicLocalShareData.isVideoLinkMic, true);
+        controlAdapter.updateItemVisibility(CONTROL_CAMERA, myselfIsTeacher && (linkMicItemDataBean.isGuest() || isVideoLinkMicType));
     }
 
     public void setHasSpeakerUser(PLVSocketUserBean user) {
@@ -436,44 +446,6 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout implements Vie
         }
     }
 
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="点击事件">
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-
-
-//        if (id == R.id.plvsa_streamer_camera_iv
-//                || id == R.id.plvsa_streamer_camera_tv) {
-//            if (onViewActionListener != null) {
-//                onViewActionListener.onClickCamera(plvsaStreamerCameraIv.isSelected());
-//            }
-//        } else if (id == R.id.plvsa_streamer_mic_iv
-//                || id == R.id.plvsa_streamer_mic_tv) {
-//            if (onViewActionListener != null) {
-//                onViewActionListener.onClickMic(plvsaStreamerMicIv.isSelected());
-//            }
-//        } else if (id == R.id.plvsa_streamer_down_linkmic_iv
-//                || id == R.id.plvsa_streamer_down_linkmic_tv) {
-//            close();
-//            new PLVSAConfirmDialog(v.getContext())
-//                    .setTitle("确定下麦吗？")
-//                    .setContentVisibility(View.GONE)
-//                    .setLeftButtonText("取消")
-//                    .setRightButtonText("确定")
-//                    .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, View v) {
-//                            dialog.dismiss();
-//                            if (onViewActionListener != null) {
-//                                onViewActionListener.onClickDownLinkMic();
-//                            }
-//                        }
-//                    })
-//                    .show();
-//        }
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">

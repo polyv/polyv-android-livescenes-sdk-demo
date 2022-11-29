@@ -94,6 +94,9 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     //延迟隐藏"可从此处重新打开浮窗"
     private Disposable reopenFloatingDelay;
 
+    //延迟隐藏“控制栏”
+    private Disposable hideMediaControllerDisable;
+
     //player presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter;
 
@@ -328,6 +331,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public void show() {
         setVisibility(VISIBLE);
+        resetHideControllerBarDelay();
     }
     // </editor-fold>
 
@@ -527,6 +531,17 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             disposable.dispose();
         }
     }
+
+    //开启/重置 延迟3s隐藏控制栏
+    private void resetHideControllerBarDelay(){
+        dispose(hideMediaControllerDisable);
+        hideMediaControllerDisable = PLVRxTimer.delay(3000, new Consumer<Long>() {
+            @Override
+            public void accept(Long aLong) throws Exception {
+                hide();
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="事件监听 - 监听播放信息变化">
@@ -577,13 +592,19 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         } else if (id == R.id.plvlc_playback_controller_land_iv_back) {
             //点击横屏返回
             PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
+            resetHideControllerBarDelay();
         } else if (id == R.id.plvlc_playback_controller_land_iv_playpause || id == R.id.plvlc_playback_controller_port_iv_play_pause) {
             //点击播放/暂停
             playOrPause();
+            //重置一下隐藏控制栏时间
+            resetHideControllerBarDelay();
         } else if (id == R.id.plvlc_playback_controller_port_iv_full_screen) {
             //点击竖屏全屏
             PLVOrientationManager.getInstance().setLandscape((Activity) getContext());
+            resetHideControllerBarDelay();
         } else if (id == R.id.plvlc_playback_controller_land_iv_subview_show_land || id == R.id.plvlc_playback_controller_port_iv_subview_show) {
+            //重置一下隐藏控制栏时间
+            resetHideControllerBarDelay();
             //selected == true时就是隐藏状态，false时是显示状态
             boolean isNotShowState = ivSubviewShowPort.isSelected();
             boolean isShowState = !isNotShowState;
