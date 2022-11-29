@@ -74,9 +74,11 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             if (mainAnimator.isRunning()) {
                 mainView.setVisibility(View.VISIBLE);
             }
-        } else if (mainAnimator != null) {
+        } else {
             setAnimation();
-            mainAnimator.start();
+            if (mainAnimator != null) {
+                mainAnimator.start();
+            }
         }
     }
 

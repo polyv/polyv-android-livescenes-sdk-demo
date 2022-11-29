@@ -36,6 +36,14 @@ public class PLVWebViewHelper {
         return Build.VERSION.SDK_INT >= 19;
     }
 
+    private static boolean javaScriptEnabled = true;
+    private static boolean domStorageEnabled = true;
+    private static boolean databaseEnabled = true;
+    private static boolean appCacheEnabled = true;
+    private static boolean allowFileAccess = true;
+    private static boolean allowFileAccessFromFileURLs = true;
+    private static boolean allowUniversalAccessFromFileURLs = true;
+
     private static void initWebSettings(Context context, WebView webView) {
         WebSettings webSettings = webView.getSettings();
         if (webSettings == null) {
@@ -44,17 +52,17 @@ public class PLVWebViewHelper {
         //设置字体缩放倍数，默认100
         webSettings.setTextZoom(100);
         // 支持 Js 使用
-        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptEnabled(javaScriptEnabled);
         // 开启DOM缓存
-        webSettings.setDomStorageEnabled(true);
+        webSettings.setDomStorageEnabled(domStorageEnabled);
         // 开启数据库缓存
-        webSettings.setDatabaseEnabled(true);
+        webSettings.setDatabaseEnabled(databaseEnabled);
         // 支持自动加载图片
         webSettings.setLoadsImagesAutomatically(hasKitkat());
         // 设置 WebView 的缓存模式
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         // 支持启用缓存模式
-        webSettings.setAppCacheEnabled(true);
+        webSettings.setAppCacheEnabled(appCacheEnabled);
         // 设置 AppCache 最大缓存值(现在官方已经不提倡使用，已废弃)
         webSettings.setAppCacheMaxSize(8 * 1024 * 1024);
         // Android 私有缓存存储，如果你不调用setAppCachePath方法，WebView将不会产生这个目录
@@ -70,33 +78,19 @@ public class PLVWebViewHelper {
         // 设置 UserAgent 属性
         webSettings.setUserAgentString("");
         // 允许加载本地 html 文件/false
-        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowFileAccess(allowFileAccess);
 
 
         // 允许通过 file url 加载的 Javascript 读取其他的本地文件,Android 4.1 之前默认是true，在 Android 4.1 及以后默认是false,也就是禁止
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            webSettings.setAllowFileAccessFromFileURLs(false);
+            webSettings.setAllowFileAccessFromFileURLs(allowFileAccessFromFileURLs);
         }
         // 允许通过 file url 加载的 Javascript 可以访问其他的源，包括其他的文件和 http，https 等其他的源，
         // Android 4.1 之前默认是true，在 Android 4.1 及以后默认是false,也就是禁止
         // 如果此设置是允许，则 setAllowFileAccessFromFileURLs 不起做用
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            webSettings.setAllowUniversalAccessFromFileURLs(false);
+            webSettings.setAllowUniversalAccessFromFileURLs(allowUniversalAccessFromFileURLs);
         }
-        /**
-         * ///暂时保留该代码
-         *  webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-         * //设置默认编码，无效 loadDataWithBaseURL刷新(goBack)会白屏
-         * webSettings.setDefaultTextEncodingName("utf-8");
-         */
-
-        /**
-         *  关于缓存目录:
-         *
-         *  我自测发现以下规律，如果你有涉及到目录操作，需要自己做下验证。
-         *  Android 4.4 以下：/data/data/包名/cache
-         *  Android 4.4 - 5.0：/data/data/包名/app_webview/cache/
-         */
     }
 
     private static void initListener(WebView webView, boolean isUseActionView) {

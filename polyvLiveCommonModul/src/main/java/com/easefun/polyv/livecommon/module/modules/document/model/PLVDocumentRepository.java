@@ -15,7 +15,6 @@ import com.easefun.polyv.livescenes.document.model.PLVSPPTPaintStatus;
 import com.easefun.polyv.livescenes.document.model.PLVSPPTStatus;
 import com.easefun.polyv.livescenes.upload.IPLVSDocumentUploadManager;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
@@ -26,6 +25,8 @@ import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import net.plv.android.jsbridge.CallBackFunction;
 
 import java.io.File;
 import java.lang.ref.WeakReference;

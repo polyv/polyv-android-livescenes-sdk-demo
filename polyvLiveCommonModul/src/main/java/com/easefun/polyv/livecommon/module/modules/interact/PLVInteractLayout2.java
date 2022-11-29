@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -22,8 +24,6 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -34,9 +34,10 @@ import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
-import java.util.List;
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+import java.util.List;
 
 /**
  * 互动应用View - v2

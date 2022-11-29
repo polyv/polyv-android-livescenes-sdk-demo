@@ -232,11 +232,17 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     );
 
     private void updateStatusInner(final PLVLiveStateEnum stateEnum) {
-        final PLVLiveStateEnum mergedState = mergeEndOrWaitingState(stateEnum, classDetailVO.getData().getStartTime());
         if (currentLiveState == null) {
-            currentLiveState = mergedState;
+            //记录第一次请求直播间的状态信息
+            currentLiveState = stateEnum;
         } else {
-            currentLiveState = currentLiveState.toState(mergedState);
+            //当前获取值直播流状态
+            //当直播流状态为END 且 当前状态为 WAIT 或 UNSTART 保持当前状态不变，其余皆更新为直播流状态
+            if ((currentLiveState != PLVLiveStateEnum.WAITING
+                    && currentLiveState != PLVLiveStateEnum.UNSTART)
+                    || stateEnum != PLVLiveStateEnum.END) {
+                currentLiveState = stateEnum;
+            }
         }
 
         if (statusTv == null) {

@@ -27,7 +27,9 @@ import com.easefun.polyv.livecommon.module.modules.beauty.di.PLVBeautyModule;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
+import com.easefun.polyv.livecommon.module.modules.linkmic.di.PLVLinkMicModule;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
@@ -299,6 +301,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
+                .addModule(PLVLinkMicModule.instance)
                 .addModule(PLVBeautyModule.instance);
     }
 
@@ -609,9 +612,16 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
             @Override
             public void onChangeLinkMicLayoutType() {
-                if(streamerLayout != null){
+                if (streamerLayout != null) {
                     streamerLayout.changeLinkMicLayoutType();
                 }
+            }
+
+            @Override
+            public void onLinkMicMediaTypeUpdate(boolean isVideoLinkMicType, boolean isOpen) {
+                final PLVLinkMicLocalShareData linkMicLocalShareData = PLVDependManager.getInstance().get(PLVLinkMicLocalShareData.class);
+                linkMicLocalShareData.isOpenLinkMic = isOpen;
+                linkMicLocalShareData.isVideoLinkMic = isVideoLinkMicType;
             }
         });
 

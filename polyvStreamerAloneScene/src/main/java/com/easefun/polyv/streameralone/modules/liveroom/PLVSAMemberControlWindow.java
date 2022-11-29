@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -10,9 +12,11 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -47,6 +51,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     private OnViewActionListener onViewActionListener;
 
     private boolean isNeedPermissionDialogShow = false;
+
+    private final PLVLinkMicLocalShareData linkMicLocalShareData = PLVDependManager.getInstance().get(PLVLinkMicLocalShareData.class);
 
     // </editor-fold>
 
@@ -94,9 +100,11 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
 
     public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType, boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
         this.windowParentView = view;
-        int mediaViewVisibility = isRTCJoin ? View.VISIBLE : View.GONE;
-        plvsaMemberCameraIv.setVisibility(mediaViewVisibility);
-        plvsaMemberCameraTv.setVisibility(mediaViewVisibility);
+        final boolean isVideoLinkMicType = getOrDefault(linkMicLocalShareData.isVideoLinkMic, true);
+        final int mediaViewVisibility = isRTCJoin ? View.VISIBLE : View.GONE;
+        final int cameraViewVisibility = isRTCJoin && isVideoLinkMicType ? View.VISIBLE : View.GONE;
+        plvsaMemberCameraIv.setVisibility(cameraViewVisibility);
+        plvsaMemberCameraTv.setVisibility(cameraViewVisibility);
         plvsaMemberMicIv.setVisibility(mediaViewVisibility);
         plvsaMemberMicTv.setVisibility(mediaViewVisibility);
         plvsaMemberGrantSpeakerTv.setVisibility(mediaViewVisibility);

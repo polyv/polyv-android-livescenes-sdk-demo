@@ -434,6 +434,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     if (view != null) {
                         view.onSubVideoViewVisiblityChanged(isOpenAdHead, isShow);
                     }
+                    if (isShow) {
+                        resetErrorViewStatus();
+                    }
                 }
             });
         }
@@ -816,6 +819,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     }
 
     private void setDefaultViewStatus() {
+        subVideoView.clear();
         videoView.removeRenderView();
         IPLVLivePlayerContract.ILivePlayerView view = getView();
         if (view != null && view.getBufferingIndicator() != null) {

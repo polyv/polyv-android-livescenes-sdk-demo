@@ -1,8 +1,12 @@
 package com.easefun.polyv.livecloudclass.modules.media.widget;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +68,11 @@ public class PLVLCProgressTipsView extends FrameLayout {
                 fastForwardPos = 0;
             if (fastForwardPos > totaltime)
                 fastForwardPos = totaltime;
-            tvProgress.setText(PLVTimeUtils.generateTime(fastForwardPos, true) + "/" + PLVTimeUtils.generateTime(totaltime, true));
+            String fastPos = PLVTimeUtils.generateTime(fastForwardPos, true);
+            String totalPos = PLVTimeUtils.generateTime(totaltime, true);
+            SpannableStringBuilder builder = new SpannableStringBuilder(fastPos + "/" + totalPos);
+            builder.setSpan(new ForegroundColorSpan(Color.parseColor("#6DA7FF")),0,fastPos.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            tvProgress.setText(builder);
         }
     }
 }
