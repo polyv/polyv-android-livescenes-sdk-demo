@@ -1,6 +1,8 @@
 package com.easefun.polyv.livecloudclass.modules.ppt;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 
 /**
@@ -48,6 +50,30 @@ public interface IPLVLCPPTView {
      */
     void turnPagePPT(String type);
 
+    /**
+     * 更新画笔模式状态
+     */
+    void notifyPaintModeStatus(boolean isInPaintMode);
+
+    /**
+     * 更新画笔工具
+     */
+    void notifyPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool);
+
+    /**
+     * 更新画笔工具颜色
+     */
+    void notifyPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color);
+
+    /**
+     * 撤销上一步画笔
+     */
+    void notifyUndoLastPaint();
+
+    /**
+     * 更新文本画笔内容
+     */
+    void notifyPaintUpdateTextContent(String textContent);
 
 // </editor-fold>
 
@@ -138,6 +164,11 @@ public interface IPLVLCPPTView {
          * 直播ppt状态更新
          */
         void onLivePPTStatusChange(PLVPPTStatus pptStatus);
+
+        /**
+         * 画笔模式文本工具提示输入
+         */
+        void onPaintEditText(PLVPPTPaintStatus paintStatus);
     }
     // </editor-fold>
 

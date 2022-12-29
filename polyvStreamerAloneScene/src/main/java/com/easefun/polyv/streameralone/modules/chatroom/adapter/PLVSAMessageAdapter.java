@@ -17,6 +17,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.holder.PLVSAMessageRewardViewHolder;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.holder.PLVSAMessageViewHolder;
+import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLengthMessageLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
@@ -265,10 +266,18 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         }
     }
 
+    public void callOnShowOverLengthMessage(PLVSAChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
+        }
+    }
+
     public interface OnViewActionListener {
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
 
         void onShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId);
+
+        void onShowOverLengthMessage(PLVSAChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
     }
     // </editor-fold>
 }

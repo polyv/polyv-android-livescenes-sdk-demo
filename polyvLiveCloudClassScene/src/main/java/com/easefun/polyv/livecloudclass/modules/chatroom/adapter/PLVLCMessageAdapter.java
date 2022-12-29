@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRewardViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -291,11 +292,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     public interface OnViewActionListener {
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
+
+        void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
         if (onViewActionListener != null) {
             onViewActionListener.onChatImgClick(position, view, imgUrl, isQuoteImg);
+        }
+    }
+
+    public void callOnShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
         }
     }
     // </editor-fold>

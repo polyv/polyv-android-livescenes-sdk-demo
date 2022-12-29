@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityDetailActivity;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
@@ -123,21 +124,7 @@ public class PLVLCProductLayout extends FrameLayout {
         if (liveRoomDataManager == null) {
             return null;
         }
-        return new PLVInteractNativeAppParams()
-                .setAppId(liveRoomDataManager.getConfig().getAccount().getAppId())
-                .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
-                .setSessionId(liveRoomDataManager.getSessionId())
-                .setChannelInfo(
-                        new PLVInteractNativeAppParams.ChannelInfoDTO()
-                                .setChannelId(liveRoomDataManager.getConfig().getChannelId())
-                                .setRoomId(liveRoomDataManager.getConfig().getChannelId())
-                )
-                .setUserInfo(
-                        new PLVInteractNativeAppParams.UserInfoDTO()
-                                .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
-                                .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
-                                .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
-                );
+        return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
     }
 
 }

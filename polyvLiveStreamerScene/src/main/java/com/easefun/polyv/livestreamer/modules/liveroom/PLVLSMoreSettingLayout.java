@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -28,6 +29,7 @@ import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
@@ -67,6 +69,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
 
     private OnViewActionListener onViewActionListener;
 
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     private Disposable updateBlurViewDisposable;
 
     // </editor-fold>
@@ -160,13 +163,30 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                     }
                 });
     }
+
+    private void observeLiveRoomStatus(){
+        if (liveRoomDataManager != null) {
+            liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                    liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                    if(polyvLiveClassDetailVOPLVStatefulData.getData() != null){
+                        boolean isOpen = polyvLiveClassDetailVOPLVStatefulData.getData().isOpenPushShare();
+                        moreSettingShareItemLayout.setVisibility(isOpen == true ? VISIBLE : INVISIBLE);
+                    }
+                }
+            });
+        }
+    }
     // </editor-fold>
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
         if (shareLayout != null) {
             shareLayout.init(liveRoomDataManager);
         }
+        observeLiveRoomStatus();
     }
     // </editor-folder>
 

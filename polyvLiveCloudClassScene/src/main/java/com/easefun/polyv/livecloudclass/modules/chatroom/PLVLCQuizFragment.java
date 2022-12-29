@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
@@ -89,6 +90,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
                 } else {
                     chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) getContext(), messageAdapter.getDataList(), messageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
                 }
+            }
+
+            @Override
+            public void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+
             }
         });
         //设置信息索引，需在chatroomPresenter.registerView后设置

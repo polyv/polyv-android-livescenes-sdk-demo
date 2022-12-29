@@ -102,7 +102,7 @@
             android:gravity="left|center"
             android:hint="有话要说…"
             android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
-            android:maxLength="200"
+            android:maxLength="2000"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:singleLine="true"

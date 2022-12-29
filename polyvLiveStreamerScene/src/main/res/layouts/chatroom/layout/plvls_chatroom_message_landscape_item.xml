@@ -6,13 +6,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/plvls_chatroom_chat_msg_item_bg_shape"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:minHeight="20dp"
     android:orientation="vertical"
     android:paddingLeft="12dp"
     android:paddingTop="2.5dp"
     android:paddingRight="12dp"
-    android:clipChildren="false"
-    android:clipToPadding="false"
     android:paddingBottom="2.5dp">
 
     <!--显示被回复人发送的文本信息-->
@@ -80,12 +80,12 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:lineSpacingExtra="2dp"
-            android:text="1213213123121321111111231231213213123123123123123"
             android:textColor="#F0F1F5"
             android:textSize="12sp"
             android:visibility="visible"
             tools:layout_marginRight="20dp"
-            tools:visibility="gone" />
+            tools:text="1213213123121321111111231231213213123123123123123"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/prohibited_word_tips_iv"
@@ -97,6 +97,52 @@
             android:visibility="gone"
             tools:visibility="gone" />
     </FrameLayout>
+
+    <View
+        android:id="@+id/plvls_chat_msg_over_length_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="#1FD8D8D8"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/plvls_chat_msg_over_length_control_ll"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/plvls_chat_msg_over_length_copy_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="复制"
+            android:textColor="#CCFFFEFC"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center_vertical"
+            android:background="#1FD8D8D8" />
+
+        <TextView
+            android:id="@+id/plvls_chat_msg_over_length_more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="更多"
+            android:textColor="#CCFFFEFC"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -147,28 +193,28 @@
                 tools:visibility="visible" />
         </FrameLayout>
 
-<!--        发送图片失败 -->
+        <!--        发送图片失败 -->
         <LinearLayout
             android:id="@+id/failed_image_ll"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:visibility="gone"
             tools:visibility="visible">
 
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/plvls_chatroom_send_fail_img"/>
+                android:src="@drawable/plvls_chatroom_send_fail_img" />
 
             <ImageView
                 android:id="@+id/failed_image_tips_iv"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="right|bottom"
+                android:layout_marginLeft="-8dp"
                 android:src="@drawable/plvls_chatroom_send_fail_icon"
-                android:translationY="1.5dp"
-                android:layout_marginLeft="-8dp" />
+                android:translationY="1.5dp" />
         </LinearLayout>
 
 

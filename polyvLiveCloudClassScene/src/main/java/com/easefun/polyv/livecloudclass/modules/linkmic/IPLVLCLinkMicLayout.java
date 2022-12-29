@@ -108,6 +108,11 @@ public interface IPLVLCLinkMicLayout {
     boolean isMediaShowInLinkMicList();
 
     /**
+     * 将Media切到主屏
+     */
+    void switchMediaToMainScreen();
+
+    /**
      * 回调通知，在加入连麦时已经将PPT切换到了主屏幕
      */
     void notifySwitchedPptToMainScreenOnJoinChannel();
@@ -153,21 +158,6 @@ public interface IPLVLCLinkMicLayout {
      * 连麦布局监听器
      */
     interface OnPLVLinkMicLayoutListener {
-        //todo 未来将支持画笔事件
-
-        // <editor-fold defaultstate="collapsed" desc="画笔事件监听">
-        /***
-         /// 暂时保留，以后需要时再使用
-        //        //点击擦除PPT画笔
-        //        void onUpdateEraseStatus(boolean toErase);
-        //
-        //        //更新画笔颜色
-        //        void onUpdateBrushColor(String color);
-        //
-        //        //更新画笔状态
-        //        boolean onUpdateBrushStatus(boolean unSelected);
-        //        // </editor-fold>
-         **/
 
         // <editor-fold defaultstate="collapsed" desc="连麦事件监听">
 
@@ -235,6 +225,8 @@ public interface IPLVLCLinkMicLayout {
         // <editor-fold defaultstate="collapsed" desc="RTC播放事件监听器">
         void onRTCPrepared();
         // </editor-fold>
+
+        boolean isInPaintMode();
 
     }
 // </editor-fold>

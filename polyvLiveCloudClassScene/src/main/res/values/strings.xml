@@ -1,2 +1,4 @@
 <resources>
+    <string name="plvlc_chat_msg_over_length_more">更多</string>
+    <string name="plvlc_chat_msg_over_length_fold">收起</string>
 </resources>

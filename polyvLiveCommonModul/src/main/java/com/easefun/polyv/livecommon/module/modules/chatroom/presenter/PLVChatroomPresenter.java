@@ -45,16 +45,20 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.component.exts.AsyncLazy;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.logcode.chat.PLVErrorCodeChatroomStatus;
 import com.plv.foundationsdk.net.PLVResponseApiBean2;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
+import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
@@ -68,6 +72,7 @@ import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
+import com.plv.socket.event.chat.PLVOverLengthMessageEvent;
 import com.plv.socket.event.chat.PLVRemoveContentEvent;
 import com.plv.socket.event.chat.PLVRemoveHistoryEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
@@ -176,14 +181,15 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
     public static String convertSpecialString(String input) {
-        String output;
-        output = input.replace("&lt;", "<");
-        output = output.replace("&lt", "<");
-        output = output.replace("&gt;", ">");
-        output = output.replace("&gt", ">");
-        output = output.replace("&yen;", "¥");
-        output = output.replace("&yen", "¥");
-        return output;
+        return input.replace("&lt;", "<")
+                .replace("&lt", "<")
+                .replace("&gt;", ">")
+                .replace("&gt", ">")
+                .replace("&yen;", "¥")
+                .replace("&yen", "¥")
+                .replace("&quot;", "\"")
+                .replace("&#39;", "'")
+                .replace("&amp;", "&");
     }
     // </editor-fold>
 
@@ -294,16 +300,18 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 if (args == null || args.length == 0 || args[0] == null) {
                     return;
                 }
-                /**
-                 * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
-                 *if ("".equals(args[0])) {
-                 *    // 触发严禁词时，args[0]为""
-                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
-                 *    return;
-                 *}
-                 */
+                final String messageId = String.valueOf(args[0]);
+                if (args.length == 1) {
+                    acceptLocalChatMessage(textMessage, messageId);
+                    return;
+                }
 
-                acceptLocalChatMessage(textMessage, String.valueOf(args[0]));
+                // 后台选择严禁词替换为*发出时，触发严禁词后会在args[1]返回实际发出内容
+                final JsonObject jsonObject = PLVGsonUtil.fromJson(JsonObject.class, String.valueOf(args[1]));
+                if (jsonObject != null && jsonObject.has("content")) {
+                    textMessage.setSpeakMessage(jsonObject.get("content").getAsString());
+                }
+                acceptLocalChatMessage(textMessage, messageId);
             }
         });
         if (sendValue == PolyvLocalMessage.SENDVALUE_BANIP) {//被禁言也认为发送成功，但不会广播给其他用户
@@ -323,16 +331,18 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 if (args == null || args.length == 0 || args[0] == null) {
                     return;
                 }
-                /**
-                 * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
-                 *if ("".equals(args[0])) {
-                 *    // 触发严禁词时，args[0]为""
-                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
-                 *    return;
-                 *}
-                 */
+                final String messageId = String.valueOf(args[0]);
+                if (args.length == 1) {
+                    acceptLocalChatMessage(textMessage, messageId);
+                    return;
+                }
 
-                acceptLocalChatMessage(textMessage, String.valueOf(args[0]));
+                // 后台选择严禁词替换为*发出时，触发严禁词后会在args[1]返回实际发出内容
+                final JsonObject jsonObject = PLVGsonUtil.fromJson(JsonObject.class, String.valueOf(args[1]));
+                if (jsonObject != null && jsonObject.has("content")) {
+                    textMessage.setSpeakMessage(jsonObject.get("content").getAsString());
+                }
+                acceptLocalChatMessage(textMessage, messageId);
             }
         }, quoteId);
         if (sendValue == PolyvLocalMessage.SENDVALUE_BANIP) {//被禁言也认为发送成功，但不会广播给其他用户
@@ -751,6 +761,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     }
                     int itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
                     PLVSpeakHistoryEvent speakHistory = PLVGsonUtil.fromJson(PLVSpeakHistoryEvent.class, jsonObject.toString());
+                    parseSpeakEventOverLength(speakHistory);
                     //如果是当前用户，则使用当前用户的昵称
                     if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(speakHistory.getUser().getUserId())) {
                         speakHistory.getUser().setNick(PolyvSocketWrapper.getInstance().getLoginVO().getNickName());
@@ -859,6 +870,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         final PLVSpeakEvent speakEvent = PLVEventHelper.toMessageEventModel(message, PLVSpeakEvent.class);
                         if (speakEvent != null && speakEvent.getUser() != null) {
                             parseSpeakEventFileData(speakEvent);
+                            parseSpeakEventOverLength(speakEvent);
                             if (!PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(speakEvent.getUser().getUserId())) {
                                 //把带表情的信息解析保存下来
                                 speakEvent.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(convertSpecialString(speakEvent.getValues().get(0)), getSpeakEmojiSizes(), Utils.getApp()));
@@ -1312,6 +1324,52 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 .setUrl(url)
                 .setName(name)
                 .setSuffix(name == null ? "" : name.substring(name.lastIndexOf(".") + 1));
+    }
+
+    private static void parseSpeakEventOverLength(final PLVSpeakEvent speakEvent) {
+        if (speakEvent == null || !speakEvent.isOverLength() || speakEvent.getId() == null) {
+            return;
+        }
+        speakEvent.setOverLengthFullMessage(new AsyncLazy<String>() {
+            @Override
+            public void onLazyInit(@NonNull final PLVSugarUtil.Consumer<String> initializer) {
+                onInitOverLengthFullMessage(speakEvent.getId(), initializer);
+            }
+        });
+    }
+
+    private static void parseSpeakEventOverLength(final PLVSpeakHistoryEvent speakHistoryEvent) {
+        if (speakHistoryEvent == null || !speakHistoryEvent.isOverLength() || speakHistoryEvent.getId() == null) {
+            return;
+        }
+        speakHistoryEvent.setOverLengthFullMessage(new AsyncLazy<String>() {
+            @Override
+            public void onLazyInit(@NonNull final PLVSugarUtil.Consumer<String> initializer) {
+                onInitOverLengthFullMessage(speakHistoryEvent.getId(), initializer);
+            }
+        });
+    }
+
+    private static void onInitOverLengthFullMessage(@NonNull final String msgId, @NonNull final PLVSugarUtil.Consumer<String> initializer) {
+        PLVChatroomManager.getInstance().getOverLengthFullMessage(msgId, new Ack() {
+            @Override
+            public void call(Object... args) {
+                if (args == null || args.length == 0 || args[0] == null || !(args[0] instanceof String)) {
+                    return;
+                }
+                final PLVOverLengthMessageEvent overLengthMessageEvent;
+                try {
+                    overLengthMessageEvent = PLVGsonUtil.fromJson(PLVOverLengthMessageEvent.class, (String) args[0]);
+                } catch (Exception e) {
+                    PLVCommonLog.exception(e);
+                    return;
+                }
+                if (!PLVOverLengthMessageEvent.validate(overLengthMessageEvent)) {
+                    return;
+                }
+                initializer.accept(overLengthMessageEvent.getData().getContent());
+            }
+        });
     }
     // </editor-fold>
 

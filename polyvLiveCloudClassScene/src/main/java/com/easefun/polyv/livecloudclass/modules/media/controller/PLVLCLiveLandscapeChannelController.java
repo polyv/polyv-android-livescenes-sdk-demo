@@ -236,6 +236,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public ImageView getEnterPaintView() {
+        return findViewById(R.id.plvlc_live_player_controller_enter_paint_iv);
+    }
+
+    @Override
     public void show() {
         setVisibility(VISIBLE);
     }

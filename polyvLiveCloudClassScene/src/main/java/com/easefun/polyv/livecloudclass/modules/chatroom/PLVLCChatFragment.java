@@ -40,6 +40,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPer
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatFunctionListener;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
@@ -111,6 +112,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private PLVLCChatCommonMessageList chatCommonMessageList;
     //未读信息提醒view
     private TextView unreadMsgTv;
+
+    @Nullable
+    private PLVLCChatOverLengthMessageLayout chatOverLengthMessageLayout;
 
     //信息输入框
     private EditText inputEt;
@@ -294,6 +298,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     unreadMsgTv.setText("有" + currentUnreadCount + "条新消息，点击查看");
                 }
             });
+            chatCommonMessageList.setOnViewActionListener(new PLVLCChatCommonMessageList.OnViewActionListener() {
+                @Override
+                public void onShowAloneOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+                    if (chatOverLengthMessageLayout != null) {
+                        chatOverLengthMessageLayout.show(chatMessageDataBean);
+                    }
+                }
+            });
         }
 
         //信息输入框
@@ -424,6 +436,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         cardEnterTipsView = findViewById(R.id.card_enter_tips_view);
         if (cardPushManager != null) {
             cardPushManager.registerView(cardEnterView, cardEnterCdTv, cardEnterTipsView);
+        }
+
+        if (getContext() != null && chatOverLengthMessageLayout == null) {
+            chatOverLengthMessageLayout = new PLVLCChatOverLengthMessageLayout(getContext());
         }
 
         addPopupButton(toggleEmojiIv);

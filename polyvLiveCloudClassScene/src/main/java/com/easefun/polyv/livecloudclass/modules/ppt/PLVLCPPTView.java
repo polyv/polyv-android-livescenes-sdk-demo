@@ -17,6 +17,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTVodProcessor;
 import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView;
 import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
@@ -29,6 +30,7 @@ import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.web.PLVWebview;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -209,8 +211,60 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     @Override
     public void turnPagePPT(String type) {
-        PLVCommonLog.d(TAG, "turnPagePPT: "+type);
+        PLVCommonLog.d(TAG, "turnPagePPT: " + type);
         sendWebMessage(PLVLivePPTProcessor.CHANGE_PPT_PAGE, "{\"type\":\"" + type + "\"}");
+    }
+
+    @Override
+    public void notifyPaintModeStatus(boolean isInPaintMode) {
+        if (pptWebView != null) {
+            pptWebView.setNeedGestureAction(isInPaintMode);
+            pptWebView.setFocusable(true);
+            pptWebView.setFocusableInTouchMode(true);
+            if (isInPaintMode) {
+                pptWebView.requestFocus();
+            } else {
+                pptWebView.clearFocus();
+            }
+        }
+
+        final String userType;
+        if (isInPaintMode) {
+            userType = "paint";
+        } else {
+            userType = "";
+        }
+        sendWebMessage(PLVLivePPTProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"" + userType + "\"}");
+    }
+
+    @Override
+    public void notifyPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool) {
+        if (PLVLCMarkToolEnums.MarkTool.CLEAR.equals(markTool)) {
+            sendWebMessage(PLVLivePPTProcessor.DELETE_ALL_PAINT, "");
+        } else if (PLVLCMarkToolEnums.MarkTool.ERASER.equals(markTool)) {
+            sendWebMessage(PLVLivePPTProcessor.ERASE_STATUS, "");
+        } else if (PLVLCMarkToolEnums.MarkTool.PEN.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.RECT.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.ARROW.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.TEXT.equals(markTool)) {
+            final String message = "{\"type\":\"" + markTool.getMarkTool() + "\"}";
+            sendWebMessage(PLVLivePPTProcessor.SET_DRAW_TYPE, message);
+        }
+    }
+
+    @Override
+    public void notifyPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color) {
+        sendWebMessage(PLVLivePPTProcessor.CHANGE_COLOR, color.getColorString());
+    }
+
+    @Override
+    public void notifyUndoLastPaint() {
+        sendWebMessage(PLVLivePPTProcessor.UNDO, "");
+    }
+
+    @Override
+    public void notifyPaintUpdateTextContent(String textContent) {
+        sendWebMessage(PLVLivePPTProcessor.CHANGE_TEXT_CONTENT, textContent);
     }
 
     // </editor-fold>
@@ -402,10 +456,18 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             @Override
             public void onPPTStatusChange(String data) {
                 PLVPPTStatus pptStatus = PLVGsonUtil.fromJson(PLVPPTStatus.class, data);
-                if(pptStatus != null && pptStatus.getMaxTeacherOp() != null){
-                    if(onLivePPTViewListener != null){
+                if (pptStatus != null && pptStatus.getMaxTeacherOp() != null) {
+                    if (onLivePPTViewListener != null) {
                         onLivePPTViewListener.onLivePPTStatusChange(pptStatus);
                     }
+                }
+            }
+
+            @Override
+            public void onEditTextChanged(String data) {
+                final PLVPPTPaintStatus pptPaintStatus = PLVGsonUtil.fromJson(PLVPPTPaintStatus.class, data);
+                if (onLivePPTViewListener != null) {
+                    onLivePPTViewListener.onPaintEditText(pptPaintStatus);
                 }
             }
         });

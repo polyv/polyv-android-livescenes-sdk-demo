@@ -291,10 +291,12 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         //更新竖屏UI
         tvRequestTip.setVisibility(INVISIBLE);
         ll4BtnParent.setVisibility(VISIBLE);
+        btnRingActionPortrait.setRingOffState();
 
         //更新横屏UI
         tvRequestTipLandscape.setVisibility(GONE);
         llFunctionBtnParentLand.setVisibility(VISIBLE);
+        btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_off);
 
         startAutoHideCountDown();
     }

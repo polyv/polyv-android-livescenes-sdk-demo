@@ -124,27 +124,39 @@
         android:id="@+id/plvlc_live_more_control_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/plvlc_live_control_floating_iv"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:padding="8dp"
             android:layout_marginEnd="4dp"
+            android:padding="8dp"
             android:src="@drawable/plvlc_live_controller_floating_icon" />
 
         <ImageView
             android:id="@+id/more_port_iv"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:padding="8dp"
             android:layout_marginEnd="4dp"
+            android:padding="8dp"
             android:src="@drawable/plvlc_controller_more" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/plvlc_live_player_controller_enter_paint_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="44dp"
+        android:src="@drawable/plvlc_controller_paint_mode_icon"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/plvlc_live_player_controller_tv_reopen_floating_view"

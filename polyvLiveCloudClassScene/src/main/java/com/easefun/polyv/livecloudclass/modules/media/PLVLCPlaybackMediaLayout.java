@@ -71,6 +71,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -646,6 +647,22 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void onTurnPageLayoutChange(boolean toShow) {
 
     }
+
+    @Override
+    public void onPaintEditText(PLVPPTPaintStatus paintStatus) {
+
+    }
+
+    @Override
+    public boolean isInPaintMode() {
+        return false;
+    }
+
+    @Override
+    public void notifyMediaLayoutPosition(boolean isInLinkMicList) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的playback方法">

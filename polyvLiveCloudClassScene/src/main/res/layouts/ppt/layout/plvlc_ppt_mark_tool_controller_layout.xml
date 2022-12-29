@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvlc_ppt_exit_mark_tool_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="16dp"
+        android:background="#99000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="all"
+        app:radius="4dp">
+
+        <ImageView
+            android:id="@+id/plvlc_ppt_exit_mark_tool_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/plvlc_ppt_exit_mark_tool_mode_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/plvlc_ppt_exit_mark_tool_iv"
+            android:text="退出画笔模式"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="12dp"
+        android:background="#99000000"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/plvlc_ppt_mark_tool_state_ll"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:radius="22dp">
+
+        <LinearLayout
+            android:id="@+id/plvlc_ppt_mark_tool_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="gone">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_pen_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_pen_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_rect_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_rect_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_arrow_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_arrow_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_text_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_text_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_eraser_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_eraser_icon" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_mark_tool_clear_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/plvlc_ppt_mark_tool_icon_bg"
+                android:src="@drawable/plvlc_ppt_clear_icon" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plvlc_ppt_mark_tool_color_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_red_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#FF6363"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_blue_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#4399FF"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_green_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#5AE59C"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_yellow_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#FFE45B"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_black_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#4A5060"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvlc_ppt_mark_tool_color_white_view"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:plvBackgroundColor="#33FFFFFF"
+                app:plvMainColor="#F0F1F5"
+                app:plvMainRadius="8dp"
+                app:plvSecondColor="#FFFFFF"
+                app:plvSecondRadius="10dp" />
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+    <LinearLayout
+        android:id="@+id/plvlc_ppt_mark_tool_state_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="34dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/plvlc_ppt_mark_undo_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="#99000000"
+            android:src="@drawable/plvlc_ppt_mark_tool_undo_icon"
+            app:radius_iv="18dp" />
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+            android:id="@+id/plvlc_ppt_mark_tool_current_color_view"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            app:plvBackgroundColor="#99000000"
+            app:plvMainColor="#FF6363"
+            app:plvMainRadius="8dp" />
+
+        <RelativeLayout
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plvlc_ppt_current_mark_tool_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="#99000000"
+                android:src="@drawable/plvlc_ppt_pen_icon"
+                app:radius_iv="18dp" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/plvlc_ppt_mark_tool_more_icon"
+                android:tint="#99000000"
+                android:tintMode="src_in" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

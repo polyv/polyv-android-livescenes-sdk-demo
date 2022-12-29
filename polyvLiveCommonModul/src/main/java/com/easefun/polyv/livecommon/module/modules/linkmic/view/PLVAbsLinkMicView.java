@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.view;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVViewerLinkMicState;
 
 import java.util.List;
 
@@ -32,7 +33,17 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
     }
 
     @Override
+    public void onLinkMicStateChanged(PLVViewerLinkMicState oldState, PLVViewerLinkMicState newState) {
+
+    }
+
+    @Override
     public void onJoinChannelTimeout() {
+
+    }
+
+    @Override
+    public void onLinkMicMemberReachLimit() {
 
     }
 

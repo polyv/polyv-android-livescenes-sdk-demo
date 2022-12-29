@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.chatroom;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -55,6 +57,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
+import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengthMessageLayout;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputWindow;
 import com.easefun.polyv.livestreamer.modules.managerchat.PLVLSManagerChatroomLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -82,8 +85,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * 聊天室布局
@@ -122,6 +123,9 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     // 管理员私聊布局
     @Nullable
     private PLVLSManagerChatroomLayout managerChatroomLayout;
+
+    @Nullable
+    private PLVLSChatOverLengthMessageLayout chatOverLengthMessageLayout;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -171,6 +175,8 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         plvlsChatroomToolbarCameraControlIv = findViewById(R.id.plvls_chatroom_toolbar_camera_control_iv);
         plvlsChatroomToolbarFrontCameraControlIv = findViewById(R.id.plvls_chatroom_toolbar_front_camera_control_iv);
         plvlsChatroomToolbarOpenInputWindowTv = findViewById(R.id.plvls_chatroom_toolbar_open_input_window_tv);
+
+        chatOverLengthMessageLayout = new PLVLSChatOverLengthMessageLayout(getContext());
 
         //初始化按钮点击事件
         plvlsChatroomControlIv.setOnClickListener(this);
@@ -231,6 +237,13 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
 
                     }
                 });
+            }
+
+            @Override
+            public void onShowOverLengthMessage(PLVLSChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+                if (chatOverLengthMessageLayout != null) {
+                    chatOverLengthMessageLayout.show(chatMessageDataBean);
+                }
             }
         });
         plvlsChatroomChatMsgRv.setAdapter(chatMessageAdapter);

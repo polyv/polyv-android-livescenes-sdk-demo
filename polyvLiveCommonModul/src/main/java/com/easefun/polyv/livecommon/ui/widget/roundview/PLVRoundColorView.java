@@ -24,12 +24,17 @@ public class PLVRoundColorView extends View {
     private int mainRadius = 0;
     @ColorInt
     private int mainColor = Color.TRANSPARENT;
+    @Px
+    private int secondRadius = 0;
+    @ColorInt
+    private int secondColor = Color.TRANSPARENT;
     @ColorInt
     private int backgroundColor = Color.TRANSPARENT;
 
     private int backgroundRadius;
 
     private final Paint mainPaint = new Paint();
+    private final Paint secondPaint = new Paint();
     private final Paint backgroundPaint = new Paint();
 
     public PLVRoundColorView(Context context) {
@@ -59,6 +64,7 @@ public class PLVRoundColorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawCircle(getWidth() / 2F, getHeight() / 2F, backgroundRadius, backgroundPaint);
+        canvas.drawCircle(getWidth() / 2F, getHeight() / 2F, secondRadius, secondPaint);
         canvas.drawCircle(getWidth() / 2F, getHeight() / 2F, mainRadius, mainPaint);
     }
 
@@ -67,6 +73,8 @@ public class PLVRoundColorView extends View {
 
         mainRadius = ta.getDimensionPixelSize(R.styleable.PLVRoundColorView_plvMainRadius, 0);
         mainColor = ta.getColor(R.styleable.PLVRoundColorView_plvMainColor, Color.TRANSPARENT);
+        secondRadius = ta.getDimensionPixelSize(R.styleable.PLVRoundColorView_plvSecondRadius, 0);
+        secondColor = ta.getColor(R.styleable.PLVRoundColorView_plvSecondColor, Color.TRANSPARENT);
         backgroundColor = ta.getColor(R.styleable.PLVRoundColorView_plvBackgroundColor, Color.TRANSPARENT);
 
         ta.recycle();
@@ -79,6 +87,10 @@ public class PLVRoundColorView extends View {
         mainPaint.setStyle(Paint.Style.FILL);
         mainPaint.setAntiAlias(true);
 
+        secondPaint.setColor(secondColor);
+        secondPaint.setStyle(Paint.Style.FILL);
+        secondPaint.setAntiAlias(true);
+
         backgroundPaint.setColor(backgroundColor);
         backgroundPaint.setStyle(Paint.Style.FILL);
         backgroundPaint.setAntiAlias(true);
@@ -87,6 +99,12 @@ public class PLVRoundColorView extends View {
     public void updateMainColor(@ColorInt int mainColor) {
         this.mainColor = mainColor;
         mainPaint.setColor(mainColor);
+        invalidate();
+    }
+
+    public void updateSecondColor(@ColorInt int secondColor) {
+        this.secondColor = secondColor;
+        secondPaint.setColor(secondColor);
         invalidate();
     }
 
