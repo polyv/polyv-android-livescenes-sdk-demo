@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -292,22 +293,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
 
     private String getNativeAppPramsInfo(){
         if(liveRoomDataManager != null) {
-            PLVInteractNativeAppParams nativeAppParams = new PLVInteractNativeAppParams()
-                    .setAppId(liveRoomDataManager.getConfig().getAccount().getAppId())
-                    .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
-                    .setSessionId(liveRoomDataManager.getSessionId())
-                    .setChannelInfo(
-                            new PLVInteractNativeAppParams.ChannelInfoDTO()
-                                    .setChannelId(liveRoomDataManager.getConfig().getChannelId())
-                                    .setRoomId(liveRoomDataManager.getConfig().getChannelId())
-                    )
-                    .setUserInfo(
-                            new PLVInteractNativeAppParams.UserInfoDTO()
-                                    .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
-                                    .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
-                                    .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
-                    );
-
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";

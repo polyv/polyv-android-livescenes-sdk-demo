@@ -12,6 +12,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
@@ -65,11 +66,19 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
 
     public interface OnViewActionListener {
         void onChatImgClick(View view, String imgUrl);
+
+        void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
     }
 
     public void callOnChatImgClick(View view, String imgUrl) {
         if (onViewActionListener != null) {
             onViewActionListener.onChatImgClick(view, imgUrl);
+        }
+    }
+
+    public void callOnShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
         }
     }
     // </editor-fold>

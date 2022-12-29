@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
@@ -41,8 +43,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
-
 /**
  * 横屏的聊天布局
  */
@@ -67,6 +67,8 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     //是否打开
     private boolean toShow = true;
+
+    private boolean isInPaintMode;
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -469,7 +471,17 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="横屏聊天室布局 - 开关控制">
     public void toggle(boolean toShow) {
         this.toShow = toShow;
-        setVisibility((toShow && ScreenUtils.isLandscape()) ? View.VISIBLE : View.GONE);
+        setVisibility((toShow && ScreenUtils.isLandscape() && !isInPaintMode) ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 更新画笔模式状态
+     *
+     * @param isInPaintMode 是否正在画笔模式
+     */
+    public void notifyPaintModeStatus(boolean isInPaintMode) {
+        this.isInPaintMode = isInPaintMode;
+        toggle(toShow);
     }
     // </editor-fold>
 
@@ -478,9 +490,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (toShow) {
-                setVisibility(View.VISIBLE);
-            }
+            toggle(toShow);
             if (chatCommonMessageList != null) {
                 boolean result = chatCommonMessageList.attachToParent(swipeLoadView, true);
                 if (result && chatroomPresenter != null) {

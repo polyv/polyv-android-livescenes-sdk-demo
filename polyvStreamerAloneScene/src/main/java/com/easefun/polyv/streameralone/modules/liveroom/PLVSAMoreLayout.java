@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -34,6 +35,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -116,6 +118,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private boolean isEnableVideo = true;
 
     private long lastClickCameraSwitchViewTime;
+
+    private IPLVLiveRoomDataManager liveRoomDataManager;
 
     /**
      * 限制每800ms点击一次
@@ -229,6 +233,21 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         });
     }
 
+    private void observeLiveRoomStatus() {
+        if (liveRoomDataManager != null) {
+            liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                    liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                    if (polyvLiveClassDetailVOPLVStatefulData.getData() != null){
+                        boolean isOpen = polyvLiveClassDetailVOPLVStatefulData.getData().isOpenPushShare();
+                        moreShareLl.setVisibility(isOpen == true ? VISIBLE : INVISIBLE);
+                    }
+                }
+            });
+        }
+    }
+
     private void observeBeautyModuleInitResult() {
         PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
                 .getUiState()
@@ -262,9 +281,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
         if (shareLayout != null) {
             shareLayout.init(liveRoomDataManager);
         }
+        observeLiveRoomStatus();
     }
     // </editor-folder>
 

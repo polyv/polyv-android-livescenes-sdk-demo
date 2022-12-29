@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
+import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicInvitationLayout;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -37,8 +38,10 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicC
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVLinkMicPresenter;
+import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVViewerLinkMicState;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -47,6 +50,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -96,6 +100,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private LinearLayout llTryScrollTip;
     private LinearLayout llSpeakingUsers;
     private TextView tvSpeakingUsersText;
+    private final PLVLCLinkMicInvitationLayout linkMicInvitationLayout = new PLVLCLinkMicInvitationLayout(getContext());
     //连麦列表适配器
     private PLVLinkMicListAdapter linkMicListAdapter;
     private PLVLinkMicRvLandscapeItemDecoration landscapeItemDecoration = new PLVLinkMicRvLandscapeItemDecoration();
@@ -220,6 +225,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             }
         });
 
+        linkMicInvitationLayout.setOnViewActionListener(new PLVLCLinkMicInvitationLayout.OnViewActionListener() {
+            @Override
+            public void answerLinkMicInvitation(boolean accept, int cancelBy, boolean openCamera, boolean openMicrophone) {
+                linkMicPresenter.answerLinkMicInvitation(accept, cancelBy == PLVLCLinkMicInvitationLayout.CANCEL_BY_TIMEOUT, openCamera, openMicrophone);
+            }
+
+            @Override
+            public void asyncGetAcceptInvitationLeftTimeInSecond(PLVSugarUtil.Consumer<Integer> callback) {
+                linkMicPresenter.getJoinAnswerTimeLeft(callback);
+            }
+        });
+
         //init方向
         curIsLandscape = PLVScreenUtils.isLandscape(getContext());
     }
@@ -286,6 +303,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void destroy() {
         linkMicPresenter.destroy();
+        linkMicInvitationLayout.destroy();
     }
 
     @Override
@@ -375,6 +393,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public boolean isMediaShowInLinkMicList() {
         return isMediaShowInLinkMicList;
+    }
+
+    @Override
+    public void switchMediaToMainScreen() {
+        if (isMediaShowInLinkMicList) {
+            performClickInLinkMicListItem(getMediaViewIndexInLinkMicList());
+        }
     }
 
     @Override
@@ -521,8 +546,19 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onLinkMicStateChanged(PLVViewerLinkMicState oldState, PLVViewerLinkMicState newState) {
+        linkMicInvitationLayout.setIsOnlyAudio(linkMicPresenter.getIsAudioLinkMic());
+        linkMicInvitationLayout.onLinkMicStateChanged(oldState, newState);
+    }
+
+    @Override
     public void onJoinChannelTimeout() {
         ToastUtils.showShort("加入频道超时，请重试");
+    }
+
+    @Override
+    public void onLinkMicMemberReachLimit() {
+        PLVToast.Builder.context(getContext()).setText("连麦人数已达上限").show();
     }
 
     @Override
@@ -852,6 +888,10 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVSwitchViewAnchorLayout firstScreenSwitchView = linkMicListAdapter.getFirstScreenSwitchView();
         //如果当前连麦列表为空，则返回
         if (firstScreenSwitchView == null) {
+            return;
+        }
+        if (onPLVLinkMicLayoutListener != null && onPLVLinkMicLayoutListener.isInPaintMode()) {
+            // 画笔模式不响应
             return;
         }
         if (isMediaShowInLinkMicList && linkMicListAdapter.getSwitchViewHasMedia() != null) {

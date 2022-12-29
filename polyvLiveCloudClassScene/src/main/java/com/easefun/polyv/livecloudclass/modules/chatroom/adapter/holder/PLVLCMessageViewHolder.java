@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
@@ -63,6 +65,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private View chatLayout;
     private LinearLayout chatMsgLl;
     private ImageView chatMsgFileShareIv;
+    @Nullable
+    private View chatMsgOverLengthMask;
 
     //横屏item
     //文本信息
@@ -75,6 +79,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private TextView quoteChatNickTv;
     private LinearLayout chatMsgLandLl;
     private ImageView chatMsgFileShareLandIv;
+    @Nullable
+    private View chatMsgOverLengthSplitLine;
 
     //横/竖屏图片信息
     private ImageView imgMessageIv;
@@ -84,6 +90,11 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private View quoteSplitView;
     //横/竖被回复人的图片信息
     private ImageView quoteImgMessageIv;
+    private LinearLayout chatMsgOverLengthControlLl;
+    private TextView chatMsgOverLengthCopyBtn;
+    private TextView chatMsgOverLengthMoreBtn;
+
+    private boolean isOverLengthContentFolding = true;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -99,6 +110,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         chatMsgLl = findViewById(R.id.plvlc_chat_msg_ll);
         chatMsgFileShareIv = findViewById(R.id.plvlc_chat_msg_file_share_iv);
         chatLayout = findViewById(R.id.chat_msg_ll);
+        chatMsgOverLengthMask = findViewById(R.id.plvlc_chat_msg_over_length_mask);
+
         //land item
         chatMsgTv = (GifSpanTextView) findViewById(R.id.chat_msg_tv);
         chatNickTv = (TextView) findViewById(R.id.chat_nick_tv);
@@ -106,11 +119,16 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         quoteChatNickTv = (TextView) findViewById(R.id.quote_chat_nick_tv);
         chatMsgLandLl = findViewById(R.id.plvlc_chat_msg_land_ll);
         chatMsgFileShareLandIv = findViewById(R.id.plvlc_chat_msg_file_share_land_iv);
+        chatMsgOverLengthSplitLine = findViewById(R.id.plvlc_chat_msg_over_length_split_line);
+
         //common item
         imgMessageIv = (ImageView) findViewById(R.id.img_message_iv);
         imgLoadingView = (ProgressBar) findViewById(R.id.img_loading_view);
         quoteSplitView = findViewById(R.id.quote_split_view);
         quoteImgMessageIv = (ImageView) findViewById(R.id.quote_img_message_iv);
+        chatMsgOverLengthControlLl = findViewById(R.id.plvlc_chat_msg_over_length_control_ll);
+        chatMsgOverLengthCopyBtn = findViewById(R.id.plvlc_chat_msg_over_length_copy_btn);
+        chatMsgOverLengthMoreBtn = findViewById(R.id.plvlc_chat_msg_over_length_more_btn);
 
         initView();
         addOnSendImgListener();
@@ -130,7 +148,9 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             textMessageTv.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    PLVCopyBoardPopupWindow.show(textMessageTv, true, textMessageTv.getText().toString());
+                    if (!isOverLengthFoldingMessage) {
+                        PLVCopyBoardPopupWindow.show(textMessageTv, true, textMessageTv.getText().toString());
+                    }
                     return true;
                 }
             });
@@ -147,7 +167,9 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             chatMsgTv.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    PLVCopyBoardPopupWindow.show(chatMsgTv, true, chatMsgTv.getText().toString());
+                    if (!isOverLengthFoldingMessage) {
+                        PLVCopyBoardPopupWindow.show(chatMsgTv, true, chatMsgTv.getText().toString());
+                    }
                     return true;
                 }
             });
@@ -279,19 +301,20 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         //设置昵称
         if (nickName != null) {
+            String showName = nickName;
             if (loginUserId != null && loginUserId.equals(userId)) {
-                nickName = nickName + "(我)";
+                showName = showName + "(我)";
             }
             if (actor != null) {
-                nickName = actor + "-" + nickName;
+                showName = actor + "-" + showName;
             }
             if (nickTv != null) {
-                nickTv.setText(nickName);
+                nickTv.setText(showName);
                 nickTv.setTextColor(Color.parseColor(actor != null ? "#78A7ED" : "#ADADC0"));
             }
             if (chatNickTv != null && chatImgUrl != null) {
                 chatNickTv.setVisibility(View.VISIBLE);
-                chatNickTv.setText(nickName + ": ");
+                chatNickTv.setText(showName + ": ");
                 chatNickTv.setTextColor(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF"));
             }
         }
@@ -412,7 +435,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 }
             }
         }
+
+        processOverLengthMessage();
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="UI - 重置view">
@@ -466,12 +492,40 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             quoteImgMessageIv.setVisibility(View.GONE);
         }
     }
+
+    private void updateOverLengthView() {
+        if (!isOverLengthFoldingMessage) {
+            if (chatMsgOverLengthMask != null) {
+                chatMsgOverLengthMask.setVisibility(View.GONE);
+            }
+            if (chatMsgOverLengthSplitLine != null) {
+                chatMsgOverLengthSplitLine.setVisibility(View.GONE);
+            }
+            chatMsgOverLengthControlLl.setVisibility(View.GONE);
+            return;
+        }
+        chatMsgOverLengthControlLl.setVisibility(View.VISIBLE);
+
+        if (chatMsgOverLengthMask != null) {
+            chatMsgOverLengthMask.setVisibility(isOverLengthContentFolding ? View.VISIBLE : View.GONE);
+        }
+        if (chatMsgOverLengthSplitLine != null) {
+            chatMsgOverLengthSplitLine.setVisibility(View.VISIBLE);
+        }
+        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plvlc_chat_msg_over_length_more : R.string.plvlc_chat_msg_over_length_fold);
+        if (textMessageTv != null) {
+            textMessageTv.setMaxLines(isOverLengthContentFolding ? 6 : Integer.MAX_VALUE);
+        }
+        if (chatMsgTv != null) {
+            chatMsgTv.setMaxLines(isOverLengthContentFolding ? 6 : Integer.MAX_VALUE);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据交互 - 设置图片信息">
     private void setImgMessage() {
         if (chatImgUrl != null && imgMessageIv != null) {
-            if(!isLandscapeLayout) {
+            if (!isLandscapeLayout) {
                 chatLayout.setVisibility(View.INVISIBLE);
             }
             imgMessageIv.setVisibility(View.VISIBLE);
@@ -542,6 +596,56 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 imgMessageIv.setImageDrawable(drawable);
             }
         };
+    }
+
+    private void processOverLengthMessage() {
+        isOverLengthContentFolding = true;
+
+        chatMsgOverLengthCopyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (isFullMessage || fullMessageOnOverLength == null) {
+                    PLVCopyBoardPopupWindow.copy(v.getContext(), speakMsg.toString());
+                } else {
+                    fullMessageOnOverLength.getAsync(new PLVSugarUtil.Consumer<String>() {
+                        @Override
+                        public void accept(final String s) {
+                            postToMainThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    PLVCopyBoardPopupWindow.copy(v.getContext(), s);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+        chatMsgOverLengthMoreBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isOverLengthShowAloneMessage) {
+                    adapter.callOnShowOverLengthMessage(createShowAloneOverLengthMessage());
+                } else {
+                    isOverLengthContentFolding = !isOverLengthContentFolding;
+                    updateOverLengthView();
+                }
+            }
+        });
+
+        updateOverLengthView();
+    }
+
+    private PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean createShowAloneOverLengthMessage() {
+        return new PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean.Builder()
+                .setAvatar(avatar)
+                .setNick(nickName)
+                .setUserType(userType)
+                .setActor(actor)
+                .setMessage(speakMsg)
+                .setOverLength(!isFullMessage)
+                .setOnOverLengthFullMessage(fullMessageOnOverLength)
+                .build();
     }
 
     @Nullable

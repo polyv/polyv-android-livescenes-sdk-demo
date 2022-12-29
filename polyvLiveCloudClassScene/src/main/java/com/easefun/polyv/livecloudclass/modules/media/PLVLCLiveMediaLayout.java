@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
@@ -45,13 +47,16 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeV
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
+import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout;
+import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
+import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
-import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.PLVLivePlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePlayerView;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -74,6 +79,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
@@ -116,6 +122,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     private TextView tvCountDown;
     private LinearLayout llAuxiliaryCountDown;
+
+    private PLVLCMarkToolControllerLayout liveMarkToolControllerLayout;
 
     //音频模式view
     private PLVLCLiveAudioModeView audioModeView;
@@ -189,6 +197,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private boolean isOnlyAudio = false;
     private String coverImage = DEFAULT_COVER_IMAGE;
 
+    private boolean isInPaintMode;
+
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
     private PLVLCFloatingWindow floatingWindow;
@@ -233,6 +243,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         volumeTipsView = findViewById(R.id.volume_view);
         screenshotIV = findViewById(R.id.screenshot_iv);
         timeCountDownTv = findViewById(R.id.time_count_down_tv);
+        liveMarkToolControllerLayout = findViewById(R.id.plvlc_live_mark_tool_controller_layout);
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
@@ -257,6 +268,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         initVideoView();
         initPlayErrorView();
         initDanmuView();
+        initMarkToolControllerLayout();
         initMediaController();
         initAudioModeView();
         initLoadingView();
@@ -317,6 +329,42 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     if (!result.first) {
                         ToastUtils.showShort(getResources().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + result.second);
                     }
+                }
+            }
+        });
+    }
+
+    private void initMarkToolControllerLayout() {
+        liveMarkToolControllerLayout.setOnMarkToolActionListener(new PLVLCMarkToolControllerLayout.OnMarkToolActionListener() {
+            @Override
+            public void onPaintModeChanged(boolean isInPaintMode) {
+                PLVLCLiveMediaLayout.this.isInPaintMode = isInPaintMode;
+                mediaController.notifyPaintModeStatus(isInPaintMode);
+                chatLandscapeLayout.notifyPaintModeStatus(isInPaintMode);
+                if (onViewActionListener != null) {
+                    onViewActionListener.onPaintModeChanged(isInPaintMode);
+                }
+                livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode);
+            }
+
+            @Override
+            public void onChangeMarkTool(PLVLCMarkToolEnums.MarkTool newMarkTool) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onPaintMarkToolChanged(newMarkTool);
+                }
+            }
+
+            @Override
+            public void onChangeColor(PLVLCMarkToolEnums.Color newColor) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onPaintMarkToolColorChanged(newColor);
+                }
+            }
+
+            @Override
+            public void onUndo() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onPaintUndo();
                 }
             }
         });
@@ -415,6 +463,17 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 if (floatingWindow != null) {
                     floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
                 }
+            }
+
+            @Override
+            public void onEnterPaintMode() {
+                liveMarkToolControllerLayout.enterPaintMode();
+                postToMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ScreenUtils.setLandscape((Activity) getContext());
+                    }
+                });
             }
         });
     }
@@ -759,6 +818,26 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public void onPaintEditText(PLVPPTPaintStatus paintStatus) {
+        new PLVLCPPTInputWidget(getContext())
+                .setContent(paintStatus)
+                .setOnViewActionListener(new PLVLCPPTInputWidget.OnViewActionListener() {
+                    @Override
+                    public void onFinishChangeTextContent(String content) {
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onFinishChangeTextContent(content);
+                        }
+                    }
+                })
+                .show(this);
+    }
+
+    @Override
+    public boolean isInPaintMode() {
+        return liveMarkToolControllerLayout.isInPaintMode();
+    }
+
+    @Override
     public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
@@ -773,7 +852,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             livePlayerPresenter.setPlayerVolume(0);
         }
         //禁用播放器手势
-        livePlayerPresenter.setNeedGestureDetector(false);
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode);
 
         mediaController.show();
 
@@ -800,7 +879,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             startPlay();
         }
         //恢复播放器手势
-        livePlayerPresenter.setNeedGestureDetector(true);
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode);
         //恢复播放器音量
         livePlayerPresenter.setPlayerVolume(100);
 
@@ -830,6 +909,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         videoView.setIsLinkMic(false);
         mediaController.updateWhenLeaveLinkMic();
         networkTipsView.setIsLinkMic(true);
+        if (liveMarkToolControllerLayout.isInPaintMode()) {
+            liveMarkToolControllerLayout.exitPaintMode();
+        }
     }
 
     @Override
@@ -896,6 +978,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     public void onTurnPageLayoutChange(boolean toShow) {
         mediaController.setTurnPageLayoutStatus(toShow);
     }
+
+    @Override
+    public void notifyMediaLayoutPosition(boolean isInLinkMicList) {
+        if (liveMarkToolControllerLayout.isInPaintMode() && isInLinkMicList) {
+            liveMarkToolControllerLayout.exitPaintMode();
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的playback方法，空实现">
@@ -1151,6 +1241,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         MarginLayoutParams networkTipsLp = (MarginLayoutParams) networkTipsView.getLayoutParams();
         networkTipsLp.rightMargin = show ? landscapeMarginRightForLinkMicLayout : 0;
         networkTipsView.setLayoutParams(networkTipsLp);
+
+        MarginLayoutParams markToolControllerLp = (MarginLayoutParams) liveMarkToolControllerLayout.getLayoutParams();
+        markToolControllerLp.rightMargin = show ? landscapeMarginRightForLinkMicLayout : 0;
+        liveMarkToolControllerLayout.setLayoutParams(markToolControllerLp);
     }
     // </editor-fold>
 

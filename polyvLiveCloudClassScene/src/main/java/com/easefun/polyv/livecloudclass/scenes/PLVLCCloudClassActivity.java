@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.scenes;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
 
 import android.app.Activity;
@@ -27,6 +28,7 @@ import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWind
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCFloatingPPTLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -59,6 +61,7 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
@@ -611,6 +614,49 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public boolean isRtcPausing() {
                 return linkMicLayout.isPausing();
             }
+
+            @Override
+            public void onPaintModeChanged(boolean isInPaintMode) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                if (isInPaintMode && linkMicLayout != null && linkMicLayout.isMediaShowInLinkMicList()) {
+                    linkMicLayout.switchMediaToMainScreen();
+                }
+                floatingPPTLayout.getPPTView().notifyPaintModeStatus(isInPaintMode);
+            }
+
+            @Override
+            public void onPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintMarkToolChanged(markTool);
+            }
+
+            @Override
+            public void onPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintMarkToolColorChanged(color);
+            }
+
+            @Override
+            public void onPaintUndo() {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyUndoLastPaint();
+            }
+
+            @Override
+            public void onFinishChangeTextContent(String content) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintUpdateTextContent(content);
+            }
         });
 
         //当前页面 监听 播放器数据中的PPT是否显示状态
@@ -924,6 +970,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         mediaLayout.updatePPTStatusChange(plvpptStatus);
                     }
                 }
+
+                @Override
+                public void onPaintEditText(PLVPPTPaintStatus paintStatus) {
+                    if (mediaLayout != null) {
+                        mediaLayout.onPaintEditText(paintStatus);
+                    }
+                }
             });
         } else {
             //设置回放PPT事件监听
@@ -1033,6 +1086,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onClickSwitchWithMediaOnce(PLVSwitchViewAnchorLayout switchView) {
                 linkMicItemSwitcher.registerSwitchView(switchView, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
+
+                checkMediaViewPosition();
             }
 
             @Override
@@ -1044,11 +1099,33 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //再将要切到主屏幕的item和PPT交换位置
                 linkMicItemSwitcher.registerSwitchView(switchViewGoMainScreen, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
+
+                checkMediaViewPosition();
             }
 
             @Override
             public void onRTCPrepared() {
                 mediaLayout.notifyRTCPrepared();
+            }
+
+            @Override
+            public boolean isInPaintMode() {
+                if (mediaLayout != null) {
+                    return mediaLayout.isInPaintMode();
+                }
+                return false;
+            }
+
+            private void checkMediaViewPosition() {
+                postToMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (linkMicLayout == null || mediaLayout == null) {
+                            return;
+                        }
+                        mediaLayout.notifyMediaLayoutPosition(linkMicLayout.isMediaShowInLinkMicList());
+                    }
+                });
             }
         });
     }

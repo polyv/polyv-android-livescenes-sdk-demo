@@ -14,6 +14,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.component.exts.AsyncLazy;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
@@ -37,6 +38,10 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
  */
 public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter extends PLVBaseAdapter>
         extends PLVBaseViewHolder<Data, Adapter> {
+
+    public static final int CHAT_MESSAGE_OVER_LENGTH_TO_FOLD = 500;
+    public static final int CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE = 500;
+
     private int msgIndex;//信息索引
 
     protected Object messageData;//信息数据
@@ -48,6 +53,11 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
     protected String bgColor;//头衔背景色
     protected String avatar;//头像url
     protected CharSequence speakMsg;//文本发言信息
+    protected boolean isFullMessage = true;
+    @Nullable
+    protected AsyncLazy<String> fullMessageOnOverLength = null;
+    protected boolean isOverLengthFoldingMessage = false;
+    protected boolean isOverLengthShowAloneMessage = false;
     @Nullable
     protected PLVPptShareFileVO speakFileData;
 
@@ -106,6 +116,10 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromUser(speakEvent.getUser());
             int validIndex = Math.min(speakEvent.getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) speakEvent.getObjects()[validIndex];
+            isFullMessage = !speakEvent.isOverLength();
+            fullMessageOnOverLength = speakEvent.getOverLengthFullMessage();
+            isOverLengthFoldingMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_FOLD;
+            isOverLengthShowAloneMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE;
             speakFileData = speakEvent.getFileData();
             chatQuoteVO = speakEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
@@ -115,6 +129,8 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvLocalMessage) messageData).getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) ((PolyvLocalMessage) messageData).getObjects()[validIndex];
+            isOverLengthFoldingMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_FOLD;
+            isOverLengthShowAloneMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE;
             prohibitedWordVO = ((PolyvLocalMessage) messageData).getProhibitedWord();
             chatQuoteVO = ((PolyvLocalMessage) messageData).getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
@@ -169,6 +185,10 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             fillFieldFromUser(speakHistoryEvent.getUser());
             int validIndex = Math.min(speakHistoryEvent.getObjects().length - 1, msgIndex);
             speakMsg = (CharSequence) speakHistoryEvent.getObjects()[validIndex];
+            isFullMessage = !speakHistoryEvent.isOverLength();
+            fullMessageOnOverLength = speakHistoryEvent.getOverLengthFullMessage();
+            isOverLengthFoldingMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_FOLD;
+            isOverLengthShowAloneMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE;
             chatQuoteVO = speakHistoryEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
                 quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];

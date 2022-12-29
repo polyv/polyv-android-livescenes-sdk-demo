@@ -53,18 +53,18 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/actor_ly"
         android:layout_marginTop="3dp"
-        android:layout_toRightOf="@id/avatar_iv">
+        android:layout_toRightOf="@id/avatar_iv"
+        android:background="@drawable/plvlc_tv_receive">
 
         <LinearLayout
             android:id="@+id/chat_msg_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/plvlc_tv_receive"
             android:minHeight="40dp"
             android:orientation="vertical"
             android:paddingLeft="12dp"
@@ -148,6 +148,53 @@
 
         </LinearLayout>
 
+        <View
+            android:id="@+id/plvlc_chat_msg_over_length_mask"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@drawable/plvlc_chatroom_msg_over_length_mask_bg"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/chat_msg_ll"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/plvlc_chat_msg_over_length_control_ll"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/chat_msg_ll"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/plvlc_chat_msg_over_length_copy_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="复制"
+                android:textColor="#CCADADC0"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:background="#4DFFFFFF" />
+
+            <TextView
+                android:id="@+id/plvlc_chat_msg_over_length_more_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="更多"
+                android:textColor="#CCADADC0"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
         <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
             android:id="@+id/img_message_iv"
             android:layout_width="wrap_content"
@@ -159,7 +206,6 @@
             android:id="@+id/img_loading_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:max="100"
             android:progress="0"
             android:visibility="gone"
@@ -168,6 +214,10 @@
             app:cpv_outerSize="1dp"
             app:cpv_progressNormalColor="#00000000"
             app:cpv_progressReachColor="#E5ffffff"
-            app:cpv_progressStyle="FillInnerArc" />
-    </FrameLayout>
+            app:cpv_progressStyle="FillInnerArc"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

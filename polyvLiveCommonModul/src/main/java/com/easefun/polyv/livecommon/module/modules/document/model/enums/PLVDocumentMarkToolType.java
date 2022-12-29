@@ -26,6 +26,11 @@ public class PLVDocumentMarkToolType {
     public static final String TEXT = "text";
 
     /**
+     * 矩形模式
+     */
+    public static final String RECT = "rect";
+
+    /**
      * 橡皮擦模式
      */
     public static final String ERASER = "eraser";
@@ -37,7 +42,7 @@ public class PLVDocumentMarkToolType {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
-            BRUSH, ARROW, TEXT, ERASER, CLEAR
+            BRUSH, ARROW, TEXT, RECT, ERASER, CLEAR
     })
     public @interface Range {
     }

@@ -151,6 +151,11 @@
         tools:text="倒计时：06天22小时07分31秒"
         tools:visibility="visible" />
 
+    <com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout
+        android:id="@+id/plvlc_live_mark_tool_controller_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- 控制栏 -->
     <com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCLiveMediaController
         android:id="@+id/controller_view"

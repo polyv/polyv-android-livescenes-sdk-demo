@@ -39,6 +39,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
+import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanPopupView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatInputWindow;
@@ -98,6 +99,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private PLVECChatMessageAdapter chatMessageAdapter;
     private TextView sendMsgTv;
     private PLVECChatImgScanPopupView chatImgScanPopupView;
+    @Nullable
+    private PLVECChatOverLengthMessageLayout chatOverLengthMessageLayout;
     //未读信息提醒view
     private TextView unreadMsgTv;
     //下拉加载历史记录控件
@@ -216,6 +219,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         morePopupView = new PLVECMorePopupView();
         commodityPopupView = new PLVECCommodityPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
+        if (getContext() != null) {
+            chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
+        }
 
         //打赏动画特效
         polyvPointRewardEffectWidget = findViewById(R.id.plvec_point_reward_effect);
@@ -684,6 +690,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         @Override
         public void onChatImgClick(View view, String imgUrl) {
             chatImgScanPopupView.showImgScanLayout(view, imgUrl);
+        }
+
+        @Override
+        public void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+            if (chatOverLengthMessageLayout != null) {
+                chatOverLengthMessageLayout.show(chatMessageDataBean);
+            }
         }
     };
     // </editor-fold>

@@ -32,4 +32,7 @@
     <string name="plvsa_beauty_reset_confirm_cancel">取消</string>
     <string name="plvsa_beauty_reset_confirm_reset">确定</string>
     <string name="plvsa_beauty_reset_success">重置成功</string>
+
+    <string name="plvsa_chat_msg_over_length_more">更多</string>
+    <string name="plvsa_chat_msg_over_length_fold">收起</string>
 </resources>

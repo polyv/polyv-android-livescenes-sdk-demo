@@ -9,9 +9,9 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.widget.EditText;
 
-import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmojiListAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPersonalListAdapter;
@@ -91,8 +91,8 @@ public class PLVSAChatroomUtils {
     //添加表情
     private static void appendEmo(String emoKey, EditText inputEt) {
         SpannableStringBuilder span = new SpannableStringBuilder(emoKey);
-        if(inputEt.getText().length() + span.length() >= 200){
-            Log.e("ChatroomUtils", "appendEmo fail because exceed maxLength 200");
+        if (inputEt.getText().length() + span.length() >= 2000) {
+            Log.e("ChatroomUtils", "appendEmo fail because exceed maxLength 2000");
             return;
         }
         int textSize = (int) inputEt.getTextSize();

@@ -33,17 +33,21 @@ import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCom
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
@@ -86,6 +90,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     //ppt翻页
     private PLVLCPPTTurnPageLayout pptTurnPagePortLayout;
 
+    private ImageView livePlayerControllerEnterPaintIv;
+
     //横屏皮肤
     private IPLVLCLiveLandscapePlayerController landscapeController;
     //横屏控制栏布局
@@ -122,6 +128,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     //商品按钮
     private ImageView commodityView;
 
+    private ImageView livePlayerControllerEnterPaintLandIv;
+
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
 
@@ -156,9 +164,13 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean isLinkMic;
     // rtc观看时是否隐藏刷新按钮
     private boolean hideRefreshButtonInRtcChannel;
+    // 是否正在画笔模式
+    private boolean isInPaintMode;
 
     //view动作监听器
     private OnViewActionListener onViewActionListener;
+
+    private PLVUserAbilityManager.OnUserAbilityChangedListener userAbilityChangedListener;
 
     // </editor-fold>
 
@@ -184,25 +196,29 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         //竖屏控制栏布局
         videoControllerPortLy = findViewById(R.id.video_controller_port_ly);
         backPortIv = findViewById(R.id.back_port_iv);
-        backPortIv.setOnClickListener(this);
         videoNamePortTv = findViewById(R.id.video_name_port_tv);
         videoViewerCountPortTv = findViewById(R.id.video_viewer_count_port_tv);
         videoPausePortIv = findViewById(R.id.video_pause_port_iv);
-        videoPausePortIv.setOnClickListener(this);
         videoRefreshPortIv = findViewById(R.id.video_refresh_port_iv);
-        videoRefreshPortIv.setOnClickListener(this);
         videoPptSwitchPortIv = findViewById(R.id.video_ppt_switch_port_iv);
-        videoPptSwitchPortIv.setOnClickListener(this);
         videoScreenSwitchPortIv = findViewById(R.id.video_screen_switch_port_iv);
-        videoScreenSwitchPortIv.setOnClickListener(this);
         liveMoreControlLl = findViewById(R.id.plvlc_live_more_control_ll);
         morePortIv = findViewById(R.id.more_port_iv);
-        morePortIv.setOnClickListener(this);
         liveControlFloatingIv = findViewById(R.id.plvlc_live_control_floating_iv);
-        liveControlFloatingIv.setOnClickListener(this);
         gradientBarTopPortView = findViewById(R.id.gradient_bar_top_port_view);
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_live_player_controller_tv_reopen_floating_view);
         pptTurnPagePortLayout = findViewById(R.id.video_ppt_turn_page_layout);
+        livePlayerControllerEnterPaintIv = findViewById(R.id.plvlc_live_player_controller_enter_paint_iv);
+
+        backPortIv.setOnClickListener(this);
+        videoPausePortIv.setOnClickListener(this);
+        videoRefreshPortIv.setOnClickListener(this);
+        videoPptSwitchPortIv.setOnClickListener(this);
+        videoScreenSwitchPortIv.setOnClickListener(this);
+        morePortIv.setOnClickListener(this);
+        liveControlFloatingIv.setOnClickListener(this);
+        livePlayerControllerEnterPaintIv.setOnClickListener(this);
+
         pptTurnPagePortLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
             public void onPPTTurnPage(String type) {
@@ -221,6 +237,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         }
 
         observeFloatingPlayerShowingState();
+        observePaintAbility();
     }
 
     private void initMoreLayout() {
@@ -297,6 +314,31 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                     }
                 });
     }
+
+    private void observePaintAbility() {
+        PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(userAbilityChangedListener = new PLVUserAbilityManager.OnUserAbilityChangedListener() {
+            @Override
+            public void onUserAbilitiesChanged(@NonNull List<PLVUserAbility> addedAbilities, @NonNull List<PLVUserAbility> removedAbilities) {
+                boolean updatePaintModeEntrance = false;
+                if (addedAbilities.contains(PLVUserAbility.LIVE_DOCUMENT_ALLOW_USE_PAINT_ON_LINKMIC)) {
+                    updatePaintModeEntrance = true;
+                    PLVToast.Builder.context(getContext())
+                            .setText("讲师已授予你画笔权限")
+                            .show();
+                    show();
+                }
+                if (removedAbilities.contains(PLVUserAbility.LIVE_DOCUMENT_ALLOW_USE_PAINT_ON_LINKMIC)) {
+                    updatePaintModeEntrance = true;
+                    PLVToast.Builder.context(getContext())
+                            .setText("讲师已收回你的画笔权限")
+                            .show();
+                }
+                if (updatePaintModeEntrance) {
+                    updatePaintModeEntrance();
+                }
+            }
+        }));
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLiveMediaController父接口IPolyvMediaController定义的方法">
@@ -315,7 +357,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void hide() {
         setVisibility(View.GONE);
         if (onViewActionListener != null) {
-            onViewActionListener.onShow(false);
+            onViewActionListener.onShow(getVisibility() == View.VISIBLE);
         }
     }
 
@@ -343,7 +385,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void show() {
         setVisibility(VISIBLE);
         if (onViewActionListener != null) {
-            onViewActionListener.onShow(true);
+            onViewActionListener.onShow(getVisibility() == View.VISIBLE);
         }
     }
     // </editor-fold>
@@ -361,31 +403,35 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         //横屏控制栏布局
         videoControllerLandLy = landscapeController.getLandRoot();
         backLandIv = landscapeController.getBackView();
-        backLandIv.setOnClickListener(this);
         videoNameLandTv = landscapeController.getNameView();
         videoViewerCountLandTv = landscapeController.getViewerCountView();
         videoPauseLandIv = landscapeController.getPauseView();
-        videoPauseLandIv.setOnClickListener(this);
         videoRefreshLandIv = landscapeController.getRefreshView();
-        videoRefreshLandIv.setOnClickListener(this);
         videoPptSwitchLandIv = landscapeController.getSwitchView();
-        videoPptSwitchLandIv.setOnClickListener(this);
         liveControlFloatingLandIv = landscapeController.getFloatingControlView();
-        liveControlFloatingLandIv.setOnClickListener(this);
         startSendMessageLandIv = landscapeController.getMessageSender();
-        startSendMessageLandIv.setOnClickListener(this);
         danmuSwitchLandIv = landscapeController.getDanmuSwitchView();
         bulletinLandIv = landscapeController.getBulletinView();
-        bulletinLandIv.setOnClickListener(this);
         likesLandIv = landscapeController.getLikesView();
-        likesLandIv.setOnButtonClickListener(this);
         moreLandIv = landscapeController.getMoreView();
-        moreLandIv.setOnClickListener(this);
         rewardView = landscapeController.getRewardView();
-        rewardView.setOnClickListener(this);
         commodityView = landscapeController.getCommodityView();
-        commodityView.setOnClickListener(this);
         pptTurnPageLandLayout = landscapeController.getPPTTurnPageLayout();
+        livePlayerControllerEnterPaintLandIv = landscapeController.getEnterPaintView();
+
+        backLandIv.setOnClickListener(this);
+        videoPauseLandIv.setOnClickListener(this);
+        videoRefreshLandIv.setOnClickListener(this);
+        videoPptSwitchLandIv.setOnClickListener(this);
+        liveControlFloatingLandIv.setOnClickListener(this);
+        startSendMessageLandIv.setOnClickListener(this);
+        bulletinLandIv.setOnClickListener(this);
+        likesLandIv.setOnButtonClickListener(this);
+        moreLandIv.setOnClickListener(this);
+        rewardView.setOnClickListener(this);
+        commodityView.setOnClickListener(this);
+        livePlayerControllerEnterPaintLandIv.setOnClickListener(this);
+
         pptTurnPageLandLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
             public void onPPTTurnPage(String type) {
@@ -527,6 +573,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         isRequestingJoinLinkMic = false;
         hideRefreshButtonInRtcChannel = isHideRefreshButton;
         getLiveMediaDispatcher().updateViewProperties();
+        updatePaintModeEntrance();
     }
 
     @Override
@@ -534,6 +581,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         isLinkMic = false;
         isRequestingJoinLinkMic = false;
         getLiveMediaDispatcher().updateViewProperties();
+        updatePaintModeEntrance();
     }
 
     @Override
@@ -607,8 +655,18 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void updateRewardView(boolean enable) {
-        if(rewardView != null){
+        if (rewardView != null) {
             rewardView.setVisibility(enable ? VISIBLE : GONE);
+        }
+    }
+
+    @Override
+    public void notifyPaintModeStatus(boolean isInPaintMode) {
+        this.isInPaintMode = isInPaintMode;
+        if (isInPaintMode) {
+            hide();
+        } else {
+            show();
         }
     }
 
@@ -617,6 +675,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     // <editor-fold defaultstate="collapsed" desc="对外API - 重写View定义的方法">
     @Override
     public void setVisibility(int visibility) {
+        if (!canShow()) {
+            visibility = View.GONE;
+        }
+
         super.setVisibility(visibility);
         if (visibility == VISIBLE) {
             landscapeController.show();
@@ -756,6 +818,16 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部工具方法">
+    private boolean canShow() {
+        return !isInPaintMode;
+    }
+
+    private void updatePaintModeEntrance() {
+        final boolean showEntrance = isLinkMic && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.LIVE_DOCUMENT_ALLOW_USE_PAINT_ON_LINKMIC);
+        livePlayerControllerEnterPaintIv.setVisibility(showEntrance ? View.VISIBLE : View.GONE);
+        livePlayerControllerEnterPaintLandIv.setVisibility(showEntrance ? View.VISIBLE : View.GONE);
+    }
+
     private void dispose(Disposable disposable) {
         if (disposable != null) {
             disposable.dispose();
@@ -835,6 +907,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             }
         } else if (id == commodityView.getId()) {
             commodityViewModel.showProductLayoutOnLandscape();
+        } else if (id == livePlayerControllerEnterPaintIv.getId() || id == livePlayerControllerEnterPaintLandIv.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onEnterPaintMode();
+            }
         }
     }
     // </editor-fold>

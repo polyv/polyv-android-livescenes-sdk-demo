@@ -2,6 +2,7 @@
 <resources>
     <attr name="plv_show_on_portrait" format="boolean" />
     <attr name="plv_show_on_landscape" format="boolean" />
+    <attr name="plv_max_height" format="dimension" />
     <declare-styleable name="PLVMarqueeTextView">
         <attr name="scroll_interval" format="integer" />
         <attr name="scroll_first_delay" format="integer" />
@@ -268,6 +269,8 @@
     <declare-styleable name="PLVRoundColorView">
         <attr name="plvMainRadius" format="dimension" />
         <attr name="plvMainColor" format="color" />
+        <attr name="plvSecondRadius" format="dimension" />
+        <attr name="plvSecondColor" format="color" />
         <attr name="plvBackgroundColor" format="color" />
     </declare-styleable>
 
@@ -339,6 +342,10 @@
     <declare-styleable name="PLVOrientationSensibleLinearLayout">
         <attr name="plv_show_on_landscape" />
         <attr name="plv_show_on_portrait" />
+    </declare-styleable>
+
+    <declare-styleable name="PLVMaxHeightScrollView">
+        <attr name="plv_max_height" />
     </declare-styleable>
 
 </resources>
