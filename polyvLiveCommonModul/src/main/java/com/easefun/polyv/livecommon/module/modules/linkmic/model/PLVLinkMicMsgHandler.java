@@ -6,6 +6,7 @@ import com.easefun.polyv.businesssdk.model.ppt.PolyvPPTAuthentic;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.linkmic.model.PLVJoinLeaveEvent;
 import com.plv.linkmic.model.PLVJoinRequestSEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
@@ -126,11 +127,9 @@ public class PLVLinkMicMsgHandler {
             //服务端发回来的join request
             case PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT:
                 PLVJoinRequestSEvent joinRequestSEvent = PLVGsonUtil.fromJson(PLVJoinRequestSEvent.class, message);
-                if (joinRequestSEvent != null && joinRequestSEvent.getUser() != null) {
-                    if (linkMicId.equals(joinRequestSEvent.getUser().getUserId())) {
-                        for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
-                            onLinkMicDataListener.onTeacherReceiveJoinRequest();
-                        }
+                if (joinRequestSEvent != null) {
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onUserJoinRequest(joinRequestSEvent);
                     }
                 }
                 break;
@@ -139,7 +138,7 @@ public class PLVLinkMicMsgHandler {
                 PLVLinkMicJoinSuccess joinSuccess = PLVGsonUtil.fromJson(PLVLinkMicJoinSuccess.class, message);
                 if (joinSuccess != null) {
                     for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
-                        onLinkMicDataListener.onUserJoinSuccess(PLVLinkMicDataMapper.map2LinkMicItemData(joinSuccess));
+                        onLinkMicDataListener.onUserJoinSuccess(PLVLinkMicDataMapper.map2LinkMicItemData(joinSuccess), joinSuccess);
                     }
                 }
                 break;
@@ -161,6 +160,12 @@ public class PLVLinkMicMsgHandler {
                 break;
             //离开连麦
             case PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT:
+                PLVJoinLeaveEvent joinLeaveEvent = PLVGsonUtil.fromJson(PLVJoinLeaveEvent.class, message);
+                if (joinLeaveEvent != null) {
+                    for (OnLinkMicDataListener onLinkMicDataListener : onLinkMicDataListeners) {
+                        onLinkMicDataListener.onUserJoinLeave(joinLeaveEvent);
+                    }
+                }
                 break;
             //讲师禁用观众视频或麦克风
             case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
@@ -244,9 +249,14 @@ public class PLVLinkMicMsgHandler {
     // <editor-fold defaultstate="collapsed" desc="接口定义 - OnLinkMicDataListener">
     public interface OnLinkMicDataListener {
         /**
-         * 讲师收到了我发送的连麦请求
+         * 频道内有用户申请连麦
          */
-        void onTeacherReceiveJoinRequest();
+        void onUserJoinRequest(PLVJoinRequestSEvent joinRequestEvent);
+
+        /**
+         * 频道内有用户离开连麦
+         */
+        void onUserJoinLeave(PLVJoinLeaveEvent joinLeaveEvent);
 
         /**
          * 讲师允许我上麦
@@ -289,7 +299,7 @@ public class PLVLinkMicMsgHandler {
          *
          * @param dataBean 用户列表数据
          */
-        void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean);
+        void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean, PLVLinkMicJoinSuccess joinSuccessEvent);
 
         /**
          * 讲师设置权限
@@ -339,7 +349,12 @@ public class PLVLinkMicMsgHandler {
     // <editor-fold defaultstate="collapsed" desc="接口定义 - SimpleOnLinkMicDataListener">
     public abstract static class SimpleOnLinkMicDataListener implements OnLinkMicDataListener {
         @Override
-        public void onTeacherReceiveJoinRequest() {
+        public void onUserJoinRequest(PLVJoinRequestSEvent joinRequestEvent) {
+
+        }
+
+        @Override
+        public void onUserJoinLeave(PLVJoinLeaveEvent joinLeaveEvent) {
 
         }
 
@@ -374,7 +389,7 @@ public class PLVLinkMicMsgHandler {
         }
 
         @Override
-        public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean) {
+        public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean, PLVLinkMicJoinSuccess joinSuccess) {
 
         }
 

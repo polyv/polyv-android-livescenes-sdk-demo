@@ -54,11 +54,23 @@ public interface IPLVLCLinkMicControlBar {
 
 
     /**
-     * 设置是音频连麦还是视频连麦
+     * 更新是音频连麦还是视频连麦下的连麦控制栏宽度
      *
      * @param isAudio true表示是音频连麦，false表示是视频连麦
      */
-    void setIsAudio(boolean isAudio);
+    void updateIsAudioWidth(boolean isAudio);
+
+    /**
+     * 设置请求连麦状态是音频连麦还是视频连麦
+     *
+     * @param isAudio true表示是音频连麦，false表示是视频连麦
+     */
+    void setAudioState(boolean isAudio);
+
+    /**
+     * 更新连麦排队序号
+     */
+    void updateLinkMicQueueOrder(int orderIndex);
 
     /**
      * 显示

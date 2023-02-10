@@ -41,6 +41,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAda
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatFunctionListener;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatReplyMessageLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
@@ -81,6 +82,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -179,6 +181,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //公告(管理员发言)
     private PLVLCBulletinTextView bulletinTv;
+
+    private PLVLCChatReplyMessageLayout chatReplyLayout;
 
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
@@ -303,6 +307,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 public void onShowAloneOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
                     if (chatOverLengthMessageLayout != null) {
                         chatOverLengthMessageLayout.show(chatMessageDataBean);
+                    }
+                }
+
+                @Override
+                public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                    if (chatReplyLayout != null) {
+                        chatReplyLayout.setChatQuoteContent(chatQuoteVO);
+                    }
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onReplyMessage(chatQuoteVO);
                     }
                 }
             });
@@ -437,6 +451,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         if (cardPushManager != null) {
             cardPushManager.registerView(cardEnterView, cardEnterCdTv, cardEnterTipsView);
         }
+
+        chatReplyLayout = findViewById(R.id.plvlc_chat_reply_layout);
 
         if (getContext() != null && chatOverLengthMessageLayout == null) {
             chatOverLengthMessageLayout = new PLVLCChatOverLengthMessageLayout(getContext());
@@ -1010,6 +1026,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 发送聊天信息">
+    @Nullable
+    public PLVChatQuoteVO getChatQuoteContent() {
+        return chatReplyLayout.getChatQuoteContent();
+    }
+
+    public void onCloseChatQuote() {
+        chatReplyLayout.setChatQuoteContent(null);
+    }
+
     private boolean sendChatMessage(String message) {
         if (message.trim().length() == 0) {
             ToastUtils.showLong(R.string.plv_chat_toast_send_text_empty);
@@ -1022,10 +1047,17 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             if (chatroomPresenter == null) {
                 return false;
             }
-            Pair<Boolean, Integer> sendResult = chatroomPresenter.sendChatMessage(localMessage);
+            Pair<Boolean, Integer> sendResult;
+            if (chatReplyLayout.getChatQuoteContent() == null || chatReplyLayout.getChatQuoteContent().getMessageId() == null) {
+                sendResult = chatroomPresenter.sendChatMessage(localMessage);
+            } else {
+                localMessage.setQuote(chatReplyLayout.getChatQuoteContent());
+                sendResult = chatroomPresenter.sendQuoteMessage(localMessage, chatReplyLayout.getChatQuoteContent().getMessageId());
+            }
             if (sendResult.first) {
                 //清空输入框内容并隐藏键盘/弹出的表情布局等
                 inputEt.setText("");
+                chatReplyLayout.setChatQuoteContent(null);
                 hideSoftInputAndPopupLayout();
                 return true;
             } else {
@@ -1415,6 +1447,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * @param event 动态功能的event data
          */
         void onClickDynamicFunction(String event);
+
+        void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
     }
     // </editor-fold>
 }

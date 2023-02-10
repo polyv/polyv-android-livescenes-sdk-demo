@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.setOnLongClickListenerRecursively;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
@@ -11,8 +12,10 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,10 +37,13 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 /**
@@ -46,6 +52,10 @@ import java.util.Map;
 public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> {
     // <editor-fold defaultstate="collapsed" desc="变量">
     public static final String LOADIMG_MOUDLE_TAG = "PLVLCMessageViewHolder";
+
+    // 全局存储长按复制/回复的弹层
+    @Nullable
+    private static WeakReference<PopupWindow> copyBoardPopupWindowRef;
 
     //是否是横屏布局
     private boolean isLandscapeLayout;
@@ -144,13 +154,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     PLVWebUtils.openWebLink(url, textMessageTv.getContext());
                 }
             });
-
-            textMessageTv.setOnLongClickListener(new View.OnLongClickListener() {
+            setOnLongClickListenerRecursively((ViewGroup) chatLayout, new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if (!isOverLengthFoldingMessage) {
-                        PLVCopyBoardPopupWindow.show(textMessageTv, true, textMessageTv.getText().toString());
-                    }
+                    onLongClickItem(chatLayout);
                     return true;
                 }
             });
@@ -163,13 +170,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     PLVWebUtils.openWebLink(url, chatMsgTv.getContext());
                 }
             });
-
-            chatMsgTv.setOnLongClickListener(new View.OnLongClickListener() {
+            setOnLongClickListenerRecursively((ViewGroup) itemView, new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if (!isOverLengthFoldingMessage) {
-                        PLVCopyBoardPopupWindow.show(chatMsgTv, true, chatMsgTv.getText().toString());
-                    }
+                    onLongClickItem(itemView);
                     return true;
                 }
             });
@@ -180,6 +184,13 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 @Override
                 public void onClick(View v) {
                     ((PLVLCMessageAdapter) adapter).callOnChatImgClick(getVHPosition(), v, chatImgUrl, false);
+                }
+            });
+            imgMessageIv.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onLongClickItem(imgMessageIv);
+                    return true;
                 }
             });
         }
@@ -260,6 +271,66 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 }
             }
         });
+    }
+
+    private void onLongClickItem(View anchor) {
+        if (speakFileData != null) {
+            // 文件类型消息
+            return;
+        }
+        if (chatImgUrl != null) {
+            onLongClickImageMessage(anchor);
+        } else if (speakMsg != null) {
+            onLongClickTextMessage(anchor);
+        }
+    }
+
+    private void onLongClickTextMessage(View anchor) {
+        final boolean showCopyButton = !isOverLengthFoldingMessage;
+        final boolean showReplyButton = adapter.isAllowReplyMessage();
+        hideCopyBoardPopupWindow();
+        final PopupWindow popupWindow = PLVCopyBoardPopupWindow.showAndAnswer(anchor, true, !showReplyButton, showCopyButton ? speakMsg.toString() : null, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
+                if (messageData instanceof IPLVIdEvent) {
+                    chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
+                }
+                chatQuoteVO.setUserId(userId);
+                chatQuoteVO.setNick(nickName);
+                chatQuoteVO.setContent(speakMsg.toString());
+                chatQuoteVO.setObjects(speakMsg);
+                adapter.callOnReplyMessage(chatQuoteVO);
+            }
+        });
+        copyBoardPopupWindowRef = new WeakReference<>(popupWindow);
+    }
+
+    private void onLongClickImageMessage(View anchor) {
+        if (localImgStatus != PolyvSendLocalImgEvent.SENDSTATUS_SUCCESS) {
+            //图片发送成功后才可回复
+            return;
+        }
+        final boolean showReplyButton = adapter.isAllowReplyMessage();
+        hideCopyBoardPopupWindow();
+        final PopupWindow popupWindow = PLVCopyBoardPopupWindow.showAndAnswer(anchor, true, !showReplyButton, null, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
+                if (messageData instanceof IPLVIdEvent) {
+                    chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
+                }
+                chatQuoteVO.setUserId(userId);
+                chatQuoteVO.setNick(nickName);
+                PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
+                imageBean.setUrl(chatImgUrl);
+                imageBean.setWidth(chatImgWidth);
+                imageBean.setHeight(chatImgHeight);
+                chatQuoteVO.setImage(imageBean);
+                adapter.callOnReplyMessage(chatQuoteVO);
+            }
+        });
+        copyBoardPopupWindowRef = new WeakReference<>(popupWindow);
     }
     // </editor-fold>
 
@@ -442,6 +513,20 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="UI - 重置view">
+    public static void hideCopyBoardPopupWindow() {
+        if (copyBoardPopupWindowRef == null) {
+            return;
+        }
+        PopupWindow popupWindow = copyBoardPopupWindowRef.get();
+        if (popupWindow == null) {
+            return;
+        }
+        if (popupWindow.isShowing()) {
+            popupWindow.dismiss();
+        }
+        copyBoardPopupWindowRef = null;
+    }
+
     private void resetView() {
         if (textMessageTv != null) {
             textMessageTv.setVisibility(View.GONE);

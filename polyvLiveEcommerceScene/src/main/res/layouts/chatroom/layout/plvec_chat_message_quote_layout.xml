@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="#66000000">
+
+    <TextView
+        android:id="@+id/plvec_chat_quote_msg_name_content_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#CCCCCCCC"
+        android:textSize="12sp"
+        tools:text="@tools:sample/lorem/random" />
+
+    <ImageView
+        android:id="@+id/plvec_chat_quote_msg_image_iv"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        tools:src="#FFFFFF" />
+
+</LinearLayout>

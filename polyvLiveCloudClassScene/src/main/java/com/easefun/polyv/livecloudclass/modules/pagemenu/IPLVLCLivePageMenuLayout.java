@@ -1,13 +1,16 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu;
 
+import androidx.annotation.Nullable;
+
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
-import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
+import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 /**
  * 直播页面菜单布局的接口
@@ -99,6 +102,11 @@ public interface IPLVLCLivePageMenuLayout {
      */
     void updateLiveStatus(PLVLiveStateEnum liveStateEnum);
 
+    @Nullable
+    PLVChatQuoteVO getChatQuoteContent();
+
+    void onCloseChatQuote();
+
     /**
      * 是否拦截返回事件，拦截的情况有：
      * 1.当前显示的tab是推广外链，并且其webView可以返回
@@ -172,9 +180,15 @@ public interface IPLVLCLivePageMenuLayout {
 
         /**
          * 点击了聊天室更多-动态功能按钮
+         *
          * @param event 功能event
          */
         void onClickChatMoreDynamicFunction(String event);
+
+        /**
+         * 回调 引用回复消息
+         */
+        void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
 
     }
     // </editor-fold>

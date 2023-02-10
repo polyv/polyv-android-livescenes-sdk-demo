@@ -1,10 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
+import static com.plv.foundationsdk.component.livedata.PLVLiveDataExt.mutableLiveData;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 import android.Manifest;
 import android.app.Activity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.DialogInterface;
 import androidx.annotation.NonNull;
@@ -23,6 +26,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListS
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicMsgHandler;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicMuteCacheList;
+import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.usecase.PLVLinkMicRequestQueueOrderUseCase;
 import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicListener;
@@ -37,6 +41,8 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
 import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
+import com.plv.linkmic.model.PLVJoinLeaveEvent;
+import com.plv.linkmic.model.PLVJoinRequestSEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
@@ -91,6 +97,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Nullable
     private IPLVLinkMicContract.IPLVLinkMicView linkMicView;
 
+    /**
+     * uc
+     **/
+    private PLVLinkMicRequestQueueOrderUseCase linkMicRequestQueueOrderUseCase;
+
     /**** Model ****/
     private IPolyvLinkMicManager linkMicManager;
     @Nullable
@@ -130,6 +141,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private boolean enableLocalVideoOnJoinLinkMic = false;
     // 加入连麦时是否打开麦克风
     private boolean enableLocalAudioOnJoinLinkMic = false;
+    /**
+     * 申请连麦排队序号，从0开始
+     * value < 0 表明数据不可用
+     */
+    private final MutableLiveData<Integer> linkMicRequestQueueOrder = mutableLiveData(-1);
 
     /**** Disposable ****/
     private Disposable getLinkMicListDelay;
@@ -193,6 +209,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             }
             return;
         }
+        linkMicRequestQueueOrderUseCase = new PLVLinkMicRequestQueueOrderUseCase(myLinkMicId, linkMicRequestQueueOrder);
         //连麦socket事件监听
         linkMicMsgHandler = new PLVLinkMicMsgHandler(myLinkMicId);
         linkMicMsgHandler.addLinkMicMsgListener(socketEventListener);
@@ -626,6 +643,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Override
     public void resetRequestPermissionList(ArrayList<String> permissions) {
         linkMicManager.resetRequestPermissionList(permissions);
+    }
+
+    @Override
+    public LiveData<Integer> getLinkMicRequestQueueOrder() {
+        return linkMicRequestQueueOrder;
     }
 
     // </editor-fold>
@@ -1150,9 +1172,17 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - socket事件接收器">
     private class PolyvLinkMicSocketEventListener implements PLVLinkMicMsgHandler.OnLinkMicDataListener {
+
         @Override
-        public void onTeacherReceiveJoinRequest() {
-            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onTeacherReceiveJoinRequest");
+        public void onUserJoinRequest(PLVJoinRequestSEvent joinRequestEvent) {
+            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onUserJoinRequest");
+            linkMicRequestQueueOrderUseCase.onUserJoinRequest(joinRequestEvent);
+        }
+
+        @Override
+        public void onUserJoinLeave(PLVJoinLeaveEvent joinLeaveEvent) {
+            PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onUserJoinLeave");
+            linkMicRequestQueueOrderUseCase.onUserJoinLeave(joinLeaveEvent);
         }
 
         @Override
@@ -1242,8 +1272,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         }
 
         @Override
-        public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean) {
+        public void onUserJoinSuccess(PLVLinkMicItemDataBean dataBean, PLVLinkMicJoinSuccess joinSuccessEvent) {
             PLVCommonLog.d(TAG, "PolyvLinkMicSocketEventListener.onUserJoinSuccess");
+            linkMicRequestQueueOrderUseCase.onUserJoinSuccess(joinSuccessEvent);
             if (rtcInvokeStrategy == null || !rtcInvokeStrategy.isJoinChannel()) {
                 return;
             }

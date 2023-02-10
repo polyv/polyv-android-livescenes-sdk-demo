@@ -52,6 +52,8 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
@@ -115,6 +117,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private RecyclerView.OnScrollListener onScrollTryScrollTipListener;
 
     //状态数据
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     //media区是否显示在连麦列表
     private boolean isMediaShowInLinkMicList = false;
     //media在连麦列表中对应item的连麦id
@@ -287,16 +290,33 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             }
         });
     }
+
+    private void observeLinkMicQueueOrder() {
+        linkMicPresenter.getLinkMicRequestQueueOrder().observe((LifecycleOwner) getContext(), new Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer orderIndex) {
+                if (orderIndex == null) {
+                    return;
+                }
+                if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_LINK_MIC_SHOW_REQUEST_ORDER)) {
+                    linkMicControlBar.updateLinkMicQueueOrder(orderIndex);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 外部直接调用的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager, IPLVLCLinkMicControlBar linkMicControlBar) {
+        this.liveRoomDataManager = liveRoomDataManager;
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         initLinkMicControlBar(linkMicControlBar);
         updatePushResolution(curIsLandscape);
         observeOnAudioState(liveRoomDataManager);
+        observeLinkMicQueueOrder();
     }
 
 
@@ -382,6 +402,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void setIsAudio(boolean isAudioLinkMic) {
+        linkMicControlBar.setAudioState(isAudioLinkMic);
         linkMicPresenter.setIsAudioLinkMic(isAudioLinkMic);
     }
 
@@ -525,6 +546,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onTeacherOpenLinkMic() {
         //教师打开连麦
+        linkMicControlBar.setAudioState(linkMicPresenter.getIsAudioLinkMic());
         linkMicControlBar.setIsTeacherOpenLinkMic(true);
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onChannelLinkMicOpenStatusChanged(true);
@@ -585,7 +607,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         lpOfSpeakingUsers.rightMargin = landscapeWidth + PLVScreenUtils.dip2px(DP_LAND_SPEAKING_USER_VIEW_MARGIN_RIGHT_TO_LINK_MIC_LIST);
         llSpeakingUsers.setLayoutParams(lpOfSpeakingUsers);
 
-        linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
+        linkMicControlBar.updateIsAudioWidth(linkMicPresenter.getIsAudioLinkMic());
 
         initShouldShowLandscapeRTCLayout();
     }
@@ -673,7 +695,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         resume();
         //更新连麦控制器
         //无延迟观看时，需要在上麦的时候再设置连麦类型
-        linkMicControlBar.setIsAudio(linkMicPresenter.getIsAudioLinkMic());
+        linkMicControlBar.updateIsAudioWidth(linkMicPresenter.getIsAudioLinkMic());
         linkMicControlBar.setJoinLinkMicSuccess();
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinLinkMic();

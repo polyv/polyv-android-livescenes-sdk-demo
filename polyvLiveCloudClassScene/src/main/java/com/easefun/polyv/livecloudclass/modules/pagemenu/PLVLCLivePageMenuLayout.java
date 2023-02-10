@@ -81,6 +81,7 @@ import com.plv.livescenes.playback.chat.PLVChatPlaybackFootDataListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
@@ -359,6 +360,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         initChatPlaybackManager();
 
+        chatCommonMessageList.init(liveRoomDataManager);
+
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.init();
         //获取表情列表
@@ -438,6 +441,22 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
         if (liveDescFragment != null) {
             liveDescFragment.updateLiveStatus(liveStateEnum);
+        }
+    }
+
+    @Nullable
+    @Override
+    public PLVChatQuoteVO getChatQuoteContent() {
+        if (chatFragment != null) {
+            return chatFragment.getChatQuoteContent();
+        }
+        return null;
+    }
+
+    @Override
+    public void onCloseChatQuote() {
+        if (chatFragment != null) {
+            chatFragment.onCloseChatQuote();
         }
     }
 
@@ -558,6 +577,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onClickDynamicFunction(String event) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onClickChatMoreDynamicFunction(event);
+                }
+            }
+
+            @Override
+            public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReplyMessage(chatQuoteVO);
                 }
             }
 

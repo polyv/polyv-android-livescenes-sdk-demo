@@ -370,7 +370,7 @@ public class PLVStreamerMsgHandler {
                 //如果当前用户是嘉宾，则收到joinLeave的时候不要把自己移除了。
                 PLVCommonLog.d(TAG, "guest receive joinLeave");
             } else {
-                updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId());
+                updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId(), false);
             }
 
         }
@@ -380,7 +380,7 @@ public class PLVStreamerMsgHandler {
         if (joinAnswerSEvent != null) {
             String linkMicUid = joinAnswerSEvent.getUserId();
             if (joinAnswerSEvent.isRefuse()) {
-                updateMemberListWithLeave(linkMicUid);
+                updateMemberListWithLeave(linkMicUid, false);
             }
         }
     }
@@ -459,7 +459,7 @@ public class PLVStreamerMsgHandler {
             public void onUserOffline(String uid) {
                 super.onUserOffline(uid);
                 PLVCommonLog.d(TAG, "onUserOffline: " + uid);
-                updateMemberListWithLeave(uid);
+                updateMemberListWithLeave(uid, true);
             }
 
             @Override
@@ -546,8 +546,10 @@ public class PLVStreamerMsgHandler {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="列表数据处理">
-    private void updateMemberListWithLeave(final String linkMicUid) {
-        streamerPresenter.rtcJoinMap.remove(linkMicUid);
+    private void updateMemberListWithLeave(final String linkMicUid, boolean isRTCCall) {
+        if (isRTCCall) {
+            streamerPresenter.rtcJoinMap.remove(linkMicUid);
+        }
         Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithLinkMicId(linkMicUid);
         if (item != null) {
             item.second.getLinkMicItemDataBean().setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);

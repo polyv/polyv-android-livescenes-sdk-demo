@@ -83,6 +83,7 @@ import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -322,13 +323,29 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         landscapeMessageSender = new PLVLCLandscapeMessageSendPanel((AppCompatActivity) getContext(), this);
         landscapeMessageSender.setOnSendMessageListener(new IPLVLCLandscapeMessageSender.OnSendMessageListener() {
             @Override
-            public void onSend(String message) {
+            public void onSend(String message, @Nullable PLVChatQuoteVO chatQuoteVO) {
                 if (onViewActionListener != null) {
                     //发送信息到聊天室
-                    Pair<Boolean, Integer> result = onViewActionListener.onSendChatMessageAction(message);
+                    Pair<Boolean, Integer> result = onViewActionListener.onSendChatMessageAction(message, chatQuoteVO);
                     if (!result.first) {
                         ToastUtils.showShort(getResources().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + result.second);
                     }
+                }
+            }
+
+            @Nullable
+            @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                if (onViewActionListener == null) {
+                    return null;
+                }
+                return onViewActionListener.getChatQuoteContent();
+            }
+
+            @Override
+            public void onCloseChatQuote() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onCloseChatQuote();
                 }
             }
         });
@@ -746,6 +763,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void showController() {
         mediaController.show();
+    }
+
+    @Override
+    public void notifyOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+        if (ScreenUtils.isLandscape()) {
+            landscapeMessageSender.openMessageSender();
+        }
     }
 
     @Override
