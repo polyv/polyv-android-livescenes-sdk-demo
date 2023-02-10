@@ -60,6 +60,7 @@ import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -212,6 +213,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             @Override
             public void onChatImgClick(View view, String imgUrl) {
                 chatImgScanPopupView.showImgScanLayout(view, imgUrl);
+            }
+
+            @Override
+            public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+
             }
 
             @Override

@@ -1,5 +1,9 @@
 package com.easefun.polyv.livecloudclass.modules.media.danmu;
 
+import android.support.annotation.Nullable;
+
+import com.plv.socket.event.chat.PLVChatQuoteVO;
+
 /**
  * date: 2019/6/6 0006
  *
@@ -40,6 +44,17 @@ public interface IPLVLCLandscapeMessageSender {
          *
          * @param message 消息
          */
-        void onSend(String message);
+        void onSend(String message, @Nullable PLVChatQuoteVO chatQuoteVO);
+
+        /**
+         * 获取当前引用消息
+         */
+        @Nullable
+        PLVChatQuoteVO getChatQuoteContent();
+
+        /**
+         * 回调 取消引用消息
+         */
+        void onCloseChatQuote();
     }
 }

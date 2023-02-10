@@ -307,8 +307,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
                 hideLoading();
                 if (pptWebView != null) {
                     final WebSettings pptWebSetting = pptWebView.getSettings();
-                    pptWebSetting.setAllowFileAccess(true);
-                    pptWebSetting.setAllowFileAccessFromFileURLs(true);
+                    boolean allowFileAccess = true;
+                    pptWebSetting.setAllowFileAccess(allowFileAccess);
+                    pptWebSetting.setAllowFileAccessFromFileURLs(allowFileAccess);
 
                     pptWebView.loadLocalPpt(localCacheVO);
                 }

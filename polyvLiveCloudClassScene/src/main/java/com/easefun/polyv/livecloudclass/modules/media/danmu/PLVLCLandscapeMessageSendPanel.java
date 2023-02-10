@@ -1,8 +1,10 @@
 package com.easefun.polyv.livecloudclass.modules.media.danmu;
 
 import android.graphics.Rect;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -14,11 +16,13 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -29,10 +33,14 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
  * @author hwj
  * description 横屏发送信息输入框
  */
-public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSender {
+public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSender, View.OnClickListener {
     private PopupWindow window;
     private AppCompatActivity activity;
 
+    private View root;
+    private ConstraintLayout chatSendMsgQuoteLayout;
+    private TextView chatSendMsgQuoteTv;
+    private ImageView chatSendMsgQuoteCloseIv;
     private PLVOrientationSensibleLinearLayout llSendMessage;
     private EditText etSendMessage;
     private TextView tvSendMessage;
@@ -46,7 +54,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         this.anchor = anchor;
         this.activity = appCompatActivity;
         this.window = new PopupWindow(activity);
-        View root = LayoutInflater.from(activity).inflate(R.layout.plvlc_player_message_send_layout, null);
+        root = LayoutInflater.from(activity).inflate(R.layout.plvlc_player_message_send_layout, null);
         window.setContentView(root);
         window.setOutsideTouchable(false);
         window.setFocusable(true);
@@ -66,7 +74,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
             public void onGlobalLayout() {//all call
                 int usableHeightNow = computeUsableHeight(childOfContent);
                 if (usableHeightPrevious != usableHeightNow) {
-                    ViewGroup.LayoutParams flp = (ViewGroup.LayoutParams) llSendMessage.getLayoutParams();
+                    ViewGroup.LayoutParams flp = root.getLayoutParams();
                     if (flp == null) {
                         return;
                     }
@@ -107,6 +115,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
     @Override
     public void openMessageSender() {
         window.showAtLocation(anchor, Gravity.CENTER, 0, 0);
+        updateChatQuote();
         llSendMessage.post(new Runnable() {
             @Override
             public void run() {
@@ -121,21 +130,16 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
     }
 
     private void initView(View root) {
+        chatSendMsgQuoteLayout = root.findViewById(R.id.plvlc_chat_send_msg_quote_layout);
+        chatSendMsgQuoteTv = root.findViewById(R.id.plvlc_chat_send_msg_quote_tv);
+        chatSendMsgQuoteCloseIv = root.findViewById(R.id.plvlc_chat_send_msg_quote_close_iv);
         llSendMessage = root.findViewById(R.id.ll_send_message);
-        tvSendMessage = root.findViewById(R.id.tv_send_message);
         etSendMessage = root.findViewById(R.id.et_send_message);
-        llSendMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view2) {
-                PLVLCLandscapeMessageSendPanel.this.onClick(view2);
-            }
-        });
-        tvSendMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view1) {
-                PLVLCLandscapeMessageSendPanel.this.onClick(view1);
-            }
-        });
+        tvSendMessage = root.findViewById(R.id.tv_send_message);
+
+        root.setOnClickListener(this);
+        chatSendMsgQuoteCloseIv.setOnClickListener(this);
+        tvSendMessage.setOnClickListener(this);
 
         etSendMessage.addTextChangedListener(new TextWatcher() {
             @Override
@@ -168,14 +172,34 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         });
     }
 
-    private void onClick(View view) {
-        int i = view.getId();
-        if (i == R.id.ll_send_message) {
-            hide();
+    private void updateChatQuote() {
+        final PLVChatQuoteVO chatQuoteVO = sendMessageListener == null ? null : sendMessageListener.getChatQuoteContent();
+        if (chatQuoteVO == null) {
+            chatSendMsgQuoteLayout.setVisibility(View.GONE);
+            return;
+        }
+        chatSendMsgQuoteLayout.setVisibility(View.VISIBLE);
 
+        CharSequence quoteMsg = chatQuoteVO.getObjects() == null || chatQuoteVO.getObjects().length == 0 ? "" : (CharSequence) chatQuoteVO.getObjects()[0];
+        final boolean isImageContent = chatQuoteVO.getContent() == null && chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
+        if (isImageContent) {
+            quoteMsg = "[图片]";
+        }
+        chatSendMsgQuoteTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
+    }
+
+    @Override
+    public void onClick(View view) {
+        int i = view.getId();
+        if (i == root.getId()) {
+            hide();
         } else if (i == R.id.tv_send_message) {
             sendMessage();
-
+        } else if (i == chatSendMsgQuoteCloseIv.getId()) {
+            if (sendMessageListener != null) {
+                sendMessageListener.onCloseChatQuote();
+                updateChatQuote();
+            }
         }
     }
 
@@ -188,7 +212,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         etSendMessage.setText("");
         //发送消息
         if (sendMessageListener != null) {
-            sendMessageListener.onSend(msg);
+            sendMessageListener.onSend(msg, sendMessageListener.getChatQuoteContent());
         }
         KeyboardUtils.hideSoftInput(etSendMessage);
         hide();

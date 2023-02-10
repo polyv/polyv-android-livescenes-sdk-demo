@@ -59,6 +59,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
@@ -66,6 +67,7 @@ import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -559,9 +561,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public Pair<Boolean, Integer> onSendChatMessageAction(String message) {
+            public Pair<Boolean, Integer> onSendChatMessageAction(String message, @Nullable PLVChatQuoteVO chatQuoteVO) {
                 PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
-                return livePageMenuLayout.getChatroomPresenter().sendChatMessage(localMessage);
+                localMessage.setQuote(chatQuoteVO);
+                if (chatQuoteVO != null && chatQuoteVO.getMessageId() != null) {
+                    return livePageMenuLayout.getChatroomPresenter().sendQuoteMessage(localMessage, chatQuoteVO.getMessageId());
+                } else {
+                    return livePageMenuLayout.getChatroomPresenter().sendChatMessage(localMessage);
+                }
+            }
+
+            @Nullable
+            @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                return livePageMenuLayout.getChatQuoteContent();
+            }
+
+            @Override
+            public void onCloseChatQuote() {
+                livePageMenuLayout.onCloseChatQuote();
             }
 
             @Override
@@ -749,8 +767,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     if (linkMicLayout == null) {
                         return;
                     }
-                    linkMicLayout.setIsTeacherOpenLinkMic(isLinkMicOpen);
                     linkMicLayout.setIsAudio(isAudio);
+                    linkMicLayout.setIsTeacherOpenLinkMic(isLinkMicOpen);
                 }
             });
             //当前页面 监听 播放器数据中的sei数据
@@ -872,6 +890,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onClickChatMoreDynamicFunction(String event) {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().onCallDynamicFunction(event);
+                }
+            }
+
+            @Override
+            public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                if (mediaLayout != null) {
+                    mediaLayout.notifyOnReplyMessage(chatQuoteVO);
                 }
             }
         });

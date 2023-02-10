@@ -29,6 +29,7 @@ public class PLVEntranceActivity extends PLVBaseActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plv_entrance_activity);
+
     }
 
     @Override

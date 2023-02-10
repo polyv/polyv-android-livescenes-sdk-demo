@@ -63,6 +63,8 @@
     <string name="plv_linkmic_toast_error">连麦错误</string>
     <string name="plv_linkmic_toast_invalid_channel_format">频道号格式有误</string>
     <string name="plv_linkmic_tip_request_link_mic">申请连麦</string>
+    <string name="plv_linkmic_tip_request_video_link_mic">申请视频连麦</string>
+    <string name="plv_linkmic_tip_request_audio_link_mic">申请音频连麦</string>
     <string name="plv_linkmic_tip_requesting_link_mic">请求中…</string>
     <string name="plv_linkmic_tip_try_scroll_left">向左滑动试试</string>
     <string name="plv_linkmic_dialog_hang_off_confirm_ask">确认挂断连麦吗?</string>

@@ -123,7 +123,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             speakFileData = speakEvent.getFileData();
             chatQuoteVO = speakEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
-                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[Math.min(validIndex, chatQuoteVO.getObjects().length - 1)];
             }
         } else if (messageData instanceof PolyvLocalMessage) {//本地的发言事件信息
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
@@ -134,7 +134,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             prohibitedWordVO = ((PolyvLocalMessage) messageData).getProhibitedWord();
             chatQuoteVO = ((PolyvLocalMessage) messageData).getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
-                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[Math.min(validIndex, chatQuoteVO.getObjects().length - 1)];
             }
         } else if (messageData instanceof PLVChatImgEvent) {//接收的图片事件信息
             PLVChatImgEvent chatImgEvent = (PLVChatImgEvent) messageData;
@@ -191,7 +191,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             isOverLengthShowAloneMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE;
             chatQuoteVO = speakHistoryEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
-                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[Math.min(validIndex, chatQuoteVO.getObjects().length - 1)];
             }
         } else if (messageData instanceof PLVFileShareHistoryEvent) {
             PLVFileShareHistoryEvent speakHistoryEvent = (PLVFileShareHistoryEvent) messageData;
@@ -201,7 +201,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             speakFileData = speakHistoryEvent.getFileData();
             chatQuoteVO = speakHistoryEvent.getQuote();
             if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
-                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[Math.min(validIndex, chatQuoteVO.getObjects().length - 1)];
             }
         } else if (messageData instanceof PLVChatImgHistoryEvent) {//历史图片信息
             PLVChatImgHistoryEvent chatImgHistoryEvent = (PLVChatImgHistoryEvent) messageData;
@@ -247,7 +247,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
                 chatQuoteVO = chatPlaybackData.getChatQuoteVO();
                 if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
                     if (chatQuoteVO.getObjects() != null) {
-                        quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[validIndex];
+                        quoteSpeakMsg = (CharSequence) chatQuoteVO.getObjects()[Math.min(validIndex, chatQuoteVO.getObjects().length - 1)];
                     }
                 }
             }

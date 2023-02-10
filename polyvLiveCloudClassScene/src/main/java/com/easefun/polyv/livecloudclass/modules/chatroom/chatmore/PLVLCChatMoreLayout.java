@@ -89,6 +89,7 @@ public class PLVLCChatMoreLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="初始化">
     private void initView() {
+        setVisibility(GONE);
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_chatroom_chat_more_layout, this, true);
         chatMoreRv = findViewById(R.id.plvlc_chat_more_rv);
 

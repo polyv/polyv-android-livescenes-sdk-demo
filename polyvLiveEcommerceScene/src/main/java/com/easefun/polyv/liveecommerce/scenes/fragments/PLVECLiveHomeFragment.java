@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
@@ -57,10 +58,13 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -145,6 +149,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private boolean isFocusModeStatus;
     //聊天输入窗口
     private PLVECChatInputWindow chatInputWindow;
+
+    @Nullable
+    private PLVChatQuoteVO chatQuoteVO = null;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -256,6 +263,24 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
         });
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化数据">
+
+    @Override
+    public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
+        super.init(liveRoomDataManager);
+        runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                chatMessageAdapter.setAllowReplyMessage(
+                        PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                                .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_VIEWER_QUOTE_REPLY)
+                );
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
@@ -693,6 +718,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
 
         @Override
+        public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+            PLVECLiveHomeFragment.this.chatQuoteVO = chatQuoteVO;
+            showInputWindow();
+        }
+
+        @Override
         public void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
             if (chatOverLengthMessageLayout != null) {
                 chatOverLengthMessageLayout.show(chatMessageDataBean);
@@ -710,15 +741,33 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                return PLVECLiveHomeFragment.this.chatQuoteVO;
+            }
+
+            @Override
+            public void onCloseQuote() {
+                PLVECLiveHomeFragment.this.chatQuoteVO = null;
+            }
+
+            @Override
             public boolean onSendMsg(String message) {
                 PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
-                Pair<Boolean, Integer> sendResult = chatroomPresenter.sendChatMessage(localMessage);
+                Pair<Boolean, Integer> sendResult;
+                if (chatQuoteVO == null || chatQuoteVO.getMessageId() == null) {
+                    sendResult = chatroomPresenter.sendChatMessage(localMessage);
+                } else {
+                    localMessage.setQuote(chatQuoteVO);
+                    sendResult = chatroomPresenter.sendQuoteMessage(localMessage, chatQuoteVO.getMessageId());
+                }
                 if (!sendResult.first) {
                     //发送失败
                     ToastUtils.showShort(getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second);
                     return false;
+                } else {
+                    PLVECLiveHomeFragment.this.chatQuoteVO = null;
+                    return true;
                 }
-                return true;
             }
         });
     }

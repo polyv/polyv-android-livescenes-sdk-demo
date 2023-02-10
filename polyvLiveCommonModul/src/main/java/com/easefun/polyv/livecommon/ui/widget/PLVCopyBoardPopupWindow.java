@@ -62,6 +62,9 @@ public class PLVCopyBoardPopupWindow {
     }
 
     public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, int parentY, boolean onlyShowCopyItem, @Nullable final String copyContent, @DrawableRes int bgResId, @DrawableRes int triangleResId, @ColorInt int textColor, final View.OnClickListener clickListener) {
+        if (onlyShowCopyItem && copyContent == null) {
+            return null;
+        }
         // 自定义的布局View
         final PopupWindow popupWindow = new PopupWindow();
         View view = LayoutInflater.from(anchor.getContext()).inflate(R.layout.plv_copy_answer_board_popup_layout, null, false);

@@ -1,10 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="bottom"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:gravity="bottom"
+    android:orientation="vertical"
+    tools:background="#66000000">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvec_chat_input_quote_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#66000000"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/plvec_chat_quote_close_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/plvec_chat_quote_name_content_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp"
+                tools:text="reply: xxxxxxxxxxxxx" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/plvec_chat_quote_close_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="4dp"
+            android:padding="6dp"
+            android:src="@drawable/plvec_chat_quote_message_close_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <EditText
         android:id="@+id/chat_input_et"

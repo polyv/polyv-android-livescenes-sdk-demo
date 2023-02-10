@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.contract;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.view.SurfaceView;
 
@@ -396,5 +397,10 @@ public interface IPLVLinkMicContract {
          * 重制连麦请求所需的权限列表
          */
         void resetRequestPermissionList(ArrayList<String> permissions);
+
+        /**
+         * 连麦排队序号
+         */
+        LiveData<Integer> getLinkMicRequestQueueOrder();
     }
 }

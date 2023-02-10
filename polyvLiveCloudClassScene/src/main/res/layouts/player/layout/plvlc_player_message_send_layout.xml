@@ -1,45 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ll_send_message"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B3000000"
-    android:clipChildren="false"
-    android:orientation="horizontal"
-    android:paddingBottom="16dp"
-    android:paddingLeft="142dp">
+    android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/et_send_message"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/plvlc_message_btn_send_grey_shape"
-        android:imeOptions="flagNoFullscreen|flagNoExtractUi|actionSend"
-        android:maxLength="200"
-        android:layout_gravity="bottom"
-        android:minHeight="32dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="6dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="6dp"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        tools:text="好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好" />
+        android:background="#CC000000"
+        android:orientation="vertical"
+        android:paddingVertical="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <TextView
-        android:id="@+id/tv_send_message"
-        android:layout_width="64dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="10dp"
-        android:layout_gravity="bottom"
-        android:layout_marginRight="84dp"
-        android:layout_toRightOf="@id/et_send_message"
-        android:background="@drawable/plvlc_message_btn_send_selector"
-        android:enabled="false"
-        android:gravity="center"
-        android:text="发送"
-        android:textColor="@drawable/plvlc_message_btn_send_text_color" />
-</com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/plvlc_chat_send_msg_quote_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingStart="36dp"
+            android:paddingEnd="28dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/plvlc_chat_send_msg_quote_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#F0F1F5"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/plvlc_chat_send_msg_quote_close_iv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="reply：xxxxxx" />
+
+            <ImageView
+                android:id="@+id/plvlc_chat_send_msg_quote_close_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="8dp"
+                android:src="@drawable/plvlc_chatroom_msg_quote_close_icon_land"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+            android:id="@+id/ll_send_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="36dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <EditText
+                android:id="@+id/et_send_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="@drawable/plvlc_message_btn_send_grey_shape"
+                android:imeOptions="flagNoFullscreen|flagNoExtractUi|actionSend"
+                android:maxLength="200"
+                android:minHeight="32dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="6dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="6dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好" />
+
+            <TextView
+                android:id="@+id/tv_send_message"
+                android:layout_width="64dp"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/plvlc_message_btn_send_selector"
+                android:enabled="false"
+                android:gravity="center"
+                android:text="发送"
+                android:textColor="@drawable/plvlc_message_btn_send_text_color" />
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
+
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

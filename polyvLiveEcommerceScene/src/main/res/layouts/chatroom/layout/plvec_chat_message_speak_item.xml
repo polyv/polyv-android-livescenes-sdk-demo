@@ -85,4 +85,19 @@
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/plvec_chat_msg_quote_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="#4DD8D8D8"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatMessageQuoteLayout
+        android:id="@+id/plvec_chat_msg_quote_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" />
+
 </LinearLayout>

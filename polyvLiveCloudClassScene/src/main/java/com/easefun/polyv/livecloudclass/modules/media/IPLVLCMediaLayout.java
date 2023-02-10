@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -156,6 +158,11 @@ public interface IPLVLCMediaLayout {
      * 显示控制栏
      */
     void showController();
+
+    /**
+     * 触发引用回复消息
+     */
+    void notifyOnReplyMessage(PLVChatQuoteVO chatQuoteVO);
 
     /**
      * 是否拦截返回事件
@@ -395,7 +402,12 @@ public interface IPLVLCMediaLayout {
          * @param message 发送的信息
          * @return <是否发送成功, 结果码>
          */
-        Pair<Boolean, Integer> onSendChatMessageAction(String message);
+        Pair<Boolean, Integer> onSendChatMessageAction(String message, @Nullable PLVChatQuoteVO chatQuoteVO);
+
+        @Nullable
+        PLVChatQuoteVO getChatQuoteContent();
+
+        void onCloseChatQuote();
 
         /**
          * 显示公告动作（直播独有）

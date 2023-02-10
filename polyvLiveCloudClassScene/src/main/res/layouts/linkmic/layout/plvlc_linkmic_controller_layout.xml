@@ -39,7 +39,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="16dp"
-                android:text="@string/plv_linkmic_tip_request_link_mic"
+                android:text="@string/plv_linkmic_tip_request_video_link_mic"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:visibility="visible"
@@ -138,7 +138,6 @@
                 android:background="@drawable/plvlc_linkmic_iv_camera_front_back_enabled" />
         </LinearLayout>
 
-
         <Button
             android:id="@+id/plvlc_linkmic_controlBar_btn_setting_landscape"
             android:layout_width="32dp"
@@ -152,8 +151,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="4dp"
-            android:text="@string/plv_linkmic_tip_request_link_mic"
+            android:gravity="center"
+            android:text="@string/plv_linkmic_tip_request_video_link_mic"
             android:textColor="@color/white"
-            android:textSize="12sp" />
+            android:textSize="10sp" />
     </LinearLayout>
 </merge>

@@ -1,12 +1,15 @@
 package com.easefun.polyv.liveecommerce.modules.chatroom;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.setOnLongClickListenerRecursively;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
@@ -14,8 +17,13 @@ import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatMessageQuoteLayout;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
+
+import java.lang.ref.WeakReference;
 
 /**
  * 发言信息viewHolder
@@ -28,6 +36,8 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
     private LinearLayout chatMsgOverLengthControlLl;
     private TextView chatMsgOverLengthCopyBtn;
     private TextView chatMsgOverLengthMoreBtn;
+    private View chatMsgQuoteSplitLine;
+    private PLVECChatMessageQuoteLayout chatMsgQuoteLayout;
 
     private boolean isOverLengthContentFolding = true;
 
@@ -39,6 +49,8 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
         chatMsgOverLengthControlLl = findViewById(R.id.plvec_chat_msg_over_length_control_ll);
         chatMsgOverLengthCopyBtn = findViewById(R.id.plvec_chat_msg_over_length_copy_btn);
         chatMsgOverLengthMoreBtn = findViewById(R.id.plvec_chat_msg_over_length_more_btn);
+        chatMsgQuoteSplitLine = findViewById(R.id.plvec_chat_msg_quote_split_line);
+        chatMsgQuoteLayout = findViewById(R.id.plvec_chat_msg_quote_layout);
     }
 
     @Override
@@ -51,6 +63,7 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
         }
         bindFileShareIcon();
         bindChatMessageOnClick();
+        bindQuoteMessage();
         processOverLengthMessage();
     }
 
@@ -67,6 +80,30 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
     private void bindChatMessageOnClick() {
         if (speakFileData == null) {
             itemView.setOnClickListener(null);
+            setOnLongClickListenerRecursively((ViewGroup) itemView, new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final boolean showCopyButton = !isOverLengthFoldingMessage;
+                    final boolean showReplyButton = adapter.isAllowReplyMessage();
+                    hideCopyBoardPopupWindow();
+                    final PopupWindow popupWindow = PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, !showReplyButton, showCopyButton ? speakMsg.toString() : null, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            final PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
+                            if (messageData instanceof IPLVIdEvent) {
+                                chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
+                            }
+                            chatQuoteVO.setUserId(userId);
+                            chatQuoteVO.setNick(nickName);
+                            chatQuoteVO.setContent(speakMsg.toString());
+                            chatQuoteVO.setObjects(speakMsg);
+                            adapter.callOnReplyMessage(chatQuoteVO);
+                        }
+                    });
+                    copyBoardPopupWindowRef = new WeakReference<>(popupWindow);
+                    return true;
+                }
+            });
         } else {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,7 +113,19 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
                     }
                 }
             });
+            setOnLongClickListenerRecursively((ViewGroup) itemView, null);
         }
+    }
+
+    private void bindQuoteMessage() {
+        chatMsgQuoteSplitLine.setVisibility(chatQuoteVO == null ? View.GONE : View.VISIBLE);
+        chatMsgQuoteLayout.setQuoteMessage(chatQuoteVO);
+        chatMsgQuoteLayout.setOnActionListener(new PLVECChatMessageQuoteLayout.OnViewActionListener() {
+            @Override
+            public void onImageClick(PLVChatQuoteVO chatQuoteVO) {
+                adapter.callOnChatImgClick(chatMsgQuoteLayout, chatQuoteVO.getImage().getUrl());
+            }
+        });
     }
 
     private void processOverLengthMessage() {
