@@ -93,7 +93,7 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     /**
      * 设置聊天回放是否可用
      */
-    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);
 
     /**
      * 更新聊天室房间状态

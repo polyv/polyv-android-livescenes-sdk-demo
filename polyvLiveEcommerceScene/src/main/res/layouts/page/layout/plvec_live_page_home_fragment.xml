@@ -27,6 +27,13 @@
         android:visibility="invisible"
         tools:visibility="visible" />
 
+    <!--互动入口布局-->
+    <com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout
+        android:id="@+id/plvec_interact_entrance_ly"
+        android:layout_below="@+id/bulletin_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <!--打赏布局-->
     <com.easefun.polyv.liveecommerce.modules.reward.widget.PLVECRewardGiftAnimView
         android:id="@+id/reward_ly"

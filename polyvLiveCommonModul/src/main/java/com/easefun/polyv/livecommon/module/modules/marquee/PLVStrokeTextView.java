@@ -13,7 +13,6 @@ import android.text.style.ScaleXSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 
 /**
@@ -126,7 +125,7 @@ public class PLVStrokeTextView extends TextView {
             if (strokeBlurX > 0 && strokeBlurY > 0) {
                 int strokeBlur = Math.max(strokeBlurX, strokeBlurY);
                 // if no set,it mask can cover other textView same text.
-                disableHardwareRendering(this);
+//                disableHardwareRendering(this);
                 getPaint().setMaskFilter(
                         new BlurMaskFilter(/*strokeWidth*/PLVScreenUtils.dip2px(getContext(),
                                 strokeBlur),

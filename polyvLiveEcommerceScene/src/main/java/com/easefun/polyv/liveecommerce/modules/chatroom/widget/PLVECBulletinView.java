@@ -35,6 +35,8 @@ public class PLVECBulletinView extends FrameLayout {
     private int gonggaoLyWidth;
     private int gonggaoTvWidth;
 
+    private OnVisibilityChangedListener onVisibilityChangedListener;
+
     private Disposable gonggaoCdDisposable;
 
     public PLVECBulletinView(@NonNull Context context) {
@@ -59,9 +61,21 @@ public class PLVECBulletinView extends FrameLayout {
     }
 
     @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+        if (onVisibilityChangedListener != null) {
+            onVisibilityChangedListener.onChanged(visibility == View.VISIBLE);
+        }
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         removeBulletinCountDown();
         super.onDetachedFromWindow();
+    }
+
+    public void setOnVisibilityChangedListener(OnVisibilityChangedListener onVisibilityChangedListener) {
+        this.onVisibilityChangedListener = onVisibilityChangedListener;
     }
 
     public void acceptBulletinMessage(final PolyvBulletinVO bulletinVO) {
@@ -166,5 +180,9 @@ public class PLVECBulletinView extends FrameLayout {
                 }
             }
         });
+    }
+
+    public interface OnVisibilityChangedListener {
+        void onChanged(boolean isVisible);
     }
 }

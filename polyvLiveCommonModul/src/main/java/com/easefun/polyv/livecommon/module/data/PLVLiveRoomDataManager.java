@@ -14,6 +14,9 @@ import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.interact.PLVCallAppEvent;
+
+import java.util.List;
 
 /**
  * 直播间数据管理器，实现IPLVLiveRoomDataManager接口。
@@ -48,6 +51,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<String>> channelNameData = new MutableLiveData<>();
     //互动应用icon状态
     private MutableLiveData<PLVWebviewUpdateAppStatusVO> interactStatusData = new MutableLiveData<>();
+    //互动应用入口状态
+    private MutableLiveData<List<PLVCallAppEvent.ValueBean.DataBean>> interactEntranceData = new MutableLiveData<>();
     //有状态的课节详情数据
     private MutableLiveData<PLVStatefulData<PLVHiClassDataBean>> fulClassDataBean = new MutableLiveData<>();
     //课节详情数据
@@ -144,6 +149,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData() {
         return interactStatusData;
+    }
+
+    @Override
+    public MutableLiveData<List<PLVCallAppEvent.ValueBean.DataBean>> getInteractEntranceData() {
+        return interactEntranceData;
     }
 
     @Override

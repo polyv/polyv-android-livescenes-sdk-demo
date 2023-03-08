@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVLiveFloatingContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVLiveFloatingPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -72,6 +73,7 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
     //Presenter
     private IPLVLiveFloatingContract.IPLVLiveFloatingPresenter presenter;
 
+    private boolean isPPTChannelType;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -86,7 +88,6 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
     public PLVLCFloatingPPTLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
-        initData();
     }
 
     // </editor-fold>
@@ -137,6 +138,13 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 外部直接调用的方法">
     @Override
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        isPPTChannelType = liveRoomDataManager.getConfig().isPPTChannelType();
+        initData();
+        pptView.init(liveRoomDataManager);
+    }
+
+    @Override
     public void setServerEnablePPT(boolean enable) {
         isServerEnablePPT = enable;
         if (enable) {
@@ -158,7 +166,7 @@ public class PLVLCFloatingPPTLayout extends FrameLayout implements IPLVLiveFloat
     public void show() {
         PLVCommonLog.d(TAG, "show");
         final boolean isRtcWatching = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() && isLowLatencyWatch;
-        if (isServerEnablePPT && !isRtcWatching) {
+        if (isServerEnablePPT && !isRtcWatching && isPPTChannelType) {
             setVisibility(VISIBLE);
         }
     }

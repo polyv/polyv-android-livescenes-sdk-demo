@@ -59,7 +59,6 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
@@ -404,6 +403,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
         // 悬浮PPT布局
         floatingPPTLayout = findViewById(R.id.plvlc_ppt_floating_ppt_layout);
+        floatingPPTLayout.init(liveRoomDataManager);
 
         if (liveRoomDataManager.getConfig().isLive()) {
             // 横屏频道控制器
@@ -863,11 +863,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onAddedChatTab(boolean isChatPlaybackEnabled) {
                 if (chatLandscapeLayout != null) {
                     chatLandscapeLayout.setIsChatPlaybackLayout(isChatPlaybackEnabled);
+                    chatLandscapeLayout.setIsLiveType(liveRoomDataManager.getConfig().isLive());
                     livePageMenuLayout.getChatPlaybackManager().addOnCallDataListener(chatLandscapeLayout.getChatPlaybackDataListener());
                     livePageMenuLayout.getChatroomPresenter().registerView(chatLandscapeLayout.getChatroomView());
                 }
                 if (mediaLayout != null) {
-                    mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled);
+                    mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled, liveRoomDataManager.getConfig().isLive());
                 }
             }
 
@@ -883,6 +884,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //控制横屏时的打赏特效显示
                 if (mediaLayout != null) {
                     mediaLayout.setLandscapeRewardEffectVisibility(isShow);
+                }
+            }
+
+            @Override
+            public void onShowQuestionnaire() {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showQuestionnaire();
                 }
             }
 
@@ -1008,7 +1016,15 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             floatingPPTLayout.getPPTView().initPlaybackPPT(new IPLVLCPPTView.OnPLVLCPlaybackPPTViewListener() {
                 @Override
                 public void onPlaybackSwitchPPTViewLocation(boolean toMainScreen) {
-                    pptViewSwitcher.switchView();
+                    if (toMainScreen) {
+                        if (!pptViewSwitcher.isViewSwitched()) {
+                            pptViewSwitcher.switchView();
+                        }
+                    } else {
+                        if (pptViewSwitcher.isViewSwitched()) {
+                            pptViewSwitcher.switchView();
+                        }
+                    }
                 }
             });
         }

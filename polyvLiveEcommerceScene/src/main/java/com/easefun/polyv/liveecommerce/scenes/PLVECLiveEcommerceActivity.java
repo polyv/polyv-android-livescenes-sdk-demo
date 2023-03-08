@@ -750,6 +750,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         @Override
+        public void onShowQuestionnaire() {
+            if (popoverLayout != null) {
+                popoverLayout.getInteractLayout().showQuestionnaire();
+            }
+        }
+
+        @Override
         public boolean isCurrentLowLatencyMode() {
             return videoLayout.isCurrentLowLatencyMode();
         }

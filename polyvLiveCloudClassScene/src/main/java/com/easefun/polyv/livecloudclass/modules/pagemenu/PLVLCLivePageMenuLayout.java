@@ -83,6 +83,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
+import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -600,6 +601,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     onViewActionListener.onShowEffectAction(isShow);
                 }
             }
+
+            @Override
+            public void onShowQuestionnaire() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowQuestionnaire();
+                }
+            }
         });
         pageMenuTabFragmentList.add(chatFragment);
         if (onViewActionListener != null) {
@@ -928,6 +936,14 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO plvWebviewUpdateAppStatusVO) {
                 if (chatFragment != null && plvWebviewUpdateAppStatusVO != null) {
                     chatFragment.updateChatMoreFunction(plvWebviewUpdateAppStatusVO);
+                }
+            }
+        });
+        liveRoomDataManager.getInteractEntranceData().observe((LifecycleOwner) getContext(), new Observer<List<PLVCallAppEvent.ValueBean.DataBean>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVCallAppEvent.ValueBean.DataBean> dataBeanList) {
+                if (chatFragment != null) {
+                    chatFragment.acceptInteractEntranceData(dataBeanList);
                 }
             }
         });

@@ -744,8 +744,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled) {
-        mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled);
+    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
+        mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled, isLiveType);
     }
     // </editor-fold>
 

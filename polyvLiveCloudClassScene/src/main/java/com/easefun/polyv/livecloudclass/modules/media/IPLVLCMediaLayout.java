@@ -373,7 +373,7 @@ public interface IPLVLCMediaLayout {
     /**
      * 设置聊天回放是否可用
      */
-    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">

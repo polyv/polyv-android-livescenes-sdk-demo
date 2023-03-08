@@ -2,6 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.ppt;
 
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 
@@ -102,6 +103,11 @@ public interface IPLVLCPPTView {
 // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1. 外部直接调用的方法 - common部分，定义直播PPT和回放PPT通用的方法">
+    /**
+     * 初始化
+     * @param liveRoomDataManager
+     */
+    void init(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
      * 发送消息到webView

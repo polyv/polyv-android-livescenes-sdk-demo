@@ -12,6 +12,9 @@ import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.interact.PLVCallAppEvent;
+
+import java.util.List;
 
 /**
  * 直播间数据管理器的接口
@@ -73,6 +76,11 @@ public interface IPLVLiveRoomDataManager {
      * 获取互动应用状态
      */
     MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData();
+
+    /**
+     * 获取互动应用入口
+     */
+    MutableLiveData<List<PLVCallAppEvent.ValueBean.DataBean>> getInteractEntranceData();
 
     /**
      * 获取有状态的互动学堂课节详情LiveData

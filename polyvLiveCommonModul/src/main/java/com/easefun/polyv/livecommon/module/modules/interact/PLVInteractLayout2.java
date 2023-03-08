@@ -182,6 +182,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void showQuestionnaire() {
+        String data = "{\"event\" : \"SHOW_QUESTIONNAIRE\"}";
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
     public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
         String data = PLVGsonUtil.toJsonSimple(showPushCardEvent);
         plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
@@ -219,9 +230,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     public void destroy() {
         if (plvlcInteractWeb != null) {
             plvlcInteractWeb.removeAllViews();
-            ViewParent viewParent=plvlcInteractWeb.getParent();
-            if (viewParent instanceof ViewGroup){
-                ViewGroup viewGroup= (ViewGroup) viewParent;
+            ViewParent viewParent = plvlcInteractWeb.getParent();
+            if (viewParent instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) viewParent;
                 viewGroup.removeView(plvlcInteractWeb);
             }
             plvlcInteractWeb.destroy();
@@ -239,7 +250,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         liveRoomDataManager.getSessionIdLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String sessionId) {
-                if(!TextUtils.isEmpty(sessionId)){
+                if (!TextUtils.isEmpty(sessionId)) {
                     plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
                         @Override
                         public void onCallBack(String s) {
@@ -267,6 +278,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             } else if (callAppEvent.isOutsideOpen()) {
                 PLVOutsideWebViewActivity.start(getContext(), callAppEvent.getUrl());
             }
+        } else if (callAppEvent.isUpdateIarEntranceEvent()) {
+            liveRoomDataManager.getInteractEntranceData().postValue(callAppEvent.getDataArray());
         }
     }
 
@@ -291,8 +304,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         liveRoomDataManager.getInteractStatusData().postValue(appStatusVO);
     }
 
-    private String getNativeAppPramsInfo(){
-        if(liveRoomDataManager != null) {
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
             PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }

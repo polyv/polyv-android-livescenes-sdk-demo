@@ -179,6 +179,11 @@ public interface IPLVLCLivePageMenuLayout {
         void onShowEffectAction(boolean isShow);
 
         /**
+         * 显示问卷
+         */
+        void onShowQuestionnaire();
+
+        /**
          * 点击了聊天室更多-动态功能按钮
          *
          * @param event 功能event

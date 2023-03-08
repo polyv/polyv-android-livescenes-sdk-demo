@@ -18,6 +18,7 @@ import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView;
 import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
@@ -65,6 +66,8 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     private boolean isLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
+
+    private boolean isPPTChannelType;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -80,7 +83,6 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     public PLVLCPPTView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialView(context);
-        initData();
     }
 // </editor-fold>
 
@@ -94,6 +96,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         pptPlaceHolderView.setPlaceHolderImg(R.drawable.plvlc_ppt_placeholder);
         //设置占位图文本
         pptPlaceHolderView.setPlaceHolderText(getResources().getString(R.string.plv_ppt_no_document));
+    }
+
+    private void loadWeb() {
         //loadWeb
         if (pptWebView != null) {
             pptWebView.setPageLoadCallback(new PLVWebview.WebPageLoadCallback() {
@@ -116,9 +121,13 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         PolyvELogSender.send(PolyvPPTElog.class, PolyvPPTElog.PPTEvent.PPT_LOAD_START, "load start :");
         registerHandler();
         //加载ppt的webView
-        if (pptWebView != null) {
+        if (canLoadWeb()) {
             pptWebView.loadWeb();//"file:///android_asset/startForMobile.html"
         }
+    }
+
+    private boolean canLoadWeb() {
+        return pptWebView != null && isPPTChannelType;
     }
 
     private void registerHandler() {
@@ -137,15 +146,17 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    //初始化数据
-    private void initData() {
+    // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法 - common部分，定义直播PPT和回放PPT通用的方法">
+    @Override
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        isPPTChannelType = liveRoomDataManager.getConfig().isPPTChannelType();
+
         presenter = new PLVPPTPresenter();
         presenter.init(this);
-    }
-    // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法 - common部分，定义直播PPT和回放PPT通用的方法">
+        loadWeb();
+    }
+
     @Override
     public void sendWebMessage(String event, String message) {
         if (pptWebView != null) {
@@ -155,7 +166,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     @Override
     public void reLoad() {
-        if (pptWebView != null) {
+        if (canLoadWeb()) {
             pptWebView.loadWeb();
         }
     }
@@ -288,7 +299,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             public void pptPrepare(final String message) {
                 PLVCommonLog.d(TAG, "PLVLCPPTView.pptPrepare=" + message);
                 hideLoading();
-                if (pptWebView != null) {
+                if (canLoadWeb()) {
                     pptWebView.loadWeb();
                     pptWebView.postDelayed(new Runnable() {
                         @Override
@@ -305,7 +316,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             public void onLoadLocalPpt(@NonNull PLVPPTLocalCacheVO localCacheVO) {
                 PLVCommonLog.d(TAG, "PLVLCPPTView.onLoadLocalPpt=" + localCacheVO);
                 hideLoading();
-                if (pptWebView != null) {
+                if (canLoadWeb()) {
                     final WebSettings pptWebSetting = pptWebView.getSettings();
                     boolean allowFileAccess = true;
                     pptWebSetting.setAllowFileAccess(allowFileAccess);

@@ -26,12 +26,15 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
+import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
+
+import java.util.List;
 
 /**
  * 直播和回放主页共同业务的fragment
@@ -88,6 +91,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
         observeClassDetailVO();
         observeCommodityVO();
+        observeInteractEntranceData();
     }
     // </editor-fold>
 
@@ -127,6 +131,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //处理获取到的聊天回放开关
     protected void acceptChatPlaybackEnable(boolean isChatPlaybackEnable) {
+    }
+
+    protected void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
     }
     // </editor-fold>
 
@@ -287,7 +294,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听直播详情、商品信息数据">
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听直播详情、商品信息数据、互动入口数据">
     private void observeClassDetailVO() {
         //当前页面 监听 直播间数据管理器对象中的直播详情数据变化
         liveRoomDataManager.getClassDetailVO().observe(this, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
@@ -322,6 +329,15 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                     boolean isAddOrSet = liveRoomDataManager.getCommodityRank() <= -1;
                     acceptCommodityVO(commodityVO.getData(), !isAddOrSet);
                 }
+            }
+        });
+    }
+
+    private void observeInteractEntranceData() {
+        liveRoomDataManager.getInteractEntranceData().observe(this, new Observer<List<PLVCallAppEvent.ValueBean.DataBean>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
+                acceptInteractEntranceData(dataBeans);
             }
         });
     }
