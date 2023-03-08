@@ -137,6 +137,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void showQuestionnaire() {
+
+    }
+
+    @Override
     public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
 
     }

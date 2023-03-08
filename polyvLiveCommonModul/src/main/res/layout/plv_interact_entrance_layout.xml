@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    tools:visibility="visible">
+
+    <LinearLayout
+        android:id="@+id/plv_question_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/plv_interact_entrance_ly_bg_selector_lc"
+        android:clickable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/plv_question_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/plv_icon_questionnaire" />
+
+        <TextView
+            android:id="@+id/plv_question_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:text="问卷"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+    </LinearLayout>
+</FrameLayout>
