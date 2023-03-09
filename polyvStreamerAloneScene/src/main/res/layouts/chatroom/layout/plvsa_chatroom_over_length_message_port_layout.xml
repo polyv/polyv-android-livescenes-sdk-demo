@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="#2C2C2C"
+    app:mode="top"
+    app:radius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/plvsa_chatroom_over_length_message_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:text="全文"
+            android:textColor="#F0F1F5"
+            android:textSize="18sp" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVMaxHeightScrollView
+            android:id="@+id/plvsa_chatroom_over_length_message_content_sv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            app:plv_max_height="400dp">
+
+            <TextView
+                android:id="@+id/plvsa_chatroom_over_length_message_text_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#F0F1F5"
+                android:textSize="14sp"
+                tools:text="@tools:sample/lorem/random" />
+
+        </com.easefun.polyv.livecommon.ui.widget.PLVMaxHeightScrollView>
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvsa_chatroom_over_length_message_copy_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="36dp"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="6dp"
+            android:text="复制"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:plvGradientEndColor="#3399FF"
+            app:plvGradientOrientation="leftRight"
+            app:plvGradientStartColor="#0080FF"
+            app:plvRadius="18dp" />
+
+    </LinearLayout>
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

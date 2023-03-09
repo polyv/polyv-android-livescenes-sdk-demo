@@ -16,6 +16,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.holder.PLVLSMessageViewHolder;
+import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengthMessageLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
@@ -251,6 +252,8 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
 
         void onShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId);
+
+        void onShowOverLengthMessage(PLVLSChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
@@ -262,6 +265,12 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     public void callOnShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId) {
         if (onViewActionListener != null) {
             onViewActionListener.onShowAnswerWindow(chatQuoteVO, quoteId);
+        }
+    }
+
+    public void callOnShowOverLengthMessage(PLVLSChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
         }
     }
     // </editor-fold>

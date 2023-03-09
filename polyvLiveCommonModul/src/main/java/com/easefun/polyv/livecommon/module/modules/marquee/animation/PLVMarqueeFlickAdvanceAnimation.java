@@ -1,15 +1,18 @@
 package com.easefun.polyv.livecommon.module.modules.marquee.animation;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.os.Build;
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
+
 import androidx.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver;
-import android.view.animation.LinearInterpolator;
+
+import com.plv.foundationsdk.rx.PLVRxTimer;
 
 import java.util.HashMap;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * 跑马灯 闪烁增强动画类
@@ -17,17 +20,12 @@ import java.util.HashMap;
 public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
 
     // <editor-fold desc="变量">
-    private static final String TAG = "PLVMarqueeFlickAdvanceA";
-
     @Nullable
     private View secondView;
 
-    @Nullable
-    protected ObjectAnimator secondFlickObjectAnimator1;
-    @Nullable
-    protected ObjectAnimator secondFlickObjectAnimator2;
+    private Disposable viewPositionChangeDisposable;
+    private volatile boolean isStarted = false;
 
-    private boolean isSetSecondParams = false;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -45,64 +43,54 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
     // <editor-fold desc="对外API - 生命周期控制">
     @Override
     public void start() {
-        if (secondView == null) {
-            return;
-        }
-        if (animationStatus == PAUSE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (secondFlickObjectAnimator1 != null && secondFlickObjectAnimator1.isPaused()) {
-                    secondFlickObjectAnimator1.resume();
-                } else if (secondFlickObjectAnimator2 != null && secondFlickObjectAnimator2.isPaused()) {
-                    secondFlickObjectAnimator2.resume();
-                }
-            } else {
-                if (secondFlickObjectAnimator1 != null) {
-                    secondFlickObjectAnimator1.start();
-                }
-            }
-        } else {
-            setSecondAnimation();
-            if (secondFlickObjectAnimator1 != null) {
-                secondFlickObjectAnimator1.start();
-            }
-        }
         super.start();
+        isStarted = true;
+        if (secondView != null) {
+            secondView.setAlpha(1);
+        }
+        if (viewPositionChangeDisposable != null) {
+            viewPositionChangeDisposable.dispose();
+        }
+        viewPositionChangeDisposable = PLVRxTimer.timer((int) seconds(5).toMillis(),
+                new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        if (isStarted) {
+                            setSecondActiveRect();
+                        }
+                    }
+                });
     }
 
     @Override
     public void pause() {
         super.pause();
-        if (secondView == null) {
-            return;
+        isStarted = false;
+        if (secondView != null) {
+            secondView.setAlpha(0);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (secondFlickObjectAnimator1 != null && secondFlickObjectAnimator1.isStarted()) {
-                secondFlickObjectAnimator1.pause();
-            }
-            if (secondFlickObjectAnimator2 != null && secondFlickObjectAnimator2.isStarted()) {
-                secondFlickObjectAnimator2.pause();
-            }
-        } else {
-            stopSecondAnimator();
-        }
-        secondView.setAlpha(0);
     }
 
     @Override
     public void stop() {
         super.stop();
-        if (secondView == null) {
-            return;
+        isStarted = false;
+        if (secondView != null) {
+            secondView.setAlpha(0);
         }
-        stopSecondAnimator();
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        stopSecondAnimator();
-        secondFlickObjectAnimator1 = null;
-        secondFlickObjectAnimator2 = null;
+        isStarted = false;
+        if (secondView != null) {
+            secondView.setAlpha(0);
+        }
+        if (viewPositionChangeDisposable != null) {
+            viewPositionChangeDisposable.dispose();
+            viewPositionChangeDisposable = null;
+        }
     }
 
     @Override
@@ -118,91 +106,13 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
                 screenWidth = parentView.getWidth();
                 screenHeight = parentView.getHeight();
                 secondView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                if (animationStatus == STARTED) {
-                    stopSecondAnimator();
-                    setSecondAnimation();
-                    if (secondFlickObjectAnimator1 != null) {
-                        secondFlickObjectAnimator1.start();
-                    }
-                } else if (animationStatus == PAUSE) {
-                    stopSecondAnimator();
-                    setSecondAnimation();
-                }
+                setSecondActiveRect();
             }
         });
     }
     // </editor-fold>
 
-    // <editor-fold desc="功能模块 - 设置动画样式和位置">
-    private void setSecondAnimation() {
-        if (isSetSecondParams) {
-            return;
-        }
-        if (secondView == null) {
-            return;
-        }
-        isSetSecondParams = true;
-        secondFlickObjectAnimator1 = ObjectAnimator.ofFloat(secondView, "alpha", 0f, 1f);
-        secondFlickObjectAnimator1.setDuration(tweenTime);
-
-        secondFlickObjectAnimator1.setInterpolator(new LinearInterpolator());
-        secondFlickObjectAnimator1.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                setSecondActiveRect();
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (animationStatus == STARTED
-                        || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
-                        || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
-                    if (secondFlickObjectAnimator1 != null) {
-                        secondFlickObjectAnimator1.setStartDelay(isAlwaysShowWhenRun ? 0 : interval);
-                    }
-                    if (secondFlickObjectAnimator2 != null) {
-                        secondFlickObjectAnimator2.start();
-                    }
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-
-        secondFlickObjectAnimator2 = ObjectAnimator.ofFloat(secondView, "alpha", 1f, 0f);
-        secondFlickObjectAnimator2.setDuration(tweenTime);
-
-        secondFlickObjectAnimator2.setInterpolator(new LinearInterpolator());
-        secondFlickObjectAnimator2.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (animationStatus == STARTED
-                        || (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted())
-                        || (flickObjectAnimator2 != null && flickObjectAnimator2.isStarted())) {
-                    secondFlickObjectAnimator2.setStartDelay(lifeTime);
-                    secondFlickObjectAnimator1.start();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-    }
+    // <editor-fold desc="功能模块 - 设置位置">
 
     // 设置活动区域
     protected void setSecondActiveRect() {
@@ -215,19 +125,6 @@ public class PLVMarqueeFlickAdvanceAnimation extends PLVMarqueeFlickAnimation {
         secondView.setLayoutParams(lp);
     }
 
-    private void stopSecondAnimator() {
-        if (secondFlickObjectAnimator1 != null) {
-            secondFlickObjectAnimator1.removeAllListeners();
-            secondFlickObjectAnimator1.cancel();
-            secondFlickObjectAnimator1.end();
-        }
-        if (secondFlickObjectAnimator2 != null) {
-            secondFlickObjectAnimator2.removeAllListeners();
-            secondFlickObjectAnimator2.cancel();
-            secondFlickObjectAnimator2.end();
-        }
-        isSetSecondParams = false;
-    }
     // </editor-fold>
 
 }

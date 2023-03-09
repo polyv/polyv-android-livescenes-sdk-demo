@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.scenes;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
 
 import android.app.Activity;
@@ -27,6 +28,7 @@ import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWind
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCFloatingPPTLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -59,10 +61,12 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -399,6 +403,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
         // 悬浮PPT布局
         floatingPPTLayout = findViewById(R.id.plvlc_ppt_floating_ppt_layout);
+        floatingPPTLayout.init(liveRoomDataManager);
 
         if (liveRoomDataManager.getConfig().isLive()) {
             // 横屏频道控制器
@@ -556,9 +561,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public Pair<Boolean, Integer> onSendChatMessageAction(String message) {
+            public Pair<Boolean, Integer> onSendChatMessageAction(String message, @Nullable PLVChatQuoteVO chatQuoteVO) {
                 PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
-                return livePageMenuLayout.getChatroomPresenter().sendChatMessage(localMessage);
+                localMessage.setQuote(chatQuoteVO);
+                if (chatQuoteVO != null && chatQuoteVO.getMessageId() != null) {
+                    return livePageMenuLayout.getChatroomPresenter().sendQuoteMessage(localMessage, chatQuoteVO.getMessageId());
+                } else {
+                    return livePageMenuLayout.getChatroomPresenter().sendChatMessage(localMessage);
+                }
+            }
+
+            @Nullable
+            @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                return livePageMenuLayout.getChatQuoteContent();
+            }
+
+            @Override
+            public void onCloseChatQuote() {
+                livePageMenuLayout.onCloseChatQuote();
             }
 
             @Override
@@ -610,6 +631,49 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             @Override
             public boolean isRtcPausing() {
                 return linkMicLayout.isPausing();
+            }
+
+            @Override
+            public void onPaintModeChanged(boolean isInPaintMode) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                if (isInPaintMode && linkMicLayout != null && linkMicLayout.isMediaShowInLinkMicList()) {
+                    linkMicLayout.switchMediaToMainScreen();
+                }
+                floatingPPTLayout.getPPTView().notifyPaintModeStatus(isInPaintMode);
+            }
+
+            @Override
+            public void onPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintMarkToolChanged(markTool);
+            }
+
+            @Override
+            public void onPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintMarkToolColorChanged(color);
+            }
+
+            @Override
+            public void onPaintUndo() {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyUndoLastPaint();
+            }
+
+            @Override
+            public void onFinishChangeTextContent(String content) {
+                if (floatingPPTLayout == null || floatingPPTLayout.getPPTView() == null) {
+                    return;
+                }
+                floatingPPTLayout.getPPTView().notifyPaintUpdateTextContent(content);
             }
         });
 
@@ -703,8 +767,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     if (linkMicLayout == null) {
                         return;
                     }
-                    linkMicLayout.setIsTeacherOpenLinkMic(isLinkMicOpen);
                     linkMicLayout.setIsAudio(isAudio);
+                    linkMicLayout.setIsTeacherOpenLinkMic(isLinkMicOpen);
                 }
             });
             //当前页面 监听 播放器数据中的sei数据
@@ -799,11 +863,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onAddedChatTab(boolean isChatPlaybackEnabled) {
                 if (chatLandscapeLayout != null) {
                     chatLandscapeLayout.setIsChatPlaybackLayout(isChatPlaybackEnabled);
+                    chatLandscapeLayout.setIsLiveType(liveRoomDataManager.getConfig().isLive());
                     livePageMenuLayout.getChatPlaybackManager().addOnCallDataListener(chatLandscapeLayout.getChatPlaybackDataListener());
                     livePageMenuLayout.getChatroomPresenter().registerView(chatLandscapeLayout.getChatroomView());
                 }
                 if (mediaLayout != null) {
-                    mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled);
+                    mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled, liveRoomDataManager.getConfig().isLive());
                 }
             }
 
@@ -823,9 +888,23 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onShowQuestionnaire() {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showQuestionnaire();
+                }
+            }
+
+            @Override
             public void onClickChatMoreDynamicFunction(String event) {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().onCallDynamicFunction(event);
+                }
+            }
+
+            @Override
+            public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                if (mediaLayout != null) {
+                    mediaLayout.notifyOnReplyMessage(chatQuoteVO);
                 }
             }
         });
@@ -924,13 +1003,28 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         mediaLayout.updatePPTStatusChange(plvpptStatus);
                     }
                 }
+
+                @Override
+                public void onPaintEditText(PLVPPTPaintStatus paintStatus) {
+                    if (mediaLayout != null) {
+                        mediaLayout.onPaintEditText(paintStatus);
+                    }
+                }
             });
         } else {
             //设置回放PPT事件监听
             floatingPPTLayout.getPPTView().initPlaybackPPT(new IPLVLCPPTView.OnPLVLCPlaybackPPTViewListener() {
                 @Override
                 public void onPlaybackSwitchPPTViewLocation(boolean toMainScreen) {
-                    pptViewSwitcher.switchView();
+                    if (toMainScreen) {
+                        if (!pptViewSwitcher.isViewSwitched()) {
+                            pptViewSwitcher.switchView();
+                        }
+                    } else {
+                        if (pptViewSwitcher.isViewSwitched()) {
+                            pptViewSwitcher.switchView();
+                        }
+                    }
                 }
             });
         }
@@ -1033,6 +1127,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onClickSwitchWithMediaOnce(PLVSwitchViewAnchorLayout switchView) {
                 linkMicItemSwitcher.registerSwitchView(switchView, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
+
+                checkMediaViewPosition();
             }
 
             @Override
@@ -1044,11 +1140,33 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 //再将要切到主屏幕的item和PPT交换位置
                 linkMicItemSwitcher.registerSwitchView(switchViewGoMainScreen, mediaLayout.getPlayerSwitchView());
                 linkMicItemSwitcher.switchView();
+
+                checkMediaViewPosition();
             }
 
             @Override
             public void onRTCPrepared() {
                 mediaLayout.notifyRTCPrepared();
+            }
+
+            @Override
+            public boolean isInPaintMode() {
+                if (mediaLayout != null) {
+                    return mediaLayout.isInPaintMode();
+                }
+                return false;
+            }
+
+            private void checkMediaViewPosition() {
+                postToMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (linkMicLayout == null || mediaLayout == null) {
+                            return;
+                        }
+                        mediaLayout.notifyMediaLayoutPosition(linkMicLayout.isMediaShowInLinkMicList());
+                    }
+                });
             }
         });
     }

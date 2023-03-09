@@ -46,6 +46,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAMessageAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.holder.PLVSAMessageViewHolder;
+import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLengthMessageLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgInputWindow;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.PLVBaseEvent;
@@ -88,6 +89,8 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
     private PLVSimpleSwipeRefreshLayout plvlsChatroomSwipeLoadView;
     private PLVMessageRecyclerView plvlsChatroomChatMsgRv;
     private TextView plvlsChatroomUnreadMsgTv;
+    @Nullable
+    private PLVSAChatOverLengthMessageLayout chatOverLengthMessageLayout;
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -117,6 +120,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         plvlsChatroomSwipeLoadView = findViewById(R.id.plvls_chatroom_swipe_load_view);
         plvlsChatroomChatMsgRv = findViewById(R.id.plvls_chatroom_chat_msg_rv);
         plvlsChatroomUnreadMsgTv = findViewById(R.id.plvls_chatroom_unread_msg_tv);
+        chatOverLengthMessageLayout = new PLVSAChatOverLengthMessageLayout(getContext());
 
         //初始化聊天室列表
         PLVMessageRecyclerView.setLayoutManager(plvlsChatroomChatMsgRv).setStackFromEnd(true);
@@ -164,6 +168,13 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
                         return sendChatMessage(message);
                     }
                 });
+            }
+
+            @Override
+            public void onShowOverLengthMessage(PLVSAChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+                if (chatOverLengthMessageLayout != null) {
+                    chatOverLengthMessageLayout.show(chatMessageDataBean);
+                }
             }
         });
         plvlsChatroomChatMsgRv.setAdapter(chatMessageAdapter);

@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -19,11 +21,10 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -34,9 +35,10 @@ import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
-import java.util.List;
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+import java.util.List;
 
 /**
  * 互动应用View - v2
@@ -180,6 +182,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void showQuestionnaire() {
+        String data = "{\"event\" : \"SHOW_QUESTIONNAIRE\"}";
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
     public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
         String data = PLVGsonUtil.toJsonSimple(showPushCardEvent);
         plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
@@ -217,9 +230,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     public void destroy() {
         if (plvlcInteractWeb != null) {
             plvlcInteractWeb.removeAllViews();
-            ViewParent viewParent=plvlcInteractWeb.getParent();
-            if (viewParent instanceof ViewGroup){
-                ViewGroup viewGroup= (ViewGroup) viewParent;
+            ViewParent viewParent = plvlcInteractWeb.getParent();
+            if (viewParent instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) viewParent;
                 viewGroup.removeView(plvlcInteractWeb);
             }
             plvlcInteractWeb.destroy();
@@ -237,7 +250,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         liveRoomDataManager.getSessionIdLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String sessionId) {
-                if(!TextUtils.isEmpty(sessionId)){
+                if (!TextUtils.isEmpty(sessionId)) {
                     plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
                         @Override
                         public void onCallBack(String s) {
@@ -265,6 +278,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             } else if (callAppEvent.isOutsideOpen()) {
                 PLVOutsideWebViewActivity.start(getContext(), callAppEvent.getUrl());
             }
+        } else if (callAppEvent.isUpdateIarEntranceEvent()) {
+            liveRoomDataManager.getInteractEntranceData().postValue(callAppEvent.getDataArray());
         }
     }
 
@@ -289,24 +304,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         liveRoomDataManager.getInteractStatusData().postValue(appStatusVO);
     }
 
-    private String getNativeAppPramsInfo(){
-        if(liveRoomDataManager != null) {
-            PLVInteractNativeAppParams nativeAppParams = new PLVInteractNativeAppParams()
-                    .setAppId(liveRoomDataManager.getConfig().getAccount().getAppId())
-                    .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
-                    .setSessionId(liveRoomDataManager.getSessionId())
-                    .setChannelInfo(
-                            new PLVInteractNativeAppParams.ChannelInfoDTO()
-                                    .setChannelId(liveRoomDataManager.getConfig().getChannelId())
-                                    .setRoomId(liveRoomDataManager.getConfig().getChannelId())
-                    )
-                    .setUserInfo(
-                            new PLVInteractNativeAppParams.UserInfoDTO()
-                                    .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
-                                    .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
-                                    .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
-                    );
-
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";

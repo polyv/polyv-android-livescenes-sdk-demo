@@ -119,6 +119,11 @@ public interface IPLVLCLiveLandscapePlayerController {
     PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
+     * 进入画笔模式控件
+     */
+    ImageView getEnterPaintView();
+
+    /**
      * 显示
      */
     void show();

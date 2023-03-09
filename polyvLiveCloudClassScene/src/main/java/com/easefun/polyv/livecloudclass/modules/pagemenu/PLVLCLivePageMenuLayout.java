@@ -79,10 +79,11 @@ import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackFootDataListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
-import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
+import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -360,6 +361,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         initChatPlaybackManager();
 
+        chatCommonMessageList.init(liveRoomDataManager);
+
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.init();
         //获取表情列表
@@ -439,6 +442,22 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
         if (liveDescFragment != null) {
             liveDescFragment.updateLiveStatus(liveStateEnum);
+        }
+    }
+
+    @Nullable
+    @Override
+    public PLVChatQuoteVO getChatQuoteContent() {
+        if (chatFragment != null) {
+            return chatFragment.getChatQuoteContent();
+        }
+        return null;
+    }
+
+    @Override
+    public void onCloseChatQuote() {
+        if (chatFragment != null) {
+            chatFragment.onCloseChatQuote();
         }
     }
 
@@ -563,6 +582,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             }
 
             @Override
+            public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReplyMessage(chatQuoteVO);
+                }
+            }
+
+            @Override
             public void onShowRewardAction() {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowRewardAction();
@@ -573,6 +599,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onShowEffectAction(boolean isShow) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowEffectAction(isShow);
+                }
+            }
+
+            @Override
+            public void onShowQuestionnaire() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowQuestionnaire();
                 }
             }
         });
@@ -906,6 +939,14 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 }
             }
         });
+        liveRoomDataManager.getInteractEntranceData().observe((LifecycleOwner) getContext(), new Observer<List<PLVCallAppEvent.ValueBean.DataBean>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVCallAppEvent.ValueBean.DataBean> dataBeanList) {
+                if (chatFragment != null) {
+                    chatFragment.acceptInteractEntranceData(dataBeanList);
+                }
+            }
+        });
     }
     // </editor-fold>
 
@@ -942,15 +983,20 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听章节tab">
     private void observerChapters() {
         // 监听是否开启章节功能
-        playbackChapterViewModel.getPlaybackDataVOLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVPlaybackDataVO>() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @Override
-            public void onChanged(@Nullable PLVPlaybackDataVO playbackDataVO) {
-                if (playbackDataVO == null) {
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (polyvLiveClassDetailVOPLVStatefulData == null
+                        || !polyvLiveClassDetailVOPLVStatefulData.isSuccess()
+                        || polyvLiveClassDetailVOPLVStatefulData.getData() == null
+                        || polyvLiveClassDetailVOPLVStatefulData.getData().getData() == null) {
                     return;
                 }
-                final boolean sectionEnabled = "Y".equals(playbackDataVO.getSectionEnabled());
-                final boolean hasRecordFile = "Y".equals(playbackDataVO.getHasRecordFile());
-                final boolean hasPlaybackVideo = "Y".equals(playbackDataVO.getHasPlaybackVideo());
+                PLVLiveClassDetailVO.DataBean dataBean = polyvLiveClassDetailVOPLVStatefulData.getData().getData();
+                final boolean hasPlaybackVideo = dataBean.isHasPlayback();
+                final boolean sectionEnabled = "Y".equals(dataBean.getSectionEnabled());
+                final boolean hasRecordFile = dataBean.getRecordFileSimpleModel() != null;
                 if (!liveRoomDataManager.getConfig().isLive()
                         && liveRoomDataManager.getConfig().getChannelType() == PLVLiveChannelType.PPT
                         && sectionEnabled

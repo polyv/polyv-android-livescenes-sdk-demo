@@ -12,9 +12,11 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     private List<PLVBaseViewData> fullDataList;//全部信息的数据列表
     private List<PLVBaseViewData> specialDataList;//只看讲师信息的数据列表(包括我、讲师类型、嘉宾类型、助教类型、管理员类型的信息)
     private List<PLVBaseViewData> focusModeDataList;//专注模式的数据列表(包括讲师类型、嘉宾类型、助教类型、管理员类型的信息)
+
+    private boolean allowReplyMessage = false;
 
     private int displayDataType = DISPLAY_DATA_TYPE_FULL;//显示数据类型
 
@@ -65,11 +69,27 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
 
     public interface OnViewActionListener {
         void onChatImgClick(View view, String imgUrl);
+
+        void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+        void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
     }
 
     public void callOnChatImgClick(View view, String imgUrl) {
         if (onViewActionListener != null) {
             onViewActionListener.onChatImgClick(view, imgUrl);
+        }
+    }
+
+    public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+        if (onViewActionListener != null) {
+            onViewActionListener.callOnReplyMessage(chatQuoteVO);
+        }
+    }
+
+    public void callOnShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
         }
     }
     // </editor-fold>
@@ -207,6 +227,19 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         this.msgIndex = msgIndex;
     }
 
+    // <editor-fold defaultstate="collapsed" desc="对外API - 引用回复">
+
+    public PLVECChatMessageAdapter setAllowReplyMessage(boolean allowReplyMessage) {
+        this.allowReplyMessage = allowReplyMessage;
+        return this;
+    }
+
+    public boolean isAllowReplyMessage() {
+        return allowReplyMessage;
+    }
+
+    // </editor-fold>
+
     private int remove(String id, List<PLVBaseViewData> dataList) {
         int removeDataPosition = -1;
         for (PLVBaseViewData baseViewData : dataList) {
@@ -259,6 +292,7 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
 
     @Override
     public void onBindViewHolder(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVECChatMessageAdapter> holder, int position) {
+        PLVECChatMessageCommonViewHolder.hideCopyBoardPopupWindow();
         holder.processData(dataList.get(position), position);
     }
 

@@ -1,10 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.contract;
 
+import androidx.lifecycle.LiveData;
 import android.content.Context;
 import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
+import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVViewerLinkMicState;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.ArrayList;
@@ -40,9 +43,19 @@ public interface IPLVLinkMicContract {
         void onTeacherAllowJoin();
 
         /**
+         * 响应讲师邀请连麦
+         */
+        void onLinkMicStateChanged(PLVViewerLinkMicState oldState, PLVViewerLinkMicState newState);
+
+        /**
          * 响应加入连麦频道超时
          */
         void onJoinChannelTimeout();
+
+        /**
+         * 连麦人数达到上限
+         */
+        void onLinkMicMemberReachLimit();
 
         /**
          * 准备连麦列表
@@ -216,6 +229,16 @@ public interface IPLVLinkMicContract {
         void cancelRequestJoinLinkMic();
 
         /**
+         * 响应邀请连麦
+         */
+        void answerLinkMicInvitation(boolean accept, boolean isTimeout, boolean openCamera, boolean openMicrophone);
+
+        /**
+         * 获取邀请连麦接受邀请的剩余时间
+         */
+        void getJoinAnswerTimeLeft(PLVSugarUtil.Consumer<Integer> callback);
+
+        /**
          * 下麦
          */
         void leaveLinkMic();
@@ -374,5 +397,10 @@ public interface IPLVLinkMicContract {
          * 重制连麦请求所需的权限列表
          */
         void resetRequestPermissionList(ArrayList<String> permissions);
+
+        /**
+         * 连麦排队序号
+         */
+        LiveData<Integer> getLinkMicRequestQueueOrder();
     }
 }

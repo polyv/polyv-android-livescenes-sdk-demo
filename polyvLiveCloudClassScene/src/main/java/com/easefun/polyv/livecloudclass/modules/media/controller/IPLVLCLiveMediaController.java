@@ -165,9 +165,17 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
 
     /**
      * 更新积分打赏按钮视图，控制是否显示
+     *
      * @param enable
      */
     void updateRewardView(boolean enable);
+
+    /**
+     * 更新画笔模式状态
+     *
+     * @param isInPaintMode 是否正在画笔模式
+     */
+    void notifyPaintModeStatus(boolean isInPaintMode);
 
     // </editor-fold>
 
@@ -237,6 +245,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * 小窗点击事件
          */
         void onClickFloating();
+
+        /**
+         * 进入画笔模式
+         */
+        void onEnterPaintMode();
     }
     // </editor-fold>
 }

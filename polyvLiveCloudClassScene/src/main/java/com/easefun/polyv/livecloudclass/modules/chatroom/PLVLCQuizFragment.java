@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.utils.PLVChatroomUtils;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
@@ -28,6 +29,7 @@ import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragme
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -89,6 +91,16 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
                 } else {
                     chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) getContext(), messageAdapter.getDataList(), messageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
                 }
+            }
+
+            @Override
+            public void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+
+            }
+
+            @Override
+            public void onReplyMessage(PLVChatQuoteVO quoteVO) {
+
             }
         });
         //设置信息索引，需在chatroomPresenter.registerView后设置

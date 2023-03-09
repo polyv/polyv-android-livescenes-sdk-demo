@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2C2C2C">
+
+    <TextView
+        android:id="@+id/plvsa_chatroom_over_length_message_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="全文"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/plvsa_chatroom_over_length_message_content_sv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/plvsa_chatroom_over_length_message_copy_btn"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_chatroom_over_length_message_title">
+
+        <TextView
+            android:id="@+id/plvsa_chatroom_over_length_message_text_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#F0F1F5"
+            android:textSize="14sp"
+            tools:text="@tools:sample/lorem/random" />
+
+    </ScrollView>
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvsa_chatroom_over_length_message_copy_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="36dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="6dp"
+        android:text="复制"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:plvGradientEndColor="#3399FF"
+        app:plvGradientOrientation="leftRight"
+        app:plvGradientStartColor="#0080FF"
+        app:plvRadius="18dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

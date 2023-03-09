@@ -166,7 +166,7 @@ public class PLVLCPPTTurnPageLayout extends RelativeLayout implements View.OnCli
             plvlcPptTurnPageNextIv.setSelected(true);
         }
 
-        plvlcPptTurnPageProgressTv.setText(String.format("%s/%s", page, maxPage));
+        plvlcPptTurnPageProgressTv.setText(String.format("%s/%s", page, Math.max(page, maxPage)));
     }
 
     @Override

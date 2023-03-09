@@ -13,9 +13,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,16 +34,19 @@ import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWind
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
 import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.livescenes.log.linkmic.PLVLinkMicELog;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -59,7 +65,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private static final int DURATION_MS_LINK_MIC_OPEN_OFF = 300;
     //延迟后自动隐藏
     private static final int DELAY_AUTO_HIDE_WHEN_NOT_JOINED = 5000;
+    private static final boolean AUTO_HIDE_WHEN_NOT_JOINED = false;
     private static final int DELAY_AUTO_HIDE_WHEN_JOINED = 3000;
+    private static final boolean AUTO_HIDE_WHEN_JOINED = true;
     //竖屏下初始位置的y偏移
     private static final int DP_ORIGIN_MARGIN_TOP_PORTRAIT = 466;
 
@@ -97,6 +105,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private boolean isCameraFront = true;
     private boolean isMicrophoneOpen = true;
     private boolean isPortrait;
+    private boolean isAudioState = false;
 
     //Listener
     private OnPLCLinkMicControlBarListener onPLCLinkMicControlBarListener;
@@ -243,14 +252,22 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             //设置竖屏UI
             btnRingActionPortrait.setRingUpState();
             tvRequestTip.setVisibility(VISIBLE);
-            tvRequestTip.setText(R.string.plv_linkmic_tip_request_link_mic);
+            if (isAudioState) {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+            } else {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+            }
             ll4BtnParent.setVisibility(INVISIBLE);
 
             //设置横屏UI
             btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_up);
             llFunctionBtnParentLand.setVisibility(GONE);
             tvRequestTipLandscape.setVisibility(VISIBLE);
-            tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_link_mic);
+            if (isAudioState) {
+                tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+            } else {
+                tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+            }
 
             //设置屏幕方向的UI
             setOrientation(isPortrait);
@@ -291,16 +308,18 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         //更新竖屏UI
         tvRequestTip.setVisibility(INVISIBLE);
         ll4BtnParent.setVisibility(VISIBLE);
+        btnRingActionPortrait.setRingOffState();
 
         //更新横屏UI
         tvRequestTipLandscape.setVisibility(GONE);
         llFunctionBtnParentLand.setVisibility(VISIBLE);
+        btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_off);
 
         startAutoHideCountDown();
     }
 
     @Override
-    public void setIsAudio(boolean isAudio) {
+    public void updateIsAudioWidth(boolean isAudio) {
         if (isAudio) {
             btnCameraOpenPortrait.setVisibility(GONE);
             btnCameraOpenLandscape.setVisibility(GONE);
@@ -321,6 +340,11 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         });
     }
 
+    @Override
+    public void setAudioState(boolean isAudio) {
+        isAudioState = isAudio;
+    }
+
     //设置下麦
     @Override
     public void setLeaveLinkMic() {
@@ -330,20 +354,59 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
 
         //更新竖屏UI
         tvRequestTip.setVisibility(VISIBLE);
-        tvRequestTip.setText(R.string.plv_linkmic_tip_request_link_mic);
+        if (isAudioState) {
+            tvRequestTip.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+        } else {
+            tvRequestTip.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+        }
         btnRingActionPortrait.setRingUpState();
         ll4BtnParent.setVisibility(INVISIBLE);
 
         //更新横屏UI
         btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_up);
         tvRequestTipLandscape.setVisibility(VISIBLE);
-        tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_link_mic);
+        if (isAudioState) {
+            tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+        } else {
+            tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+        }
         llFunctionBtnParentLand.setVisibility(GONE);
 
         if (state != PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
             state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN;
             animateMoveToShowMiddleWidth();
             startAutoHideCountDown();
+        }
+    }
+
+    @Override
+    public void updateLinkMicQueueOrder(int orderIndex) {
+        if (orderIndex < 0) {
+            return;
+        }
+        final String orderText;
+        if (orderIndex < 50) {
+            orderText = String.valueOf(orderIndex + 1);
+        } else {
+            orderText = "50+";
+        }
+        if (state == PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC) {
+            tvRequestTip.setText(new PLVSpannableStringBuilder(getContext().getString(R.string.plv_linkmic_tip_requesting_link_mic))
+                    .appendExclude("\n排队" + orderText, new AbsoluteSizeSpan(ConvertUtils.sp2px(12)) {
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            super.updateDrawState(ds);
+                            ds.setColor(PLVFormatUtils.parseColor("#99FFFFFF"));
+                        }
+                    }));
+            tvRequestTipLandscape.setText(new PLVSpannableStringBuilder(getContext().getString(R.string.plv_linkmic_tip_requesting_link_mic))
+                    .appendExclude("\n排队" + orderText, new AbsoluteSizeSpan(ConvertUtils.sp2px(10)) {
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            super.updateDrawState(ds);
+                            ds.setColor(PLVFormatUtils.parseColor("#99FFFFFF"));
+                        }
+                    }));
         }
     }
 
@@ -379,7 +442,16 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     }
 
     private void animateMoveToShowMiddleWidth() {
-        animateMove((float) (biggestStateWidthPortrait - middleStateWidthPortrait));
+        //显示请求上麦按钮和一段文案的长度前，需要重置一下最大长度，防止音频下麦后，最大长度变短导致位移不正确
+        updateIsAudioWidth(false);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                biggestStateWidthPortrait = floatingViewPortraitRoot.getWidth();
+                animateMove((float) (biggestStateWidthPortrait - middleStateWidthPortrait));
+            }
+        });
+
     }
 
     private void animateMoveToShowSmallestWidth() {
@@ -424,9 +496,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private void startAutoHideCountDown() {
         dispose(autoHideDisposable);
         int delay;
-        if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN) {
+        if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN && AUTO_HIDE_WHEN_NOT_JOINED) {
             delay = DELAY_AUTO_HIDE_WHEN_NOT_JOINED;
-        } else if (state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS) {
+        } else if (state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS && AUTO_HIDE_WHEN_JOINED) {
             delay = DELAY_AUTO_HIDE_WHEN_JOINED;
         } else {
             return;

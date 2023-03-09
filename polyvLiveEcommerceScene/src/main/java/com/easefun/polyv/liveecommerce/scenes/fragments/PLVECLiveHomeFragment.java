@@ -18,16 +18,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftBean;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
@@ -39,6 +42,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
+import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanPopupView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatInputWindow;
@@ -56,10 +60,13 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
@@ -70,6 +77,7 @@ import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
+import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
@@ -98,6 +106,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private PLVECChatMessageAdapter chatMessageAdapter;
     private TextView sendMsgTv;
     private PLVECChatImgScanPopupView chatImgScanPopupView;
+    @Nullable
+    private PLVECChatOverLengthMessageLayout chatOverLengthMessageLayout;
     //未读信息提醒view
     private TextView unreadMsgTv;
     //下拉加载历史记录控件
@@ -142,6 +152,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private boolean isFocusModeStatus;
     //聊天输入窗口
     private PLVECChatInputWindow chatInputWindow;
+
+    @Nullable
+    private PLVChatQuoteVO chatQuoteVO = null;
+
+    //互动入口
+    private PLVInteractEntranceLayout interactEntranceView;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -169,7 +185,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(isOpenPointReward) {
+        if (isOpenPointReward) {
             destroyPointRewardEffectQueue();
         }
     }
@@ -180,6 +196,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private void initView() {
         watchInfoLy = findViewById(R.id.watch_info_ly);
         bulletinLy = findViewById(R.id.bulletin_ly);
+        bulletinLy.setOnVisibilityChangedListener(new PLVECBulletinView.OnVisibilityChangedListener() {
+            @Override
+            public void onChanged(boolean isVisible) {
+                adjustInteractEntranceLyLocation(isVisible);
+            }
+        });
         greetLy = findViewById(R.id.greet_ly);
         chatMsgRv = findViewById(R.id.chat_msg_rv);
         PLVMessageRecyclerView.setLayoutManager(chatMsgRv).setStackFromEnd(true);
@@ -216,6 +238,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         morePopupView = new PLVECMorePopupView();
         commodityPopupView = new PLVECCommodityPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
+        if (getContext() != null) {
+            chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
+        }
 
         //打赏动画特效
         polyvPointRewardEffectWidget = findViewById(R.id.plvec_point_reward_effect);
@@ -226,10 +251,22 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         networkTipsView = findViewById(R.id.plvec_live_network_tips_layout);
 
+        interactEntranceView = findViewById(R.id.plvec_interact_entrance_ly);
+        interactEntranceView.changeLayoutStyle(false);
+        interactEntranceView.setOnViewActionListener(new PLVInteractEntranceLayout.OnViewActionListener() {
+            @Override
+            public void onShowQuestionnaire() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowQuestionnaire();
+                }
+            }
+        });
+
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
 
         initNetworkTipsLayout();
+        adjustInteractEntranceLyLocation(bulletinLy.getVisibility() == View.VISIBLE);
     }
 
     private void initNetworkTipsLayout() {
@@ -250,6 +287,37 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
         });
     }
+
+    private void adjustInteractEntranceLyLocation(boolean isBulletinLyVisible) {
+        if (interactEntranceView == null) {
+            return;
+        }
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) interactEntranceView.getLayoutParams();
+        if (isBulletinLyVisible) {
+            rlp.addRule(RelativeLayout.BELOW, R.id.bulletin_ly);
+        } else {
+            rlp.addRule(RelativeLayout.BELOW, R.id.watch_info_ly);
+        }
+        interactEntranceView.setLayoutParams(rlp);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化数据">
+
+    @Override
+    public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
+        super.init(liveRoomDataManager);
+        runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                chatMessageAdapter.setAllowReplyMessage(
+                        PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                                .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_VIEWER_QUOTE_REPLY)
+                );
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部API">
@@ -286,6 +354,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             commodityPopupView.addCommodityVO(commodityVO);
         } else {
             commodityPopupView.setCommodityVO(commodityVO);
+        }
+    }
+
+    @Override
+    protected void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
+        if (interactEntranceView != null) {
+            interactEntranceView.acceptInteractEntranceData(dataBeans);
         }
     }
     // </editor-fold>
@@ -347,11 +422,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 打赏动画控制">
+
     /**
      * 初始化积分打赏动画特效item
      */
-    private void initPointRewardEffectQueue(){
-        if(pointRewardEventProducer == null) {
+    private void initPointRewardEffectQueue() {
+        if (pointRewardEventProducer == null) {
             pointRewardEventProducer = new PLVPointRewardEffectQueue();
             polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
         }
@@ -360,14 +436,14 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     /**
      * 销毁积分打赏动效队列
      */
-    private void destroyPointRewardEffectQueue(){
+    private void destroyPointRewardEffectQueue() {
         if (pointRewardEventProducer != null) {
             pointRewardEventProducer.destroy();
         }
         svgaHelper.clear();
     }
 
-    private void acceptPointRewardMessage(PLVRewardEvent rewardEvent){
+    private void acceptPointRewardMessage(PLVRewardEvent rewardEvent) {
         if (pointRewardEventProducer != null) {
             //横屏不处理积分打赏事件
             if (ScreenUtils.isPortrait()) {
@@ -685,6 +761,19 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         public void onChatImgClick(View view, String imgUrl) {
             chatImgScanPopupView.showImgScanLayout(view, imgUrl);
         }
+
+        @Override
+        public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+            PLVECLiveHomeFragment.this.chatQuoteVO = chatQuoteVO;
+            showInputWindow();
+        }
+
+        @Override
+        public void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+            if (chatOverLengthMessageLayout != null) {
+                chatOverLengthMessageLayout.show(chatMessageDataBean);
+            }
+        }
     };
     // </editor-fold>
 
@@ -697,15 +786,33 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                return PLVECLiveHomeFragment.this.chatQuoteVO;
+            }
+
+            @Override
+            public void onCloseQuote() {
+                PLVECLiveHomeFragment.this.chatQuoteVO = null;
+            }
+
+            @Override
             public boolean onSendMsg(String message) {
                 PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
-                Pair<Boolean, Integer> sendResult = chatroomPresenter.sendChatMessage(localMessage);
+                Pair<Boolean, Integer> sendResult;
+                if (chatQuoteVO == null || chatQuoteVO.getMessageId() == null) {
+                    sendResult = chatroomPresenter.sendChatMessage(localMessage);
+                } else {
+                    localMessage.setQuote(chatQuoteVO);
+                    sendResult = chatroomPresenter.sendQuoteMessage(localMessage, chatQuoteVO.getMessageId());
+                }
                 if (!sendResult.first) {
                     //发送失败
                     ToastUtils.showShort(getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second);
                     return false;
+                } else {
+                    PLVECLiveHomeFragment.this.chatQuoteVO = null;
+                    return true;
                 }
-                return true;
             }
         });
     }
@@ -927,14 +1034,14 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 是否打开积分打赏">
-    private void observeRewardData(){
+    private void observeRewardData() {
         liveRoomDataManager.getPointRewardEnableData().observe(this, new Observer<PLVStatefulData<Boolean>>() {
             @Override
             public void onChanged(@Nullable PLVStatefulData<Boolean> booleanPLVStatefulData) {
                 liveRoomDataManager.getPointRewardEnableData().removeObserver(this);
-                if( booleanPLVStatefulData != null && booleanPLVStatefulData.getData() != null){
+                if (booleanPLVStatefulData != null && booleanPLVStatefulData.getData() != null) {
                     isOpenPointReward = booleanPLVStatefulData.getData();
-                    if(isOpenPointReward) {
+                    if (isOpenPointReward) {
                         initPointRewardEffectQueue();
                     }
                     if (rewardIv != null) {
@@ -960,9 +1067,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         } else if (id == R.id.commodity_iv) {
             showCommodityLayout(v);
         } else if (id == R.id.reward_iv) {
-            if(isOpenPointReward){
+            if (isOpenPointReward) {
                 //回调显示积分打赏弹窗
-                if(onViewActionListener != null){
+                if (onViewActionListener != null) {
                     onViewActionListener.onShowRewardAction();
                 }
             }
@@ -1001,6 +1108,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         //显示积分选择弹窗
         void onShowRewardAction();
+
+        //显示问卷
+        void onShowQuestionnaire();
 
         /**
          * 当前是否无延迟模式

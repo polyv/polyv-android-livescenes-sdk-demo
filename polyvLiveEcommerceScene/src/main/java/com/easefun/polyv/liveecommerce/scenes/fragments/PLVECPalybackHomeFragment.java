@@ -34,6 +34,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
+import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanPopupView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
@@ -59,6 +60,7 @@ import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -102,6 +104,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //下拉加载历史记录控件
     private SwipeRefreshLayout swipeLoadView;
     private PLVECChatImgScanPopupView chatImgScanPopupView;
+    @Nullable
+    private PLVECChatOverLengthMessageLayout chatOverLengthMessageLayout;
     //聊天回放tips
     private TextView chatPlaybackTipsTv;
 
@@ -196,6 +200,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         dataList = new ArrayList<>();
 
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
+        if (getContext() != null) {
+            chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
+        }
         greetLy = findViewById(R.id.greet_ly);
         chatMsgRv = findViewById(R.id.chat_msg_rv);
         PLVMessageRecyclerView.setLayoutManager(chatMsgRv).setStackFromEnd(true);
@@ -206,6 +213,18 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             @Override
             public void onChatImgClick(View view, String imgUrl) {
                 chatImgScanPopupView.showImgScanLayout(view, imgUrl);
+            }
+
+            @Override
+            public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+
+            }
+
+            @Override
+            public void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+                if (chatOverLengthMessageLayout != null) {
+                    chatOverLengthMessageLayout.show(chatMessageDataBean);
+                }
             }
         });
         //未读信息view

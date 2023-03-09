@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.player.playback.model.dataso
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.SkipQueryVerification;
 import androidx.room.TypeConverters;
 
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
@@ -17,6 +18,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
  * @author Hoshiiro
  */
 @Database(entities = {PLVPlaybackCacheVideoVO.class}, version = 1, exportSchema = false)
+@SkipQueryVerification
 @TypeConverters({
         PLVPlaybackCacheDownloadStatusEnum.Converter.class,
         PLVLiveChannelTypeConverter.class,

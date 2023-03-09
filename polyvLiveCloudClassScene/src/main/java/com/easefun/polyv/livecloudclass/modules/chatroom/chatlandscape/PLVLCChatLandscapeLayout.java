@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
@@ -41,8 +43,6 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
-
 /**
  * 横屏的聊天布局
  */
@@ -68,11 +68,14 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     //是否打开
     private boolean toShow = true;
 
+    private boolean isInPaintMode;
+
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
 
     //是否聊天回放布局
     private boolean isChatPlaybackLayout;
+    private boolean isLiveType;
 
     private OnRoomStatusListener onRoomStatusListener;
     //聊天室开关状态
@@ -114,6 +117,10 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
         this.isChatPlaybackLayout = isChatPlaybackLayout;
+    }
+
+    public void setIsLiveType(boolean isLiveType) {
+        this.isLiveType = isLiveType;
     }
     // </editor-fold>
 
@@ -295,7 +302,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onCloseRoomEvent(@NonNull final PLVCloseRoomEvent closeRoomEvent) {
             super.onCloseRoomEvent(closeRoomEvent);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             acceptCloseRoomEvent(closeRoomEvent);
@@ -304,7 +311,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onFocusModeEvent(@NonNull PLVFocusModeEvent focusModeEvent) {
             super.onFocusModeEvent(focusModeEvent);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             acceptFocusModeEvent(focusModeEvent);
@@ -313,7 +320,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onRemoveMessageEvent(@Nullable String id, boolean isRemoveAll) {
             super.onRemoveMessageEvent(id, isRemoveAll);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             removeChatMessageToList(id, isRemoveAll);
@@ -322,7 +329,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onLocalSpeakMessage(@Nullable PolyvLocalMessage localMessage) {
             super.onLocalSpeakMessage(localMessage);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             if (localMessage == null) {
@@ -337,7 +344,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onLocalImageMessage(@Nullable PolyvSendLocalImgEvent localImgEvent) {
             super.onLocalImageMessage(localImgEvent);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             List<PLVBaseViewData> dataList = new ArrayList<>();
@@ -349,7 +356,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onSpeakImgDataList(List<PLVBaseViewData> chatMessageDataList) {
             super.onSpeakImgDataList(chatMessageDataList);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             //添加信息至列表
@@ -389,7 +396,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         @Override
         public void onLoadEmotionMessage(@Nullable @org.jetbrains.annotations.Nullable PLVChatEmotionEvent emotionEvent) {
             super.onLoadEmotionMessage(emotionEvent);
-            if (isChatPlaybackLayout) {
+            if (isChatPlaybackLayout || !isLiveType) {
                 return;
             }
             if (emotionEvent == null) {
@@ -469,7 +476,17 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="横屏聊天室布局 - 开关控制">
     public void toggle(boolean toShow) {
         this.toShow = toShow;
-        setVisibility((toShow && ScreenUtils.isLandscape()) ? View.VISIBLE : View.GONE);
+        setVisibility((toShow && ScreenUtils.isLandscape() && !isInPaintMode) ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 更新画笔模式状态
+     *
+     * @param isInPaintMode 是否正在画笔模式
+     */
+    public void notifyPaintModeStatus(boolean isInPaintMode) {
+        this.isInPaintMode = isInPaintMode;
+        toggle(toShow);
     }
     // </editor-fold>
 
@@ -478,9 +495,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (toShow) {
-                setVisibility(View.VISIBLE);
-            }
+            toggle(toShow);
             if (chatCommonMessageList != null) {
                 boolean result = chatCommonMessageList.attachToParent(swipeLoadView, true);
                 if (result && chatroomPresenter != null) {

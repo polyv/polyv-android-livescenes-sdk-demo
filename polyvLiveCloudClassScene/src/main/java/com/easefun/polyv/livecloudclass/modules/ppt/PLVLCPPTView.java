@@ -17,23 +17,27 @@ import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTVodProcessor;
 import com.easefun.polyv.businesssdk.api.common.ppt.PolyvPPTWebView;
 import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
-import com.github.lzyzsd.jsbridge.BridgeHandler;
-import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.business.api.common.ppt.PLVPPTWebView;
 import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.web.PLVWebview;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+
+import net.plv.android.jsbridge.BridgeHandler;
+import net.plv.android.jsbridge.CallBackFunction;
 
 /**
  * date: 2020/8/6
@@ -62,6 +66,8 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     private boolean isLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
+
+    private boolean isPPTChannelType;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -77,7 +83,6 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     public PLVLCPPTView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialView(context);
-        initData();
     }
 // </editor-fold>
 
@@ -91,6 +96,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         pptPlaceHolderView.setPlaceHolderImg(R.drawable.plvlc_ppt_placeholder);
         //设置占位图文本
         pptPlaceHolderView.setPlaceHolderText(getResources().getString(R.string.plv_ppt_no_document));
+    }
+
+    private void loadWeb() {
         //loadWeb
         if (pptWebView != null) {
             pptWebView.setPageLoadCallback(new PLVWebview.WebPageLoadCallback() {
@@ -113,9 +121,13 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
         PolyvELogSender.send(PolyvPPTElog.class, PolyvPPTElog.PPTEvent.PPT_LOAD_START, "load start :");
         registerHandler();
         //加载ppt的webView
-        if (pptWebView != null) {
+        if (canLoadWeb()) {
             pptWebView.loadWeb();//"file:///android_asset/startForMobile.html"
         }
+    }
+
+    private boolean canLoadWeb() {
+        return pptWebView != null && isPPTChannelType;
     }
 
     private void registerHandler() {
@@ -134,15 +146,17 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    //初始化数据
-    private void initData() {
+    // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法 - common部分，定义直播PPT和回放PPT通用的方法">
+    @Override
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        isPPTChannelType = liveRoomDataManager.getConfig().isPPTChannelType();
+
         presenter = new PLVPPTPresenter();
         presenter.init(this);
-    }
-    // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="对外API - 1. 外部直接调用的方法 - common部分，定义直播PPT和回放PPT通用的方法">
+        loadWeb();
+    }
+
     @Override
     public void sendWebMessage(String event, String message) {
         if (pptWebView != null) {
@@ -152,7 +166,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     @Override
     public void reLoad() {
-        if (pptWebView != null) {
+        if (canLoadWeb()) {
             pptWebView.loadWeb();
         }
     }
@@ -208,8 +222,60 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     @Override
     public void turnPagePPT(String type) {
-        PLVCommonLog.d(TAG, "turnPagePPT: "+type);
+        PLVCommonLog.d(TAG, "turnPagePPT: " + type);
         sendWebMessage(PLVLivePPTProcessor.CHANGE_PPT_PAGE, "{\"type\":\"" + type + "\"}");
+    }
+
+    @Override
+    public void notifyPaintModeStatus(boolean isInPaintMode) {
+        if (pptWebView != null) {
+            pptWebView.setNeedGestureAction(isInPaintMode);
+            pptWebView.setFocusable(true);
+            pptWebView.setFocusableInTouchMode(true);
+            if (isInPaintMode) {
+                pptWebView.requestFocus();
+            } else {
+                pptWebView.clearFocus();
+            }
+        }
+
+        final String userType;
+        if (isInPaintMode) {
+            userType = "paint";
+        } else {
+            userType = "";
+        }
+        sendWebMessage(PLVLivePPTProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"" + userType + "\"}");
+    }
+
+    @Override
+    public void notifyPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool) {
+        if (PLVLCMarkToolEnums.MarkTool.CLEAR.equals(markTool)) {
+            sendWebMessage(PLVLivePPTProcessor.DELETE_ALL_PAINT, "");
+        } else if (PLVLCMarkToolEnums.MarkTool.ERASER.equals(markTool)) {
+            sendWebMessage(PLVLivePPTProcessor.ERASE_STATUS, "");
+        } else if (PLVLCMarkToolEnums.MarkTool.PEN.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.RECT.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.ARROW.equals(markTool)
+                || PLVLCMarkToolEnums.MarkTool.TEXT.equals(markTool)) {
+            final String message = "{\"type\":\"" + markTool.getMarkTool() + "\"}";
+            sendWebMessage(PLVLivePPTProcessor.SET_DRAW_TYPE, message);
+        }
+    }
+
+    @Override
+    public void notifyPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color) {
+        sendWebMessage(PLVLivePPTProcessor.CHANGE_COLOR, color.getColorString());
+    }
+
+    @Override
+    public void notifyUndoLastPaint() {
+        sendWebMessage(PLVLivePPTProcessor.UNDO, "");
+    }
+
+    @Override
+    public void notifyPaintUpdateTextContent(String textContent) {
+        sendWebMessage(PLVLivePPTProcessor.CHANGE_TEXT_CONTENT, textContent);
     }
 
     // </editor-fold>
@@ -233,7 +299,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             public void pptPrepare(final String message) {
                 PLVCommonLog.d(TAG, "PLVLCPPTView.pptPrepare=" + message);
                 hideLoading();
-                if (pptWebView != null) {
+                if (canLoadWeb()) {
                     pptWebView.loadWeb();
                     pptWebView.postDelayed(new Runnable() {
                         @Override
@@ -250,10 +316,11 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             public void onLoadLocalPpt(@NonNull PLVPPTLocalCacheVO localCacheVO) {
                 PLVCommonLog.d(TAG, "PLVLCPPTView.onLoadLocalPpt=" + localCacheVO);
                 hideLoading();
-                if (pptWebView != null) {
+                if (canLoadWeb()) {
                     final WebSettings pptWebSetting = pptWebView.getSettings();
-                    pptWebSetting.setAllowFileAccess(true);
-                    pptWebSetting.setAllowFileAccessFromFileURLs(true);
+                    boolean allowFileAccess = true;
+                    pptWebSetting.setAllowFileAccess(allowFileAccess);
+                    pptWebSetting.setAllowFileAccessFromFileURLs(allowFileAccess);
 
                     pptWebView.loadLocalPpt(localCacheVO);
                 }
@@ -401,10 +468,18 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             @Override
             public void onPPTStatusChange(String data) {
                 PLVPPTStatus pptStatus = PLVGsonUtil.fromJson(PLVPPTStatus.class, data);
-                if(pptStatus != null && pptStatus.getMaxTeacherOp() != null){
-                    if(onLivePPTViewListener != null){
+                if (pptStatus != null && pptStatus.getMaxTeacherOp() != null) {
+                    if (onLivePPTViewListener != null) {
                         onLivePPTViewListener.onLivePPTStatusChange(pptStatus);
                     }
+                }
+            }
+
+            @Override
+            public void onEditTextChanged(String data) {
+                final PLVPPTPaintStatus pptPaintStatus = PLVGsonUtil.fromJson(PLVPPTPaintStatus.class, data);
+                if (onLivePPTViewListener != null) {
+                    onLivePPTViewListener.onPaintEditText(pptPaintStatus);
                 }
             }
         });

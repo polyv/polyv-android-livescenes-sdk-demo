@@ -21,4 +21,6 @@
     <item name="md__translationX" type="id" />
 
     <item name="md__translationY" type="id" />
+
+    <item name="plv_view_util_show_view_for_duration_tag" type="id" />
 </resources>

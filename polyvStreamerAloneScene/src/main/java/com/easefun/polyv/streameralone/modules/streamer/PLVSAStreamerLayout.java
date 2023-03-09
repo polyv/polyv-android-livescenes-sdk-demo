@@ -53,6 +53,8 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.screenshare.IPLVScreenShareListener;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -271,8 +273,12 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             }
         });
 
+        final boolean isDefaultBackCamera = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_ALONE_DEFAULT_BACK_CAMERA, false);
+
         streamerPresenter = new PLVStreamerPresenter(liveRoomDataManager);
         streamerPresenter.registerView(streamerView);
+        streamerPresenter.setCameraDirection(!isDefaultBackCamera);
         streamerPresenter.init();
         streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
 

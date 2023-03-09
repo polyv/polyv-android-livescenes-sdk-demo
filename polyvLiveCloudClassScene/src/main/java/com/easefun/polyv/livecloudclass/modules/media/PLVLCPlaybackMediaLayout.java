@@ -71,7 +71,9 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -267,6 +269,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         danmuSwitchView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaController.show();
                 danmuWrapper.dispatchDanmuSwitchOnClicked(v);
                 mediaController.dispatchDanmuSwitchOnClicked(v);
                 if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
@@ -280,13 +283,29 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         landscapeMessageSender = new PLVLCLandscapeMessageSendPanel((AppCompatActivity) getContext(), this);
         landscapeMessageSender.setOnSendMessageListener(new IPLVLCLandscapeMessageSender.OnSendMessageListener() {
             @Override
-            public void onSend(String message) {
+            public void onSend(String message, @Nullable PLVChatQuoteVO chatQuoteVO) {
                 if (onViewActionListener != null) {
                     //发送信息到聊天室
-                    Pair<Boolean, Integer> result = onViewActionListener.onSendChatMessageAction(message);
+                    Pair<Boolean, Integer> result = onViewActionListener.onSendChatMessageAction(message, chatQuoteVO);
                     if (!result.first) {
                         ToastUtils.showShort(getResources().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + result.second);
                     }
+                }
+            }
+
+            @Nullable
+            @Override
+            public PLVChatQuoteVO getChatQuoteContent() {
+                if (onViewActionListener == null) {
+                    return null;
+                }
+                return onViewActionListener.getChatQuoteContent();
+            }
+
+            @Override
+            public void onCloseChatQuote() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onCloseChatQuote();
                 }
             }
         });
@@ -392,7 +411,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                         if (seekPosition == null) {
                             return;
                         }
-                        seekTo(seekPosition, getDuration());
+                        seekTo(seekPosition * 1000, getDuration());
                     }
                 });
     }
@@ -512,6 +531,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public void showController() {
         mediaController.show();
+    }
+
+    @Override
+    public void notifyOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+        landscapeMessageSender.openMessageSender();
     }
 
     @Override
@@ -645,6 +669,22 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void onTurnPageLayoutChange(boolean toShow) {
 
     }
+
+    @Override
+    public void onPaintEditText(PLVPPTPaintStatus paintStatus) {
+
+    }
+
+    @Override
+    public boolean isInPaintMode() {
+        return false;
+    }
+
+    @Override
+    public void notifyMediaLayoutPosition(boolean isInLinkMicList) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的playback方法">
@@ -704,8 +744,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled) {
-        mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled);
+    public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
+        mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled, isLiveType);
     }
     // </editor-fold>
 
@@ -828,6 +868,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public boolean onProgressChanged(int seekTime, int totalTime, boolean isEnd, boolean isRightSwipe) {
             progressTipsView.setProgressPercent(seekTime, totalTime, isEnd, isRightSwipe);
+            mediaController.show();
             return true;
         }
 
@@ -841,6 +882,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onDoubleClick() {
             super.onDoubleClick();
             mediaController.playOrPause();
+            mediaController.show();
         }
 
         @Override

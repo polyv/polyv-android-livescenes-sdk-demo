@@ -10,6 +10,6 @@
     <string name="plv_login_appId">APP ID</string>
     <string name="plv_login_appSecret">APP Secret</string>
     <string name="plv_login_waiting">正在登录中，请稍等…</string>
-    <string name="plv_login_copyright">2013 – 2020 广州易方信息科技股份有限公司 版权所有</string>
+    <string name="plv_login_copyright">2013 – 2023 易方信息科技股份有限公司 版权所有</string>
 
 </resources>

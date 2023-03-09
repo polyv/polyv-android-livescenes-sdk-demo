@@ -2,6 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.ppt;
 
 import android.view.View;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 
 /**
@@ -15,6 +16,11 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 public interface IPLVLCFloatingPPTLayout {
 
     // <editor-fold defaultstate="collapsed" desc="1. 外部直接调用的方法">
+    /**
+     * 初始化
+     * @param liveRoomDataManager
+     */
+    void init(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
      * 设置服务端的PPT开关

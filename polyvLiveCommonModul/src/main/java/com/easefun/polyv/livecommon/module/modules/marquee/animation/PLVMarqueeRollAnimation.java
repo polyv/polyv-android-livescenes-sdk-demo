@@ -74,9 +74,11 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             if (mainAnimator.isRunning()) {
                 mainView.setVisibility(View.VISIBLE);
             }
-        } else if (mainAnimator != null) {
+        } else {
             setAnimation();
-            mainAnimator.start();
+            if (mainAnimator != null) {
+                mainAnimator.start();
+            }
         }
     }
 
@@ -153,8 +155,8 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = STARTED;
-        final float startX = isAlwaysShowWhenRun ? screenWidth - viewWidth : screenWidth;
-        final float endX = isAlwaysShowWhenRun ? 0 : -viewWidth;
+        final float startX = isAlwaysShowWhenRun && screenWidth > viewWidth ? screenWidth - viewWidth : screenWidth;
+        final float endX = isAlwaysShowWhenRun && screenWidth > viewWidth ? 0 : -viewWidth;
         mainAnimator = ObjectAnimator.ofFloat(mainView, "translationX", startX, endX);
 
         mainAnimator.setDuration(duration);

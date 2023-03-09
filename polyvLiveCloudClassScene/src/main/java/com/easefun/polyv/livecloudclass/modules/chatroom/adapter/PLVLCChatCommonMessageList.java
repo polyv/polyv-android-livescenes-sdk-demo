@@ -9,10 +9,15 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ScrollView;
 
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -30,6 +35,9 @@ public class PLVLCChatCommonMessageList {
     private boolean isLandscapeLayout;//是否横屏布局
     private boolean isLandscapeLastScrollChanged;//最后一次滚动是否是在横屏布局触发
     private PLVChatImageViewerFragment chatImageViewerFragment;//聊天图片查看fragment
+
+    private OnViewActionListener onViewActionListener;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -70,9 +78,34 @@ public class PLVLCChatCommonMessageList {
                     chatImageViewerFragment = PLVChatImageViewerFragment.show((AppCompatActivity) context, messageAdapter.getDataList(), messageAdapter.getDataList().get(position), Window.ID_ANDROID_CONTENT);
                 }
             }
+
+            @Override
+            public void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowAloneOverLengthMessage(chatMessageDataBean);
+                }
+            }
+
+            @Override
+            public void onReplyMessage(PLVChatQuoteVO quoteVO) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReplyMessage(quoteVO);
+                }
+            }
         });
         chatMsgRv.setAdapter(messageAdapter);
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="对外API - 初始化">
+
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        messageAdapter.setAllowReplyMessage(
+                PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_VIEWER_QUOTE_REPLY)
+        );
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 列表数据操作">
@@ -267,5 +300,20 @@ public class PLVLCChatCommonMessageList {
         }
         return false;
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="回调">
+
+    public PLVLCChatCommonMessageList setOnViewActionListener(OnViewActionListener onViewActionListener) {
+        this.onViewActionListener = onViewActionListener;
+        return this;
+    }
+
+    public interface OnViewActionListener {
+        void onShowAloneOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
+    }
+
     // </editor-fold>
 }

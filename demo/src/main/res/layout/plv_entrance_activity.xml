@@ -13,31 +13,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/plv_entrance_live_streamer_btn"
-            android:text="手机开播"
             style="@style/plv_entrance_button_style"
+            android:background="@drawable/plv_entrance_streamer_bg"
             android:onClick="onClick"
-            android:background="@drawable/plv_entrance_streamer_bg" />
+            android:text="手机开播" />
 
         <Button
             android:id="@+id/plv_entrance_live_cloudclass_btn"
-            android:text="云直播观看"
             style="@style/plv_entrance_button_style"
             android:layout_marginTop="-16dp"
+            android:background="@drawable/plv_entrance_live_bg"
             android:onClick="onClick"
-            android:background="@drawable/plv_entrance_live_bg" />
+            android:text="云直播观看" />
 
         <Button
             android:id="@+id/plv_entrance_hi_class_btn"
-            android:text="互动学堂"
             style="@style/plv_entrance_button_style"
             android:layout_marginTop="-16dp"
+            android:background="@drawable/plv_entrance_hi_class_bg"
             android:onClick="onClick"
-            android:background="@drawable/plv_entrance_hi_class_bg" />
+            android:text="互动学堂" />
 
     </LinearLayout>
 

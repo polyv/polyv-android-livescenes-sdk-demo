@@ -1,6 +1,8 @@
 package com.easefun.polyv.streameralone.scenes.fragments;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,30 +17,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
-import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
-import com.easefun.polyv.livescenes.streamer.linkmic.IPLVSLinkMicEventSender;
-import com.easefun.polyv.livescenes.streamer.linkmic.PLVSLinkMicEventSender;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.IPLVSAChatroomLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.PLVSAChatroomLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAGreetingView;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSARewardGiftAnimView;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSACommodityControlLayout;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicControlWindow;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMoreLayout;
 import com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -78,6 +83,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     private PLVSAGreetingView plvsaChatroomGreetingLy;
     //聊天室布局
     private IPLVSAChatroomLayout plvsaChatroomLayout;
+    // 商品库管理布局
+    private PLVSACommodityControlLayout commodityControlLayout;
     //view
     private ConstraintLayout homeFragmentLayout;
     private TextView plvsaToolBarCallInputTv;
@@ -87,6 +94,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     private ImageView plvsaToolBarLinkmicTypeIv;
     private View plvsaToolBarMemberLinkmicRequestTipsView;
     private TextView plvsaToolBarLinkmicTypeTip;
+    private ImageView toolBarCommodityControlIv;
+    private PLVSALinkMicControlWindow linkMicControlWindow;
 
     // 聊天室消息列表观察者
     private RecyclerView.AdapterDataObserver chatMessageDataObserver;
@@ -95,6 +104,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     private OnViewActionListener onViewActionListener;
 
     private boolean isBeautyLayoutShowing = false;
+    private boolean isVideoLinkMic = false;
+    private boolean isOpenLinkMic = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -129,27 +140,45 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaToolBarLinkmicTypeIv = (ImageView) findViewById(R.id.plvsa_tool_bar_linkmic_type_iv);
         plvsaToolBarMemberLinkmicRequestTipsView = findViewById(R.id.plvsa_tool_bar_member_linkmic_request_tips_view);
         plvsaToolBarLinkmicTypeTip = findViewById(R.id.plvsa_tool_bar_linkmic_type_tip);
+        toolBarCommodityControlIv = findViewById(R.id.plvsa_tool_bar_commodity_control_iv);
 
         plvsaToolBarCallInputTv.setOnClickListener(this);
         plvsaToolBarMoreIv.setOnClickListener(this);
         plvsaToolBarMemberIv.setOnClickListener(this);
         plvsaToolBarLinkmicIv.setOnClickListener(this);
         plvsaToolBarLinkmicTypeIv.setOnClickListener(this);
+        toolBarCommodityControlIv.setOnClickListener(this);
 
-        initMoreLayout();
-        initMemberLayout();
+        initLinkMicControlWindow();
+
+        moreLayout = new PLVSAMoreLayout(view.getContext());
+        memberLayout = new PLVSAMemberLayout(view.getContext());
+        commodityControlLayout = new PLVSACommodityControlLayout(view.getContext());
 
         observeBeautyLayoutStatus();
 
         updateViewWithOrientation();
     }
 
-    private void initMoreLayout() {
-        moreLayout = new PLVSAMoreLayout(view.getContext());
-    }
+    private void initLinkMicControlWindow() {
+        linkMicControlWindow = new PLVSALinkMicControlWindow(view.getContext());
 
-    private void initMemberLayout() {
-        memberLayout = new PLVSAMemberLayout(view.getContext());
+        linkMicControlWindow.setOnViewActionListener(new PLVSALinkMicControlWindow.OnViewActionListener() {
+            @Override
+            public boolean isStreamerStartSuccess() {
+                return true;
+            }
+
+            @Override
+            public void onLinkMicMediaTypeUpdate(boolean isVideoLinkMicType, boolean isOpen) {
+                PLVSAStreamerHomeFragment.this.isVideoLinkMic = isVideoLinkMicType;
+                PLVSAStreamerHomeFragment.this.isOpenLinkMic = isOpen;
+                plvsaToolBarLinkmicIv.setSelected(isOpen);
+                if (onViewActionListener != null) {
+                    onViewActionListener.onLinkMicMediaTypeUpdate(isVideoLinkMicType, isOpen);
+                }
+            }
+        });
     }
 
     private void observeBeautyLayoutStatus() {
@@ -163,6 +192,24 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                     public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
                         PLVSAStreamerHomeFragment.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
                         updateVisibility();
+                    }
+                });
+    }
+
+    private void observeCommodityControlSwitch(@NonNull IPLVLiveRoomDataManager liveRoomDataManager) {
+        final Context context = getContext();
+        if (context == null) {
+            return;
+        }
+        liveRoomDataManager.getClassDetailVO()
+                .observe((LifecycleOwner) context, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                    @Override
+                    public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> data) {
+                        if (data != null && data.isSuccess() && data.getData() != null && data.getData().getData() != null) {
+                            final boolean isCommodityControlSwitchOn = data.getData().getData().isMobileAnchorProductEnabled();
+                            final boolean hasControlPermission = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_COMMODITY_ALLOW_CONTROL);
+                            toolBarCommodityControlIv.setVisibility(isCommodityControlSwitchOn && hasControlPermission ? View.VISIBLE : View.GONE);
+                        }
                     }
                 });
     }
@@ -181,9 +228,11 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         memberLayout.init(liveRoomDataManager);
         //初始化更多布局
         moreLayout.init(liveRoomDataManager);
+        commodityControlLayout.init(liveRoomDataManager);
 
         observeChatroomLayout();
         observeStatusBarLayout();
+        observeCommodityControlSwitch(liveRoomDataManager);
         updateGuestLayout();
     }
 
@@ -431,30 +480,11 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                 onViewActionListener.onClickToOpenMemberLayout();
             }
         } else if (id == R.id.plvsa_tool_bar_linkmic_iv) {
-            final Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    boolean isOpenLinkMic = PLVSLinkMicEventSender.getInstance().openLinkMic(true, !v.isSelected(), new IPLVSLinkMicEventSender.PLVSMainCallAck() {
-                        @Override
-                        public void onCall(Object... args) {
-                            v.setSelected(!v.isSelected());
-                            PLVToast.Builder.context(v.getContext())
-                                    .setText(v.isSelected() ? R.string.plv_linkmic_video_type_open_success_tip : R.string.plv_linkmic_hang_all_off_tip)
-                                    .build()
-                                    .show();
-                        }
-                    });
-                    if (!isOpenLinkMic) {
-                        PLVToast.Builder.context(v.getContext())
-                                .setText(R.string.plv_linkmic_error_tip_have_not_opened)
-                                .build()
-                                .show();
-                    }
-                }
-            };
-            if (v.isSelected()) {
+            if (!isOpenLinkMic) {
+                linkMicControlWindow.show(plvsaToolBarLinkmicIv);
+            } else {
                 new PLVSAConfirmDialog(v.getContext())
-                        .setTitle("确定关闭视频连麦吗？")
+                        .setTitle("确定关闭连麦吗？")
                         .setContent("关闭后将挂断进行中的所有连麦")
                         .setLeftButtonText(R.string.plv_common_dialog_cancel)
                         .setRightButtonText("确定")
@@ -462,21 +492,21 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                             @Override
                             public void onClick(DialogInterface dialog, View v) {
                                 dialog.dismiss();
-                                runnable.run();
+                                linkMicControlWindow.acceptLinkMicControl(isVideoLinkMic, false);
                             }
                         })
                         .show();
-                return;
             }
-            runnable.run();
         } else if (id == R.id.plvsa_tool_bar_linkmic_type_iv) {
             plvsaToolBarLinkmicTypeTip.setVisibility(View.INVISIBLE);
-            if(PLVDebounceClicker.tryClick(this, 800)) {
+            if (PLVDebounceClicker.tryClick(this, 800)) {
                 v.setSelected(!v.isSelected());
                 if (onViewActionListener != null) {
                     onViewActionListener.onChangeLinkMicLayoutType();
                 }
             }
+        } else if (id == toolBarCommodityControlIv.getId()) {
+            commodityControlLayout.show();
         }
     }
     // </editor-fold>
@@ -518,6 +548,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
          * 改变连麦布局类型
          */
         void onChangeLinkMicLayoutType();
+
+        void onLinkMicMediaTypeUpdate(boolean isVideoLinkMicType, boolean isOpen);
     }
     // </editor-fold>
 

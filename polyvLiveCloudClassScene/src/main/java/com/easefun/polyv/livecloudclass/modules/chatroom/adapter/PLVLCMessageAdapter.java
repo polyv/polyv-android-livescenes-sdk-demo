@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRewardViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -18,6 +19,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,8 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     private List<PLVBaseViewData> fullDataList;//全部信息的数据列表
     private List<PLVBaseViewData> specialDataList;//只看讲师信息的数据列表(包括我、讲师类型、嘉宾类型、助教类型、管理员类型的信息)
     private List<PLVBaseViewData> focusModeDataList;//专注模式的数据列表(包括讲师类型、嘉宾类型、助教类型、管理员类型的信息)
+
+    private boolean allowReplyMessage = false;
 
     private int displayDataType = DISPLAY_DATA_TYPE_FULL;//显示数据类型
 
@@ -91,6 +95,7 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     @Override
     public void onBindViewHolder(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> holder, int position) {
+        PLVLCMessageViewHolder.hideCopyBoardPopupWindow();
         holder.processData(dataList.get(position), position);
     }
 
@@ -267,6 +272,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="对外API - 引用回复">
+
+    public PLVLCMessageAdapter setAllowReplyMessage(boolean allowReplyMessage) {
+        this.allowReplyMessage = allowReplyMessage;
+        return this;
+    }
+
+    public boolean isAllowReplyMessage() {
+        return allowReplyMessage;
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部工具方法">
     private int remove(String id, List<PLVBaseViewData> dataList) {
         int removeDataPosition = -1;
@@ -291,11 +309,27 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     public interface OnViewActionListener {
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
+
+        void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        void onReplyMessage(PLVChatQuoteVO quoteVO);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
         if (onViewActionListener != null) {
             onViewActionListener.onChatImgClick(position, view, imgUrl, isQuoteImg);
+        }
+    }
+
+    public void callOnShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
+        }
+    }
+
+    public void callOnReplyMessage(PLVChatQuoteVO quoteVO) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onReplyMessage(quoteVO);
         }
     }
     // </editor-fold>

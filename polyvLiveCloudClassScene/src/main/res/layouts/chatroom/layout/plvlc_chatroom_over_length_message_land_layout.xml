@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    app:mode="left"
+    app:radius="4dp">
+
+    <TextView
+        android:id="@+id/plvlc_chatroom_over_length_message_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="16dp"
+        android:text="全文"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvlc_chatroom_over_length_message_close_btn"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/plvlc_chatroom_over_length_message_close_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/plvlc_chatroom_over_length_message_title_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#EDEDEF"
+        app:layout_constraintTop_toBottomOf="@id/plvlc_chatroom_over_length_message_title" />
+
+    <ScrollView
+        android:id="@+id/plvlc_chatroom_over_length_message_content_sv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="23dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/plvlc_chatroom_over_length_message_copy_btn"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_chatroom_over_length_message_title_split_line">
+
+        <TextView
+            android:id="@+id/plvlc_chatroom_over_length_message_text_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            tools:text="@tools:sample/lorem/random" />
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/plvlc_chatroom_over_length_message_copy_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/plvlc_chatroom_msg_over_length_copy_btn_bg"
+        android:paddingHorizontal="46dp"
+        android:paddingVertical="8dp"
+        android:text="复制"
+        android:textColor="#333333"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

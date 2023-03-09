@@ -5,31 +5,99 @@
     android:layout_height="wrap_content"
     android:background="@drawable/plvec_chat_msg_corner_bg"
     android:minHeight="20dp"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingHorizontal="8dp"
     android:paddingVertical="4dp">
 
-    <TextView
-        android:id="@+id/chat_msg_tv"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:lineSpacingExtra="2dp"
-        android:textColor="#ffffff"
-        android:textSize="12sp"
-        tools:text="121321312312132131231231231213213123123123123123" />
+        android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/plvec_chat_msg_file_share_iv"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginVertical="4dp"
-        android:layout_marginStart="7dp"
+        <TextView
+            android:id="@+id/chat_msg_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:lineSpacingExtra="2dp"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            tools:text="121321312312132131231231231213213123123123123123" />
+
+        <ImageView
+            android:id="@+id/plvec_chat_msg_file_share_iv"
+            android:layout_width="40dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginVertical="4dp"
+            android:layout_marginStart="7dp"
+            android:visibility="gone"
+            tools:src="@drawable/plvec_chatroom_file_share_doc_icon"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/plvec_chat_msg_over_length_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="#4DD8D8D8"
         android:visibility="gone"
-        tools:src="@drawable/plvec_chatroom_file_share_doc_icon"
         tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/plvec_chat_msg_over_length_control_ll"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/plvec_chat_msg_over_length_copy_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="复制"
+            android:textColor="#CCFFFEFC"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center_vertical"
+            android:background="#4DD8D8D8" />
+
+        <TextView
+            android:id="@+id/plvec_chat_msg_over_length_more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="更多"
+            android:textColor="#CCFFFEFC"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/plvec_chat_msg_quote_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="#4DD8D8D8"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatMessageQuoteLayout
+        android:id="@+id/plvec_chat_msg_quote_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>

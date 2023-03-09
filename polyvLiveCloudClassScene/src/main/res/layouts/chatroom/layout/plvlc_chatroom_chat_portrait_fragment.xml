@@ -242,7 +242,7 @@
     <FrameLayout
         android:id="@+id/bottom_parent_ly"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
 
         <LinearLayout
@@ -250,6 +250,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout
+                android:id="@+id/plvlc_interact_entrance_ly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatReplyMessageLayout
+                android:id="@+id/plvlc_chat_reply_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <include
                 android:id="@+id/input_ly"

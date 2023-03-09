@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Pair;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
 import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -16,7 +18,9 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -156,6 +160,11 @@ public interface IPLVLCMediaLayout {
     void showController();
 
     /**
+     * 触发引用回复消息
+     */
+    void notifyOnReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+    /**
      * 是否拦截返回事件
      *
      * @return true：拦截，false：不拦截。如果当前处于横屏状态，会拦截返回事件，并切换到竖屏。
@@ -193,6 +202,16 @@ public interface IPLVLCMediaLayout {
      * 更新ppt状态数据变更
      */
     void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
+
+    /**
+     * 画笔模式文本工具提示输入
+     */
+    void onPaintEditText(PLVPPTPaintStatus paintStatus);
+
+    /**
+     * 是否在画笔模式
+     */
+    boolean isInPaintMode();
 
     /**
      * 当加入RTC时，更新布局
@@ -264,6 +283,13 @@ public interface IPLVLCMediaLayout {
      * @param toShow true：显示，false：隐藏
      */
     void onTurnPageLayoutChange(boolean toShow);
+
+    /**
+     * 通知布局位置
+     *
+     * @param isInLinkMicList 是否在连麦列表内
+     */
+    void notifyMediaLayoutPosition(boolean isInLinkMicList);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -347,7 +373,7 @@ public interface IPLVLCMediaLayout {
     /**
      * 设置聊天回放是否可用
      */
-    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled);
+    void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">
@@ -376,7 +402,12 @@ public interface IPLVLCMediaLayout {
          * @param message 发送的信息
          * @return <是否发送成功, 结果码>
          */
-        Pair<Boolean, Integer> onSendChatMessageAction(String message);
+        Pair<Boolean, Integer> onSendChatMessageAction(String message, @Nullable PLVChatQuoteVO chatQuoteVO);
+
+        @Nullable
+        PLVChatQuoteVO getChatQuoteContent();
+
+        void onCloseChatQuote();
 
         /**
          * 显示公告动作（直播独有）
@@ -416,6 +447,33 @@ public interface IPLVLCMediaLayout {
          * rtc观看是否正在暂停
          */
         boolean isRtcPausing();
+
+        /**
+         * 回调画笔模式
+         *
+         * @param isInPaintMode 是否正在画笔模式
+         */
+        void onPaintModeChanged(boolean isInPaintMode);
+
+        /**
+         * 回调画笔工具变更
+         */
+        void onPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool);
+
+        /**
+         * 回调画笔工具颜色变更
+         */
+        void onPaintMarkToolColorChanged(PLVLCMarkToolEnums.Color color);
+
+        /**
+         * 回调撤销上一步画笔
+         */
+        void onPaintUndo();
+
+        /**
+         * 回调文本画笔工具内容变更
+         */
+        void onFinishChangeTextContent(String content);
     }
     // </editor-fold>
 
