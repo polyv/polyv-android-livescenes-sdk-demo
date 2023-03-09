@@ -83,6 +83,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private static final String EXTRA_VIEWER_ID = "viewerId";   // 观看者Id
     private static final String EXTRA_VIEWER_NAME = "viewerName";   // 观看者昵称
     private static final String EXTRA_VIEWER_AVATAR = "viewerAvatar";//观看者头像地址
+    private static final String EXTRA_VIEWER_PARAM4 = "liveParam4";
+    private static final String EXTRA_VIEWER_PARAM5 = "liveParam5";
     private static final String EXTRA_VID = "vid";//视频Id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
@@ -125,7 +127,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName,@NonNull String viewerAvatar) {
+    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull String viewerId, @NonNull String viewerName,@NonNull String viewerAvatar, @NonNull String param4, @NonNull String param5) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动直播带货直播页失败！");
         }
@@ -143,6 +145,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
+        intent.putExtra(EXTRA_VIEWER_PARAM4, param4);
+        intent.putExtra(EXTRA_VIEWER_PARAM5, param5);
         intent.putExtra(EXTRA_IS_LIVE, true);
         activity.startActivity(intent);
         return PLVLaunchResult.success();
@@ -166,7 +170,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar, PLVPlaybackListType videoListType) {
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar, @NonNull String param4, @NonNull String param5, PLVPlaybackListType videoListType) {
         if (activity == null) {
             return PLVLaunchResult.error("activity 为空，启动直播带货回放页失败！");
         }
@@ -188,6 +192,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
+        intent.putExtra(EXTRA_VIEWER_PARAM4, param4);
+        intent.putExtra(EXTRA_VIEWER_PARAM5, param5);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
@@ -278,6 +284,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         final String viewerId = intent.getStringExtra(EXTRA_VIEWER_ID);
         final String viewerName = intent.getStringExtra(EXTRA_VIEWER_NAME);
         final String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
+        final String liveParam4 = intent.getStringExtra(EXTRA_VIEWER_PARAM4);
+        final String liveParam5 = intent.getStringExtra(EXTRA_VIEWER_PARAM5);
         final String vid = intent.getStringExtra(EXTRA_VID);
         final PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
 
@@ -285,7 +293,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setIsLive(isLive);
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, viewerAvatar,
                 PolyvLinkMicConfig.getInstance().getLiveChannelType() == PolyvLiveChannelType.PPT
-                        ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT);
+                        ? PLVSocketUserConstant.USERTYPE_SLICE : PLVSocketUserConstant.USERTYPE_STUDENT, null, liveParam4, liveParam5);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
 
         PLVFloatingPlayerManager.getInstance().saveIntent(intent);

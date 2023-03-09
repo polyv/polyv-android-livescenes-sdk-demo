@@ -383,7 +383,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     //进入云课堂场景
                     case CLOUDCLASS:
                         if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchLive(PLVLoginWatcherActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar());
+                            PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchLive(PLVLoginWatcherActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar(), null, null);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -394,7 +394,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     //进入直播带货场景
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, getViewerId(), getViewerName(), getViewerAvatar());
+                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, getViewerId(), getViewerName(), getViewerAvatar(), null, null);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -445,6 +445,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                                     getViewerId(),
                                     getViewerName(),
                                     getViewerAvatar(),
+                                    null,
+                                    null,
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
                             );
                             if (!launchResult.isSuccess()) {
@@ -458,7 +460,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
-                                    vid, getViewerId(), getViewerName(), getViewerAvatar(),
+                                    vid, getViewerId(), getViewerName(), getViewerAvatar(), null, null,
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -506,6 +508,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                                     getViewerId(),
                                     getViewerName(),
                                     getViewerAvatar(),
+                                    null,
+                                    null,
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
                             );
                             if (!launchResult.isSuccess()) {
@@ -519,7 +523,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
-                                    vid, getViewerId(), getViewerName(),getViewerAvatar(),
+                                    vid, getViewerId(), getViewerName(),getViewerAvatar(), null, null,
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
