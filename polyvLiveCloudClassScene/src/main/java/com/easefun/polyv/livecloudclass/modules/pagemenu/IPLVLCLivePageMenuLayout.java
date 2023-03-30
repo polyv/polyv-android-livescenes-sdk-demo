@@ -80,8 +80,9 @@ public interface IPLVLCLivePageMenuLayout {
      *
      * @param sessionId sessionId
      * @param channelId 频道号
+     * @param fileId    文件Id
      */
-    void onPlaybackVideoPrepared(String sessionId, String channelId);
+    void onPlaybackVideoPrepared(String sessionId, String channelId, String fileId);
 
     /**
      * 回放视频seek完成

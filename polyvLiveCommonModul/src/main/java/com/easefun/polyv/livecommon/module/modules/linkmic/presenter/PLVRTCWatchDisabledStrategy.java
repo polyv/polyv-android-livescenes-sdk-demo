@@ -2,7 +2,6 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
-import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
@@ -23,7 +22,7 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
 
     /**** core ****/
     private PLVLinkMicPresenter linkMicPresenter;
-    private IPolyvLinkMicManager linkMicManager;
+    private IPLVLinkMicManager linkMicManager;
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVLinkMicEventListener linkMicEventListener;
@@ -36,7 +35,7 @@ public class PLVRTCWatchDisabledStrategy implements IPLVRTCInvokeStrategy {
 
     // <editor-fold defaultstate="collapsed" desc="初始化">
     public PLVRTCWatchDisabledStrategy(PLVLinkMicPresenter linkMicPresenter,
-                                       final IPolyvLinkMicManager linkMicManager,
+                                       final IPLVLinkMicManager linkMicManager,
                                        IPLVLiveRoomDataManager ipliveRoomDataManager,
                                        OnJoinLinkMicListener joinLinkMicListener) {
         this.linkMicPresenter = linkMicPresenter;

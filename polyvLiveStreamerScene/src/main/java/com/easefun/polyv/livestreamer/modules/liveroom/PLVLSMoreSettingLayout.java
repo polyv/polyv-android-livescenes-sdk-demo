@@ -186,6 +186,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         if (shareLayout != null) {
             shareLayout.init(liveRoomDataManager);
         }
+        if (moreSettingBitrateLayout != null) {
+            moreSettingBitrateLayout.init(liveRoomDataManager);
+        }
         observeLiveRoomStatus();
     }
     // </editor-folder>

@@ -371,6 +371,11 @@ public interface IPLVLCMediaLayout {
     String getSessionId();
 
     /**
+     * 获取fileId
+     */
+    String getFileId();
+
+    /**
      * 设置聊天回放是否可用
      */
     void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);

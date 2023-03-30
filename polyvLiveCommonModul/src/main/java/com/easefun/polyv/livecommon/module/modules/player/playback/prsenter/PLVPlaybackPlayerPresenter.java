@@ -212,6 +212,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     }
 
     @Override
+    public String getFileId() {
+        if (videoView != null && videoView.getPlaybackData() != null) {
+            return videoView.getPlaybackData().getFileId();
+        }
+        return null;
+    }
+
+    @Override
     public void seekTo(int duration) {
         if (videoView != null) {
             videoView.seekTo(duration);

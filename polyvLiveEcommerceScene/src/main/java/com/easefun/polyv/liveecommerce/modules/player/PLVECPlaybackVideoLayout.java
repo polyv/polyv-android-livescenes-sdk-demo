@@ -401,6 +401,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     public String getSessionId() {
         return playbackPlayerPresenter.getSessionId();
     }
+
+    @Override
+    public String getFileId() {
+        return playbackPlayerPresenter.getFileId();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view层实现">

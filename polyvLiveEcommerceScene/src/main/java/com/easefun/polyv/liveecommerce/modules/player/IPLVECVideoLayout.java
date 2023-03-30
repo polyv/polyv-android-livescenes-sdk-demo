@@ -264,6 +264,11 @@ public interface IPLVECVideoLayout {
      * 获取sessionId
      */
     String getSessionId();
+
+    /**
+     * 获取文件Id
+     */
+    String getFileId();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">

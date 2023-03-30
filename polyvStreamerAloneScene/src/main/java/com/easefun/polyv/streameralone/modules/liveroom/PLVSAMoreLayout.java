@@ -36,15 +36,20 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.IPLVChatroomManager;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 更多布局
@@ -120,12 +125,26 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private long lastClickCameraSwitchViewTime;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private String channelId;
 
     /**
      * 限制每800ms点击一次
      **/
     private static final long QUICK_CLICK_LIMIT_TIME = 800;
     private long lastClickTime = 0;
+
+    private Map<Integer, Integer> bitrateMapIcon = new HashMap<Integer, Integer>() {{
+        put(PLVStreamerConfig.Bitrate.BITRATE_STANDARD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_HIGH, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
+    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -277,14 +296,31 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 });
     }
+
+    private void initBitrateMapIcon() {
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            bitrateMapIcon.clear();
+            int i = 0;
+            for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
+                i++;
+                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
         if (shareLayout != null) {
             shareLayout.init(liveRoomDataManager);
         }
+        if (bitrateLayout != null) {
+            bitrateLayout.init(liveRoomDataManager);
+        }
+        initBitrateMapIcon();
         observeLiveRoomStatus();
     }
     // </editor-folder>
@@ -401,19 +437,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     if (bitrate == null || getContext() == null) {
                         return;
                     }
-                    String bitrateText = PLVSStreamerConfig.Bitrate.getText(bitrate);
+                    String bitrateText = PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
                     plvsaMoreBitrateTv.setText(bitrateText);
-                    switch (bitrate) {
-                        case PLVSStreamerConfig.Bitrate.BITRATE_STANDARD:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_sd);
-                            break;
-                        case PLVSStreamerConfig.Bitrate.BITRATE_HIGH:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_hd);
-                            break;
-                        case PLVSStreamerConfig.Bitrate.BITRATE_SUPER:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_uhd);
-                            break;
-                        default:
+                    Integer iconId = bitrateMapIcon.get(bitrate);
+                    if (iconId != null) {
+                        plvsaMoreBitrateIv.setImageResource(iconId);
                     }
 
                     if (switchBitrateByUser) {

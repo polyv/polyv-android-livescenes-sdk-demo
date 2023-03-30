@@ -23,8 +23,10 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
+import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
@@ -47,12 +49,14 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.exts.AsyncLazy;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.logcode.chat.PLVErrorCodeChatroomStatus;
 import com.plv.foundationsdk.net.PLVResponseApiBean2;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxBus;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVChannelFeature;
@@ -129,6 +133,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     public static final int GET_CHAT_HISTORY_COUNT = 10;
     //聊天信息处理间隔
     private static final int CHAT_MESSAGE_TIMESPAN = 500;
+
+    // model
+    private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //聊天室数据
@@ -409,14 +417,36 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     @Override
     public void sendChatImage(final PolyvSendLocalImgEvent localImgEvent) {
         PLVCommonLog.d(TAG, "chatroom sendChatImage: " + localImgEvent.getImageFilePath() + ", sessionId: " + liveRoomDataManager.getSessionId());
-        PolyvChatroomManager.getInstance().sendChatImage(localImgEvent, liveRoomDataManager.getSessionId());
-        localImgEvent.setTime(System.currentTimeMillis());
-        callbackToView(new ViewRunnable() {
-            @Override
-            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
-                view.onLocalImageMessage(localImgEvent);
-            }
-        });
+        Disposable disposable = Observable.just(localImgEvent)
+                .observeOn(Schedulers.computation())
+                .doOnNext(new Consumer<PolyvSendLocalImgEvent>() {
+                    @Override
+                    public void accept(PolyvSendLocalImgEvent event) throws Exception {
+                        event.setImageFilePath(PLVImageUtils.compressImage(PLVAppUtils.getApp(), event.getImageFilePath()));
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<PolyvSendLocalImgEvent>() {
+                    @Override
+                    public void accept(final PolyvSendLocalImgEvent event) throws Exception {
+                        if (liveRoomDataManager == null) {
+                            return;
+                        }
+                        PolyvChatroomManager.getInstance().sendChatImage(event, liveRoomDataManager.getSessionId());
+                        event.setTime(System.currentTimeMillis());
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onLocalImageMessage(event);
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
     }
 
     @Override
@@ -1411,6 +1441,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 viewerCount = classDetailVO.getData().getPageView();
                 chatroomData.postLikesCountData(likesCount);
                 chatroomData.postViewerCountData(viewerCount);
+                multiRoomTransmitRepo.updateChannelDetail(classDetailVO);
             }
         };
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);

@@ -25,7 +25,6 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
-import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
@@ -90,7 +89,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         this.liveRoomDataManager = liveRoomDataManager;
 
         observeClassDetailVO();
-        observeCommodityVO();
         observeInteractEntranceData();
     }
     // </editor-fold>
@@ -125,10 +123,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void acceptOpenCommodity() {
     }
 
-    //处理获取到的商品数据
-    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
-    }
-
     //处理获取到的聊天回放开关
     protected void acceptChatPlaybackEnable(boolean isChatPlaybackEnable) {
     }
@@ -149,11 +143,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //设置播放状态
     public void setPlayerState(PLVPlayerState state) {
-    }
-
-    //跳转到购买商品页面
-    public void jumpBuyCommodity() {
-
     }
 
     //设置回放播放信息
@@ -185,8 +174,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
      *
      * @param sessionId sessionId
      * @param channelId 频道号
+     * @param fileId    文件Id
      */
-    public void onPlaybackVideoPrepared(String sessionId, String channelId) {
+    public void onPlaybackVideoPrepared(String sessionId, String channelId, String fileId) {
     }
 
     /**
@@ -315,19 +305,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         boolean isChatPlaybackEnable = classDetailVO.getData().isChatPlaybackEnabled();
                         acceptChatPlaybackEnable(isChatPlaybackEnable);
                     }
-                }
-            }
-        });
-    }
-
-    private void observeCommodityVO() {
-        //当前页面 监听 直播间数据管理器对象中的直播商品数据变化
-        liveRoomDataManager.getCommodityVO().observe(this, new Observer<PLVStatefulData<PLVCommodityVO2>>() {
-            @Override
-            public void onChanged(@Nullable PLVStatefulData<PLVCommodityVO2> commodityVO) {
-                if (commodityVO != null && commodityVO.isSuccess()) {
-                    boolean isAddOrSet = liveRoomDataManager.getCommodityRank() <= -1;
-                    acceptCommodityVO(commodityVO.getData(), !isAddOrSet);
                 }
             }
         });

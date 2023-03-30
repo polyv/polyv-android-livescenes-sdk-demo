@@ -19,6 +19,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
+import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -113,6 +114,7 @@ public class PLVECFloatingWindow {
                                 requestShowByUser = false;
                                 restoreContentLayoutParam();
                                 PLVFloatingPlayerManager.getInstance().clear();
+                                AppUtils.bring2Front(contentAnchorLayout.getContext());
                                 savedIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 final boolean needReLogin = ((Activity) contentAnchorLayout.getContext()).isFinishing();
                                 if (needReLogin) {

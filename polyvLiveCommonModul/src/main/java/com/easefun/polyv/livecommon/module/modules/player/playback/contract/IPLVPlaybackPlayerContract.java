@@ -284,6 +284,11 @@ public interface IPLVPlaybackPlayerContract {
         String getSessionId();
 
         /**
+         * 获取fileId
+         */
+        String getFileId();
+
+        /**
          * 跳转到指定的视频时间
          *
          * @param duration 时间，单位：ms
