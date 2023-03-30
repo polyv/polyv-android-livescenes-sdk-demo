@@ -43,6 +43,7 @@ import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
@@ -163,7 +164,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     /**** 推流参数 ****/
     @PLVStreamerConfig.BitrateType
-    private int curBitrate = loadBitrate();
+    private int curBitrate = 0;
     private boolean curCameraFront = true;
     private boolean curEnableRecordingAudioVolume = true;
     private boolean curEnableLocalVideo = true;
@@ -203,6 +204,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     public PLVStreamerPresenter(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
         streamerData = new PLVStreamerData();
+        curBitrate = loadBitrate();
 
         String viewerId = liveRoomDataManager.getConfig().getUser().getViewerId();
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
@@ -421,7 +423,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public int getMaxBitrate() {
-        return PLVStreamerInnerDataTransfer.getInstance().getSupportedMaxBitrate();
+        return PLVStreamerInnerDataTransfer.getInstance().getSupportedMaxBitrateCombineTemplate();
     }
 
     @Override
@@ -1523,21 +1525,38 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     // <editor-fold defaultstate="collapsed" desc="数据存储">
     private void saveBitrate() {
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(liveRoomDataManager.getConfig().getChannelId());
+        int maxSettingBitrate = PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH;
+        String key = "plv_key_bitrate";
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            maxSettingBitrate = pushStreamTemplateJsonBean.getVideoParams().size();
+            key = "plv_key_template_bitrate";
+        }
         if (curBitrate < PLVStreamerConfig.Bitrate.BITRATE_STANDARD
-                || curBitrate > PLVStreamerConfig.Bitrate.BITRATE_SUPER) {
+                || curBitrate > maxSettingBitrate) {
             // invalid bitrate data
             return;
         }
-        SPUtils.getInstance().put("plv_key_bitrate", curBitrate);
+        SPUtils.getInstance().put(key, curBitrate);
     }
 
     private int loadBitrate() {
-        int bitrate = SPUtils.getInstance().getInt("plv_key_bitrate", PLVStreamerConfig.Bitrate.BITRATE_SUPER);
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(liveRoomDataManager.getConfig().getChannelId());
+        int maxSettingBitrate = PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH;
+        int defaultSettingBitrate = PLVStreamerConfig.Bitrate.BITRATE_SUPER;
+        String key = "plv_key_bitrate";
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            maxSettingBitrate = pushStreamTemplateJsonBean.getVideoParams().size();
+            String defaultQualityLevel = PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) ? pushStreamTemplateJsonBean.getTeacherDefaultQualityLevel() : pushStreamTemplateJsonBean.getGuestDefaultQualityLevel();
+            defaultSettingBitrate = PLVStreamerConfig.QualityLevel.getBitrateByLevel(defaultQualityLevel);
+            key = "plv_key_template_bitrate";
+        }
+        int bitrate = SPUtils.getInstance().getInt(key, defaultSettingBitrate);
         if (bitrate < PLVStreamerConfig.Bitrate.BITRATE_STANDARD) {
             bitrate = PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
         }
-        if (bitrate > PLVStreamerConfig.Bitrate.BITRATE_SUPER) {
-            bitrate = PLVStreamerConfig.Bitrate.BITRATE_SUPER;
+        if (bitrate > maxSettingBitrate) {
+            bitrate = maxSettingBitrate;
         }
         return bitrate;
     }

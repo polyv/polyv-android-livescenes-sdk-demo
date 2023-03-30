@@ -241,7 +241,7 @@ public class PLVSAShareLayout extends FrameLayout implements View.OnClickListene
                         posterFragment = new PosterFragment();
                         posterFragment.init(url);
                         fragmentTransaction.replace(R.id.plvsa_share_poster_ly, posterFragment, "PosterFragment");
-                        fragmentTransaction.commitAllowingStateLoss();
+                        fragmentTransaction.commitNowAllowingStateLoss();
                         PLVCommonLog.d(TAG, "poster url：" + url);
                     }
                 }, new Consumer<Throwable>() {

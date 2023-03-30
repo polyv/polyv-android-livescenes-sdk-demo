@@ -39,7 +39,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomV
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
-import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
+import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVOutsideTouchableLayout;
@@ -317,8 +317,7 @@ public class PLVHCChatroomLayout extends FrameLayout implements IPLVHCChatroomLa
     public void handleImgSelectResult(Intent data) {
         final Uri selectedUri = data.getData();
         if (selectedUri != null) {
-            String picturePath = PLVUriPathHelper.getPrivatePath(getContext(), selectedUri);
-            sendImg(picturePath);
+            sendImg(PLVImageUtils.transformUriToFilePath(getContext(), selectedUri));
         } else {
             PLVHCToast.Builder.context(getContext())
                     .setText(R.string.plv_chat_cannot_retrieve_selected_image)

@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,10 +47,8 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanP
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatInputWindow;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityAdapter;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailActivity;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupView;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout;
+import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
+import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
@@ -62,7 +59,6 @@ import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
-import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -72,11 +68,7 @@ import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
-import com.plv.socket.event.commodity.PLVProductContentBean;
-import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
-import com.plv.socket.event.commodity.PLVProductMoveEvent;
-import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
@@ -123,10 +115,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private Rect videoViewRect;
     //商品
     private ImageView commodityIv;
-    private PLVECCommodityPopupView commodityPopupView;
-    private boolean isOpenCommodityMenu;
-    private PLVECCommodityPushLayout commodityPushLayout;
-    private String lastJumpBuyCommodityLink;
+    private PLVECCommodityPopupLayout2 commodityPopupLayout;
+    private PLVECCommodityPushLayout2 commodityPushLayout;
     //打赏
     private ImageView rewardIv;
 
@@ -231,15 +221,14 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         moreIv.setOnClickListener(this);
         commodityIv = findViewById(R.id.commodity_iv);
         commodityIv.setOnClickListener(this);
-        commodityPushLayout = findViewById(R.id.commodity_push_ly);
         rewardIv = findViewById(R.id.reward_iv);
         rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
         rewardIv.setOnClickListener(this);
         morePopupView = new PLVECMorePopupView();
-        commodityPopupView = new PLVECCommodityPopupView();
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
         if (getContext() != null) {
             chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
+            commodityPopupLayout = new PLVECCommodityPopupLayout2(getContext());
         }
 
         //打赏动画特效
@@ -250,6 +239,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         svgaHelper.init(rewardSvgImage, svgaParser);
 
         networkTipsView = findViewById(R.id.plvec_live_network_tips_layout);
+
+        commodityPushLayout = findViewById(R.id.plvec_commodity_push_layout);
+        commodityPushLayout.setAnchor(commodityIv);
 
         interactEntranceView = findViewById(R.id.plvec_interact_entrance_ly);
         interactEntranceView.changeLayoutStyle(false);
@@ -314,6 +306,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                         PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                                 .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_VIEWER_QUOTE_REPLY)
                 );
+                commodityPopupLayout.init(liveRoomDataManager);
             }
         });
     }
@@ -344,17 +337,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     @Override
     protected void acceptOpenCommodity() {
-        isOpenCommodityMenu = true;
         commodityIv.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    protected void acceptCommodityVO(PLVCommodityVO2 commodityVO, boolean isAddOrSet) {
-        if (isAddOrSet) {
-            commodityPopupView.addCommodityVO(commodityVO);
-        } else {
-            commodityPopupView.setCommodityVO(commodityVO);
-        }
     }
 
     @Override
@@ -385,17 +368,6 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             morePopupView.hideAll();
             morePopupView.updatePlayStateView(View.GONE);
         }
-    }
-
-    @Override
-    public void jumpBuyCommodity() {
-        if (TextUtils.isEmpty(lastJumpBuyCommodityLink)) {
-            return;
-        }
-        commodityPushLayout.hide();
-        commodityPopupView.hide();
-        //默认用当前应用的一个webView页面打开后端填写的链接，另外也可以根据后端填写的信息自行调整需要的操作
-        PLVECCommodityDetailActivity.start(getContext(), lastJumpBuyCommodityLink);
     }
 
     @Override
@@ -633,24 +605,6 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
 
         @Override
-        public void onProductControlEvent(@NonNull PLVProductControlEvent productControlEvent) {
-            super.onProductControlEvent(productControlEvent);
-            acceptProductControlEvent(productControlEvent);
-        }
-
-        @Override
-        public void onProductRemoveEvent(@NonNull PLVProductRemoveEvent productRemoveEvent) {
-            super.onProductRemoveEvent(productRemoveEvent);
-            acceptProductRemoveEvent(productRemoveEvent);
-        }
-
-        @Override
-        public void onProductMoveEvent(@NonNull PLVProductMoveEvent productMoveEvent) {
-            super.onProductMoveEvent(productMoveEvent);
-            acceptProductMoveEvent(productMoveEvent);
-        }
-
-        @Override
         public void onProductMenuSwitchEvent(@NonNull PLVProductMenuSwitchEvent productMenuSwitchEvent) {
             super.onProductMenuSwitchEvent(productMenuSwitchEvent);
 
@@ -853,93 +807,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="商品 - 布局显示、事件处理、推送显示、商品链接跳转等">
-    private void showCommodityLayout(View v) {
-        //清空旧数据
-        commodityPopupView.setCommodityVO(null);
-        //每次弹出都调用一次接口获取商品信息
-        liveRoomDataManager.requestProductList();
-        commodityPopupView.showCommodityLayout(v, new PLVECCommodityAdapter.OnViewActionListener() {
-            @Override
-            public void onBuyCommodityClick(View view, PLVProductContentBean contentsBean) {
-                acceptBuyCommodityClick(contentsBean);
-            }
-
-            @Override
-            public void onLoadMoreData(int rank) {
-                liveRoomDataManager.requestProductList(rank);
-            }
-        });
-    }
-
-    private void acceptProductControlEvent(final PLVProductControlEvent productControlEvent) {
-        if (!isOpenCommodityMenu) {
-            return;
+    // <editor-fold defaultstate="collapsed" desc="商品 - 布局显示">
+    private void showCommodityLayout() {
+        if (commodityPopupLayout != null) {
+            commodityPopupLayout.show();
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                final PLVProductContentBean contentBean = productControlEvent.getContent();
-                if (productControlEvent.getContent() == null) {
-                    return;
-                }
-                if (productControlEvent.isPush()) {//商品推送
-                    commodityPushLayout.setViewActionListener(new PLVECCommodityPushLayout.ViewActionListener() {
-                        @Override
-                        public void onEnterClick() {
-                            acceptBuyCommodityClick(contentBean);
-                        }
-                    });
-                    commodityPushLayout.updateView(contentBean);
-                    commodityPushLayout.show();
-                } else if (productControlEvent.isNewly()) {//新增
-                    commodityPopupView.add(contentBean, true);
-                } else if (productControlEvent.isRedact()) {//编辑
-                    commodityPopupView.update(contentBean);
-                } else if (productControlEvent.isPutOnShelves()) {//上架
-                    commodityPopupView.add(contentBean, false);
-                }
-            }
-        });
-    }
-
-    private void acceptProductRemoveEvent(final PLVProductRemoveEvent productRemoveEvent) {
-        if (!isOpenCommodityMenu) {
-            return;
-        }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (productRemoveEvent.getContent() != null) {
-                    commodityPopupView.delete(productRemoveEvent.getContent().getProductId());//删除/下架
-                    if (commodityPushLayout.isShown() && commodityPushLayout.getProductId() == productRemoveEvent.getContent().getProductId()) {
-                        commodityPushLayout.hide();
-                    }
-                }
-            }
-        });
-    }
-
-    private void acceptProductMoveEvent(final PLVProductMoveEvent productMoveEvent) {
-        if (!isOpenCommodityMenu) {
-            return;
-        }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                commodityPopupView.move(productMoveEvent);//移动
-            }
-        });
-    }
-
-    private void acceptBuyCommodityClick(PLVProductContentBean contentBean) {
-        final String link = contentBean.getLinkByType();
-        if (TextUtils.isEmpty(link)) {
-            ToastUtils.showShort(R.string.plv_commodity_toast_empty_link);
-            return;
-        }
-        lastJumpBuyCommodityLink = link;
-        jumpBuyCommodity();
     }
     // </editor-fold>
 
@@ -1065,7 +937,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             chatroomPresenter.sendLikeMessage();
             acceptLikesMessage(1);
         } else if (id == R.id.commodity_iv) {
-            showCommodityLayout(v);
+            showCommodityLayout();
         } else if (id == R.id.reward_iv) {
             if (isOpenPointReward) {
                 //回调显示积分打赏弹窗

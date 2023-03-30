@@ -543,6 +543,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     public String getSessionId() {
         return null;
     }
+
+    @Override
+    public String getFileId() {
+        return null;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - MVP模式的view层实现">

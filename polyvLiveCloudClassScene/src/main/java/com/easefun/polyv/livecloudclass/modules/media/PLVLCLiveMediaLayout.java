@@ -1069,6 +1069,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public String getFileId() {
+        return null;
+    }
+
+    @Override
     public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
 
     }

@@ -744,6 +744,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public String getFileId() {
+        return playbackPlayerPresenter.getFileId();
+    }
+
+    @Override
     public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
         mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled, isLiveType);
     }

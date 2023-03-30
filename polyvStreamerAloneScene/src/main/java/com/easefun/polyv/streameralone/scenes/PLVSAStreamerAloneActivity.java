@@ -23,11 +23,10 @@ import android.view.WindowManager;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
-import com.easefun.polyv.livecommon.module.modules.beauty.di.PLVBeautyModule;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
-import com.easefun.polyv.livecommon.module.modules.linkmic.di.PLVLinkMicModule;
+import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -301,8 +300,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVLinkMicModule.instance)
-                .addModule(PLVBeautyModule.instance);
+                .addModule(PLVCommonModule.instance);
     }
 
     // </editor-fold>

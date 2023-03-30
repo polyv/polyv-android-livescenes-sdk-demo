@@ -27,6 +27,8 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
+import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
+import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
 import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVLivePlayerData;
 import com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO;
@@ -42,6 +44,7 @@ import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVLiveVideoParams;
 import com.plv.business.model.video.PLVWatermarkVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVControlUtils;
@@ -54,6 +57,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
 /**
  * mvp-直播播放器presenter层实现，实现 IPLVLivePlayerContract.ILivePlayerPresenter 接口
  */
@@ -61,6 +67,10 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLivePlayerPresenter.class.getSimpleName();
     private static final int WHAT_PLAY_PROGRESS = 1;
+
+    // model
+    private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
+
     //设置是否要开启片头广告
     private boolean isAllowOpenAdHead = false;
     //设置是否允许跑马灯运行
@@ -78,6 +88,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     //logo对象
     private PLVPlayerLogoView logoView;
 
+    // 转播数据
+    @Nullable
+    private Disposable transmitDataObserver = null;
+    @Nullable
+    private PLVMultiRoomTransmitVO transmitVO = null;
+
     private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
 
     private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
@@ -87,7 +103,33 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     public PLVLivePlayerPresenter(@NonNull IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
         livePlayerData = new PLVLivePlayerData();
+
+        observeTransmitChangeEvent();
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="初始化">
+
+    private void observeTransmitChangeEvent() {
+        transmitDataObserver = multiRoomTransmitRepo.transmitObservable
+                .retry()
+                .subscribe(new Consumer<PLVMultiRoomTransmitVO>() {
+                    @Override
+                    public void accept(PLVMultiRoomTransmitVO multiRoomTransmitVO) throws Exception {
+                        final boolean isWatchMainRoomLastTime = transmitVO != null && transmitVO.isWatchMainRoom();
+                        transmitVO = multiRoomTransmitVO;
+                        if (isWatchMainRoomLastTime != multiRoomTransmitVO.isWatchMainRoom()) {
+                            restartPlay();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLivePlayerContract.ILivePlayerPresenter定义的方法">
@@ -133,7 +175,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         removeWatermark();
         resetErrorViewStatus();
         PLVLiveVideoParams liveVideoParams = new PLVLiveVideoParams(
-                getConfig().getChannelId(),
+                getCurrentPlayerChannelId(),
                 getConfig().getAccount().getUserId(),
                 getConfig().getUser().getViewerId()
         );
@@ -347,6 +389,9 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         stopMarqueeView();
         unregisterView();
         removeWatermark();
+        if (transmitDataObserver != null) {
+            transmitDataObserver.dispose();
+        }
         if (logoView != null) {
             logoView.removeAllViews();
             logoView = null;
@@ -873,6 +918,13 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 view.updatePlayInfo(builder.build());
             }
         }
+    }
+
+    private String getCurrentPlayerChannelId() {
+        if (transmitVO == null || !transmitVO.isWatchMainRoom()) {
+            return getConfig().getChannelId();
+        }
+        return transmitVO.mainRoomChannelId;
     }
     // </editor-fold>
 

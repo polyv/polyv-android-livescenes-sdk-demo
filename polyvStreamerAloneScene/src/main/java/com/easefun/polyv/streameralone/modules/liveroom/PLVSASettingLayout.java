@@ -48,6 +48,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -75,6 +76,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private String channelId;
     //data
     private boolean isFrontCamera;
     private boolean isMirrorMode;
@@ -124,6 +126,19 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private boolean isBeautyLayoutShowing = false;
 
     private long lastClickCameraSwitchViewTime;
+
+    private Map<Integer, Integer> bitrateMapIcon = new HashMap<Integer, Integer>() {{
+        put(PLVStreamerConfig.Bitrate.BITRATE_STANDARD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_HIGH, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
+    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -236,7 +251,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 if (onViewActionListener != null) {
                     onViewActionListener.onBitrateClick(bitrate);
                 }
-                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrate));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId));
                 updateBitrateIcon(bitrate);
                 PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrate);
             }
@@ -362,16 +377,31 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         return PLVSocketUserConstant.USERTYPE_GUEST.equals(userType);
     }
+
+    private void initBitrateMapIcon() {
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            bitrateMapIcon.clear();
+            int i = 0;
+            for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
+                i++;
+                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSASettingLayout定义的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
 
         this.liveTitle = liveRoomDataManager.getConfig().getChannelName();
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
+        bitrateLayout.init(liveRoomDataManager);
+        initBitrateMapIcon();
         initStartLiveBtnText();
         initPushResolutionRatioLayout();
 
@@ -385,7 +415,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (onViewActionListener != null) {
             Pair<Integer, Integer> bitrateInfo = onViewActionListener.getBitrateInfo();
             if (bitrateInfo != null) {
-                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrateInfo.second));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrateInfo.second, channelId));
                 updateBitrateIcon(bitrateInfo.second);
                 PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrateInfo.second);
             }
@@ -468,7 +498,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         return;
                     }
                     switchBitrateByUser = false;
-                    String toastText = "已切换为" + PLVStreamerConfig.Bitrate.getText(bitrate);
+                    String toastText = "已切换为" + PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -693,17 +723,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private void updateBitrateIcon(int selectedBitrate) {
-        switch (selectedBitrate) {
-            case PLVStreamerConfig.Bitrate.BITRATE_STANDARD:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_sd);
-                break;
-            case PLVStreamerConfig.Bitrate.BITRATE_HIGH:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_hd);
-                break;
-            case PLVStreamerConfig.Bitrate.BITRATE_SUPER:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_uhd);
-                break;
-            default:
+        Integer iconId = bitrateMapIcon.get(selectedBitrate);
+        if (iconId != null) {
+            plvsaSettingBitrateIv.setImageResource(iconId);
         }
     }
 

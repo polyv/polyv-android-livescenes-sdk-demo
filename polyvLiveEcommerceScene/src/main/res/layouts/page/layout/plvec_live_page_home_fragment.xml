@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/plvec_margin_common"
-    android:paddingTop="@dimen/plvec_margin_top">
+    android:paddingTop="@dimen/plvec_margin_top"
+    android:paddingBottom="@dimen/plvec_margin_common">
 
     <!--观看信息布局-->
     <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView
@@ -22,8 +22,8 @@
         android:layout_height="24dp"
         android:layout_below="@+id/watch_info_ly"
         android:layout_marginLeft="@dimen/plvec_margin_common"
-        android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_marginTop="@dimen/plvec_margin_common"
+        android:layout_marginRight="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -47,10 +47,10 @@
     <!--    积分打赏动画-->
     <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget
         android:id="@+id/plvec_point_reward_effect"
-        android:layout_above="@+id/greet_ly"
-        android:layout_marginBottom="@dimen/plvec_margin_common"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/greet_ly"
+        android:layout_marginBottom="@dimen/plvec_margin_common" />
 
     <!--欢迎语布局-->
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView
@@ -103,8 +103,8 @@
         android:id="@+id/send_msg_tv"
         android:layout_width="165dp"
         android:layout_height="32dp"
-        android:layout_marginLeft="@dimen/plvec_margin_common"
         android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/plvec_margin_common"
         android:background="@drawable/plvec_watch_info_corner_bg"
         android:drawableLeft="@drawable/plvec_chat_msg"
         android:drawablePadding="6dp"
@@ -122,19 +122,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_toLeftOf="@+id/reward_iv"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:src="@drawable/plvec_shopping_trolley" />
-
-    <!--商品推送布局-->
-    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout
-        android:id="@+id/commodity_push_ly"
-        android:layout_width="match_parent"
-        android:layout_height="86dp"
-        android:layout_above="@+id/commodity_iv"
-        android:layout_marginLeft="@dimen/plvec_margin_common"
-        android:layout_marginRight="94dp"
-        android:layout_marginBottom="4dp"
+        android:src="@drawable/plvec_shopping_trolley"
         android:visibility="gone"
         tools:visibility="visible" />
 
@@ -227,8 +215,8 @@
         android:id="@+id/more_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_above="@+id/more_iv"
+        android:layout_alignParentRight="true"
         android:layout_marginBottom="14dp"
         android:gravity="right"
         android:orientation="vertical">
@@ -236,10 +224,10 @@
         <!--点赞布局-->
         <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView
             android:id="@+id/like_bt"
-            android:layout_height="160dp"
             android:layout_width="42dp"
-            android:layout_marginBottom="-3dp"
-            android:layout_marginRight="10dp" />
+            android:layout_height="160dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="-3dp" />
 
         <!--点赞数-->
         <TextView
@@ -257,18 +245,27 @@
     <!--    打赏动画  -->
     <com.opensource.svgaplayer.SVGAImageView
         android:id="@+id/plvec_reward_svg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:layout_marginTop="90dp"
         android:layout_marginBottom="90dp"
-        android:layout_gravity="center"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
         android:visibility="visible"
-        app:source="posche.svga"
-        app:autoPlay="true"/>
+        app:autoPlay="true"
+        app:source="posche.svga" />
 
     <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView
         android:id="@+id/plvec_live_network_tips_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2
+        android:id="@+id/plvec_commodity_push_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/commodity_iv"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="4dp" />
 
 </RelativeLayout>

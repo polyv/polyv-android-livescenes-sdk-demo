@@ -39,7 +39,6 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean isNeedShow = false;
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">

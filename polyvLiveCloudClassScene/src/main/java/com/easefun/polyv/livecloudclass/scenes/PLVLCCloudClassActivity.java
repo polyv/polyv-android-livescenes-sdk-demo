@@ -34,14 +34,12 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
-import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
+import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
-import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.config.PLVPlaybackCacheVideoConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -311,9 +309,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVPlaybackCacheModule.instance)
-                .addModule(PLVPlaybackChapterModule.instance)
-                .addModule(PLVCommodityModule.instance)
+                .addModule(PLVCommonModule.instance)
                 .addModule(PLVLCFloatingWindowModule.instance);
     }
 
@@ -741,7 +737,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     switch (playerState) {
                         case PREPARED:
                             floatingPPTLayout.show();
-                            livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId());
+                            livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), mediaLayout.getFileId());
                             break;
                         case IDLE:
                             floatingPPTLayout.hide();

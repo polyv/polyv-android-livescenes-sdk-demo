@@ -28,11 +28,12 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
+import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
+import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
-import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.config.PLVPlaybackCacheVideoConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -262,8 +263,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     private void injectDependency() {
         PLVDependManager.getInstance().switchStore(this)
-                .addModule(PLVPlaybackCacheModule.instance)
-                .addModule(PLVPlaybackChapterModule.instance)
+                .addModule(PLVCommonModule.instance)
                 .addModule(PLVECFloatingWindowModule.instance);
     }
 
@@ -652,7 +652,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             public void onChanged(@Nullable PLVPlayerState state) {
                 commonHomeFragment.setPlayerState(state);
                 if (PLVPlayerState.PREPARED.equals(state)) {
-                    commonHomeFragment.onPlaybackVideoPrepared(videoLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId());
+                    commonHomeFragment.onPlaybackVideoPrepared(videoLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), videoLayout.getFileId());
                 }
             }
         });

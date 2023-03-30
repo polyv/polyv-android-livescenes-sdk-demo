@@ -24,8 +24,8 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
-import com.easefun.polyv.livecommon.module.utils.PLVUriPathHelper;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
 import com.easefun.polyv.livehiclass.R;
@@ -99,8 +99,7 @@ public class PLVHCChatMsgInputWindow extends PLVInputWindow implements View.OnCl
         if (requestCode == REQUEST_SELECT_IMG && resultCode == Activity.RESULT_OK) {
             final Uri selectedUri = data.getData();
             if (selectedUri != null) {
-                String picturePath = PLVUriPathHelper.getPrivatePath(this, selectedUri);
-                sendImg(picturePath);
+                sendImg(PLVImageUtils.transformUriToFilePath(this, selectedUri));
             } else {
                 PLVHCToast.Builder.context(this)
                         .setText(R.string.plv_chat_cannot_retrieve_selected_image)

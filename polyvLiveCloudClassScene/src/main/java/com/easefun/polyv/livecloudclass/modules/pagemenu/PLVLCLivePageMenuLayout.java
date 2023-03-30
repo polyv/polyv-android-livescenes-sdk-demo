@@ -96,6 +96,8 @@ import com.plv.thirdpart.blankj.utilcode.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.Triple;
+
 /**
  * 直播页面菜单布局，实现 IPLVLCLivePageMenuLayout 接口
  */
@@ -121,7 +123,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private IPLVChatPlaybackManager chatPlaybackManager;
     private boolean chatPlaybackEnabled;
     //播放器准备完成的聊天回放任务
-    private List<Pair<String, String>> needAddedChatPlaybackTask = new ArrayList<>();
+    private List<Triple<String, String, String>> needAddedChatPlaybackTask = new ArrayList<>();
 
     //回放Presenter
     private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPlaybackPresenter;
@@ -417,12 +419,12 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
-    public void onPlaybackVideoPrepared(String sessionId, String channelId) {
+    public void onPlaybackVideoPrepared(String sessionId, String channelId, String fileId) {
         if (needAddedChatPlaybackTask != null) {
-            needAddedChatPlaybackTask.add(new Pair<>(sessionId, channelId));
+            needAddedChatPlaybackTask.add(new Triple<>(sessionId, channelId, fileId));
         }
         if (isChatPlaybackEnabled() && chatPlaybackManager != null) {
-            chatPlaybackManager.start(sessionId, channelId);
+            chatPlaybackManager.start(sessionId, channelId, fileId);
         }
     }
 
@@ -711,8 +713,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // <editor-fold defaultstate="collapsed" desc="聊天回放 - 初始化">
     private void checkStartChatPlayback() {
         if (needAddedChatPlaybackTask != null && needAddedChatPlaybackTask.size() > 0) {
-            Pair<String, String> data = needAddedChatPlaybackTask.get(needAddedChatPlaybackTask.size() - 1);
-            chatPlaybackManager.start(data.first, data.second);
+            Triple<String, String, String> data = needAddedChatPlaybackTask.get(needAddedChatPlaybackTask.size() - 1);
+            chatPlaybackManager.start(data.getFirst(), data.getSecond(), data.getThird());
         }
         needAddedChatPlaybackTask = null;
     }
