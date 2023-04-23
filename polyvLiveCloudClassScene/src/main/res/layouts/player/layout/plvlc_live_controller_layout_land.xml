@@ -166,7 +166,7 @@
         app:src_wh="36dp"
         tools:visibility="visible" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/plvlc_controller_widget_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -287,6 +287,6 @@
             app:layout_constraintEnd_toStartOf="@+id/plvlc_live_player_controller_enter_paint_iv"
             app:layout_constraintStart_toStartOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

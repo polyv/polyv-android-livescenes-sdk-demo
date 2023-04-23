@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.redpack.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.modules.redpack.model.datasource.PLVRedpackLocalDataSource;
 import com.easefun.polyv.livecommon.module.modules.redpack.model.datasource.PLVRedpackMemoryDataSource;

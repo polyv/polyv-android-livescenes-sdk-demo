@@ -24,7 +24,6 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVAuthorizationBean;
 import com.plv.socket.user.PLVSocketUserBean;

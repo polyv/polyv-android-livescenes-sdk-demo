@@ -60,7 +60,6 @@ import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
-import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;

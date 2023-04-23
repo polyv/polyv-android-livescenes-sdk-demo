@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.vo;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.model.enums.PLVRedPaperType;
 

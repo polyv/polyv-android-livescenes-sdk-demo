@@ -2,8 +2,8 @@ package com.easefun.polyv.livecommon.module.modules.chatroom.model.enums;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Hoshiiro

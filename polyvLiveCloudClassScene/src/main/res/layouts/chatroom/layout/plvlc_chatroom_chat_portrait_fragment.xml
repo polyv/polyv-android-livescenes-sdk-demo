@@ -138,7 +138,7 @@
                     app:plvlc_red_pack_hint_position="left"
                     tools:visibility="visible" />
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp">
@@ -196,7 +196,7 @@
                         app:triangleWidth="10dp"
                         tools:visibility="visible" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 

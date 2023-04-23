@@ -6,12 +6,12 @@ import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreL
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_MODE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_ROUTE;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Gravity;

@@ -2,11 +2,11 @@ package com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;

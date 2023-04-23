@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.redpack.model.datasource.database.converter;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
 

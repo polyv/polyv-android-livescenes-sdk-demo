@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;

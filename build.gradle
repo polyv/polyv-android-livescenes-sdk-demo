@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
     }
 }
@@ -40,9 +40,9 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 31
+    compileSdkVersion = 30
     minSdkVersion = 21
-    targetSdkVersion = 27
+    targetSdkVersion = 28
     versionCode = 1112
     versionName = "1.11.2"
 }

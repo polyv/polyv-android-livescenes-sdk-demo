@@ -14,7 +14,7 @@
         android:visibility="invisible"
         tools:visibility="visible">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/plvec_linkmic_bg_controlbar_portrait"
@@ -91,7 +91,7 @@
                     android:background="@drawable/plvec_linkmic_iv_hide_setting" />
             </LinearLayout>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView>
 </merge>

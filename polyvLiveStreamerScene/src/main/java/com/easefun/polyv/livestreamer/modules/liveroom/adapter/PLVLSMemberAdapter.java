@@ -23,7 +23,6 @@ import com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
-import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
