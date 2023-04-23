@@ -68,6 +68,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -147,6 +148,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     private boolean enableLocalVideoOnJoinLinkMic = false;
     // 加入连麦时是否打开麦克风
     private boolean enableLocalAudioOnJoinLinkMic = false;
+    private boolean isEcommerceLinkMicItemSort = false;
     /**
      * 申请连麦排队序号，从0开始
      * value < 0 表明数据不可用
@@ -299,8 +301,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                                 //添加自己
                                 if (linkMicList.isEmpty()) {
                                     linkMicList.add(selfDataBean);
+                                    sort(linkMicList);
                                 } else {
                                     linkMicList.add(1, selfDataBean);//添加自己
+                                    sort(linkMicList);
                                 }
                             }
 
@@ -320,10 +324,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     while (it.hasNext()) {
                         PLVLinkMicItemDataBean dataBean = it.next();
                         if (dataBean.getLinkMicId().equals(myLinkMicId)) {
+                            it.remove();
                             if (linkMicView != null) {
                                 linkMicView.onUsersLeave(Collections.singletonList(myLinkMicId));
                             }
-                            it.remove();
                             break;
                         }
                     }
@@ -479,6 +483,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     @Override
     public void getJoinAnswerTimeLeft(PLVSugarUtil.Consumer<Integer> callback) {
         linkMicManager.getJoinAnswerTimeLeft(callback);
+    }
+
+    @Override
+    public void setEcommerceLinkMicItemSort(boolean isEcommerceLinkMicItemSort) {
+        this.isEcommerceLinkMicItemSort = isEcommerceLinkMicItemSort;
     }
 
     @Override
@@ -765,6 +774,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         PLVLinkMicItemDataBean itemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(plvJoinInfoEvent);
                         //从连麦列表中添加用户
                         linkMicList.add(itemDataBean);
+                        sort(linkMicList);
                         muteCacheList.updateUserMuteCacheWhenJoinList(itemDataBean);
                         newJoinUserList.add(plvJoinInfoEvent.getUserId());
                     }
@@ -820,6 +830,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         //找出第一画面，并插入到连麦列表顶部
                         PLVLinkMicItemDataBean firstScreenDataBean = null;
                         for (PLVLinkMicItemDataBean plvLinkMicItemDataBean : linkMicList) {
+                            plvLinkMicItemDataBean.setFirstScreen(false);
                             if (plvLinkMicItemDataBean.getLinkMicId().equals(firstScreenLinkMicId)) {
                                 firstScreenDataBean = plvLinkMicItemDataBean;
                                 linkMicList.remove(plvLinkMicItemDataBean);
@@ -827,6 +838,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             }
                         }
                         if (firstScreenDataBean != null) {
+                            firstScreenDataBean.setFirstScreen(true);
                             linkMicList.add(0, firstScreenDataBean);
                         }
                     }
@@ -1149,10 +1161,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             while (it.hasNext()) {
                 PLVLinkMicItemDataBean dataBean = it.next();
                 if (dataBean.getLinkMicId().equals(uid)) {
+                    it.remove();
                     if (linkMicView != null) {
                         linkMicView.onUsersLeave(Collections.singletonList(uid));
                     }
-                    it.remove();
                     break;
                 }
             }
@@ -1289,6 +1301,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             if (rtcInvokeStrategy != null) {
                 rtcInvokeStrategy.setLeaveLinkMic();
             }
+            if (linkMicView != null) {
+                linkMicView.onTeacherHangupMe();
+            }
         }
 
         @Override
@@ -1367,6 +1382,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     // 添加观众
                     linkMicList.add(dataBean);
                 }
+                sort(linkMicList);
                 if (linkMicView != null) {
                     linkMicView.onUsersJoin(Collections.singletonList(dataBean.getLinkMicId()));
                 }
@@ -1473,10 +1489,13 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
                 //2. 将原先的第一画面和新的第一画面的位置进行切换
                 PLVLinkMicItemDataBean oldFirst = linkMicList.get(oldFirstScreenPos);
+                oldFirst.setFirstScreen(false);
+                itemToBeFirst.setFirstScreen(true);
                 linkMicList.remove(oldFirst);
                 linkMicList.remove(itemToBeFirst);
                 linkMicList.add(0, itemToBeFirst);
                 linkMicList.add(indexOfTarget, oldFirst);
+                sort(linkMicList);
                 view.onSwitchFirstScreen(linkMicId);
 
                 //3. 将原先在连麦列表的PPT恢复到原先的位置
@@ -1569,6 +1588,87 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                         linkMicView.onLeaveLinkMic();
                     }
                 }).setCancelable(false).show();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 排序成员列表">
+    private void sort(List<PLVLinkMicItemDataBean> linkMicList) {
+        if (isEcommerceLinkMicItemSort) {
+            SortLinkMicListUtils.sort(linkMicList);
+        }
+    }
+
+    public static class SortLinkMicListUtils {
+        //按第一画面>讲师>自己>嘉宾>管理员>助教>非虚拟用户>虚拟用户类型进行排序
+        private static final String FIRST = "第一画面";
+        private static final String SELF = "自己";
+        private static final String REAL = "非虚拟";
+        private static final String REAL_LINK_MIC_RTC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_RTC_JOIN;
+        private static final String REAL_LINK_MIC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_JOIN;
+        private static final String REAL_LINK_MIC_JOINING = REAL + PLVLinkMicItemDataBean.STATUS_JOINING;
+        private static final String REAL_LINK_MIC_WAIT = REAL + PLVLinkMicItemDataBean.STATUS_WAIT;
+        private static final List<String> SORT_INDEX = Arrays.asList(
+                FIRST,
+                PLVSocketUserConstant.USERTYPE_TEACHER,
+                SELF,
+                PLVSocketUserConstant.USERTYPE_GUEST,
+                PLVSocketUserConstant.USERTYPE_MANAGER,
+                PLVSocketUserConstant.USERTYPE_VIEWER,
+                PLVSocketUserConstant.USERTYPE_ASSISTANT,
+                REAL_LINK_MIC_WAIT,
+                REAL_LINK_MIC_JOINING,
+                REAL_LINK_MIC_JOIN,
+                REAL_LINK_MIC_RTC_JOIN,
+                REAL,
+                PLVSocketUserConstant.USERTYPE_DUMMY
+        );
+
+        private static String getSortType(PLVLinkMicItemDataBean linkMicItemDataBean) {
+            String type = linkMicItemDataBean.getUserType();
+            String myUserId = PLVSocketWrapper.getInstance().getLoginVO().getUserId();
+            if (linkMicItemDataBean.isFirstScreen()) {
+                type = FIRST;
+                return type;
+            }
+            if (myUserId.equals(linkMicItemDataBean.getUserId())) {
+                type = SELF;
+                return type;
+            }
+            if (!PLVSocketUserConstant.USERTYPE_MANAGER.equals(type)
+                    && !PLVSocketUserConstant.USERTYPE_TEACHER.equals(type)
+                    && !PLVSocketUserConstant.USERTYPE_GUEST.equals(type)
+                    && !PLVSocketUserConstant.USERTYPE_VIEWER.equals(type)
+                    && !PLVSocketUserConstant.USERTYPE_ASSISTANT.equals(type)
+                    && !PLVSocketUserConstant.USERTYPE_DUMMY.equals(type)) {
+                if (linkMicItemDataBean.isRtcJoinStatus()) {
+                    type = REAL_LINK_MIC_RTC_JOIN;
+                    return type;
+                } else if (linkMicItemDataBean.isJoinStatus()) {
+                    type = REAL_LINK_MIC_JOIN;
+                    return type;
+                } else if (linkMicItemDataBean.isJoiningStatus()) {
+                    type = REAL_LINK_MIC_JOINING;
+                    return type;
+                } else if (linkMicItemDataBean.isWaitStatus()) {
+                    type = REAL_LINK_MIC_WAIT;
+                    return type;
+                }
+                type = REAL;
+            }
+            return type;
+        }
+
+        public static List<PLVLinkMicItemDataBean> sort(List<PLVLinkMicItemDataBean> linkMicList) {
+            Collections.sort(linkMicList, new Comparator<PLVLinkMicItemDataBean>() {
+                @Override
+                public int compare(PLVLinkMicItemDataBean o1, PLVLinkMicItemDataBean o2) {
+                    int io1 = SORT_INDEX.indexOf(getSortType(o1));
+                    int io2 = SORT_INDEX.indexOf(getSortType(o2));
+                    return io1 - io2;
+                }
+            });
+            return linkMicList;
+        }
     }
     // </editor-fold>
 }

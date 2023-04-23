@@ -71,6 +71,8 @@ public class PLVInteractJSBridgeEventConst {
     //native2js
     public static final String V2_UPDATE_NATIVE_APP_PARAMS_INFO = "updateNativeAppParamsInfo";
     public static final String V2_APP_CALL_WEB_VIEW_EVENT = "appCallWebViewEvent";
+    public static final String EVENT_OPEN_RED_PAPER = "OPEN_RED_PAPER";
+    public static final String V2_UPDATE_CHANNEL_CONFIG = "updateChannelConfig";
 
 
 

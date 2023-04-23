@@ -1,10 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.interact.cardpush;
 
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import android.text.Layout;
+import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,7 +15,6 @@ import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,11 +200,6 @@ public class PLVCardPushManager {
                 } else {
                     cardEnterTipsView.setColor(Color.parseColor("#FF9D4D"), Color.parseColor("#F65F49"));
                 }
-                if (cardEnterTipsView.getTrianglePosition() == PLVTriangleIndicateTextView.POSITION_RIGHT) {
-                    ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) cardEnterTipsView.getLayoutParams();
-                    mlp.bottomMargin = needLookTime > 0 ? ConvertUtils.dp2px(108) : ConvertUtils.dp2px(98);
-                    cardEnterTipsView.setLayoutParams(mlp);
-                }
                 if (needLookTime > 0) {
                     Runnable runnable = new Runnable() {
                         @Override
@@ -217,13 +209,6 @@ public class PLVCardPushManager {
                     };
                     cardEnterTipsView.setTag(runnable);
                     cardEnterTipsView.postDelayed(runnable, 3000);
-                }
-                if (cardEnterTipsView.getVisibility() == View.VISIBLE
-                        && cardEnterTipsView.getTrianglePosition() == PLVTriangleIndicateTextView.POSITION_BOTTOM) {
-                    int cardEnterViewWidth = ConvertUtils.dp2px(36);
-                    float cardEnterTipsViewWidth = Layout.getDesiredWidth(cardEnterTipsView.getText(), cardEnterTipsView.getPaint()) + 2 * cardEnterTipsView.getPaddingStart();
-                    float translationX = (cardEnterViewWidth - cardEnterTipsViewWidth) / 2;
-                    cardEnterTipsView.setTranslationX(-translationX);
                 }
             }
         }, cardEnterTipsViews);
@@ -262,16 +247,6 @@ public class PLVCardPushManager {
                                 textView.setText(PLVTimeUtils.generateTime(remainTime, true));
                                 if (remainTime <= 0) {
                                     textView.setVisibility(View.GONE);
-                                    forView(new RunnableT<PLVTriangleIndicateTextView>() {
-                                        @Override
-                                        public void run(@NonNull PLVTriangleIndicateTextView plvTriangleIndicateTextView) {
-                                            if (plvTriangleIndicateTextView.getTrianglePosition() == PLVTriangleIndicateTextView.POSITION_RIGHT) {
-                                                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) plvTriangleIndicateTextView.getLayoutParams();
-                                                mlp.bottomMargin = ConvertUtils.dp2px(98);
-                                                plvTriangleIndicateTextView.setLayoutParams(mlp);
-                                            }
-                                        }
-                                    }, cardEnterTipsViews);
                                 }
                             }
                         }, cardEnterCdTvs);

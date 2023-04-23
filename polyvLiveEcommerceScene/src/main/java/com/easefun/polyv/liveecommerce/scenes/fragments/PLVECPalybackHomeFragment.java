@@ -3,12 +3,11 @@ package com.easefun.polyv.liveecommerce.scenes.fragments;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLeng
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanPopupView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
@@ -60,6 +60,7 @@ import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -122,6 +123,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //更多回放视频的presenter
     private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPresenter;
     private PLVPreviousView plvPreviousView;
+
+    private PLVECRedpackView chatroomRedPackWidgetView;
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -219,6 +222,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                     chatOverLengthMessageLayout.show(chatMessageDataBean);
                 }
             }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReceiveRedPaper(redPaperEvent);
+                }
+            }
         });
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
@@ -241,6 +251,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         chatPlaybackTipsTv = findViewById(R.id.plvlc_chat_playback_tips_tv);
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
+
+        chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
+        chatroomRedPackWidgetView.initData(liveRoomDataManager);
+
     }
 
     // </editor-fold>
@@ -822,6 +836,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          * @param vid
          */
         void onChangePlaybackVidAndPlay(String vid);
+
+        /**
+         * 回调 拆开红包
+         */
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
     // </editor-fold>
 }

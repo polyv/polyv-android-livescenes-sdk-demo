@@ -9,6 +9,9 @@
 
     <!-- 目前仅有纯视频开播用到 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <!-- 开播所需权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
 
     <application>

@@ -88,6 +88,11 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
     }
 
     @Override
+    public void onTeacherHangupMe() {
+
+    }
+
+    @Override
     public void onNotInLinkMicList() {
 
     }

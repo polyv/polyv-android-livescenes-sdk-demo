@@ -40,7 +40,6 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
@@ -79,6 +78,7 @@ import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackFootDataListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
+import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -87,6 +87,7 @@ import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.NetworkUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -105,7 +106,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     // <editor-fold defaultstate="collapsed" desc="变量">
 
     private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
-    private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -283,10 +283,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (chatFragment == null) {
             chatFragment = tryGetRestoreFragment(PLVLCChatFragment.class);
         }
-        if (chatFragment == null || messageList == null) {
+        if (chatFragment == null || messageList == null || liveRoomDataManager == null) {
             return;
         }
-        chatFragment.init(messageList);
+        chatFragment.init(messageList, liveRoomDataManager);
     }
 
     /**
@@ -561,7 +561,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabTitleList.add(channelMenusBean.getName());
         if (chatFragment == null) {
             chatFragment = new PLVLCChatFragment();
-            chatFragment.init(chatCommonMessageList);
+            chatFragment.init(chatCommonMessageList, liveRoomDataManager);
             chatFragment.setCardPushManager(cardPushManager);
             chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
             chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
@@ -587,6 +587,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onReplyMessage(chatQuoteVO);
+                }
+            }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReceiveRedPaper(redPaperEvent);
                 }
             }
 
@@ -634,6 +641,24 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         //初始化
         previousFragment.init(previousPlaybackPresenter);
         observerPreviousData();
+    }
+
+    /**
+     * 检查是否要插入往期Fragment
+     */
+    private void checkAddPreviousTab() {
+        if (previousFragment != null && pageMenuTabFragmentList.contains(previousFragment)) {
+            return;
+        }
+        //1.SDK中未开启点播列表时——默认选择“读取直播后台回放设置”的参数
+        //2.SDK中开启“点播列表”/通过vid观看时——优先响应“点播列表”/vid观看开关配置
+        if (liveRoomDataManager.getConfig().getVideoListType() == PLVPlaybackListType.VOD
+                && !liveRoomDataManager.getConfig().isLive()
+                && liveRoomDataManager.getConfig().getVid().isEmpty()) {
+            PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean = new PLVLiveClassDetailVO.DataBean.ChannelMenusBean();
+            channelMenusBean.setName("往期");
+            addPreviousTab(channelMenusBean);
+        }
     }
 
     /**
@@ -1076,6 +1101,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 addBuyProductTab(channelMenusBean.getName());
             }
         }
+        checkAddPreviousTab();
         refreshPageMenuTabAdapter();
     }
     // </editor-fold>

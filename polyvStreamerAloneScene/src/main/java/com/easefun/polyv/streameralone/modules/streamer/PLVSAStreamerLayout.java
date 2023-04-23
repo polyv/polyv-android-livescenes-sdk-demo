@@ -58,6 +58,7 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.streamer.IPLVStreamerManager;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -525,6 +526,24 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                                 })
                                 .create();
                         dialog.show();
+                    } else if (errorCode == IPLVStreamerManager.ERROR_SLICE_START_FAIL) {
+                        new PLVSAConfirmDialog(getContext())
+                                .setTitle("直播异常")
+                                .setContent("检测到上课错误 code:" + errorCode + "，是否重新开播")
+                                .setIsNeedLeftBtn(true)
+                                .setCancelable(false)
+                                .setLeftButtonText("继续直播")
+                                .setRightButtonText("重新开播")
+                                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, View v) {
+                                        dialog.dismiss();
+                                        if (onViewActionListener != null) {
+                                            onViewActionListener.onRestartLiveAction();
+                                        }
+                                    }
+                                })
+                                .show();
                     } else {
                         new PLVSAConfirmDialog(getContext())
                                 .setTitle("直播异常")

@@ -46,16 +46,19 @@
         android:id="@+id/plvsa_member_nick_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="14dp"
+        android:layout_toLeftOf="@+id/plvsa_plvsa_member_linkmic_control_ll"
         android:layout_toRightOf="@+id/plvsa_member_user_type_tv"
         android:ellipsize="end"
         android:maxEms="8"
         android:singleLine="true"
-        android:layout_centerVertical="true"
         android:textColor="#F0F1F5"
         android:textSize="14sp"
         tools:text="讲师" />
 
     <LinearLayout
+        android:id="@+id/plvsa_plvsa_member_linkmic_control_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

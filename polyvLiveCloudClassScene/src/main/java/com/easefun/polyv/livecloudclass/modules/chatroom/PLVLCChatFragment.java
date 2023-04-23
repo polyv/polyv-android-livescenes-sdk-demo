@@ -51,6 +51,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTex
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -59,6 +60,7 @@ import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPush
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.viewmodel.PLVMultiRoomTransmitViewModel;
+import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
@@ -100,6 +102,7 @@ import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -122,9 +125,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private static final int REQUEST_OPEN_CAMERA = 0x02;//打开相机请求标志
 
     private final PLVMultiRoomTransmitViewModel multiRoomTransmitViewModel = PLVDependManager.getInstance().get(PLVMultiRoomTransmitViewModel.class);
+    private final PLVRedpackViewModel redpackViewModel = PLVDependManager.getInstance().get(PLVRedpackViewModel.class);
 
     //聊天信息列表
     private PLVLCChatCommonMessageList chatCommonMessageList;
+    // 数据管理
+    private IPLVLiveRoomDataManager liveRoomDataManager;
     //未读信息提醒view
     private TextView unreadMsgTv;
 
@@ -275,8 +281,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void init(PLVLCChatCommonMessageList chatCommonMessageList) {
+    public void init(PLVLCChatCommonMessageList chatCommonMessageList, IPLVLiveRoomDataManager liveRoomDataManager) {
         this.chatCommonMessageList = chatCommonMessageList;
+        this.liveRoomDataManager = liveRoomDataManager;
+
+        redpackViewModel.updateDelayRedpackStatus(liveRoomDataManager.getConfig().getChannelId());
     }
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
@@ -332,6 +341,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     }
                     if (onViewActionListener != null) {
                         onViewActionListener.onReplyMessage(chatQuoteVO);
+                    }
+                }
+
+                @Override
+                public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onReceiveRedPaper(redPaperEvent);
                     }
                 }
             });
@@ -1539,6 +1555,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         void onClickDynamicFunction(String event);
 
         void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+        /**
+         * 回调 拆开红包
+         */
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
     // </editor-fold>
 }

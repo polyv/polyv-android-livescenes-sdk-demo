@@ -10,6 +10,7 @@ import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStat
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 /**
@@ -195,6 +196,11 @@ public interface IPLVLCLivePageMenuLayout {
          * 回调 引用回复消息
          */
         void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+        /**
+         * 回调 拆开红包
+         */
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
 
     }
     // </editor-fold>

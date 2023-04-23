@@ -2,6 +2,7 @@ package com.easefun.polyv.livestreamer.modules.streamer;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -16,6 +17,7 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -28,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
@@ -38,6 +41,7 @@ import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdap
 import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
 import com.easefun.polyv.livestreamer.modules.streamer.position.vo.PLVLSStreamerViewPositionUiState;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.permission.PLVFastPermission;
@@ -45,6 +49,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.streamer.IPLVStreamerManager;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -409,6 +414,21 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                                 })
                                 .create();
                         dialog.show();
+                    } else if (errorCode == IPLVStreamerManager.ERROR_SLICE_START_FAIL) {
+                        PLVLSConfirmDialog.Builder.context(getContext())
+                                .setTitleVisibility(View.GONE)
+                                .setContent("检测到上课错误 code:" + errorCode + "，是否结束直播")
+                                .setLeftButtonText("继续直播")
+                                .setRightButtonText("结束直播")
+                                .setCancelable(false)
+                                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, View v) {
+                                        dialog.dismiss();
+                                        ((Activity) getContext()).finish();
+                                    }
+                                })
+                                .show();
                     } else {
                         PLVToast.Builder.context(getContext())
                                 .setText(throwable.getMessage())

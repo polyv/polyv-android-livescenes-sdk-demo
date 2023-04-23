@@ -16,6 +16,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLeng
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO);
 
         void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
 
     public void callOnChatImgClick(View view, String imgUrl) {
@@ -90,6 +93,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     public void callOnShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
         if (onViewActionListener != null) {
             onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
+        }
+    }
+
+    public void callOnReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onReceiveRedPaper(redPaperEvent);
         }
     }
     // </editor-fold>
@@ -276,6 +285,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
             case PLVChatMessageItemType.ITEMTYPE_REWARD:
                 viewHolder = new PLVECChatMessageRewardViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_custom_gift_item, parent, false),
+                        this
+                );
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_RECEIVE_RED_PAPER:
+                viewHolder = new PLVECChatMessageRedPaperViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_red_paper_item, parent, false),
                         this
                 );
                 break;

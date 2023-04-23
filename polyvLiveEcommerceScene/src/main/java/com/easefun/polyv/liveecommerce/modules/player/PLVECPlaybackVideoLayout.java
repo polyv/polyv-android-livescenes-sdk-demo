@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -254,6 +256,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public PLVPlayerLogoView getLogoView() {
+        return logoView;
+    }
+
+    @Override
     public void setPlayerVolume(int volume) {
         playbackPlayerPresenter.setPlayerVolume(volume);
     }
@@ -284,6 +291,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         if (!isVideoViewPlayingInFloatWindow) {
             fitVideoRatioAndRect();
         }
+    }
+
+    @Override
+    public void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener) {
+        playbackPlayerPresenter.getData().getPlayerState().observe((LifecycleOwner) getContext(), listener);
     }
 
     @Override
@@ -348,6 +360,41 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     @Override
     public LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO() {
         return null;
+    }
+
+    @Override
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+
+    }
+
+    @Override
+    public void updateWhenLeaveRTC() {
+
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic() {
+
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+
+    }
+
+    @Override
+    public void notifyRTCPrepared() {
+
+    }
+
+    @Override
+    public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
+
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+
     }
     // </editor-fold>
 

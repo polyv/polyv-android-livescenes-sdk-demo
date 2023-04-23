@@ -31,6 +31,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -100,6 +101,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
 
             @Override
             public void onReplyMessage(PLVChatQuoteVO quoteVO) {
+
+            }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
 
             }
         });

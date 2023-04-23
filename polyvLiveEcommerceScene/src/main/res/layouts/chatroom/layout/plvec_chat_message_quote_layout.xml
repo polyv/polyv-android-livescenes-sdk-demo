@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="#66000000">
+    tools:background="#A8333333">
 
     <TextView
         android:id="@+id/plvec_chat_quote_msg_name_content_tv"

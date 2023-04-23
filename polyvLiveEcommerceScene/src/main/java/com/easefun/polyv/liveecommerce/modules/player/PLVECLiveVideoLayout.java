@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,10 +46,10 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
-import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -77,8 +78,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private PLVSwitchViewAnchorLayout livePlayerSwitchAnchorLayout;
     //主播放器渲染视图view
     private PolyvLiveVideoView videoView;
-    // RTC播放器容器视图
-    private IPLVECLiveRtcVideoLayout rtcVideoLayout;
     //子播放器渲染视图view
     private PolyvAuxiliaryVideoview subVideoView;
     //子播放器倒计时显示的view
@@ -121,6 +120,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     //Listener
     private IPLVECVideoLayout.OnViewActionListener onViewActionListener;
 
+    //是否加入了RTC
+    private boolean isJoinRTC;
+    //是否加入了连麦
+    private boolean isJoinLinkMic;
+
     /**
      * 暂无直播的图片以及文字
      */
@@ -154,7 +158,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         livePlayerSwitchAnchorLayout = findViewById(R.id.plvec_live_player_switch_anchor_layout);
         videoView = findViewById(R.id.plvec_live_video_view);
-        rtcVideoLayout = findViewById(R.id.plvec_live_rtc_video_container);
 
         playCenterView = findViewById(R.id.play_center);
         hidePlayCenterView();
@@ -183,7 +186,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         initVideoView();
         initPlayErrorView();
-        initRtcVideoLayout();
         initSubVideoViewChangeListener();
         observeFloatingPlayer();
     }
@@ -195,66 +197,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoView.setNoStreamIndicator(nostreamView);
         videoView.setMediaController(mediaController);
 
-        videoView.setOnRTCPlayEventListener(new IPLVLiveListenerEvent.OnRTCPlayEventListener() {
-            @Override
-            public void onRTCLiveStart() {
-                videoView.stopPlay();
-                videoView.setVisibility(View.GONE);
-                rtcVideoLayout.setLiveStart();
-            }
-
-            @Override
-            public void onRTCLiveEnd() {
-                rtcVideoLayout.setLiveEnd();
-                videoView.setVisibility(View.VISIBLE);
-            }
-        });
-
         videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
             @Override
             public void onNetworkQuality(int networkQuality) {
                 if (onViewActionListener != null) {
                     onViewActionListener.acceptNetworkQuality(networkQuality);
-                }
-            }
-        });
-    }
-
-    private void initRtcVideoLayout() {
-        rtcVideoLayout.setOnViewActionListener(new IPLVECLiveRtcVideoLayout.OnViewActionListener() {
-            @Override
-            public void onRtcPrepared() {
-                videoView.rtcPrepared();
-            }
-
-            @Override
-            public void onSizeChanged(final int width, final int height) {
-                if (!isLowLatency || PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
-                    return;
-                }
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean isPortrait = height > width;
-                        PLVVideoSizeUtils.fitVideoRect(isPortrait, videoView.getParent(), videoViewRect);
-                        rtcVideoLayout.requestLayout();
-                    }
-                });
-            }
-
-            @Override
-            public void onUpdatePlayInfo() {
-                if (isPlaying()) {
-                    hidePlayCenterView();
-                } else {
-                    showPlayCenterView();
-                }
-            }
-
-            @Override
-            public void acceptNetworkQuality(int quality) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.acceptNetworkQuality(quality);
                 }
             }
         });
@@ -331,8 +278,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         livePlayerPresenter.registerView(livePlayerView);
         livePlayerPresenter.init();
         livePlayerPresenter.setAllowOpenAdHead(isAllowOpenAdHead);
-
-        rtcVideoLayout.init(liveRoomDataManager);
     }
 
     @Override
@@ -343,13 +288,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public void pause() {
         livePlayerPresenter.pause();
-        rtcVideoLayout.pause();
     }
 
     @Override
     public void resume() {
         livePlayerPresenter.resume();
-        rtcVideoLayout.resume();
     }
 
     @Override
@@ -359,11 +302,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public boolean isPlaying() {
-        if (!isLowLatency) {
-            return livePlayerPresenter.isPlaying();
-        } else {
-            return !rtcVideoLayout.isPausing();
-        }
+        return livePlayerPresenter.isPlaying();
     }
 
     @Override
@@ -374,6 +313,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public String getSubVideoViewHerf() {
         return livePlayerPresenter.getSubVideoViewHerf();
+    }
+
+    @Override
+    public PLVPlayerLogoView getLogoView() {
+        return logoView;
     }
 
     @Override
@@ -410,12 +354,14 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
+    public void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener) {
+        livePlayerPresenter.getData().getPlayerState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
     public void destroy() {
         if (audioModeView != null) {
             audioModeView.onHide();
-        }
-        if (rtcVideoLayout != null) {
-            rtcVideoLayout.destroy();
         }
         if (livePlayerPresenter != null) {
             livePlayerPresenter.destroy();
@@ -491,6 +437,60 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         return livePlayerPresenter.getData().getPlayInfoVO();
     }
 
+    @Override
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+        isJoinRTC = true;
+
+        if (liveRoomDataManager.isSupportRTC()) {
+            //如果支持RTC，连麦时停止播放器播放，使用rtc视频流+rtc音频流
+            livePlayerPresenter.stop();
+        } else {
+            //如果不支持RTC，连麦时静音播放器，使用播放器的cdn视频流+rtc音频流
+            livePlayerPresenter.setPlayerVolume(0);
+        }
+        //禁用播放器手势
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC);
+    }
+
+    @Override
+    public void updateWhenLeaveRTC() {
+        isJoinRTC = false;
+
+        if (liveRoomDataManager.isSupportRTC()) {
+            startPlay();
+        }
+        //恢复播放器手势
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC);
+        //恢复播放器音量
+        livePlayerPresenter.setPlayerVolume(100);
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic() {
+        isJoinLinkMic = true;
+        videoView.setIsLinkMic(true);
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+        isJoinLinkMic = false;
+        videoView.setIsLinkMic(false);
+    }
+
+    @Override
+    public void notifyRTCPrepared() {
+        videoView.rtcPrepared();
+    }
+
+    @Override
+    public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
+        livePlayerPresenter.getData().getLinkMicState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+        videoView.setOnRTCPlayEventListener(listener);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的playback方法，空实现">

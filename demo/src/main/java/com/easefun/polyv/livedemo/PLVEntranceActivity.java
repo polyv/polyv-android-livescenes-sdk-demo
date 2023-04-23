@@ -3,8 +3,7 @@ package com.easefun.polyv.livedemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -27,7 +26,6 @@ public class PLVEntranceActivity extends PLVBaseActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plv_entrance_activity);
-
     }
 
     @Override

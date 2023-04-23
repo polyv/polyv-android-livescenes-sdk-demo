@@ -101,7 +101,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     private void loadWeb() {
         //loadWeb
         if (pptWebView != null) {
-            pptWebView.setPageLoadCallback(new PLVWebview.WebPageLoadCallback() {
+            pptWebView.addPageLoadCallback(new PLVWebview.WebPageLoadCallback() {
                 @Override
                 public void onLoadFinish(WebView view, String url) {
                     PolyvELogSender.send(PolyvPPTElog.class, PolyvPPTElog.PPTEvent.PPT_LOAD_FINISH, "load finish ");
