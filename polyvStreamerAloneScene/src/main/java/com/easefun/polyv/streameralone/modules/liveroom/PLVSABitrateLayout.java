@@ -240,6 +240,9 @@ public class PLVSABitrateLayout extends FrameLayout {
                     notifyDataSetChanged();
                 }
             });
+            if (position >= 3) {
+                holder.itemView.setVisibility(View.GONE);
+            }
         }
 
         @Override

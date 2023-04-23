@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperLandViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperPortViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperResultViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRewardViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
@@ -20,6 +23,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,9 +83,33 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 break;
             case PLVChatMessageItemType.ITEMTYPE_REWARD:
                 viewHolder = new PLVLCRewardViewHolder(
-                        LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_reward_landscape_item : R.layout.plvlc_chatroom_reward_item,parent, false),
+                        LayoutInflater.from(parent.getContext()).inflate(isLandscapeLayout ? R.layout.plvlc_chatroom_reward_landscape_item : R.layout.plvlc_chatroom_reward_item, parent, false),
                         this
                 );
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_RECEIVE_RED_PAPER:
+                if (isLandscapeLayout) {
+                    viewHolder = new PLVLCRedPaperLandViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_red_paper_item_land, parent, false),
+                            this
+                    );
+                } else {
+                    viewHolder = new PLVLCRedPaperPortViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_red_paper_item_port, parent, false),
+                            this
+                    );
+                }
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_RED_PAPER_RESULT:
+                if (!isLandscapeLayout) {
+                    viewHolder = new PLVLCRedPaperResultViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_red_paper_receive_result_item, parent, false),
+                            this
+                    );
+                } else {
+                    viewHolder = new PLVChatMessageBaseViewHolder<>(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plv_horizontal_linear_layout, parent, false), this);
+                }
                 break;
             default:
                 PLVCommonLog.exception(new RuntimeException("itemType error"));
@@ -313,6 +341,8 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         void onShowOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
 
         void onReplyMessage(PLVChatQuoteVO quoteVO);
+
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
@@ -330,6 +360,12 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     public void callOnReplyMessage(PLVChatQuoteVO quoteVO) {
         if (onViewActionListener != null) {
             onViewActionListener.onReplyMessage(quoteVO);
+        }
+    }
+
+    public void callOnReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onReceiveRedPaper(redPaperEvent);
         }
     }
     // </editor-fold>

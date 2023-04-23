@@ -794,6 +794,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onTeacherHangupMe() {
+        ToastUtils.showShort("主播已结束您的连麦");
+    }
+
+    @Override
     public void onNotInLinkMicList() {
         ToastUtils.showShort("连麦重连超时，请重新上麦");
         linkMicPresenter.leaveLinkMic();

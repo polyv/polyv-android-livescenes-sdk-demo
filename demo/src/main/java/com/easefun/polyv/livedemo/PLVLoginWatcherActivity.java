@@ -350,17 +350,17 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
          * PlaybackVideoId=xxx
          */
         //直播登录参数
-        etLiveAppId.setText(PLVLoadParams.LiveAppId);
-        etLiveAppSecert.setText(PLVLoadParams.LiveAppSecert);
-        etLiveUserId.setText(PLVLoadParams.LiveUserId);
-        etLiveChannelId.setText(PLVLoadParams.LiveChannelId);
+        etLiveAppId.setText(com.easefun.polyv.livedemo.PLVLoadParams.LiveAppId);
+        etLiveAppSecert.setText(com.easefun.polyv.livedemo.PLVLoadParams.LiveAppSecert);
+        etLiveUserId.setText(com.easefun.polyv.livedemo.PLVLoadParams.LiveUserId);
+        etLiveChannelId.setText(com.easefun.polyv.livedemo.PLVLoadParams.LiveChannelId);
 
         //登录回放参数
-        etPlaybackAppId.setText(PLVLoadParams.PlaybackAppId);
-        etPlaybackAppSecret.setText(PLVLoadParams.PlaybackAppSecert);
-        etPlaybackUserId.setText(PLVLoadParams.PlaybackUserId);
-        etPlaybackChannelId.setText(PLVLoadParams.PlaybackChannelId);
-        etPlaybackVideoId.setText(PLVLoadParams.PlaybackVideoId);
+        etPlaybackAppId.setText(com.easefun.polyv.livedemo.PLVLoadParams.PlaybackAppId);
+        etPlaybackAppSecret.setText(com.easefun.polyv.livedemo.PLVLoadParams.PlaybackAppSecert);
+        etPlaybackUserId.setText(com.easefun.polyv.livedemo.PLVLoadParams.PlaybackUserId);
+        etPlaybackChannelId.setText(com.easefun.polyv.livedemo.PLVLoadParams.PlaybackChannelId);
+        etPlaybackVideoId.setText(com.easefun.polyv.livedemo.PLVLoadParams.PlaybackVideoId);
 
     }
     // </editor-fold>
@@ -394,7 +394,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     //进入直播带货场景
                     case ECOMMERCE:
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
-                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, getViewerId(), getViewerName(), getViewerAvatar());
+                            PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar());
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -431,6 +431,12 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 loginProgressDialog.dismiss();
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
                 PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
+                //1.SDK中未开启点播列表时——默认选择“读取直播后台回放设置”的参数
+                //2.SDK中开启“点播列表”/通过vid观看时——优先响应“点播列表”/vid观看开关配置
+                PLVPlaybackListType plvPlaybackListType = swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK;
+                if (TextUtils.isEmpty(vid) && plvPlaybackListType == PLVPlaybackListType.PLAYBACK && plvPlaybackLoginResult.isVodAndListType()) {
+                    plvPlaybackListType = PLVPlaybackListType.VOD;
+                }
 
                 switch (curScene) {
                     //进入云课堂场景
@@ -445,7 +451,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                                     getViewerId(),
                                     getViewerName(),
                                     getViewerAvatar(),
-                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK
+                                    plvPlaybackListType
                             );
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -459,7 +465,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
                                     vid, getViewerId(), getViewerName(), getViewerAvatar(),
-                                    swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK);
+                                    plvPlaybackListType);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }

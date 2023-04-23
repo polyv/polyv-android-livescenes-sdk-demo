@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/video_controller_land_ly"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
     <FrameLayout
         android:id="@+id/gradient_bar_land_ly"
@@ -157,130 +158,135 @@
         android:id="@+id/likes_land_iv"
         android:layout_width="62dp"
         android:layout_height="180dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginRight="12dp"
+        android:layout_marginBottom="18dp"
         android:visibility="invisible"
         app:src_wh="36dp"
         tools:visibility="visible" />
 
-    <View
-        android:id="@+id/plvlc_refer_view_1"
-        android:layout_width="60dp"
-        android:layout_height="1dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="4dp"
-        android:visibility="invisible"
-        tools:visibility="visible" />
-
-    <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
-        android:id="@+id/plvlc_iv_show_point_reward"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
-        android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@id/plvlc_refer_view_1"
-        android:src="@drawable/plvlc_iv_show_point_reward"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
-        android:id="@+id/plvlc_controller_commodity_iv"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@+id/start_send_message_land_tv"
-        android:layout_marginEnd="20dp"
-        android:layout_toStartOf="@+id/plvlc_iv_show_point_reward"
-        android:src="@drawable/plvlc_controller_commodity_icon" />
-
-    <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
-        android:id="@+id/plvlc_card_enter_view"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
-        android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@id/plvlc_controller_commodity_iv"
-        android:src="@drawable/plv_interact_redpack_gain"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <View
-        android:id="@+id/plvlc_refer_view_2"
-        android:layout_width="56dp"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
-        android:layout_marginRight="10dp"
-        android:layout_toLeftOf="@id/plvlc_controller_commodity_iv"
-        android:visibility="invisible"
-        tools:visibility="visible" />
-
-    <TextView
-        android:id="@+id/plvlc_card_enter_cd_tv"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvlc_controller_widget_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/plvlc_card_enter_view"
-        android:layout_alignLeft="@+id/plvlc_refer_view_2"
-        android:layout_alignRight="@+id/plvlc_refer_view_2"
-        android:gravity="center"
-        android:text="00:00:00"
-        android:textColor="#ADADC0"
-        android:textSize="10sp"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_toStartOf="@+id/likes_land_iv"
+        android:layout_toEndOf="@+id/bottom_bar_land_ly">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
-        android:id="@+id/plvlc_card_enter_tips_view"
-        android:layout_width="wrap_content"
-        android:layout_height="33dp"
-        android:layout_above="@+id/plvlc_card_enter_view"
-        android:layout_alignRight="@+id/plvlc_card_enter_view"
-        android:layout_marginEnd="-47dp"
-        android:layout_marginBottom="4dp"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
-        android:text="连续观看有奖励哦"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp"
-        android:visibility="gone"
-        app:indicateColor="#FF9D4D"
-        app:indicateEndColor="#F65F49"
-        app:rectRadius="4dp"
-        app:triangleCenter="true"
-        app:triangleHeight="6dp"
-        app:trianglePosition="bottom"
-        app:triangleWidth="10dp"
-        tools:visibility="visible" />
+        <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
+            android:id="@+id/plvlc_iv_show_point_reward"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="18dp"
+            android:src="@drawable/plvlc_iv_show_point_reward"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible" />
 
-    <ImageView
-        android:id="@+id/plvlc_live_player_controller_enter_paint_iv"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@id/start_send_message_land_tv"
-        android:layout_marginEnd="20dp"
-        android:layout_toStartOf="@id/plvlc_card_enter_view"
-        android:src="@drawable/plvlc_controller_paint_mode_icon"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
+            android:id="@+id/plvlc_controller_commodity_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/plvlc_controller_commodity_icon"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_iv_show_point_reward"
+            app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv" />
 
-    <TextView
-        android:id="@+id/start_send_message_land_tv"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_alignTop="@id/bottom_bar_land_ly"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="38dp"
-        android:layout_toStartOf="@id/plvlc_live_player_controller_enter_paint_iv"
-        android:layout_toEndOf="@id/bottom_bar_land_ly"
-        android:background="@drawable/plvlc_message_btn_send_bg"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:imeOptions="flagNoFullscreen|flagNoExtractUi"
-        android:singleLine="true"
-        android:text="跟大家聊点什么吧~"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCRedpackView
+            android:id="@+id/plvlc_controller_redpack_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_controller_commodity_iv"
+            app:plvlc_red_pack_hint_position="top"
+            tools:visibility="gone" />
+
+        <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
+            android:id="@+id/plvlc_card_enter_view"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/plv_interact_redpack_gain"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_controller_redpack_view"
+            app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv"
+            app:layout_goneMarginEnd="16dp"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvlc_card_enter_cd_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00:00"
+            android:textColor="#ADADC0"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintStart_toStartOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintTop_toBottomOf="@+id/plvlc_card_enter_view"
+            tools:visibility="visible" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+            android:id="@+id/plvlc_card_enter_tips_view"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:text="连续观看有奖励哦"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:indicateColor="#FF9D4D"
+            app:indicateEndColor="#F65F49"
+            app:layout_constraintBottom_toTopOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintEnd_toEndOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintStart_toStartOf="@+id/plvlc_card_enter_view"
+            app:rectRadius="4dp"
+            app:triangleCenter="true"
+            app:triangleHeight="6dp"
+            app:trianglePosition="bottom"
+            app:triangleWidth="10dp"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvlc_live_player_controller_enter_paint_iv"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/plvlc_controller_paint_mode_icon"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/start_send_message_land_tv"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_alignTop="@id/bottom_bar_land_ly"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="38dp"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/plvlc_message_btn_send_bg"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:imeOptions="flagNoFullscreen|flagNoExtractUi"
+            android:singleLine="true"
+            android:text="跟大家聊点什么吧~"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_live_player_controller_enter_paint_iv"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
 </RelativeLayout>

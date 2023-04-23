@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVAuthorizationBean;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -511,11 +513,32 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 plvsaMemberUserTypeTv.setVisibility(View.GONE);
             }
             //设置昵称
-            SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
+            final SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
             if (isMyself) {
                 nickSpan.append("(我)");
             }
             plvsaMemberNickTv.setText(nickSpan);
+            final String finalActor = actor;
+            plvsaMemberNickTv.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(TextUtils.isEmpty(finalActor) || TextUtils.isEmpty(nickSpan)){
+                        return;
+                    }
+                    //如果昵称+头衔超过长度，限制头衔长度
+                    int actorTvWidth = plvsaMemberUserTypeTv.getWidth();
+                    int nickTvWidth = plvsaMemberNickTv.getWidth();
+                    float actorTxWidth = plvsaMemberUserTypeTv.getPaint().measureText(finalActor);
+                    float nickTxWidth = plvsaMemberNickTv.getPaint().measureText(nickSpan.toString());
+                    int tvTotalWidth = actorTvWidth + nickTvWidth;
+                    float painWidth = actorTxWidth + nickTxWidth;
+                    plvsaMemberUserTypeTv.setMaxEms(Integer.MAX_VALUE);
+                    if(painWidth >= tvTotalWidth){
+                        plvsaMemberUserTypeTv.setMaxEms(5);
+                    }
+                }
+            });
+
             //设置禁言显示状态
             plvsaMemberBanIv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
             //设置连麦按钮的状态

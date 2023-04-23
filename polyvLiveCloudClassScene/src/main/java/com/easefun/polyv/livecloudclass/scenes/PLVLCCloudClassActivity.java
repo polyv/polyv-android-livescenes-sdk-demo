@@ -66,6 +66,7 @@ import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -302,6 +303,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         ).show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (popoverLayout != null) {
+            popoverLayout.onActivityResult(requestCode, resultCode, data);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
@@ -901,6 +909,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
                 if (mediaLayout != null) {
                     mediaLayout.notifyOnReplyMessage(chatQuoteVO);
+                }
+            }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().receiveRedPaper(redPaperEvent);
                 }
             }
         });

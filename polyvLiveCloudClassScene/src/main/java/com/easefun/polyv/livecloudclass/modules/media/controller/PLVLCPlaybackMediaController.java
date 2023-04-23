@@ -26,14 +26,12 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLV
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
-import com.easefun.polyv.livecommon.ui.widget.imageview.IPLVVisibilityChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -66,8 +64,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView cardEnterLandView;
     private TextView cardEnterCdLandTv;
     private PLVTriangleIndicateTextView cardEnterTipsLandView;
-    private View likesReferView;
-    private View cardEnterReferView;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -146,8 +142,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         cardEnterLandView = findViewById(R.id.plvlc_card_enter_land_view);
         cardEnterCdLandTv = findViewById(R.id.plvlc_card_enter_cd_land_tv);
         cardEnterTipsLandView = findViewById(R.id.plvlc_card_enter_tips_land_view);
-        likesReferView = findViewById(R.id.plvlc_refer_view_1);
-        cardEnterReferView = findViewById(R.id.plvlc_refer_view_2);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -190,7 +184,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         }
 
         observeCommodityStatus();
-        observeForFitRightBottomViewLocation();
     }
 
     private void initMoreLayout() {
@@ -229,65 +222,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 });
     }
 
-    private void observeForFitRightBottomViewLocation() {
-        ivLikesLand.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, true);
-            }
-        });
-        cardEnterLandView.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, false);
-            }
-        });
-        controllerCommodityLandIv.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, false);
-            }
-        });
-    }
-
-    private void processRightBottomViewVisibilityChanged(int visibility, boolean isLikesView) {
-        if (likesReferView.getLayoutParams() == null) {
-            return;
-        }
-        boolean isVisible = visibility == View.VISIBLE;
-        if (isLikesView) {
-            if (isVisible || !hasRightBottomViewVisibleExcludeLikesView()) {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
-            } else {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
-            }
-        } else {
-            if (isVisible) {
-                if (ivLikesLand.getVisibility() != View.VISIBLE) {
-                    likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
-                }
-            } else if (!hasRightBottomViewVisibleExcludeLikesView()) {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
-            }
-        }
-        MarginLayoutParams mlp = (MarginLayoutParams) cardEnterLandView.getLayoutParams();
-        if (mlp != null) {
-            mlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 44 : 20);
-        }
-        MarginLayoutParams cardEnterReferMlp = (MarginLayoutParams) cardEnterReferView.getLayoutParams();
-        if (cardEnterReferMlp != null) {
-            cardEnterReferMlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 34 : 10);
-        }
-        likesReferView.requestLayout();
-    }
-
-    private boolean isRightBottomOnlyCardEnterViewVisible() {
-        return cardEnterLandView.getVisibility() == View.VISIBLE && controllerCommodityLandIv.getVisibility() != View.VISIBLE && ivLikesLand.getVisibility() != View.VISIBLE;
-    }
-
-    private boolean hasRightBottomViewVisibleExcludeLikesView() {
-        return cardEnterLandView.getVisibility() == View.VISIBLE || controllerCommodityLandIv.getVisibility() == View.VISIBLE;
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLiveMediaController父接口IPolyvMediaController定义的方法">

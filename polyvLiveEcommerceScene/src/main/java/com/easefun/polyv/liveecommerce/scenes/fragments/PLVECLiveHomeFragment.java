@@ -47,6 +47,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanP
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatInputWindow;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
@@ -59,6 +60,8 @@ import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -73,6 +76,7 @@ import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -133,6 +137,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     // 网络较差提示
     private PLVECNetworkTipsView networkTipsView;
+
+    private PLVECRedpackView chatroomRedPackWidgetView;
+
     //监听器
     private OnViewActionListener onViewActionListener;
 
@@ -225,6 +232,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
         rewardIv.setOnClickListener(this);
         morePopupView = new PLVECMorePopupView();
+        morePopupView.init(moreIv);
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
         if (getContext() != null) {
             chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
@@ -256,6 +264,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
+
+        chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
+        chatroomRedPackWidgetView.initData(liveRoomDataManager);
 
         initNetworkTipsLayout();
         adjustInteractEntranceLyLocation(bulletinLy.getVisibility() == View.VISIBLE);
@@ -346,6 +357,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             interactEntranceView.acceptInteractEntranceData(dataBeans);
         }
     }
+
+    @Override
+    protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        if (morePopupView != null) {
+            morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -368,6 +386,16 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             morePopupView.hideAll();
             morePopupView.updatePlayStateView(View.GONE);
         }
+    }
+
+    @Override
+    public void setJoinRTCChannel(boolean isJoinRtcChannel) {
+        morePopupView.updateJoinRTCChannel(isJoinRtcChannel);
+    }
+
+    @Override
+    public void setJoinLinkMic(boolean isJoinLinkMic) {
+        morePopupView.updateJoinLinkMic(isJoinLinkMic);
     }
 
     @Override
@@ -728,6 +756,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 chatOverLengthMessageLayout.show(chatMessageDataBean);
             }
         }
+
+        @Override
+        public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onReceiveRedPaper(redPaperEvent);
+            }
+        }
     };
     // </editor-fold>
 
@@ -829,6 +864,15 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
+            public boolean onPlayModeClick(boolean viewSelected) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onChangeMediaPlayModeClick(null, viewSelected ? PolyvMediaPlayMode.MODE_VIDEO : PolyvMediaPlayMode.MODE_AUDIO);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
             public int[] onShowLinesClick(View view) {
                 return new int[]{onViewActionListener == null ? 1 : onViewActionListener.onGetLinesCountAction(), currentLinesPos};
             }
@@ -871,6 +915,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             public void switchLowLatencyMode(boolean isLowLatency) {
                 if (onViewActionListener != null) {
                     onViewActionListener.switchLowLatencyMode(isLowLatency);
+                }
+            }
+
+            @Override
+            public void onClickDynamicFunction(String event) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onClickDynamicFunction(event);
                 }
             }
         });
@@ -952,7 +1003,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
     public interface OnViewActionListener extends PLVECCommonHomeFragment.OnViewActionListener {
         //切换播放模式
-        void onChangeMediaPlayModeClick(View view, int mediaPlayMode);
+        void onChangeMediaPlayModeClick(@Nullable View view, int mediaPlayMode);
 
         //切换线路
         void onChangeLinesClick(View view, int linesPos);
@@ -997,6 +1048,18 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
          * @param isLowLatency 是否无延迟模式
          */
         void switchLowLatencyMode(boolean isLowLatency);
+
+        /**
+         * 回调 拆开红包
+         */
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        /**
+         * 点击了动态功能控件
+         *
+         * @param event 动态功能的event data
+         */
+        void onClickDynamicFunction(String event);
     }
     // </editor-fold>
 }

@@ -53,6 +53,10 @@ public class PLVECFloatingWindow {
         onRequestShowChanged();
     }
 
+    public void setRequestShowByUser(boolean requestShowByUser) {
+        this.requestShowByUser = requestShowByUser;
+    }
+
     public boolean isRequestingShowByUser() {
         return requestShowByUser;
     }

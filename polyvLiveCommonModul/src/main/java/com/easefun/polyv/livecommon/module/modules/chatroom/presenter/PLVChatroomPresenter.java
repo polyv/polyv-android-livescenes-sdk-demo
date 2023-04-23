@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.chatroom.presenter;
 
+import static com.plv.foundationsdk.component.livedata.PLVLiveDataExt.mutableLiveData;
 import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 
@@ -22,7 +23,9 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
+import com.easefun.polyv.livecommon.module.modules.chatroom.model.enums.PLVRedPaperType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
+import com.easefun.polyv.livecommon.module.modules.redpack.model.PLVRedpackRepo;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
@@ -96,6 +99,11 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
+import com.plv.socket.event.redpack.PLVRedPaperForDelayEvent;
+import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
+import com.plv.socket.event.redpack.PLVRedPaperResultEvent;
+import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.log.PLVELogSender;
 import com.plv.socket.socketio.PLVSocketIOClient;
@@ -136,6 +144,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     // model
     private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
+    private final PLVRedpackRepo redpackRepo = PLVDependManager.getInstance().get(PLVRedpackRepo.class);
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -776,6 +785,16 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(fileShareEvent, itemType, isSpecialTypeOrMe ? new PLVSpecialTypeTag(fileShareEvent.getUser().getUserId()) : null);
                             tempChatItems.add(0, itemData);
                         }
+                    } else if (PLVHistoryConstant.MSGSOURCE_RED_PAPER.equals(messageSource)) {
+                        final PLVRedPaperHistoryEvent redPaperHistoryEvent = PLVGsonUtil.fromJson(PLVRedPaperHistoryEvent.class, jsonObject.toString());
+                        if (redPaperHistoryEvent != null && PLVRedPaperType.isSupportType(redPaperHistoryEvent.getType())) {
+                            final PLVRedPaperReceiveType cachedRedPaperReceiveType = redpackRepo.getCachedReceiveStatus(redPaperHistoryEvent.getRedpackId(), liveRoomDataManager.getConfig().getUser().getViewerId());
+                            redPaperHistoryEvent.setReceiveTypeLiveData(mutableLiveData(cachedRedPaperReceiveType));
+                            redpackRepo.cacheRedPaper(redPaperHistoryEvent.asRedPaperEvent());
+
+                            PLVBaseViewData<PLVBaseEvent> itemData = new PLVBaseViewData<PLVBaseEvent>(redPaperHistoryEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_RED_PAPER, null);
+                            tempChatItems.add(0, itemData);
+                        }
                     }
                     continue;
                 }
@@ -1168,6 +1187,32 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                     }
                                 });
                             }
+                        }
+                        break;
+                    case PLVRedPaperEvent.EVENT:
+                        final PLVRedPaperEvent redPaperEvent = PLVEventHelper.toMessageEventModel(message, PLVRedPaperEvent.class);
+                        if (redPaperEvent != null && PLVRedPaperType.isSupportType(redPaperEvent.getType())) {
+                            final PLVRedPaperReceiveType cachedRedPaperReceiveType = redpackRepo.getCachedReceiveStatus(redPaperEvent.getRedpackId(), liveRoomDataManager.getConfig().getUser().getViewerId());
+                            redPaperEvent.setReceiveTypeLiveData(mutableLiveData(cachedRedPaperReceiveType));
+                            redpackRepo.cacheRedPaper(redPaperEvent);
+
+                            chatMessage = redPaperEvent;
+                            itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_RED_PAPER;
+                        }
+                        break;
+                    case PLVRedPaperResultEvent.EVENT:
+                        final PLVRedPaperResultEvent redPaperResultEvent = PLVEventHelper.toMessageEventModel(message, PLVRedPaperResultEvent.class);
+                        if (redPaperResultEvent != null && PLVRedPaperType.isSupportType(redPaperResultEvent.getType())) {
+                            redpackRepo.onRedPaperResultEvent(redPaperResultEvent);
+
+//                            chatMessage = redPaperResultEvent;
+//                            itemType = PLVChatMessageItemType.ITEMTYPE_RED_PAPER_RESULT;
+                        }
+                        break;
+                    case PLVRedPaperForDelayEvent.EVENT:
+                        final PLVRedPaperForDelayEvent redPaperForDelayEvent = PLVEventHelper.toMessageEventModel(message, PLVRedPaperForDelayEvent.class);
+                        if (redPaperForDelayEvent != null && PLVRedPaperType.isSupportType(redPaperForDelayEvent.getType())) {
+                            redpackRepo.onRedPaperForDelayEvent(redPaperForDelayEvent);
                         }
                         break;
                     default:

@@ -28,6 +28,8 @@ import com.plv.socket.event.history.PLVChatImgHistoryEvent;
 import com.plv.socket.event.history.PLVFileShareHistoryEvent;
 import com.plv.socket.event.history.PLVSpeakHistoryEvent;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
+import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
 import com.plv.socket.net.model.PLVSocketLoginVO;
 import com.plv.socket.user.PLVAuthorizationBean;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -264,6 +266,16 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
                     chatImgHeight = ConvertUtils.dp2px(80);
                 }
             }
+        } else if (messageData instanceof PLVRedPaperEvent) {
+            // 红包
+            final PLVRedPaperEvent redPaperEvent = (PLVRedPaperEvent) messageData;
+            avatar = redPaperEvent.getUser().getPic();
+            nickName = redPaperEvent.getUser().getNick();
+        } else if (messageData instanceof PLVRedPaperHistoryEvent) {
+            // 历史红包
+            final PLVRedPaperHistoryEvent redPaperHistoryEvent = (PLVRedPaperHistoryEvent) messageData;
+            avatar = redPaperHistoryEvent.getUser().getPic();
+            nickName = redPaperHistoryEvent.getUser().getNick();
         }
     }
 

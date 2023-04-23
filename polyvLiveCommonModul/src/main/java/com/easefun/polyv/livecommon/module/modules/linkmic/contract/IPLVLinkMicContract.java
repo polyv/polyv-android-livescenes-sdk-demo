@@ -108,6 +108,11 @@ public interface IPLVLinkMicContract {
         void onUsersLeave(List<String> uids);
 
         /**
+         * 讲师将我下麦
+         */
+        void onTeacherHangupMe();
+
+        /**
          * 回调我当前不在连麦列表
          */
         void onNotInLinkMicList();
@@ -237,6 +242,11 @@ public interface IPLVLinkMicContract {
          * 获取邀请连麦接受邀请的剩余时间
          */
         void getJoinAnswerTimeLeft(PLVSugarUtil.Consumer<Integer> callback);
+
+        /**
+         * 使用带货场景的连麦item排序
+         */
+        void setEcommerceLinkMicItemSort(boolean isEcommerceLinkMicItemSort);
 
         /**
          * 下麦

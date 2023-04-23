@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.easefun.polyv.livecommon.ui.widget.swipe.PLVSwipeMenu;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
@@ -123,7 +125,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             holder.plvlsMemberUserTypeTv.setVisibility(View.GONE);
         }
         //设置昵称
-        SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
+        final SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
         if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId())) {
             nickSpan.append("(我)");
         }
@@ -286,6 +288,29 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                             .setText("踢出失败(" + sendResult + ")")
                             .build()
                             .show();
+                }
+            }
+        });
+
+        final TextView tempUserTypeTv= holder.plvlsMemberUserTypeTv;
+        final TextView tempNickTv = holder.plvlsMemberNickTv;
+        final String finalActor = actor;
+        //如果昵称+头衔超过长度，限制头衔长度
+        tempNickTv.post(new Runnable() {
+            @Override
+            public void run() {
+                if(TextUtils.isEmpty(finalActor) || TextUtils.isEmpty(nickSpan)){
+                    return;
+                }
+                int actorTvWidth = tempUserTypeTv.getWidth();
+                int nickTvWidth = tempNickTv.getWidth();
+                float actorTxWidth = tempUserTypeTv.getPaint().measureText(finalActor);
+                float nickTxWidth = tempNickTv.getPaint().measureText(nickSpan.toString());
+                int tvTotalWidth = actorTvWidth + nickTvWidth;
+                float painWidth = actorTxWidth + nickTxWidth;
+                tempUserTypeTv.setMaxEms(Integer.MAX_VALUE);
+                if(painWidth >= tvTotalWidth){
+                    tempUserTypeTv.setMaxEms(5);
                 }
             }
         });

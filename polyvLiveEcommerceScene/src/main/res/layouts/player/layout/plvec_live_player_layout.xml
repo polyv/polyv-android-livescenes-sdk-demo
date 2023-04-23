@@ -43,12 +43,6 @@
 
             </com.easefun.polyv.livescenes.video.PolyvLiveVideoView>
 
-            <!--  无延迟观看时播放器容器布局  -->
-            <com.easefun.polyv.liveecommerce.modules.player.rtc.PLVECLiveRtcVideoLayout
-                android:id="@+id/plvec_live_rtc_video_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
             <!--子播放器view-->
             <include
                 layout="@layout/plvec_live_player_sub_video_layout"

@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.SwitchCompat;
 import android.util.SparseArray;
 import android.view.View;
-import android.widget.CompoundButton;
 
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livedemo.hiclass.PLVLoginHiClassActivity;
-import com.plv.foundationsdk.sign.PLVSignCreator;
 
 /**
  * @author suhongtao
@@ -29,7 +26,6 @@ public class PLVEntranceActivity extends PLVBaseActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plv_entrance_activity);
-
     }
 
     @Override

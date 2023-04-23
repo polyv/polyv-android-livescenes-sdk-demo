@@ -17,6 +17,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -90,6 +91,13 @@ public class PLVLCChatCommonMessageList {
             public void onReplyMessage(PLVChatQuoteVO quoteVO) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onReplyMessage(quoteVO);
+                }
+            }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onReceiveRedPaper(redPaperEvent);
                 }
             }
         });
@@ -313,6 +321,8 @@ public class PLVLCChatCommonMessageList {
         void onShowAloneOverLengthMessage(PLVLCChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
 
         void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
 
     // </editor-fold>

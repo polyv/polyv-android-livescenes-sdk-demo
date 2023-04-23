@@ -19,6 +19,11 @@ public class PLVChatMessageItemType {
 
     public static final int ITEMTYPE_EMOTION = 8;//个性图片表情信息
 
+    // 红包消息
+    public static final int ITEMTYPE_RECEIVE_RED_PAPER = 9;
+    // 领取红包消息
+    public static final int ITEMTYPE_RED_PAPER_RESULT = 11;
+
     public static final int ITEMTYPE_TIPS_MSG = 99;//提示信息，例如聊天室开启/关闭
 
     public static final int ITEMTYPE_CUSTOM_GIFT = 100;//(自定义)打赏礼物信息

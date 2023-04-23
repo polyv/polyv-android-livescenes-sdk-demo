@@ -25,6 +25,8 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
@@ -90,6 +92,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
         observeClassDetailVO();
         observeInteractEntranceData();
+        observeInteractStatusData();
     }
     // </editor-fold>
 
@@ -129,6 +132,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     protected void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
     }
+
+    protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -143,6 +149,14 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //设置播放状态
     public void setPlayerState(PLVPlayerState state) {
+    }
+
+    //设置加入rtc频道状态
+    public void setJoinRTCChannel(boolean isJoinRtcChannel) {
+    }
+
+    //设置加入连麦状态
+    public void setJoinLinkMic(boolean isJoinLinkMic) {
     }
 
     //设置回放播放信息
@@ -315,6 +329,15 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
                 acceptInteractEntranceData(dataBeans);
+            }
+        });
+    }
+
+    private void observeInteractStatusData() {
+        liveRoomDataManager.getInteractStatusData().observe(this, new Observer<PLVWebviewUpdateAppStatusVO>() {
+            @Override
+            public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+                acceptInteractStatusData(webviewUpdateAppStatusVO);
             }
         });
     }

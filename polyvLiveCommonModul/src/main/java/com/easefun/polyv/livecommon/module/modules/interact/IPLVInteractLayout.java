@@ -1,10 +1,15 @@
 package com.easefun.polyv.livecommon.module.modules.interact;
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
+
+import java.util.List;
 
 /**
  * date: 2020/10/9
@@ -46,11 +51,21 @@ public interface IPLVInteractLayout {
     void showCardPush(PLVShowPushCardEvent showPushCardEvent);
 
     /**
+     * 更新频道开关
+     */
+    void updateChannelSwitch(List<PLVChatFunctionSwitchVO.DataBean> dataBeanList);
+
+    /**
      * 回调动态东
      *
      * @param event
      */
     void onCallDynamicFunction(String event);
+
+    /**
+     * 拆开红包
+     */
+    void receiveRedPaper(PLVRedPaperEvent redPaperEvent);
 
     /**
      * 销毁
@@ -63,5 +78,10 @@ public interface IPLVInteractLayout {
      * @return 返回true表示拦截事件
      */
     boolean onBackPress();
+
+    /**
+     * ActivityResult回调触发时调用
+     */
+    void onActivityResult(final int requestCode, final int resultCode, final Intent intent);
     // </editor-fold>
 }

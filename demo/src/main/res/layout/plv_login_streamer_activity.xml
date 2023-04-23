@@ -97,7 +97,7 @@
         android:gravity="left|center"
         android:hint="请输入昵称"
         android:paddingLeft="20dp"
-        android:maxLength="20"
+        android:maxLength="15"
         android:paddingRight="48dp"
         android:singleLine="true"
         android:textColor="#F0F1F5"
