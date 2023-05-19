@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -10,6 +11,8 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
@@ -92,7 +95,12 @@ public interface IPLVStreamerContract {
          *
          * @param quality 网络状态常量
          */
-        void onNetworkQuality(int quality);
+        void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);
+
+        /**
+         * 推流网络统计
+         */
+        void onUpstreamNetworkStatus(PLVNetworkStatusVO networkStatus);
 
         /**
          * 更新推流时间
@@ -230,7 +238,7 @@ public interface IPLVStreamerContract {
          *
          * @return 网络质量常量
          */
-        int getNetworkQuality();
+        PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
         /**
          * 设置推流码率
@@ -454,6 +462,19 @@ public interface IPLVStreamerContract {
          */
         @NonNull
         PLVStreamerData getData();
+
+        /**
+         * 设置弱网条件下的降级策略
+         *
+         * @param pushDowngradePreference 降级策略
+         */
+        void setPushDowngradePreference(@NonNull PLVPushDowngradePreference pushDowngradePreference);
+
+        /**
+         * @return 当前降级策略，当引擎未初始化或不支持降级策略时返回 null
+         */
+        @Nullable
+        PLVPushDowngradePreference getPushDowngradePreference();
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

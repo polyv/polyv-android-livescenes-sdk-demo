@@ -25,6 +25,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
@@ -174,7 +175,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     }
 
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
 
     }
 

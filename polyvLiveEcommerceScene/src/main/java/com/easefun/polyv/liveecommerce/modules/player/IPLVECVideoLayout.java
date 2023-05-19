@@ -15,6 +15,7 @@ import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListe
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.List;
 
@@ -347,7 +348,7 @@ public interface IPLVECVideoLayout {
         /**
          * 网络质量回调
          */
-        void acceptNetworkQuality(int networkQuality);
+        void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality);
     }
     // </editor-fold>
 }

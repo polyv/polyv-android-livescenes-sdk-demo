@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -89,7 +90,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //media在连麦列表中对应item的连麦id
     private String mediaInLinkMicListLinkMicId;
     //本地网络质量
-    private int netQuality;
+    private PLVLinkMicConstant.NetworkQuality netQuality;
     //列表显示模式
     private PLVLinkMicListShowMode listShowMode = PLVLinkMicListShowMode.SHOW_ALL;
     //是否已经回调了绑定老师ViewHolder
@@ -342,8 +343,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         updateAllItem();
     }
 
-    public void updateNetQuality(int quality) {
+    public void updateNetQuality(PLVLinkMicConstant.NetworkQuality quality) {
         netQuality = quality;
+        if (dataList == null) {
+            return;
+        }
         //找到我的位置
         int myPos = 0;
         for (int i = 0; i < dataList.size(); i++) {

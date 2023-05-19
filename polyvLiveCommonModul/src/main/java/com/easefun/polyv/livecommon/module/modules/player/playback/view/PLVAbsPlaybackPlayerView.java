@@ -146,6 +146,11 @@ public abstract class PLVAbsPlaybackPlayerView implements IPLVPlaybackPlayerCont
     }
 
     @Override
+    public void onServerDanmuSpeed(int speed) {
+
+    }
+
+    @Override
     public void onShowPPTView(int visible) {
 
     }

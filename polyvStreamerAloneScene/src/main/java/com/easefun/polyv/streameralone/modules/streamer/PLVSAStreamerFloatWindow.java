@@ -25,7 +25,6 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -132,13 +131,13 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         }
 
         @Override
-        public void onNetworkQuality(int quality) {
+        public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
             //处理断网后的回调错误
             if (!PLVNetworkUtils.isConnected(context)) {
-                quality = PLVLinkMicConstant.NetQuality.NET_QUALITY_NO_CONNECTION;
+                quality = PLVLinkMicConstant.NetworkQuality.DISCONNECT;
             }
 
-            if (quality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            if (quality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                 if (!isNoNetWork) {
                     updateWhenStreamStop();
                     autoExpand(true, 0);

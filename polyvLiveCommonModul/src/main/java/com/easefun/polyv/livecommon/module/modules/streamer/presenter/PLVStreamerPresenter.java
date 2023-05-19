@@ -35,15 +35,19 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
 import com.plv.linkmic.model.PLVLinkMicJoinStatus;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
 import com.plv.linkmic.screenshare.IPLVScreenShareListener;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
-import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
@@ -321,6 +325,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 enableLocalVideo(curEnableLocalVideo);
                 enableRecordingAudioVolume(curEnableRecordingAudioVolume);
                 setFrontCameraMirror(isFrontMirror);
+                setPushDowngradePreference(
+                        PLVChannelFeatureManager.onChannel(param.getChannelId())
+                                .getOrDefault(PLVChannelFeature.STREAMER_PUSH_QUALITY_PREFERENCE, PLVPushDowngradePreference.PREFER_BETTER_QUALITY)
+                );
 
                 initStreamerListener();
 
@@ -401,8 +409,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public int getNetworkQuality() {
-        return streamerManager.getCurrentNetQuality();
+    public PLVLinkMicConstant.NetworkQuality getNetworkQuality() {
+        return streamerManager.getNetworkQuality();
     }
 
     @Override
@@ -873,6 +881,18 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void setPushDowngradePreference(@NonNull PLVPushDowngradePreference pushDowngradePreference) {
+        streamerData.postDowngradePreference(pushDowngradePreference);
+        streamerManager.setPushDowngradePreference(pushDowngradePreference);
+    }
+
+    @Nullable
+    @Override
+    public PLVPushDowngradePreference getPushDowngradePreference() {
+        return streamerManager.getPushDowngradePreference();
+    }
+
+    @Override
     public void destroy() {
         if (currentSocketUserBean != null && currentSocketUserBean.getUserId() != null && !currentSocketUserBean.isTeacher()) {
             setUserPermissionSpeaker(currentSocketUserBean.getUserId(), false, null);
@@ -916,7 +936,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerManager.addEventHandler(new PLVStreamerEventListener() {
             //推流网络状态变化
             @Override
-            public void onNetworkQuality(final int quality) {
+            public void onNetworkQuality(final PLVLinkMicConstant.NetworkQuality quality) {
                 streamerData.postNetworkQuality(quality);
                 callbackToView(new ViewRunnable() {
                     @Override
@@ -924,7 +944,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         view.onNetworkQuality(quality);
                     }
                 });
-                if (quality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                if (quality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                     timerToShowNetBroken.invokeTimerWhenNoConnection();
                     updateNetworkForGuestAutoLinkMic(false);
                 } else {
@@ -968,6 +988,17 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     itemDataBean.setScreenShare(false);
                     updateMixLayoutWhenScreenShare(false, uid);
                 }
+            }
+
+            @Override
+            public void onUpstreamNetworkStatus(final PLVNetworkStatusVO networkStatusVO) {
+                streamerData.postNetworkStatus(networkStatusVO);
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onUpstreamNetworkStatus(networkStatusVO);
+                    }
+                });
             }
         });
 
@@ -1894,8 +1925,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         }
                     } else {
                         //还未到时间，检查是否连上网络了,如果在指定时间内网络恢复，则取消定时器。
-                        int netQuality = streamerManager.getCurrentNetQuality();
-                        if (netQuality != PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                        PLVLinkMicConstant.NetworkQuality netQuality = streamerManager.getNetworkQuality();
+                        if (netQuality != PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                             dispose(timerDisposable);
                         }
                     }

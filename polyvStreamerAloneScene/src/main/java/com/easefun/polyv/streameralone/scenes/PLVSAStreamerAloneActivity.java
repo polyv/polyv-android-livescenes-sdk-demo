@@ -58,7 +58,6 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -442,7 +441,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
-            public int getCurrentNetworkQuality() {
+            public PLVLinkMicConstant.NetworkQuality getCurrentNetworkQuality() {
                 return streamerLayout.getNetworkQuality();
             }
 
@@ -707,7 +706,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (streamerLayout.getNetworkQuality() == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                    if (streamerLayout.getNetworkQuality() == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                         settingLayout.showAlertDialogNoNetwork();
                         return;
                     }

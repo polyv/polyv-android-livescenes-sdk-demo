@@ -50,8 +50,10 @@ import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamVi
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.api.common.player.PLVPlayerConstant;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
@@ -200,8 +202,17 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
             @Override
             public void onNetworkQuality(int networkQuality) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.acceptNetworkQuality(networkQuality);
+                if (onViewActionListener == null) {
+                    return;
+                }
+                if (PLVPlayerConstant.NetQuality.isNoConnection(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.DISCONNECT);
+                } else if (PLVPlayerConstant.NetQuality.isNetPoor(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.VERY_BAD);
+                } else if (PLVPlayerConstant.NetQuality.isNetMiddleOrWorse(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.POOR);
+                } else {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.GOOD);
                 }
             }
         });

@@ -758,6 +758,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                 }
             });
+            videoView.setOnDanmuSpeedServerListener(new IPLVVideoViewListenerEvent.OnDanmuSpeedServerListener() {
+                @Override
+                public void OnDanmuSpeedServerListener(int speed) {
+                    IPLVLivePlayerContract.ILivePlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuSpeed(speed);
+                    }
+                }
+            });
             videoView.setMicroPhoneListener(new IPolyvLiveListenerEvent.MicroPhoneListener() {
                 @Override
                 public void showMicPhoneLine(int visible) {

@@ -44,11 +44,11 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
-import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -460,8 +460,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     @Override
     public void liveStart() {
         if (onViewActionListener != null) {
-            int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-            if (currentNetworkQuality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            PLVLinkMicConstant.NetworkQuality currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
+            if (currentNetworkQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                 //如果断网，则不直播，显示弹窗。
                 showAlertDialogNoNetwork();
                 return;

@@ -66,6 +66,7 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
@@ -742,7 +743,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void acceptNetworkQuality(int networkQuality) {
+            public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality) {
                 if (commonHomeFragment != null) {
                     commonHomeFragment.acceptNetworkQuality(networkQuality);
                 }
@@ -882,7 +883,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onNetworkQuality(int quality) {
+            public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
                 if (commonHomeFragment != null) {
                     commonHomeFragment.acceptNetworkQuality(quality);
                 }

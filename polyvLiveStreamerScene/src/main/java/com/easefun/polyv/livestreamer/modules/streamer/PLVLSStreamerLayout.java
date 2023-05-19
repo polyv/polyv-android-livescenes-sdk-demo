@@ -46,6 +46,9 @@ import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -263,8 +266,13 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
-    public void addOnNetworkQualityListener(IPLVOnDataChangedListener<Integer> listener) {
+    public void addOnNetworkQualityListener(IPLVOnDataChangedListener<PLVLinkMicConstant.NetworkQuality> listener) {
         streamerPresenter.getData().getNetworkQuality().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public void addOnNetworkStatusListener(IPLVOnDataChangedListener<PLVNetworkStatusVO> listener) {
+        streamerPresenter.getData().getNetworkStatus().observe((LifecycleOwner) getContext(), listener);
     }
 
     @Override
@@ -298,7 +306,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
-    public int getNetworkQuality() {
+    public PLVLinkMicConstant.NetworkQuality getNetworkQuality() {
         return streamerPresenter.getNetworkQuality();
     }
 
@@ -310,6 +318,14 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     @Override
     public IPLVStreamerContract.IStreamerPresenter getStreamerPresenter() {
         return streamerPresenter;
+    }
+
+    @Override
+    public void setPushDowngradePreference(@NonNull PLVPushDowngradePreference pushDowngradePreference) {
+        if (streamerPresenter.getPushDowngradePreference() == pushDowngradePreference) {
+            return;
+        }
+        streamerPresenter.setPushDowngradePreference(pushDowngradePreference);
     }
 
     @Override

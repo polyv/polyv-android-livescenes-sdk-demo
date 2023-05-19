@@ -6,6 +6,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 /**
  * date: 2020/10/9
@@ -196,7 +197,7 @@ public interface IPLVECLinkMicLayout {
         /**
          * rtc网络质量回调
          */
-        void onNetworkQuality(int quality);
+        void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);
         // </editor-fold>
 
         // <editor-fold defaultstate="collapsed" desc="点击事件监听器">

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#CC1B202D"
+    app:mode="all"
+    app:radius="40dp">
+
+    <TextView
+        android:id="@+id/plvls_live_room_push_downgrade_alert_toast_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="4dp"
+        android:layout_marginStart="12dp"
+        android:text="@string/plv_push_downgrade_alert_toast_text"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvls_live_room_push_downgrade_alert_switch_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="4dp"
+        android:text="马上切换"
+        android:textColor="#FF6363"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvls_live_room_push_downgrade_alert_toast_desc"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/plvls_live_room_push_downgrade_alert_close_iv"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginHorizontal="4dp"
+        android:padding="6dp"
+        android:src="@drawable/plv_close_ic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvls_live_room_push_downgrade_alert_switch_tv"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

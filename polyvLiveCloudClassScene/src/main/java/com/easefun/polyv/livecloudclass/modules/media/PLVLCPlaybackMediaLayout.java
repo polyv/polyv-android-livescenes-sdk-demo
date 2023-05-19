@@ -36,6 +36,7 @@ import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCPlaybackM
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCDanmuController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessageSender;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
+import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuSettingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
@@ -71,6 +72,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -135,6 +137,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private IPLVLCDanmuController danmuController;
     //弹幕包装器
     private PLVLCDanmuWrapper danmuWrapper;
+    //弹幕设置layout
+    private PLVLCDanmuSettingLayout danmuSettingLayout;
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
@@ -309,6 +313,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 }
             }
         });
+
+        danmuSettingLayout = new PLVLCDanmuSettingLayout(this);
+        danmuSettingLayout.registerDanWrapper(danmuWrapper);
     }
 
     private void initMediaController() {
@@ -428,6 +435,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
+
+        if(danmuSettingLayout != null){
+            danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+        }
     }
 
     @Override
@@ -631,7 +642,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
 
     }
 
@@ -894,6 +905,14 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onServerDanmuOpen(boolean isServerDanmuOpen) {
             super.onServerDanmuOpen(isServerDanmuOpen);
             danmuWrapper.setOnServerDanmuOpen(isServerDanmuOpen);
+        }
+
+        @Override
+        public void onServerDanmuSpeed(int speed){
+            super.onServerDanmuSpeed(speed);
+            if(danmuSettingLayout != null){
+                danmuSettingLayout.setDanmuSpeedOnServer(speed);
+            }
         }
 
         @Override

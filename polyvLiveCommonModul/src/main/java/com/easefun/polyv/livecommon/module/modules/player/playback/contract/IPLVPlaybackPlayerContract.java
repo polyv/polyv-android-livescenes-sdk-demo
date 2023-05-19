@@ -196,6 +196,12 @@ public interface IPLVPlaybackPlayerContract {
         void onServerDanmuOpen(boolean isServerDanmuOpen);
 
         /**
+         * 该频道的服务端设置的弹幕速度
+         * @param speed
+         */
+        void onServerDanmuSpeed(int speed);
+
+        /**
          * 根据频道的类型，决定是否要显示ppt
          *
          * @param visible {@link View#VISIBLE}

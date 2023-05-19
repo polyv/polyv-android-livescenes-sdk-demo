@@ -25,12 +25,11 @@ import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocum
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
-import com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.PLVLSPptListLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.IPLVLSCountDownView;
@@ -41,6 +40,9 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWi
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -59,7 +61,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     //view
     private TextView plvlsStatusBarChannelInfoTv;
     private TextView plvlsStatusBarStreamerTimeTv;
-    private PLVLSNetworkQualityWidget plvlsStatusBarNetQualityView;
+    private PLVStreamerNetworkStatusLayout statusBarNetQualityView;
     private TextView plvlsStatusBarClassControlTv;
     private ImageView plvlsStatusBarShareIv;
     private ImageView plvlsStatusBarSettingIv;
@@ -140,7 +142,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
         plvlsStatusBarChannelInfoTv = findViewById(R.id.plvls_status_bar_channel_info_tv);
         plvlsStatusBarStreamerTimeTv = findViewById(R.id.plvls_status_bar_streamer_time_tv);
-        plvlsStatusBarNetQualityView = findViewById(R.id.plvls_status_bar_net_quality_view);
+        statusBarNetQualityView = findViewById(R.id.plvls_status_bar_net_quality_view);
         plvlsStatusBarClassControlTv = findViewById(R.id.plvls_status_bar_class_control_tv);
         plvlsStatusBarShareIv = findViewById(R.id.plvls_status_bar_share_iv);
         plvlsStatusBarSettingIv = findViewById(R.id.plvls_status_bar_setting_iv);
@@ -243,6 +245,22 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             @Override
             public boolean isCurrentLocalVideoEnable() {
                 return onViewActionListener.isCurrentLocalVideoEnable();
+            }
+
+            @Nullable
+            @Override
+            public PLVPushDowngradePreference getCurrentDowngradePreference() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.getCurrentDowngradePreference();
+                }
+                return null;
+            }
+
+            @Override
+            public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onDowngradePreferenceChanged(preference);
+                }
             }
         });
     }
@@ -437,8 +455,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     @Override
-    public void updateNetworkQuality(int networkQuality) {
-        plvlsStatusBarNetQualityView.setNetQuality(networkQuality);
+    public void updateNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality) {
+        statusBarNetQualityView.onNetworkQuality(networkQuality);
+    }
+
+    @Override
+    public void updateNetworkStatus(PLVNetworkStatusVO networkStatusVO) {
+        statusBarNetQualityView.onNetworkStatus(networkStatusVO);
     }
 
     @Override
@@ -490,8 +513,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     private void toggleClassStates(boolean isWillStart) {
         if (isWillStart) {
             if (onViewActionListener != null) {
-                int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-                if (currentNetworkQuality == PLVSStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                PLVLinkMicConstant.NetworkQuality currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
+                if (currentNetworkQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                     //如果断网，则不上课，显示弹窗。
                     showAlertDialogNoNetwork();
                     return;

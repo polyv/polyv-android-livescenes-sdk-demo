@@ -334,8 +334,8 @@
                     android:layout_marginEnd="4dp"
                     android:layout_marginBottom="6dp"
                     android:gravity="center|top"
-                    android:visibility="gone"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/plvsa_more_share_iv"
@@ -350,6 +350,35 @@
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
                         android:text="分享"
+                        android:textColor="#99F0F1F5"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_more_push_downgrade_preference_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:gravity="center|top"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="12dp"
+                        android:src="@drawable/plvsa_live_room_push_downgrade_preference_icon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top"
+                        android:text="@string/plv_push_downgrade_preference_title"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 

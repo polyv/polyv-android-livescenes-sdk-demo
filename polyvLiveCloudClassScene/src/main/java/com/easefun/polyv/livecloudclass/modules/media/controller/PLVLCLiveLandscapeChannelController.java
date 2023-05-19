@@ -97,6 +97,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public ImageView getDanmuSettingView() {
+        return findViewById(R.id.plvlc_danmu_setting_land_iv);
+    }
+
+    @Override
     public PLVLCLikeIconView getLikesView() {
         return likesView;
     }

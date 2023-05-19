@@ -103,7 +103,7 @@ public class PLVLCPlaybackMoreLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化View">
     private void initView() {
         //父布局
-        containerLy = root.findViewById(R.id.container_ly);
+        containerLy = root.findViewById(R.id.plvlc_danmu_container_ly);
         containerLy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -792,6 +792,15 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                 }
             });
+            videoView.setOnDanmuSpeedServerListener(new IPLVVideoViewListenerEvent.OnDanmuSpeedServerListener() {
+                @Override
+                public void OnDanmuSpeedServerListener(int speed) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuSpeed(speed);
+                    }
+                }
+            });
             videoView.setOnPPTShowListener(new IPolyvVideoViewListenerEvent.OnPPTShowListener() {
                 @Override
                 public void showPPTView(int visible) {

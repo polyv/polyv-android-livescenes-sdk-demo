@@ -163,7 +163,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         plvlcLiveControlMoreLatencyRv = root.findViewById(R.id.plvlc_live_control_more_latency_rv);
         plvlcLiveControlMoreLatencyLl = root.findViewById(R.id.plvlc_live_control_more_latency_ll);
         llMoreVertical = root.findViewById(R.id.ll_more_vertical);
-        containerLy = root.findViewById(R.id.container_ly);
+        containerLy = root.findViewById(R.id.plvlc_danmu_container_ly);
     }
 
     private void initLatencyRv() {

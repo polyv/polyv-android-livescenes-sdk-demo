@@ -872,7 +872,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onNetQuality(int quality) {
+    public void onNetQuality(PLVLinkMicConstant.NetworkQuality quality) {
         linkMicListAdapter.updateNetQuality(quality);
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onNetworkQuality(quality);

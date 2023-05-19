@@ -1,11 +1,15 @@
 package com.easefun.polyv.livestreamer.modules.streamer;
 
+import androidx.annotation.NonNull;
 import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
 
 /**
  * 推流和连麦布局的接口定义
@@ -105,7 +109,14 @@ public interface IPLVLSStreamerLayout {
      *
      * @param listener 监听器
      */
-    void addOnNetworkQualityListener(IPLVOnDataChangedListener<Integer> listener);
+    void addOnNetworkQualityListener(IPLVOnDataChangedListener<PLVLinkMicConstant.NetworkQuality> listener);
+
+    /**
+     * 添加网络状态监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnNetworkStatusListener(IPLVOnDataChangedListener<PLVNetworkStatusVO> listener);
 
     /**
      * 添加推流时间监听器
@@ -154,7 +165,7 @@ public interface IPLVLSStreamerLayout {
      *
      * @return 网络质量常量
      */
-    int getNetworkQuality();
+    PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
     /**
      * 是否推流开始成功
@@ -169,6 +180,11 @@ public interface IPLVLSStreamerLayout {
      * @return presenter
      */
     IPLVStreamerContract.IStreamerPresenter getStreamerPresenter();
+
+    /**
+     * 设置推流降级策略
+     */
+    void setPushDowngradePreference(@NonNull PLVPushDowngradePreference pushDowngradePreference);
 
     /**
      * 销毁，释放资源

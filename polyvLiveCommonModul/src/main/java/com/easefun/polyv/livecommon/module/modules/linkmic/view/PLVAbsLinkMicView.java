@@ -4,6 +4,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicC
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowMode;
 import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.PLVViewerLinkMicState;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.List;
 
@@ -118,7 +119,7 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
     }
 
     @Override
-    public void onNetQuality(int quality) {
+    public void onNetQuality(PLVLinkMicConstant.NetworkQuality quality) {
 
     }
 

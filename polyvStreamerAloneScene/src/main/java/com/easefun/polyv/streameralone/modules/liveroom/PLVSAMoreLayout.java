@@ -40,10 +40,11 @@ import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.IPLVChatroomManager;
-import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -63,6 +64,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     // 弹层布局位置
     private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
     private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 弹层布局尺寸 竖屏高度 横屏宽度
+    private static final int MENU_DRAWER_SIZE_PORT = ConvertUtils.dp2px(270);
+    private static final int MENU_DRAWER_SIZE_LAND = ConvertUtils.dp2px(240);
     // 更多布局高度
     private static final int MORE_LAYOUT_HEIGHT_PORT = ViewGroup.LayoutParams.WRAP_CONTENT;
     private static final int MORE_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -98,15 +102,17 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreShareScreenTv;
     private LinearLayout moreBeautyLl;
     private LinearLayout moreShareLl;
+    private LinearLayout morePushDowngradePreferenceLl;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
 
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
-
     //分享布局
     private PLVSAShareLayout shareLayout;
+    // 推流降级布局
+    private final PLVSAPushDowngradePreferenceLayout pushDowngradePreferenceLayout = new PLVSAPushDowngradePreferenceLayout(getContext());
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -190,7 +196,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreShareScreenTv = findViewById(R.id.plvsa_more_share_screen_tv);
         moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
         moreShareLl = findViewById(R.id.plvsa_more_share_layout);
-
+        morePushDowngradePreferenceLl = findViewById(R.id.plvsa_more_push_downgrade_preference_ll);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -209,6 +215,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreShareScreenLl.setOnClickListener(this);
         moreBeautyLl.setOnClickListener(this);
         moreShareLl.setOnClickListener(this);
+        morePushDowngradePreferenceLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
@@ -238,8 +245,27 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         //init shareLayout
         shareLayout = new PLVSAShareLayout(getContext());
 
+        setupPushDowngradeLayout();
         observeBeautyModuleInitResult();
         observeChatroomStatus();
+    }
+
+    private void setupPushDowngradeLayout() {
+        pushDowngradePreferenceLayout.setOnViewActionListener(new PLVSAPushDowngradePreferenceLayout.OnViewActionListener() {
+            @Nullable
+            @Override
+            public PLVPushDowngradePreference getCurrentDowngradePreference() {
+                return streamerPresenter.getPushDowngradePreference();
+            }
+
+            @Override
+            public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
+                if (streamerPresenter.getPushDowngradePreference() == preference) {
+                    return;
+                }
+                streamerPresenter.setPushDowngradePreference(preference);
+            }
+        });
     }
 
     private void observeChatroomStatus() {
@@ -336,6 +362,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
             menuDrawer.setMenuView(this);
+            menuDrawer.setMenuSize(PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_SIZE_PORT : MENU_DRAWER_SIZE_LAND);
             menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
@@ -658,6 +685,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == moreShareLl.getId()) {
             close();
             shareLayout.open();
+        } else if (id == morePushDowngradePreferenceLl.getId()) {
+            close();
+            pushDowngradePreferenceLayout.open();
         }
     }
     // </editor-fold>
