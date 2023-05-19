@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -242,7 +243,7 @@ public interface IPLVLCMediaLayout {
     /**
      * 更新网络质量
      */
-    void acceptNetworkQuality(int quality);
+    void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);
 
     void notifyRTCPrepared();
 

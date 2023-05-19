@@ -140,6 +140,11 @@ public abstract class PLVAbsLivePlayerView implements IPLVLivePlayerContract.ILi
     }
 
     @Override
+    public void onServerDanmuSpeed(int speed) {
+
+    }
+
+    @Override
     public void onShowPPTView(int visible) {
 
     }

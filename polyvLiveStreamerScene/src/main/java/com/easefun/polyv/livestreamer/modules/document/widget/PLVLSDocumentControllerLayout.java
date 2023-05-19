@@ -388,8 +388,9 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             public void onPptStatusChange(PLVSPPTStatus pptStatus) {
                 currentAutoId = pptStatus.getAutoId();
                 currentPageIndex = pptStatus.getPageId();
-                autoId2PageCountMap.put(currentAutoId, Math.max(1, pptStatus.getTotal()));
-
+                if (pptStatus.getTotal() != 0) {
+                    autoId2PageCountMap.put(currentAutoId, Math.max(1, pptStatus.getTotal()));
+                }
                 updatePageIndicator(currentAutoId, currentPageIndex);
 
                 // 更新画笔和添加白板按钮状态

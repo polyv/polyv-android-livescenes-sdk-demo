@@ -31,7 +31,7 @@ android {
 dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:gridlayout-v7:27.1.1'
-    api 'net.polyv.android:polyvSDKLiveScenes:1.11.2'
+    api 'net.polyv.android:polyvSDKLiveScenes:1.11.3'
 
     //glide
     api("com.github.bumptech.glide:okhttp3-integration:4.7.1") {

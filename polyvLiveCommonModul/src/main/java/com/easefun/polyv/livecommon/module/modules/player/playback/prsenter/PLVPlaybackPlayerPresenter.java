@@ -25,6 +25,7 @@ import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlayback
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
+import com.easefun.polyv.livecommon.module.modules.player.live.contract.IPLVLivePlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.PLVPlaybackPlayerRepo;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
@@ -789,6 +790,15 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (view != null) {
                         view.onServerDanmuOpen(isServerDanmuOpen);
+                    }
+                }
+            });
+            videoView.setOnDanmuSpeedServerListener(new IPLVVideoViewListenerEvent.OnDanmuSpeedServerListener() {
+                @Override
+                public void OnDanmuSpeedServerListener(int speed) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuSpeed(speed);
                     }
                 }
             });

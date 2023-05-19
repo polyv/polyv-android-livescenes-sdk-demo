@@ -337,7 +337,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
-    public int getNetworkQuality() {
+    public PLVLinkMicConstant.NetworkQuality getNetworkQuality() {
         return streamerPresenter.getNetworkQuality();
     }
 

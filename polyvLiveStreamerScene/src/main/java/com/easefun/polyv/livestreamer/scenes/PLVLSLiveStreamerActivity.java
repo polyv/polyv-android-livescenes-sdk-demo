@@ -31,6 +31,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.IPLVLSChatroomLayout;
 import com.easefun.polyv.livestreamer.modules.document.IPLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
+import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSPushDowngradeAlertToastLayout;
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.di.PLVLSStreamerModule;
@@ -39,11 +40,13 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -82,6 +85,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private IPLVLSChatroomLayout plvlsChatroomLy;
     // 美颜布局
     private IPLVLSBeautyLayout beautyLayout;
+    // 推流降级提示布局
+    private PLVLSPushDowngradeAlertToastLayout pushDowngradeAlertToastLy;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -164,6 +169,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         initLiveRoomManager();
         initView();
         initBeautyModule();
+        initPushDowngradeAlertLayout();
 
         checkStreamRecover();
 
@@ -283,6 +289,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsDocumentLy = findViewById(R.id.plvls_document_ly);
         plvlsStreamerLy = findViewById(R.id.plvls_streamer_ly);
         plvlsChatroomLy = findViewById(R.id.plvls_chatroom_ly);
+        pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
 
         // 初始化推流和连麦布局
         plvlsStreamerLy.init(liveRoomDataManager);
@@ -351,8 +358,19 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
-            public int getCurrentNetworkQuality() {
+            public PLVLinkMicConstant.NetworkQuality getCurrentNetworkQuality() {
                 return plvlsStreamerLy.getNetworkQuality();
+            }
+
+            @Nullable
+            @Override
+            public PLVPushDowngradePreference getCurrentDowngradePreference() {
+                return plvlsStreamerLy.getStreamerPresenter().getPushDowngradePreference();
+            }
+
+            @Override
+            public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
+                plvlsStreamerLy.setPushDowngradePreference(preference);
             }
 
             @Override
@@ -460,13 +478,22 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
         });
         //监听推流网络变化
-        plvlsStreamerLy.addOnNetworkQualityListener(new IPLVOnDataChangedListener<Integer>() {
+        plvlsStreamerLy.addOnNetworkQualityListener(new IPLVOnDataChangedListener<PLVLinkMicConstant.NetworkQuality>() {
             @Override
-            public void onChanged(@Nullable Integer integer) {
-                if (integer == null) {
+            public void onChanged(@Nullable PLVLinkMicConstant.NetworkQuality quality) {
+                if (quality == null) {
                     return;
                 }
-                plvlsStatusBarLy.updateNetworkQuality(integer);
+                plvlsStatusBarLy.updateNetworkQuality(quality);
+            }
+        });
+        plvlsStreamerLy.addOnNetworkStatusListener(new IPLVOnDataChangedListener<PLVNetworkStatusVO>() {
+            @Override
+            public void onChanged(@Nullable PLVNetworkStatusVO networkStatusVO) {
+                if (networkStatusVO == null) {
+                    return;
+                }
+                plvlsStatusBarLy.updateNetworkStatus(networkStatusVO);
             }
         });
         //监听推流的累计时间
@@ -535,6 +562,10 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 plvlsChatroomLy.setFrontCameraViewStatus(aBoolean);
             }
         });
+    }
+
+    private void initPushDowngradeAlertLayout() {
+        plvlsStreamerLy.getStreamerPresenter().registerView(pushDowngradeAlertToastLy.streamerView);
     }
     // </editor-fold>
 
@@ -614,7 +645,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (plvlsStreamerLy.getNetworkQuality() == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                    if (plvlsStreamerLy.getNetworkQuality() == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                         plvlsStatusBarLy.showAlertDialogNoNetwork();
                         return;
                     }

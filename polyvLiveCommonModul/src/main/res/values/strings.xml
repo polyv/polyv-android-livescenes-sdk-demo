@@ -83,6 +83,12 @@
     <string name="plv_streamer_dialog_no_network">网络断开，已停止直播，请更换网络后重试</string>
     <string name="plv_streamer_toast_can_not_linkmic_before_the_class">上课前无法发起连麦</string>
     <string name="plv_streamer_toast_please_click_class_first">请先点击上课</string>
+    <string name="plv_push_downgrade_preference_title">弱网处理</string>
+    <string name="plv_push_downgrade_quality_title">画质优先</string>
+    <string name="plv_push_downgrade_quality_desc">当网络状态差时，优先保证画面清晰度，但会造成观看画面卡顿</string>
+    <string name="plv_push_downgrade_fluency_title">流畅优先</string>
+    <string name="plv_push_downgrade_fluency_desc">当网络状态差时，优先保证画面流畅度，但清晰度会下降</string>
+    <string name="plv_push_downgrade_alert_toast_text">当前网络较差，建议切换为流畅模式</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>

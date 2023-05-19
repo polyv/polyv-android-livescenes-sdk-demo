@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
-import com.plv.business.api.common.player.PLVPlayerConstant;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 
 import java.util.concurrent.TimeUnit;
@@ -37,7 +37,7 @@ public class PLVLCNetworkTipsView extends FrameLayout implements View.OnClickLis
     private boolean isLinkMic = false;
     private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
 
-    private int lastQuality = -1;
+    private PLVLinkMicConstant.NetworkQuality lastQuality = PLVLinkMicConstant.NetworkQuality.UNKNOWN;
     private int qualityCount = 0;
     private boolean hasShowNotGoodTips = false;
     private boolean hasShowChangeLatencyTips = false;
@@ -84,7 +84,7 @@ public class PLVLCNetworkTipsView extends FrameLayout implements View.OnClickLis
         hide();
     }
 
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
         if (lastQuality != quality) {
             lastQuality = quality;
             qualityCount = 1;
@@ -108,7 +108,7 @@ public class PLVLCNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     public void reset() {
-        lastQuality = -1;
+        lastQuality = PLVLinkMicConstant.NetworkQuality.UNKNOWN;
         qualityCount = 0;
         hasShowNotGoodTips = false;
         hasShowChangeLatencyTips = false;
@@ -120,11 +120,15 @@ public class PLVLCNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     private void tryShow() {
-        if (PLVPlayerConstant.NetQuality.isNoConnection(lastQuality)) {
+        if (lastQuality == PLVLinkMicConstant.NetworkQuality.UNKNOWN) {
+            return;
+        }
+
+        if (lastQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
             tryShowNetNotGoodTips();
-        } else if (PLVPlayerConstant.NetQuality.isNetPoor(lastQuality)) {
+        } else if (lastQuality == PLVLinkMicConstant.NetworkQuality.VERY_BAD) {
             tryShowChangeLatencyTips();
-        } else if (PLVPlayerConstant.NetQuality.isNetMiddleOrWorse(lastQuality)) {
+        } else if (lastQuality.worseThan(PLVLinkMicConstant.NetworkQuality.GOOD)) {
             tryShowNetNotGoodTips();
         }
     }

@@ -38,6 +38,7 @@ import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
 import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
@@ -1243,7 +1244,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         }
 
         @Override
-        public void onNetworkQuality(int quality) {
+        public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
             super.onNetworkQuality(quality);
             if (linkMicView != null) {
                 linkMicView.onNetQuality(quality);

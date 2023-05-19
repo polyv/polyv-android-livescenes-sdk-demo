@@ -39,6 +39,7 @@ import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveMedia
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCDanmuController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessageSender;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
+import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuSettingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
@@ -75,10 +76,12 @@ import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
+import com.plv.business.api.common.player.PLVPlayerConstant;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -157,6 +160,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private IPLVLCDanmuController danmuController;
     //弹幕包装器
     private PLVLCDanmuWrapper danmuWrapper;
+    //弹幕设置layout
+    private PLVLCDanmuSettingLayout danmuSettingLayout;
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
@@ -349,6 +354,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 }
             }
         });
+
+        danmuSettingLayout = new PLVLCDanmuSettingLayout(this);
+        danmuSettingLayout.registerDanWrapper(danmuWrapper);
     }
 
     private void initMarkToolControllerLayout() {
@@ -651,6 +659,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         observeLinkMicStatus(livePlayerPresenter);
 
         mediaController.setLivePlayerPresenter(livePlayerPresenter);
+
+        if(danmuSettingLayout != null){
+            danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+        }
     }
 
     @Override
@@ -812,18 +824,30 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     public void setLandscapeControllerView(@NonNull IPLVLCLiveLandscapePlayerController landscapeControllerView) {
         mediaController.setLandscapeController(landscapeControllerView);
         final View danmuSwitchView = landscapeControllerView.getDanmuSwitchView();
+        final View danmuSettingView = landscapeControllerView.getDanmuSettingView();
+        danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);
+        danmuWrapper.setDanmuSwitchSettingView(danmuSettingView);
+
         danmuSwitchView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 danmuWrapper.dispatchDanmuSwitchOnClicked(v);
                 mediaController.dispatchDanmuSwitchOnClicked(v);
+                danmuSettingView.setVisibility(!danmuSwitchView.isSelected() ? View.VISIBLE : View.GONE);
                 if (SYNC_LANDSCAPE_CHATROOM_LAYOUT_VISIBILITY_WITH_DANMU) {
                     final boolean showChatLayout = !danmuSwitchView.isSelected();
                     chatLandscapeLayout.toggle(showChatLayout);
                 }
             }
         });
-        danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);
+
+        danmuSettingView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaController.hide();
+                danmuSettingLayout.show();
+            }
+        });
     }
 
     @Override
@@ -939,7 +963,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
         networkTipsView.acceptNetworkQuality(quality);
     }
 
@@ -1223,6 +1247,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         @Override
+        public void onServerDanmuSpeed(int speed){
+            super.onServerDanmuSpeed(speed);
+            if(danmuSettingLayout != null){
+                danmuSettingLayout.setDanmuSpeedOnServer(speed);
+            }
+        }
+
+        @Override
         public void onShowPPTView(int visible) {
             super.onShowPPTView(visible);
             mediaController.setServerEnablePPT(visible == View.VISIBLE);
@@ -1242,7 +1274,15 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
         @Override
         public void onLowLatencyNetworkQuality(int networkQuality) {
-            networkTipsView.acceptNetworkQuality(networkQuality);
+            if (PLVPlayerConstant.NetQuality.isNoConnection(networkQuality)) {
+                networkTipsView.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.DISCONNECT);
+            } else if (PLVPlayerConstant.NetQuality.isNetPoor(networkQuality)) {
+                networkTipsView.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.VERY_BAD);
+            } else if (PLVPlayerConstant.NetQuality.isNetMiddleOrWorse(networkQuality)) {
+                networkTipsView.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.POOR);
+            } else {
+                networkTipsView.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.GOOD);
+            }
         }
     };
     // </editor-fold>

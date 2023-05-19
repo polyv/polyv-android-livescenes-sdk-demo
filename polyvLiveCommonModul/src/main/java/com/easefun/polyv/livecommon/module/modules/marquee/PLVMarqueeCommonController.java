@@ -70,19 +70,21 @@ public class PLVMarqueeCommonController {
         int defaultFontSize = 0;
         int defaultFontColor = 0;
         int defaultSetting = PLVMarqueeAnimationVO.ROLL;
+        int defaultSpeed = 200;
 
         if (!channelJsonMarqueeVO.marqueeType.equals(PolyvLiveMarqueeVO.MARQUEETYPE_DIYURL)) {
             defaultFontAlpha = (int) (255 * PLVFormatUtils.parseFloat(channelJsonMarqueeVO.marqueeOpacity.replace("%", "")) * 0.01F);
             defaultFontSize = Math.min(channelJsonMarqueeVO.marqueeFontSize, 66);
             defaultFontColor = PLVFormatUtils.parseColor(channelJsonMarqueeVO.marqueeFontColor);
             defaultSetting = PLVFormatUtils.integerValueOf(channelJsonMarqueeVO.marqueeSetting, PLVMarqueeAnimationVO.ROLL);
+            defaultSpeed = channelJsonMarqueeVO.marqueeSpeed >= 0 ? channelJsonMarqueeVO.marqueeSpeed : 200;
         }
 
         switch (channelJsonMarqueeVO.marqueeType) {
             case PolyvLiveMarqueeVO.MARQUEETYPE_FIXED:
                 setDefaultMarqueeParams(marqueeModel, channelJsonMarqueeVO.marquee,
                         defaultFontSize, defaultFontColor, defaultFontAlpha,
-                        defaultSetting, callback);
+                        defaultSetting, callback, defaultSpeed);
                 break;
             case PolyvLiveMarqueeVO.MARQUEETYPE_NICKNAME:
                 marqueeModel.setInterval(0);
@@ -90,7 +92,7 @@ public class PLVMarqueeCommonController {
                 marqueeModel.setTweenTime(0);
                 setDefaultMarqueeParams(marqueeModel, nickName,
                         defaultFontSize, defaultFontColor, defaultFontAlpha,
-                        defaultSetting, callback);
+                        defaultSetting, callback, defaultSpeed);
                 break;
             case PolyvLiveMarqueeVO.MARQUEETYPE_DIYURL:
                 setDiyUrlMarqueeParams(marqueeModel,
@@ -119,14 +121,15 @@ public class PLVMarqueeCommonController {
     private void setDefaultMarqueeParams(PLVMarqueeModel marqueeModel,
                                          String content, int fontSize,
                                          int fontColor, int fontAlpha,
-                                         int setting, IPLVMarqueeControllerCallback callback) {
+                                         int setting, IPLVMarqueeControllerCallback callback,
+                                         int speed) {
         marqueeModel.setUserName(content)
                 .setFontSize(fontSize)
                 .setFontColor(fontColor)
                 .setFontAlpha(fontAlpha)
                 .setFilter(false)
                 .setSetting(setting)
-                .setSpeed(100);
+                .setSpeed(speed);
         if (callback != null) {
             callback.onMarqueeModel(PLVMarqueeSDKController.ALLOW_PLAY_MARQUEE, marqueeModel);
         }

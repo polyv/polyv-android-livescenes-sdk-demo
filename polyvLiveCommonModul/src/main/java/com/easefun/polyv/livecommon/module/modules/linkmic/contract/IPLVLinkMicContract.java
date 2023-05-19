@@ -147,9 +147,10 @@ public interface IPLVLinkMicContract {
 
         /**
          * 更新本地网络质量
+         *
          * @param quality 网络质量
          */
-        void onNetQuality(int quality);
+        void onNetQuality(PLVLinkMicConstant.NetworkQuality quality);
 
         /**
          * 切换第一画面

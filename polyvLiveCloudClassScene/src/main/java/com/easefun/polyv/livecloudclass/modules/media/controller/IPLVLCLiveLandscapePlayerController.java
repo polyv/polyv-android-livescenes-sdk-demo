@@ -57,6 +57,12 @@ public interface IPLVLCLiveLandscapePlayerController {
     ImageView getDanmuSwitchView();
 
     /**
+     * 获取弹幕设置按钮
+     * @return
+     */
+    ImageView getDanmuSettingView();
+
+    /**
      * 获取点赞view
      */
     PLVLCLikeIconView getLikesView();

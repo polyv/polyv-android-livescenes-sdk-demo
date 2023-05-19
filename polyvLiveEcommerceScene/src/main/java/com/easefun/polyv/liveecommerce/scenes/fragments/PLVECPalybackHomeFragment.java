@@ -247,6 +247,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }
             }
         });
+        swipeLoadView.setEnabled(isChatPlaybackEnabled);
         //聊天回放tips
         chatPlaybackTipsTv = findViewById(R.id.plvlc_chat_playback_tips_tv);
         //卡片推送
@@ -336,6 +337,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
             //聊天回放重新设置播放器的位置，后续加上在线聊天室后，可以放在onActivityCreated方法中调用
             calculateLiveVideoViewRect();
+        }
+        if (swipeLoadView != null) {
+            swipeLoadView.setEnabled(isChatPlaybackEnabled);
         }
         chatroomPresenter.registerView(chatroomView);
         //后于播放器准备完成回调时，这时检测是否要触发加载聊天回放

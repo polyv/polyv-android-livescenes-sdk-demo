@@ -22,8 +22,8 @@
         android:id="@+id/plvls_document_ly"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -57,4 +57,15 @@
         android:id="@+id/plvls_live_room_popup_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSPushDowngradeAlertToastLayout
+        android:id="@+id/plvls_push_downgrade_alert_toast_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/plvls_document_ly"
+        app:layout_constraintStart_toStartOf="@+id/plvls_document_ly"
+        app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
+
 </android.support.constraint.ConstraintLayout>

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.HashMap;
@@ -20,12 +21,15 @@ import net.polyv.danmaku.controller.DrawHandler;
 import net.polyv.danmaku.controller.IDanmakuView;
 import net.polyv.danmaku.danmaku.model.BaseDanmaku;
 import net.polyv.danmaku.danmaku.model.DanmakuTimer;
+import net.polyv.danmaku.danmaku.model.Duration;
 import net.polyv.danmaku.danmaku.model.IDanmakus;
 import net.polyv.danmaku.danmaku.model.IDisplayer;
+import net.polyv.danmaku.danmaku.model.R2LDanmaku;
 import net.polyv.danmaku.danmaku.model.android.DanmakuContext;
 import net.polyv.danmaku.danmaku.model.android.Danmakus;
 import net.polyv.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import net.polyv.danmaku.danmaku.parser.BaseDanmakuParser;
+import net.polyv.danmaku.ui.widget.DanmakuView;
 
 /**
  * 弹幕Fragment
@@ -38,6 +42,9 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
     private IDanmakuView mDanmakuView;
     private BaseDanmakuParser mParser;
     private DanmakuContext mContext;
+
+    //弹幕速度
+    private int speed = 200;
 
     @Nullable
     @Override
@@ -72,7 +79,9 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
                 .setScrollSpeedFactor(1.2f).setScaleTextSize(1.0f)
                 // 图文混排使用SpannedCacheStuffer
                 .setCacheStuffer(new CustomSpannedCacheStuffer(), null)
-                .setMaximumLines(maxLinesPair).preventOverlapping(overlappingEnablePair);
+                .setMaximumLines(maxLinesPair).preventOverlapping(overlappingEnablePair)
+                //开启自定义速度
+                .setOpenCustomerSpeed(true);
 
         if(getActivity() != null) {
             //修复高帧率下弹幕会重复的问题
@@ -175,6 +184,10 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
             return;
         }
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
+
+        //注意：动态设置不同弹幕速度仅针对 BaseDanmaku.TYPE_SCROLL_RL 和
+        //setDuplicateMergingEnabled(false) 必须为 false 及 setOpenCustomerSpeed(true) 才会生效
+        danmaku.setCusomerSpeed(speed);
         danmaku.text = message;
         danmaku.padding = 0;
         danmaku.priority = 1; // 一定会显示, 一般用于本机发送的弹幕
@@ -201,6 +214,11 @@ public class PLVLCDanmuFragment extends Fragment implements IPLVLCDanmuControlle
             mDanmakuView.release();
             mDanmakuView = null;
         }
+    }
+
+    @Override
+    public void setDanmuSpeed(int speed) {
+        this.speed = speed;
     }
 
     @Override

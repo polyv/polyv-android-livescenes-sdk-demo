@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-        android:id="@+id/container_ly"
+        android:id="@+id/plvlc_danmu_container_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#CC000000">

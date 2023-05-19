@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
@@ -54,7 +56,12 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onNetworkQuality(int quality) {
+    public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
+
+    }
+
+    @Override
+    public void onUpstreamNetworkStatus(PLVNetworkStatusVO networkStatus) {
 
     }
 

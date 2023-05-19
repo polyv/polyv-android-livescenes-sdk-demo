@@ -4,6 +4,7 @@ import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 /**
  * 设置页布局的接口定义
@@ -79,7 +80,7 @@ public interface IPLVSASettingLayout {
          *
          * @return 网络质量常量
          */
-        int getCurrentNetworkQuality();
+        PLVLinkMicConstant.NetworkQuality getCurrentNetworkQuality();
 
         /**
          * 设置相机方向

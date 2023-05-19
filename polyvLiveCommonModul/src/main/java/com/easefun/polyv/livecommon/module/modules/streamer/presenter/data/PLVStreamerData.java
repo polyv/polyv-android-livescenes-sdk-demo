@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 
 /**
  * 推流和连麦的数据，主要用于提供给 非mvp的v 监听/获取推流和连麦的数据
@@ -14,7 +16,8 @@ public class PLVStreamerData {
     private MutableLiveData<Boolean> streamerStatus = new MutableLiveData<>();
 
     //推流网络变化状态
-    private MutableLiveData<Integer> networkQuality = new MutableLiveData<>();
+    private MutableLiveData<PLVLinkMicConstant.NetworkQuality> networkQuality = new MutableLiveData<>();
+    private MutableLiveData<PLVNetworkStatusVO> networkStatus = new MutableLiveData<>();
 
     //推流时间
     private MutableLiveData<Integer> streamerTime = new MutableLiveData<>();
@@ -39,6 +42,8 @@ public class PLVStreamerData {
 
     //当前设置的码率
     private MutableLiveData<Integer> curBitrate = new MutableLiveData<>();
+    // 推流降级策略
+    private MutableLiveData<PLVPushDowngradePreference> downgradePreferenceLiveData = new MutableLiveData<>();
 
     // 推流画面比例
     private MutableLiveData<PLVLinkMicConstant.PushResolutionRatio> pushResolutionRatioLiveData = new MutableLiveData<>();
@@ -60,13 +65,23 @@ public class PLVStreamerData {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="网络变化状态">
-    public void postNetworkQuality(int quality) {
+
+    public void postNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
         networkQuality.postValue(quality);
     }
 
-    public LiveData<Integer> getNetworkQuality() {
+    public LiveData<PLVLinkMicConstant.NetworkQuality> getNetworkQuality() {
         return networkQuality;
     }
+
+    public void postNetworkStatus(PLVNetworkStatusVO networkStatusVO) {
+        networkStatus.postValue(networkStatusVO);
+    }
+
+    public LiveData<PLVNetworkStatusVO> getNetworkStatus() {
+        return networkStatus;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流时间">
@@ -106,6 +121,14 @@ public class PLVStreamerData {
 
     public LiveData<Integer> getCurBitrate() {
         return curBitrate;
+    }
+
+    public void postDowngradePreference(PLVPushDowngradePreference downgradePreference) {
+        downgradePreferenceLiveData.postValue(downgradePreference);
+    }
+
+    public LiveData<PLVPushDowngradePreference> getDowngradePreferenceLiveData() {
+        return downgradePreferenceLiveData;
     }
     // </editor-fold>
 

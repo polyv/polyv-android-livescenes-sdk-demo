@@ -32,6 +32,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
 
     //观看热度是否已经请求成功
     private boolean isRequestedPageViewer;
+    private int requestedPageViewer;
 
     //观看热度数据
     private MutableLiveData<PLVStatefulData<Integer>> pageViewerData = new MutableLiveData<>();
@@ -241,6 +242,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             @Override
             public void onSuccess(Integer integer) {
                 isRequestedPageViewer = true;
+                requestedPageViewer = integer;
                 pageViewerData.postValue(PLVStatefulData.success(integer));
             }
 
@@ -257,9 +259,10 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
         liveRoomDataRequester.requestChannelDetail(new PLVLiveRoomDataRequester.IPLVNetRequestListener<PolyvLiveClassDetailVO>() {
             @Override
             public void onSuccess(PolyvLiveClassDetailVO liveClassDetailVO) {
-                if (!isRequestedPageViewer && liveClassDetailVO.getData() != null) {
+                if (liveClassDetailVO.getData() != null) {
+                    long fixPageView = isRequestedPageViewer ? requestedPageViewer : (liveClassDetailVO.getData().getPageView() + 1);
                     //如果观看热度还没请求成功，则加上自己
-                    liveClassDetailVO.getData().setPageView(liveClassDetailVO.getData().getPageView() + 1);
+                    liveClassDetailVO.getData().setPageView(fixPageView);
                 }
                 classDetailVO.postValue(PLVStatefulData.success(liveClassDetailVO));
             }

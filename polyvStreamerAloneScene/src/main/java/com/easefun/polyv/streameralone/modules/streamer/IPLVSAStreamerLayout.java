@@ -9,6 +9,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 /**
  * 推流和连麦布局的接口定义
@@ -72,7 +73,7 @@ public interface IPLVSAStreamerLayout {
      *
      * @return 网络质量常量
      */
-    int getNetworkQuality();
+    PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
     /**
      * 添加因断网延迟20s断流的状态监听器
