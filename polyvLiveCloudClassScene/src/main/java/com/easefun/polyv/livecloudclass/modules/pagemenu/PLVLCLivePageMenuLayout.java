@@ -39,6 +39,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragmen
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
@@ -71,6 +72,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
@@ -445,6 +447,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (liveDescFragment != null) {
             liveDescFragment.updateLiveStatus(liveStateEnum);
         }
+        //新增下面的代码
+        if (tuWenFragment != null) {
+            tuWenFragment.updateLiveStatus(liveStateEnum);
+        }
     }
 
     @Nullable
@@ -544,7 +550,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private void addTuWenTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
         tuWenFragment = new PLVLCTuWenFragment();
-        tuWenFragment.init(liveRoomDataManager.getConfig().getChannelId());
+        PLVInteractNativeAppParams appParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+        tuWenFragment.init(liveRoomDataManager.getConfig().getChannelId(),appParams);
         pageMenuTabFragmentList.add(tuWenFragment);
     }
 
