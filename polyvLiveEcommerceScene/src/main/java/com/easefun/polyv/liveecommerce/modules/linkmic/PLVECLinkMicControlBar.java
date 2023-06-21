@@ -69,6 +69,8 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     private static final boolean AUTO_HIDE_WHEN_JOINED = true;
     //竖屏下初始位置的y偏移
     private static final int DP_ORIGIN_MARGIN_TOP_PORTRAIT = 466;
+    //初始化位置->横屏margin top
+    private static final int DP_ORIGIN_MARGIN_TOP_LANDSCAPE = 87;
 
     //View
     //--竖屏
@@ -186,7 +188,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         //设置竖屏点击监听器
         setPortraitClickListener();
         //设置竖屏初始化位置
-        floatingViewPortraitRoot.setInitLocation(0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_PORTRAIT), 0, 0);
+        floatingViewPortraitRoot.setInitLocation(0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_PORTRAIT), 0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_LANDSCAPE));
 
         //设置屏幕方向
         isPortrait = PLVScreenUtils.isPortrait(getContext());
@@ -516,14 +518,11 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
             return;
         }
-        if (isPortrait) {
-            floatingViewPortraitRoot.setVisibility(VISIBLE);
-            //旋转到竖屏时，如果当前上麦了，那么将控制条拉到最长
-            if (state.ordinal() >= PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS.ordinal()) {
-                clickRingSetting();
-            }
-        } else {
-            floatingViewPortraitRoot.setVisibility(GONE);
+        //直播带货场景的横竖屏都使用同一样式 连麦条
+        floatingViewPortraitRoot.setVisibility(VISIBLE);
+        //旋转到竖屏时，如果当前上麦了，那么将控制条拉到最长
+        if (state.ordinal() >= PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS.ordinal()) {
+            clickRingSetting();
         }
     }
     // </editor-fold>

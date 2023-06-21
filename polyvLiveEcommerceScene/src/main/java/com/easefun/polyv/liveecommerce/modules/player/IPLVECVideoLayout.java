@@ -349,6 +349,12 @@ public interface IPLVECVideoLayout {
          * 网络质量回调
          */
         void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality);
+
+        /**
+         * 当前视频是否可以设置全屏
+         * @param isCanFullScreen
+         */
+        void acceptVideoSize(boolean isCanFullScreen);
     }
     // </editor-fold>
 }

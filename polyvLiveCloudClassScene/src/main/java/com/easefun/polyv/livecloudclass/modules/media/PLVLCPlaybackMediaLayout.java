@@ -43,9 +43,11 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
@@ -142,6 +144,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
 
+    //商品卡片
+    private PLVLCCommodityPushLayout commodityPushLayout;
+
     //跑马灯
     private PLVMarqueeView marqueeView = null;
 
@@ -222,6 +227,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         watermarkView = findViewById(R.id.polyv_watermark_view);
         playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvlc_playback_auto_continue_seek_time_hint_layout);
         playbackAutoContinueSeekTimeTv = findViewById(R.id.plvlc_playback_auto_continue_seek_time_tv);
+        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_ly);
 
         initVideoView();
         initPlayErrorView();
@@ -439,6 +445,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
+
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }
 
     @Override

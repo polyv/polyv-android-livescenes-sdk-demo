@@ -73,6 +73,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private OnOpenInsideWebViewListener onOpenInsideWebViewListener;
     private PLVInsideWebViewLayout insideWebViewLayout;
 
+    //是否锁定到竖屏
+    private boolean isLockPortrait = false;
+
     private static final List<String> JS_HANDLER = listOf(
             PLVInteractJSBridgeEventConst.V2_GET_NATIVE_APP_PARAMS_INFO,
             PLVInteractJSBridgeEventConst.V2_CLOSE_WEB_VIEW,
@@ -297,6 +300,11 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void updateOrientationLock(boolean isLock) {
+        this.isLockPortrait = isLock;
+    }
+
+    @Override
     public void destroy() {
         if (plvlcInteractWeb != null) {
             plvlcInteractWeb.removeAllViews();
@@ -377,7 +385,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private void processWebViewVisibility(boolean close) {
         Log.d(TAG, "processWebViewVisibility close: " + close);
         setVisibility(close ? View.INVISIBLE : View.VISIBLE);
-        if (close) {
+        if (close && !isLockPortrait) {
             //隐藏的时候解锁屏幕方向锁定
             PLVOrientationManager.getInstance().unlockOrientation();
         }

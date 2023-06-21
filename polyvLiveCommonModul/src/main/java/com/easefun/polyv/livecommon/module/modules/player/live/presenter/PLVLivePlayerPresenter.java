@@ -844,6 +844,12 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                     }
                 }
             });
+            videoView.setOnVideoPlayListener(new IPLVVideoViewListenerEvent.OnVideoPlayListener() {
+                @Override
+                public void onPlay(boolean isFirst) {
+                    setMarqueeViewRunning(true);
+                }
+            });
             videoView.setOnVideoPauseListener(new IPolyvVideoViewListenerEvent.OnVideoPauseListener() {
                 @Override
                 public void onPause() {
@@ -853,7 +859,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
             videoView.setOnOnlyAudioListener(new IPolyvLiveListenerEvent.OnOnlyAudioListener() {
                 @Override
                 public void onOnlyAudio(boolean isOnlyAudio) {
-                    if(!getConfig().isPPTChannelType()){
+                    if (!getConfig().isPPTChannelType()) {
                         isOnlyAudio = false;//仅音频模式限三分屏
                     }
                     liveRoomDataManager.setOnlyAudio(isOnlyAudio);

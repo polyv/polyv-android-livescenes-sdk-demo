@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.modules.reward.view.adapter.PLVRewardListAdapter;
-import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVBeadWidget;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -322,7 +321,7 @@ public class PLVRewardDialogView {
 
                 rootView.setVisibility(View.GONE);
                 rootView.clearFocus();
-                PLVOrientationManager.getInstance().unlockOrientation();
+//                PLVOrientationManager.getInstance().unlockOrientation();
                 isShown = false;
             }
 

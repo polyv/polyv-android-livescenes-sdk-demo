@@ -14,7 +14,18 @@
         android:layout_height="36dp"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:visibility="invisible"
+        android:layout_toRightOf="@+id/plvec_controller_back_iv"
         tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/plvec_controller_back_iv"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="6dp"
+        android:src="@drawable/plvec_controller_back"
+        android:visibility="gone" />
+
     <!--公告布局-->
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView
         android:id="@+id/bulletin_ly"
@@ -67,7 +78,7 @@
         android:layout_width="244dp"
         android:layout_height="152dp"
         android:layout_above="@+id/send_msg_tv"
-        android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:paddingLeft="@dimen/plvec_margin_common"
         android:layout_marginBottom="16dp">
 
         <!--聊天信息列表-->
