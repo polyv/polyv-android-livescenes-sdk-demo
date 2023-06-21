@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.view.MotionEvent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -199,6 +200,15 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
      * @param time 时间，单位：毫秒
      */
     public void onPlaybackVideoSeekComplete(int time) {
+    }
+
+    /**
+     * 主页fragment某些布局与videoLayout重叠，这里决定什么情况下进行拦截处理
+     * @param motionEvent
+     * @return
+     */
+    public boolean isInterceptViewAction(MotionEvent motionEvent){
+        return false;
     }
     // </editor-fold>
 

@@ -197,6 +197,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
     }
+
+    @Override
+    public void updateOrientationLock(boolean isLock) {
+
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="添加互动应用">

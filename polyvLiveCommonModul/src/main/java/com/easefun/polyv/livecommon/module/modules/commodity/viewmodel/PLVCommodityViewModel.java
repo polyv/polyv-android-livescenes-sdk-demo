@@ -93,7 +93,7 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
             if (productControlEvent.isPush()) {
                 // 推送
                 commodityUiState.productContentBeanPushToShow = productControlEvent.getContent();
-                commodityUiStateLiveData.postValue(commodityUiState.copy());
+                commodityUiStateLiveData.postValue(commodityUiState.copyWithPushState());
             }
         } else if (productEvent.isProductRemoveEvent()) {
             // 商品下架/删除事件

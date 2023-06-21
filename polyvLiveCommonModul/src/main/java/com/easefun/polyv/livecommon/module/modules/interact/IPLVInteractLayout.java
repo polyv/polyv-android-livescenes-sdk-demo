@@ -83,5 +83,11 @@ public interface IPLVInteractLayout {
      * ActivityResult回调触发时调用
      */
     void onActivityResult(final int requestCode, final int resultCode, final Intent intent);
+
+    /**
+     * 开启互动应用时是否允许旋转
+     * @param isLock true标识不允许旋转
+     */
+    void updateOrientationLock(boolean isLock);
     // </editor-fold>
 }

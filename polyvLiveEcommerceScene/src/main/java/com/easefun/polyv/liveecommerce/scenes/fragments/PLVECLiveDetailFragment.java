@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -79,6 +80,19 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
             introWebView = null;
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int marginPortrait = getResources().getDimensionPixelSize(R.dimen.plvec_margin_common);
+        int marginLandscape = getResources().getDimensionPixelSize(R.dimen.plvec_landscape_margin_common);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view.setPadding(marginLandscape,0,marginLandscape, marginPortrait);
+        } else {
+            view.setPadding(marginPortrait,0,marginPortrait,marginPortrait);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">

@@ -41,6 +41,7 @@
                     android:layout_height="match_parent"
                     android:visibility="gone" />
 
+
             </com.easefun.polyv.livescenes.video.PolyvLiveVideoView>
 
             <!--子播放器view-->
@@ -58,6 +59,7 @@
                 android:padding="8dp"
                 android:src="@drawable/plvec_commodity_push_close"
                 android:visibility="gone" />
+
             <!--watermark view-->
             <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
                 android:id="@+id/plvec_watermark_view"
@@ -77,6 +79,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/plvec_full_screen_iv"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="right|end"
+                android:layout_marginRight="4dp"
+                android:visibility="gone"
+                android:src="@drawable/plvec_controller_fullscreen"/>
         </FrameLayout>
 
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>

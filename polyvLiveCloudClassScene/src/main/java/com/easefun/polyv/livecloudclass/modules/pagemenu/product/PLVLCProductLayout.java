@@ -95,6 +95,12 @@ public class PLVLCProductLayout extends FrameLayout {
         observeLiveRoomDataManager();
     }
 
+    public void sendOpenProductEvent() {
+        if (productWebView != null) {
+            productWebView.sendOpenProductEvent();
+        }
+    }
+
     private void observeLiveRoomDataManager() {
         if (liveRoomDataManager == null) {
             return;

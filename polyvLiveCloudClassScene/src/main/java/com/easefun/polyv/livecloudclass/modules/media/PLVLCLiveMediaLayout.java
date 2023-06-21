@@ -48,11 +48,13 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeV
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -180,6 +182,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     //直播开始时间
     private String liveStartTime;
 
+    //商品卡片
+    private PLVLCCommodityPushLayout commodityPushLayout;
+
     //横屏时为连麦预留的右偏移量
     private int landscapeMarginRightForLinkMicLayout;
     //是否加入了RTC
@@ -253,6 +258,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
+        commodityPushLayout = findViewById(R.id.commodity_push_ly);
 
         //初始化
         svgaParser = new SVGAParser(getContext());
@@ -663,6 +669,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
+
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }
 
     @Override

@@ -21,12 +21,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
+import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
+import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.plv.business.model.video.PLVMediaPlayMode;
@@ -34,6 +37,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.List;
 
@@ -76,6 +80,16 @@ public class PLVECMorePopupView {
     //是否有多线路信息
     private boolean isHasLinesInfo;
 
+    //更多弹窗布局
+    private View rootview;
+    private PLVOrientationSensibleLinearLayout orientationLayout;
+    private PLVRoundRectLayout roundBgRl;
+    private LinearLayout moreLinearLayout;
+    private TextView titleTv;
+
+    //当前是否是处于横屏状态
+    private boolean isOnLandscape = false;
+
     private SparseArray<Float> speedArray;
 
     public PLVECMorePopupView() {
@@ -92,14 +106,47 @@ public class PLVECMorePopupView {
     public void init(View v) {
         if (liveMorePopupWindow == null) {
             liveMorePopupWindow = new PopupWindow(v.getContext());
-            View view = initPopupWindow(v, R.layout.plvec_live_more_popup_layout, liveMorePopupWindow);
+            rootview = initPopupWindow(v, R.layout.plvec_live_more_popup_layout, liveMorePopupWindow);
 
-            PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
-            moreLayout = view.findViewById(R.id.plvec_more_ly);
+            orientationLayout = rootview.findViewById(R.id.plvec_more_pop_vertical_ly);
+            roundBgRl = rootview.findViewById(R.id.plvec_widget_round_ly);
+            moreLinearLayout = rootview.findViewById(R.id.more_ly);
+            titleTv = rootview.findViewById(R.id.plvec_popup_title_tv);
+
+            PLVBlurUtils.initBlurView((PLVBlurView) rootview.findViewById(R.id.blur_ly));
+            moreLayout = rootview.findViewById(R.id.plvec_more_ly);
+
+            orientationLayout.setOnLandscape(new Runnable() {
+                @Override
+                public void run() {
+                    onLandscape();
+                }
+            });
+
+            orientationLayout.setOnPortrait(new Runnable() {
+                @Override
+                public void run() {
+                    onPortrait();
+                }
+            });
 
             updateSubViewVisibility();
-            observeFloatingPlayer(view.getContext());
+            observeFloatingPlayer(rootview.getContext());
         }
+    }
+
+    public void onPortrait() {
+        isOnLandscape = false;
+        initPortraitChangeLayout(rootview,liveMorePopupWindow);
+        titleTv.setVisibility(View.GONE);
+
+    }
+
+    public void onLandscape() {
+        isOnLandscape = true;
+        initLandscapeChangeLayout(rootview,liveMorePopupWindow);
+        titleTv.setVisibility(View.VISIBLE);
+
     }
 
     public void showLiveMoreLayout(final View v, boolean isCurrentVideoMode, final OnLiveMoreClickListener clickListener) {
@@ -176,13 +223,34 @@ public class PLVECMorePopupView {
     public void showLinesChangeLayout(View v, int[] lines) {
         if (linesChangePopupWindow == null) {
             linesChangePopupWindow = new PopupWindow(v.getContext());
-            View view = initPopupWindow(v, R.layout.plvec_live_more_lines_change_layout, linesChangePopupWindow);
+            final View view = initPopupWindow(v, R.layout.plvec_live_more_lines_change_layout, linesChangePopupWindow);
 
             PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
             changeLinesLy = view.findViewById(R.id.change_lines_ly);
+            PLVOrientationSensibleLinearLayout orientationLinesLayout = view.findViewById(R.id.plvec_more_lines_pop_vertical_ly);
+            orientationLinesLayout.setOnPortrait(new Runnable() {
+                @Override
+                public void run() {
+                    initPortraitChangeLayout(linesChangePopupWindow.getContentView(), linesChangePopupWindow);
+                }
+            });
+
+            orientationLinesLayout.setOnLandscape(new Runnable() {
+                @Override
+                public void run() {
+                    initLandscapeChangeLayout(linesChangePopupWindow.getContentView(), linesChangePopupWindow);
+                }
+            });
+
         }
         updateLinesView(lines);
-        linesChangePopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
+        if (isOnLandscape) {
+            initLandscapeChangeLayout(linesChangePopupWindow.getContentView(),linesChangePopupWindow);
+            linesChangePopupWindow.showAtLocation(v, Gravity.RIGHT, 0, 0);
+        } else {
+            initPortraitChangeLayout(linesChangePopupWindow.getContentView(),linesChangePopupWindow);
+            linesChangePopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
+        }
 
     }
 
@@ -268,13 +336,75 @@ public class PLVECMorePopupView {
     public void showDefinitionChangeLayout(View v, Pair<List<PolyvDefinitionVO>, Integer> listIntegerPair) {
         if (definitionPopupWindow == null) {
             definitionPopupWindow = new PopupWindow(v.getContext());
-            View view = initPopupWindow(v, R.layout.plvec_live_more_definition_change_layout, definitionPopupWindow);
+            final View view = initPopupWindow(v, R.layout.plvec_live_more_definition_change_layout, definitionPopupWindow);
 
             PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
             changeDefinitionLy = view.findViewById(R.id.change_definition_ly);
+            PLVOrientationSensibleLinearLayout definition = view.findViewById(R.id.plvec_more_definition_pop_vertical_ly);
+            definition.setOnLandscape(new Runnable() {
+                @Override
+                public void run() {
+                    initLandscapeChangeLayout(view, definitionPopupWindow);
+                }
+            });
+
+            definition.setOnPortrait(new Runnable() {
+                @Override
+                public void run() {
+                    initPortraitChangeLayout(view, definitionPopupWindow);
+                }
+            });
         }
         updateDefinitionView(listIntegerPair);
-        definitionPopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
+        if (isOnLandscape) {
+            initLandscapeChangeLayout(definitionPopupWindow.getContentView(), definitionPopupWindow);
+            definitionPopupWindow.showAtLocation(v, Gravity.RIGHT, 0, 0);
+        } else {
+            initPortraitChangeLayout(definitionPopupWindow.getContentView(), definitionPopupWindow);
+            definitionPopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
+        }
+    }
+
+    private void initPortraitChangeLayout(View view, PopupWindow popupWindow) {
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.update();
+        }
+        View linesRoundBg = view.findViewById(R.id.plvec_widget_round_ly);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linesRoundBg.getLayoutParams();
+        layoutParams.height = ConvertUtils.dp2px(130);
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        linesRoundBg.setLayoutParams(layoutParams);
+
+        View morely = view.findViewById(R.id.more_ly);
+        RelativeLayout.LayoutParams morelyParams = (RelativeLayout.LayoutParams) morely.getLayoutParams();
+        morelyParams.height = ConvertUtils.dp2px(130);
+        morelyParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        morelyParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        morelyParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        morely.setLayoutParams(morelyParams);
+    }
+
+    private void initLandscapeChangeLayout(View view, PopupWindow popupWindow) {
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.update();
+        }
+        View linesRoundBg = view.findViewById(R.id.plvec_widget_round_ly);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linesRoundBg.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        layoutParams.width = ConvertUtils.dp2px(375);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        linesRoundBg.setLayoutParams(layoutParams);
+
+        View morely = view.findViewById(R.id.more_ly);
+        RelativeLayout.LayoutParams morelyParams = (RelativeLayout.LayoutParams) morely.getLayoutParams();
+        morelyParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        morelyParams.width = ConvertUtils.dp2px(375);
+        morelyParams.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        morelyParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        morely.setLayoutParams(morelyParams);
     }
 
     //暖场/无直播时隐藏切换音视频模式、切换线路相关的按钮
@@ -492,7 +622,7 @@ public class PLVECMorePopupView {
 
         public void init(Context context) {
             rootView = LayoutInflater.from(context).inflate(R.layout.plvec_live_more_latency_layout, null);
-            liveMoreLatencyLy = rootView.findViewById(R.id.plvec_live_more_latency_ly);
+            liveMoreLatencyLy = rootView.findViewById(R.id.more_ly);
             liveMoreLatencyBackIv = rootView.findViewById(R.id.plvec_live_more_latency_back_iv);
             liveMoreLatencyLl = rootView.findViewById(R.id.plvec_live_more_latency_ll);
             liveMoreLowLatencyTv = rootView.findViewById(R.id.plvec_live_more_low_latency_tv);
@@ -523,7 +653,26 @@ public class PLVECMorePopupView {
         public void show(boolean isCurrentLowLatency) {
             liveMoreLowLatencyTv.setSelected(isCurrentLowLatency);
             liveMoreNormalLatencyTv.setSelected(!isCurrentLowLatency);
-            latencyPopupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+            PLVOrientationSensibleLinearLayout definition = rootView.findViewById(R.id.plvec_more_latency_pop_vertical_ly);
+            definition.setOnLandscape(new Runnable() {
+                @Override
+                public void run() {
+                    initLandscapeChangeLayout(rootView, latencyPopupWindow);
+                }
+            });
+            definition.setOnPortrait(new Runnable() {
+                @Override
+                public void run() {
+                    initPortraitChangeLayout(rootView, latencyPopupWindow);
+                }
+            });
+            if (isOnLandscape) {
+                initLandscapeChangeLayout(rootView, latencyPopupWindow);
+                latencyPopupWindow.showAtLocation(rootView, Gravity.RIGHT, 0, 0);
+            } else {
+                initPortraitChangeLayout(rootView, latencyPopupWindow);
+                latencyPopupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
+            }
         }
 
         public void hide() {

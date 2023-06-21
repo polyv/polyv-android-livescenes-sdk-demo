@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
@@ -41,6 +43,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -65,6 +68,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
@@ -123,6 +127,14 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private boolean isUserCloseFloatingWindow;
     //布局的手势操作
     protected GestureDetector gestureScanner;
+
+    private ImageView closeIm;
+
+    //当前频道是否支持横置全屏
+    private boolean isCanFullScreen;
+
+    //当前是否是直播状态
+    private boolean isLive;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -220,6 +232,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         initParams();
         initLiveRoomManager();
         initView();
+        initOnClick();
         initFloatingWindowSetting();
 
         observeVideoLayout();
@@ -263,6 +276,10 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if(popoverLayout != null && popoverLayout.onBackPress()){
             return;
         }
+        if(PLVScreenUtils.isLandscape(this)){
+            PLVOrientationManager.getInstance().setPortrait(this);
+            return;
+        }
         super.onBackPressed();
     }
 
@@ -273,6 +290,29 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             popoverLayout.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+
+    @Override
+    protected boolean enableRotationObserver() {
+        return true;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            closeIm.setVisibility(View.GONE);
+            PLVScreenUtils.enterLandscape(this);
+            floatingWindow.setLanderScreen(true);
+        } else {
+            PLVScreenUtils.exitFullScreen(this);
+            closeIm.setVisibility(View.VISIBLE);
+            floatingWindow.setLanderScreen(false);
+            if (!isLive) {
+                PLVOrientationManager.getInstance().lockOrientation();
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="手势事件拦截">
@@ -280,7 +320,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (videoLayout != null) {
-            videoLayout.dispatchTouchEvent(ev);
+            if (commonHomeFragment != null && !commonHomeFragment.isInterceptViewAction(ev)) {
+                videoLayout.dispatchTouchEvent(ev);
+            }
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -339,6 +381,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         initPlaybackParam(vid, channelId, viewerId, viewerName, viewerAvatar, PLVLiveChannelType.ALONE, videoListType);
+
+        PLVOrientationManager.getInstance().lockOrientation();
     }
 
     private void initPlaybackParam(
@@ -385,6 +429,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面UI">
     private void initView() {
         // 页面关闭按钮
+        closeIm = findViewById(R.id.close_page_iv);
         findViewById(R.id.close_page_iv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -442,6 +487,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         if (isPlayback && TextUtils.isEmpty(vid)) {
             observePreviousPage();
         }
+    }
+
+    private void initOnClick(){
+        closeIm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     //设置布局可单次点击或者多次点击
@@ -637,6 +691,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 public void onClosed() {
                 }
             });
+            popoverLayout.getInteractLayout().updateOrientationLock(true);
         }
     }
     // </editor-fold >
@@ -748,6 +803,17 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                     commonHomeFragment.acceptNetworkQuality(networkQuality);
                 }
             }
+
+            @Override
+            public void acceptVideoSize(boolean isCanFullScreen) {
+                PLVECLiveEcommerceActivity.this.isCanFullScreen = isCanFullScreen;
+                //根据视频的宽高来决定是否可以全屏
+                if (isCanFullScreen) {
+                    PLVOrientationManager.getInstance().unlockOrientation();
+                } else {
+                    PLVOrientationManager.getInstance().lockOrientation();;
+                }
+            }
         });
         //监听播放状态
         videoLayout.addOnPlayerStateListener(new IPLVOnDataChangedListener<PLVPlayerState>() {
@@ -763,12 +829,19 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                             if (linkMicLayout != null) {
                                 linkMicLayout.showAll();
                             }
+                            isLive = true;
                             break;
                         case LIVE_STOP:
                             if (linkMicLayout != null) {
                                 linkMicLayout.setLiveEnd();
                                 linkMicLayout.hideAll();
                             }
+                            //如果是可以旋转的频道，停止直播时，禁止旋转
+                            if (isCanFullScreen && PLVScreenUtils.isPortrait(PLVECLiveEcommerceActivity.this)) {
+                                isCanFullScreen = false;
+                                PLVOrientationManager.getInstance().lockOrientation();
+                            }
+                            isLive = false;
                             break;
                         case NO_LIVE:
                         case LIVE_END:
@@ -776,6 +849,12 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                                 linkMicLayout.setLiveEnd();
                                 linkMicLayout.hideAll();
                             }
+                            //如果是可以旋转的频道，停止直播时，禁止旋转
+                            if (isCanFullScreen && PLVScreenUtils.isPortrait(PLVECLiveEcommerceActivity.this)) {
+                                isCanFullScreen = false;
+                                PLVOrientationManager.getInstance().lockOrientation();
+                            }
+                            isLive = false;
                             break;
                         default:
                             break;
@@ -864,6 +943,10 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public void onJoinLinkMic() {
+                if (isCanFullScreen) {
+                    //在连麦期间不允许自动旋转屏幕
+                    PLVOrientationManager.getInstance().lockOrientation();
+                }
                 videoLayout.updateWhenJoinLinkMic();
                 if (commonHomeFragment != null) {
                     commonHomeFragment.setJoinLinkMic(true);
@@ -872,6 +955,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public void onLeaveLinkMic() {
+                if (isCanFullScreen) {
+                    PLVOrientationManager.getInstance().unlockOrientation();
+                }
                 videoLayout.updateWhenLeaveLinkMic();
                 if (commonHomeFragment != null) {
                     commonHomeFragment.setJoinLinkMic(false);

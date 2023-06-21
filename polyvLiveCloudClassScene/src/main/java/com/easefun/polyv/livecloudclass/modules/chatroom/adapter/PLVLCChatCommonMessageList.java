@@ -11,14 +11,15 @@ import android.widget.ScrollView;
 
 import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
-import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -112,6 +113,8 @@ public class PLVLCChatCommonMessageList {
                 PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                         .isFeatureSupport(PLVChannelFeature.LIVE_CHATROOM_VIEWER_QUOTE_REPLY)
         );
+        // 追踪红包曝光事件
+        PLVTrackLogHelper.trackReadRedpack(chatMsgRv, messageAdapter.getDataList(), liveRoomDataManager);
     }
 
     // </editor-fold>
@@ -214,7 +217,7 @@ public class PLVLCChatCommonMessageList {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 信息列表view附加到父控件">
-    public boolean attachToParent(ViewGroup parent, boolean isLandscapeLayout) {
+    public boolean attachToParent(ViewGroup parent, final boolean isLandscapeLayout) {
         if (ScreenUtils.isLandscape() != isLandscapeLayout) {
             return false;
         }
@@ -239,7 +242,10 @@ public class PLVLCChatCommonMessageList {
             chatMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(4), 0));
         } else {
             chatMsgRv.setVerticalFadingEdgeEnabled(false);
-            chatMsgRv.setStackFromEnd(false);
+            // 加上条件是为了处理从横屏切回竖屏时，列表会先滚动到顶部再滚动到指定位置的问题
+            if (lastPosition != -1) {
+                chatMsgRv.setStackFromEnd(false);
+            }
             chatMsgRv.setFadingEdgeLength(ConvertUtils.dp2px(0));
             chatMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(16), ConvertUtils.dp2px(16)));
         }
@@ -269,6 +275,9 @@ public class PLVLCChatCommonMessageList {
                 public void run() {
                     //直接使用scrollToPosition有时不会滚动最底部
                     chatMsgRv.scrollToPosition(messageAdapter.getItemCount() - 1);
+                    if (!isLandscapeLayout) {
+                        chatMsgRv.setStackFromEnd(false);
+                    }
                 }
             });
         }

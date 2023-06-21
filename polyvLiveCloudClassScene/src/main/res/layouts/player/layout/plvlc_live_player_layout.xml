@@ -116,6 +116,7 @@
         android:layout_marginTop="10dp" />
 
     <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:id="@+id/commodity_push_ly"
         android:layout_width="308dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"

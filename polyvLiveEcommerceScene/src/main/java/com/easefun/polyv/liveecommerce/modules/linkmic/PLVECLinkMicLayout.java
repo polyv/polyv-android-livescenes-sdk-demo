@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -636,7 +637,13 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public void onJoinLinkMic() {
         //我，加入频道成功
         PLVCommonLog.d(TAG, "onJoinLinkMic");
-        ToastUtils.showShort("上麦成功");
+        //如果是横屏状态下 连麦成功就切换成竖屏状态
+        if (PLVScreenUtils.isLandscape(getContext())) {
+            PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
+            ToastUtils.showShort("连麦成功，已为你切换到竖屏模式");
+        } else {
+            ToastUtils.showShort("上麦成功");
+        }
         // 连麦时不允许小窗播放
         PLVDependManager.getInstance().get(PLVECFloatingWindow.class).showByUser(false);
         // 连麦成功不再暂停rtc观看

@@ -138,7 +138,8 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
                 public void handler(String data, CallBackFunction function) {
                     String nativeAppPramsInfo = PLVGsonUtil.toJsonSimple(new PLVInteractNativeAppParams()
                             .setAppId(PolyvLiveSDKClient.getInstance().getAppId())
-                            .setAppSecret(PolyvLiveSDKClient.getInstance().getAppSecret()));
+                            .setAppSecret(PolyvLiveSDKClient.getInstance().getAppSecret())
+                            .setAccountId(PolyvLiveSDKClient.getInstance().getUserId()));
                     function.onCallBack(nativeAppPramsInfo);
                 }
             });

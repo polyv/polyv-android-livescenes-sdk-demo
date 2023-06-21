@@ -21,6 +21,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
@@ -189,6 +190,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         morePopupView = new PLVECMorePopupView();
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
 
         previousPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
         previousPopupView = new PLVECPreviousDialogFragment();
@@ -230,6 +233,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }
             }
         });
+        // 追踪红包曝光事件
+        PLVTrackLogHelper.trackReadRedpack(chatMsgRv, chatMessageAdapter.getDataList(), liveRoomDataManager);
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
         chatMsgRv.addUnreadView(unreadMsgTv);

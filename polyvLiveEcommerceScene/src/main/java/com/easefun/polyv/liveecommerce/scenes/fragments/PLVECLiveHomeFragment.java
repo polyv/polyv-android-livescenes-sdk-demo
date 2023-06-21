@@ -7,6 +7,7 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -30,15 +32,18 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
@@ -58,6 +63,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
@@ -150,6 +156,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     //聊天输入窗口
     private PLVECChatInputWindow chatInputWindow;
 
+    private ImageView backIv;
+
     @Nullable
     private PLVChatQuoteVO chatQuoteVO = null;
 
@@ -187,6 +195,45 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int marginPortrait = getResources().getDimensionPixelSize(R.dimen.plvec_margin_common);
+        int marginLandscape = getResources().getDimensionPixelSize(R.dimen.plvec_landscape_margin_common);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) sendMsgTv.getLayoutParams();
+        RelativeLayout.LayoutParams effectWidgetLayoutParams = (RelativeLayout.LayoutParams) polyvPointRewardEffectWidget.getLayoutParams();
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            swipeLoadView.setPadding(marginLandscape, 0, 0, 0);
+            layoutParams.setMargins(marginLandscape, 0, 0, 0);
+            sendMsgTv.setLayoutParams(layoutParams);
+            backIv.setVisibility(View.VISIBLE);
+            if (morePopupView != null) {
+                morePopupView.onLandscape();
+            }
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(true);
+            }
+            effectWidgetLayoutParams.removeRule(RelativeLayout.ABOVE);
+        } else {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            swipeLoadView.setPadding(marginPortrait, 0, 0, 0);
+            layoutParams.setMargins(marginPortrait, 0, 0, 0);
+            sendMsgTv.setLayoutParams(layoutParams);
+            backIv.setVisibility(View.GONE);
+
+            if (morePopupView != null) {
+                morePopupView.onPortrait();
+            }
+
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(false);
+            }
+
+            effectWidgetLayoutParams.addRule(RelativeLayout.ABOVE, R.id.greet_ly);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -206,6 +253,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         chatMessageAdapter = new PLVECChatMessageAdapter();
         chatMsgRv.setAdapter(chatMessageAdapter);
         chatMessageAdapter.setOnViewActionListener(onChatMsgViewActionListener);
+        // 追踪红包曝光事件
+        PLVTrackLogHelper.trackReadRedpack(chatMsgRv, chatMessageAdapter.getDataList(), liveRoomDataManager);
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
         chatMsgRv.addUnreadView(unreadMsgTv);
@@ -231,6 +280,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         rewardIv = findViewById(R.id.reward_iv);
         rewardIv.setVisibility(isOpenPointReward ? View.VISIBLE : View.GONE);
         rewardIv.setOnClickListener(this);
+        backIv = findViewById(R.id.plvec_controller_back_iv);
+        backIv.setOnClickListener(this);
         morePopupView = new PLVECMorePopupView();
         morePopupView.init(moreIv);
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
@@ -250,6 +301,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         commodityPushLayout = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout.setAnchor(commodityIv);
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, true, liveRoomDataManager);
 
         interactEntranceView = findViewById(R.id.plvec_interact_entrance_ly);
         interactEntranceView.changeLayoutStyle(false);
@@ -267,6 +320,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
+
 
         initNetworkTipsLayout();
         adjustInteractEntranceLyLocation(bulletinLy.getVisibility() == View.VISIBLE);
@@ -419,6 +473,20 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             moreIv.performClick();
         }
     }
+
+    @Override
+    public boolean isInterceptViewAction(MotionEvent motionEvent) {
+        if (backIv.getVisibility() == View.VISIBLE) {
+            float x = backIv.getX() + backIv.getWidth();
+            float y = backIv.getY() + backIv.getHeight();
+            if (motionEvent.getX() >= backIv.getX() && motionEvent.getX() <= x
+                    && motionEvent.getY() >= backIv.getY() && motionEvent.getY() <= y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 打赏动画控制">
@@ -430,6 +498,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         if (pointRewardEventProducer == null) {
             pointRewardEventProducer = new PLVPointRewardEffectQueue();
             polyvPointRewardEffectWidget.setEventProducer(pointRewardEventProducer);
+            //开启横屏积分打赏效果
+            polyvPointRewardEffectWidget.isOpenLandscapeEffect(true);
         }
     }
 
@@ -995,6 +1065,10 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowRewardAction();
                 }
+            }
+        } else if (id == R.id.plvec_controller_back_iv) {
+            if(PLVScreenUtils.isLandscape(getContext())){
+                PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
             }
         }
     }

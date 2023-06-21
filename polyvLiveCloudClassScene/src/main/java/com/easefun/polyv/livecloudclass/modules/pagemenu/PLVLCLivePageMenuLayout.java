@@ -30,6 +30,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.PLVLCPlaybackChapterFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescOfflineFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
@@ -45,6 +46,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
@@ -143,6 +145,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //直播页面菜单tab标题列表
     private List<String> pageMenuTabTitleList;
 
+    //商品卡片
+    private PLVLCCommodityPushLayout commodityPushLayout;
+
     //tab
     private PLVLCLiveDescFragment liveDescFragment; //直播介绍tab页
     private PLVLCLiveDescOfflineFragment liveDescOfflineFragment;
@@ -231,6 +236,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         chatCommonMessageList = new PLVLCChatCommonMessageList(getContext());
         restoreChatTabForMessageList(chatCommonMessageList);
+
+        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_layout);
     }
 
     private void initChatroomMvpView(IPLVChatroomContract.IChatroomPresenter presenter) {
@@ -376,6 +383,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (!NetworkUtils.isConnected()) {
             tryAddOfflineDescTabForPlaybackCache();
         }
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
 
         initSocketLoginManager();
         observeClassDetailVO();

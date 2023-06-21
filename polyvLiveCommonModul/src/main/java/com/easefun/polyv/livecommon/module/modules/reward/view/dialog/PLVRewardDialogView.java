@@ -322,7 +322,7 @@ public class PLVRewardDialogView {
 
                 rootView.setVisibility(View.GONE);
                 rootView.clearFocus();
-                PLVOrientationManager.getInstance().unlockOrientation();
+//                PLVOrientationManager.getInstance().unlockOrientation();
                 isShown = false;
             }
 

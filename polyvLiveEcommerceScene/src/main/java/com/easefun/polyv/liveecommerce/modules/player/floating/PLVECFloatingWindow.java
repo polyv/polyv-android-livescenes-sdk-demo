@@ -32,6 +32,7 @@ public class PLVECFloatingWindow {
 
     private boolean requestShowByCommodityPage = false;
     private boolean requestShowByUser = false;
+    private boolean isLanderScreen = false;
     @Nullable
     private PLVSwitchViewAnchorLayout contentAnchorLayout;
     @Nullable
@@ -70,6 +71,10 @@ public class PLVECFloatingWindow {
         this.liveRoomDataManager = liveRoomDataManager;
     }
 
+    public void setLanderScreen(boolean isLanderScreen){
+        this.isLanderScreen = isLanderScreen;
+    }
+
     private void onRequestShowChanged() {
         if (requestShowByUser) {
             showType = PLVFloatingEnums.ShowType.SHOW_ALWAYS;
@@ -100,12 +105,12 @@ public class PLVECFloatingWindow {
                 }
                 PLVFloatingPlayerManager.getInstance()
                         .setFloatingSize(
-                                ConvertUtils.dp2px(90),
-                                ConvertUtils.dp2px(160)
+                                isLanderScreen ? ConvertUtils.dp2px(240) : ConvertUtils.dp2px(90),
+                                isLanderScreen ? ConvertUtils.dp2px(134) : ConvertUtils.dp2px(160)
                         )
                         .setFloatingPosition(
-                                ScreenUtils.getScreenOrientatedWidth() - ConvertUtils.dp2px(90 + 16),
-                                ScreenUtils.getScreenOrientatedHeight() - ConvertUtils.dp2px(160 + 34)
+                                ScreenUtils.getScreenOrientatedWidth() - ConvertUtils.dp2px(isLanderScreen ? 240 : 90 + 16),
+                                ScreenUtils.getScreenOrientatedHeight() - ConvertUtils.dp2px(isLanderScreen ? 134 : 160 + 34)
                         )
                         .updateShowType(showType)
                         .setOnGoBackListener(new PLVFloatingPlayerManager.OnGoBackListener() {

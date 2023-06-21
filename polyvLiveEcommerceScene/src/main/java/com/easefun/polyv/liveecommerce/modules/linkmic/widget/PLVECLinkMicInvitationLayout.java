@@ -37,6 +37,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -60,6 +61,7 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
     public static final int CANCEL_BY_PERMISSION = 3;
 
     private PortLayout portLayout;
+    private LandLayout landLayout;
     private PLVMenuDrawer menuDrawer;
 
     private final SoundPool bgmSoundPool = new SoundPool(1, AudioManager.STREAM_VOICE_CALL, 0);
@@ -86,7 +88,9 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
 
     private void init() {
         portLayout = new PortLayout(getContext());
+        landLayout = new LandLayout(getContext());
         setListener(portLayout);
+        setListener(landLayout);
 
         prepareBgm();
 
@@ -133,7 +137,9 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
             public void onChanged(@Nullable Boolean openBoolean) {
                 final boolean open = getOrDefault(openBoolean, false);
                 portLayout.cameraSwitch().setChecked(open);
+                landLayout.cameraSwitch().setChecked(open);
                 portLayout.cameraHintView().setVisibility(open ? GONE : VISIBLE);
+                landLayout.cameraHintView().setVisibility(open ? GONE : VISIBLE);
                 changeCamera(open);
             }
         });
@@ -143,6 +149,7 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
             public void onChanged(@Nullable Boolean openBoolean) {
                 final boolean open = getOrDefault(openBoolean, false);
                 portLayout.microphoneSwitch().setChecked(open);
+                landLayout.microphoneSwitch().setChecked(open);
                 changeMicrophone(open);
             }
         });
@@ -177,12 +184,19 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
         for (View view : portLayout.cameraViews()) {
             view.setVisibility(isOnlyAudio ? View.GONE : View.VISIBLE);
         }
+        for (View view : landLayout.cameraViews()) {
+            view.setVisibility(isOnlyAudio ? View.GONE : View.VISIBLE);
+        }
         if (isOnlyAudio) {
             portLayout.cameraHintView().setVisibility(View.GONE);
+            landLayout.cameraHintView().setVisibility(View.GONE);
             portLayout.onlyAudioHintView().setVisibility(View.VISIBLE);
+            landLayout.onlyAudioHintView().setVisibility(View.VISIBLE);
         } else {
             portLayout.cameraHintView().setVisibility(getOrDefault(isOpenCamera.getValue(), false) ? View.GONE : View.VISIBLE);
+            landLayout.cameraHintView().setVisibility(getOrDefault(isOpenCamera.getValue(), false) ? View.GONE : View.VISIBLE);
             portLayout.onlyAudioHintView().setVisibility(View.GONE);
+            landLayout.onlyAudioHintView().setVisibility(View.GONE);
         }
         portLayout.titleTextView().setText(format("邀请你{}连麦", isOnlyAudio ? "语音" : "视频"));
     }
@@ -248,7 +262,7 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
         menuDrawer.openMenu();
 
         removeAllViews();
-        final ChildLayout child = portLayout;
+        final ChildLayout child = PLVScreenUtils.isPortrait(getContext()) ? portLayout : landLayout;
         addView((View) child, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setupCamera(child.renderView());
     }
@@ -305,6 +319,7 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
                             return;
                         }
                         portLayout.cancelInvitationTextView().setText(format("暂不连麦({}s)", timeLeftInSecond));
+                        landLayout.cancelInvitationTextView().setText(format("暂不连麦({}s)", timeLeftInSecond));
                     }
                 });
     }
@@ -544,6 +559,96 @@ public class PLVECLinkMicInvitationLayout extends FrameLayout {
             linkmicInvitationPrivacyNotifyTv = findViewById(R.id.plvec_linkmic_invitation_privacy_notify_tv);
             linkmicInvitationCancelTv = findViewById(R.id.plvec_linkmic_invitation_cancel_tv);
             linkmicInvitationAcceptTv = findViewById(R.id.plvec_linkmic_invitation_accept_tv);
+        }
+
+        @Override
+        public TextView titleTextView() {
+            return linkmicInvitationTitleTv;
+        }
+
+        @Override
+        public View renderView() {
+            return linkmicInvitationCameraPreviewView;
+        }
+
+        @Override
+        public View cameraHintView() {
+            return linkmicInvitationCameraClosedHintLayout;
+        }
+
+        @Override
+        public View onlyAudioHintView() {
+            return linkmicInvitationOnlyAudioHintLayout;
+        }
+
+        @Override
+        public Switch cameraSwitch() {
+            return linkmicInvitationCameraSwitch;
+        }
+
+        @Override
+        public List<View> cameraViews() {
+            return listOf(linkmicInvitationCameraIv,
+                    linkmicInvitationCameraTv,
+                    linkmicInvitationCameraSwitch);
+        }
+
+        @Override
+        public Switch microphoneSwitch() {
+            return linkmicInvitationMicrophoneSwitch;
+        }
+
+        @Override
+        public TextView cancelInvitationTextView() {
+            return linkmicInvitationCancelTv;
+        }
+
+        @Override
+        public TextView acceptInvitationTextView() {
+            return linkmicInvitationAcceptTv;
+        }
+    }
+
+    private static class LandLayout extends FrameLayout implements ChildLayout {
+
+        private TextView linkmicInvitationTitleTv;
+        private ConstraintLayout linkmicInvitationCameraLayout;
+        private View linkmicInvitationCameraPreviewView;
+        private ConstraintLayout linkmicInvitationCameraClosedHintLayout;
+        private ConstraintLayout linkmicInvitationOnlyAudioHintLayout;
+        private ImageView linkmicInvitationCameraIv;
+        private TextView linkmicInvitationCameraTv;
+        private Switch linkmicInvitationCameraSwitch;
+        private ImageView linkmicInvitationMicrophoneIv;
+        private TextView linkmicInvitationMicrophoneTv;
+        private Switch linkmicInvitationMicrophoneSwitch;
+        private ImageView linkmicInvitationPrivacyNotifyIv;
+        private TextView linkmicInvitationPrivacyNotifyTv;
+        private TextView linkmicInvitationCancelTv;
+        private TextView linkmicInvitationAcceptTv;
+
+        public LandLayout(@NonNull Context context) {
+            super(context);
+            LayoutInflater.from(getContext()).inflate(R.layout.plvec_linkmic_invitation_land_layout, this);
+            findView();
+        }
+
+        private void findView() {
+            linkmicInvitationTitleTv = findViewById(R.id.plvlc_linkmic_invitation_title_tv);
+            linkmicInvitationCameraLayout = findViewById(R.id.plvlc_linkmic_invitation_camera_layout);
+            linkmicInvitationCameraPreviewView = findViewById(R.id.plvlc_linkmic_invitation_camera_preview_view);
+            linkmicInvitationCameraClosedHintLayout = findViewById(R.id.plvlc_linkmic_invitation_camera_closed_hint_layout);
+            linkmicInvitationOnlyAudioHintLayout = findViewById(R.id.plvlc_linkmic_invitation_only_audio_hint_layout);
+            linkmicInvitationCameraIv = findViewById(R.id.plvlc_linkmic_invitation_camera_iv);
+            linkmicInvitationCameraTv = findViewById(R.id.plvlc_linkmic_invitation_camera_tv);
+            linkmicInvitationCameraSwitch = findViewById(R.id.plvlc_linkmic_invitation_camera_switch);
+            linkmicInvitationMicrophoneIv = findViewById(R.id.plvlc_linkmic_invitation_microphone_iv);
+            linkmicInvitationMicrophoneTv = findViewById(R.id.plvlc_linkmic_invitation_microphone_tv);
+            linkmicInvitationMicrophoneSwitch = findViewById(R.id.plvlc_linkmic_invitation_microphone_switch);
+            linkmicInvitationPrivacyNotifyIv = findViewById(R.id.plvlc_linkmic_invitation_privacy_notify_iv);
+            linkmicInvitationPrivacyNotifyTv = findViewById(R.id.plvlc_linkmic_invitation_privacy_notify_tv);
+            linkmicInvitationCancelTv = findViewById(R.id.plvlc_linkmic_invitation_cancel_tv);
+            linkmicInvitationAcceptTv = findViewById(R.id.plvlc_linkmic_invitation_accept_tv);
         }
 
         @Override
