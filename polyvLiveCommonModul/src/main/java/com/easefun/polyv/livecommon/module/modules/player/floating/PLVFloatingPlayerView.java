@@ -32,6 +32,8 @@ public class PLVFloatingPlayerView extends FrameLayout {
         floatingContentSwitchAnchorLayout = findViewById(R.id.plv_floating_content_switch_anchor_layout);
         floatingPlaceholderSpace = findViewById(R.id.plv_floating_placeholder_space);
         floatingCloseIv = findViewById(R.id.plv_floating_close_iv);
+
+        floatingContentSwitchAnchorLayout.setInterceptTouchEvent(true);
     }
 
     public PLVSwitchViewAnchorLayout getAnchorLayout() {

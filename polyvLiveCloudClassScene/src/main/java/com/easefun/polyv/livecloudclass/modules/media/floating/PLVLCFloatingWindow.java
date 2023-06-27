@@ -6,12 +6,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
+import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
+import com.plv.business.api.common.player.PLVBaseVideoView;
+import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
@@ -33,9 +38,12 @@ public class PLVLCFloatingWindow {
     @Nullable
     private PLVSwitchViewAnchorLayout contentAnchorLayout;
     @Nullable
+    private PLVBaseVideoView baseVideoView;
+    @Nullable
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_FOREGROUND;
+    private PLVFloatingEnums.Orientation orientation = PLVFloatingEnums.Orientation.AUTO;
 
     public void showByCommodityPage(boolean toShow) {
         requestShowByCommodityPage = toShow;
@@ -53,10 +61,94 @@ public class PLVLCFloatingWindow {
 
     public void bindContentView(PLVSwitchViewAnchorLayout anchorLayout) {
         this.contentAnchorLayout = anchorLayout;
+        if (contentAnchorLayout != null) {
+            findBaseVideoView((View) contentAnchorLayout.getParent());
+        }
     }
 
     public void setLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+    }
+
+    /**
+     * 设置悬浮窗里的播放器音量
+     *
+     * @param volume 音量值，范围：[0,100]
+     */
+    public void setPlayerVolume(int volume) {
+        if (baseVideoView != null) {
+            baseVideoView.setPlayerVolume(volume);
+        }
+    }
+
+    /**
+     * 设置系统音量
+     *
+     * @param volume 音量值，范围：[0,100]
+     */
+    public void setVolume(int volume) {
+        if (baseVideoView != null) {
+            baseVideoView.setVolume(volume);
+        }
+    }
+
+    /**
+     * 设置由音频焦点引起的播放状态改变监听器
+     *
+     * @param listener 监听器
+     */
+    public void setOnPlayStatusChangeByAudioFocusListener(IPLVVideoViewListenerEvent.OnPlayStatusChangeByAudioFocusListener listener) {
+        if (baseVideoView != null) {
+            baseVideoView.setOnPlayStatusChangeByAudioFocusListener(listener);
+        }
+    }
+
+    /**
+     * 设置窗口方向
+     *
+     * @param orientation 方向
+     */
+    public void setOrientation(PLVFloatingEnums.Orientation orientation) {
+        this.orientation = orientation;
+    }
+
+    /**
+     * 关闭悬浮窗
+     */
+    public void close() {
+        requestShowByCommodityPage = false;
+        requestShowByUser = false;
+        PLVFloatingPlayerManager.getInstance().clear();
+    }
+
+    // 根据视频宽高适配悬浮窗宽高
+    private int[] getFloatingSize() {
+        int width = ConvertUtils.dp2px(200);
+        int height = ConvertUtils.dp2px(112.5F);
+        boolean isLandscape = orientation != PLVFloatingEnums.Orientation.PORTRAIT;
+        if (baseVideoView != null && orientation == PLVFloatingEnums.Orientation.AUTO) {
+            int[] wh = PLVVideoSizeUtils.getVideoWH(baseVideoView);
+            if (wh[0] != 0 && wh[0] < wh[1]) {
+                isLandscape = false;
+            }
+        }
+        return new int[]{isLandscape ? width : height, isLandscape ? height : width};
+    }
+
+    private boolean findBaseVideoView(View view) {
+        if (view instanceof PLVBaseVideoView) {
+            baseVideoView = (PLVBaseVideoView) view;
+            return true;
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0, size = viewGroup.getChildCount(); i < size; i++) {
+                boolean result = findBaseVideoView(viewGroup.getChildAt(i));
+                if (result) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void onRequestShowChanged() {
@@ -86,14 +178,15 @@ public class PLVLCFloatingWindow {
                 if (!isNeedShow()) {
                     return;
                 }
+                int[] floatingSize = getFloatingSize();
                 PLVFloatingPlayerManager.getInstance()
                         .setFloatingSize(
-                                ConvertUtils.dp2px(200),
-                                ConvertUtils.dp2px(112.5F)
+                                floatingSize[0],
+                                floatingSize[1]
                         )
                         .setFloatingPosition(
-                                ScreenUtils.getScreenOrientatedWidth() - ConvertUtils.dp2px(200 + 16),
-                                ScreenUtils.getScreenOrientatedHeight() - ConvertUtils.dp2px(112.5F + 34)
+                                ScreenUtils.getScreenOrientatedWidth() - floatingSize[0] - ConvertUtils.dp2px(16),
+                                ScreenUtils.getScreenOrientatedHeight() - floatingSize[1] - ConvertUtils.dp2px(34)
                         )
                         .updateShowType(showType)
                         .setOnGoBackListener(new PLVFloatingPlayerManager.OnGoBackListener() {
@@ -123,9 +216,7 @@ public class PLVLCFloatingWindow {
                         .setOnCloseFloatingWindowListener(new PLVFloatingPlayerManager.OnCloseFloatingWindowListener() {
                             @Override
                             public void onClosedFloatingWindow(@Nullable String tag) {
-                                requestShowByCommodityPage = false;
-                                requestShowByUser = false;
-                                PLVFloatingPlayerManager.getInstance().clear();
+                                close();
                             }
                         })
                         .bindContentLayout(contentAnchorLayout)

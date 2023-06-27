@@ -47,6 +47,9 @@ public class PLVFloatPermissionUtils {
      * @return
      */
     public static boolean checkPermission(Activity activity) {
+        if (activity == null) {
+            return false;
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (RomUtils.checkIsHuaweiRom()) return huaweiPermissionCheck(activity);
             if (RomUtils.checkIsMiuiRom()) return miuiPermissionCheck(activity);
