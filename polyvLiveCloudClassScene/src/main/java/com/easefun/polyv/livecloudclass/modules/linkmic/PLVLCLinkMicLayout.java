@@ -880,6 +880,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
+    public void onVideoSizeChanged(String uid, int width, int height) {
+
+    }
+
+    @Override
     public void onSwitchFirstScreen(String linkMicId) {
         linkMicListAdapter.updateAllItem();
     }

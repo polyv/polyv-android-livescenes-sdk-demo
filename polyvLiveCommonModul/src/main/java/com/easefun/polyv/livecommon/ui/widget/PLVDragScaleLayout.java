@@ -45,10 +45,17 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
 
     public static final int FLAG_CENTER = 0x1000;
 
+    public static final int FLAG_AUTO_ATTACH_EDGE_ON_NEVER = 0;
+    public static final int FLAG_AUTO_ATTACH_EDGE_ON_TOUCHING = 0x1;
+    public static final int FLAG_AUTO_ATTACH_EDGE_ON_FINISH_TOUCH = 0x2;
+
     private int edgeResponseSize = ConvertUtils.dp2px(24);
+    private int autoAttachEdgeResponseSize = ConvertUtils.dp2px(24);
 
     private int flagDragMode;
     private int flagScaleMode;
+    private int flagAutoAttachEdge = FLAG_AUTO_ATTACH_EDGE_ON_NEVER;
+    private int flagAutoAttachEdgeSide = FLAG_EDGE_ALL;
 
     private int minWidth = ConvertUtils.dp2px(144);
     private int minHeight = ConvertUtils.dp2px(81);
@@ -114,6 +121,8 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
         float maxX = typedArray.getDimension(R.styleable.PLVDragScaleLayout_plvMaxX, 0);
         float minY = typedArray.getDimension(R.styleable.PLVDragScaleLayout_plvMinY, 0);
         float maxY = typedArray.getDimension(R.styleable.PLVDragScaleLayout_plvMaxY, 0);
+        flagAutoAttachEdge = typedArray.getInteger(R.styleable.PLVDragScaleLayout_plvAutoAttachEdge, flagAutoAttachEdge);
+        flagAutoAttachEdgeSide = typedArray.getInteger(R.styleable.PLVDragScaleLayout_plvAutoAttachEdgeSide, flagAutoAttachEdgeSide);
         typedArray.recycle();
 
         setDragRange(minX, maxX, minY, maxY);
@@ -131,6 +140,11 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
                         } else if (pointCount > 1 && (flagDragMode & FLAG_MULTI_TOUCH) != 0) {
                             processDrag(dx, dy);
                         }
+                    }
+
+                    @Override
+                    public void onFinishDrag() {
+                        processFinishDrag();
                     }
                 })
                 .build();
@@ -217,6 +231,11 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
         this.maxY = maxY;
     }
 
+    public void setFixSize(@Px int width, @Px int height) {
+        setMinSize(width, height);
+        setMaxSize(width, height);
+    }
+
     public void setMinSize(@Px int minWidth, @Px int minHeight) {
         this.minWidth = minWidth;
         this.minHeight = minHeight;
@@ -230,6 +249,11 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
     public void setEdgeResponseSize(int edgeResponseSize) {
         this.edgeResponseSize = edgeResponseSize;
         singleTouchScaleGestureDetector.setEdgeResponseSize(edgeResponseSize);
+    }
+
+    public PLVDragScaleLayout setAutoAttachEdgeResponseSize(int autoAttachEdgeResponseSize) {
+        this.autoAttachEdgeResponseSize = autoAttachEdgeResponseSize;
+        return this;
     }
 
     public void setDragScaleMode(int dragFlags, int scaleFlags) {
@@ -282,8 +306,18 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
         if (right + dx > maxX) {
             maxConsumeDx = maxX - right;
         }
-        scaleLeft(maxConsumeDx);
-        scaleRight(maxConsumeDx);
+        if ((flagAutoAttachEdge & FLAG_AUTO_ATTACH_EDGE_ON_TOUCHING) != 0
+                && (flagAutoAttachEdgeSide & FLAG_EDGE_LEFT) != 0
+                && dx < 0 && left + dx < minX + autoAttachEdgeResponseSize) {
+            maxConsumeDx = minX - left;
+        }
+        if ((flagAutoAttachEdge & FLAG_AUTO_ATTACH_EDGE_ON_TOUCHING) != 0
+                && (flagAutoAttachEdgeSide & FLAG_EDGE_RIGHT) != 0
+                && dx > 0 && right + dx > maxX - autoAttachEdgeResponseSize) {
+            maxConsumeDx = maxX - right;
+        }
+        left += maxConsumeDx;
+        right += maxConsumeDx;
 
         float maxConsumeDy = dy;
         if (top + dy < minY) {
@@ -292,8 +326,45 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
         if (bottom + dy > maxY) {
             maxConsumeDy = maxY - bottom;
         }
-        scaleTop(maxConsumeDy);
-        scaleBottom(maxConsumeDy);
+        if ((flagAutoAttachEdge & FLAG_AUTO_ATTACH_EDGE_ON_TOUCHING) != 0
+                && (flagAutoAttachEdgeSide & FLAG_EDGE_TOP) != 0
+                && dy < 0 && top + dy < minY + autoAttachEdgeResponseSize) {
+            maxConsumeDy = minY - top;
+        }
+        if ((flagAutoAttachEdge & FLAG_AUTO_ATTACH_EDGE_ON_TOUCHING) != 0
+                && (flagAutoAttachEdgeSide & FLAG_EDGE_BOTTOM) != 0
+                && dy > 0 && bottom + dy > maxY - autoAttachEdgeResponseSize) {
+            maxConsumeDy = maxY - bottom;
+        }
+        top += maxConsumeDy;
+        bottom += maxConsumeDy;
+        // 防止越界
+        processScale(0, 0, 0, 0);
+    }
+
+    protected void processFinishDrag() {
+        if ((flagAutoAttachEdge & FLAG_AUTO_ATTACH_EDGE_ON_FINISH_TOUCH) != 0) {
+            float move = 0F;
+            if ((flagAutoAttachEdgeSide & FLAG_EDGE_LEFT) != 0 && left < minX + autoAttachEdgeResponseSize) {
+                move = minX - left;
+            } else if ((flagAutoAttachEdgeSide & FLAG_EDGE_RIGHT) != 0 && right > maxX - autoAttachEdgeResponseSize) {
+                move = maxX - right;
+            }
+            left += move;
+            right += move;
+
+            move = 0F;
+            if ((flagAutoAttachEdgeSide & FLAG_EDGE_TOP) != 0 && top < minY + autoAttachEdgeResponseSize) {
+                move = minY - top;
+            } else if ((flagAutoAttachEdgeSide & FLAG_EDGE_BOTTOM) != 0 && bottom > maxY - autoAttachEdgeResponseSize) {
+                move = maxY - bottom;
+            }
+            top += move;
+            bottom += move;
+
+            // 防止越界
+            processScale(0, 0, 0, 0);
+        }
     }
 
     protected void processScale(float left, float right, float top, float bottom) {
@@ -475,6 +546,11 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
                 }
                 lastCenterPoint.set(centerPoint);
             }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (onDragListener != null) {
+                    onDragListener.onFinishDrag();
+                }
+            }
         }
 
         private PointF getCenterPoint(MotionEvent event) {
@@ -519,6 +595,8 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
 
         interface OnDragListener {
             void onDrag(float dx, float dy, int pointCount);
+
+            void onFinishDrag();
         }
 
     }

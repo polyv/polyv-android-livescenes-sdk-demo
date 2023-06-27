@@ -21,4 +21,9 @@ public class PLVFloatingEnums {
         NO_AUTO_MOVE
     }
 
+    public enum Orientation {
+        PORTRAIT,
+        LANDSCAPE,
+        AUTO
+    }
 }

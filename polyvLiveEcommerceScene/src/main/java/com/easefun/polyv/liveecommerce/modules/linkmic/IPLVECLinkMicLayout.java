@@ -6,6 +6,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView;
 import com.plv.linkmic.PLVLinkMicConstant;
 
 /**
@@ -26,6 +27,11 @@ public interface IPLVECLinkMicLayout {
      * @param liveRoomDataManager 频道数据
      */
     void init(IPLVLiveRoomDataManager liveRoomDataManager, IPLVECLinkMicControlBar linkMicControlBar);
+
+    /**
+     * 初始化单独显示的连麦视图
+     */
+    void setupSeparateLinkMicView(PLVECSeparateLinkMicView separateLinkMicView);
 
     /**
      * 销毁
