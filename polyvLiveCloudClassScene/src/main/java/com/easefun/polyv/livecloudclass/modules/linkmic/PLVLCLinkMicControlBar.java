@@ -700,6 +700,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             btnCameraFrontBackLandscape.setEnabled(true);
             btnCameraFrontBackPortrait.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_front_back_enabled);
             btnCameraFrontBackLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_front_back_enabled);
+            btnCameraFrontBackPortrait.setAlpha(1f);
+            btnCameraFrontBackLandscape.setAlpha(1f);
         } else {
             btnCameraOpenPortrait.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_close);
             btnCameraOpenLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_close);
@@ -707,6 +709,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             btnCameraFrontBackLandscape.setEnabled(false);
             btnCameraFrontBackPortrait.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_front_back_disabled);
             btnCameraFrontBackLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_camera_front_back_disabled);
+            btnCameraFrontBackPortrait.setAlpha(0.3f);
+            btnCameraFrontBackLandscape.setAlpha(0.3f);
         }
     }
 

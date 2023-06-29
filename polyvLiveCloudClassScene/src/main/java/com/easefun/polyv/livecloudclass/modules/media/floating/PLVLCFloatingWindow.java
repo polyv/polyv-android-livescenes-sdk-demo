@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.player.floating.IPLVFloatingWindow;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -29,7 +30,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 /**
  * @author Hoshiiro
  */
-public class PLVLCFloatingWindow {
+public class PLVLCFloatingWindow implements IPLVFloatingWindow {
 
     private static final String TAG = PLVLCFloatingWindow.class.getSimpleName();
 
@@ -71,24 +72,18 @@ public class PLVLCFloatingWindow {
     }
 
     /**
-     * 设置悬浮窗里的播放器音量
+     * 静音播放器/恢复音量
      *
-     * @param volume 音量值，范围：[0,100]
+     * @param mute true：静音，false：恢复音量
      */
-    public void setPlayerVolume(int volume) {
+    @Override
+    public void mutePlayer(boolean mute) {
         if (baseVideoView != null) {
-            baseVideoView.setPlayerVolume(volume);
-        }
-    }
-
-    /**
-     * 设置系统音量
-     *
-     * @param volume 音量值，范围：[0,100]
-     */
-    public void setVolume(int volume) {
-        if (baseVideoView != null) {
-            baseVideoView.setVolume(volume);
+            int currentPlayerVolume = baseVideoView.getPlayerVolume();
+            float setVolume = mute ? 0 : currentPlayerVolume / 100.f;
+            if (baseVideoView.getIjkMediaPlayer() != null) {
+                baseVideoView.getIjkMediaPlayer().setVolume(setVolume, setVolume);
+            }
         }
     }
 
@@ -97,6 +92,7 @@ public class PLVLCFloatingWindow {
      *
      * @param listener 监听器
      */
+    @Override
     public void setOnPlayStatusChangeByAudioFocusListener(IPLVVideoViewListenerEvent.OnPlayStatusChangeByAudioFocusListener listener) {
         if (baseVideoView != null) {
             baseVideoView.setOnPlayStatusChangeByAudioFocusListener(listener);
@@ -108,6 +104,7 @@ public class PLVLCFloatingWindow {
      *
      * @param orientation 方向
      */
+    @Override
     public void setOrientation(PLVFloatingEnums.Orientation orientation) {
         this.orientation = orientation;
     }
@@ -115,6 +112,7 @@ public class PLVLCFloatingWindow {
     /**
      * 关闭悬浮窗
      */
+    @Override
     public void close() {
         requestShowByCommodityPage = false;
         requestShowByUser = false;
@@ -219,6 +217,7 @@ public class PLVLCFloatingWindow {
                                 close();
                             }
                         })
+                        .setFloatingWindow(PLVLCFloatingWindow.this)
                         .bindContentLayout(contentAnchorLayout)
                         .show();
             }
