@@ -651,10 +651,12 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
             btnCameraOpenPortrait.setBackgroundResource(R.drawable.plvec_linkmic_iv_camera_open);
             btnCameraFrontBackPortrait.setEnabled(true);
             btnCameraFrontBackPortrait.setBackgroundResource(R.drawable.plvec_linkmic_iv_camera_front_back_enabled);
+            btnCameraFrontBackPortrait.setAlpha(1f);
         } else {
             btnCameraOpenPortrait.setBackgroundResource(R.drawable.plvec_linkmic_iv_camera_close);
             btnCameraFrontBackPortrait.setEnabled(false);
             btnCameraFrontBackPortrait.setBackgroundResource(R.drawable.plvec_linkmic_iv_camera_front_back_disabled);
+            btnCameraFrontBackPortrait.setAlpha(0.3f);
         }
     }
 
