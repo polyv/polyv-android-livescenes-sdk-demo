@@ -200,6 +200,22 @@ public class PLVPopupHelper {
                 return res;
             }
         },
+        BOTTOM_CENTER {
+            @Override
+            public int[] layout(View anchor, View target, ShowPopupConfig config) {
+                int[] res = new int[2];
+                anchor.getLocationInWindow(res);
+                final int anchorLeft = res[0];
+                final int anchorTop = res[1];
+                final int anchorWidth = anchor.getMeasuredWidth();
+                final int anchorHeight = anchor.getMeasuredHeight();
+                final int targetWidth = target.getMeasuredWidth();
+                final int targetHeight = target.getMeasuredHeight();
+                res[0] = anchorLeft + anchorWidth / 2 - targetWidth / 2;
+                res[1] = anchorTop + anchorHeight + config.marginTop;
+                return res;
+            }
+        },
         BOTTOM_ALIGN_RIGHT {
             @Override
             public int[] layout(View anchor, View target, ShowPopupConfig config) {

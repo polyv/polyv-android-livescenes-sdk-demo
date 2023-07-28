@@ -16,6 +16,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
@@ -379,10 +380,6 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
-            }
-
-            @Override
             public Pair<Integer, Integer> getBitrateInfo() {
                 return plvlsStreamerLy.getBitrateInfo();
             }
@@ -424,8 +421,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
-                plvlsStreamerLy.controlUserLinkMic(position, isAllowJoin);
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
+                plvlsStreamerLy.controlUserLinkMic(position, action);
             }
 
             @Override
@@ -588,6 +585,17 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             public boolean onFrontCameraControl(boolean isFront) {
                 PLVLiveLocalActionHelper.getInstance().updateCameraDirection(isFront);
                 return plvlsStreamerLy.setCameraDirection(isFront);
+            }
+
+            @Override
+            public void onKickByServer() {
+                boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+                if (plvlsStreamerLy != null) {
+                    if (!isGuest) {
+                        plvlsStreamerLy.stopClass();
+                    }
+                    plvlsStreamerLy.destroy();
+                }
             }
         });
         //监听聊天室的在线人数变化

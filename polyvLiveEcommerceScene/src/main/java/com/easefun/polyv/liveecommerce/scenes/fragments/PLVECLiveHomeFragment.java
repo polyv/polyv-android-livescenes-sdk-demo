@@ -318,6 +318,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
 
+        //无条件抽奖
+        lotteryManager.registerView((ImageView) findViewById(R.id.plvec_live_lottery_enter_view),(TextView) findViewById(R.id.plvec_live_lottery_enter_cd_tv),(PLVTriangleIndicateTextView) findViewById(R.id.plvec_live_lottery_enter_tips_view));
+
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
 
@@ -414,6 +417,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     @Override
     protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        super.acceptInteractStatusData(webviewUpdateAppStatusVO);
         if (morePopupView != null) {
             morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
         }

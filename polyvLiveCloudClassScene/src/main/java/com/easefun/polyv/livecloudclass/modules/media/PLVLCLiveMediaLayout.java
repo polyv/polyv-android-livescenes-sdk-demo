@@ -760,6 +760,21 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public ImageView getLotteryEnterView() {
+        return mediaController.getLandscapeController().getLotteryEnterView();
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return mediaController.getLandscapeController().getLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return mediaController.getLandscapeController().getLotteryEnterTipsView();
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }

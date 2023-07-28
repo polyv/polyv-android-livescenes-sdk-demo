@@ -44,6 +44,11 @@ public class PLVECMoreLayout extends FrameLayout {
      */
     public static final String MORE_FUNCTION_TYPE_FLOATING = "MORE_FUNCTION_TYPE_FLOATING";
 
+    /**
+     * 抽奖挂件事件
+     */
+    public static final String CLICK_LOTTERY_PENDANT= "CLICK_LOTTERY_PENDANT";
+
 
     //每行显示的功能模块数量
     public static final int LAYOUT_SPAN_COUNT = 5;
@@ -56,6 +61,9 @@ public class PLVECMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LATENCY, R.drawable.plvec_live_more_latency, "模式", false),
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_FLOATING, R.drawable.plvec_live_more_floating_icon, "小窗播放", false)
     );
+
+    //初始化不支持的事件
+    private ArrayList<String> unacceptFunctions = arrayListOf(CLICK_LOTTERY_PENDANT);
 
     //功能响应监听
     private PLVECFunctionListener functionListener;
@@ -123,6 +131,12 @@ public class PLVECMoreLayout extends FrameLayout {
                 if (function.getEvent().equals(functionList.get(i).getType())) {
                     index = i;
                     break;
+                }
+            }
+
+            for (String unacceptFunction : unacceptFunctions) {
+                if (function.getEvent().equals(unacceptFunction)) {
+                    return;
                 }
             }
 

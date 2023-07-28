@@ -121,7 +121,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
         String actor = itemDataBean.getActor();
-        String status = itemDataBean.getStatus();
 
         holder.onBindLinkMicItem(itemDataBean);
 
@@ -198,7 +197,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        String status = itemDataBean.getStatus();
 
         //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
         if (isAudioLinkMic && !isTeacher && !isGuest) {

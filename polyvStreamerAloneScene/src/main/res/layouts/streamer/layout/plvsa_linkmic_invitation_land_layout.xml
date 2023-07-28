@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99000000">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#232323"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/plvsa_linkmic_invitation_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="22dp"
+            android:paddingVertical="16dp"
+            android:text="邀请你视频连麦"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+            android:id="@+id/plvsa_linkmic_invitation_camera_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/plvsa_linkmic_invitation_camera_iv"
+            app:layout_constraintDimensionRatio="W,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_linkmic_invitation_title_tv"
+            app:mode="all"
+            app:radius="4dp">
+
+            <TextureView
+                android:id="@+id/plvsa_linkmic_invitation_camera_preview_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/plvsa_linkmic_invitation_camera_closed_hint_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#EEE"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/plvsa_linkmic_invitation_camera_closed_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="已关摄像头"
+                        android:textColor="#70757575"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/plvsa_linkmic_invitation_only_audio_hint_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E1EEFF"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/plvsa_linkmic_invitation_only_audio_hint_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+        <ImageView
+            android:id="@+id/plvsa_linkmic_invitation_camera_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/plvsa_linkmic_invitation_camera_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/plvsa_linkmic_invitation_microphone_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_linkmic_invitation_camera_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:text="摄像头"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_linkmic_invitation_camera_iv"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_linkmic_invitation_camera_iv"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_linkmic_invitation_camera_iv"
+            tools:visibility="visible" />
+
+        <Switch
+            android:id="@+id/plvsa_linkmic_invitation_camera_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="31dp"
+            android:thumb="@drawable/plvsa_linkmic_invitation_switch_thumb"
+            android:track="@drawable/plvsa_linkmic_invitation_switch_track"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_linkmic_invitation_camera_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_linkmic_invitation_camera_tv"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvsa_linkmic_invitation_microphone_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/plvsa_linkmic_invitation_microphone_icon"
+            app:layout_constraintBottom_toTopOf="@+id/plvsa_linkmic_invitation_privacy_notify_iv"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/plvsa_linkmic_invitation_microphone_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:text="麦克风"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_linkmic_invitation_microphone_iv"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_linkmic_invitation_microphone_iv"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_linkmic_invitation_microphone_iv" />
+
+        <Switch
+            android:id="@+id/plvsa_linkmic_invitation_microphone_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="31dp"
+            android:thumb="@drawable/plvsa_linkmic_invitation_switch_thumb"
+            android:track="@drawable/plvsa_linkmic_invitation_switch_track"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_linkmic_invitation_microphone_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_linkmic_invitation_microphone_tv" />
+
+        <ImageView
+            android:id="@+id/plvsa_linkmic_invitation_privacy_notify_iv"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/plvsa_linkmic_invitation_privacy_notify_icon"
+            android:tint="#999999"
+            app:layout_constraintBottom_toTopOf="@+id/plvsa_linkmic_invitation_cancel_tv"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/plvsa_linkmic_invitation_privacy_notify_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="连麦将收集人像信息，确认上麦视为同意"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_linkmic_invitation_privacy_notify_iv"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_linkmic_invitation_privacy_notify_iv"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_linkmic_invitation_privacy_notify_iv" />
+
+        <TextView
+            android:id="@+id/plvsa_linkmic_invitation_cancel_tv"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/plvsa_linkmic_invitation_cancel_bg"
+            android:gravity="center"
+            android:textColor="#3082FE"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/plvsa_linkmic_invitation_accept_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="暂不连麦(30s)" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvsa_linkmic_invitation_accept_tv"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="开始连麦"
+            android:textColor="#FFF"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_linkmic_invitation_cancel_tv"
+            app:plvGradientColors="#3082FE"
+            app:plvRadius="1000dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,6 +47,11 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      */
     public static final String CHAT_FUNCTION_TYPE_EFFECT = "CHAT_FUNCTION_TYPE_EFFECT";
 
+    /**
+     * 抽奖挂件事件
+     */
+    public static final String CLICK_LOTTERY_PENDANT= "CLICK_LOTTERY_PENDANT";
+
 
     //每行显示的功能模块数量
     public static final int LAYOUT_SPAN_COUNT = 4;
@@ -60,6 +65,9 @@ public class PLVLCChatMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, "消息", false)
 //            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, "屏蔽特效", false)
     );
+
+    //初始化不支持的事件
+    private ArrayList<String> unacceptFunctions = arrayListOf(CLICK_LOTTERY_PENDANT);
 
     //功能响应监听
     private PLVLCChatFunctionListener functionListener;
@@ -128,6 +136,12 @@ public class PLVLCChatMoreLayout extends FrameLayout {
                 if (function.getEvent().equals(functionList.get(i).getType())) {
                     index = i;
                     break;
+                }
+            }
+
+            for (String unacceptFunction : unacceptFunctions) {
+                if (function.getEvent().equals(unacceptFunction)) {
+                    return;
                 }
             }
 

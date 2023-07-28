@@ -128,7 +128,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
     }
 
     private void prepareBgm() {
-        bgmSoundId = bgmSoundPool.load(getContext(), R.raw.plvlc_linkmic_invitation_bgm, 1);
+        bgmSoundId = bgmSoundPool.load(getContext(), R.raw.plv_linkmic_invitation_bgm, 1);
     }
 
     private void observeOpenStateChanged() {

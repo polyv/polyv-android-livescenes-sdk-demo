@@ -5,12 +5,11 @@ import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
-import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
-import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 
 /**
  * 状态布局的接口定义、
@@ -111,8 +110,16 @@ public interface IPLVLSStatusBarLayout {
     /**
      * view交互事件监听器
      */
-    interface OnViewActionListener extends PLVLSMemberLayout.OnViewActionListener
-            , PLVLSMoreSettingLayout.OnViewActionListener, PLVLSLinkMicControlWindow.OnViewActionListener {
+    interface OnViewActionListener extends PLVLSMemberLayout.OnViewActionListener,
+            PLVLSMoreSettingLayout.OnViewActionListener {
+
+        /**
+         * 是否推流开始成功
+         *
+         * @return true：成功，false：未成功
+         */
+        boolean isStreamerStartSuccess();
+
         /**
          * 上下课控制
          *

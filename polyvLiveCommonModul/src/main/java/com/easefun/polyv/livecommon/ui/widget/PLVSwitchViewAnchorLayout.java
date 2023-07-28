@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -19,6 +20,7 @@ public class PLVSwitchViewAnchorLayout extends FrameLayout {
     private IPLVSwitchViewAnchorLayoutListener onSwitchListener;
     //子View是否已经切换
     private boolean isViewSwitched = false;
+    private boolean interceptTouchEvent = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -64,6 +66,10 @@ public class PLVSwitchViewAnchorLayout extends FrameLayout {
     public boolean isViewSwitched() {
         return isViewSwitched;
     }
+
+    public void setInterceptTouchEvent(boolean interceptTouchEvent) {
+        this.interceptTouchEvent = interceptTouchEvent;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="notify监听器">
@@ -93,6 +99,13 @@ public class PLVSwitchViewAnchorLayout extends FrameLayout {
         isViewSwitched = true;
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="方法重写">
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        return interceptTouchEvent || super.onInterceptTouchEvent(ev);
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="监听器定义">
     public static class IPLVSwitchViewAnchorLayoutListener {

@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom.adapter;
 
+import static com.plv.thirdpart.svga.PLVSvgaHelper.loadFromAssets;
+
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import androidx.annotation.IdRes;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -24,6 +27,11 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.opensource.svgaplayer.SVGAImageView;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVAuthorizationBean;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -44,13 +52,17 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final String PAYLOAD_UPDATE_CAMERA_DIRECTION = "updateCameraDirection";
     public static final String PAYLOAD_UPDATE_SOCKET_USER_DATA = "updateSocketUserData";
 
+    private static final String LINK_MIC_INVITATION_DRAWABLE_FILE_NAME = "plvsa_linkmic_guest_requesting.svga";
+
     //dataList
     private List<PLVMemberItemDataBean> dataBeanList;
     //streamerStatus
     private boolean isStartedStatus;
     private boolean isGuestAutoLinkMic;
+    private boolean isOpenLinkMic = false;
     //是否有全县控制连麦和更多操作
     private boolean isHasPermission = true;
+    private boolean isChannelAllowInviteLinkMic = false;
 
     private PLVSAMemberControlWindow lastShowControlWindow;
 
@@ -180,8 +192,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    public void setOpenLinkMic(boolean openLinkMic) {
+        if (this.isOpenLinkMic == openLinkMic) {
+            return;
+        }
+        this.isOpenLinkMic = openLinkMic;
+        notifyDataSetChanged();
+    }
+
     //设置有主讲权限的用户
-    public void setHasSpeakerUser(PLVSocketUserBean user){
+    public void setHasSpeakerUser(PLVSocketUserBean user) {
         speakerUser = user;
     }
 
@@ -197,8 +217,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         isHasPermission = grant;
     }
 
-    public void hideControlWindow(){
-        if(lastShowControlWindow != null && lastShowControlWindow.isShowing()){
+    public void setChannelAllowInviteLinkMic(boolean allowInviteLinkMic) {
+        if (this.isChannelAllowInviteLinkMic == allowInviteLinkMic) {
+            return;
+        }
+        this.isChannelAllowInviteLinkMic = allowInviteLinkMic;
+        notifyDataSetChanged();
+    }
+
+    public void hideControlWindow() {
+        if (lastShowControlWindow != null && lastShowControlWindow.isShowing()) {
             lastShowControlWindow.dismiss();
         }
     }
@@ -284,11 +312,14 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         private ImageView plvsaMemberBanIv;
         private TextView plvsaMemberUserTypeTv;
         private TextView plvsaMemberNickTv;
-        private ImageView plvsaMemberLinkmicControlIv;
-        private ImageView plvsaMemberLinkmicConnectingIv;
+        private ImageView memberLinkmicHandUpIv;
+        private SVGAImageView plvsaMemberLinkmicControlIv;
         private ImageView plvsaMemberMoreIv;
         private PLVSAMemberControlWindow memberControlWindow;
         private ObjectAnimator connectingAnimator;
+
+        @Nullable
+        private PLVMemberItemDataBean currentMemberItemDataBean;
 
         public MemberViewHolder(final View itemView) {
             super(itemView);
@@ -296,11 +327,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             plvsaMemberBanIv = findViewById(R.id.plvsa_member_ban_iv);
             plvsaMemberUserTypeTv = (TextView) findViewById(R.id.plvsa_member_user_type_tv);
             plvsaMemberNickTv = (TextView) findViewById(R.id.plvsa_member_nick_tv);
-            plvsaMemberLinkmicControlIv = (ImageView) findViewById(R.id.plvsa_member_linkmic_control_iv);
-            plvsaMemberLinkmicConnectingIv = (ImageView) findViewById(R.id.plvsa_member_linkmic_connecting_iv);
+            memberLinkmicHandUpIv = findViewById(R.id.plvsa_member_linkmic_hand_up_iv);
+            plvsaMemberLinkmicControlIv = findViewById(R.id.plvsa_member_linkmic_control_iv);
             plvsaMemberMoreIv = (ImageView) findViewById(R.id.plvsa_member_more_iv);
 
-            connectingAnimator = ObjectAnimator.ofFloat(plvsaMemberLinkmicConnectingIv, "alpha", 1f, 0.2f);
+            connectingAnimator = ObjectAnimator.ofFloat(plvsaMemberLinkmicControlIv, "alpha", 1f, 0.2f);
             connectingAnimator.setDuration(1000);
             connectingAnimator.setRepeatCount(ObjectAnimator.INFINITE);
             connectingAnimator.setRepeatMode(ObjectAnimator.RESTART);
@@ -316,33 +347,28 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View v) {
                     final int pos = getAdapterPosition();
-                    if (pos < 0) {
+                    if (pos < 0 || currentMemberItemDataBean == null || currentMemberItemDataBean.getSocketUserBean() == null) {
                         return;
                     }
-                    if (v.isSelected()) {
-                        new PLVSAConfirmDialog(itemView.getContext())
-                                .setTitle("确定挂断连麦吗？")
-                                .setContentVisibility(View.GONE)
-                                .setLeftButtonText("取消")
-                                .setRightButtonText("确定")
-                                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, View v) {
-                                        dialog.dismiss();
-                                        if (onViewActionListener != null) {
-                                            int pos = getAdapterPosition();
-                                            if (pos < 0) {
-                                                return;
-                                            }
-                                            onViewActionListener.onControlUserLinkMic(pos, false);
-                                        }
-                                    }
-                                })
-                                .show();
-                        return;
-                    }
-                    if (onViewActionListener != null) {
-                        onViewActionListener.onControlUserLinkMic(pos, !v.isSelected());
+                    final boolean isGuest = currentMemberItemDataBean.getSocketUserBean().isGuest();
+                    final boolean isViewer = isViewerUserType(currentMemberItemDataBean.getSocketUserBean().getUserType());
+                    final boolean canInviteLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+                            && (isOpenLinkMic || isGuest || isViewer)
+                            && (isChannelAllowInviteLinkMic || isGuest || isViewer);
+                    final boolean notNeedAnswer = !isChannelAllowInviteLinkMic && (isGuest || isViewer);
+                    switch (currentMemberItemDataBean.getLinkMicStatus()) {
+                        case WAIT_ACCEPT_HAND_UP:
+                            processAcceptHandUp(pos);
+                            break;
+                        case JOIN:
+                        case RTC_JOIN:
+                            processHangUpLinkMic(pos);
+                            break;
+                        default:
+                            if (canInviteLinkMic) {
+                                processInviteLinkMic(pos, !notNeedAnswer);
+                            }
+                            break;
                     }
                 }
             });
@@ -476,6 +502,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
 
         private void processData(PLVMemberItemDataBean dataBean) {
+            this.currentMemberItemDataBean = dataBean;
             final PLVSocketUserBean socketUserBean = dataBean.getSocketUserBean();
             @Nullable
             PLVLinkMicItemDataBean linkMicItemDataBean = dataBean.getLinkMicItemDataBean();
@@ -532,7 +559,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     int tvTotalWidth = actorTvWidth + nickTvWidth;
                     float painWidth = actorTxWidth + nickTxWidth;
                     plvsaMemberUserTypeTv.setMaxEms(Integer.MAX_VALUE);
-                    if(painWidth >= tvTotalWidth){
+                    if (painWidth >= tvTotalWidth) {
                         plvsaMemberUserTypeTv.setMaxEms(5);
                     }
                 }
@@ -541,54 +568,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //设置禁言显示状态
             plvsaMemberBanIv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
             //设置连麦按钮的状态
-            if (isMyself || !isHasPermission) {
-                //自己和无主讲权限时，不需要显示
-                plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                connectingAnimator.cancel();
-                plvsaMemberMoreIv.setVisibility(View.GONE);
-            } else {
-                plvsaMemberMoreIv.setVisibility(isSpecialType ? View.GONE : View.VISIBLE);
-                if (!isStartedStatus) {
-                    plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                    plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                } else {
-                    if (linkMicItemDataBean == null) {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                        connectingAnimator.cancel();
-                    } else if (linkMicItemDataBean.isJoiningStatus()) {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.VISIBLE);
-                        connectingAnimator.start();
-                    } else if (linkMicItemDataBean.isRtcJoinStatus()) {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.VISIBLE);
-                        plvsaMemberLinkmicControlIv.setSelected(true);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                        connectingAnimator.cancel();
-                        //加入连麦状态把更多按钮设置为可见
-                        plvsaMemberMoreIv.setVisibility(View.VISIBLE);
-                    } else if (linkMicItemDataBean.isJoinStatus()
-                            || linkMicItemDataBean.isWaitStatus()
-                            || isViewerUserType(socketUserBean.getUserType())
-                            || isGuestUserType(socketUserBean.getUserType())) {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.VISIBLE);
-                        plvsaMemberLinkmicControlIv.setSelected(false);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                        connectingAnimator.cancel();
-                    } else {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                        connectingAnimator.cancel();
-                    }
-                    //如果是自动连麦的嘉宾，则把连麦相关的按钮隐藏
-                    if (isGuestAutoLinkMic && isGuestUserType(socketUserBean.getUserType())) {
-                        plvsaMemberLinkmicControlIv.setVisibility(View.GONE);
-                        plvsaMemberLinkmicConnectingIv.setVisibility(View.GONE);
-                        connectingAnimator.cancel();
-                    }
-                }
-            }
+            memberLinkmicHandUpIv.setVisibility(isShowHandUpIcon(dataBean) ? View.VISIBLE : View.GONE);
+            plvsaMemberLinkmicControlIv.setVisibility(isShowControlButton(dataBean) ? View.VISIBLE : View.GONE);
+            plvsaMemberMoreIv.setVisibility(isShowMoreButton(dataBean) ? View.VISIBLE : View.GONE);
+            updateControlButtonState(dataBean);
+            updateJoiningAnimation(dataBean);
         }
 
         private void processData(PLVMemberItemDataBean memberItemDataBean, @NonNull List<Object> payloads) {
@@ -620,6 +604,124 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         }
 
+        private boolean isShowHandUpIcon(PLVMemberItemDataBean memberItemDataBean) {
+            final boolean isMyselfTeacher = PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
+            return isMyselfTeacher && memberItemDataBean.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP;
+        }
+
+        private boolean isShowControlButton(PLVMemberItemDataBean memberItemDataBean) {
+            final PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
+            final boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
+            final boolean canInviteLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+                    && (isOpenLinkMic || socketUserBean.isGuest())
+                    && isChannelAllowInviteLinkMic;
+
+            if (isMyself || !isHasPermission || !isStartedStatus) {
+                return false;
+            }
+            switch (memberItemDataBean.getLinkMicStatus()) {
+                case IDLE:
+                    return canInviteLinkMic || isViewerUserType(socketUserBean.getUserType()) || isGuestUserType(socketUserBean.getUserType());
+                case WAIT_ACCEPT_INVITATION:
+                case WAIT_ACCEPT_HAND_UP:
+                case JOINING:
+                case JOIN:
+                case RTC_JOIN:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private boolean isShowMoreButton(PLVMemberItemDataBean memberItemDataBean) {
+            final PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
+            final boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
+            final boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
+
+            if (isMyself || !isHasPermission) {
+                return false;
+            } else if (!isSpecialType) {
+                return true;
+            } else {
+                return memberItemDataBean.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.RTC_JOIN;
+            }
+        }
+
+        private void updateControlButtonState(PLVMemberItemDataBean memberItemDataBean) {
+            final PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
+            final boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
+
+            if (isMyself || !isHasPermission) {
+                return;
+            }
+            switch (memberItemDataBean.getLinkMicStatus()) {
+                case IDLE:
+                case WAIT_ACCEPT_HAND_UP:
+                case JOINING:
+                    plvsaMemberLinkmicControlIv.stopAnimation();
+                    plvsaMemberLinkmicControlIv.setImageResource(R.drawable.plvsa_member_linkmic);
+                    break;
+                case WAIT_ACCEPT_INVITATION:
+                    loadFromAssets(plvsaMemberLinkmicControlIv, LINK_MIC_INVITATION_DRAWABLE_FILE_NAME);
+                    break;
+                case JOIN:
+                case RTC_JOIN:
+                    plvsaMemberLinkmicControlIv.stopAnimation();
+                    plvsaMemberLinkmicControlIv.setImageResource(R.drawable.plvsa_member_linkmic_sel);
+                    break;
+                default:
+            }
+        }
+
+        private void updateJoiningAnimation(PLVMemberItemDataBean memberItemDataBean) {
+            final PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
+            final boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
+
+            if (isMyself
+                    || !isHasPermission
+                    || (isGuestAutoLinkMic && isGuestUserType(socketUserBean.getUserType()))) {
+                connectingAnimator.cancel();
+                plvsaMemberLinkmicControlIv.setAlpha(1F);
+            } else if (memberItemDataBean.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.JOINING) {
+                if (!connectingAnimator.isStarted()) {
+                    connectingAnimator.start();
+                }
+            } else {
+                connectingAnimator.cancel();
+                plvsaMemberLinkmicControlIv.setAlpha(1F);
+            }
+        }
+
+        private void processInviteLinkMic(int pos, boolean needAnswer) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onControlUserLinkMic(pos, PLVStreamerControlLinkMicAction.sendInvitation(needAnswer));
+            }
+        }
+
+        private void processAcceptHandUp(int pos) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onControlUserLinkMic(pos, PLVStreamerControlLinkMicAction.acceptRequest());
+            }
+        }
+
+        private void processHangUpLinkMic(final int pos) {
+            new PLVSAConfirmDialog(itemView.getContext())
+                    .setTitle("确定挂断连麦吗？")
+                    .setContentVisibility(View.GONE)
+                    .setLeftButtonText("取消")
+                    .setRightButtonText("确定")
+                    .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, View v) {
+                            dialog.dismiss();
+                            if (onViewActionListener != null) {
+                                onViewActionListener.onControlUserLinkMic(pos, PLVStreamerControlLinkMicAction.hangUp());
+                            }
+                        }
+                    })
+                    .show();
+        }
+
         private <T extends View> T findViewById(@IdRes int id) {
             return itemView.findViewById(id);
         }
@@ -641,7 +743,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         /**
          * 用户加入或离开连麦控制
          */
-        void onControlUserLinkMic(int position, boolean isAllowJoin);
+        void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action);
 
         /**
          * 授予用户主讲权限

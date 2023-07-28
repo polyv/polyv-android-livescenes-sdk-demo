@@ -106,6 +106,11 @@ public interface IPLVLSChatroomLayout {
          * @param isFront true：前置，false：后置
          */
         boolean onFrontCameraControl(boolean isFront);
+
+        /**
+         * 被踢出直播间
+         */
+        void onKickByServer();
     }
     // </editor-fold>
 }

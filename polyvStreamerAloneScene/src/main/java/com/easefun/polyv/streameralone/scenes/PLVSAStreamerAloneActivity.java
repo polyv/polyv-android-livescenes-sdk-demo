@@ -58,6 +58,8 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -421,7 +423,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             public void onStartLiveAction() {
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
-                homeFragment.chatroomLogin();
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.startLive();
                 //开始直播后，请求成员列表接口
@@ -433,7 +434,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 //嘉宾进入直播间
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
-                homeFragment.chatroomLogin();
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.enterLive();
                 //开始直播后，请求成员列表接口
@@ -568,10 +568,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             @Override
             public void onViewCreated() {
                 homeFragment.init(liveRoomDataManager);
+                homeFragment.chatroomLogin();
                 //注册streamerView
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getMoreLayoutStreamerView());
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getMemberLayoutStreamerView());
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getStatusBarLayoutStreamerView());
+                streamerLayout.getStreamerPresenter().registerView(homeFragment.getStreamerView());
 
                 //监听用户连麦请求的变化
                 streamerLayout.addOnUserRequestListener(new IPLVOnDataChangedListener<String>() {
@@ -580,7 +579,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         if (s == null) {
                             return;
                         }
-                        homeFragment.updateUserRequestStatus();
+                        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                            homeFragment.updateUserRequestStatus();
+                        }
                     }
                 });
             }
@@ -620,6 +621,17 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 linkMicLocalShareData.isOpenLinkMic = isOpen;
                 linkMicLocalShareData.isVideoLinkMic = isVideoLinkMicType;
             }
+
+            @Override
+            public void onKickByServer() {
+                boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+                if (streamerLayout != null) {
+                    if (!isGuest) {
+                        streamerLayout.stopLive();
+                    }
+                    streamerLayout.destroy();
+                }
+            }
         });
 
         emptyFragment.setOnViewActionListener(new PLVSAEmptyFragment.OnViewActionListener() {
@@ -631,7 +643,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         if (s == null) {
                             return;
                         }
-                        linkMicRequestTipsLayout.show();
+                        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                            linkMicRequestTipsLayout.show();
+                        }
                     }
                 });
             }

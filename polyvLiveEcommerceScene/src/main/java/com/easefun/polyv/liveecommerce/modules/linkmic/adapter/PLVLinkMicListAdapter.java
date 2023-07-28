@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,6 +124,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private LinkMicItemViewHolder teacherViewHolder;
     @Nullable
     private SurfaceView localRenderView;
+    private View checkClickView;
 
     private int itemType = ITEM_TYPE_DEFAULT;
 
@@ -402,6 +404,12 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     //更新奖杯
     public void updateCup(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_CUP);
+    }
+
+    public void checkClickItemView(MotionEvent ev) {
+        if (checkClickView != null && ev.getAction() != MotionEvent.ACTION_DOWN) {
+            checkClickView.dispatchTouchEvent(ev);
+        }
     }
     // </editor-fold>
 
@@ -770,6 +778,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (isFirstScreen && (holder != null)) {
             holder.plvPlayerLogoView.addLogo(plvPlayerLogoView.getParamZero());
             holder.plvPlayerLogoView.setVisibility(View.VISIBLE);
+            checkClickView = holder.itemView;
         } else if (!isFirstScreen && (holder != null)) {
             holder.plvPlayerLogoView.setVisibility(View.GONE);
         }

@@ -23,6 +23,7 @@ import com.easefun.polyv.livecommon.ui.widget.floating.PLVFloatingWindowManager;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -112,7 +113,11 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
 
     public void destroy() {
         PLVFloatingWindowManager.getInstance().destroy();
-        context.unregisterReceiver(receiver);
+        try {
+            context.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+        }
     }
     // </editor-fold >
 

@@ -16,6 +16,7 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -51,6 +52,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
     //卡片推送管理器
     protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
+    //抽奖挂件管理器
+    protected PLVLotteryManager lotteryManager = new PLVLotteryManager();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -82,6 +85,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         }
         if (cardPushManager != null) {
             cardPushManager.disposeCardPushAllTask();
+        }
+        if (lotteryManager != null) {
+            lotteryManager.destroy();
         }
         destroySocketLoginManager();
     }
@@ -135,12 +141,23 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        acceptLotteryVO(webviewUpdateAppStatusVO);
+    }
+
+    private void acceptLotteryVO(PLVWebviewUpdateAppStatusVO  webviewUpdateAppStatusVO) {
+        if (lotteryManager != null) {
+            lotteryManager.acceptLotteryVo(webviewUpdateAppStatusVO);
+        }
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
     public PLVCardPushManager getCardPushManager() {
         return cardPushManager;
+    }
+
+    public PLVLotteryManager getLotteryManager() {
+        return lotteryManager;
     }
 
     //获取聊天室的公告信息

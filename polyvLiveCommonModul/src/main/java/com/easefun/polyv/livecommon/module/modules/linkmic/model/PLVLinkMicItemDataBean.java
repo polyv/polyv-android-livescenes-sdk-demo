@@ -15,11 +15,11 @@ import java.util.Map;
  * description:连麦列表item对应的数据实体
  */
 public class PLVLinkMicItemDataBean {
-    public static final String STATUS_IDLE = "idle";//空闲
-    public static final String STATUS_WAIT = "wait";//等待同意
-    public static final String STATUS_JOINING = "joining";//加入中
-    public static final String STATUS_JOIN = "join";//已加入列表
-    public static final String STATUS_RTC_JOIN = "rtcJoin";//已加入rtc
+    public static final LinkMicStatus STATUS_IDLE = LinkMicStatus.IDLE;
+    public static final LinkMicStatus STATUS_WAIT = LinkMicStatus.WAIT_ACCEPT_HAND_UP;
+    public static final LinkMicStatus STATUS_JOINING = LinkMicStatus.JOINING;
+    public static final LinkMicStatus STATUS_JOIN = LinkMicStatus.JOIN;
+    public static final LinkMicStatus STATUS_RTC_JOIN = LinkMicStatus.RTC_JOIN;
     //最大音量值
     public static final int MAX_VOLUME = 100;
 
@@ -59,7 +59,7 @@ public class PLVLinkMicItemDataBean {
     private transient boolean isFullScreen = false;
 
     //linkMic status
-    private String status = STATUS_IDLE;
+    private LinkMicStatus status = STATUS_IDLE;
     private Map<Integer, MuteMedia> muteVideoInRtcJoinListMap = new HashMap<>();
     private Map<Integer, MuteMedia> muteAudioInRtcJoinListMap = new HashMap<>();
 
@@ -113,11 +113,11 @@ public class PLVLinkMicItemDataBean {
                 || PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX == this.streamType;
     }
 
-    public String getStatus() {
+    public LinkMicStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(LinkMicStatus status) {
         this.status = status;
         callStatusMethodTouch();
     }
@@ -356,5 +356,47 @@ public class PLVLinkMicItemDataBean {
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
                 '}';
+    }
+
+    public enum LinkMicStatus {
+        /**
+         * 未连麦
+         */
+        IDLE("idle"),
+        /**
+         * 等待同意举手上麦
+         */
+        WAIT_ACCEPT_HAND_UP("wait"),
+        /**
+         * 等待接受邀请上麦
+         */
+        WAIT_ACCEPT_INVITATION("no_server_name"),
+        /**
+         * 加入中
+         */
+        JOINING("joining"),
+        /**
+         * 已加入连麦列表
+         */
+        JOIN("join"),
+        /**
+         * 已加入rtc
+         */
+        RTC_JOIN("rtcJoin");
+
+        private final String serverName;
+
+        LinkMicStatus(String serverName) {
+            this.serverName = serverName;
+        }
+
+        public static LinkMicStatus match(String serverName) {
+            for (LinkMicStatus value : values()) {
+                if (value.serverName.equals(serverName)) {
+                    return value;
+                }
+            }
+            return IDLE;
+        }
     }
 }

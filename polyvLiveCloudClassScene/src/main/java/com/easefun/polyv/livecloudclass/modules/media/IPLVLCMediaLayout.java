@@ -130,6 +130,22 @@ public interface IPLVLCMediaLayout {
     PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
+     * 获取无条件抽奖入口按钮
+     * @return
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器

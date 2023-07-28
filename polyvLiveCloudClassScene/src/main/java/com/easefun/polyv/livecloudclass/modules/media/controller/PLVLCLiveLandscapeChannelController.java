@@ -167,6 +167,21 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public ImageView getLotteryEnterView() {
+        return findViewById(R.id.plvlc_live_lottery_enter_view);
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return findViewById(R.id.plvlc_live_lottery_enter_cd_tv);
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return findViewById(R.id.plvlc_live_lottery_enter_tips_view);
+    }
+
+    @Override
     public ImageView getEnterPaintView() {
         return findViewById(R.id.plvlc_live_player_controller_enter_paint_iv);
     }

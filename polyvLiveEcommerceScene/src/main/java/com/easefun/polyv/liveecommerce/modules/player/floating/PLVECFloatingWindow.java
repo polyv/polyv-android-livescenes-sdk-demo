@@ -11,14 +11,19 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.player.floating.IPLVFloatingWindow;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
+import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
+import com.plv.business.api.common.player.PLVBaseVideoView;
+import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -26,7 +31,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 /**
  * @author Hoshiiro
  */
-public class PLVECFloatingWindow {
+public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     private static final String TAG = PLVECFloatingWindow.class.getSimpleName();
 
@@ -38,9 +43,12 @@ public class PLVECFloatingWindow {
     @Nullable
     private View contentChild;
     @Nullable
+    private PLVBaseVideoView baseVideoView;
+    @Nullable
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_FOREGROUND;
+    private PLVFloatingEnums.Orientation orientation = PLVFloatingEnums.Orientation.AUTO;
 
     private ViewGroup.LayoutParams originContentLayoutParam;
 
@@ -64,7 +72,10 @@ public class PLVECFloatingWindow {
 
     public void bindContentView(PLVSwitchViewAnchorLayout anchorLayout) {
         this.contentAnchorLayout = anchorLayout;
-        this.contentChild = anchorLayout.getChildAt(0);
+        if (contentAnchorLayout != null) {
+            this.contentChild = contentAnchorLayout.getChildAt(0);
+            findBaseVideoView((View) contentAnchorLayout.getParent());
+        }
     }
 
     public void setLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -73,6 +84,88 @@ public class PLVECFloatingWindow {
 
     public void setLanderScreen(boolean isLanderScreen){
         this.isLanderScreen = isLanderScreen;
+    }
+
+    /**
+     * 静音播放器/恢复音量
+     *
+     * @param mute true：静音，false：恢复音量
+     */
+    @Override
+    public void mutePlayer(boolean mute) {
+        if (baseVideoView != null) {
+            int currentPlayerVolume = baseVideoView.getPlayerVolume();
+            float setVolume = mute ? 0 : currentPlayerVolume / 100.f;
+            if (baseVideoView.getIjkMediaPlayer() != null) {
+                baseVideoView.getIjkMediaPlayer().setVolume(setVolume, setVolume);
+            }
+        }
+    }
+
+    /**
+     * 设置由音频焦点引起的播放状态改变监听器
+     *
+     * @param listener 监听器
+     */
+    @Override
+    public void setOnPlayStatusChangeByAudioFocusListener(IPLVVideoViewListenerEvent.OnPlayStatusChangeByAudioFocusListener listener) {
+        if (baseVideoView != null) {
+            baseVideoView.setOnPlayStatusChangeByAudioFocusListener(listener);
+        }
+    }
+
+    /**
+     * 设置窗口方向
+     *
+     * @param orientation 方向
+     */
+    @Override
+    public void setOrientation(PLVFloatingEnums.Orientation orientation) {
+        this.orientation = orientation;
+    }
+
+    /**
+     * 关闭悬浮窗
+     */
+    @Override
+    public void close() {
+        requestShowByCommodityPage = false;
+        requestShowByUser = false;
+        restoreContentLayoutParam();
+        PLVFloatingPlayerManager.getInstance().clear();
+    }
+
+    // 根据视频宽高适配悬浮窗宽高
+    private int[] getFloatingSize() {
+        if (isLanderScreen) {
+            return new int[]{ConvertUtils.dp2px(240), ConvertUtils.dp2px(134)};
+        }
+        int width = ConvertUtils.dp2px(90);
+        int height = ConvertUtils.dp2px(160);
+        boolean isPortrait = orientation != PLVFloatingEnums.Orientation.LANDSCAPE;
+        if (baseVideoView != null && orientation == PLVFloatingEnums.Orientation.AUTO) {
+            int[] wh = PLVVideoSizeUtils.getVideoWH(baseVideoView);
+            if (wh[0] != 0 && wh[0] > wh[1]) {
+                isPortrait = false;
+            }
+        }
+        return new int[]{isPortrait ? width : height, isPortrait ? height : width};
+    }
+
+    private boolean findBaseVideoView(View view) {
+        if (view instanceof PLVBaseVideoView) {
+            baseVideoView = (PLVBaseVideoView) view;
+            return true;
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0, size = viewGroup.getChildCount(); i < size; i++) {
+                boolean result = findBaseVideoView(viewGroup.getChildAt(i));
+                if (result) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void onRequestShowChanged() {
@@ -103,14 +196,15 @@ public class PLVECFloatingWindow {
                 if (!isNeedShow()) {
                     return;
                 }
+                int[] floatingSize = getFloatingSize();
                 PLVFloatingPlayerManager.getInstance()
                         .setFloatingSize(
-                                isLanderScreen ? ConvertUtils.dp2px(240) : ConvertUtils.dp2px(90),
-                                isLanderScreen ? ConvertUtils.dp2px(134) : ConvertUtils.dp2px(160)
+                                floatingSize[0],
+                                floatingSize[1]
                         )
                         .setFloatingPosition(
-                                ScreenUtils.getScreenOrientatedWidth() - ConvertUtils.dp2px(isLanderScreen ? 240 : 90 + 16),
-                                ScreenUtils.getScreenOrientatedHeight() - ConvertUtils.dp2px(isLanderScreen ? 134 : 160 + 34)
+                                ScreenUtils.getScreenOrientatedWidth() - floatingSize[0] - ConvertUtils.dp2px(16),
+                                ScreenUtils.getScreenOrientatedHeight() - floatingSize[1] - ConvertUtils.dp2px(34)
                         )
                         .updateShowType(showType)
                         .setOnGoBackListener(new PLVFloatingPlayerManager.OnGoBackListener() {
@@ -141,12 +235,10 @@ public class PLVECFloatingWindow {
                         .setOnCloseFloatingWindowListener(new PLVFloatingPlayerManager.OnCloseFloatingWindowListener() {
                             @Override
                             public void onClosedFloatingWindow(@Nullable String tag) {
-                                requestShowByCommodityPage = false;
-                                requestShowByUser = false;
-                                restoreContentLayoutParam();
-                                PLVFloatingPlayerManager.getInstance().clear();
+                                close();
                             }
                         })
+                        .setFloatingWindow(PLVECFloatingWindow.this)
                         .bindContentLayout(contentAnchorLayout)
                         .show();
                 setContentMatchParent();
@@ -182,7 +274,8 @@ public class PLVECFloatingWindow {
         if (PLVFloatPermissionUtils.checkPermission((Activity) context)) {
             runnable.run();
         } else {
-            new AlertDialog.Builder(context)
+            final Activity topActivity = ActivityUtils.getTopActivity();
+            new AlertDialog.Builder(topActivity == null ? context : topActivity)
                     .setMessage("悬浮小窗播放功能需要在应用设置中开启悬浮窗权限，是否前往开启权限？")
                     .setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override

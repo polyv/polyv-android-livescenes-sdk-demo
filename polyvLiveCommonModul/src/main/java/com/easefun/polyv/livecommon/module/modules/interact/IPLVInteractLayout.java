@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 
@@ -49,6 +50,11 @@ public interface IPLVInteractLayout {
      * 显示卡片推送
      */
     void showCardPush(PLVShowPushCardEvent showPushCardEvent);
+
+    /**
+     * 显示抽奖
+     */
+    void showLottery(PLVShowLotteryEvent showLotteryEvent);
 
     /**
      * 更新频道开关

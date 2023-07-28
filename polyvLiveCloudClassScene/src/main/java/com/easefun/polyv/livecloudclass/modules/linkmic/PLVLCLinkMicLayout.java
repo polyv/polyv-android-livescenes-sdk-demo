@@ -92,6 +92,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     //滑动提示状态：不可见，由于已经滑动了
     private static final int TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_SCROLLED = 2;
 
+    //是否都使用横屏推流分辨率
+    private static final boolean USE_LANDSCAPE_RESOLUTION = true;
+
     //Presenter
     private IPLVLinkMicContract.IPLVLinkMicPresenter linkMicPresenter;
 
@@ -1077,7 +1080,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     private void updatePushResolution(boolean isLandscape) {
         if (linkMicPresenter != null) {
-            linkMicPresenter.setPushPictureResolutionType(isLandscape ?
+            linkMicPresenter.setPushPictureResolutionType(isLandscape || USE_LANDSCAPE_RESOLUTION ?
                     PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE :
                     PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
         }

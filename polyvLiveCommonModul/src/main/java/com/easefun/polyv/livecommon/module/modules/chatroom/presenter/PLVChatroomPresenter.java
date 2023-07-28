@@ -673,6 +673,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void setChatNickName(String nickName) {
+        PLVChatroomManager.getInstance().setNickName(nickName);
+    }
+
+    @Override
     public void destroy() {
         clearHistoryInfo();
         if (iChatroomViews != null) {

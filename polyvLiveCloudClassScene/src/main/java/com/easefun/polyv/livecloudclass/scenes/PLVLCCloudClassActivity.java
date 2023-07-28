@@ -37,6 +37,7 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
@@ -66,6 +67,7 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -482,6 +484,17 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().showCardPush(event);
                 }
+            }
+        });
+
+
+        //无条件抽奖挂件配置
+        livePageMenuLayout.getLotteryManager().registerView(mediaLayout.getLotteryEnterView(), mediaLayout.getLotteryEnterCdView(), mediaLayout.getLotteryEnterTipsView());
+        livePageMenuLayout.getLotteryManager().setLotteryEnterClickListener(new PLVLotteryManager.OnLotteryEnterClickListener() {
+            @Override
+            public void onClick(PLVShowLotteryEvent event) {
+                //发送显示无条件抽奖
+                popoverLayout.getInteractLayout().showLottery(event);
             }
         });
 
