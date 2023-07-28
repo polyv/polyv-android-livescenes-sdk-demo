@@ -61,6 +61,7 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -94,6 +95,10 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    @Nullable
+    private OnViewActionListener onViewActionListener = null;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -235,6 +240,11 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         //请求一次历史记录
         chatroomPresenter.setHistoryContainRewardEvent(true);
         chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
+    }
+
+    @Override
+    public void setOnViewActionListener(@Nullable OnViewActionListener onViewActionListener) {
+        this.onViewActionListener = onViewActionListener;
     }
 
     @Override
@@ -621,14 +631,28 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         }
 
         @Override
+        public void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent) {
+            if (PLVRoomPushStatusEvent.STATUS_FORBID.equals(roomPushStatusEvent.getStatus())) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onKickByServer();
+                }
+                showExitDialog(R.string.plv_chat_toast_kicked_streamer);
+            }
+        }
+
+        @Override
         public void onLoginRefuseEvent(@NonNull PLVLoginRefuseEvent loginRefuseEvent) {
-            super.onLoginRefuseEvent(loginRefuseEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_been_kicked);
         }
 
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
-            super.onReloginEvent(reloginEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
         }
     };
@@ -664,5 +688,18 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         chatroomPresenter.getChatEmotionImages();
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="接口回调">
+
+    public interface OnViewActionListener {
+
+        /**
+         * 被踢出直播间
+         */
+        void onKickByServer();
+
+    }
+
+    // </editor-fold>
 
 }

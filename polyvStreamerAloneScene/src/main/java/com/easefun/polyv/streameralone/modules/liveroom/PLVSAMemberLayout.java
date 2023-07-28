@@ -2,6 +2,7 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -18,9 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -28,6 +31,7 @@ import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListe
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
@@ -128,9 +132,9 @@ public class PLVSAMemberLayout extends FrameLayout {
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
                 if (streamerPresenter != null) {
-                    streamerPresenter.controlUserLinkMic(position, isAllowJoin);
+                    streamerPresenter.controlUserLinkMic(position, action);
                 }
             }
 
@@ -159,6 +163,21 @@ public class PLVSAMemberLayout extends FrameLayout {
             }
         });
         plvsaMemberListRv.setAdapter(memberAdapter);
+
+        observeClassDetail();
+    }
+
+    private void observeClassDetail() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(),
+                new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                    @Override
+                    public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> data) {
+                        if (data == null || data.getData() == null) {
+                            return;
+                        }
+                        memberAdapter.setChannelAllowInviteLinkMic(data.getData().getData().isInviteAudioEnabled());
+                    }
+                });
     }
     // </editor-fold>
 
@@ -236,6 +255,12 @@ public class PLVSAMemberLayout extends FrameLayout {
 
     public boolean hasUserRequestLinkMic() {
         return memberAdapter.hasUserRequestLinkMic();
+    }
+
+    public void notifyLinkMicTypeChange(boolean isVideoLinkMic, boolean isOpenLinkMic) {
+        if (memberAdapter != null) {
+            memberAdapter.setOpenLinkMic(isOpenLinkMic);
+        }
     }
 
     public void setOnDrawerStateChangeListener(PLVMenuDrawer.OnDrawerStateChangeListener listener) {

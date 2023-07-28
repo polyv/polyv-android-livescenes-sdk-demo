@@ -104,6 +104,7 @@ import com.plv.socket.event.redpack.PLVRedPaperForDelayEvent;
 import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
 import com.plv.socket.event.redpack.PLVRedPaperResultEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.log.PLVELogSender;
 import com.plv.socket.socketio.PLVSocketIOClient;
@@ -670,6 +671,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     @Override
     public PLVChatroomData getData() {
         return chatroomData;
+    }
+
+    @Override
+    public void setChatNickName(String nickName) {
+        PLVChatroomManager.getInstance().setNickName(nickName);
     }
 
     @Override

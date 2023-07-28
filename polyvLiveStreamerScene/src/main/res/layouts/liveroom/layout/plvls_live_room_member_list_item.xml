@@ -123,29 +123,39 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/plvls_member_cam_front_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:layout_marginLeft="16dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@drawable/plvls_member_iv_bg_shape"
                     android:src="@drawable/plvls_chatroom_toolbar_front_iv_selector" />
 
                 <ImageView
+                    android:id="@+id/plvls_member_linkmic_hand_up_iv"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/plvls_member_linkmic_hand_up_icon"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <com.opensource.svgaplayer.SVGAImageView
                     android:id="@+id/plvls_member_linkmic_control_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/plvls_member_linkmic_control_selector"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/plvls_member_join_response"
                     android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/plvls_member_linkmic_connecting_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:layout_marginLeft="16dp"
                     android:src="@drawable/plvls_member_linkmic_connecting_animation"
                     android:visibility="gone" />
             </LinearLayout>

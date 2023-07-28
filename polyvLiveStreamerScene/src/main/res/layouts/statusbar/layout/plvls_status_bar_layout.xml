@@ -97,7 +97,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--连麦-->
-    <ImageView
+    <com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSLinkMicControlButton
         android:id="@+id/plvls_status_bar_linkmic_iv"
         android:layout_width="28dp"
         android:layout_height="match_parent"

@@ -527,6 +527,21 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public ImageView getLotteryEnterView() {
+        return mediaController.getLotteryEnterView();
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return mediaController.getLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return mediaController.getLotteryEnterTipsView();
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }

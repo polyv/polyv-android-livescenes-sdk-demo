@@ -1,5 +1,6 @@
 package com.easefun.polyv.streameralone.modules.streamer;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 import static java.lang.Math.min;
 
@@ -31,6 +32,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
@@ -59,6 +61,8 @@ import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.streamer.IPLVStreamerManager;
+import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
+import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -100,6 +104,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     private Runnable updateLinkmicLayoutRunnable;
     //连麦列表布局管理
     private GridLayoutManager gridLayoutManager;
+    // 邀请连麦布局
+    private final PLVSALinkMicInvitationLayout linkMicInvitationLayout = new PLVSALinkMicInvitationLayout(getContext());
 
     //退出直播间弹窗
     private PLVConfirmDialog leaveLiveConfirmDialog;
@@ -140,7 +146,16 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
         //init RecyclerView
         PLVNoInterceptTouchRecyclerView plvsaStreamerRv = plvsaStreamerRvLayout.getRecyclerView();
-        plvsaStreamerRv.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+        plvsaStreamerRv.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false) {
+            @Override
+            public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                try {
+                    super.onLayoutChildren(recycler, state);
+                } catch (IndexOutOfBoundsException e) {
+                    // ignore IndexOutOfBoundsException: Inconsistency detected. Invalid view holder adapter positionViewHolder
+                }
+            }
+        });
         //禁用RecyclerView默认动画
         plvsaStreamerRv.getItemAnimator().setAddDuration(0);
         plvsaStreamerRv.getItemAnimator().setChangeDuration(0);
@@ -151,7 +166,16 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             ((SimpleItemAnimator) rvAnimator).setSupportsChangeAnimations(false);
         }
 
-        gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        gridLayoutManager = new GridLayoutManager(getContext(), 1) {
+            @Override
+            public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                try {
+                    super.onLayoutChildren(recycler, state);
+                } catch (IndexOutOfBoundsException e) {
+                    // ignore IndexOutOfBoundsException: Inconsistency detected. Invalid view holder adapter positionViewHolder
+                }
+            }
+        };
         plvsaStreamerRv.setLayoutManager(gridLayoutManager);
 
         //启动前台服务，防止在后台被杀
@@ -162,7 +186,29 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         //悬浮窗
         floatWindow = new PLVSAStreamerFloatWindow(getContext());
 
+        initLinkMicInvitationLayout();
         observeSpeakerPermissionChange();
+    }
+
+    private void initLinkMicInvitationLayout() {
+        linkMicInvitationLayout.setOnViewActionListener(new PLVSALinkMicInvitationLayout.OnViewActionListener() {
+
+            @Override
+            public void answerLinkMicInvitation(boolean accept, int cancelBy, boolean openCamera, boolean openMicrophone) {
+                streamerPresenter.answerLinkMicInvitation(accept, cancelBy == PLVSALinkMicInvitationLayout.CANCEL_BY_TIMEOUT, openCamera, openMicrophone);
+            }
+
+            @Override
+            public void asyncGetAcceptInvitationLeftTimeInSecond(PLVSugarUtil.Consumer<Integer> callback) {
+                streamerPresenter.getJoinAnswerTimeLeft(callback);
+            }
+
+            @Override
+            public void requestChangeCameraFocus(boolean requestFocus) {
+                streamerPresenter.enableLocalVideoCapture(!requestFocus);
+            }
+
+        });
     }
 
     private void observeSpeakerPermissionChange() {
@@ -231,9 +277,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
                 if (streamerPresenter != null) {
-                    streamerPresenter.controlUserLinkMicInLinkMicList(position, isAllowJoin);
+                    streamerPresenter.controlUserLinkMicInLinkMicList(position, action);
                 }
             }
 
@@ -285,6 +331,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
         //初始化悬浮窗
         streamerPresenter.registerView(floatWindow.getStreamerView());
+
+        linkMicInvitationLayout.setIsOnlyAudio(liveRoomDataManager.isOnlyAudio());
+
         observePushResolutionRatio();
     }
 
@@ -373,6 +422,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
     @Override
     public void startLive() {
+        streamerAdapter.updateEnterLive(true);
         streamerPresenter.startLiveStream();
     }
 
@@ -384,6 +434,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     public void enterLive() {
         isEnterLive = true;
+        streamerAdapter.updateEnterLive(true);
         //嘉宾进入直播间
         streamerPresenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
             @Override
@@ -398,12 +449,12 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                     if(plvsaStreamerRvLayout.getCurrentMode() == PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER){
                         plvsaStreamerRvLayout.changeMode(PLVMultiModeRecyclerViewLayout.MODE_TILED);
                         streamerAdapter.setItemType(PLVSAStreamerAdapter.ITEM_TYPE_ONLY_TEACHER);
-                        updateLinkMicLayoutListOnChange();
                     }
                 } else {
                     changePlaceholder();
-                    updateLinkMicLayoutListOnChange();
+                    linkMicInvitationLayout.close();
                 }
+                updateLinkMicLayoutListOnChange();
             }
         });
     }
@@ -434,6 +485,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     public void destroy() {
         floatWindow.close();
         floatWindow.destroy();
+        linkMicInvitationLayout.destroy();
         streamerPresenter.destroy();
         PLVForegroundService.stopForegroundService();
     }
@@ -497,9 +549,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         }
 
         @Override
-        public void onGuestRTCStatusChanged(int pos) {
-            super.onGuestRTCStatusChanged(pos);
+        public void onGuestRTCStatusChanged(int pos, boolean isJoinRTC) {
             streamerAdapter.updateGuestStatus(pos);
+            if (isJoinRTC) {
+                linkMicInvitationLayout.close();
+            }
         }
 
         @Override
@@ -633,6 +687,26 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
             updateLinkMicLayoutListOnChange();
             streamerAdapter.updateAllItem();
+        }
+
+        @Override
+        public void onTeacherInviteMeJoinLinkMic(PLVJoinResponseSEvent event) {
+            if (isEnterLive) {
+                linkMicInvitationLayout.setCurrentEnableVideo(streamerPresenter.isLocalVideoEnabled());
+                linkMicInvitationLayout.setCurrentEnableAudio(streamerPresenter.isLocalAudioEnabled());
+                linkMicInvitationLayout.open();
+            } else {
+                streamerPresenter.answerLinkMicInvitation(false, false, streamerPresenter.isLocalVideoEnabled(), streamerPresenter.isLocalAudioEnabled());
+            }
+        }
+
+        @Override
+        public void onViewerJoinAnswer(PLVJoinAnswerSEvent joinAnswerEvent, PLVMemberItemDataBean member) {
+            if (joinAnswerEvent.isRefuse() && member != null && member.getSocketUserBean() != null) {
+                PLVToast.Builder.context(getContext())
+                        .setText(format("{}没有接受你的邀请", member.getSocketUserBean().getNick()))
+                        .build().show();
+            }
         }
     };
 

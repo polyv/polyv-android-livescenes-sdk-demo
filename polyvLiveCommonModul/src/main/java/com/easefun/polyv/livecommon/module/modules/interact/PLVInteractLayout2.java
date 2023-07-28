@@ -42,6 +42,7 @@ import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
@@ -226,6 +227,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void showLottery(PLVShowLotteryEvent showLotteryEvent) {
+        String data = PLVGsonUtil.toJsonSimple(showLotteryEvent);
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
     public void updateChannelSwitch(List<PLVChatFunctionSwitchVO.DataBean> dataBeanList) {
         if (dataBeanList == null || dataBeanList.isEmpty()) {
             return;
@@ -394,7 +406,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
 
     private void processWebViewUpdateAppStatus(String data, CallBackFunction callBackFunction) {
         PLVWebviewUpdateAppStatusVO appStatusVO = PLVGsonUtil.fromJson(PLVWebviewUpdateAppStatusVO.class, data);
-        liveRoomDataManager.getInteractStatusData().postValue(appStatusVO);
+        liveRoomDataManager.getInteractStatusData().setValue(appStatusVO);
     }
 
     private String getNativeAppPramsInfo() {

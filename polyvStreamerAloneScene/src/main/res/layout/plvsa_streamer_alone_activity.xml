@@ -63,20 +63,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!--直播间弹层布局容器底层蒙层遮罩-->
-    <View
-        android:id="@+id/plvsa_popup_container_mask"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#802c2c2c"
-        android:visibility="gone" />
-
-    <!--直播间弹层布局容器-->
-    <FrameLayout
-        android:id="@+id/plvsa_live_room_popup_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <!--清屏指引布局-->
     <com.easefun.polyv.streameralone.modules.liveroom.PLVSACleanUpLayout
         android:id="@+id/plvsa_clean_up_layout"
@@ -91,6 +77,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"/>
+
+    <!--直播间弹层布局容器底层蒙层遮罩-->
+    <View
+        android:id="@+id/plvsa_popup_container_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#802c2c2c"
+        android:visibility="gone" />
+
+    <!--直播间弹层布局容器-->
+    <FrameLayout
+        android:id="@+id/plvsa_live_room_popup_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!--直播结束布局-->
     <com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayout

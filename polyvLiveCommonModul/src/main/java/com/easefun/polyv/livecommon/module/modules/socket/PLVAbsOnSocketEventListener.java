@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 
 /**
  * socket事件监听器抽象类
@@ -37,6 +38,11 @@ public abstract class PLVAbsOnSocketEventListener implements IPLVSocketLoginMana
 
     @Override
     public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
+
+    }
+
+    @Override
+    public void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent) {
 
     }
 }

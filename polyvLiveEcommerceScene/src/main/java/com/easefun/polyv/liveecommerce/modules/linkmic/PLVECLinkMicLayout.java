@@ -440,6 +440,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public boolean onRvSuperTouchEvent(MotionEvent ev) {
         boolean returnResult = rvLinkMicList.onSuperTouchEvent(ev);
+        linkMicListAdapter.checkClickItemView(ev);
         return returnResult;
     }
 

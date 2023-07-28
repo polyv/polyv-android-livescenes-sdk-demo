@@ -427,6 +427,12 @@ public interface IPLVChatroomContract {
         PLVChatroomData getData();
 
         /**
+         * 修改昵称
+         * @param nickName 昵称
+         */
+        void setChatNickName(String nickName);
+
+        /**
          * 销毁，包括销毁聊天室操作、解除view操作
          */
         void destroy();

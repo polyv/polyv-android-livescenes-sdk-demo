@@ -58,6 +58,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.viewmodel.PLVMultiRoomTransmitViewModel;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
@@ -194,6 +195,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private PLVTriangleIndicateTextView cardEnterTipsView;
     private PLVCardPushManager cardPushManager;
 
+    //无条件抽奖挂件
+    private PLVLotteryManager lotteryManager;
+    private ImageView lotteryEnterView;
+    private TextView lotteryEnterCdTv;
+    private PLVTriangleIndicateTextView lotteryEnterTipsView;
+
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
     private boolean isShowGreeting;//是否显示欢迎语
@@ -294,6 +301,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public void setCardPushManager(PLVCardPushManager cardPushManager) {
         this.cardPushManager = cardPushManager;
+    }
+
+    public void setLotteryManager(PLVLotteryManager lotteryManager) {
+        this.lotteryManager = lotteryManager;
     }
 
     //设置是否是直播类型，如果不是直播类型，则隐藏公告(互动功能相关)按钮
@@ -481,6 +492,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         cardEnterTipsView = findViewById(R.id.card_enter_tips_view);
         if (cardPushManager != null) {
             cardPushManager.registerView(cardEnterView, cardEnterCdTv, cardEnterTipsView);
+        }
+
+        //无条件抽奖挂件
+        lotteryEnterView = findViewById(R.id.plvlc_live_lottery_enter_view);
+        lotteryEnterCdTv = findViewById(R.id.plvlc_live_lottery_enter_cd_tv);
+        lotteryEnterTipsView = findViewById(R.id.plvlc_live_lottery_enter_tips_view);
+        if (lotteryManager != null) {
+            lotteryManager.registerView(lotteryEnterView, lotteryEnterCdTv, lotteryEnterTipsView);
         }
 
         //互动入口

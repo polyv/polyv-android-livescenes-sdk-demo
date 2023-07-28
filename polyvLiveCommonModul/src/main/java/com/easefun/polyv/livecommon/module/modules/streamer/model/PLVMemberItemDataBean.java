@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.model;
 
+import android.support.annotation.Nullable;
+
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.plv.socket.user.PLVClassStatusBean;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -10,6 +12,8 @@ import com.plv.socket.user.PLVSocketUserBean;
 public class PLVMemberItemDataBean {
     //连麦信息
     private PLVLinkMicItemDataBean linkMicItemDataBean;
+    @Nullable
+    private PLVLinkMicItemDataBean.LinkMicStatus linkMicStatus;
 
     //讲师是否是前置摄像头
     private boolean isFrontCamera = true;
@@ -41,6 +45,24 @@ public class PLVMemberItemDataBean {
     public void setLinkMicItemDataBean(PLVLinkMicItemDataBean linkMicItemDataBean) {
         this.linkMicItemDataBean = linkMicItemDataBean;
         syncClassStatusToLinkMicBean(socketUserBean, linkMicItemDataBean);
+        if (linkMicStatus != null) {
+            linkMicItemDataBean.setStatus(linkMicStatus);
+        }
+    }
+
+    public PLVLinkMicItemDataBean.LinkMicStatus getLinkMicStatus() {
+        if (linkMicItemDataBean != null) {
+            return linkMicItemDataBean.getStatus();
+        }
+        return linkMicStatus == null ? PLVLinkMicItemDataBean.LinkMicStatus.IDLE : linkMicStatus;
+    }
+
+    public PLVMemberItemDataBean setLinkMicStatus(PLVLinkMicItemDataBean.LinkMicStatus linkMicStatus) {
+        this.linkMicStatus = linkMicStatus;
+        if (linkMicItemDataBean != null) {
+            linkMicItemDataBean.setStatus(linkMicStatus);
+        }
+        return this;
     }
 
     public void updateBaseLinkMicBean(PLVLinkMicItemDataBean linkMicItemDataBean) {

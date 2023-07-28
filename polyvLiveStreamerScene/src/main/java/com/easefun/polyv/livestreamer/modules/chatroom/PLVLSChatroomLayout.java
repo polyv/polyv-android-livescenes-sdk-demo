@@ -77,6 +77,7 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
@@ -674,14 +675,28 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
 
         @Override
+        public void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent) {
+            if (PLVRoomPushStatusEvent.STATUS_FORBID.equals(roomPushStatusEvent.getStatus())) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onKickByServer();
+                }
+                showExitDialog(R.string.plv_chat_toast_kicked_streamer);
+            }
+        }
+
+        @Override
         public void onLoginRefuseEvent(@NonNull PLVLoginRefuseEvent loginRefuseEvent) {
-            super.onLoginRefuseEvent(loginRefuseEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_been_kicked);
         }
 
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
-            super.onReloginEvent(reloginEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
         }
     };

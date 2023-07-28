@@ -64,6 +64,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView cardEnterLandView;
     private TextView cardEnterCdLandTv;
     private PLVTriangleIndicateTextView cardEnterTipsLandView;
+
+    private PLVSimpleImageView lotteryEnterLandView;
+    private TextView lotteryEnterCdLandTv;
+    private PLVTriangleIndicateTextView lotteryEnterTipsLandView;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -142,6 +146,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         cardEnterLandView = findViewById(R.id.plvlc_card_enter_land_view);
         cardEnterCdLandTv = findViewById(R.id.plvlc_card_enter_cd_land_tv);
         cardEnterTipsLandView = findViewById(R.id.plvlc_card_enter_tips_land_view);
+
+        lotteryEnterLandView = findViewById(R.id.plvlc_playback_lottery_enter_land_view);
+        lotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_lottery_enter_cd_land_tv);
+        lotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_lottery_enter_tips_land_view);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -294,6 +302,21 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public PLVTriangleIndicateTextView getCardEnterTipsView() {
         return cardEnterTipsLandView;
+    }
+
+    @Override
+    public ImageView getLotteryEnterView() {
+        return lotteryEnterLandView;
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return lotteryEnterCdLandTv;
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return lotteryEnterTipsLandView;
     }
 
     @Override

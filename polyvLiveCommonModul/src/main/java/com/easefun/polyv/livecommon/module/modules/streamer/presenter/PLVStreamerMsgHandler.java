@@ -9,6 +9,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataM
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
@@ -26,6 +27,7 @@ import com.plv.socket.event.chat.PLVSetNickEvent;
 import com.plv.socket.event.chat.PLVUnshieldEvent;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinLeaveSEvent;
+import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
@@ -37,7 +39,6 @@ import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -149,6 +150,10 @@ public class PLVStreamerMsgHandler {
                     case PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT:
                         PLVJoinAnswerSEvent joinAnswerSEvent = PLVGsonUtil.fromJson(PLVJoinAnswerSEvent.class, message);
                         acceptJoinAnswerSEvent(joinAnswerSEvent);
+                        break;
+                    case PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT:
+                        PLVJoinResponseSEvent joinResponseSEvent = PLVGsonUtil.fromJson(PLVJoinResponseSEvent.class, message);
+                        acceptJoinResponseEvent(joinResponseSEvent);
                         break;
                     case PLVEventConstant.LinkMic.TEACHER_SET_PERMISSION:
                         PLVPPTAuthentic authentic = PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message);
@@ -341,17 +346,35 @@ public class PLVStreamerMsgHandler {
     }
 
     private void acceptJoinRequestSEvent(PLVJoinRequestSEvent joinRequestSEvent) {
-        if (joinRequestSEvent != null && joinRequestSEvent.getUser() != null) {
-            PLVSocketUserBean socketUserBean = PLVLinkMicDataMapper.map2SocketUserBean(joinRequestSEvent.getUser());
-            final PLVLinkMicItemDataBean linkMicItemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(joinRequestSEvent.getUser());
+        if (joinRequestSEvent == null || joinRequestSEvent.getUser() == null) {
+            return;
+        }
+        final PLVSocketUserBean socketUserBean = PLVLinkMicDataMapper.map2SocketUserBean(joinRequestSEvent.getUser());
+        final Pair<Integer, PLVMemberItemDataBean> memberItemDataBean = streamerPresenter.getMemberItemWithUserId(joinRequestSEvent.getUser().getUserId());
+        final PLVLinkMicItemDataBean linkMicItemDataBean = PLVLinkMicDataMapper.map2LinkMicItemData(joinRequestSEvent.getUser());
+
+        if (memberItemDataBean != null
+                && memberItemDataBean.second != null
+                && memberItemDataBean.second.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_INVITATION) {
+            streamerPresenter.controlUserLinkMicInLinkMicList(memberItemDataBean.first, PLVStreamerControlLinkMicAction.acceptRequest());
+        } else if (memberItemDataBean != null
+                && memberItemDataBean.second != null
+                && memberItemDataBean.second.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.IDLE) {
+            memberItemDataBean.second.setLinkMicStatus(PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP);
+            streamerPresenter.callUpdateSortMemberList();
+            streamerPresenter.getData().postUserRequestData(linkMicItemDataBean.getLinkMicId());
+            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onUserRequest(linkMicItemDataBean.getLinkMicId());
+                }
+            });
+        } else {
             boolean hasChanged = streamerPresenter.updateMemberListItemInfo(socketUserBean, linkMicItemDataBean, false, true);
             //更新成员列表数据
             if (hasChanged) {
                 streamerPresenter.callUpdateSortMemberList();
-                //嘉宾不回调用户请求连麦的数据
-                if (!streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType().equals(PLVSocketUserConstant.USERTYPE_GUEST)) {
-                    streamerPresenter.getData().postUserRequestData(linkMicItemDataBean.getLinkMicId());
-                }
+                streamerPresenter.getData().postUserRequestData(linkMicItemDataBean.getLinkMicId());
                 streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -370,48 +393,113 @@ public class PLVStreamerMsgHandler {
                 //如果当前用户是嘉宾，则收到joinLeave的时候不要把自己移除了。
                 PLVCommonLog.d(TAG, "guest receive joinLeave");
             } else {
-                updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId(), false);
+                streamerPresenter.updateMemberListWithLeave(joinLeaveSEvent.getUser().getUserId(), false);
             }
 
         }
     }
 
-    private void acceptJoinAnswerSEvent(PLVJoinAnswerSEvent joinAnswerSEvent) {
-        if (joinAnswerSEvent != null) {
-            String linkMicUid = joinAnswerSEvent.getUserId();
-            if (joinAnswerSEvent.isRefuse()) {
-                updateMemberListWithLeave(linkMicUid, false);
-            }
+    private void acceptJoinAnswerSEvent(final PLVJoinAnswerSEvent joinAnswerSEvent) {
+        if (joinAnswerSEvent == null || joinAnswerSEvent.getUserId() == null) {
+            return;
+        }
+        final String linkMicUid = joinAnswerSEvent.getUserId();
+        final Pair<Integer, PLVMemberItemDataBean> currentMemberItemDataBean = streamerPresenter.getMemberItemWithUserId(linkMicUid);
+        if (joinAnswerSEvent.isAccept()) {
+            streamerPresenter.updateMemberListWithJoin(linkMicUid);
+        } else {
+            streamerPresenter.updateMemberListWithLeave(linkMicUid, false);
+        }
+
+        if (currentMemberItemDataBean != null && currentMemberItemDataBean.second != null) {
+            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onViewerJoinAnswer(joinAnswerSEvent, currentMemberItemDataBean.second);
+                }
+            });
         }
     }
 
+    private void acceptJoinResponseEvent(PLVJoinResponseSEvent event) {
+        if (event == null) {
+            return;
+        }
+        if (event.isNeedAnswer()) {
+            streamerPresenter.onInviteJoinLinkMic(event);
+        } else {
+            streamerPresenter.onResponseJoinLinkMic(event);
+        }
+    }
 
     private void acceptTeacherSetPermissionEvent(final PLVPPTAuthentic authentic) {
-        if(authentic != null){
-            //memberlist和streamerlist排序可能不同
-            Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
-            Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getLinkMicItemWithLinkMicId(authentic.getUserId());
+        if (authentic == null || authentic.getUserId() == null) {
+            return;
+        }
+        //memberlist和streamerlist排序可能不同
+        Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
+        Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getLinkMicItemWithLinkMicId(authentic.getUserId());
+        final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());
+        final PLVSocketUserBean bean = (memberItem != null && memberItem.second != null) ? memberItem.second.getSocketUserBean() : null;
 
-            if (PLVPPTAuthentic.TYPE_SPEAKER.equals(authentic.getType())) {
-                if(memberItem != null && memberItem.second != null) {
-                    memberItem.second.getLinkMicItemDataBean().setHasSpeaker(!authentic.hasNoAthuentic());
-                }
-                if(streamerItem != null && streamerItem.second != null) {
-                    streamerItem.second.setHasSpeaker(!authentic.hasNoAthuentic());
-                }
-            } else if (PLVPPTAuthentic.PermissionType.SCREEN_SHARE.equals(authentic.getType())){
-                if(memberItem != null && memberItem.second != null) {
-                    memberItem.second.getLinkMicItemDataBean().setScreenShare(!authentic.hasNoAthuentic());
-                }
-                if(streamerItem != null && streamerItem.second != null) {
-                    streamerItem.second.setScreenShare(!authentic.hasNoAthuentic());
+        if (PLVPPTAuthentic.TYPE_SPEAKER.equals(authentic.getType())) {
+            if (memberItem != null && memberItem.second != null && memberItem.second.getLinkMicItemDataBean() != null) {
+                memberItem.second.getLinkMicItemDataBean().setHasSpeaker(!authentic.hasNoAthuentic());
+            }
+            if (streamerItem != null && streamerItem.second != null) {
+                streamerItem.second.setHasSpeaker(!authentic.hasNoAthuentic());
+            }
+            streamerPresenter.onCurrentSpeakerChanged(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
+        } else if (PLVPPTAuthentic.PermissionType.SCREEN_SHARE.equals(authentic.getType())) {
+            if (memberItem != null && memberItem.second != null && memberItem.second.getLinkMicItemDataBean() != null) {
+                memberItem.second.getLinkMicItemDataBean().setScreenShare(!authentic.hasNoAthuentic());
+            }
+            if (streamerItem != null && streamerItem.second != null) {
+                streamerItem.second.setScreenShare(!authentic.hasNoAthuentic());
+            }
+        } else if (PLVPPTAuthentic.TYPE_VOICE.equals(authentic.getType())) {
+            if (isCurrentUser) {
+                if ("0".equals(authentic.getStatus())) {
+                    streamerPresenter.getStreamerManager().switchRoleToAudience();
+                    streamerPresenter.callUpdateGuestStatus(false);
+                } else {
+                    streamerPresenter.getStreamerManager().switchRoleToBroadcaster();
+                    streamerPresenter.callUpdateGuestStatus(true);
                 }
             }
-            final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());
-            final PLVSocketUserBean bean = (memberItem != null && memberItem.second != null) ? memberItem.second.getSocketUserBean() : null;
-            streamerPresenter.onCurrentSpeakerChanged(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
+        } else if (PLVPPTAuthentic.TYPE_SPECIAL_RAISE_HAND.equals(authentic.getType())) {
+            final Pair<Integer, PLVMemberItemDataBean> memberItemDataBean = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
+            if ("1".equals(authentic.getStatus())) {
+                if (memberItemDataBean != null && memberItemDataBean.second != null) {
+                    if (memberItemDataBean.second.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_INVITATION) {
+                        streamerPresenter.controlUserLinkMicInLinkMicList(memberItemDataBean.first, PLVStreamerControlLinkMicAction.acceptRequest());
+                    } else {
+                        memberItemDataBean.second.setLinkMicStatus(PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP);
+                        streamerPresenter.callUpdateSortMemberList();
+                        streamerPresenter.getData().postUserRequestData(authentic.getUserId());
+                        streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                                view.onUserRequest(authentic.getUserId());
+                            }
+                        });
+                    }
+                }
+            } else {
+                if (memberItemDataBean != null && memberItemDataBean.second != null && PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP.equals(memberItemDataBean.second.getLinkMicStatus())) {
+                    memberItemDataBean.second.setLinkMicStatus(PLVLinkMicItemDataBean.LinkMicStatus.IDLE);
+                    streamerPresenter.callUpdateSortMemberList();
+                }
+            }
+        } else if (PLVPPTAuthentic.TYPE_IN_WAIT_VOICE.equals(authentic.getType())) {
+            if ("0".equals(authentic.getStatus())) {
+                final Pair<Integer, PLVMemberItemDataBean> memberItemDataBean = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
+                if (memberItemDataBean != null && memberItemDataBean.second != null) {
+                    memberItemDataBean.second.setLinkMicStatus(PLVLinkMicItemDataBean.LinkMicStatus.IDLE);
+                    streamerPresenter.callUpdateSortMemberList();
+                }
+            }
         }
-
 
     }
 
@@ -443,9 +531,16 @@ public class PLVStreamerMsgHandler {
             public void onJoinChannelSuccess(String uid) {
                 super.onJoinChannelSuccess(uid);
                 PLVCommonLog.d(TAG, "onJoinChannelSuccess: " + uid);
-                if (PLVSocketUserConstant.USERTYPE_GUEST.equals(streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType())) {
-                    streamerPresenter.getStreamerManager().switchRoleToBroadcaster();
-                    streamerPresenter.callUpdateGuestStatus(true);
+                final boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType());
+                final boolean isGuestAutoLinkMic = streamerPresenter.getLiveRoomDataManager().getConfig().isAutoLinkToGuest();
+                if (isGuest) {
+                    if (isGuestAutoLinkMic) {
+                        streamerPresenter.getStreamerManager().switchRoleToBroadcaster();
+                        streamerPresenter.callUpdateGuestStatus(true);
+                    } else {
+                        streamerPresenter.getStreamerManager().switchRoleToAudience();
+                        streamerPresenter.callUpdateGuestStatus(false);
+                    }
                 }
             }
 
@@ -459,14 +554,14 @@ public class PLVStreamerMsgHandler {
             public void onUserOffline(String uid) {
                 super.onUserOffline(uid);
                 PLVCommonLog.d(TAG, "onUserOffline: " + uid);
-                updateMemberListWithLeave(uid, true);
+                streamerPresenter.updateMemberListWithLeave(uid, true);
             }
 
             @Override
             public void onUserJoined(String uid) {
                 super.onUserJoined(uid);
                 PLVCommonLog.d(TAG, "onUserJoined: " + uid);
-                updateMemberListWithJoin(uid);
+                streamerPresenter.updateMemberListWithJoin(uid);
             }
 
             @Override
@@ -545,44 +640,4 @@ public class PLVStreamerMsgHandler {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="列表数据处理">
-    private void updateMemberListWithLeave(final String linkMicUid, boolean isRTCCall) {
-        if (isRTCCall) {
-            streamerPresenter.rtcJoinMap.remove(linkMicUid);
-        }
-        Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithLinkMicId(linkMicUid);
-        if (item != null) {
-            item.second.getLinkMicItemDataBean().setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
-            streamerPresenter.callUpdateSortMemberList();
-        }
-        final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicUid);
-        if (linkMicItem != null) {
-            streamerPresenter.streamerList.remove(linkMicItem.second);
-            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                    //更新推流和连麦列表
-                    view.onUsersLeave(Collections.singletonList(linkMicItem.second));
-                }
-            });
-            streamerPresenter.updateMixLayoutUsers();
-            streamerPresenter.updateLinkMicCount();
-        }
-    }
-
-    private void updateMemberListWithJoin(final String linkMicUid) {
-        if (!streamerPresenter.rtcJoinMap.containsKey(linkMicUid)) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = new PLVLinkMicItemDataBean();
-            linkMicItemDataBean.setLinkMicId(linkMicUid);
-            streamerPresenter.rtcJoinMap.put(linkMicUid, linkMicItemDataBean);
-        }
-        Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithLinkMicId(linkMicUid);
-        if (item != null) {
-            boolean result = streamerPresenter.updateMemberListLinkMicStatusWithRtcJoinList(item.second, linkMicUid);
-            if (result) {
-                streamerPresenter.callUpdateSortMemberList();
-            }
-        }
-    }
-    // </editor-fold>
 }

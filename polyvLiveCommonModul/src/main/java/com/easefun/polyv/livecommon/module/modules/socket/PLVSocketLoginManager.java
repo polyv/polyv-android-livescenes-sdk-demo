@@ -6,11 +6,13 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.net.model.PLVSocketLoginVO;
 import com.plv.socket.socketio.PLVSocketIOClient;
@@ -166,6 +168,18 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
                     break;
                 default:
                     break;
+            }
+        } else {
+            switch (listenEvent) {
+                case PLVRoomPushStatusEvent.EVENT_TYPE:
+                    PLVRoomPushStatusEvent roomPushStatusEvent = PLVGsonUtil.fromJson(PLVRoomPushStatusEvent.class, message);
+                    if (roomPushStatusEvent != null) {
+                        if (onSocketEventListener != null) {
+                            onSocketEventListener.onRoomPushStatusEvent(roomPushStatusEvent);
+                        }
+                    }
+                    break;
+                default:
             }
         }
     }

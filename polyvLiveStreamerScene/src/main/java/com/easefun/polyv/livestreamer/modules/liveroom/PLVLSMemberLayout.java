@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -119,9 +120,9 @@ public class PLVLSMemberLayout extends FrameLayout {
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
                 if (onViewActionListener != null) {
-                    onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
+                    onViewActionListener.onControlUserLinkMic(position, action);
                 }
             }
 
@@ -315,8 +316,8 @@ public class PLVLSMemberLayout extends FrameLayout {
         memberAdapter.setStreamerStatus(isStartedStatus);
     }
 
-    public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
-        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType);
+    public void updateLinkMicMediaType(boolean isVideoLinkMicType, boolean isOpenLinkMic) {
+        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
     }
 
     public boolean onBackPressed() {

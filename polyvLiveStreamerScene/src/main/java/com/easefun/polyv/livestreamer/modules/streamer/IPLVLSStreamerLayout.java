@@ -5,11 +5,12 @@ import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
-import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 
 /**
  * 推流和连麦布局的接口定义
@@ -71,10 +72,10 @@ public interface IPLVLSStreamerLayout {
     /**
      * 控制成员列表中的用户加入或离开连麦
      *
-     * @param position    列表中的位置
-     * @param isAllowJoin true：加入，false：离开
+     * @param position 列表中的位置
+     * @param action   具体操作
      */
-    void controlUserLinkMic(int position, boolean isAllowJoin);
+    void controlUserLinkMic(int position, PLVStreamerControlLinkMicAction action);
 
     /**
      * 禁/启用用户媒体

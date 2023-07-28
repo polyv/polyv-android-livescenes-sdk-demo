@@ -49,6 +49,8 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
@@ -821,10 +823,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
                 if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
                     rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId, isMuteAllVideo);
-                    if (linkMicView != null) {
-                        //位置传递-1表示不需要对新旧位置的View渲染更新，只记录第一画面的id即可。
-                        linkMicView.updateFirstScreenChanged(firstScreenLinkMicId, -1, -1);
-                    }
+                    //位置传递-1表示不需要对新旧位置的View渲染更新，只记录第一画面的id即可。
+                    dispatchOnFirstScreenChanged(firstScreenLinkMicId, -1, -1);
 
                     if (linkMicList.size() > 0
                             && !linkMicList.get(0).getLinkMicId().equals(firstScreenLinkMicId)) {
@@ -1074,6 +1074,25 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             muteAudio(!enableLocalAudioOnJoinLinkMic);
         }
 
+    }
+
+    private void dispatchOnFirstScreenChanged(String firstScreenLinkMicId, int oldPos, int newPos) {
+        if (linkMicView != null) {
+            linkMicView.updateFirstScreenChanged(firstScreenLinkMicId, oldPos, newPos);
+        }
+        updateLinkMicBitrateOnFirstScreenChanged(firstScreenLinkMicId);
+    }
+
+    private void updateLinkMicBitrateOnFirstScreenChanged(String firstScreenLinkMicId) {
+        final boolean isMyFirstScreen = myLinkMicId != null && myLinkMicId.equals(firstScreenLinkMicId);
+        if (isMyFirstScreen && isJoinLinkMic()) {
+            linkMicManager.setBitrate(
+                    PLVChannelFeatureManager.onChannel(getCurrentLinkMicChannelId())
+                            .getOrDefault(PLVChannelFeature.LIVE_LINK_MIC_FIRST_SCREEN_PUSH_BITRATE, PLVLinkMicConstant.Bitrate.BITRATE_STANDARD)
+            );
+        } else {
+            linkMicManager.setBitrate(PLVLinkMicConstant.Bitrate.BITRATE_STANDARD);
+        }
     }
     // </editor-fold>
 
@@ -1505,7 +1524,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 }
             }
 
-            view.updateFirstScreenChanged(linkMicId, oldFirstScreenPos, indexOfTarget);
+            dispatchOnFirstScreenChanged(linkMicId, oldFirstScreenPos, indexOfTarget);
         }
 
         @Override

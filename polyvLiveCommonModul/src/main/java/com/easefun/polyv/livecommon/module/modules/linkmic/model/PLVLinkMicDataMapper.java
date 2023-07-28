@@ -30,7 +30,7 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setUserType(joinInfoEvent.getUserType());
         itemDataBean.setActor(joinInfoEvent.getActor());
         itemDataBean.setPic(joinInfoEvent.getPic());
-        itemDataBean.setStatus(joinInfoEvent.getStatus());
+        itemDataBean.setStatus(PLVLinkMicItemDataBean.LinkMicStatus.match(joinInfoEvent.getStatus()));
         itemDataBean.setUserId(joinInfoEvent.getUserId());
         return itemDataBean;
     }
@@ -42,8 +42,14 @@ public class PLVLinkMicDataMapper {
         itemDataBean.setUserType(waitListBean.getUserType());
         itemDataBean.setActor(waitListBean.getActor());
         itemDataBean.setPic(waitListBean.getPic());
-        itemDataBean.setStatus(waitListBean.getStatus());
+        itemDataBean.setStatus(PLVLinkMicItemDataBean.LinkMicStatus.match(waitListBean.getStatus()));
         itemDataBean.setUserId(waitListBean.getUserId());
+
+        if (itemDataBean.isJoinStatus()) {
+            // waitList当中的成员不应该是join状态
+            itemDataBean.setStatus(PLVLinkMicItemDataBean.LinkMicStatus.IDLE);
+        }
+
         return itemDataBean;
     }
     // </editor-fold>

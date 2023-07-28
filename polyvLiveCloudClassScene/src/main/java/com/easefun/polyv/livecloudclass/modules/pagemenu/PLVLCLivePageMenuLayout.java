@@ -46,6 +46,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
@@ -120,6 +121,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private IPLVChatroomContract.IChatroomView chatroomMvpView;
     //卡片推送管理器
     private PLVCardPushManager cardPushManager = new PLVCardPushManager();
+    //无条件抽奖挂件管理器
+    private PLVLotteryManager lotteryManager = new PLVLotteryManager();
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -408,6 +411,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
+    public PLVLotteryManager getLotteryManager() {
+        return lotteryManager;
+    }
+
+    @Override
     public IPLVChatPlaybackManager getChatPlaybackManager() {
         return chatPlaybackManager;
     }
@@ -506,6 +514,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (chatPlaybackManager != null) {
             chatPlaybackManager.destroy();
         }
+        if (lotteryManager != null) {
+            lotteryManager.destroy();
+        }
         //移除聊天室加载图片进度的监听器，避免内存泄漏
         PLVMyProgressManager.removeModuleListener(PLVLCMessageViewHolder.LOADIMG_MOUDLE_TAG);
     }
@@ -572,6 +583,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             chatFragment = new PLVLCChatFragment();
             chatFragment.init(chatCommonMessageList, liveRoomDataManager);
             chatFragment.setCardPushManager(cardPushManager);
+            chatFragment.setLotteryManager(lotteryManager);
             chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
             chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
             chatroomPresenter.registerView(chatFragment.getChatroomView());
@@ -972,6 +984,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onChanged(@Nullable PLVWebviewUpdateAppStatusVO plvWebviewUpdateAppStatusVO) {
                 if (chatFragment != null && plvWebviewUpdateAppStatusVO != null) {
                     chatFragment.updateChatMoreFunction(plvWebviewUpdateAppStatusVO);
+                }
+                if (lotteryManager != null) {
+                    lotteryManager.acceptLotteryVo(plvWebviewUpdateAppStatusVO);
                 }
             }
         });

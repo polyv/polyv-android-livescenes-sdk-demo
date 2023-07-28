@@ -32,7 +32,7 @@
     <string name="plv_chat_toast_login_failed">聊天室连接失败</string>
     <string name="plv_chat_toast_been_kicked">您已被管理员踢出聊天室！</string>
     <string name="plv_chat_toast_kicked_streamer">频道已被禁止直播</string>
-    <string name="plv_chat_toast_account_login_elsewhere">账号在异地登录，您将被强制退出观看！</string>
+    <string name="plv_chat_toast_account_login_elsewhere">当前账号已在其他地方登录，您将被退出本直播间</string>
     <string name="plv_chat_toast_send_msg_success">发言成功</string>
     <string name="plv_chat_toast_post_msg_success">提交成功</string>
     <string name="plv_chat_toast_send_msg_failed">发言失败</string>
