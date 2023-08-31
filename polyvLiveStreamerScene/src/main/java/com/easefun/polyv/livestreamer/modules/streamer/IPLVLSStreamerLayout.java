@@ -11,6 +11,7 @@ import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
 /**
  * 推流和连麦布局的接口定义
@@ -42,11 +43,25 @@ public interface IPLVLSStreamerLayout {
     void setBitrate(@PLVSStreamerConfig.BitrateType int bitrate);
 
     /**
+     * 设置混流布局
+     *
+     * @param mixLayout 混流布局
+     */
+    void setMixLayout(@PLVStreamerConfig.MixStreamType int mixLayout);
+
+    /**
      * 获取推流的码率信息
      *
      * @return 码率信息<最大支持码率, 选择码率>
      */
     Pair<Integer, Integer> getBitrateInfo();
+
+    /**
+     * 获取混流布局信息
+     *
+     * @return 混流布局信息
+     */
+    int getMixInfo();
 
     /**
      * 是否允许录制声音

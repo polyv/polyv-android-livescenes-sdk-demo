@@ -84,6 +84,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVSASettingTitleInputLayout titleInputLayout;
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
+    //混流布局设置布局
+    private PLVSAMixLayout mixLayout;
     //推流开始倒计时布局
     private IPLVSACountDownWindow countDownWindow;
 
@@ -99,10 +101,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
+    private ImageView plvsaSettingMixIv;
     private ImageView plvsaSettingScreenOrientationIv;
     private TextView plvsaSettingCameraOrientTv;
     private TextView plvsaSettingMirrorTv;
     private TextView plvsaSettingBitrateTv;
+    private TextView plvsaSettingMixTv;
     private TextView plvsaSettingScreenOrientationTv;
     private LinearLayout plvsaSettingBtnLl;
     private PLVRoundRectLayout plvsaSettingBeautyLayout;
@@ -167,10 +171,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
         plvsaSettingBitrateIv = findViewById(R.id.plvsa_setting_bitrate_iv);
+        plvsaSettingMixIv = findViewById(R.id.plvsa_setting_mix_layout_iv);
         plvsaSettingScreenOrientationIv = findViewById(R.id.plvsa_setting_screen_orientation_iv);
         plvsaSettingCameraOrientTv = findViewById(R.id.plvsa_setting_camera_orient_tv);
         plvsaSettingMirrorTv = findViewById(R.id.plvsa_setting_mirror_tv);
         plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
+        plvsaSettingMixTv = findViewById(R.id.plvsa_setting_mix_layout_tv);
         plvsaSettingScreenOrientationTv = findViewById(R.id.plvsa_setting_screen_orientation_tv);
         plvsaSettingBtnLl = findViewById(R.id.plvsa_setting_btn_ll);
         plvsaSettingBeautyLayout = findViewById(R.id.plvsa_setting_beauty_layout);
@@ -189,12 +195,23 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingMirrorTv.setOnClickListener(this);
         plvsaSettingBitrateIv.setOnClickListener(this);
         plvsaSettingBitrateTv.setOnClickListener(this);
+        plvsaSettingMixIv.setOnClickListener(this);
+        plvsaSettingMixTv.setOnClickListener(this);
         plvsaSettingScreenOrientationIv.setOnClickListener(this);
         plvsaSettingScreenOrientationTv.setOnClickListener(this);
         settingPushResolutionRatioLl.setOnClickListener(this);
 
+        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
+            plvsaSettingMixIv.setVisibility(VISIBLE);
+            plvsaSettingMixTv.setVisibility(VISIBLE);
+        } else {
+            plvsaSettingMixIv.setVisibility(GONE);
+            plvsaSettingMixTv.setVisibility(GONE);
+        }
+
         initTitleInputLayout();
         initBitrateLayout();
+        initMixLayout();
         initTitleTextOnClickListener();
         initBeginCountDownWindow();
 
@@ -276,6 +293,24 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         });
     }
 
+    private void initMixLayout() {
+        mixLayout = new PLVSAMixLayout(getContext());
+        mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
+            @Override
+            public int getMixInfo() {
+                return onViewActionListener != null ? onViewActionListener.getMixInfo() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                mixLayout.close();
+                if (onViewActionListener != null) {
+                    onViewActionListener.onMixClick(mix);
+                }
+            }
+        });
+    }
+
     /**
      * 初始化直播标题点击事件
      * 点击直播标题时，显示直播标题输入布局
@@ -284,7 +319,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isGuest()){
+                if (isGuest()) {
                     return;
                 }
                 ViewGroup.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -401,6 +436,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
         bitrateLayout.init(liveRoomDataManager);
+        mixLayout.init(liveRoomDataManager);
         initBitrateMapIcon();
         initStartLiveBtnText();
         initPushResolutionRatioLayout();
@@ -454,7 +490,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     @Override
     public boolean onBackPressed() {
-        return bitrateLayout.onBackPressed();
+        return bitrateLayout.onBackPressed() || mixLayout.onBackPressed();
     }
 
     @Override
@@ -644,6 +680,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == R.id.plvsa_setting_bitrate_iv
                 || id == R.id.plvsa_setting_bitrate_tv) {
             bitrateLayout.open();
+        } else if (id == R.id.plvsa_setting_mix_layout_iv
+                || id == R.id.plvsa_setting_mix_layout_tv) {
+            mixLayout.open();
         } else if (id == plvsaSettingScreenOrientationIv.getId()
                 || id == plvsaSettingScreenOrientationTv.getId()) {
             changeScreenOrientation();

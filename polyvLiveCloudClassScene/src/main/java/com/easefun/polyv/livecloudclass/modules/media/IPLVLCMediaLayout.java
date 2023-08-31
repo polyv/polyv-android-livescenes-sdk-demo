@@ -146,6 +146,13 @@ public interface IPLVLCMediaLayout {
     PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器

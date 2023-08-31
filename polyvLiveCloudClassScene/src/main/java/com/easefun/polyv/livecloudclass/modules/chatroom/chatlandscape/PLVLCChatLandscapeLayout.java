@@ -75,6 +75,8 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     //是否聊天回放布局
     private boolean isChatPlaybackLayout;
+    //是否可见
+    private boolean isDisplayEnabled = true;
     private boolean isLiveType;
 
     private OnRoomStatusListener onRoomStatusListener;
@@ -117,6 +119,11 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
         this.isChatPlaybackLayout = isChatPlaybackLayout;
+    }
+
+    public void setIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isDisplayEnabled = isDisplayEnabled;
+        toggle(toShow);
     }
 
     public void setIsLiveType(boolean isLiveType) {
@@ -170,6 +177,16 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         });
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="API - 方法重写">
+    @Override
+    public void setVisibility(int visibility) {
+        if (!isDisplayEnabled && visibility == View.VISIBLE) {
+            return;
+        }
+        super.setVisibility(visibility);
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="聊天回放">
     private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new PLVChatPlaybackCallDataExListener() {

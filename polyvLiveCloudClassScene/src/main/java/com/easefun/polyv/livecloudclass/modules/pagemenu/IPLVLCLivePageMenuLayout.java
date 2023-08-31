@@ -173,9 +173,12 @@ public interface IPLVLCLivePageMenuLayout {
         int getVideoCurrentPosition();
 
         /**
-         * 添加了聊天tab
+         * 聊天tab准备完成
+         *
+         * @param isChatPlaybackEnabled 聊天回放是否可用
+         * @param isDisplayEnabled      是否显示tab
          */
-        void onAddedChatTab(boolean isChatPlaybackEnabled);
+        void onChatTabPrepared(boolean isChatPlaybackEnabled, boolean isDisplayEnabled);
 
         /**
          * 显示积分打赏弹窗

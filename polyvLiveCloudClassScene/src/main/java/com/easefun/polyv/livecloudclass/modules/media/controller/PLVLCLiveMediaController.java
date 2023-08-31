@@ -150,6 +150,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 服务端的点赞开关
+    private boolean isLikesSwitchEnabled = true;
+    // 服务端的打赏开关
+    private boolean isRewardSwitchEnabled = true;
+    // 聊天室tab是否可见
+    private boolean isChatDisplayEnabled = true;
     // 主播放器是否正在播放
     private boolean isMainVideoViewPlaying;
     // 是否无延迟观看
@@ -456,7 +462,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
-        likesLandIv.setVisibility(isSwitchEnabled ? View.VISIBLE : View.INVISIBLE);
+        this.isLikesSwitchEnabled = isSwitchEnabled;
+        likesLandIv.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -644,6 +651,20 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isChatDisplayEnabled = isDisplayEnabled;
+        if (startSendMessageLandIv != null) {
+            startSendMessageLandIv.setVisibility(isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (likesLandIv != null) {
+            likesLandIv.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (rewardView != null) {
+            rewardView.setVisibility(isRewardSwitchEnabled && isChatDisplayEnabled ? VISIBLE : GONE);
+        }
+    }
+
+    @Override
     public void clean() {
         if (moreLayout != null) {
             moreLayout.hide();
@@ -655,8 +676,9 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void updateRewardView(boolean enable) {
+        this.isRewardSwitchEnabled = enable;
         if (rewardView != null) {
-            rewardView.setVisibility(enable ? VISIBLE : GONE);
+            rewardView.setVisibility(isRewardSwitchEnabled && isChatDisplayEnabled ? VISIBLE : GONE);
         }
     }
 

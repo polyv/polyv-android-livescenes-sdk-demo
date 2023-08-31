@@ -35,6 +35,8 @@ import com.easefun.polyv.livestreamer.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
@@ -57,9 +59,11 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private View moreSettingTitleSeparator;
     private LinearLayout moreSettingBeautyItemLayout;
     private LinearLayout moreSettingBitrateItemLayout;
+    private LinearLayout moreSettingMixItemLayout;
     private LinearLayout moreSettingShareItemLayout;
     private LinearLayout morePushDowngradeItemLayout;
     private PLVLSBitrateLayout moreSettingBitrateLayout;
+    private PLVLSMixLayout moreSettingMixLayout;
     private PLVLSPushDowngradePreferenceLayout morePushDowngradePreferenceLayout;
     private View moreSettingExitSeparator;
     private TextView moreSettingExitTv;
@@ -101,6 +105,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         findView();
 
         initBitrateLayout();
+        initMixLayout();
         initPushDowngradeLayout();
         initShareLayout();
         observeBeautyModuleInitResult();
@@ -116,6 +121,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingBeautyItemLayout = findViewById(R.id.plvls_more_setting_beauty_item_layout);
         moreSettingBitrateItemLayout = findViewById(R.id.plvls_more_setting_bitrate_item_layout);
         moreSettingBitrateLayout = findViewById(R.id.plvls_more_setting_bitrate_layout);
+        moreSettingMixItemLayout = findViewById(R.id.plvls_more_setting_mix_item_layout);
+        moreSettingMixLayout = findViewById(R.id.plvls_more_setting_mix_layout);
         morePushDowngradeItemLayout = findViewById(R.id.plvls_more_push_downgrade_item_layout);
         morePushDowngradePreferenceLayout = findViewById(R.id.plvls_more_push_downgrade_preference_layout);
         moreSettingShareItemLayout = findViewById(R.id.plvls_more_setting_share_item_layout);
@@ -126,6 +133,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingExitTv.setOnClickListener(this);
         moreSettingBeautyItemLayout.setOnClickListener(this);
         moreSettingBitrateItemLayout.setOnClickListener(this);
+        moreSettingMixItemLayout.setOnClickListener(this);
         morePushDowngradeItemLayout.setOnClickListener(this);
         moreSettingShareItemLayout.setOnClickListener(this);
     }
@@ -136,6 +144,22 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             public void onBitrateClick(int bitrate) {
                 if (PLVLSMoreSettingLayout.this.onViewActionListener != null) {
                     PLVLSMoreSettingLayout.this.onViewActionListener.onBitrateClick(bitrate);
+                }
+            }
+        });
+    }
+
+    private void initMixLayout() {
+        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
+            moreSettingMixItemLayout.setVisibility(View.VISIBLE);
+        } else {
+            moreSettingMixItemLayout.setVisibility(View.GONE);
+        }
+        moreSettingMixLayout.setOnViewActionListener(new PLVLSMixLayout.OnViewActionListener() {
+            @Override
+            public void onMixClick(int mix) {
+                if (PLVLSMoreSettingLayout.this.onViewActionListener != null) {
+                    PLVLSMoreSettingLayout.this.onViewActionListener.onMixClick(mix);
                 }
             }
         });
@@ -219,6 +243,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         if (moreSettingBitrateLayout != null) {
             moreSettingBitrateLayout.init(liveRoomDataManager);
         }
+        if (moreSettingMixLayout != null) {
+            moreSettingMixLayout.init(liveRoomDataManager);
+        }
         observeLiveRoomStatus();
     }
     // </editor-folder>
@@ -227,6 +254,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     public void open() {
         if (onViewActionListener != null && onViewActionListener.getBitrateInfo() != null) {
             moreSettingBitrateLayout.updateData(onViewActionListener.getBitrateInfo().first, onViewActionListener.getBitrateInfo().second);
+        }
+        if (onViewActionListener != null) {
+            moreSettingMixLayout.updateData(onViewActionListener.getMixInfo());
         }
         showLayout(moreSettingSelectLayout);
 
@@ -312,6 +342,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         final List<View> views = PLVSugarUtil.<View>listOf(
                 moreSettingSelectLayout,
                 moreSettingBitrateLayout,
+                moreSettingMixLayout,
                 morePushDowngradePreferenceLayout
         );
         foreach(views, new PLVSugarUtil.Consumer<View>() {
@@ -362,6 +393,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
         } else if (id == moreSettingBitrateItemLayout.getId()) {
             showLayout(moreSettingBitrateLayout);
+        } else if (id == moreSettingMixItemLayout.getId()) {
+            showLayout(moreSettingMixLayout);
         } else if (id == morePushDowngradeItemLayout.getId()) {
             showLayout(morePushDowngradePreferenceLayout);
         } else if (id == moreSettingShareItemLayout.getId()) {
@@ -376,6 +409,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         Pair<Integer, Integer> getBitrateInfo();
 
         void onBitrateClick(int bitrate);
+
+        int getMixInfo();
+
+        void onMixClick(int mix);
 
         boolean isCurrentLocalVideoEnable();
 

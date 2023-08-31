@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:background="@drawable/plvec_chatroom_tips_bg"
+            android:drawableLeft="@drawable/plvec_chatroom_tips_icon"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="提问频道"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:drawableLeft="@drawable/plvec_chatroom_tips_icon_fill"
+            android:paddingLeft="12dp" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_load_view"
+            android:layout_width="244dp"
+            android:layout_height="116dp">
+
+            <!--提问信息列表-->
+            <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+                android:id="@+id/quiz_msg_rv"
+                android:layout_width="244dp"
+                android:layout_height="116dp"
+                android:fadingEdgeLength="32dp"
+                android:overScrollMode="never"
+                android:requiresFadingEdge="vertical"
+                app:fastScrollEnabled="false" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/unread_msg_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/swipe_load_view"
+            android:layout_alignBottom="@+id/swipe_load_view"
+            android:layout_gravity="bottom"
+            android:background="@drawable/plvec_chatroom_view_more_bg"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp"
+            android:text="查看新信息"
+            android:textColor="#FFA611"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </RelativeLayout>
+</LinearLayout>

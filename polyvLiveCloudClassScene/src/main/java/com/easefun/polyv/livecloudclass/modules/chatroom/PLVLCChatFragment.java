@@ -1140,10 +1140,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 发送聊天信息">
     @Nullable
     public PLVChatQuoteVO getChatQuoteContent() {
+        if (chatReplyLayout == null) {
+            return null;
+        }
         return chatReplyLayout.getChatQuoteContent();
     }
 
     public void onCloseChatQuote() {
+        if (chatReplyLayout == null) {
+            return;
+        }
         chatReplyLayout.setChatQuoteContent(null);
     }
 

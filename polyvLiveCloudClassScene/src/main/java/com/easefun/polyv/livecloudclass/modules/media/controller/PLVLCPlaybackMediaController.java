@@ -102,6 +102,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 服务端的点赞开关
+    private boolean isLikesSwitchEnabled = true;
+    // 聊天室tab是否可见
+    private boolean isChatDisplayEnabled = true;
 
     //Listener
     private OnViewActionListener onViewActionListener;
@@ -321,7 +325,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
-        ivLikesLand.setVisibility(isSwitchEnabled ? View.VISIBLE : View.INVISIBLE);
+        this.isLikesSwitchEnabled = isSwitchEnabled;
+        ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -385,6 +390,17 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 tvStartSendMessageLand.setText("跟大家聊点什么吧~");
                 tvStartSendMessageLand.setEnabled(true);
             }
+        }
+    }
+
+    @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isChatDisplayEnabled = isDisplayEnabled;
+        if (tvStartSendMessageLand != null) {
+            tvStartSendMessageLand.setVisibility(isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (ivLikesLand != null) {
+            ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

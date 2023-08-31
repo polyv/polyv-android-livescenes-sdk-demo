@@ -33,15 +33,18 @@ public class PLVViewInitUtils {
     }
 
     public static View initPopupWindow(View v, @LayoutRes int resource, final PopupWindow popupWindow, View.OnClickListener listener) {
-        View root = LayoutInflater.from(v.getContext()).inflate(resource, null, false);
-        popupWindow.setContentView(root);
+        return initPopupWindow(LayoutInflater.from(v.getContext()).inflate(resource, null, false), popupWindow, listener);
+    }
+
+    public static View initPopupWindow(View resource, final PopupWindow popupWindow, View.OnClickListener listener) {
+        popupWindow.setContentView(resource);
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new ColorDrawable());
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
-        root.setOnClickListener(listener);
-        return root;
+        resource.setOnClickListener(listener);
+        return resource;
     }
 
     public static void initMarginTopWithStatusBar(View view, int defaultStatusBarHeightDp) {

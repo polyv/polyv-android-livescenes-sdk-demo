@@ -55,6 +55,8 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     private ImageView commodityDialogCloseIv;
     private ImageView commodityEnterIv;
 
+    private View anchorView;
+
     private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
     @Nullable
@@ -117,6 +119,9 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
                         if (uiState == null) {
                             return;
                         }
+                        if (anchorView != null) {
+                            anchorView.setVisibility(uiState.hasProductView ? View.VISIBLE : View.GONE);
+                        }
                         if (uiState.productContentBeanPushToShow != null) {
                             updateProduct(uiState.productContentBeanPushToShow);
                         }
@@ -130,6 +135,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     // <editor-fold defaultstate="collapsed" desc="对外API">
 
     public void setAnchor(View view) {
+        this.anchorView = view;
         commodityPushLayoutRoot.setMarginAnchor(view);
     }
 

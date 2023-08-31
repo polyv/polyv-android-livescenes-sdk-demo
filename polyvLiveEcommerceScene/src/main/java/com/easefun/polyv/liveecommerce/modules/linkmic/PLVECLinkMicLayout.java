@@ -54,7 +54,6 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -868,8 +867,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             linkMicListAdapter.setItemType(itemType);
 
             lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            lp.topMargin = ConvertUtils.dp2px(78);
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.topMargin = 0;
             //2-4人时，布局为2列，超过4人为为maxCount
             int maxCount = 3;
             int spanCount = linkMicListAdapter.getItemCount() <= 4 ? 2 : maxCount;

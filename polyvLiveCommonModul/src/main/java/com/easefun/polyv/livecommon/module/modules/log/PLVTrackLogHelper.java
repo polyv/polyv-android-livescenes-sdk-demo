@@ -139,7 +139,9 @@ public class PLVTrackLogHelper {
                 }
             }
             if (!isInVisibleRange) {
-                entry.getValue().dispose();
+                if (entry.getValue() != null) {
+                    entry.getValue().dispose();
+                }
                 removeKeyList.add(entry.getKey());
             }
         }
@@ -166,6 +168,8 @@ public class PLVTrackLogHelper {
                                 }
                                 // 上报红包曝光事件
                                 PLVTrackLog.getInstance().reportReadRedpackEvent(trackLogBaseData, redpackId);
+                                // 这里不能使用remove，因为key还需要用来判断是否已经加入到发送队列/已经发送过
+                                READ_REDPACK_DISPOSABLE_MAP.put(data, null);
                             }
                         }, new Consumer<Throwable>() {
                             @Override

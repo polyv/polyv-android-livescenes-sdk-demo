@@ -24,7 +24,7 @@ public interface IPLVSAChatroomLayout {
     void init(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
-     * 聊天室登陆
+     * 聊天室登录
      */
     void loginAndLoadHistory();
 

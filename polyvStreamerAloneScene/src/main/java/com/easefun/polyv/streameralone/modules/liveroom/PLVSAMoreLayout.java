@@ -2,7 +2,6 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
@@ -94,6 +93,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreFlashlightTv;
     private ImageView plvsaMoreBitrateIv;
     private TextView plvsaMoreBitrateTv;
+    private ImageView plvsaMoreMixIv;
+    private TextView plvsaMoreMixTv;
+    private View plvsaMoreMixLayout;
     private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreCloseRoomTv;
     private View plvsaMoreCloseRoomLayout;
@@ -109,6 +111,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
+    //混流设置布局
+    private PLVSAMixLayout mixLayout;
     //分享布局
     private PLVSAShareLayout shareLayout;
     // 推流降级布局
@@ -188,6 +192,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreFlashlightTv = (TextView) findViewById(R.id.plvsa_more_flashlight_tv);
         plvsaMoreBitrateIv = (ImageView) findViewById(R.id.plvsa_more_bitrate_iv);
         plvsaMoreBitrateTv = (TextView) findViewById(R.id.plvsa_more_bitrate_tv);
+        plvsaMoreMixIv = findViewById(R.id.plvsa_more_mix_iv);
+        plvsaMoreMixTv = findViewById(R.id.plvsa_more_mix_tv);
+        plvsaMoreMixLayout = findViewById(R.id.plvsa_more_mix_layout);
         plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreCloseRoomTv = (TextView) findViewById(R.id.plvsa_more_close_room_tv);
         plvsaMoreCloseRoomLayout = findViewById(R.id.plvsa_more_close_room_layout);
@@ -210,6 +217,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreFlashlightTv.setOnClickListener(this);
         plvsaMoreBitrateIv.setOnClickListener(this);
         plvsaMoreBitrateTv.setOnClickListener(this);
+        plvsaMoreMixIv.setOnClickListener(this);
+        plvsaMoreMixTv.setOnClickListener(this);
         plvsaMoreCloseRoomIv.setOnClickListener(this);
         plvsaMoreCloseRoomTv.setOnClickListener(this);
         plvsaMoreShareScreenLl.setOnClickListener(this);
@@ -220,8 +229,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
 
-        if(!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
+        if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
             plvsaMoreSettingsLayout.removeView(plvsaMoreShareScreenLl);
+        }
+        if (!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
+            plvsaMoreSettingsLayout.removeView(plvsaMoreMixLayout);
         }
 
         //init bitrateLayout
@@ -238,6 +250,23 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 switchBitrateByUser = true;
                 if (streamerPresenter != null) {
                     streamerPresenter.setBitrate(bitrate);
+                }
+            }
+        });
+
+        //init mixLayout
+        mixLayout = new PLVSAMixLayout(getContext());
+        mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
+            @Override
+            public int getMixInfo() {
+                return streamerPresenter != null ? streamerPresenter.getMixLayoutType() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                mixLayout.close();
+                if (streamerPresenter != null) {
+                    streamerPresenter.setMixLayoutType(mix);
                 }
             }
         });
@@ -345,6 +374,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         }
         if (bitrateLayout != null) {
             bitrateLayout.init(liveRoomDataManager);
+        }
+        if (mixLayout != null) {
+            mixLayout.init(liveRoomDataManager);
         }
         initBitrateMapIcon();
         observeLiveRoomStatus();
@@ -621,6 +653,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == R.id.plvsa_more_bitrate_iv
                 || id == R.id.plvsa_more_bitrate_tv) {
             bitrateLayout.open();
+        } else if (id == R.id.plvsa_more_mix_iv
+                || id == R.id.plvsa_mix_tv) {
+            mixLayout.open();
         } else if (id == R.id.plvsa_more_close_room_iv
                 || id == R.id.plvsa_more_close_room_tv) {
             PolyvChatroomManager.getInstance().toggleRoomByEvent(new IPolyvChatroomManager.RequestApiListener<String>() {
@@ -651,18 +686,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                         .build()
                         .show();
                 return;
-            }
-
-            LiveData<Boolean> enableVideo = streamerPresenter.getData().getEnableVideo();
-            if(enableVideo != null && enableVideo.getValue() != null){
-                if(!enableVideo.getValue()){
-                    //屏幕共享需要打开摄像头
-                    PLVToast.Builder.context(getContext())
-                            .setText(getContext().getString(R.string.plvsa_streamer_sharescreen_need_video_first))
-                            .build()
-                            .show();
-                    return;
-                }
             }
 
             //开始屏幕共享

@@ -236,6 +236,16 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
+            public int getMixInfo() {
+                return onViewActionListener.getMixInfo();
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                onViewActionListener.onMixClick(mix);
+            }
+
+            @Override
             public boolean isCurrentLocalVideoEnable() {
                 return onViewActionListener.isCurrentLocalVideoEnable();
             }

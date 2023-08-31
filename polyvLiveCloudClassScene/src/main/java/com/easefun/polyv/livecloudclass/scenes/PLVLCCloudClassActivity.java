@@ -878,8 +878,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onAddedChatTab(boolean isChatPlaybackEnabled) {
+            public void onChatTabPrepared(boolean isChatPlaybackEnabled, boolean isDisplayEnabled) {
                 if (chatLandscapeLayout != null) {
+                    chatLandscapeLayout.setIsDisplayEnabled(isDisplayEnabled);
                     chatLandscapeLayout.setIsChatPlaybackLayout(isChatPlaybackEnabled);
                     chatLandscapeLayout.setIsLiveType(liveRoomDataManager.getConfig().isLive());
                     livePageMenuLayout.getChatPlaybackManager().addOnCallDataListener(chatLandscapeLayout.getChatPlaybackDataListener());
@@ -887,6 +888,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 }
                 if (mediaLayout != null) {
                     mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled, liveRoomDataManager.getConfig().isLive());
+                    mediaLayout.setChatIsDisplayEnabled(isDisplayEnabled);
                 }
             }
 

@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.text.SpannableStringBuilder;
+import android.util.Pair;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,8 +18,8 @@ public class PLVECChatInputWindow extends PLVInputWindow {
     private ConstraintLayout chatInputQuoteMsgLayout;
     private TextView chatQuoteNameContentTv;
     private ImageView chatQuoteCloseIv;
-    private EditText chatInputEt;
-    private View chatInputBg;
+    private ImageView quizToggleIv;
+    private View sendView;
 
     private PLVChatQuoteVO chatQuoteVO;
 
@@ -36,8 +36,7 @@ public class PLVECChatInputWindow extends PLVInputWindow {
         chatInputQuoteMsgLayout = findViewById(R.id.plvec_chat_input_quote_msg_layout);
         chatQuoteNameContentTv = findViewById(R.id.plvec_chat_quote_name_content_tv);
         chatQuoteCloseIv = findViewById(R.id.plvec_chat_quote_close_iv);
-        chatInputEt = findViewById(R.id.chat_input_et);
-        chatInputBg = findViewById(R.id.chat_input_bg);
+        quizToggleIv = findViewById(R.id.quiz_toggle_iv);
 
         chatQuoteCloseIv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,8 +46,39 @@ public class PLVECChatInputWindow extends PLVInputWindow {
             }
         });
 
+        quizToggleIv.setVisibility(((MessageSendListener) inputListener).hasQuiz() ? View.VISIBLE : View.GONE);
+        quizToggleIv.setSelected(((MessageSendListener) inputListener).isSelectedQuiz());
+        quizToggleIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quizToggleIv.setSelected(!quizToggleIv.isSelected());
+                ((MessageSendListener) inputListener).onQuizToggle(quizToggleIv.isSelected());
+            }
+        });
+        Pair<String, Boolean> hintPair = ((MessageSendListener) inputListener).getHintPair();
+        updateHintPair(hintPair.first, hintPair.second);
+
         updateChatQuoteContent();
     }
+
+    // <editor-folder defaultstate="collapsed" desc="对外API">
+    public void updateHintPair(String text, boolean enabled) {
+        if (inputView != null) {
+            inputView.setHint(text);
+            inputView.setEnabled(enabled);
+            if (!enabled) {
+                lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏
+                inputView.setText("");
+            } else {
+                if (lastInputText != null) {
+                    inputView.setText(lastInputText);
+                    inputView.setSelection(inputView.getText().length());
+                    lastInputText = null;
+                }
+            }
+        }
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="父类方法重写">
 
@@ -58,6 +88,14 @@ public class PLVECChatInputWindow extends PLVInputWindow {
             ((MessageSendListener) inputListener).onInputContext(null);
         }
         super.finish();
+    }
+
+    @Override
+    public View sendView() {
+        if (sendView == null) {
+            sendView = findViewById(R.id.chat_send_tv);
+        }
+        return sendView;
     }
 
     @Override
@@ -98,8 +136,16 @@ public class PLVECChatInputWindow extends PLVInputWindow {
     }
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - 信息发送监听器">
-    public interface MessageSendListener extends InputListener {
+    public interface MessageSendListener extends SoftKeyboardListener {
         void onInputContext(PLVECChatInputWindow inputWindow);
+
+        boolean hasQuiz();
+
+        boolean isSelectedQuiz();
+
+        void onQuizToggle(boolean isSelectedQuiz);
+
+        Pair<String, Boolean> getHintPair();
 
         @Nullable
         PLVChatQuoteVO getChatQuoteContent();

@@ -381,8 +381,18 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
+    public void setMixLayout(int mixLayout) {
+        streamerPresenter.setMixLayoutType(mixLayout);
+    }
+
+    @Override
     public Pair<Integer, Integer> getBitrateInfo() {
         return new Pair<>(streamerPresenter.getMaxBitrate(), streamerPresenter.getBitrate());
+    }
+
+    @Override
+    public int getMixInfo() {
+        return streamerPresenter.getMixLayoutType();
     }
 
     @Override
@@ -497,7 +507,6 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         @Override
         public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
             super.onStreamerEngineCreatedSuccess(linkMicUid, linkMicList);
-            streamerPresenter.setMixLayoutType(PLVSStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE);
             streamerAdapter.setMyLinkMicId(linkMicUid);
             streamerAdapter.setDataList(linkMicList);
             updateLinkMicListLayout();
@@ -782,26 +791,18 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
             streamerAdapter.setItemType(itemType);
 
-            if (isPortrait) {
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            if (streamerAdapter.getItemCount() <= 2) {
                 lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                lp.topMargin = ConvertUtils.dp2px(78);
-                lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            } else if (streamerAdapter.getItemCount() <= 4) {
+                lp.width = (int) (ScreenUtils.getScreenOrientatedHeight() * 1.5);
             } else {
-                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                if(streamerAdapter.getItemCount() <= 2){
-                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                } else if (streamerAdapter.getItemCount() <= 4){
-                    lp.width = (int) (ScreenUtils.getScreenOrientatedHeight() * 1.5);
-                } else {
-                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                }
-                lp.topMargin = 0;
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
             }
+            lp.topMargin = 0;
+            lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+            lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+            lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             //2-4人时，布局为2列，超过4人为为maxCount
             int maxCount = ScreenUtils.isPortrait() ? 3: 4;
             int spanCount = streamerAdapter.getItemCount() <= 4 ? 2 : maxCount;
@@ -831,7 +832,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         //更新MainView视图
         plvsaStreamerRvLayout.clearMainView();
         streamerAdapter.releaseMainViewHolder();
-        final RecyclerView.ViewHolder viewHolder = streamerAdapter.createMainViewHolder(plvsaStreamerRvLayout.getMainContainer());
+        final PLVSAStreamerAdapter.StreamerItemViewHolder viewHolder = streamerAdapter.createMainViewHolder(plvsaStreamerRvLayout.getMainContainer());
+        viewHolder.changeRectLyToMatchParent();
         mainView = viewHolder.itemView;
         //将维护的viewHolder副本添加到主布局上，实现一对多主讲模式
         plvsaStreamerRvLayout.addViewToMain(mainView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -864,6 +866,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             if(!isPortrait){
                 layoutParams.topMargin = 0;
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            } else {
+                layoutParams.topMargin = ConvertUtils.dp2px(78);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             }
         }
         gridLayoutManager.setSpanCount(1);
@@ -873,7 +878,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     /**
-     * 更新占位模式布局，用于嘉宾登陆时，讲师占位
+     * 更新占位模式布局，用于嘉宾登录时，讲师占位
      */
     private void updatePlaceholderLayout(){
         if(plvsaStreamerRvLayout.getCurrentMode() != PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER){
@@ -906,6 +911,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             layoutParams.topMargin = ConvertUtils.dp2px(78);
             layoutParams.width = ScreenUtils.getScreenOrientatedWidth() / 2;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            layoutParams.removeRule(RelativeLayout.CENTER_IN_PARENT);
         }
         gridLayoutManager.setSpanCount(1);
         gridLayoutManager.requestLayout();
@@ -994,7 +1000,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     /**
-     * 切换到占位模式，适用于嘉宾登陆时讲师占位
+     * 切换到占位模式，适用于嘉宾登录时讲师占位
      */
     private void changePlaceholder(){
         plvsaStreamerRvLayout.changeMode(PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER);

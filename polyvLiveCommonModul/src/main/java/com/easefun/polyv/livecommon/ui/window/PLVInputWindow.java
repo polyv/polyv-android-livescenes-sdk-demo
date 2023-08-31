@@ -34,11 +34,11 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     private static final String TAG = "PLVInputWindow";
     private static final int ALLOW_SHOW_INTERVAL = 1200;
     private static long lastStartTime;
-    private static SpannableStringBuilder lastInputText;//editText CharSequence 持有activity引用
+    protected static SpannableStringBuilder lastInputText;//editText CharSequence 持有activity引用
     private boolean isShowKeyBoard;
     private boolean willShowKeyBoard;
     private View viewBg;
-    private EditText inputView;
+    protected EditText inputView;
 
     private List<View> popupButtonList = new ArrayList<>();
     private List<ViewGroup> popupLayoutList = new ArrayList<>();
@@ -99,6 +99,19 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                         viewBg.setLayoutParams(lp);
                         viewBg.setTag(heightDifference);
                     }
+                    // 获取输入布局可见的高度
+                    ViewGroup parent = (ViewGroup) viewBg.getParent();
+                    int inputHeight = 0;
+                    for (int i = 0; i < parent.getChildCount(); i++) {
+                        View view = parent.getChildAt(i);
+                        if (view == inputView || view == inputView.getParent()) {
+                            inputHeight += parent.getChildAt(i).getHeight();
+                            break;
+                        }
+                    }
+                    if (inputListener instanceof SoftKeyboardListener && !isFinishing()) {
+                        ((SoftKeyboardListener) inputListener).onSoftKeyboardOpened(inputHeight + heightDifference - (usableHeightSansKeyboard - parent.getHeight()));
+                    }
                 } else {
                     isShowKeyBoard = false;
                     if (!willShowKeyBoard) {
@@ -109,6 +122,9 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                     }
                     if (willSelectPopupButton != null) {
                         willSelectPopupButton.setSelected(true);
+                    }
+                    if (inputListener instanceof SoftKeyboardListener && !isFinishing()) {
+                        ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed();
                     }
                 }
             }
@@ -126,7 +142,10 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
             hideSoftInputAndPopupLayout();
             return;
         }
-        if (inputView != null) {
+        if (inputListener instanceof SoftKeyboardListener) {
+            ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed();
+        }
+        if (inputView != null && lastInputText == null) {
             lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏
         }
         inputListener = null;
@@ -168,6 +187,11 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         if (lastInputText != null) {
             inputView.setText(lastInputText);
             inputView.setSelection(inputView.getText().length());
+            if (sendView() != null) {
+                sendView().setEnabled(inputView.getText().length() > 0);
+                sendView().setSelected(inputView.getText().length() > 0);
+            }
+            lastInputText = null;
         }
         inputView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -191,9 +215,17 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                 if (s != null && s.length() > 0) {
                     //send enabled true
                     PLVCommonLog.d(TAG, "onTextChanged: enabled true");
+                    if (sendView() != null) {
+                        sendView().setEnabled(true);
+                        sendView().setSelected(true);
+                    }
                 } else {
                     //send enabled false
                     PLVCommonLog.d(TAG, "onTextChanged: enabled false");
+                    if (sendView() != null) {
+                        sendView().setEnabled(false);
+                        sendView().setSelected(false);
+                    }
                 }
             }
 
@@ -212,6 +244,14 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                 return false;
             }
         });
+        if (sendView() != null) {
+            sendView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    postMsg();
+                }
+            });
+        }
     }
     // </editor-fold>
 
@@ -256,6 +296,10 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     }
 
     public ViewGroup firstPopupLayout() {
+        return null;
+    }
+
+    public View sendView() {
         return null;
     }
 
@@ -372,6 +416,12 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="内部类 - 输入窗口监听器">
     public interface InputListener {
         boolean onSendMsg(String message);
+    }
+
+    public interface SoftKeyboardListener extends InputListener{
+        void onSoftKeyboardOpened(int keyboardHeightInPx);
+
+        void onSoftKeyboardClosed();
     }
     // </editor-fold>
 }

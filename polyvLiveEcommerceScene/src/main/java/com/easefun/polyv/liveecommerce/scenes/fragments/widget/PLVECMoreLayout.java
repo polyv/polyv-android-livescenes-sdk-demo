@@ -17,6 +17,8 @@ import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class PLVECMoreLayout extends FrameLayout {
@@ -124,8 +126,10 @@ public class PLVECMoreLayout extends FrameLayout {
             return;
         }
 
+        final List<String> sortList = new ArrayList<>();
         List<PLVWebviewUpdateAppStatusVO.Value.Function> functions = functionsVO.getValue().getDataArray();
         for (PLVWebviewUpdateAppStatusVO.Value.Function function : functions) {
+            sortList.add(function.getEvent());
             int index = -1;
             for (int i = 0; i < functionList.size(); i++) {
                 if (function.getEvent().equals(functionList.get(i).getType())) {
@@ -148,6 +152,16 @@ public class PLVECMoreLayout extends FrameLayout {
                 functionList.set(index, chatFunctionVO);
             }
         }
+        Collections.sort(functionList, new Comparator<PLVChatFunctionVO>() {
+            @Override
+            public int compare(PLVChatFunctionVO o1, PLVChatFunctionVO o2) {
+                String event1 = o1.getType();
+                String event2 = o2.getType();
+                int index1 = sortList.indexOf(event1);
+                int index2 = sortList.indexOf(event2);
+                return index1 - index2;
+            }
+        });
 
         if (adapter != null) {
             adapter.updateFunctionList(functionList);

@@ -60,7 +60,7 @@
                 android:layout_alignLeft="@+id/more_ly"
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="16dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:text="更多"/>
         </RelativeLayout>
     </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>

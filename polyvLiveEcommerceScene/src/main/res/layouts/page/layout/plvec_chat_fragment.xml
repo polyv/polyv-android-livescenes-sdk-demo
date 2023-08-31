@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_load_view"
+        android:layout_width="244dp"
+        android:layout_height="152dp">
+
+        <!--聊天信息列表-->
+        <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+            android:id="@+id/chat_msg_rv"
+            android:layout_width="244dp"
+            android:layout_height="152dp"
+            android:fadingEdgeLength="32dp"
+            android:overScrollMode="never"
+            android:requiresFadingEdge="vertical"
+            app:fastScrollEnabled="false" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/unread_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/swipe_load_view"
+        android:layout_alignBottom="@+id/swipe_load_view"
+        android:layout_gravity="bottom"
+        android:background="@drawable/plvec_chatroom_view_more_bg"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="查看新信息"
+        android:textColor="#FFA611"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</RelativeLayout>
