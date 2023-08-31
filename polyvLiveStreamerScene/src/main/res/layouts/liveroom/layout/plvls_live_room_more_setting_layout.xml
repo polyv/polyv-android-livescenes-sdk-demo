@@ -55,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
@@ -79,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
@@ -103,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:visibility="gone">
@@ -128,6 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:visibility="visible">
@@ -142,6 +146,31 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/plv_push_downgrade_preference_title"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvls_more_setting_mix_item_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/plvls_setting_mix_layout_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/plvls_mix_layout_title"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -167,6 +196,14 @@
 
     <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSBitrateLayout
         android:id="@+id/plvls_more_setting_bitrate_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_separator"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMixLayout
+        android:id="@+id/plvls_more_setting_mix_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"

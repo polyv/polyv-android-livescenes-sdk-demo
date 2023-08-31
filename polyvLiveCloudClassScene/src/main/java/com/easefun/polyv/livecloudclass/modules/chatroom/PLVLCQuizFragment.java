@@ -3,9 +3,11 @@ package com.easefun.polyv.livecloudclass.modules.chatroom;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -37,14 +40,20 @@ import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
+import java.util.List;
+
 /**
  * 咨询提问tab页
  */
 public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String DEFAULT_TIPS = "你已进入专属的提问频道，提问内容不会公开";
     //提问信息列表
+    private SwipeRefreshLayout chatroomQuizRefreshLayout;
     private PLVMessageRecyclerView quizMsgRv;
     private PLVLCMessageAdapter messageAdapter;
+    //未读信息提醒view
+    private TextView unreadMsgTv;
     private PLVChatImageViewerFragment chatImageViewerFragment;//聊天图片查看fragment
 
     //输入框
@@ -63,6 +72,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
 
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+
+    //提示语
+    private String tips = DEFAULT_TIPS;
+
+    private boolean firstLoadHistory = true;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -80,7 +94,36 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         if (chatroomPresenter == null) {
             return;
         }
+        findView();
+        initQuizMsgRv();
+
+        // 拉取一次历史消息
+        chatroomPresenter.requestQuizHistory();
+
+        inputEt.addTextChangedListener(inputTextWatcher);
+
+        PLVChatroomUtils.initEmojiList(emojiRv, inputEt);
+
+        addPopupButton(toggleEmojiIv);
+        addPopupLayout(emojiLy);
+    }
+
+    private void findView() {
+        chatroomQuizRefreshLayout = view.findViewById(R.id.plvlc_chatroom_quiz_refresh_layout);
         quizMsgRv = findViewById(R.id.chat_msg_rv);
+        inputEt = findViewById(R.id.input_et);
+        toggleEmojiIv = findViewById(R.id.toggle_emoji_iv);
+        emojiLy = findViewById(R.id.emoji_ly);
+        sendMsgTv = findViewById(R.id.send_msg_tv);
+        deleteMsgIv = findViewById(R.id.delete_msg_iv);
+        emojiRv = findViewById(R.id.emoji_rv);
+
+        toggleEmojiIv.setOnClickListener(this);
+        sendMsgTv.setOnClickListener(this);
+        deleteMsgIv.setOnClickListener(this);
+    }
+
+    private void initQuizMsgRv() {
         quizMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(16), ConvertUtils.dp2px(16)));
         PLVMessageRecyclerView.setLayoutManager(quizMsgRv);
         messageAdapter = new PLVLCMessageAdapter();
@@ -112,28 +155,31 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         //设置信息索引，需在chatroomPresenter.registerView后设置
         messageAdapter.setMsgIndex(chatroomPresenter.getViewIndex(chatroomView));
         quizMsgRv.setAdapter(messageAdapter);
-        //添加一条提示信息到列表中
-        addQuizTipsToList();
 
-        inputEt = findViewById(R.id.input_et);
-        inputEt.addTextChangedListener(inputTextWatcher);
-
-        toggleEmojiIv = findViewById(R.id.toggle_emoji_iv);
-        toggleEmojiIv.setOnClickListener(this);
-
-        emojiLy = findViewById(R.id.emoji_ly);
-        sendMsgTv = findViewById(R.id.send_msg_tv);
-        sendMsgTv.setOnClickListener(this);
-        deleteMsgIv = findViewById(R.id.delete_msg_iv);
-        deleteMsgIv.setOnClickListener(this);
-
-        emojiRv = findViewById(R.id.emoji_rv);
-        PLVChatroomUtils.initEmojiList(emojiRv, inputEt);
-
-        addPopupButton(toggleEmojiIv);
-        addPopupLayout(emojiLy);
+        chatroomQuizRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, android.R.color.holo_red_light,
+                android.R.color.holo_orange_light, android.R.color.holo_green_light);
+        chatroomQuizRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (chatroomPresenter != null) {
+                    chatroomPresenter.requestQuizHistory();
+                }
+            }
+        });
+        //未读信息view
+        unreadMsgTv = findViewById(R.id.unread_msg_tv);
+        quizMsgRv.addUnreadView(unreadMsgTv);
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="对外API">
+    public void setTips(String tips) {
+        if (TextUtils.isEmpty(tips)) {
+            return;
+        }
+        this.tips = tips;
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="内部API - 实现PLVInputFragment定义的方法">
     @Override
@@ -171,6 +217,30 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         }
 
         @Override
+        public void onQuizHistoryDataList(@NonNull List<PLVBaseViewData<PLVBaseEvent>> answerEvents, boolean isNoMoreQuizHistory) {
+            if (messageAdapter != null) {
+                boolean isScrollEnd = messageAdapter.getItemCount() == 0;
+                messageAdapter.addDataListChangedAtFirst(answerEvents);
+                quizMsgRv.scrollToPosition(isScrollEnd ? messageAdapter.getItemCount() - 1 : 0);
+            }
+            if (firstLoadHistory && answerEvents.isEmpty()) {
+                addQuizTipsToList();
+            }
+            firstLoadHistory = false;
+            chatroomQuizRefreshLayout.setRefreshing(false);
+            chatroomQuizRefreshLayout.setEnabled(!isNoMoreQuizHistory);
+        }
+
+        @Override
+        public void onQuizHistoryRequestFailed(Throwable throwable) {
+            if (firstLoadHistory) {
+                addQuizTipsToList();
+            }
+            firstLoadHistory = false;
+            chatroomQuizRefreshLayout.setRefreshing(false);
+        }
+
+        @Override
         public void onLocalQuestionMessage(@Nullable PolyvQuestionMessage questionMessage) {
             super.onLocalQuestionMessage(questionMessage);
             if (questionMessage == null) {
@@ -181,19 +251,20 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
                 @Override
                 public void call() {
                     //添加信息至列表
-                    addQuizMessageToList(viewData);//如果键盘还没完全隐藏，则等待键盘隐藏后再添加到列表中，避免出现列表布局动画问题
+                    addQuizMessageToList(viewData, true);//如果键盘还没完全隐藏，则等待键盘隐藏后再添加到列表中，避免出现列表布局动画问题
                 }
             })) {
                 //添加信息至列表
-                addQuizMessageToList(viewData);
+                addQuizMessageToList(viewData, true);
             }
         }
 
         @Override
         public void onAnswerEvent(@NonNull PLVTAnswerEvent answerEvent) {
             super.onAnswerEvent(answerEvent);
+            int itemType = answerEvent.isImgEvent() ? PLVChatMessageItemType.ITEMTYPE_RECEIVE_IMG : PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ;
             //添加信息至列表
-            addQuizMessageToList(new PLVBaseViewData<>(answerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag(answerEvent.getUserId())));
+            addQuizMessageToList(new PLVBaseViewData<>(answerEvent, itemType, new PLVSpecialTypeTag(answerEvent.getUserId())), false);
         }
     };
 
@@ -203,7 +274,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 添加信息至列表">
-    private void addQuizMessageToList(final PLVBaseViewData baseViewData) {
+    private void addQuizMessageToList(final PLVBaseViewData baseViewData, final boolean isScrollEnd) {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -212,7 +283,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
                 }
                 boolean result = messageAdapter.addDataChangedAtLast(baseViewData);
                 if (result) {
-                    quizMsgRv.scrollToPosition(messageAdapter.getItemCount() - 1);
+                    if (isScrollEnd) {
+                        quizMsgRv.scrollToPosition(messageAdapter.getItemCount() - 1);
+                    } else {
+                        quizMsgRv.scrollToBottomOrShowMore(1);
+                    }
                 }
             }
         });
@@ -220,7 +295,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
 
     private void addQuizTipsToList() {
         PLVTAnswerEvent tAnswerEvent = new PLVTAnswerEvent();
-        tAnswerEvent.setContent("同学，您好！请问有什么问题吗？");
+        tAnswerEvent.setContent(tips);
         tAnswerEvent.setObjects(PLVTextFaceLoader.messageToSpan(tAnswerEvent.getContent(), ConvertUtils.dp2px(14), getContext()));
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserType(PLVSocketUserConstant.USERTYPE_TEACHER);
@@ -229,7 +304,7 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         userBean.setPic(PLVSocketUserConstant.TEACHER_AVATAR_URL);
         tAnswerEvent.setUser(userBean);
 
-        addQuizMessageToList(new PLVBaseViewData<>(tAnswerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag(null)));
+        addQuizMessageToList(new PLVBaseViewData<>(tAnswerEvent, PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ, new PLVSpecialTypeTag(null)), false);
     }
     // </editor-fold>
 

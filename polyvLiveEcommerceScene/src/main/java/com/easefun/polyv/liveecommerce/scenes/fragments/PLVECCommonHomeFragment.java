@@ -15,6 +15,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -27,7 +28,9 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
@@ -75,6 +78,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         initSocketLoginManager();
 
         observeChatroomData();
+        observeClassDetailVO();
+        observeInteractEntranceData();
+        observeInteractStatusData();
     }
 
     @Override
@@ -96,10 +102,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
-
-        observeClassDetailVO();
-        observeInteractEntranceData();
-        observeInteractStatusData();
     }
     // </editor-fold>
 
@@ -131,6 +133,14 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //处理商品打开
     protected void acceptOpenCommodity() {
+    }
+
+    //处理咨询提问菜单打开
+    protected void acceptOpenQuiz(@NonNull PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+    }
+
+    //处理咨询提问菜单关闭
+    protected void acceptCloseQuiz() {
     }
 
     //处理获取到的聊天回放开关
@@ -340,11 +350,29 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         updateWatchInfo(dataBean.getCoverImage(), dataBean.getPublisher());
                         //根据商品列表开关来显示/隐藏商品库按钮
                         if (classDetailVO.isOpenCommodity()) {
+                            PLVDependManager.getInstance().get(PLVCommodityViewModel.class).notifyHasProductLayout(true);
                             acceptOpenCommodity();
                         }
                         //聊天回放开关
                         boolean isChatPlaybackEnable = classDetailVO.getData().isChatPlaybackEnabled();
                         acceptChatPlaybackEnable(isChatPlaybackEnable);
+                        //频道菜单
+                        List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = dataBean.getChannelMenus();
+                        boolean isOpenQuiz = false;
+                        for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
+                            if (channelMenusBean == null) {
+                                continue;
+                            }
+                            //咨询提问菜单
+                            if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
+                                isOpenQuiz = true;
+                                acceptOpenQuiz(channelMenusBean);
+                                break;
+                            }
+                        }
+                        if (!isOpenQuiz) {
+                            acceptCloseQuiz();
+                        }
                     }
                 }
             }

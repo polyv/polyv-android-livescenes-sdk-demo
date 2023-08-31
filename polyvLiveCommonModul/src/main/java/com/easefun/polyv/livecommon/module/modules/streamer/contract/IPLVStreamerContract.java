@@ -366,6 +366,13 @@ public interface IPLVStreamerContract {
         void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);
 
         /**
+         * 获取混流画面布局类型
+         *
+         * @return 混流布局类型
+         */
+        int getMixLayoutType();
+
+        /**
          * 设置直播推流，是否需要恢复上一场的流继续推流
          */
         void setRecoverStream(boolean recoverStream);

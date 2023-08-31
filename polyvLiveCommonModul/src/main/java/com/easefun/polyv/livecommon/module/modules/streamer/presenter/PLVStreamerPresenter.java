@@ -52,6 +52,7 @@ import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
@@ -165,6 +166,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private PLVSocketUserBean currentSocketUserBean;
     //用户类型，现在这里可能的用户类型是：讲师、嘉宾
     private final String userType;
+    //频道类型
+    private PLVLiveChannelType channelType;
     //推流和连麦数据
     private final PLVStreamerData streamerData;
     //当前拥有主讲权限的用户
@@ -181,6 +184,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean isFrontMirror = true;
     private int pushPictureResolution = PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE;
     private PLVLinkMicConstant.PushResolutionRatio pushResolutionRatio = PLVLinkMicConstant.PushResolutionRatio.RATIO_16_9;
+    private int mixLayoutType = PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
     //开始推流是否需要恢复上一场的直播流，继续推流
     private boolean isRecoverStream = false;
     private float localCameraZoomFactor = 1F;
@@ -214,8 +218,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVStreamerPresenter(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        channelType = liveRoomDataManager.getConfig().getChannelType();
         streamerData = new PLVStreamerData();
         curBitrate = loadBitrate();
+        mixLayoutType = loadMixLayoutType();
 
         String viewerId = liveRoomDataManager.getConfig().getUser().getViewerId();
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
@@ -336,6 +342,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         PLVChannelFeatureManager.onChannel(param.getChannelId())
                                 .getOrDefault(PLVChannelFeature.STREAMER_PUSH_QUALITY_PREFERENCE, PLVPushDowngradePreference.PREFER_BETTER_QUALITY)
                 );
+                setMixLayoutType(mixLayoutType);
 
                 initStreamerListener();
 
@@ -571,10 +578,17 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public void setMixLayoutType(int mixLayoutType) {
+        this.mixLayoutType = mixLayoutType;
         if (!isInitStreamerManager()) {
             return;
         }
         streamerManager.setMixLayoutType(mixLayoutType);
+        saveMixLayoutType();
+    }
+
+    @Override
+    public int getMixLayoutType() {
+        return mixLayoutType;
     }
 
     @Override
@@ -1198,7 +1212,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         dispose(linkMicListTimerDisposable);
         String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
         if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登陆时，使用频道号
+            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登录时，使用频道号
         }
         final String roomId = loginRoomId;
         listUsersDisposable = PLVChatApiRequestHelper.getListUsers(roomId, DEFAULT_MEMBER_PAGE, DEFAULT_MEMBER_LENGTH)
@@ -1518,7 +1532,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             PLVRTCMixUser mixUser = new PLVRTCMixUser();
             mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenShare());
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
-            mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
+            //屏幕共享时，当前用户的混流摄像头不能为mute，否则CDN混流无画面
+            if (plvLinkMicItemDataBean.isScreenShare()) {
+                mixUser.setMuteVideo(false);
+            } else {
+                mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
+            }
             mixUserList.add(mixUser);
         }
         streamerManager.updateMixLayoutUsers(mixUserList);
@@ -1538,7 +1557,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenShare());
             }
             //屏幕共享时，当前用户的混流摄像头不能为mute，否则CDN混流无画面
-            mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
+            if (plvLinkMicItemDataBean.isScreenShare()) {
+                mixUser.setMuteVideo(false);
+            } else {
+                mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
+            }
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
             mixUserList.add(mixUser);
         }
@@ -1767,6 +1790,17 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             bitrate = maxSettingBitrate;
         }
         return bitrate;
+    }
+
+    private void saveMixLayoutType() {
+        String key = "plv_key_mix_layout_type_" + channelType.getValue();
+        SPUtils.getInstance().put(key, mixLayoutType);
+    }
+
+    private int loadMixLayoutType() {
+        String key = "plv_key_mix_layout_type_" + channelType.getValue();
+        int defaultMixLayoutType = channelType == PLVLiveChannelType.PPT ? PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+        return SPUtils.getInstance().getInt(key, defaultMixLayoutType);
     }
     // </editor-fold>
 

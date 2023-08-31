@@ -22,6 +22,7 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecloudclass.R;
@@ -29,6 +30,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCChatFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreFloatingView;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.PLVLCPlaybackChapterFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
@@ -123,6 +125,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVCardPushManager cardPushManager = new PLVCardPushManager();
     //无条件抽奖挂件管理器
     private PLVLotteryManager lotteryManager = new PLVLotteryManager();
+    //更多浮层view
+    private PLVLCChatMoreFloatingView chatMoreFloatingView;
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -150,6 +154,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
     //商品卡片
     private PLVLCCommodityPushLayout commodityPushLayout;
+    //空布局
+    private ViewGroup emptyLy;
 
     //tab
     private PLVLCLiveDescFragment liveDescFragment; //直播介绍tab页
@@ -185,7 +191,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (ScreenUtils.isPortrait()) {
             setVisibility(View.VISIBLE);
         } else {
-            setVisibility(View.GONE);
+            setVisibility(View.INVISIBLE);
         }
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_live_page_menu_layout, this, true);
 
@@ -241,6 +247,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         restoreChatTabForMessageList(chatCommonMessageList);
 
         commodityPushLayout = findViewById(R.id.plvlc_commodity_push_layout);
+        emptyLy = findViewById(R.id.plvlc_chatroom_empty_ly);
     }
 
     private void initChatroomMvpView(IPLVChatroomContract.IChatroomPresenter presenter) {
@@ -279,6 +286,26 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         presenter.registerView(chatroomMvpView);
     }
+
+    private void initChatMoreFloatingView() {
+        chatMoreFloatingView = findViewById(R.id.plvlc_chat_more_floating_view);
+        chatMoreFloatingView.init(liveRoomDataManager);
+        chatMoreFloatingView.setOnViewActionListener(new PLVLCChatMoreFloatingView.OnViewActionListener() {
+            @Override
+            public void onShowBulletinAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowBulletinAction();
+                }
+            }
+
+            @Override
+            public void onClickDynamicFunction(String event) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onClickChatMoreDynamicFunction(event);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部处理 - 重建时的初始化逻辑">
@@ -287,7 +314,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
      * 重建 chatFragment 的 chatCommonMessageList
      *
      * @param messageList
-     * @see #addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean)
+     * @see #checkAddChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean, boolean)
      */
     private void restoreChatTabForMessageList(PLVLCChatCommonMessageList messageList) {
         if (chatFragment == null) {
@@ -303,7 +330,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
      * 重建 chatFragment 的 chatroomPresenter
      *
      * @param presenter
-     * @see #addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean)
+     * @see #checkAddChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean, boolean)
      */
     private void restoreChatTabForPresenter(IPLVChatroomContract.IChatroomPresenter presenter) {
         if (chatFragment == null) {
@@ -372,6 +399,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         this.liveRoomDataManager = liveRoomDataManager;
 
         initChatPlaybackManager();
+        initChatMoreFloatingView();
 
         chatCommonMessageList.init(liveRoomDataManager);
 
@@ -572,76 +600,82 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabTitleList.add(channelMenusBean.getName());
         if (quizFragment == null) {
             quizFragment = new PLVLCQuizFragment();
+            quizFragment.setTips(channelMenusBean.getContent());
             chatroomPresenter.registerView(quizFragment.getChatroomView());
         }
         pageMenuTabFragmentList.add(quizFragment);
     }
 
-    private void addChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
-        pageMenuTabTitleList.add(channelMenusBean.getName());
-        if (chatFragment == null) {
-            chatFragment = new PLVLCChatFragment();
-            chatFragment.init(chatCommonMessageList, liveRoomDataManager);
-            chatFragment.setCardPushManager(cardPushManager);
-            chatFragment.setLotteryManager(lotteryManager);
-            chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
-            chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
-            chatroomPresenter.registerView(chatFragment.getChatroomView());
+    private void checkAddChatTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean, boolean isDisplayEnabled) {
+        if (isDisplayEnabled) {
+            pageMenuTabTitleList.add(channelMenusBean.getName());
+            if (chatFragment == null) {
+                chatFragment = new PLVLCChatFragment();
+                chatFragment.init(chatCommonMessageList, liveRoomDataManager);
+                chatFragment.setCardPushManager(cardPushManager);
+                chatFragment.setLotteryManager(lotteryManager);
+                chatFragment.setIsChatPlaybackLayout(isChatPlaybackEnabled());
+                chatPlaybackManager.addOnCallDataListener(chatFragment.getChatPlaybackDataListener());
+                chatroomPresenter.registerView(chatFragment.getChatroomView());
+            }
+            chatFragment.setIsLiveType(liveRoomDataManager.getConfig().isLive());
+            chatFragment.setOnViewActionListener(new PLVLCChatFragment.OnViewActionListener() {
+                @Override
+                public void onShowBulletinAction() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowBulletinAction();
+                    }
+                }
+
+                @Override
+                public void onClickDynamicFunction(String event) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onClickChatMoreDynamicFunction(event);
+                    }
+                }
+
+                @Override
+                public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onReplyMessage(chatQuoteVO);
+                    }
+                }
+
+                @Override
+                public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onReceiveRedPaper(redPaperEvent);
+                    }
+                }
+
+                @Override
+                public void onShowRewardAction() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowRewardAction();
+                    }
+                }
+
+                @Override
+                public void onShowEffectAction(boolean isShow) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowEffectAction(isShow);
+                    }
+                }
+
+                @Override
+                public void onShowQuestionnaire() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowQuestionnaire();
+                    }
+                }
+            });
+            pageMenuTabFragmentList.add(chatFragment);
         }
-        chatFragment.setIsLiveType(liveRoomDataManager.getConfig().isLive());
-        chatFragment.setOnViewActionListener(new PLVLCChatFragment.OnViewActionListener() {
-            @Override
-            public void onShowBulletinAction() {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onShowBulletinAction();
-                }
-            }
-
-            @Override
-            public void onClickDynamicFunction(String event) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onClickChatMoreDynamicFunction(event);
-                }
-            }
-
-            @Override
-            public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onReplyMessage(chatQuoteVO);
-                }
-            }
-
-            @Override
-            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onReceiveRedPaper(redPaperEvent);
-                }
-            }
-
-            @Override
-            public void onShowRewardAction() {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onShowRewardAction();
-                }
-            }
-
-            @Override
-            public void onShowEffectAction(boolean isShow) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onShowEffectAction(isShow);
-                }
-            }
-
-            @Override
-            public void onShowQuestionnaire() {
-                if (onViewActionListener != null) {
-                    onViewActionListener.onShowQuestionnaire();
-                }
-            }
-        });
-        pageMenuTabFragmentList.add(chatFragment);
+        if (chatMoreFloatingView != null) {
+            chatMoreFloatingView.setVisibility(!isDisplayEnabled && liveRoomDataManager.getConfig().isLive() ? View.VISIBLE : View.GONE);
+        }
         if (onViewActionListener != null) {
-            onViewActionListener.onAddedChatTab(isChatPlaybackEnabled());
+            onViewActionListener.onChatTabPrepared(isChatPlaybackEnabled(), isDisplayEnabled);
         }
     }
 
@@ -753,6 +787,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             pageMenuTabIndicator.setBackgroundColor(Color.parseColor("#3E3E4E"));
             findViewById(R.id.split_view).setVisibility(View.VISIBLE);
         }
+        emptyLy.setVisibility(pageMenuTabAdapter.getCount() > 0 ? View.GONE : View.VISIBLE);
     }
     // </editor-fold>
 
@@ -949,6 +984,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                             onViewActionListener.onSendDanmuAction(charSequence);
                         }
                     }
+                } else if (!isChatPlaybackEnabled()) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onSendDanmuAction(charSequence);
+                    }
                 }
             }
         });
@@ -1105,7 +1144,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             if (PLVLiveClassDetailVO.MENUTYPE_DESC.equals(channelMenusBean.getMenuType())) {
                 addDescTab(liveClassDetail, channelMenusBean);
             } else if (PLVLiveClassDetailVO.MENUTYPE_CHAT.equals(channelMenusBean.getMenuType())) {
-                addChatTab(channelMenusBean);
+                checkAddChatTab(channelMenusBean, channelMenusBean.isDisplayEnabled());
             } else if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
                 addQuizTab(channelMenusBean);
             } else if (PLVLiveClassDetailVO.MENUTYPE_TEXT.equals(channelMenusBean.getMenuType())) {

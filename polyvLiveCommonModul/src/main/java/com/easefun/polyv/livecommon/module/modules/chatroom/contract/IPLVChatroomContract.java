@@ -260,6 +260,23 @@ public interface IPLVChatroomContract {
         void onHistoryRequestFailed(String errorMsg, Throwable t, int viewIndex);
 
         /**
+         * 历史提问记录数据回调
+         *
+         * @param answerEvents        历史提问数据
+         * @param isNoMoreQuizHistory 是否没有更多的历史提问记录
+         */
+        @MainThread
+        void onQuizHistoryDataList(@NonNull List<PLVBaseViewData<PLVBaseEvent>> answerEvents, boolean isNoMoreQuizHistory);
+
+        /**
+         * 历史提问记录请求失败回调
+         *
+         * @param throwable 异常
+         */
+        @MainThread
+        void onQuizHistoryRequestFailed(Throwable throwable);
+
+        /**
          * 踢出列表数据
          *
          * @param dataList 数据列表
@@ -362,6 +379,8 @@ public interface IPLVChatroomContract {
          * @param viewIndex 调用该方法的view的索引，没有时传0
          */
         void requestChatHistory(int viewIndex);
+
+        void requestQuizHistory();
 
         /**
          * 获取聊天发言的表情图片的大小

@@ -845,7 +845,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - StreamerItemViewHolder定义">
-    static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
+    public static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         @Nullable
         private PLVRoundRectLayout plvsaStreamerRoundRectLy;
@@ -900,6 +900,14 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         plvsaStreamerRoundRectLy.requestLayout();
                     }
                 });
+            }
+        }
+
+        public void changeRectLyToMatchParent() {
+            if (plvsaStreamerRoundRectLy != null) {
+                ConstraintLayout.LayoutParams rectLyLp = (ConstraintLayout.LayoutParams) plvsaStreamerRoundRectLy.getLayoutParams();
+                rectLyLp.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                plvsaStreamerRoundRectLy.setLayoutParams(rectLyLp);
             }
         }
     }

@@ -1,4 +1,8 @@
 <resources>
     <string name="plvec_chat_msg_over_length_more">更多</string>
     <string name="plvec_chat_msg_over_length_fold">收起</string>
+    <string name="plvec_chat_input_tips_close">聊天室已关闭</string>
+    <string name="plvec_chat_input_tips_focus">当前为专注模式..</string>
+    <string name="plvec_chat_input_tips_chat">聊点什么吧~</string>
+    <string name="plvec_chat_input_tips_quiz">发起提问</string>
 </resources>

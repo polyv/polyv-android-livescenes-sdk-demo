@@ -542,6 +542,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        mediaController.setChatIsDisplayEnabled(isDisplayEnabled);
+    }
+
+    @Override
     public void setOnViewActionListener(IPLVLCMediaLayout.OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }

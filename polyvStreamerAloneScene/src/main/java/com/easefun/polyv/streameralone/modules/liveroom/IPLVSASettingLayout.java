@@ -104,11 +104,25 @@ public interface IPLVSASettingLayout {
         Pair<Integer, Integer> getBitrateInfo();
 
         /**
+         * 获取推流的混流布局信息
+         *
+         * @return 混流布局信息
+         */
+        int getMixInfo();
+
+        /**
          * 切换码率
          *
          * @param bitrate 码率
          */
         void onBitrateClick(int bitrate);
+
+        /**
+         * 切换混流布局
+         *
+         * @param mix 混流布局
+         */
+        void onMixClick(int mix);
 
         /**
          * 获取推流Presenter

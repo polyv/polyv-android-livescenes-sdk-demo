@@ -786,13 +786,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                         //全屏按钮
                         //如果是宽比高大的话就显示全屏按钮
                         if (isCanFullScreen && PLVScreenUtils.isPortrait(getContext())) {
-                            fullScreenIv.setVisibility(VISIBLE);
-                            View renderView = videoView.getIjkVideoView().getRenderView().getView();
-                            int bottom = renderView.getBottom();
-                            FrameLayout.LayoutParams fullScreenIvLayoutParams = (FrameLayout.LayoutParams) fullScreenIv.getLayoutParams();
-                            int margin = PLVUIUtil.dip2px(getContext(), 4);
-                            fullScreenIvLayoutParams.setMargins(0, margin + bottom, margin, 0);
-                            fullScreenIv.setLayoutParams(fullScreenIvLayoutParams);
+                            setFullScreenIvPosition();
                         }
 
                     } else {
@@ -859,13 +853,32 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                 String simpleName = ActivityUtils.getTopActivity().getClass().getSimpleName();
                 //当在横屏状态下 点击商品库开启小窗， 那么会创建一个竖屏的商品详情Activity
                 // 这里我们只监控顶层PLVECLiveEcommerceActivity的旋转状态
-                if (!isVideoViewPlayingInFloatWindow && simpleName.equals("PLVECLiveEcommerceActivity")) {
+                String ecommerceActivityName = getContext().getClass().getSimpleName();
+                if (!isVideoViewPlayingInFloatWindow && simpleName.equals(ecommerceActivityName)) {
                     setFitParentVideo();
                 }
-                fullScreenIv.setVisibility(VISIBLE);
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //重新计算全屏图标的位置
+                        setFullScreenIvPosition();
+                    }
+                });
             } else {
                 fullScreenIv.setVisibility(GONE);
             }
+        }
+    }
+
+    private void setFullScreenIvPosition() {
+        View renderView = videoView.getIjkVideoView().getRenderView().getView();
+        if (renderView != null) {
+            int bottom = renderView.getBottom();
+            FrameLayout.LayoutParams fullScreenIvLayoutParams = (FrameLayout.LayoutParams) fullScreenIv.getLayoutParams();
+            int margin = PLVUIUtil.dip2px(getContext(), 4);
+            fullScreenIvLayoutParams.setMargins(0, margin + bottom, margin, 0);
+            fullScreenIv.setLayoutParams(fullScreenIvLayoutParams);
+            fullScreenIv.setVisibility(VISIBLE);
         }
     }
 

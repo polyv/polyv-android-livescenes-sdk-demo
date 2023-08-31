@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/plvsa_more_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -335,7 +336,8 @@
                     android:layout_marginBottom="6dp"
                     android:gravity="center|top"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         android:id="@+id/plvsa_more_share_iv"
@@ -379,6 +381,37 @@
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
                         android:text="@string/plv_push_downgrade_preference_title"
+                        android:textColor="#99F0F1F5"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_more_mix_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:gravity="center|top"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_more_mix_iv"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="12dp"
+                        android:src="@drawable/plvsa_more_mix_layout_icon" />
+
+                    <TextView
+                        android:id="@+id/plvsa_more_mix_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top"
+                        android:text="混流布局"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 

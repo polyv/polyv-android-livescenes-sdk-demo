@@ -68,52 +68,38 @@
         android:id="@+id/greet_ly"
         android:layout_width="258dp"
         android:layout_height="22dp"
-        android:layout_above="@+id/swipe_load_view"
+        android:layout_above="@+id/chat_msg_vp"
         android:layout_marginBottom="16dp"
         android:visibility="invisible"
         tools:visibility="visible" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_load_view"
+    <!-- 上层的viewpager布局 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVNoOverScrollViewPager
+        android:id="@+id/chat_msg_vp"
         android:layout_width="244dp"
         android:layout_height="152dp"
-        android:layout_above="@+id/send_msg_tv"
-        android:paddingLeft="@dimen/plvec_margin_common"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="7dp"
+        android:layout_above="@+id/black_tab_ly"
+        android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:fadingEdge="none"
+        android:overScrollMode="never" />
 
-        <!--聊天信息列表-->
-        <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
-            android:id="@+id/chat_msg_rv"
-            android:layout_width="244dp"
-            android:layout_height="152dp"
-            android:fadingEdgeLength="32dp"
-            android:overScrollMode="never"
-            android:requiresFadingEdge="vertical"
-            app:fastScrollEnabled="false" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <TextView
-        android:id="@+id/unread_msg_tv"
+    <!-- 空白tab布局 -->
+    <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECBlackTabLayout
+        android:id="@+id/black_tab_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/swipe_load_view"
-        android:layout_alignBottom="@+id/swipe_load_view"
-        android:layout_gravity="bottom"
-        android:background="@drawable/plvec_chatroom_view_more_bg"
-        android:paddingLeft="8dp"
-        android:paddingTop="4dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="4dp"
-        android:text="查看新信息"
-        android:textColor="#FFA611"
-        android:textSize="14sp"
-        android:visibility="gone" />
+        android:layout_marginBottom="7dp"
+        android:visibility="invisible"
+        android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:layout_above="@+id/send_msg_tv"/>
 
     <!--输入框呼出按钮-->
-    <TextView
+    <com.easefun.polyv.livecommon.ui.widget.textview.PLVDrawableListenerTextView
         android:id="@+id/send_msg_tv"
-        android:layout_width="165dp"
+        android:layout_width="wrap_content"
         android:layout_height="32dp"
+        android:minWidth="150dp"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:background="@drawable/plvec_watch_info_corner_bg"
@@ -121,16 +107,33 @@
         android:drawablePadding="6dp"
         android:gravity="center_vertical"
         android:paddingLeft="8dp"
-        android:text="跟大家聊点什么吧~"
+        android:paddingRight="8dp"
+        android:text="@string/plvec_chat_input_tips_chat"
         android:textColor="#99ffffff"
         android:textSize="14sp" />
+
+    <!-- 提问新消息提示 -->
+    <TextView
+        android:id="@+id/quiz_new_msg_tips_tv"
+        android:layout_width="38dp"
+        android:layout_height="14dp"
+        android:layout_alignRight="@+id/send_msg_tv"
+        android:layout_alignTop="@+id/send_msg_tv"
+        android:gravity="center"
+        android:translationY="-9dp"
+        android:translationX="15dp"
+        android:visibility="gone"
+        android:background="@drawable/plvec_chatroom_quiz_new_msg_tips_bg"
+        android:text="新消息"
+        android:textColor="#ffffff"
+        android:textSize="10sp" />
 
     <!--购物车按钮-->
     <ImageView
         android:id="@+id/commodity_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/more_iv"
         android:layout_marginRight="@dimen/plvec_margin_common"
         android:layout_toLeftOf="@+id/reward_iv"
         android:src="@drawable/plvec_shopping_trolley"
@@ -142,7 +145,7 @@
         android:id="@+id/reward_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/more_iv"
         android:layout_marginRight="12dp"
         android:layout_toLeftOf="@+id/more_iv"
         android:src="@drawable/plvec_reward" />
@@ -160,6 +163,7 @@
         tools:visibility="visible" />
 
     <LinearLayout
+        android:id="@+id/plvec_pendant_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/more_iv"
@@ -178,7 +182,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="10dp">
 
             <ImageView
                 android:id="@+id/card_enter_view"
@@ -233,7 +237,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="10dp">
 
             <ImageView
                 android:id="@+id/plvec_live_lottery_enter_view"
@@ -295,15 +299,16 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="14dp"
         android:gravity="right"
+        android:clipChildren="false"
         android:orientation="vertical">
 
         <!--点赞布局-->
         <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView
             android:id="@+id/like_bt"
-            android:layout_width="42dp"
-            android:layout_height="160dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="-3dp" />
+            android:layout_width="136dp"
+            android:layout_height="200dp"
+            app:src_wh="34dp"
+            app:top_view="@+id/plvec_pendant_ly"/>
 
         <!--点赞数-->
         <TextView

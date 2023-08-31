@@ -48,6 +48,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -269,6 +270,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, role, actor);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setColinMicType(colinMicType);
+        PLVLiveChannelConfigFiller.setChannelType(PLVLiveChannelType.PPT);
 
         PLVLiveLocalActionHelper.getInstance().enterChannel(channelId);
     }
@@ -387,6 +389,16 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onBitrateClick(int bitrate) {
                 plvlsStreamerLy.setBitrate(bitrate);
+            }
+
+            @Override
+            public int getMixInfo() {
+                return plvlsStreamerLy.getMixInfo();
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                plvlsStreamerLy.setMixLayout(mix);
             }
 
             @Override

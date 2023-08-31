@@ -22,6 +22,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.holder.PLVBaseViewHolder;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 
@@ -319,7 +320,9 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         for (PLVBaseViewData baseViewData : dataList) {
             removeDataPosition++;
             if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())
+                    || (baseViewData.getData() instanceof IPLVMessageIdEvent
+                    && id.equals(((IPLVMessageIdEvent) baseViewData.getData()).getMessageId()))) {
                 dataList.remove(baseViewData);
                 break;
             }

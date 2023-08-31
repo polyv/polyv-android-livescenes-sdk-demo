@@ -3,6 +3,7 @@ package com.easefun.polyv.liveecommerce.modules.chatroom;
 import static com.plv.foundationsdk.ext.PLVViewGroupExt.setOnLongClickListenerRecursively;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
+import android.graphics.Color;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -56,8 +58,16 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
     @Override
     public void processData(PLVBaseViewData data, int position) {
         super.processData(data, position);
+        chatMsgTv.setTextColor(Color.WHITE);
         if (speakFileData == null) {
             chatMsgTv.setText(nickSpan.append(speakMsg));
+            // 提问提示语
+            if (data.getTag() instanceof PLVSpecialTypeTag) {
+                if (((PLVSpecialTypeTag) data.getTag()).getUserId() == null) {
+                    chatMsgTv.setText(speakMsg);
+                    chatMsgTv.setTextColor(Color.parseColor("#FFD16B"));
+                }
+            }
         } else {
             chatMsgTv.setText(nickSpan.append(speakFileData.getName()));
         }
