@@ -69,7 +69,7 @@
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="复制"
+            android:text="@string/plv_chat_copy"
             android:textColor="#CCFFFEFC"
             android:textSize="14sp" />
 
@@ -86,7 +86,7 @@
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="更多"
+            android:text="@string/plv_chat_msg_over_length_more"
             android:textColor="#CCFFFEFC"
             android:textSize="14sp" />
 

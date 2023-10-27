@@ -20,7 +20,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
 /**
  * date: 2021-2-24
  * author: ysh
- * description: 弹出窗口布局，该布局将专门用来展示"弹出类型的、需要覆盖在其他区域上"的一类视图
+ * description: 弹出窗口布局，该布局将专门用来展示'弹出类型的、需要覆盖在其他区域上'的一类视图
  * 目前封装了积分打赏、互动应用。
  */
 public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayout {

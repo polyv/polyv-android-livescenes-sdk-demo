@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:text="音频直播中"
+            android:text="@string/plv_player_audio_mode_playing"
             android:textColor="#ffffff"
             android:textSize="14sp" />
     </LinearLayout>

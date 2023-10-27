@@ -30,6 +30,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 
@@ -244,7 +245,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         commoditySrcPriceTv.setVisibility(hideSrcPrice ? GONE : VISIBLE);
         if (productContentBean.isNormalProduct()) {
             commoditySrcPriceTv.setText("¥" + productContentBean.getPrice());
-            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? "免费" : ("¥" + productContentBean.getRealPrice()));
+            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? PLVAppUtils.getString(R.string.plv_commodity_free) : ("¥" + productContentBean.getRealPrice()));
         } else if (productContentBean.isFinanceProduct()) {
             commodityRealPriceTv.setText(productContentBean.getYield());
         }

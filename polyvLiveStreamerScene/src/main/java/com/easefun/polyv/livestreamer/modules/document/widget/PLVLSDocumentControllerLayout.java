@@ -308,7 +308,7 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                 }
 
                 PLVToast.Builder.context(getContext())
-                        .setText("新增白板成功")
+                        .setText(R.string.plvls_document_add_whiteboard_success_hint)
                         .build()
                         .show();
             }

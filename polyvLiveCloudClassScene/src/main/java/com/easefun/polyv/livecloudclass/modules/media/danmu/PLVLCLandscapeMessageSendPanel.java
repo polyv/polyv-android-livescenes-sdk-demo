@@ -70,7 +70,8 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
 
         FrameLayout content = activity.findViewById(android.R.id.content);
         final View childOfContent = content.getChildAt(0);
-        childOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        final ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener;
+        childOfContent.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             public void onGlobalLayout() {//all call
                 int usableHeightNow = computeUsableHeight(childOfContent);
                 if (usableHeightPrevious != usableHeightNow) {
@@ -89,6 +90,16 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
                     childOfContent.requestLayout();
                     usableHeightPrevious = usableHeightNow;
                 }
+            }
+        });
+        childOfContent.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                childOfContent.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
             }
         });
     }
@@ -183,7 +194,7 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         CharSequence quoteMsg = chatQuoteVO.getObjects() == null || chatQuoteVO.getObjects().length == 0 ? "" : (CharSequence) chatQuoteVO.getObjects()[0];
         final boolean isImageContent = chatQuoteVO.getContent() == null && chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
         if (isImageContent) {
-            quoteMsg = "[图片]";
+            quoteMsg = "[图片]";// no need i18n
         }
         chatSendMsgQuoteTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
     }

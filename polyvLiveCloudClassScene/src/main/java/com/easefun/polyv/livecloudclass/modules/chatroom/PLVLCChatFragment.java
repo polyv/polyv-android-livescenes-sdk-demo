@@ -83,6 +83,7 @@ import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
@@ -334,7 +335,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             chatCommonMessageList.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
                 @Override
                 public void onChange(int currentUnreadCount) {
-                    unreadMsgTv.setText("有" + currentUnreadCount + "条新消息，点击查看");
+                    unreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_2, currentUnreadCount + ""));
                 }
             });
             chatCommonMessageList.setOnViewActionListener(new PLVLCChatCommonMessageList.OnViewActionListener() {
@@ -368,7 +369,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         inputEt = findViewById(R.id.input_et);
         inputEt.addTextChangedListener(inputTextWatcher);
         if (isChatPlaybackLayout || !isLiveType) {
-            inputEt.setHint("聊天室暂时关闭");
+            inputEt.setHint(PLVAppUtils.getString(R.string.plv_chat_input_tips_chatroom_close));
             inputEt.setEnabled(false);
         }
 
@@ -377,14 +378,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         toggleEmojiIv.setOnClickListener(this);
         toggleMoreIv = findViewById(R.id.toggle_more_iv);
         if (isChatPlaybackLayout || !isLiveType) {
-            toggleMoreIv.setVisibility(View.GONE);
             toggleEmojiIv.setEnabled(false);
             toggleEmojiIv.setAlpha(0.5f);
         } else {
-            toggleMoreIv.setVisibility(View.VISIBLE);
             toggleEmojiIv.setEnabled(true);
             toggleEmojiIv.setAlpha(1f);
         }
+        toggleMoreIv.setVisibility(View.VISIBLE);
         toggleMoreIv.setOnClickListener(this);
 
         //下拉控件
@@ -479,7 +479,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         if (isChatPlaybackLayout) {
             chatTipsLayout.show(
                     new PLVLCChatTipsLayout.ShowTipsConfiguration()
-                            .setContent("聊天重放功能已开启，将会显示历史消息")
+                            .setContent(PLVAppUtils.getString(R.string.plv_chat_playback_tips))
                             .setContentGravity(Gravity.CENTER)
                             .setClosable(false)
                             .setAutoHideMillis(seconds(5).toMillis())
@@ -536,6 +536,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         chatMoreLayout = findViewById(R.id.plvlc_chat_more_layout);
         if (!isLiveType) {
             chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_BULLETIN, false);
+            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER, false);
+            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE, false);
+            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA, false);
+            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, false);
         }
         chatMoreLayout.setFunctionListener(new PLVLCChatFunctionListener() {
             @Override
@@ -544,7 +548,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 switch (type) {
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_ONLY_TEACHER:
                         if (isFocusModeStatus) {
-                            ToastUtils.showShort("专注模式下无法使用");
+                            ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_chat_toast_focus));
                             return;
                         }
                         isSelectOnlyTeacher = !isSelectOnlyTeacher;
@@ -568,6 +572,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         hideSoftInputAndPopupLayout();
                         if (onViewActionListener != null) {
                             onViewActionListener.onShowBulletinAction();
+                        }
+                        break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowLanguageAction();
                         }
                         break;
                     default:
@@ -622,12 +632,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                                     if (chatTipsLayout != null) {
                                         chatTipsLayout.show(
                                                 watchMainRoomTipsConfiguration = new PLVLCChatTipsLayout.ShowTipsConfiguration()
-                                                        .setContent("已关联其他房间，仅可观看直播内容")
+                                                        .setContent(PLVAppUtils.getString(R.string.plv_chat_linked_to_other_rooms))
                                                         .setClosable(true)
                                         );
                                     }
                                     PLVToast.Builder.context(getContext())
-                                            .setText("已切换至大房间进行上课")
+                                            .setText(PLVAppUtils.getString(R.string.plv_chat_switched_to_large_room))
                                             .show();
                                 } else {
                                     if (chatTipsLayout != null) {
@@ -636,7 +646,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                                         }
                                     }
                                     PLVToast.Builder.context(getContext())
-                                            .setText("已切回小房间上课")
+                                            .setText(PLVAppUtils.getString(R.string.plv_chat_switched_to_small_room))
                                             .show();
                                 }
                             }
@@ -700,7 +710,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         public void onHasNotAddedData() {
             if (unreadMsgTv != null) {
                 if (unreadMsgTv.getVisibility() != View.VISIBLE) {
-                    unreadMsgTv.setText("有新消息，点击查看");
+                    unreadMsgTv.setText(PLVAppUtils.getString(R.string.plv_chat_view_new_msg_3));
                     unreadMsgTv.setVisibility(View.VISIBLE);
                 }
             }
@@ -808,7 +818,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 recordInputMessage = null;
             }
         }
-        inputEt.setHint(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "我也来聊几句"));
+        String hint = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat_2));
+        inputEt.setHint(hint);
         inputEt.setEnabled(isEnabled);
         toggleEmojiIv.setEnabled(isEnabled);
         toggleEmojiIv.setAlpha(isEnabled ? 1f : 0.5f);
@@ -1190,10 +1201,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 打开相机、选择图片及发送">
     private boolean checkCanSendImg() {
         if (isCloseRoomStatus) {
-            ToastUtils.showShort("聊天室已关闭，无法发送图片");
+            ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_chat_toast_chatroom_close_2));
             return false;
         } else if (isFocusModeStatus) {
-            ToastUtils.showShort("专注模式下无法使用");
+            ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_chat_toast_focus));
             return false;
         }
         return true;
@@ -1215,9 +1226,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
                         if (!deniedForeverP.isEmpty()) {
-                            showRequestPermissionDialog("发送图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复");
+                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_send_img_error_tip_permission_denied));
                         } else {
-                            ToastUtils.showShort("请允许存储权限后再发送图片");
+                            ToastUtils.showShort(R.string.plv_chat_send_img_error_tip_permission_cancel);
                         }
                     }
                 });
@@ -1228,7 +1239,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, "选择图片"), REQUEST_SELECT_IMG);
+        startActivityForResult(Intent.createChooser(intent, PLVAppUtils.getString(R.string.plv_chat_chooser_sel_img)), REQUEST_SELECT_IMG);
     }
 
     private void requestOpenCamera() {
@@ -1248,9 +1259,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
                         if (!deniedForeverP.isEmpty()) {
-                            showRequestPermissionDialog("拍摄所需的存储或相机权限被拒绝，请到应用设置的权限管理中恢复");
+                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_denied));
                         } else {
-                            ToastUtils.showShort("请允许存储和相机权限后再拍摄");
+                            ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_cancel));
                         }
                     }
                 });
@@ -1283,15 +1294,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
 
     private void showRequestPermissionDialog(String message) {
-        new AlertDialog.Builder(getContext()).setTitle("提示")
+        new AlertDialog.Builder(getContext()).setTitle(PLVAppUtils.getString(R.string.plv_common_dialog_tip))
                 .setMessage(message)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_2), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         PLVFastPermission.getInstance().jump2Settings(getContext());
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -1351,8 +1362,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 switch (dataBean.getType()) {
                     //观众发送图片开关
                     case PolyvChatFunctionSwitchVO.TYPE_VIEWER_SEND_IMG_ENABLED:
-                        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE, isSwitchEnabled);
-                        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA, isSwitchEnabled);
+                        if (isLiveType) {
+                            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE, isSwitchEnabled);
+                            chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA, isSwitchEnabled);
+                        }
                         break;
                     //欢迎语开关
                     case PolyvChatFunctionSwitchVO.TYPE_WELCOME:
@@ -1556,6 +1569,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 显示公告
          */
         void onShowBulletinAction();
+
+        /**
+         * 显示语言切换弹窗
+         */
+        void onShowLanguageAction();
 
         /**
          * 显示积分打赏弹窗

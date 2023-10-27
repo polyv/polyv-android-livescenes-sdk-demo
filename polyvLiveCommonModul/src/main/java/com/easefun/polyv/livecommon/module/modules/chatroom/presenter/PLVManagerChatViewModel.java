@@ -38,8 +38,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
 /**
  * @author Hoshiiro
  */
@@ -208,7 +206,7 @@ public class PLVManagerChatViewModel extends ViewModel {
         final Pair<Boolean, Integer> res = chatRepo.sendTextMessage(localMessage);
         final boolean isSuccess = res.first;
         if (!isSuccess && PLVAppUtils.getApp() != null) {
-            addNotifyMsg(format(PLVAppUtils.getApp().getString(R.string.plv_chat_toast_send_msg_failed_param), PLVLocalMessage.sendValueToDescribe(res.second)));
+            addNotifyMsg(PLVAppUtils.formatString(R.string.plv_chat_toast_send_msg_failed_param, PLVLocalMessage.sendValueToDescribe(res.second)));
             return false;
         }
 

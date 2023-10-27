@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.floating.IPLVFloatingWindow;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
@@ -19,6 +20,7 @@ import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermis
 import com.plv.business.api.common.player.PLVBaseVideoView;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
@@ -254,8 +256,8 @@ public class PLVLCFloatingWindow implements IPLVFloatingWindow {
         } else {
             final Activity topActivity = ActivityUtils.getTopActivity();
             new AlertDialog.Builder(topActivity == null ? context : topActivity)
-                    .setMessage("悬浮小窗播放功能需要在应用设置中开启悬浮窗权限，是否前往开启权限？")
-                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    .setMessage(PLVAppUtils.getString(R.string.plv_player_floating_permission_apply_tips))
+                    .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_3), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PLVFloatPermissionUtils.requestPermission((Activity) context, new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
@@ -268,7 +270,7 @@ public class PLVLCFloatingWindow implements IPLVFloatingWindow {
                             });
                         }
                     })
-                    .setNegativeButton("否", null)
+                    .setNegativeButton(PLVAppUtils.getString(R.string.plv_common_dialog_cancel_2), null)
                     .show();
 
         }

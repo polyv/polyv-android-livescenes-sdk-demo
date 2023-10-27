@@ -28,6 +28,7 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.opensource.svgaplayer.SVGAImageView;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -413,11 +414,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     String toastMsg = "";
                     int sendResult = PolyvChatroomManager.getInstance().kick(socketUserBean.getUserId());
                     if (sendResult > 0) {
-                        toastMsg = "移出成功";
+                        toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_success);
                         dataBeanList.remove(getAdapterPosition());
                         notifyItemRemoved(getAdapterPosition());
                     } else {
-                        toastMsg = "移出失败" + "(" + sendResult + ")";
+                        toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_fail) + "(" + sendResult + ")";
                     }
                     PLVToast.Builder.context(itemView.getContext())
                             .setText(toastMsg)
@@ -437,16 +438,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     if (!isWillBan) {
                         int sendResult = PolyvChatroomManager.getInstance().removeShield(socketUserBean.getUserId());
                         if (sendResult > 0) {
-                            toastMsg = "解除禁言成功";
+                            toastMsg = PLVAppUtils.getString(R.string.plv_chat_unban_success);
                         } else {
-                            toastMsg = "解除禁言失败" + "(" + sendResult + ")";
+                            toastMsg = PLVAppUtils.getString(R.string.plv_chat_unban_fail) + "(" + sendResult + ")";
                         }
                     } else {
                         int sendResult = PolyvChatroomManager.getInstance().shield(socketUserBean.getUserId());
                         if (sendResult > 0) {
-                            toastMsg = "禁言成功";
+                            toastMsg = PLVAppUtils.getString(R.string.plv_chat_ban_success);
                         } else {
-                            toastMsg = "禁言失败" + "(" + sendResult + ")";
+                            toastMsg = PLVAppUtils.getString(R.string.plv_chat_ban_fail) + "(" + sendResult + ")";
                         }
                     }
                     PLVToast.Builder.context(itemView.getContext())
@@ -541,7 +542,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //设置昵称
             final SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
             if (isMyself) {
-                nickSpan.append("(我)");
+                nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
             }
             plvsaMemberNickTv.setText(nickSpan);
             final String finalActor = actor;
@@ -592,7 +593,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         //设置昵称
                         SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
                         if (isMyself) {
-                            nickSpan.append("(我)");
+                            nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
                         }
                         plvsaMemberNickTv.setText(nickSpan);
                         //设置禁言显示状态
@@ -706,10 +707,10 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         private void processHangUpLinkMic(final int pos) {
             new PLVSAConfirmDialog(itemView.getContext())
-                    .setTitle("确定挂断连麦吗？")
+                    .setTitle(R.string.plv_linkmic_dialog_hang_off_confirm_ask_4)
                     .setContentVisibility(View.GONE)
-                    .setLeftButtonText("取消")
-                    .setRightButtonText("确定")
+                    .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {

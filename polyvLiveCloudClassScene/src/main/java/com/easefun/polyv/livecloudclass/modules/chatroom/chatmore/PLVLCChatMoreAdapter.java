@@ -28,7 +28,8 @@ public class PLVLCChatMoreAdapter extends RecyclerView.Adapter<PLVLCChatMoreAdap
 
     public PLVLCChatMoreAdapter(int spanCount, Context context) {
         this.context = context;
-        itemWidth = ScreenUtils.getScreenWidth() / spanCount;
+        int portraitWidth = ScreenUtils.isPortrait() ? ScreenUtils.getScreenWidth() : ScreenUtils.getScreenHeight();
+        itemWidth = portraitWidth / spanCount;
     }
 
     public void setListener(OnItemClickListener listener) {

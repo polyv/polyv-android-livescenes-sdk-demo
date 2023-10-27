@@ -35,7 +35,7 @@
             android:paddingLeft="6dp"
             android:paddingRight="6dp"
             android:singleLine="true"
-            android:text="头衔"
+            tools:text="头衔"
             android:textColor="#ffffff"
             android:textSize="10sp"
             android:visibility="gone" />
@@ -48,7 +48,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
-            android:text="昵称昵称昵称称昵称昵称昵称昵称"
+            tools:text="昵称昵称昵称称昵称昵称昵称昵称"
             android:textColor="#ADADC0"
             android:textSize="12sp" />
     </LinearLayout>
@@ -81,7 +81,7 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:singleLine="true"
-                android:text="昵称昵称昵称称昵称昵称昵称昵称："
+                tools:text="昵称昵称昵称称昵称昵称昵称昵称："
                 android:textColor="#777786"
                 android:textSize="16sp"
                 android:visibility="gone" />
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:maxLines="2"
-                android:text="这是一条信息这是一条信息这是一条信息这是一条信息"
+                tools:text="这是一条信息这是一条信息这是一条信息这是一条信息"
                 android:textColor="#777786"
                 android:textSize="16sp"
                 android:visibility="gone" />
@@ -172,7 +172,7 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="复制"
+                android:text="@string/plv_chat_copy"
                 android:textColor="#CCADADC0"
                 android:textSize="14sp" />
 
@@ -189,7 +189,7 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="更多"
+                android:text="@string/plv_chat_msg_over_length_more"
                 android:textColor="#CCADADC0"
                 android:textSize="14sp" />
 

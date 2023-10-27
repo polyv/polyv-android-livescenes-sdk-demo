@@ -14,8 +14,8 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCEmotionPer
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
 
@@ -104,7 +104,7 @@ public class PLVChatroomUtils {
             drawable = inputEt.getResources().getDrawable(PLVFaceManager.getInstance().getFaceId(emoKey));
             imageSpan = new RelativeImageSpan(drawable, RelativeImageSpan.ALIGN_CENTER);
         } catch (Exception e) {
-            ToastUtils.showShort("添加表情失败！");
+            PLVCommonLog.e("ChatroomUtils", "添加表情失败！");// no need i18n
             return;
         }
         drawable.setBounds(0, 0, (int) (textSize * 1.5), (int) (textSize * 1.5));

@@ -171,22 +171,22 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
                                                  ArrayList<String> deniedPermissions,
                                                  ArrayList<String> deniedForeverP) {
                         if (deniedForeverP != null && !deniedForeverP.isEmpty()) {
-                            new AlertDialog.Builder(webView.getContext()).setTitle("提示")
-                                    .setMessage("保存图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复")
-                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            new AlertDialog.Builder(webView.getContext()).setTitle(R.string.plv_common_dialog_tip)
+                                    .setMessage(R.string.plv_live_no_save_img_permission_hint)
+                                    .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             PLVFastPermission.getInstance().jump2Settings(webView.getContext());
                                         }
                                     })
-                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             PLVCommonLog.d(TAG, "cancel");
                                         }
                                     }).setCancelable(false).show();
                         } else {
-                            ToastUtils.showShort("请允许存储权限后再保存图片");
+                            ToastUtils.showShort(R.string.plv_live_allow_permission_save_img_hint);
                         }
                     }
                 });
@@ -213,13 +213,13 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
             if (Build.VERSION.SDK_INT < 29) {
                 String insertImage = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, System.currentTimeMillis() + "", "");
                 if (!TextUtils.isEmpty(insertImage)) {
-                    ToastUtils.showShort("图片已保存到相册");
+                    ToastUtils.showShort(R.string.plv_live_save_img_to_album);
                 }
             } else {
                 Uri insertUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
                 outputStream = getContext().getContentResolver().openOutputStream(insertUri, "rw");
                 if (bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)) {
-                    ToastUtils.showShort("图片已保存到相册");
+                    ToastUtils.showShort(R.string.plv_live_save_img_to_album);
                 }
             }
         } catch (Exception e) {
@@ -237,10 +237,10 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
             fos = new FileOutputStream(new File(savePath, fileName));
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
             fos.flush();
-            ToastUtils.showShort("保存图片成功");
+            ToastUtils.showShort(R.string.plv_live_save_img_success);
         } catch (Exception e) {
             PLVCommonLog.exception(e);
-            ToastUtils.showShort("保存图片失败");
+            ToastUtils.showShort(R.string.plv_live_save_img_failed);
         } finally {
             CloseUtils.closeIO(fos);
         }

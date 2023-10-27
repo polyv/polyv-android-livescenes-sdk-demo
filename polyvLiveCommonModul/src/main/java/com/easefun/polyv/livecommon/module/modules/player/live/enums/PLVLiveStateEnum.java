@@ -14,44 +14,79 @@ import java.util.List;
  */
 public enum PLVLiveStateEnum {
 
-    UNSTART("unStart", getString(R.string.plv_live_state_un_start)),
+    UNSTART("unStart", "") {
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_un_start);
+        }
+    },
 
-    LIVE("live", getString(R.string.plv_live_state_live)) {
+    LIVE("live", "") {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
             return listOf(STOP, END, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
+
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_live);
+        }
     },
 
-    STOP("stop", getString(R.string.plv_live_state_stop)) {
+    STOP("stop", "") {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
             return listOf(LIVE, END, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
+
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_stop);
+        }
     },
 
-    END("end", getString(R.string.plv_live_state_end)) {
+    END("end", "") {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
             return listOf(LIVE, WAITING, PLAYBACK, PLAYBACK_CACHED);
         }
+
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_end);
+        }
     },
 
-    WAITING("waiting", getString(R.string.plv_live_state_waiting)) {
+    WAITING("waiting", "") {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
             return listOf(LIVE, END, PLAYBACK, PLAYBACK_CACHED);
         }
+
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_waiting);
+        }
     },
 
-    PLAYBACK("playback", getString(R.string.plv_live_state_playback)) {
+    PLAYBACK("playback", "") {
         @Override
         protected List<PLVLiveStateEnum> getSpecNextStates() {
             return listOf(LIVE, PLAYBACK_CACHED);
         }
+
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_playback);
+        }
     },
 
-    PLAYBACK_CACHED("playback_cached", getString(R.string.plv_live_state_playback_cached)),
+    PLAYBACK_CACHED("playback_cached", "") {
+        @Override
+        public String getDescription() {
+            return getString(R.string.plv_live_state_playback_cached);
+        }
+    },
 
     ;
 

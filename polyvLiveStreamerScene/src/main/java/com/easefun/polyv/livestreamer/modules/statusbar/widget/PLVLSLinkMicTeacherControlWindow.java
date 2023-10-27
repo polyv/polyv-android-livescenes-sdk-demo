@@ -97,8 +97,8 @@ public class PLVLSLinkMicTeacherControlWindow implements View.OnClickListener {
         plvlsLinkmicVideoTypeLy.setSelected(false);
         plvlsLinkmicAudioTypeLy.setSelected(false);
         plvlsLinkmicControlSplitView.setVisibility(View.VISIBLE);
-        plvlsLinkmicVideoTypeTv.setText("视频连麦");
-        plvlsLinkmicAudioTypeTv.setText("音频连麦");
+        plvlsLinkmicVideoTypeTv.setText(R.string.plv_linkmic_video_type);
+        plvlsLinkmicAudioTypeTv.setText(R.string.plv_linkmic_audio_type);
         updateLinkMicShowTypeView(showType = SHOW_VIDEO_AUDIO_TYPE);
     }
     // </editor-fold>
@@ -123,7 +123,7 @@ public class PLVLSLinkMicTeacherControlWindow implements View.OnClickListener {
             plvlsLinkmicVideoTypeLy.setSelected(isOpen);
             if (isOpen) {
                 plvlsLinkmicVideoTypeLy.setVisibility(View.VISIBLE);
-                plvlsLinkmicVideoTypeTv.setText("结束连麦");
+                plvlsLinkmicVideoTypeTv.setText(R.string.plv_linkmic_stop);
             } else {
                 resetLinkMicControlView();
             }
@@ -131,7 +131,7 @@ public class PLVLSLinkMicTeacherControlWindow implements View.OnClickListener {
             plvlsLinkmicAudioTypeLy.setSelected(isOpen);
             if (isOpen) {
                 plvlsLinkmicAudioTypeLy.setVisibility(View.VISIBLE);
-                plvlsLinkmicAudioTypeTv.setText("结束连麦");
+                plvlsLinkmicAudioTypeTv.setText(R.string.plv_linkmic_stop);
             } else {
                 resetLinkMicControlView();
             }

@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
@@ -281,7 +282,7 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
                 }
                 PolyvLiveClassDetailVO.DataBean dataBean = liveClassDetailVO.getData();
                 String channelName = dataBean.getName();//频道名称
-                String liveStartTime = StringUtils.isEmpty(dataBean.getStartTime()) ? "无" : dataBean.getStartTime();//直播开始时间
+                String liveStartTime = StringUtils.isEmpty(dataBean.getStartTime()) ? PLVAppUtils.getString(R.string.plv_live_nothing) : dataBean.getStartTime();//直播开始时间
                 String channelId = dataBean.getChannelId() + "";//频道id
 
                 plvlsChannelInfoChannelNameTv.setText(channelName);

@@ -239,10 +239,10 @@ public class PLVSAHorizonBeautyLayout extends FrameLayout implements IPLVSABeaut
 
     private void initReset() {
         final PLVConfirmDialog onResetConfirmDialog = new PLVSAConfirmDialog(getContext())
-                .setTitle(R.string.plvsa_beauty_reset_confirm_title)
-                .setContent(R.string.plvsa_beauty_reset_confirm_content)
-                .setLeftButtonText(R.string.plvsa_beauty_reset_confirm_cancel)
-                .setRightButtonText(R.string.plvsa_beauty_reset_confirm_reset)
+                .setTitle(R.string.plv_beauty_reset_confirm_title)
+                .setContent(R.string.plv_beauty_reset_confirm_content)
+                .setLeftButtonText(R.string.plv_beauty_reset_confirm_cancel)
+                .setRightButtonText(R.string.plv_beauty_reset_confirm_reset)
                 .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {
@@ -255,7 +255,7 @@ public class PLVSAHorizonBeautyLayout extends FrameLayout implements IPLVSABeaut
                         dialog.dismiss();
                         beautyOptionAdapter.onReset();
                         PLVToast.Builder.context(getContext())
-                                .setText(getContext().getString(R.string.plvsa_beauty_reset_success))
+                                .setText(getContext().getString(R.string.plv_beauty_reset_success))
                                 .show();
                         viewModel.resetAllOption();
                     }
@@ -405,8 +405,8 @@ public class PLVSAHorizonBeautyLayout extends FrameLayout implements IPLVSABeaut
 
         final SpannableStringBuilder sb = new PLVSpannableStringBuilder()
                 .appendExclude(((PLVFilterOption) newOption).getName(), new AbsoluteSizeSpan(ConvertUtils.sp2px(22)))
-                .append("丨")
-                .append(getContext().getString(R.string.plvsa_beauty_selector_filter_title));
+                .append("丨")// no need i18n
+                .append(getContext().getString(R.string.plv_beauty_selector_filter_title));
         beautyFilterUpdateHintTv.setText(sb);
         PLVViewUtil.showViewForDuration(beautyFilterUpdateHintTv, TimeUnit.SECONDS.toMillis(3));
     }

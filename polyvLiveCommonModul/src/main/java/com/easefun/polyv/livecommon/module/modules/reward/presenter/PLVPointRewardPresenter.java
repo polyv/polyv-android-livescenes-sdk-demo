@@ -10,6 +10,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.net.PLVResponseApiBean;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.config.PLVI18NDataMapper;
 import com.plv.livescenes.feature.pointreward.IPLVPointRewardDataSource;
 import com.plv.livescenes.feature.pointreward.PLVRewardDataSource;
 import com.plv.livescenes.feature.pointreward.vo.PLVDonateGoodResponseVO;
@@ -260,13 +261,13 @@ public class PLVPointRewardPresenter implements IPLVPointRewardContract.IPointRe
                 return "";
             }
             if (bean.getCode() == 400) {
-                return bean.getMessage();
+                return PLVI18NDataMapper.getExceptionMessageI18N(bean.getMessage());
             } else {
                 return PLVAppUtils.getString(R.string.plv_reward_make_fail);
             }
         } catch (Exception ex) {
             PLVCommonLog.e(TAG, "createErrorMessageFromException:" + ex.getMessage());
-            return "消息解析错误";
+            return PLVAppUtils.getString(R.string.plv_live_message_parse_error);
         }
     }
 

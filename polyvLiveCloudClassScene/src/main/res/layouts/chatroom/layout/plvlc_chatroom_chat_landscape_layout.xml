@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout
         android:id="@+id/swipe_load_view"
@@ -21,7 +22,7 @@
         android:paddingTop="4dp"
         android:paddingRight="8dp"
         android:paddingBottom="4dp"
-        android:text="x条新信息"
+        tools:text="x条新信息"
         android:textColor="#FF786D"
         android:textSize="12sp"
         android:visibility="gone" />

@@ -11,7 +11,7 @@
         android:paddingBottom="8dp"
         android:background="@drawable/plvls_document_del"
         android:gravity="center"
-        android:text="删除"
+        android:text="@string/plv_ppt_delete_hint"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -29,6 +29,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
@@ -322,9 +323,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getActivity())
-                .setTitle("温馨提示")
+                .setTitle(PLVAppUtils.getString(R.string.plv_common_dialog_tip_warm))
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_2), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         getActivity().finish();

@@ -5,19 +5,42 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+
 /**
  * @author Hoshiiro
  */
 public enum PLVRedPaperType {
 
-    DEFAULT_RED_PAPER("", "红包", "恭喜发财，大吉大利"),
-    ALIPAY_PASSWORD_RED_PAPER("alipay_password_official_normal", "支付宝口令红包", "输入口令，领取红包"),
+    DEFAULT_RED_PAPER("", "", "") {
+        @Override
+        public String getTypeName() {
+            return PLVAppUtils.getString(R.string.plv_red_paper_name);
+        }
+
+        @Override
+        public String getDefaultBlessingMessage() {
+            return PLVAppUtils.getString(R.string.plv_red_paper_blessing_message);
+        }
+    },
+    ALIPAY_PASSWORD_RED_PAPER("alipay_password_official_normal", "", "") {
+        @Override
+        public String getTypeName() {
+            return PLVAppUtils.getString(R.string.plv_red_paper_alipay);
+        }
+
+        @Override
+        public String getDefaultBlessingMessage() {
+            return PLVAppUtils.getString(R.string.plv_red_paper_blessing_message_2);
+        }
+    },
 
     ;
 
     public final String serverType;
-    public final String typeName;
-    public final String defaultBlessingMessage;
+    private final String typeName;
+    private final String defaultBlessingMessage;
 
     PLVRedPaperType(
             String serverType,
@@ -27,6 +50,14 @@ public enum PLVRedPaperType {
         this.serverType = serverType;
         this.typeName = typeName;
         this.defaultBlessingMessage = defaultBlessingMessage;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public String getDefaultBlessingMessage() {
+        return defaultBlessingMessage;
     }
 
     @Nullable

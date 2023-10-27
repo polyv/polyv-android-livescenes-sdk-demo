@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
@@ -171,15 +172,15 @@ public class PLVLCMarkToolControllerLayout extends FrameLayout {
             public void onClick(View v) {
                 new PLVConfirmDialog(getContext())
                         .setTitleVisibility(GONE)
-                        .setContent("清屏后笔迹将无法恢复，确定清屏吗")
-                        .setLeftButtonText("按错了")
+                        .setContent(PLVAppUtils.getString(R.string.plv_ppt_clear_mask))
+                        .setLeftButtonText(R.string.plv_common_dialog_click_wrong)
                         .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, View v) {
                                 dialog.dismiss();
                             }
                         })
-                        .setRightButtonText("确定")
+                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                         .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, View v) {
@@ -291,7 +292,7 @@ public class PLVLCMarkToolControllerLayout extends FrameLayout {
         }
         callbackCurrentMarkToolState();
         PLVToast.Builder.context(getContext())
-                .setText("进入画笔模式")
+                .setText(R.string.plv_ppt_enter_paint_mode)
                 .show();
     }
 
@@ -305,7 +306,7 @@ public class PLVLCMarkToolControllerLayout extends FrameLayout {
             onMarkToolActionListener.onPaintModeChanged(false);
         }
         PLVToast.Builder.context(getContext())
-                .setText("已退出画笔模式")
+                .setText(R.string.plv_ppt_exit_paint_mode)
                 .show();
     }
 

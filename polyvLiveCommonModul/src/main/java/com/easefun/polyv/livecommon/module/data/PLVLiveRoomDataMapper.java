@@ -25,6 +25,15 @@ public class PLVLiveRoomDataMapper {
     @NonNull
     public static PLVInteractNativeAppParams toInteractNativeAppParams(@NonNull IPLVLiveRoomDataManager liveRoomDataManager, PLVLiveScene liveScene) {
         JsonElement promotionDataBean = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).get(PLVChannelFeature.LIVE_PROMOTION_DATA_BEAN);
+        boolean isLive = false;
+        //在回放中，即使是直播间在直播依然是返回false
+        if (liveRoomDataManager.getClassDetailVO().getValue() != null && liveRoomDataManager.getConfig().isLive()) {
+            if (liveRoomDataManager.getClassDetailVO().getValue().getData() != null) {
+                if (liveRoomDataManager.getClassDetailVO().getValue().getData().getData() != null) {
+                    isLive = liveRoomDataManager.getClassDetailVO().getValue().getData().getData().isLiveStatus();
+                }
+            }
+        }
         return new PLVInteractNativeAppParams()
                 .setAppId(liveRoomDataManager.getConfig().getAccount().getAppId())
                 .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
@@ -42,7 +51,8 @@ public class PLVLiveRoomDataMapper {
                                 .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
                                 .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
                                 .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
-                );
+                )
+                .setIsLive(isLive);
     }
 
 }

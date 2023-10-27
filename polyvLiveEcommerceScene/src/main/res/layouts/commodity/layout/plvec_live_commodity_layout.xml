@@ -30,7 +30,7 @@
             android:drawablePadding="4dp"
             android:paddingBottom="3dp"
             android:paddingTop="4dp"
-            android:text="共5件商品"
+            tools:text="共5件商品"
             android:textColor="#ffffff"
             android:textSize="12sp" />
 
@@ -70,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="宝贝还没上架，敬请期待"
+                android:text="@string/plv_commodity_empty"
                 android:textColor="#99ffffff"
                 android:textSize="14sp" />
         </LinearLayout>

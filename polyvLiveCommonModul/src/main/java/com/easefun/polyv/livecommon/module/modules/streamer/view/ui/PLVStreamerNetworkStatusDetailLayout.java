@@ -1,6 +1,5 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.view.ui;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 
 import android.content.Context;
@@ -14,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 
 import java.util.Locale;
@@ -81,8 +81,8 @@ public class PLVStreamerNetworkStatusDetailLayout extends FrameLayout {
         final String upPacketLoss = String.format(Locale.getDefault(), "%.1f", getOrDefault(lastNetworkStatus.getUpPackageLost(), 0F));
         final String downPacketLoss = String.format(Locale.getDefault(), "%.1f", getOrDefault(lastNetworkStatus.getDownPackageLost(), 0F));
 
-        streamerNetworkDelayTv.setText(format("网络延迟：{}ms", delay));
-        streamerNetworkPacketLossTv.setText(format("丢包率：↑{}% ↓{}%", upPacketLoss, downPacketLoss));
+        streamerNetworkDelayTv.setText(PLVAppUtils.formatString(R.string.plv_streamer_network_delay_2, delay));
+        streamerNetworkPacketLossTv.setText(PLVAppUtils.formatString(R.string.plv_streamer_network_packet_loss_2, upPacketLoss, downPacketLoss));
     }
 
 }

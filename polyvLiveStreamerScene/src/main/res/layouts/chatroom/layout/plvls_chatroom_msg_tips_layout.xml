@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <View
@@ -23,7 +24,7 @@
             android:id="@+id/plvls_chatroom_tips_msg_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="违规词"
+            tools:text="违规词"
             android:textColor="#F0F1F5"
             android:textSize="12sp" />
     </LinearLayout>

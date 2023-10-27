@@ -33,7 +33,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/plvlc_ppt_exit_mark_tool_iv"
-            android:text="退出画笔模式"
+            android:text="@string/plv_ppt_exit_paint_mode_2"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 

@@ -49,6 +49,7 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.holder.PLVLSPpt
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.widget.PLVLSDocumentDeleteArrow;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -307,15 +308,15 @@ public class PLVLSPptListLayout extends FrameLayout {
     private void initPptDeleteConfirmDialog() {
         documentDeleteConfirmDialog = PLVLSConfirmDialog.Builder.context(getContext())
                 .setTitleVisibility(View.GONE)
-                .setContent("删除后文档将无法恢复")
-                .setLeftButtonText("按错了")
+                .setContent(R.string.plv_ppt_delete_ask)
+                .setLeftButtonText(R.string.plv_common_dialog_click_wrong)
                 .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {
                         documentDeleteConfirmDialog.hide();
                     }
                 })
-                .setRightButtonText("确定")
+                .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                 .build();
     }
 
@@ -412,7 +413,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 if (fileUri == null) {
                     Log.w(TAG, "file uri is null.");
                     PLVToast.Builder.context(getContext())
-                            .setText("无法访问文件所在路径")
+                            .setText(R.string.plv_ppt_file_uri_is_null_hint)
                             .build().show();
                     return false;
                 }
@@ -431,7 +432,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 if (TextUtils.isEmpty(filePath)) {
                     Log.w(TAG, "file path is empty.");
                     PLVToast.Builder.context(getContext())
-                            .setText("无法访问文件所在路径")
+                            .setText(R.string.plv_ppt_file_uri_is_null_hint)
                             .build().show();
                     return false;
                 }
@@ -440,7 +441,7 @@ public class PLVLSPptListLayout extends FrameLayout {
 
                 // 弹窗提示选择转码方式
                 pptConvertSelectDialog
-                        .setLeftButtonText("快速转码")
+                        .setLeftButtonText(R.string.plvls_document_fast_transcoding)
                         .setLeftBtnListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -449,7 +450,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                                 pptConvertSelectDialog.hide();
                             }
                         })
-                        .setRightButtonText("动画转码（较慢）")
+                        .setRightButtonText(R.string.plvls_document_animation_transcoding)
                         .setRightBtnListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -470,8 +471,8 @@ public class PLVLSPptListLayout extends FrameLayout {
                 }
                 // 弹窗提示是否重新上传文档
                 documentUploadAgainConfirmDialog
-                        .setContent("本地有文档上次上传中断，是否重新上传")
-                        .setLeftButtonText("取消")
+                        .setContent(R.string.plvls_document_upload_continue_hint)
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
                         .setLeftBtnListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -479,7 +480,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                                 documentUploadAgainConfirmDialog.hide();
                             }
                         })
-                        .setRightButtonText("确定")
+                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                         .setRightBtnListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -596,8 +597,8 @@ public class PLVLSPptListLayout extends FrameLayout {
                 } else if (pptVO.getUploadStatus() == PLVPptUploadStatus.STATUS_CONVERT_FAILED) {
                     // 转码失败 重新上传
                     documentUploadAgainConfirmDialog
-                            .setContent("暂不支持加密文档，请确保文档已解密 或 转为PDF文件 重试。如无法解决请联系客服。")
-                            .setLeftButtonText("取消")
+                            .setContent(R.string.plvls_document_convert_fail_hint)
+                            .setLeftButtonText(R.string.plv_common_dialog_cancel)
                             .setLeftBtnListener(new OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -606,7 +607,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                                     documentUploadAgainConfirmDialog.hide();
                                 }
                             })
-                            .setRightButtonText("重新上传")
+                            .setRightButtonText(R.string.plvls_document_reupload)
                             .setRightBtnListener(new OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -882,10 +883,12 @@ public class PLVLSPptListLayout extends FrameLayout {
         plvlsDocumentPageTv.setVisibility(GONE);
         plvlsDocumentRefreshTv.setVisibility(VISIBLE);
 
-        String name = String.format("所有文档 共%s个", mergedCoverList.size());
+        String allName = PLVAppUtils.getString(R.string.plvls_document_all);
+        String numberName = PLVAppUtils.formatString(R.string.plvls_document_number, mergedCoverList.size() + "");
+        String name = allName + numberName;
         SpannableString spannableString = new SpannableString(name);
         spannableString.setSpan(new AbsoluteSizeSpan(ConvertUtils.sp2px(12f)),
-                name.lastIndexOf("共"), name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                name.lastIndexOf(numberName), name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         plvlsDocumentNameTv.setText(spannableString);
         pptListAdapter.setCurrentSelectedId(currentAutoId);
@@ -915,7 +918,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 plvlsDocumentNameTv.setText(truncatedPptName + ".." + suffix);
             }
         }
-        plvlsDocumentPageTv.setText("共" + lastPptPageCount + "页");
+        plvlsDocumentPageTv.setText(PLVAppUtils.formatString(R.string.plvls_document_page, lastPptPageCount + ""));
         pptListAdapter.setCurrentSelectedId(currentPageId);
         pptListAdapter.updatePptList(lastPptPageVOList, PLVLSPptViewType.PAGE);
         plvlsDocumentPptRv.scrollToPosition(currentPageId);

@@ -78,7 +78,7 @@
             android:layout_gravity="center"
             android:background="@drawable/plvec_chatroom_input_corner_bg"
             android:gravity="center_vertical|left"
-            android:hint="@string/plvec_chat_input_tips_chat"
+            android:hint="@string/plv_chat_input_tips_chat_6"
             android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
             android:maxLength="200"
             android:paddingLeft="16dp"
@@ -96,7 +96,7 @@
             android:layout_marginLeft="6dp"
             android:textSize="14sp"
             android:textColor="@color/plvec_chatroom_send_fg"
-            android:text="发送" />
+            android:text="@string/plv_chat_send" />
     </LinearLayout>
 
     <View

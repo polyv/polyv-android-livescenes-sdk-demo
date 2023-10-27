@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.login.PLVLoginEvent;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class PLVECGreetingView extends FrameLayout {
                     ls = stringBuilder.toString().length() - lf - 2;
                 }
             }
-            span = new SpannableStringBuilder("欢迎 " + stringBuilder.toString() + " 等" + loginEventList.size() + "人进入直播间");
+            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join_multi, stringBuilder.toString(), loginEventList.size() + ""));
             /**
              * ///暂时保留该代码
              *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -96,7 +97,7 @@ public class PLVECGreetingView extends FrameLayout {
             loginEventList.clear();
         } else {
             PLVLoginEvent loginEvent = loginEventList.remove(0);
-            span = new SpannableStringBuilder("欢迎 " + loginEvent.getUser().getNick() + " 进入直播间");
+            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join, loginEvent.getUser().getNick()));
 
             /**
              * ///暂时保留该代码

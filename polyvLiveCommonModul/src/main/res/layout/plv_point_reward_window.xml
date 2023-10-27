@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="16dp"
-                android:text="积分打赏"
+                android:text="@string/plv_reward_type_point"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
@@ -50,7 +50,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_toRightOf="@id/plv_tv_point_reward_title"
                 android:gravity="center"
-                android:text="我的积分：0"
+                android:text="@string/plv_reward_remain_point_default"
                 android:textColor="#ADADC0"
                 android:textSize="12sp" />
 
@@ -156,11 +156,12 @@
 
             <Button
                 android:id="@+id/plv_btn_point_reward_make_reward"
-                android:layout_width="54dp"
+                android:layout_width="62dp"
                 android:layout_height="32dp"
                 android:layout_marginRight="16dp"
                 android:background="@drawable/plv_shape_point_reward_point_to_send_btn_orange"
-                android:text="打赏"
+                android:text="@string/plv_reward_text_3"
+                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 

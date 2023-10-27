@@ -258,7 +258,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         PolyvChatroomManager.getInstance().setProhibitedWordListener(new IPolyvProhibitedWordListener() {
             @Override
             public void onSendProhibitedWord(@NonNull final String prohibitedMessage, @NonNull final String hintMsg, @NonNull final String status) {
-                PLVCommonLog.d(TAG, "chatroom onSendProhibitedWord: 发送的消息涉及违禁词");
+                PLVCommonLog.d(TAG, "chatroom onSendProhibitedWord: 发送的消息涉及违禁词");// no need i18n
                 if (getConfig().getChannelId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getChannelId())) {
                     callbackToView(new ViewRunnable() {
                         @Override
@@ -415,7 +415,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                  * ///通过注释暂时保留代码，触发严禁词也认为发送成功，但不会广播给其他用户
                  *if ("".equals(args[0])) {
                  *    // 触发严禁词时，args[0]为""
-                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");
+                 *    PLVCommonLog.d(TAG, "chatroom sendTextMessage: 发送的消息涉及违禁词");// no need i18n
                  *    return;
                  *}
                  */
@@ -1442,7 +1442,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if(goodImageUrl.startsWith("//")){
             goodImageUrl = "https:"+goodImageUrl;
         }
-        SpannableStringBuilder span = new SpannableStringBuilder(nickName + " 赠送 p");
+        SpannableStringBuilder span = new SpannableStringBuilder(nickName + " " + PLVAppUtils.getString(R.string.plv_reward_give) + " p");
         int drawableSpanStart = span.length() - 1;
         int drawableSpanEnd = span.length();
         if (goodNum != 1) {

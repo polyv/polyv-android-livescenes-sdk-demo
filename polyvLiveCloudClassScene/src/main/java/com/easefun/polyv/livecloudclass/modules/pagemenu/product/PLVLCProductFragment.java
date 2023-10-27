@@ -68,6 +68,14 @@ public class PLVLCProductFragment extends PLVBaseFragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (pageMenuProductLayout != null) {
+            pageMenuProductLayout.destroy();
+        }
+    }
+
+    @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {

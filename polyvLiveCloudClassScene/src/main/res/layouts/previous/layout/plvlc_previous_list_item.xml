@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="343dp"
     android:layout_height="72dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/plvlc_previous_item_cover_Im"
@@ -35,7 +35,7 @@
         android:textColor="@color/colorSoftDodgerBlue"
         android:layout_marginTop="4dp"
         android:textSize="12sp"
-        android:text="开始时间：2020-12-12 12:30"
+        tools:text="开始时间：2020-12-12 12:30"
         app:layout_constraintLeft_toLeftOf="@+id/plvlc_previous_item_title_tv"
         app:layout_constraintTop_toBottomOf="@+id/plvlc_previous_item_title_tv"/>
 
@@ -58,7 +58,7 @@
         android:textSize="12sp"
         android:textColor="@color/white"
         android:background="@drawable/plvlc_shape_previous_playbacking_mask"
-        android:text="播放中"
+        android:text="@string/plv_player_playing"
         android:gravity="center"
         android:drawableLeft="@drawable/plvlc_previous_playbacking_icon"
         android:paddingLeft="10dp"

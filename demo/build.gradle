@@ -29,6 +29,8 @@ android {
         packagingOptions {
             pickFirst 'META-INF/proguard/coroutines.pro'
         }
+
+        resConfigs 'en', 'zh-rCN'
     }
     signingConfigs {
         release {

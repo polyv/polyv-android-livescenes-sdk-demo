@@ -1,16 +1,15 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom.widget;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.ScaleAnimation;
 
+import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.ui.widget.PLVMarqueeTextView;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.login.PLVLoginEvent;
 
 import java.util.ArrayList;
@@ -98,14 +97,14 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
                 else if (i == 1)
                     ls = stringBuilder.toString().length() - lf - 2;
             }
-            span = new SpannableStringBuilder("欢迎 " + stringBuilder.toString() + " 等" + loginEventList.size() + "人加入");
+            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join_multi_2, stringBuilder.toString(), loginEventList.size() + ""));
 //            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1, 3 + lf + 1 + ls, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1 + ls + 1, span.length() - 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             loginEventList.clear();
         } else {
             PLVLoginEvent loginEvent = loginEventList.remove(0);
-            span = new SpannableStringBuilder("欢迎 " + loginEvent.getUser().getNick() + " 加入");
+            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join_2, loginEvent.getUser().getNick()));
 //            span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, span.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         final SpannableStringBuilder finalSpan = span;

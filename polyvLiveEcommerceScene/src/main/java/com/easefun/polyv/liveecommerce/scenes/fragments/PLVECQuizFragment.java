@@ -23,6 +23,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
@@ -38,7 +39,6 @@ import java.util.List;
  */
 public class PLVECQuizFragment extends PLVBaseFragment {
     // <editor-folder defaultstate="collapsed" desc="变量">
-    private static final String DEFAULT_TIPS = "你已进入专属的提问频道，提问内容不会公开";
     //未读信息提醒view
     private TextView unreadMsgTv;
     //下拉加载历史记录控件
@@ -51,9 +51,15 @@ public class PLVECQuizFragment extends PLVBaseFragment {
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
     //提示语
-    private String tips = DEFAULT_TIPS;
+    private String tips = getDefaultTips();
     private boolean firstLoadHistory = true;
     private boolean requestHistoryAtRegister = false;
+    // </editor-folder>
+
+    // <editor-folder defaultstate="collapsed" desc="静态方法">
+    private static String getDefaultTips() {
+        return PLVAppUtils.getString(R.string.plv_chat_quiz_default_tips);
+    }
     // </editor-folder>
 
     // <editor-folder defaultstate="collapsed" desc="生命周期">
@@ -248,8 +254,8 @@ public class PLVECQuizFragment extends PLVBaseFragment {
         tAnswerEvent.setObjects(PLVTextFaceLoader.messageToSpan(tAnswerEvent.getContent(), ConvertUtils.dp2px(14), getContext()));
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserType(PLVSocketUserConstant.USERTYPE_TEACHER);
-        userBean.setNick("讲师");
-        userBean.setActor("讲师");
+        userBean.setNick("讲师");// no need i18n
+        userBean.setActor("讲师");// no need i18n
         userBean.setPic(PLVSocketUserConstant.TEACHER_AVATAR_URL);
         tAnswerEvent.setUser(userBean);
 

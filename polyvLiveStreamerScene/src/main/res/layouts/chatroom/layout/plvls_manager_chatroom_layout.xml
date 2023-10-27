@@ -84,7 +84,7 @@
                 android:id="@+id/plvls_manager_chatroom_input_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/plvls_manager_chatroom_input_tv_hint"
+                android:hint="@string/plv_chat_input_tips_chat_5"
                 android:singleLine="true"
                 android:textColor="#F0F1F5"
                 android:textColorHint="#878B93"

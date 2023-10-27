@@ -280,7 +280,7 @@ public class PLVLSChatMsgInputWindow extends PLVInputWindow implements View.OnCl
                         if (sendResult) {
                             requestClose();
                         } else {
-                            ToastUtils.showShort("图片表情发送失败");
+                            ToastUtils.showShort(R.string.plv_chat_emotion_send_fail);
                         }
                     }
                 }, new AdapterView.OnItemLongClickListener() {

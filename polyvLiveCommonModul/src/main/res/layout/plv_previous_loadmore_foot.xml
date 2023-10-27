@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#FFADADC0"
-        android:text="加载中，请稍后"
+        android:text="@string/plv_live_loading_hint"
         android:textSize="12sp"
         android:gravity="center"
         android:paddingTop="8dp"

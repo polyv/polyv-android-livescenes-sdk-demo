@@ -14,7 +14,7 @@
         android:layout_marginBottom="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginStart="32dp"
-        android:text="混流布局"
+        android:text="@string/plv_streamer_mix_layout"
         android:textColor="#F0F1F5"
         android:textSize="18sp" />
 

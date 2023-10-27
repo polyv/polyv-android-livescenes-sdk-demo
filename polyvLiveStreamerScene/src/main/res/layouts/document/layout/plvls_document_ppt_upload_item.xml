@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginLeft="4dp"
-            android:text="上传须知"
+            android:text="@string/plvls_document_upload_hint"
             android:textColor="#CFD1D6" />
 
     </LinearLayout>

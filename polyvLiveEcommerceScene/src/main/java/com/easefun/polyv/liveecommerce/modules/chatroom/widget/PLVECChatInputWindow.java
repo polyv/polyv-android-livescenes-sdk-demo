@@ -130,7 +130,7 @@ public class PLVECChatInputWindow extends PLVInputWindow {
         CharSequence quoteMsg = chatQuoteVO.getObjects() == null || chatQuoteVO.getObjects().length == 0 ? "" : (CharSequence) chatQuoteVO.getObjects()[0];
         final boolean isImageContent = chatQuoteVO.getContent() == null && chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
         if (isImageContent) {
-            quoteMsg = "[图片]";
+            quoteMsg = "[图片]";// no need i18n
         }
         chatQuoteNameContentTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
     }

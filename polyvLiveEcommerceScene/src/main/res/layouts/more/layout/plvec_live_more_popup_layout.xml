@@ -61,7 +61,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="16dp"
                 android:visibility="gone"
-                android:text="更多"/>
+                android:text="@string/plv_live_more"/>
         </RelativeLayout>
     </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
 </RelativeLayout>

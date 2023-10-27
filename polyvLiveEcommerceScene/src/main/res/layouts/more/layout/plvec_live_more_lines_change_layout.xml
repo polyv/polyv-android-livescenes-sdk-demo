@@ -35,7 +35,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="切换线路"
+                    android:text="@string/plv_player_change_route"
                     android:textColor="#ffffff"
                     android:textSize="18sp" />
 
@@ -52,7 +52,7 @@
                         android:layout_height="26dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
-                        android:text="线路1"
+                        android:text="@string/plv_player_route_1"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp" />
 
@@ -63,7 +63,7 @@
                         android:layout_marginLeft="30dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
-                        android:text="线路2"
+                        android:text="@string/plv_player_route_2"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp" />
 
@@ -74,7 +74,7 @@
                         android:layout_marginLeft="30dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
-                        android:text="线路3"
+                        android:text="@string/plv_player_route_3"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp" />
                 </LinearLayout>

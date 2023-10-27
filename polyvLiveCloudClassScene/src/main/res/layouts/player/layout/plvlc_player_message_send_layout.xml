@@ -88,7 +88,7 @@
                 android:background="@drawable/plvlc_message_btn_send_selector"
                 android:enabled="false"
                 android:gravity="center"
-                android:text="发送"
+                android:text="@string/plv_chat_send"
                 android:textColor="@drawable/plvlc_message_btn_send_text_color" />
 
         </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>

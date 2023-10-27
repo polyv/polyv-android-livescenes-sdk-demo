@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:text="频道信息"
+        android:text="@string/plv_live_channel_info"
         android:textColor="#F0F1F5"
         android:textSize="18sp" />
 
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="直播名称："
+                android:text="@string/plv_live_channel_name"
                 android:textColor="#99F0F1F5"
                 android:textSize="14sp" />
 
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="开始时间："
+                android:text="@string/plv_live_start_time_2"
                 android:textColor="#99F0F1F5"
                 android:textSize="14sp" />
 
@@ -97,7 +97,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
-                android:text="频道号："
+                android:text="@string/plv_live_channel_id"
                 android:textColor="#99F0F1F5"
                 android:textSize="14sp" />
 
@@ -125,7 +125,8 @@
                     android:layout_marginStart="12dp"
                     android:layout_marginLeft="12dp"
                     android:background="@drawable/plvsa_status_bar_channel_info_copy_btn_bg"
-                    android:text="复制"
+                    android:text="@string/plv_chat_copy"
+                    android:textAllCaps="false"
                     android:textColor="#FFF"
                     android:textSize="12dp" />
 

@@ -82,6 +82,7 @@ import com.plv.business.api.common.player.PLVPlayerConstant;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
@@ -1201,7 +1202,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -1365,7 +1366,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         startTimeCountDown = new CountDownTimer(timeSpanMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String timeText = "倒计时：" + TimeUtils.toCountDownTime(millisUntilFinished);
+                String timeText = PLVAppUtils.formatString(R.string.plv_player_start_live_count_down, TimeUtils.toCountDownTime(millisUntilFinished));
                 timeCountDownTv.setText(timeText);
                 timeCountDownTv.setVisibility(View.VISIBLE);
             }

@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingVertical="16dp"
-            android:text="邀请你视频连麦"
+            android:text="@string/plv_linkmic_invitation_default"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="已关摄像头"
+                        android:text="@string/plv_linkmic_camera_closed"
                         android:textColor="#70FFFFFF"
                         android:textSize="14sp" />
 
@@ -115,7 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="13dp"
-            android:text="摄像头"
+            android:text="@string/plv_linkmic_camera"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:visibility="gone"
@@ -152,7 +152,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="13dp"
-            android:text="麦克风"
+            android:text="@string/plv_linkmic_microphone"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/plvlc_linkmic_invitation_microphone_iv"
@@ -182,12 +182,14 @@
 
         <TextView
             android:id="@+id/plvlc_linkmic_invitation_privacy_notify_tv"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="连麦将收集人像信息，确认上麦视为同意"
+            android:text="@string/plv_linkmic_invitation_privacy_notify"
             android:textColor="#99ffffff"
             android:textSize="12sp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/plvlc_linkmic_invitation_privacy_notify_iv"
             app:layout_constraintStart_toEndOf="@+id/plvlc_linkmic_invitation_privacy_notify_iv"
             app:layout_constraintTop_toTopOf="@+id/plvlc_linkmic_invitation_privacy_notify_iv" />
@@ -216,7 +218,7 @@
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="开始连麦"
+            android:text="@string/plv_linkmic_start"
             android:textColor="#FFF"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"

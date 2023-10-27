@@ -40,6 +40,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -392,7 +393,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         }
         if (state == PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC) {
             tvRequestTip.setText(new PLVSpannableStringBuilder(getContext().getString(R.string.plv_linkmic_tip_requesting_link_mic))
-                    .appendExclude("\n排队" + orderText, new AbsoluteSizeSpan(ConvertUtils.sp2px(12)) {
+                    .appendExclude(PLVAppUtils.formatString(R.string.plv_linkmic_apply_pending, orderText), new AbsoluteSizeSpan(ConvertUtils.sp2px(12)) {
                         @Override
                         public void updateDrawState(@NonNull TextPaint ds) {
                             super.updateDrawState(ds);
@@ -400,7 +401,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                         }
                     }));
             tvRequestTipLandscape.setText(new PLVSpannableStringBuilder(getContext().getString(R.string.plv_linkmic_tip_requesting_link_mic))
-                    .appendExclude("\n排队" + orderText, new AbsoluteSizeSpan(ConvertUtils.sp2px(10)) {
+                    .appendExclude(PLVAppUtils.formatString(R.string.plv_linkmic_apply_pending, orderText), new AbsoluteSizeSpan(ConvertUtils.sp2px(10)) {
                         @Override
                         public void updateDrawState(@NonNull TextPaint ds) {
                             super.updateDrawState(ds);
@@ -626,9 +627,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                                 IPLVLinkMicTraceLogSender iplvLinkMicTraceLogSender = new PLVLinkMicTraceLogSender();
                                 iplvLinkMicTraceLogSender.setLogModuleClass(PLVLinkMicELog.class);
                                 if (state.equals(PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC)) {
-                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);// no need i18n
                                 } else {
-                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);// no need i18n
                                 }
                                 handleRingOff();
                                 dialog.dismiss();
@@ -761,7 +762,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private boolean toastWhenFloatingPlayerShowing() {
         if (PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
             PLVToast.Builder.context(getContext())
-                    .setText("小窗播放中，不支持连麦")
+                    .setText(R.string.plv_linkmic_floating_player_showing_tips)
                     .show();
             return true;
         }

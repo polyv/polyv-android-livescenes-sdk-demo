@@ -9,12 +9,12 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import android.widget.EditText;
 
-import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.span.PLVFaceManager;
 import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmojiListAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPersonalListAdapter;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.List;
@@ -102,10 +102,7 @@ public class PLVSAChatroomUtils {
             drawable = inputEt.getResources().getDrawable(PLVFaceManager.getInstance().getFaceId(emoKey));
             imageSpan = new RelativeImageSpan(drawable, RelativeImageSpan.ALIGN_CENTER);
         } catch (Exception e) {
-            PLVToast.Builder.context(inputEt.getContext())
-                    .setText("添加表情失败！")
-                    .build()
-                    .show();
+            PLVCommonLog.e("ChatroomUtils", "添加表情失败！");// no need i18n
             return;
         }
         drawable.setBounds(0, 0, (int) (textSize * 1.5), (int) (textSize * 1.5));

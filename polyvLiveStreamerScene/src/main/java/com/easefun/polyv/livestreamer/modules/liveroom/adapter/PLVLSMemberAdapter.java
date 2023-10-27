@@ -30,6 +30,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
 import com.opensource.svgaplayer.SVGAImageView;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
@@ -157,7 +158,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         //设置昵称
         final SpannableStringBuilder nickSpan = new SpannableStringBuilder(socketUserBean.getNick());
         if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId())) {
-            nickSpan.append("(我)");
+            nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
         }
         holder.plvlsMemberNickTv.setText(nickSpan);
         //设置麦克风、摄像头的view显示状态
@@ -179,11 +180,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         //设置禁言状态
         holder.plvlsMemberBanTv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
         //禁言操作
-        holder.plvlsMemberDoBanTv.setText(socketUserBean.isBanned() ? "解除禁言" : "禁言");
+        holder.plvlsMemberDoBanTv.setText(socketUserBean.isBanned() ? R.string.plv_chat_unban_2 : R.string.plv_chat_ban);
         holder.plvlsMemberDoBanTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isShield = "禁言".equals(holder.plvlsMemberDoBanTv.getText().toString());
+                boolean isShield = PLVAppUtils.getString(R.string.plv_chat_ban).equals(holder.plvlsMemberDoBanTv.getText().toString());
                 if (isShield) {
                     holder.banConfirmViewChange(true);
                 } else {
@@ -191,14 +192,14 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     int sendResult = PolyvChatroomManager.getInstance().removeShield(socketUserBean.getUserId());
                     if (sendResult > 0) {
                         PLVToast.Builder.context(v.getContext())
-                                .setText("解除禁言成功")
+                                .setText(R.string.plv_chat_unban_success)
                                 .build()
                                 .show();
                         holder.updateShieldView(false);
                         socketUserBean.setBanned(false);
                     } else {
                         PLVToast.Builder.context(v.getContext())
-                                .setText("解除禁言失败" + "(" + sendResult + ")")
+                                .setText(PLVAppUtils.formatString(R.string.plv_chat_unban_fail_2, sendResult + ""))
                                 .build()
                                 .show();
                     }
@@ -212,14 +213,14 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                 int sendResult = PolyvChatroomManager.getInstance().shield(socketUserBean.getUserId());
                 if (sendResult > 0) {
                     PLVToast.Builder.context(v.getContext())
-                            .setText("禁言成功")
+                            .setText(R.string.plv_chat_ban_success)
                             .build()
                             .show();
                     holder.updateShieldView(true);
                     socketUserBean.setBanned(true);
                 } else {
                     PLVToast.Builder.context(v.getContext())
-                            .setText("禁言失败" + "(" + sendResult + ")")
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_ban_fail_2, sendResult + ""))
                             .build()
                             .show();
                 }
@@ -239,7 +240,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                 int sendResult = PolyvChatroomManager.getInstance().kick(socketUserBean.getUserId());
                 if (sendResult > 0) {
                     PLVToast.Builder.context(v.getContext())
-                            .setText("踢出成功")
+                            .setText(R.string.plv_chat_kick_success_2)
                             .build()
                             .show();
                     int position = removeData(socketUserBean.getUserId());
@@ -249,7 +250,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     }
                 } else {
                     PLVToast.Builder.context(v.getContext())
-                            .setText("踢出失败(" + sendResult + ")")
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_kick_fail_2, sendResult + ""))
                             .build()
                             .show();
                 }
@@ -644,7 +645,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                         case RTC_JOIN:
                             onViewActionListener.onControlUserLinkMic(pos, PLVStreamerControlLinkMicAction.hangUp());
                             PLVToast.Builder.context(v.getContext())
-                                    .setText("已取消" + dataList.get(pos).getSocketUserBean().getNick() + "的连麦")
+                                    .setText(PLVAppUtils.formatString(R.string.plv_linkmic_hangup_user, dataList.get(pos).getSocketUserBean().getNick()))
                                     .build()
                                     .show();
                             break;
@@ -735,7 +736,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
 
         private void updateShieldView(boolean isShield) {
             plvlsMemberBanTv.setVisibility(isShield ? View.VISIBLE : View.GONE);
-            plvlsMemberDoBanTv.setText(isShield ? "解除禁言" : "禁言");
+            plvlsMemberDoBanTv.setText(isShield ? R.string.plv_chat_unban_2 : R.string.plv_chat_ban);
         }
 
         private void kickConfirmViewChange(boolean isShowConfirm) {

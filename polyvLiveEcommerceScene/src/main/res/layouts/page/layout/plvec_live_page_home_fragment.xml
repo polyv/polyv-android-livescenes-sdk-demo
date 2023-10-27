@@ -100,6 +100,9 @@
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:minWidth="150dp"
+        android:maxWidth="180dp"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:background="@drawable/plvec_watch_info_corner_bg"
@@ -108,7 +111,7 @@
         android:gravity="center_vertical"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:text="@string/plvec_chat_input_tips_chat"
+        android:text="@string/plv_chat_input_tips_chat_6"
         android:textColor="#99ffffff"
         android:textSize="14sp" />
 
@@ -124,7 +127,7 @@
         android:translationX="15dp"
         android:visibility="gone"
         android:background="@drawable/plvec_chatroom_quiz_new_msg_tips_bg"
-        android:text="新消息"
+        android:text="@string/plv_chat_quiz_new_msg_tips"
         android:textColor="#ffffff"
         android:textSize="10sp" />
 
@@ -216,7 +219,7 @@
                 android:layout_marginEnd="3dp"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="3dp"
-                android:text="连续观看有奖励哦"
+                android:text="@string/plv_live_watch_reward"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:visibility="gone"
@@ -271,7 +274,7 @@
                 android:layout_marginEnd="3dp"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="3dp"
-                android:text="抽奖暂未开始"
+                android:text="@string/plv_live_lottery_no_start"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:visibility="gone"

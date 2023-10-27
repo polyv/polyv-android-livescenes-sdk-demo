@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -214,7 +215,7 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
             llGoodCountParent.setVisibility(INVISIBLE);
         }
 
-        tvGoodContent.setText("赠送   " + rewardContent);
+        tvGoodContent.setText(PLVAppUtils.getString(R.string.plv_reward_give) + "   " + rewardContent);
     }
     // </editor-fold>
 

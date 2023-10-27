@@ -26,6 +26,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
@@ -111,7 +112,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         chatCommonMessageList.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
             public void onChange(int currentUnreadCount) {
-                unreadMsgTv.setText(currentUnreadCount + "条新消息");
+                unreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_4, currentUnreadCount + ""));
             }
         });
         chatCommonMessageList.attachToParent(swipeLoadView, true);//聊天信息列表附加到下拉控件中
@@ -205,7 +206,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         public void onHasNotAddedData() {
             if (unreadMsgTv != null) {
                 if (unreadMsgTv.getVisibility() != View.VISIBLE) {
-                    unreadMsgTv.setText("有新消息，点击查看");
+                    unreadMsgTv.setText(R.string.plv_chat_view_new_msg_3);
                     unreadMsgTv.setVisibility(View.VISIBLE);
                 }
             }

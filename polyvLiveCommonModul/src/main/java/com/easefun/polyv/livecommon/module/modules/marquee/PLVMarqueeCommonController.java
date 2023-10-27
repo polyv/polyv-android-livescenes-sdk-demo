@@ -1,8 +1,10 @@
 package com.easefun.polyv.livecommon.module.modules.marquee;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeAnimationVO;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 
@@ -18,7 +20,7 @@ public class PLVMarqueeCommonController {
 
     private static volatile PLVMarqueeCommonController instance = null;
     private String code = "";
-    private String errorMsg = "跑马灯验证失败";
+    private String errorMsg = PLVAppUtils.getString(R.string.plv_player_marquee_verify_error);
     // </editor-fold>
 
     // <editor-fold desc="单例">

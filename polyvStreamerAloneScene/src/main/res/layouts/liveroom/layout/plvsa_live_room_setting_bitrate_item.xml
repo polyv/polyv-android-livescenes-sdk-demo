@@ -12,7 +12,7 @@
         android:id="@+id/plvsa_bitrate_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="高清"
+        android:text="@string/plv_streamer_bitrate_high"
         android:textColor="#FFF"
         android:textSize="14sp"
         android:textStyle="bold"

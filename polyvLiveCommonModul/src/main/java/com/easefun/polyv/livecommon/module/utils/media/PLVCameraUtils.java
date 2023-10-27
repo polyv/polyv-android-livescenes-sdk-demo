@@ -246,7 +246,7 @@ public class PLVCameraUtils {
             }
         }
 
-        Log.d("PLVCameraUtils", "最终设置预览尺寸:w = " + (size == null ? "" : size.width) + "h = " + (size == null ? "" : size.height));
+        Log.d("PLVCameraUtils", "最终设置预览尺寸:w = " + (size == null ? "" : size.width) + "h = " + (size == null ? "" : size.height));// no need i18n
         return size;
     }
 

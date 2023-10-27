@@ -33,6 +33,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -218,7 +219,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     if (imgLoadingView != null) {
                         imgLoadingView.setVisibility(View.GONE);
                     }
-                    ToastUtils.showLong("发送图片失败: " + t.getMessage());
+                    ToastUtils.showLong(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()));
                 }
             }
 
@@ -230,7 +231,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     if (imgLoadingView != null) {
                         imgLoadingView.setVisibility(View.GONE);
                     }
-                    ToastUtils.showLong("发送图片失败: " + sendValue);
+                    ToastUtils.showLong(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, sendValue + ""));
                 }
             }
 
@@ -267,7 +268,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     if (imgLoadingView != null) {
                         imgLoadingView.setVisibility(View.GONE);
                     }
-                    ToastUtils.showLong("发送图片失败: " + t.getMessage());
+                    ToastUtils.showLong(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()));
                 }
             }
         });
@@ -374,7 +375,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         if (nickName != null) {
             String showName = nickName;
             if (loginUserId != null && loginUserId.equals(userId)) {
-                showName = showName + "(我)";
+                showName = showName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
             if (actor != null) {
                 showName = actor + "-" + showName;
@@ -476,7 +477,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
             if (loginUserId != null && loginUserId.equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + "(我)";
+                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
@@ -597,7 +598,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         if (chatMsgOverLengthSplitLine != null) {
             chatMsgOverLengthSplitLine.setVisibility(View.VISIBLE);
         }
-        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plvlc_chat_msg_over_length_more : R.string.plvlc_chat_msg_over_length_fold);
+        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plv_chat_msg_over_length_more : R.string.plv_chat_msg_over_length_fold);
         if (textMessageTv != null) {
             textMessageTv.setMaxLines(isOverLengthContentFolding ? 6 : Integer.MAX_VALUE);
         }

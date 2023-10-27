@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
@@ -27,7 +28,6 @@ import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
@@ -74,6 +74,7 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
 
     private void initWebView() {
         commodityPopupWebView
+                .setLang(PLVLanguageUtil.isENLanguage() ? PLVProductWebView.LANG_EN : PLVProductWebView.LANG_ZH)
                 .setOnNeedUpdateNativeAppParamsInfoHandler(new BridgeHandler() {
                     @Override
                     public void handler(String s, CallBackFunction callBackFunction) {

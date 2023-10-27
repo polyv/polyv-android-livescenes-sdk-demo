@@ -16,6 +16,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodit
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
@@ -61,6 +62,7 @@ public class PLVLCProductLayout extends FrameLayout {
 
     private void initWebView() {
         productWebView
+                .setLang(PLVLanguageUtil.isENLanguage() ? PLVProductWebView.LANG_EN : PLVProductWebView.LANG_ZH)
                 .setOnNeedUpdateNativeAppParamsInfoHandler(new BridgeHandler() {
                     @Override
                     public void handler(String s, CallBackFunction callBackFunction) {
@@ -98,6 +100,12 @@ public class PLVLCProductLayout extends FrameLayout {
     public void sendOpenProductEvent() {
         if (productWebView != null) {
             productWebView.sendOpenProductEvent();
+        }
+    }
+
+    public void destroy() {
+        if (productWebView != null) {
+            productWebView.destroy();
         }
     }
 

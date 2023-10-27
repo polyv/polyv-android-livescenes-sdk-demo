@@ -152,7 +152,7 @@ public class PLVInteractAnswer extends PLVInteractAppAbs {
             jsonObject.put("EVENT", PolyvSocketEvent.STOP_TEST_QUESTION);
             socketMsgStopQuestion = jsonObject.toString();
         } catch (JSONException e) {
-            PLVCommonLog.e(TAG, "保存问题失败\n" + e);
+            PLVCommonLog.e(TAG, "保存问题失败\n" + e);// no need i18n
         }
     }
     // </editor-fold>
@@ -167,7 +167,7 @@ public class PLVInteractAnswer extends PLVInteractAppAbs {
 
                 PLVJSResponseVO<Object> result = new PLVJSResponseVO<>();
                 result.setStatus(PolyvWebview.STATUS_SUCCESS);
-                result.setMessage("成功调用方法：" + PLVInteractJSBridgeEventConst.KNOW_ANSWER_METHOD);
+                result.setMessage("成功调用方法：" + PLVInteractJSBridgeEventConst.KNOW_ANSWER_METHOD);// no need i18n
                 function.onCallBack(PLVGsonUtil.toJson(result));
 
                 isQuestionAnswer = true;

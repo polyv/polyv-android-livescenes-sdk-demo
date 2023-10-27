@@ -44,13 +44,13 @@ import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAdapter;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -179,7 +179,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         plvsaStreamerRv.setLayoutManager(gridLayoutManager);
 
         //启动前台服务，防止在后台被杀
-        PLVForegroundService.startForegroundService(PLVSAStreamerAloneActivity.class, "POLYV开播", R.drawable.plvsa_ic_launcher);
+        PLVForegroundService.startForegroundService(PLVSAStreamerAloneActivity.class, PLVAppUtils.getString(R.string.plvsa_streamer_alone_scene_name), R.drawable.plvsa_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
 
@@ -217,7 +217,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             public void onUserRoleAdded(PLVUserRole role) {
                 if (role == PLVUserRole.STREAMER_GRANTED_SPEAKER_USER) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plvsa_streamer_grant_speaker_permission)
+                            .setText(R.string.plv_streamer_grant_speaker_permission)
                             .show();
                 }
             }
@@ -226,7 +226,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             public void onUserRoleRemoved(PLVUserRole role) {
                 if (role == PLVUserRole.STREAMER_GRANTED_SPEAKER_USER) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plvsa_streamer_remove_speaker_permission)
+                            .setText(R.string.plv_streamer_remove_speaker_permission)
                             .show();
                 }
             }
@@ -294,11 +294,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                         final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
                         final String text;
                         if (!isGrant) {
-                            text = "已收回主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_remove_speaker_permission_2);
                         } else if (isGuestTransferPermission) {
-                            text = "已移交主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_change_speaker_permission);
                         } else {
-                            text = "已授予主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_2);
                         }
                         PLVToast.Builder.context(getContext())
                                 .setText(text)
@@ -575,13 +575,13 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                         String tips = throwable.getMessage();
                         AlertDialog dialog = new AlertDialog.Builder(getContext())
                                 .setMessage(tips)
-                                .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(R.string.plv_common_dialog_setting, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         PLVFastPermission.getInstance().jump2Settings(getContext());
                                     }
                                 })
-                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -591,12 +591,12 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                         dialog.show();
                     } else if (errorCode == IPLVStreamerManager.ERROR_SLICE_START_FAIL) {
                         new PLVSAConfirmDialog(getContext())
-                                .setTitle("直播异常")
-                                .setContent("检测到上课错误 code:" + errorCode + "，是否重新开播")
+                                .setTitle(R.string.plv_streamer_exception)
+                                .setContent(PLVAppUtils.formatString(R.string.plv_streamer_exception_hint, errorCode + ""))
                                 .setIsNeedLeftBtn(true)
                                 .setCancelable(false)
-                                .setLeftButtonText("继续直播")
-                                .setRightButtonText("重新开播")
+                                .setLeftButtonText(R.string.plv_streamer_continue)
+                                .setRightButtonText(R.string.plv_streamer_restart)
                                 .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, View v) {
@@ -609,11 +609,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                                 .show();
                     } else {
                         new PLVSAConfirmDialog(getContext())
-                                .setTitle("直播异常")
+                                .setTitle(R.string.plv_streamer_exception)
                                 .setContent(throwable.getMessage())
                                 .setIsNeedLeftBtn(false)
                                 .setCancelable(false)
-                                .setRightButtonText("重新开播")
+                                .setRightButtonText(R.string.plv_streamer_restart)
                                 .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, View v) {
@@ -652,7 +652,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                 //非当前用户的屏幕共享，需要提示状态
                 String text;
                 if(user.isTeacher()){
-                    text = "主持人";
+                    text = PLVAppUtils.getString(R.string.plv_live_publisher_default);
                 } else {
                     text = user.getNick()+"";
                 }
@@ -713,7 +713,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         public void onViewerJoinAnswer(PLVJoinAnswerSEvent joinAnswerEvent, PLVMemberItemDataBean member) {
             if (joinAnswerEvent.isRefuse() && member != null && member.getSocketUserBean() != null) {
                 PLVToast.Builder.context(getContext())
-                        .setText(format("{}没有接受你的邀请", member.getSocketUserBean().getNick()))
+                        .setText(PLVAppUtils.formatString(R.string.plv_linkmic_no_answer, member.getSocketUserBean().getNick()))
                         .build().show();
             }
         }
@@ -1047,7 +1047,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             leaveLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(GONE)
                     .setContent(getContext().getString(R.string.plv_live_room_dialog_exit_confirm_ask))
-                    .setRightButtonText("确认")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm)
                     .setRightBtnListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1142,7 +1142,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         lastNotifyLocalAudioMutedTimestamp = System.currentTimeMillis();
 
         PLVToast.Builder.context(getContext())
-                .setText(R.string.plvsa_streamer_notify_speaking_with_mute_audio)
+                .setText(R.string.plv_streamer_notify_speaking_with_mute_audio)
                 .longDuration()
                 .show();
     }

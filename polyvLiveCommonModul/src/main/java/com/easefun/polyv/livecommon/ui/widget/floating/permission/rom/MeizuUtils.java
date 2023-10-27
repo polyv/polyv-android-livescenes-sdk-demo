@@ -42,11 +42,11 @@ public class MeizuUtils {
             fragment.startActivityForResult(intent, PLVFloatPermissionUtils.REQUEST_CODE_MANAGE_OVERLAY_PERMISSION);
         } catch (Exception e) {
             try {
-                Log.e(TAG, "获取悬浮窗权限, 打开AppSecActivity失败, " + Log.getStackTraceString(e));
+                Log.e(TAG, "获取悬浮窗权限, 打开AppSecActivity失败, " + Log.getStackTraceString(e));// no need i18n
                 // 最新的魅族flyme 6.2.5 用上述方法获取权限失败, 不过又可以用下述方法获取权限了
                 PLVFloatPermissionUtils.commonROMPermissionApplyInternal(fragment);
             } catch (Exception eFinal) {
-                Log.e(TAG, "获取悬浮窗权限失败, 通用获取方法失败, " + Log.getStackTraceString(eFinal));
+                Log.e(TAG, "获取悬浮窗权限失败, 通用获取方法失败, " + Log.getStackTraceString(eFinal));// no need i18n
             }
         }
 

@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="播放速度"
+            android:text="@string/plv_player_speed"
             android:textColor="#ffffff"
             android:textSize="18sp" />
 
@@ -101,15 +101,4 @@
                 app:layout_constraintWidth_percent="0.18" />
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/plvec_playback_more_dialog_close_iv"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/more_ly"
-        android:layout_marginRight="6dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/plvec_popup_close" />
 </RelativeLayout>

@@ -79,7 +79,7 @@
                     android:paddingRight="6dp"
                     android:layout_height="wrap_content"
                     android:gravity="center|top"
-                    android:text="微信好友"
+                    android:text="@string/plv_live_weixin_friend"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -116,7 +116,7 @@
                     android:paddingRight="6dp"
                     android:layout_height="wrap_content"
                     android:gravity="center|top"
-                    android:text="朋友圈"
+                    android:text="@string/plv_live_pengyouquan"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -152,7 +152,7 @@
                     android:paddingRight="6dp"
                     android:layout_height="wrap_content"
                     android:gravity="center|top"
-                    android:text="保存图片"
+                    android:text="@string/plv_live_save_img"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -188,7 +188,7 @@
                     android:paddingRight="6dp"
                     android:layout_height="wrap_content"
                     android:gravity="center|top"
-                    android:text="复制链接"
+                    android:text="@string/plv_live_copy_link"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -202,7 +202,7 @@
             android:layout_marginBottom="28dp"
             android:background="@drawable/plvsa_share_cancel_tv_shape"
             android:gravity="center"
-            android:text="取消"
+            android:text="@string/plv_common_dialog_cancel"
             android:textColor="#ffffff"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

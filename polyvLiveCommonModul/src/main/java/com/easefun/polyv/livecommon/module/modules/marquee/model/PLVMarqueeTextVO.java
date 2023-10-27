@@ -24,7 +24,7 @@ public class PLVMarqueeTextVO {
 
     // <editor-fold desc="构造方法">
     public PLVMarqueeTextVO() {
-        content = "Polyv跑马灯";
+        content = "Polyv跑马灯";// no need i18n
 
         fontColor = Color.BLACK;
         fontSize = 30;

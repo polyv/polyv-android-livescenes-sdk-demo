@@ -43,7 +43,7 @@ public class PLVRewardPointViewHolder extends PLVBaseViewHolder<PLVBaseViewData,
         if (data.getItemType() == ITEM_GIFT_POINT_REWARD) {
             plvTvRewardPoint.setText(goodsBean.getPrice() + goodsBean.getUnit());
         } else if (data.getItemType() == ITEM_GIFT_CASH_REWARD) {
-            plvTvRewardPoint.setText("免费");
+            plvTvRewardPoint.setText(R.string.plv_commodity_free);
         }
 
     }

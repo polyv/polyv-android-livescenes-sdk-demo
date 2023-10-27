@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
-        android:text="无法连接"
+        android:text="@string/plv_streamer_network_cannot_connect"
         android:textColor="#FFF24453"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"

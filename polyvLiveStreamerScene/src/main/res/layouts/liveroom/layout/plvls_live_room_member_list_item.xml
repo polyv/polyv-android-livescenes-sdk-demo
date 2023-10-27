@@ -42,7 +42,7 @@
                 android:paddingRight="2dp"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:text="讲师"
+                tools:text="讲师"
                 android:textColor="#313540"
                 android:layout_toRightOf="@+id/plvls_member_avatar_iv"
                 android:textSize="9sp" />
@@ -79,7 +79,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_toRightOf="@+id/plvls_member_nick_tv"
                 android:singleLine="true"
-                android:text="[已禁言]"
+                android:text="@string/plv_chat_baned"
                 android:textColor="#F24453"
                 android:textSize="12sp" />
 
@@ -178,7 +178,7 @@
                 android:layout_height="match_parent"
                 android:background="#474B57"
                 android:gravity="center"
-                android:text="禁言"
+                android:text="@string/plv_chat_ban"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
@@ -188,7 +188,7 @@
                 android:layout_height="match_parent"
                 android:background="#FF6363"
                 android:gravity="center"
-                android:text="踢出"
+                android:text="@string/plv_chat_kick"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
@@ -198,7 +198,7 @@
                 android:layout_height="match_parent"
                 android:background="#474B57"
                 android:gravity="center"
-                android:text="确定禁言"
+                android:text="@string/plv_chat_confirm_ban_2"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
@@ -208,7 +208,7 @@
                 android:layout_height="match_parent"
                 android:background="#FF6363"
                 android:gravity="center"
-                android:text="确定踢出"
+                android:text="@string/plv_chat_confirm_kick_2"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
         </LinearLayout>

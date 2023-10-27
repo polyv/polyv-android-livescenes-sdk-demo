@@ -21,6 +21,7 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVUrlTag;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.FileUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -84,22 +85,22 @@ public class PLVChatImageViewer extends FrameLayout {
                                                          ArrayList<String> deniedPermissions,
                                                          ArrayList<String> deniedForeverP) {
                                 if (deniedForeverP != null && !deniedForeverP.isEmpty()) {
-                                    new AlertDialog.Builder(getContext()).setTitle("提示")
-                                            .setMessage("保存图片所需的存储权限被拒绝，请到应用设置的权限管理中恢复")
-                                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    new AlertDialog.Builder(getContext()).setTitle(R.string.plv_common_dialog_tip)
+                                            .setMessage(R.string.plv_live_no_save_img_permission_hint)
+                                            .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     PLVFastPermission.getInstance().jump2Settings(getContext());
                                                 }
                                             })
-                                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     PLVCommonLog.d(TAG, "cancel");
                                                 }
                                             }).setCancelable(false).show();
                                 } else {
-                                    toast("请允许存储权限后再保存图片");
+                                    toast(PLVAppUtils.getString(R.string.plv_live_allow_permission_save_img_hint));
                                 }
                             }
                         });
@@ -111,7 +112,7 @@ public class PLVChatImageViewer extends FrameLayout {
         if (currentPosition > -1) {
             final String imgUrl = imgUrlTags.get(currentPosition).getUrl();
             if (imgUrl == null) {
-                toast("图片保存失败(null)");
+                toast(PLVAppUtils.formatString(R.string.plv_live_save_img_failed_2, "null"));
                 return;
             }
             final String fileName = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
@@ -155,12 +156,12 @@ public class PLVChatImageViewer extends FrameLayout {
                             .subscribe(new Consumer<Boolean>() {
                                 @Override
                                 public void accept(Boolean aBoolean) throws Exception {
-                                    toast(aBoolean ? "图片保存在：" + new File(savePath, fileName).getAbsolutePath() : "图片保存失败(saveFailed)");
+                                    toast(aBoolean ? PLVAppUtils.formatString(R.string.plv_live_save_img_path, new File(savePath, fileName).getAbsolutePath()) : PLVAppUtils.formatString(R.string.plv_live_save_img_failed_2, "saveFailed"));
                                 }
                             }, new Consumer<Throwable>() {
                                 @Override
                                 public void accept(Throwable throwable) throws Exception {
-                                    toast("图片保存失败(loadFailed)");
+                                    toast(PLVAppUtils.formatString(R.string.plv_live_save_img_failed_2, "loadFailed"));
                                 }
                             })
             );

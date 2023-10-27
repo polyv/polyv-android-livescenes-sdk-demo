@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
@@ -218,9 +219,9 @@ public class PLVSAMixLayout extends FrameLayout {
     private class MixAdapter extends RecyclerView.Adapter<MixAdapter.MixViewHolder> {
         private final LinkedHashMap<Integer, String> MIX_LAYOUT_TYPE_MAP = new LinkedHashMap<Integer, String>() {
             {
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER, "主讲模式");
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE, "平铺模式");
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SINGLE, "单人模式");
+                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER, PLVAppUtils.getString(R.string.plv_streamer_mix_type_speaker));
+                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_tile));
+                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SINGLE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_single));
             }
         };
         private int selPosition;
@@ -243,7 +244,7 @@ public class PLVSAMixLayout extends FrameLayout {
                     }
                     if (!PLVNetworkUtils.isConnected(getContext())) {
                         PLVToast.Builder.context(getContext())
-                                .setText("网络异常，请恢复网络后重试")
+                                .setText(R.string.plv_streamer_network_bad)
                                 .build()
                                 .show();
                         return;

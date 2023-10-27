@@ -270,13 +270,13 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
     private void updateWhenShareScering() {
         plvsaStreamerWindowRoot.setSelected(false);
         plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText("退出投屏");
+        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_exit_share_screen);
     }
 
     private void updateWhenStreamStop() {
         plvsaStreamerWindowRoot.setSelected(true);
         plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText("直播已中断");
+        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_stop_live);
     }
 
     // </editor-fold >

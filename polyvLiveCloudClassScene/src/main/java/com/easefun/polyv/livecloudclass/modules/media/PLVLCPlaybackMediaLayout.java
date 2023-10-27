@@ -73,6 +73,7 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
@@ -871,7 +872,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -889,13 +890,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public void onBufferStart() {
             super.onBufferStart();
-            PLVCommonLog.i(TAG, "开始缓冲");
+            PLVCommonLog.i(TAG, "开始缓冲");// no need i18n
         }
 
         @Override
         public void onBufferEnd() {
             super.onBufferEnd();
-            PLVCommonLog.i(TAG, "缓冲结束");
+            PLVCommonLog.i(TAG, "缓冲结束");// no need i18n
         }
 
         @Override

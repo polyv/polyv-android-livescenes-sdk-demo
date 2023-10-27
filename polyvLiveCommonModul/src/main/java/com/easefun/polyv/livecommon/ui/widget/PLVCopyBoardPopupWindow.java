@@ -139,7 +139,7 @@ public class PLVCopyBoardPopupWindow {
                 isShowToast = !((CopyBoardClickListener) listener).onClickCopyButton();
             }
             if (isShowToast) {
-                ToastUtils.showLong("复制成功");
+                ToastUtils.showLong(R.string.plv_chat_copy_success);
             }
         } catch (Exception e) {
             PLVCommonLog.exception(e);

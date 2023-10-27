@@ -9,14 +9,15 @@
     <!--频道信息-->
     <TextView
         android:id="@+id/plvls_status_bar_channel_info_tv"
-        android:layout_width="84dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:minWidth="84dp"
         android:background="@drawable/plvls_status_bar_channel_info_tv_shape"
         android:drawableRight="@drawable/plvls_status_bar_enter"
         android:gravity="center_vertical"
         android:paddingLeft="12dp"
         android:paddingRight="8dp"
-        android:text="频道信息"
+        android:text="@string/plv_live_channel_info"
         android:textColor="#F0F1F5"
         android:textSize="12sp"
         app:layout_constraintLeft_toLeftOf="parent" />
@@ -48,11 +49,14 @@
     <!--上下课-->
     <TextView
         android:id="@+id/plvls_status_bar_class_control_tv"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:minWidth="48dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
         android:background="@drawable/plvls_status_bar_start_class_tv_drawable_selector"
         android:gravity="center"
-        android:text="上课"
+        android:text="@string/plv_streamer_start"
         android:textColor="@color/plvls_status_bar_start_class_tv_color_selector"
         app:layout_constraintRight_toRightOf="parent" />
 

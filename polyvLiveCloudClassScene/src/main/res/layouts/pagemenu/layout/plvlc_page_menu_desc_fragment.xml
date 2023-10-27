@@ -35,7 +35,7 @@
                 android:ellipsize="end"
                 android:gravity="top"
                 android:singleLine="true"
-                android:text="直播标题"
+                tools:text="直播标题"
                 android:maxEms="12"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
@@ -50,7 +50,7 @@
                 android:layout_alignBottom="@+id/live_cover_iv"
                 android:gravity="bottom"
                 android:singleLine="true"
-                android:text="直播时间：无"
+                tools:text="直播时间：无"
                 android:textColor="#ADADC0"
                 android:textSize="12sp" />
 
@@ -65,7 +65,7 @@
                 android:paddingTop="@dimen/dm_3"
                 android:paddingRight="@dimen/dm_5"
                 android:paddingBottom="@dimen/dm_3"
-                android:text="暂无直播"
+                android:text="@string/plv_player_toast_no_live"
                 android:textColor="@color/red"
                 android:textSize="14sp" />
 

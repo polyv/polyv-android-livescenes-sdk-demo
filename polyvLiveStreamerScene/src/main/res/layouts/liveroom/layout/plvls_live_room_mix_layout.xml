@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
-        android:text="@string/plvls_mix_layout_title"
+        android:text="@string/plv_streamer_mix_layout"
         android:textColor="#F0F1F5"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"

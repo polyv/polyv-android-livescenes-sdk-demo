@@ -49,6 +49,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -578,12 +579,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onJoinChannelTimeout() {
-        ToastUtils.showShort("加入频道超时，请重试");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_time_out));
     }
 
     @Override
     public void onLinkMicMemberReachLimit() {
-        PLVToast.Builder.context(getContext()).setText("连麦人数已达上限").show();
+        PLVToast.Builder.context(getContext()).setText(PLVAppUtils.getString(R.string.plv_linkmic_dialog_reach_the_interact_num_limit_2)).show();
     }
 
     @Override
@@ -625,7 +626,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         linkMicListAdapter.updateAllItem();
         //启动前台服务
         Activity activity = (Activity) getContext();
-        PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
+        PLVForegroundService.startForegroundService(activity.getClass(), PLVAppUtils.getString(R.string.plvlc_cloud_class_scene_name), R.drawable.ic_launcher);
 
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onJoinRtcChannel();
@@ -691,7 +692,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public void onJoinLinkMic() {
         //我，加入频道成功
         PLVCommonLog.d(TAG, "onJoinLinkMic");
-        ToastUtils.showShort("上麦成功");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_success));
         // 连麦时不允许小窗播放
         PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
         // 连麦成功不再暂停rtc观看
@@ -798,12 +799,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onTeacherHangupMe() {
-        ToastUtils.showShort("主播已结束您的连麦");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_teacher_hangup_me));
     }
 
     @Override
     public void onNotInLinkMicList() {
-        ToastUtils.showShort("连麦重连超时，请重新上麦");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_reconnect_timeout_please_try_again));
         linkMicPresenter.leaveLinkMic();
     }
 
@@ -853,7 +854,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 }
             }
             if (curSpeakingUser != null) {
-                //设置正在发言的用户的昵称，包括字样："..." 和 "等"
+                //设置正在发言的用户的昵称，包括字样：'...' 和 '等'
                 String userNick = curSpeakingUser.getNick();
                 StringBuilder userNickSBuilder = new StringBuilder();
                 if (userNick.length() > 8) {
@@ -863,7 +864,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 }
 
                 if (moreThanOneUserSpeaking) {
-                    userNickSBuilder.append("...等");
+                    userNickSBuilder.append(PLVAppUtils.getString(R.string.plv_linkmic_more_than_one_user_speaking));
                 }
                 tvSpeakingUsersText.setText(userNickSBuilder.toString());
                 llSpeakingUsers.setVisibility(VISIBLE);

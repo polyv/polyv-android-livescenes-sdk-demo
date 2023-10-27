@@ -10,11 +10,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
-import com.easefun.polyv.livescenes.video.PolyvTuWenWebView;
-import com.plv.socket.event.PLVEventConstant;
-import com.plv.socket.impl.PLVSocketMessageObserver;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
+import com.plv.livescenes.feature.pagemenu.PLVTuWenWebView2;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -25,13 +26,13 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 public class PLVLCTuWenFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="变量">
     //图文webView
-    private PolyvTuWenWebView tuWenWebView;
+    private PLVTuWenWebView2 tuWenWebView;
     //webView的父控件
     private ViewGroup parentLy;
     //频道号
     private String channelId;
-    //socket监听器
-    private PLVSocketMessageObserver.OnMessageListener onMessageListener;
+    //互动应用app需要的属性
+    private PLVInteractNativeAppParams appParams;
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
     private static final String REPLACEMENT = "\\\\u0027";
     // </editor-fold>
@@ -48,7 +49,6 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnConnectStatusListener(onConnectStatusListener);
         if (tuWenWebView != null) {
             if (tuWenWebView.getParent() != null) {
@@ -62,8 +62,9 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void init(String channelId) {
+    public void init(String channelId, PLVInteractNativeAppParams appParams) {
         this.channelId = channelId;
+        this.appParams = appParams;
     }
     // </editor-fold>
 
@@ -71,12 +72,14 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     private void initView() {
         parentLy = findViewById(com.easefun.polyv.livecommon.R.id.parent_ly);
         parentLy.setBackgroundColor(Color.parseColor("#141518"));
-        tuWenWebView = new PolyvTuWenWebView(getContext());
+        tuWenWebView = new PLVTuWenWebView2(getContext());
+        tuWenWebView.setAppParams(appParams);
 
         LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         llp.bottomMargin = ConvertUtils.dp2px(8);
         tuWenWebView.setLayoutParams(llp);
         parentLy.addView(tuWenWebView);
+        tuWenWebView.setLang(PLVLanguageUtil.isENLanguage() ? PLVTuWenWebView2.LANG_EN : PLVTuWenWebView2.LANG_ZH);
         tuWenWebView.loadWeb();
 
         //延迟3秒初始化webView
@@ -93,31 +96,30 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 观察socket的连接状态、图文相关事件">
     private void observeDataChangedWithSocket() {
-        onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
-            @Override
-            public void onMessage(String listenEvent, String event, String message) {
-                if (PLVEventConstant.TuWen.EVENT_CREATE_IMAGE_TEXT.equals(event)) {//创建图文
-                    tuWenWebView.callCreate(message.replaceAll("'", REPLACEMENT));
-                } else if (PLVEventConstant.TuWen.EVENT_DELETE_IMAGE_TEXT.equals(event)) {//删除图文
-                    tuWenWebView.callDelete(message.replaceAll("'", REPLACEMENT));
-                } else if (PLVEventConstant.TuWen.EVENT_SET_TOP_IMAGE_TEXT.equals(event)) {//置顶图文
-                    tuWenWebView.callSetTop(message.replaceAll("'", REPLACEMENT));
-                } else if (PLVEventConstant.TuWen.EVENT_SET_IMAGE_TEXT_MSG.equals(event)) {//更新图文
-                    tuWenWebView.callUpdate(message.replaceAll("'", REPLACEMENT));
-                }
-            }
-        };
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener);
-
         onConnectStatusListener = new PLVSocketIOObservable.OnConnectStatusListener() {
             @Override
             public void onStatus(PLVSocketStatus status) {
                 if (PLVSocketStatus.STATUS_RECONNECTSUCCESS == status.getStatus()) {
-                    tuWenWebView.callRefresh(channelId);//socket重连成功，刷新图文
+                    tuWenWebView.callRefresh();//socket重连成功，刷新图文
                 }
             }
         };
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnConnectStatusListener(onConnectStatusListener);
+    }
+    // </editor-fold>
+
+
+    // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听当前直播状态变化">
+    public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
+        if (liveStateEnum.getStatus().equals(PLVLiveStateEnum.LIVE.getStatus())) {
+            appParams.setIsLive(true);
+        } else {
+            appParams.setIsLive(false);
+        }
+        if (tuWenWebView != null) {
+            tuWenWebView.setAppParams(appParams);
+            tuWenWebView.updateNativeAppParamsInfo(appParams);
+        }
     }
     // </editor-fold>
 }

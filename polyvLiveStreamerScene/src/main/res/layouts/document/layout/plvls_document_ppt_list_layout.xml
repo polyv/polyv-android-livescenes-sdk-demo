@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/plvls_document_refresh_doc_list"
             android:drawablePadding="2dp"
-            android:text="刷新"
+            android:text="@string/plv_player_refresh"
             android:textColor="#4399FF"
             android:textSize="12sp" />
 
@@ -99,7 +99,7 @@
         android:id="@+id/plvls_document_back_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="返回查看所有文档"
+        android:text="@string/plvls_document_go_back_view_all_hint"
         android:textSize="12sp"
         android:textColor="@color/white"
         android:visibility="gone"

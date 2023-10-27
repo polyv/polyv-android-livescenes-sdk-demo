@@ -12,7 +12,7 @@
         android:id="@+id/plvsa_mix_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="主讲模式"
+        android:text="@string/plv_streamer_mix_type_speaker"
         android:textColor="#FFF"
         android:textSize="14sp"
         android:textStyle="bold"

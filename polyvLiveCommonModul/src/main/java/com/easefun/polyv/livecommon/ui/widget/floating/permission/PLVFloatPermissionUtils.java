@@ -119,7 +119,7 @@ public class PLVFloatPermissionUtils {
             } else if (RomUtils.checkIs360Rom()) {
                 QikuUtils.applyPermission(fragment);
             } else {
-                Log.i(TAG, "原生 Android 6.0 以下无需权限申请");
+                Log.i(TAG, "原生 Android 6.0 以下无需权限申请");// no need i18n
             }
         } else {
             commonROMPermissionApply(fragment);

@@ -1,5 +1,13 @@
 package com.easefun.polyv.livecommon.module.modules.multirolelinkmic.presenter;
 
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ED;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ING;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_UN;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATED;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATING;
+import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_UNINITIATED;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -64,14 +72,6 @@ import java.util.Map;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.socket.client.Ack;
-
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ED;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_ING;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.JOIN_CHANNEL_UN;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATED;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_INITIATING;
-import static com.easefun.polyv.livecommon.module.modules.multirolelinkmic.model.PLVMultiRoleLinkMicConstant.LINK_MIC_UNINITIATED;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 /**
  * mvp-多角色连麦presenter层实现，实现 IPLVMultiRoleLinkMicContract.IMultiRoleLinkMicPresenter 接口
@@ -223,7 +223,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         linkMicManager.initEngine(param, new PLVLinkMicListener() {
             @Override
             public void onLinkMicEngineCreatedSuccess() {
-                PLVCommonLog.d(TAG, "连麦初始化成功");
+                PLVCommonLog.d(TAG, "连麦初始化成功");// no need i18n
                 initEngineSuccessTimestamp = System.currentTimeMillis();
                 linkMicInitState = LINK_MIC_INITIATED;
                 observeRTCEvent(linkMicManager);
@@ -246,7 +246,7 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
 
             @Override
             public void onLinkMicError(final int errorCode, final Throwable throwable) {
-                PLVCommonLog.e(TAG, "连麦模块错误：errorCode=" + errorCode);
+                PLVCommonLog.e(TAG, "连麦模块错误：errorCode=" + errorCode);// no need i18n
                 PLVCommonLog.exception(throwable);
                 if (linkMicInitState != LINK_MIC_INITIATED) {
                     linkMicInitState = LINK_MIC_UNINITIATED;
@@ -606,7 +606,6 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         memberList.destroy();
         hiClassManager.destroy();
         linkMicManager.destroy();
-        PLVLinkMicConfig.getInstance().clear();
     }
     // </editor-fold>
 
@@ -791,13 +790,13 @@ public class PLVMultiRoleLinkMicPresenter implements IPLVMultiRoleLinkMicContrac
         switch (linkMicInitState) {
             //未初始化
             case LINK_MIC_UNINITIATED:
-                PLVCommonLog.d(TAG, "连麦开始初始化");
+                PLVCommonLog.d(TAG, "连麦开始初始化");// no need i18n
                 initiatedTasks.add(runnable);
                 init();
                 break;
             //初始化中
             case LINK_MIC_INITIATING:
-                PLVCommonLog.d(TAG, "连麦初始化中");
+                PLVCommonLog.d(TAG, "连麦初始化中");// no need i18n
                 initiatedTasks.add(runnable);
                 return;
             //已经初始化

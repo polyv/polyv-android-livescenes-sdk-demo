@@ -73,6 +73,12 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                             onViewActionListener.onShowBulletinAction();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH:
+                        popupWindow.dismiss();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowLanguageAction();
+                        }
+                        break;
                     default:
                         popupWindow.dismiss();
                         if (onViewActionListener != null) {
@@ -134,6 +140,11 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
          * 显示公告
          */
         void onShowBulletinAction();
+
+        /**
+         * 显示语言切换弹窗
+         */
+        void onShowLanguageAction();
 
         /**
          * 点击了动态功能控件

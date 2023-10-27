@@ -2,22 +2,55 @@ package com.easefun.polyv.livecommon.module.modules.player.playback.model.enums;
 
 import android.arch.persistence.room.TypeConverter;
 
+import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+
 /**
  * @author Hoshiiro
  */
 public enum PLVPlaybackCacheDownloadStatusEnum {
 
-    NOT_IN_DOWNLOAD_LIST("未下载"),
+    NOT_IN_DOWNLOAD_LIST("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_un_download);
+        }
+    },
 
-    WAITING("等待中"),
+    WAITING("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_waiting);
+        }
+    },
 
-    PAUSING("已暂停"),
+    PAUSING("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_pausing);
+        }
+    },
 
-    DOWNLOADING("下载中"),
+    DOWNLOADING("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_downloading);
+        }
+    },
 
-    DOWNLOADED("已下载"),
+    DOWNLOADED("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_downloaded);
+        }
+    },
 
-    DOWNLOAD_FAIL("下载失败");
+    DOWNLOAD_FAIL("") {
+        @Override
+        public String getStatusName() {
+            return PLVAppUtils.getString(R.string.plv_download_fail);
+        }
+    };
 
     private final String statusName;
 

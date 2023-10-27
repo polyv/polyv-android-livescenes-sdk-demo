@@ -31,6 +31,7 @@ import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragme
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
@@ -47,7 +48,6 @@ import java.util.List;
  */
 public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private static final String DEFAULT_TIPS = "你已进入专属的提问频道，提问内容不会公开";
     //提问信息列表
     private SwipeRefreshLayout chatroomQuizRefreshLayout;
     private PLVMessageRecyclerView quizMsgRv;
@@ -74,10 +74,16 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
 
     //提示语
-    private String tips = DEFAULT_TIPS;
+    private String tips = getDefaultTips();
 
     private boolean firstLoadHistory = true;
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="静态方法">
+    public static String getDefaultTips() {
+        return PLVAppUtils.getString(R.string.plv_chat_quiz_default_tips);
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Nullable
@@ -299,8 +305,8 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         tAnswerEvent.setObjects(PLVTextFaceLoader.messageToSpan(tAnswerEvent.getContent(), ConvertUtils.dp2px(14), getContext()));
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserType(PLVSocketUserConstant.USERTYPE_TEACHER);
-        userBean.setNick("讲师");
-        userBean.setActor("讲师");
+        userBean.setNick("讲师");// no need i18n
+        userBean.setActor("讲师");// no need i18n
         userBean.setPic(PLVSocketUserConstant.TEACHER_AVATAR_URL);
         tAnswerEvent.setUser(userBean);
 

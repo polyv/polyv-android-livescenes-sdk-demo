@@ -135,12 +135,6 @@ public class PLVMessageRecyclerView extends RecyclerView {
                     int tempUnreadCount = getAdapter().getItemCount() - 1 - ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
                     if (tempUnreadCount < unreadCount) {
                         unreadCount = tempUnreadCount;
-                        /**
-                         * ///暂时保留该代码
-                         * if (unreadView != null) {
-                         *     unreadView.setText("有" + unreadCount + "条新信息，点击查看");
-                         * }
-                         */
 
                         if (unreadCount == 0) {
                             if (unreadViews != null) {
@@ -240,10 +234,6 @@ public class PLVMessageRecyclerView extends RecyclerView {
         if (unreadViews != null) {
             for (View unreadView : unreadViews) {
                 unreadView.setVisibility(View.VISIBLE);
-                /**
-                 * ///暂时保留该代码
-                 * unreadView.setText("有" + unreadCount + "条新信息，点击查看");
-                 */
             }
         } else {
             super.scrollToPosition(getAdapter().getItemCount() - 1);

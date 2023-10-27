@@ -53,7 +53,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_toEndOf="@id/plvsa_status_bar_channel_info_iv"
                 android:layout_toRightOf="@id/plvsa_status_bar_channel_info_iv"
-                android:text="频道信息"
+                android:text="@string/plv_live_channel_info"
                 android:textColor="#FFF"
                 android:textSize="14sp" />
 
@@ -232,7 +232,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/plvsa_status_bar_channel_info_copy_btn_bg"
             android:gravity="center"
-            android:text="通知"
+            android:text="@string/plv_live_notify"
             android:textColor="#FFF"
             android:textSize="12dp" />
 

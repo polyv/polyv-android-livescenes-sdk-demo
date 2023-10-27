@@ -89,6 +89,7 @@ public class PLVBaseActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             savedInstanceState.putParcelable("android:support:fragments", null);
             savedInstanceState.putParcelable("android:fragments", null);
+            savedInstanceState.putParcelable("androidx.lifecycle.BundlableSavedStateRegistry.key", null);
         }
         super.onCreate(savedInstanceState);
         APP_STATUS = APP_STATUS_RUNNING;

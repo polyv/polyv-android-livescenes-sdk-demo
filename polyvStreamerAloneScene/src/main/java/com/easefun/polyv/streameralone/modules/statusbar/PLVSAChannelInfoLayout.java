@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -134,7 +135,7 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
                         cm.setPrimaryClip(mClipData);
 
                         PLVToast.Builder.context(getContext())
-                                .setText("已复制")
+                                .setText(R.string.plv_live_copied)
                                 .setTextColor(Color.WHITE)
                                 .shortDuration()
                                 .build().show();
@@ -200,7 +201,7 @@ public class PLVSAChannelInfoLayout extends FrameLayout {
 
                 String startTime = polyvLiveClassDetailVOPLVStatefulData.getData().getData().getStartTime();
                 if (startTime == null || TextUtils.isEmpty(startTime.trim())) {
-                    startTime = "未设置";
+                    startTime = PLVAppUtils.getString(R.string.plv_live_not_set);
                 }
 
                 plvsaChannelInfoStartTimeTv.setText(startTime);

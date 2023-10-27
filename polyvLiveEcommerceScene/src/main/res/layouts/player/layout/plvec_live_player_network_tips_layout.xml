@@ -15,7 +15,7 @@
         android:layout_marginBottom="40dp"
         android:paddingHorizontal="12dp"
         android:paddingVertical="7dp"
-        android:text="您的网络状态不佳，可尝试切换网络"
+        android:text="@string/plv_player_network_bad_2"
         android:textColor="#333333"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -51,12 +51,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="8dp"
-                android:text="您的网络状态糟糕，可尝试在 更多>模式 切换到正常延迟"
                 android:textColor="#333333"
                 android:textSize="12sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/plvec_live_player_network_close_bad_tips_iv"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="您的网络状态糟糕，可尝试在 更多>模式 切换到正常延迟" />
 
             <ImageView
                 android:id="@+id/plvec_live_player_network_close_bad_tips_iv"

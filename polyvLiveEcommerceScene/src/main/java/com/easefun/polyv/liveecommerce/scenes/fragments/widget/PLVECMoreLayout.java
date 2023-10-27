@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 
@@ -45,6 +46,14 @@ public class PLVECMoreLayout extends FrameLayout {
      * 小窗播放
      */
     public static final String MORE_FUNCTION_TYPE_FLOATING = "MORE_FUNCTION_TYPE_FLOATING";
+    /**
+     * 播放速度
+     */
+    public static final String MORE_FUNCTION_TYPE_RATE = "MORE_FUNCTION_TYPE_RATE";
+    /**
+     * 语言切换
+     */
+    public static final String MORE_FUNCTION_TYPE_LANGUAGE_SWITCH = "MORE_FUNCTION_TYPE_LANGUAGE_SWITCH";
 
     /**
      * 抽奖挂件事件
@@ -57,11 +66,13 @@ public class PLVECMoreLayout extends FrameLayout {
 
     //初始化支持的功能模块
     private final ArrayList<PLVChatFunctionVO> functionList = arrayListOf(
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_PLAY_MODE, R.drawable.plvec_play_mode_sel, "音频模式", false),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_ROUTE, R.drawable.plvec_route, "线路", false),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_DEFINITION, R.drawable.plvec_definition, "清晰度", false),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LATENCY, R.drawable.plvec_live_more_latency, "模式", false),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_FLOATING, R.drawable.plvec_live_more_floating_icon, "小窗播放", false)
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_PLAY_MODE, R.drawable.plvec_play_mode_sel, PLVAppUtils.getString(R.string.plv_player_audio_mode), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_ROUTE, R.drawable.plvec_route, PLVAppUtils.getString(R.string.plv_player_route), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_DEFINITION, R.drawable.plvec_definition, PLVAppUtils.getString(R.string.plv_player_definition), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LATENCY, R.drawable.plvec_live_more_latency, PLVAppUtils.getString(R.string.plv_player_mode), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_FLOATING, R.drawable.plvec_live_more_floating_icon, PLVAppUtils.getString(R.string.plv_player_floating), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_RATE, R.drawable.plvec_live_more_rate, PLVAppUtils.getString(R.string.plv_player_speed), false),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvec_live_more_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true)
     );
 
     //初始化不支持的事件
