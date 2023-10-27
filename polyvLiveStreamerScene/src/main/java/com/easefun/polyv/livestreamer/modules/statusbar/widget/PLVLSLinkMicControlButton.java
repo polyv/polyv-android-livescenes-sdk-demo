@@ -238,10 +238,10 @@ public class PLVLSLinkMicControlButton extends SVGAImageView {
         @Override
         void onClick() {
             PLVLSConfirmDialog.Builder.context(getContext())
-                    .setTitle("确定关闭连麦吗？")
-                    .setContent("关闭后将挂断进行中的所有连麦")
+                    .setTitle(R.string.plv_linkmic_dialog_hang_off_confirm_ask_2)
+                    .setContent(R.string.plv_linkmic_dialog_hang_off_confirm_hint)
                     .setLeftButtonText(R.string.plv_common_dialog_cancel)
-                    .setRightButtonText("确定")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {

@@ -21,6 +21,7 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.modules.reward.view.adapter.PLVRewardListAdapter;
 import com.easefun.polyv.livecommon.ui.widget.PLVBeadWidget;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -209,7 +210,7 @@ public class PLVRewardDialogView {
      * 更新积分数
      */
     public void updateRemainingPoint(String remainingPoint) {
-        String remainingPointToShow = "我的积分：" + remainingPoint;
+        String remainingPointToShow = PLVAppUtils.formatString(R.string.plv_reward_remain_point, remainingPoint);
         plvTvPointRewardRemainingPoint.setText(remainingPointToShow);
     }
 
@@ -351,20 +352,20 @@ public class PLVRewardDialogView {
      */
     private void makeReward() {
         if (makeRewardNum <= 0) {
-            ToastUtils.showShort("请选择打赏数量");
+            ToastUtils.showShort(R.string.plv_reward_select_num_hint);
             return;
         }
 
         PLVBaseViewData selectData = null;
         if(isLandscape){
             if(landscapeAdapter == null || landscapeAdapter.getSelectData() == null){
-                ToastUtils.showShort("请选择打赏道具");
+                ToastUtils.showShort(R.string.plv_reward_select_cash_hint);
                 return;
             }
             selectData = landscapeAdapter.getSelectData();
         } else {
             if (adapter == null || adapter.getSelectData() == null) {
-                ToastUtils.showShort("请选择打赏道具");
+                ToastUtils.showShort(R.string.plv_reward_select_cash_hint);
                 return;
             }
             selectData = adapter.getSelectData();

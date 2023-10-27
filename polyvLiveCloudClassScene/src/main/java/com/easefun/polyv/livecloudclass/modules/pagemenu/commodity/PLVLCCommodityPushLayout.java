@@ -31,6 +31,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 
@@ -258,7 +259,7 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         commoditySrcPriceTv.setVisibility(hideSrcPrice ? GONE : VISIBLE);
         if (productContentBean.isNormalProduct()) {
             commoditySrcPriceTv.setText("¥" + productContentBean.getPrice());
-            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? "免费" : ("¥" + productContentBean.getRealPrice()));
+            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? PLVAppUtils.getString(R.string.plv_commodity_free) : ("¥" + productContentBean.getRealPrice()));
         } else if (productContentBean.isFinanceProduct()) {
             commodityRealPriceTv.setText(productContentBean.getYield());
         }

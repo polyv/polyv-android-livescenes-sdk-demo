@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="86dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -46,7 +47,7 @@
             android:layout_toRightOf="@+id/commodity_cover_ly"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="这是一个商品名称" />
+            tools:text="这是一个商品名称" />
 
         <TextView
             android:id="@+id/commodity_real_price_tv"

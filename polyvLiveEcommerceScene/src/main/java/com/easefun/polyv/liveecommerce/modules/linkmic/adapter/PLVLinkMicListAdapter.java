@@ -34,6 +34,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -517,7 +518,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append("（我）");
+            nickString.append(PLVAppUtils.getString(R.string.plv_chat_me));
         }
         holder.tvNick.setText(nickString.toString());
 

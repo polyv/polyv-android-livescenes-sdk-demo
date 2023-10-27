@@ -129,7 +129,7 @@ public class PLVLCDanmuWrapper {
                 danmuSwitchLandView.setVisibility(VISIBLE);
             }
             if(danmuSettingLandView != null) {
-                danmuSettingLandView.setVisibility(VISIBLE);
+                danmuSettingLandView.setVisibility(!danmuSwitchLandView.isSelected() ? View.VISIBLE : View.GONE);
             }
             if (isEnableDanmuInPortrait) {
                 if (isDanmuToggleOpen) {

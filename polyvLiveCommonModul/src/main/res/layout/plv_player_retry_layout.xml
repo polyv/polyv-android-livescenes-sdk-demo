@@ -14,7 +14,7 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="重试"
+        android:text="@string/plv_player_retry"
         android:layout_centerInParent="true"
         android:textColor="@color/white" />
 

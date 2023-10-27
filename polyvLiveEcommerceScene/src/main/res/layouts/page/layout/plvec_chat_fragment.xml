@@ -33,7 +33,7 @@
         android:paddingTop="4dp"
         android:paddingRight="8dp"
         android:paddingBottom="4dp"
-        android:text="查看新信息"
+        android:text="@string/plv_chat_view_new_msg"
         android:textColor="#FFA611"
         android:textSize="14sp"
         android:visibility="gone"

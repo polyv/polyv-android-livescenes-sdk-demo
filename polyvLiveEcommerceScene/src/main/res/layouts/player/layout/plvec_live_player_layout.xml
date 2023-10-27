@@ -98,7 +98,7 @@
         android:layout_height="match_parent"
         android:background="#2B3045"
         android:gravity="center"
-        android:text="小窗播放中..."
+        android:text="@string/plv_player_floating_playing"
         android:textColor="#E4E4E4"
         android:textSize="14sp"
         android:visibility="gone" />

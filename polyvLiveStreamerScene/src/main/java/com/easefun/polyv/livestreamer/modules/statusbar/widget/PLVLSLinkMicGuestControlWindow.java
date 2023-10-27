@@ -94,7 +94,7 @@ public class PLVLSLinkMicGuestControlWindow extends FrameLayout {
         @Override
         void update(PLVLSLinkMicGuestControlWindow window) {
             window.statusBarGuestLinkmicControlIv.setVisibility(GONE);
-            window.statusBarGuestLinkmicControlTv.setText("取消申请连麦");
+            window.statusBarGuestLinkmicControlTv.setText(R.string.plv_linkmic_cancel_apply);
         }
     };
 
@@ -102,7 +102,7 @@ public class PLVLSLinkMicGuestControlWindow extends FrameLayout {
         @Override
         void update(PLVLSLinkMicGuestControlWindow window) {
             window.statusBarGuestLinkmicControlIv.setVisibility(VISIBLE);
-            window.statusBarGuestLinkmicControlTv.setText("结束连麦");
+            window.statusBarGuestLinkmicControlTv.setText(R.string.plv_linkmic_stop);
         }
     };
 

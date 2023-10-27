@@ -35,6 +35,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapter;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -149,11 +150,11 @@ public class PLVSAMemberLayout extends FrameLayout {
                         final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
                         final String text;
                         if (!isGrant) {
-                            text = "已收回主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_remove_speaker_permission_2);
                         } else if (isGuestTransferPermission) {
-                            text = "已移交主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_change_speaker_permission);
                         } else {
-                            text = "已授予主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_2);
                         }
                         PLVToast.Builder.context(getContext())
                                 .setText(text)
@@ -250,7 +251,7 @@ public class PLVSAMemberLayout extends FrameLayout {
     }
 
     public void updateOnlineCount(int onlineCount) {
-        plvsaMemberOnlineCountTv.setText("在线人数 (" + onlineCount + ")");
+        plvsaMemberOnlineCountTv.setText(PLVAppUtils.formatString(R.string.plv_chat_online_count, onlineCount + ""));
     }
 
     public boolean hasUserRequestLinkMic() {
@@ -451,22 +452,25 @@ public class PLVSAMemberLayout extends FrameLayout {
         if (firstLinkMicItem == null) {
             return;
         }
+        String text = PLVAppUtils.formatString(isJoin ? R.string.plv_linkmic_join_channel : R.string.plv_linkmic_leave_channel, firstLinkMicItem.getNick());
         PLVToast.Builder.context(getContext())
-                .setText(firstLinkMicItem.getNick() + "已" + (isJoin ? "上麦" : "下麦"))
+                .setText(text)
                 .build()
                 .show();
     }
 
     private void toastMuteMic(boolean isMute) {
+        String text = PLVAppUtils.formatString(isMute ? R.string.plv_linkmic_microphone_mute : R.string.plv_linkmic_microphone_unmute);
         PLVToast.Builder.context(getContext())
-                .setText("麦克风" + (isMute ? "关闭" : "开启"))
+                .setText(text)
                 .build()
                 .show();
     }
 
     private void toastMuteCamera(boolean isMute) {
+        String text = PLVAppUtils.formatString(isMute ? R.string.plv_linkmic_camera_mute : R.string.plv_linkmic_camera_unmute);
         PLVToast.Builder.context(getContext())
-                .setText("摄像头" + (isMute ? "关闭" : "开启"))
+                .setText(text)
                 .build()
                 .show();
     }

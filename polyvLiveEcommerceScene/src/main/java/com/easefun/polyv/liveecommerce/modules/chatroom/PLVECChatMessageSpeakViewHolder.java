@@ -196,7 +196,7 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
         }
         chatMsgOverLengthControlLl.setVisibility(View.VISIBLE);
         chatMsgOverLengthSplitLine.setVisibility(View.VISIBLE);
-        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plvec_chat_msg_over_length_more : R.string.plvec_chat_msg_over_length_fold);
+        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plv_chat_msg_over_length_more : R.string.plv_chat_msg_over_length_fold);
         chatMsgTv.setMaxLines(isOverLengthContentFolding ? 5 : Integer.MAX_VALUE);
     }
 

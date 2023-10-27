@@ -26,6 +26,7 @@ import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberContr
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberControlTipsLayout;
 import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -227,7 +228,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append("（我）");
+            nickString.append(PLVAppUtils.getString(R.string.plv_chat_me));
         }
         if (holder.plvsaStreamerNickTv != null) {
             holder.plvsaStreamerNickTv.setText(nickString.toString());
@@ -682,10 +683,10 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         if (itemDataBean.isGuest() && myLinkMicId.equals(itemDataBean.getLinkMicId())) {
             holder.plvsaStreamerGuestLinkStatusTv.setVisibility(View.VISIBLE);
             if (PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(itemDataBean.getStatus())) {
-                holder.plvsaStreamerGuestLinkStatusTv.setText("连麦中");
+                holder.plvsaStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_joined);
                 holder.plvsaStreamerGuestLinkStatusTv.setSelected(true);
             } else {
-                holder.plvsaStreamerGuestLinkStatusTv.setText("未连麦");
+                holder.plvsaStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_un_join);
                 holder.plvsaStreamerGuestLinkStatusTv.setSelected(false);
             }
         } else {

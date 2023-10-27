@@ -6,6 +6,7 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.Observer;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -39,6 +40,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.conf
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
@@ -69,6 +71,7 @@ import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -149,23 +152,31 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param channelType 频道类型
      * @param viewerId    观众ID
      * @param viewerName  观众昵称
+     * @param langType    观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchLive(@NonNull Activity activity, @NonNull String channelId, @NonNull PLVLiveChannelType channelType, @NonNull String viewerId, @NonNull String viewerName,@NonNull String viewerAvatar) {
+    public static PLVLaunchResult launchLive(@NonNull Activity activity,
+                                             @NonNull String channelId,
+                                             @NonNull PLVLiveChannelType channelType,
+                                             @NonNull String viewerId,
+                                             @NonNull String viewerName,
+                                             @NonNull String viewerAvatar,
+                                             String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动直播带货直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_live_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动直播带货直播页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_live_error_channel_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动直播带货直播页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_live_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动直播带货直播页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_live_error_viewer_name_is_empty));
         }
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVECLiveEcommerceActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
@@ -183,7 +194,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * 如果没有输入vid的情况下会加载该频道的往期视频列表，如果输入vid的话就直接播放相应vid的视频，
      * 这样的话就不会加载往期视频列表
      * 若是想关闭不输入vid播放往期视频列表这个功能的话可以放开下面
-     * PLVLaunchResult.error("vid 为空，启动直播带货回放页失败")的注释
+     * PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_vid_is_empty))的注释
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
@@ -191,26 +202,35 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
+     * @param langType      观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
     @NonNull
-    public static PLVLaunchResult launchPlayback(@NonNull Activity activity, @NonNull String channelId, @NonNull String vid, @NonNull String viewerId, @NonNull String viewerName, @NonNull String viewerAvatar, PLVPlaybackListType videoListType) {
+    public static PLVLaunchResult launchPlayback(@NonNull Activity activity,
+                                                 @NonNull String channelId,
+                                                 @NonNull String vid,
+                                                 @NonNull String viewerId,
+                                                 @NonNull String viewerName,
+                                                 @NonNull String viewerAvatar,
+                                                 PLVPlaybackListType videoListType,
+                                                 String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动直播带货回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动直播带货回放页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_channel_id_is_empty));
         }
 //        if (TextUtils.isEmpty(vid)) {
-//            return PLVLaunchResult.error("vid 为空，启动直播带货回放页失败");
+//            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_vid_is_empty));
 //        }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动直播带货回放页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动直播带货回放页失败");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_viewer_name_is_empty));
         }
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVECLiveEcommerceActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_VID, vid);
@@ -225,6 +245,10 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -256,6 +280,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
             @Override
             public void run() {
+                PLVLanguageUtil.detachLanguageActivity();
                 PLVFloatingPlayerManager.getInstance().clear();
                 if(popoverLayout != null){
                     popoverLayout.destroy();
@@ -301,7 +326,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             closeIm.setVisibility(View.GONE);
             PLVScreenUtils.enterLandscape(this);
@@ -730,10 +755,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             }
         });
         // 当前页面 监听 聊天室数据对象中的公告数据变化
-        commonHomeFragment.getBulletinVO().observe(this, new Observer<PolyvBulletinVO>() {
+        commonHomeFragment.runAfterOnActivityCreated(new Runnable() {
             @Override
-            public void onChanged(@Nullable PolyvBulletinVO bulletinVO) {
-                liveDetailFragment.setBulletinVO(bulletinVO);
+            public void run() {
+                commonHomeFragment.getBulletinVO().observe(PLVECLiveEcommerceActivity.this, new Observer<PolyvBulletinVO>() {
+                    @Override
+                    public void onChanged(@Nullable PolyvBulletinVO bulletinVO) {
+                        liveDetailFragment.setBulletinVO(bulletinVO);
+                    }
+                });
             }
         });
     }
@@ -1174,6 +1204,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
             if (popoverLayout != null) {
                 popoverLayout.getInteractLayout().receiveRedPaper(redPaperEvent);
+            }
+        }
+
+        @Override
+        public void onClickDynamicFunction(String event) {
+            if (popoverLayout != null) {
+                popoverLayout.getInteractLayout().onCallDynamicFunction(event);
             }
         }
 

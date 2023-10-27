@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
@@ -106,7 +107,7 @@ public class PLVLotteryManager {
                 forView(new RunnableT<TextView>() {
                     @Override
                     public void run(@NonNull TextView textView) {
-                        textView.setText("已开奖");
+                        textView.setText(R.string.plv_lottery_over);
                         textView.setVisibility(View.VISIBLE);
                     }
                 }, lotteryEnterCdTvs);
@@ -191,14 +192,14 @@ public class PLVLotteryManager {
                     forView(new RunnableT<PLVTriangleIndicateTextView>() {
                         @Override
                         public void run(@NonNull PLVTriangleIndicateTextView plvTriangleIndicateTextView) {
-                            plvTriangleIndicateTextView.setText("抽奖即将开始");
+                            plvTriangleIndicateTextView.setText(R.string.plv_lottery_will_start);
                         }
                     }, lotteryEnterTipsViews);
 
                     forView(new RunnableT<TextView>() {
                         @Override
                         public void run(@NonNull TextView textView) {
-                            textView.setText("开奖中");
+                            textView.setText(R.string.plv_lottery_running);
                         }
                     }, lotteryEnterCdTvs);
                     break;
@@ -206,7 +207,7 @@ public class PLVLotteryManager {
                     forView(new RunnableT<TextView>() {
                         @Override
                         public void run(@NonNull TextView textView) {
-                            textView.setText("已开奖");
+                            textView.setText(R.string.plv_lottery_over);
                             textView.setVisibility(View.VISIBLE);
                         }
                     }, lotteryEnterCdTvs);
@@ -242,12 +243,12 @@ public class PLVLotteryManager {
                             }
                         }, lotteryEnterCdTvs);
 
-                        //设置tips文案 大于3s的显示 "抽奖暂未开始" 小于3s显示"抽奖即将开始"
+                        //设置tips文案 大于3s的显示 '抽奖暂未开始' 小于3s显示'抽奖即将开始'
                         if (remainTime > 3) {
                             forView(new RunnableT<PLVTriangleIndicateTextView>() {
                                 @Override
                                 public void run(@NonNull PLVTriangleIndicateTextView plvTriangleIndicateTextView) {
-                                    plvTriangleIndicateTextView.setText("抽奖暂未开始");
+                                    plvTriangleIndicateTextView.setText(R.string.plv_lottery_no_start);
                                 }
                             }, lotteryEnterTipsViews);
                         }
@@ -255,7 +256,7 @@ public class PLVLotteryManager {
                             forView(new RunnableT<PLVTriangleIndicateTextView>() {
                                 @Override
                                 public void run(@NonNull PLVTriangleIndicateTextView plvTriangleIndicateTextView) {
-                                    plvTriangleIndicateTextView.setText("抽奖即将开始");
+                                    plvTriangleIndicateTextView.setText(R.string.plv_lottery_will_start);
                                     showTipsTask();
                                 }
                             }, lotteryEnterTipsViews);
@@ -271,7 +272,7 @@ public class PLVLotteryManager {
                         forView(new RunnableT<TextView>() {
                             @Override
                             public void run(@NonNull TextView textView) {
-                                textView.setText("开奖中");
+                                textView.setText(R.string.plv_lottery_running);
                             }
                         }, lotteryEnterCdTvs);
 

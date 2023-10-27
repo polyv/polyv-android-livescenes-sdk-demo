@@ -60,14 +60,14 @@ public class PLVPointRewardEffectQueue implements IPLVPointRewardEventProducer {
                         rewardEvent = eventQueue.poll();
                         LogUtils.d("eventQueue.size=" + eventQueue.size() + "  poll=" + rewardEvent);
                     }
-                    LogUtils.d("从循环中跳出");
+                    LogUtils.d("从循环中跳出");// no need i18n
 
                     if (handlerThread.isInterrupted()) {
-                        LogUtils.d("线程被中断了，返回");
+                        LogUtils.d("线程被中断了，返回");// no need i18n
                         return;
                     }
                     final PLVRewardEvent finalRewardEvent = rewardEvent;
-                    LogUtils.d("发送event");
+                    LogUtils.d("发送event");// no need i18n
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -77,7 +77,7 @@ public class PLVPointRewardEffectQueue implements IPLVPointRewardEventProducer {
                         }
                     });
                 } catch (InterruptedException e) {
-                    PLVCommonLog.i(TAG, workerThreadHandler.toString() + "被中断");
+                    PLVCommonLog.i(TAG, workerThreadHandler.toString() + "被中断");// no need i18n
                 } catch (Exception e) {
                     PLVCommonLog.exception(e);
                 } finally {
@@ -114,7 +114,7 @@ public class PLVPointRewardEffectQueue implements IPLVPointRewardEventProducer {
         handlerThread.interrupt();
         lock.lock();
         try {
-            LogUtils.d("destroy, 清空eventQueue, eventQueue.size=" + eventQueue.size() + " eventQueue.clear");
+            LogUtils.d("destroy, 清空eventQueue, eventQueue.size=" + eventQueue.size() + " eventQueue.clear");// no need i18n
             eventQueue.clear();
             eventQueueEmptyCondition.signal();
         } catch (Exception e) {

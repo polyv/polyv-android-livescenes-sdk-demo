@@ -20,7 +20,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:text="提问频道"
+            android:text="@string/plv_chat_quiz_channel"
             android:textColor="#ffffff"
             android:textSize="14sp" />
 
@@ -63,7 +63,7 @@
             android:paddingTop="4dp"
             android:paddingRight="8dp"
             android:paddingBottom="4dp"
-            android:text="查看新信息"
+            android:text="@string/plv_chat_view_new_msg"
             android:textColor="#FFA611"
             android:textSize="14sp"
             android:visibility="gone"

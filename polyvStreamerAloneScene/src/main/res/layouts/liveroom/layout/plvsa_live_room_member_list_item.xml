@@ -39,7 +39,7 @@
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
         android:singleLine="true"
-        android:text="讲师"
+        tools:text="讲师"
         android:textColor="#ffffff"
         android:textSize="11sp" />
 

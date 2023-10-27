@@ -20,24 +20,24 @@
         android:ellipsize="end"
         android:maxWidth="124dp"
         android:singleLine="true"
-        android:text="广州观众11111111111111111111"
         android:textColor="#FCF2A6"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/reward_gift_name_tv"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/reward_bg_v"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="广州观众11111111111111111111" />
 
     <TextView
         android:id="@+id/reward_gift_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="赠送    掌声"
         android:textColor="#ffffff"
         android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/reward_bg_v"
         app:layout_constraintLeft_toLeftOf="@+id/reward_user_name_tv"
-        app:layout_constraintTop_toBottomOf="@+id/reward_user_name_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/reward_user_name_tv"
+        tools:text="赠送    掌声" />
 
     <ImageView
         android:id="@+id/reward_gift_pic_iv"

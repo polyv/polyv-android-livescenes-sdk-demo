@@ -14,7 +14,7 @@
         android:drawablePadding="3dp"
         android:gravity="center_vertical"
         android:singleLine="true"
-        android:text="公告："
+        android:text="@string/plv_live_bulletin_2"
         android:textColor="#ffffff"
         android:textSize="12sp" />
 

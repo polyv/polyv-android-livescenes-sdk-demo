@@ -49,6 +49,7 @@ import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoVie
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
@@ -188,6 +189,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         moreVideoListIv = findViewById(R.id.more_video_list_iv);
         moreVideoListIv.setVisibility(View.GONE);
         morePopupView = new PLVECMorePopupView();
+        morePopupView.initPlaybackMoreLayout(moreIv);
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
         // 追踪商品卡片曝光事件
@@ -352,6 +354,14 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         chatroomPresenter.registerView(chatroomView);
         //后于播放器准备完成回调时，这时检测是否要触发加载聊天回放
         checkStartChatPlayback();
+    }
+
+    @Override
+    protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        super.acceptInteractStatusData(webviewUpdateAppStatusVO);
+        if (morePopupView != null) {
+            morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
+        }
     }
     // </editor-fold>
 
@@ -783,11 +793,18 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
         } else if (id == R.id.more_iv) {
             float currentSpeed = onViewActionListener == null ? 1 : onViewActionListener.onGetSpeedAction();
-            morePopupView.showPlaybackMoreLayout(v, currentSpeed, new PLVECMorePopupView.OnPlaybackMoreClickListener() {
+            morePopupView.showPlaybackMoreLayout(v, currentSpeed, liveRoomDataManager.getConfig().getChannelId(), new PLVECMorePopupView.OnPlaybackMoreClickListener() {
                 @Override
                 public void onChangeSpeedClick(View view, float speed) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onChangeSpeedClick(view, speed);
+                    }
+                }
+
+                @Override
+                public void onClickDynamicFunction(String event) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onClickDynamicFunction(event);
                     }
                 }
             });
@@ -853,6 +870,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          * 回调 拆开红包
          */
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        /**
+         * 点击了动态功能控件
+         *
+         * @param event 动态功能的event data
+         */
+        void onClickDynamicFunction(String event);
     }
     // </editor-fold>
 }

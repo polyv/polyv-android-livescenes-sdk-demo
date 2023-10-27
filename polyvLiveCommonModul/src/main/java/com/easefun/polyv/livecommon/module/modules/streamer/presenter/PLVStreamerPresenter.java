@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.SurfaceView;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.model.PLVBeautyRepo;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
@@ -32,6 +33,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -293,7 +295,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerManager.initEngine(param, new PLVStreamerListener() {
             @Override
             public void onStreamerEngineCreatedSuccess() {
-                PLVCommonLog.d(TAG, "推流和连麦初始化成功");
+                PLVCommonLog.d(TAG, "推流和连麦初始化成功");// no need i18n
                 streamerInitState = STREAMER_MIC_INITIATED;
 
                 streamerManager.setOnlyAudio(liveRoomDataManager.isOnlyAudio());
@@ -356,7 +358,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
             @Override
             public void onStreamerError(final int errorCode, final Throwable throwable) {
-                PLVCommonLog.e(TAG, "推流和连麦模块错误：errorCode=" + errorCode);
+                PLVCommonLog.e(TAG, "推流和连麦模块错误：errorCode=" + errorCode);// no need i18n
                 PLVCommonLog.exception(throwable);
                 if (streamerInitState != STREAMER_MIC_INITIATED) {
                     streamerInitState = STREAMER_MIC_UNINITIATED;
@@ -625,12 +627,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         switch (streamerInitState) {
             //未初始化
             case STREAMER_MIC_UNINITIATED:
-                PLVCommonLog.d(TAG, "推流和连麦开始初始化");
+                PLVCommonLog.d(TAG, "推流和连麦开始初始化");// no need i18n
                 init();
                 break;
             //初始化中
             case STREAMER_MIC_INITIATING:
-                PLVCommonLog.d(TAG, "推流和连麦初始化中");
+                PLVCommonLog.d(TAG, "推流和连麦初始化中");// no need i18n
                 return;
             //已经初始化
             case STREAMER_MIC_INITIATED:
@@ -883,7 +885,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
                 @Override
                 public void onTimeout() {
-                    final String msg = "嘉宾上麦超时！";
+                    final String msg = PLVAppUtils.getString(R.string.plv_linkmic_guest_join_timeout);
                     PLVCommonLog.e(TAG, msg);
                     callbackToView(new ViewRunnable() {
                         @Override
@@ -2244,8 +2246,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     // <editor-fold defaultstate="collapsed" desc="内部类 - 排序成员列表">
     public static class SortMemberListUtils {
         //按自己>管理员>讲师>助教>非虚拟用户>虚拟用户类型进行排序
-        private static final String SELF = "自己";
-        private static final String REAL = "非虚拟";
+        private static final String SELF = "自己";// no need i18n
+        private static final String REAL = "非虚拟";// no need i18n
         private static final String REAL_LINK_MIC_RTC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_RTC_JOIN;
         private static final String REAL_LINK_MIC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_JOIN;
         private static final String REAL_LINK_MIC_JOINING = REAL + PLVLinkMicItemDataBean.STATUS_JOINING;

@@ -386,7 +386,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             final boolean isLocalVideoEnable = onViewActionListener != null && onViewActionListener.isCurrentLocalVideoEnable();
             if (!isLocalVideoEnable) {
                 PLVToast.Builder.context(getContext())
-                        .setText(getContext().getString(R.string.plvls_beauty_need_open_camera))
+                        .setText(getContext().getString(R.string.plv_beauty_need_open_camera))
                         .show();
                 return;
             }

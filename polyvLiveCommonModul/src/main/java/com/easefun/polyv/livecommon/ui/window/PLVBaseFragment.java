@@ -53,7 +53,7 @@ public abstract class PLVBaseFragment extends Fragment {
 
     // </editor-fold>
 
-    protected void runAfterOnActivityCreated(@NonNull final Runnable runnable) {
+    public void runAfterOnActivityCreated(@NonNull final Runnable runnable) {
         if (afterOnActivityCreated) {
             runnable.run();
         } else {

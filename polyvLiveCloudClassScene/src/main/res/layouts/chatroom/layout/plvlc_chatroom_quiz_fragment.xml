@@ -28,7 +28,7 @@
         android:layout_above="@+id/bottom_parent_ly"
         android:background="#d04a90e2"
         android:gravity="center"
-        android:text="有更多新消息，点击查看"
+        android:text="@string/plv_chat_view_new_msg_5"
         android:textColor="#ffffff"
         android:textSize="12sp"
         android:visibility="gone"

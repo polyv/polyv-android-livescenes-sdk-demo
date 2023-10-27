@@ -203,10 +203,10 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
         @Override
         void onClick() {
             new PLVSAConfirmDialog(getContext())
-                    .setTitle("确定关闭连麦吗？")
-                    .setContent("关闭后将挂断进行中的所有连麦")
+                    .setTitle(R.string.plv_linkmic_dialog_hang_off_confirm_ask_2)
+                    .setContent(R.string.plv_linkmic_dialog_hang_off_confirm_hint)
                     .setLeftButtonText(R.string.plv_common_dialog_cancel)
-                    .setRightButtonText("确定")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {
@@ -291,10 +291,10 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
         @Override
         void onClick() {
             new PLVSAConfirmDialog(getContext())
-                    .setTitle("等待接听中，是否取消")
+                    .setTitle(R.string.plv_linkmic_cancel_ask)
                     .setContentVisibility(View.GONE)
-                    .setLeftButtonText("否")
-                    .setRightButtonText("是")
+                    .setLeftButtonText(R.string.plv_common_dialog_cancel_2)
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_3)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {
@@ -334,10 +334,10 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
         @Override
         void onClick() {
             new PLVSAConfirmDialog(getContext())
-                    .setTitle("确定结束连麦吗？")
+                    .setTitle(R.string.plv_linkmic_dialog_hang_off_confirm_ask_3)
                     .setContentVisibility(View.GONE)
-                    .setLeftButtonText("取消")
-                    .setRightButtonText("确定")
+                    .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {

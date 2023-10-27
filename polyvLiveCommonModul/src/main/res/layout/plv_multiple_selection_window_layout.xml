@@ -27,7 +27,7 @@
         android:id="@+id/plv_multiple_selection_cancel_tv"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="取消"
+        android:text="@string/plv_common_dialog_cancel"
         android:textSize="18sp"
         android:textColor="#ADADC0"
         android:gravity="center"

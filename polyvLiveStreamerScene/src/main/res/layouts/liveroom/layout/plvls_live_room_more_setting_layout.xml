@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="14dp"
-            android:text="@string/plvls_more_setting_title"
+            android:text="@string/plv_live_more"
             android:textColor="#F0F1F5"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/plvls_beauty_title"
+                    android:text="@string/plv_beauty_selector_beauty_title"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -93,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/plvls_bitrate_title"
+                    android:text="@string/plv_player_definition"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -119,7 +119,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/plvls_share_title"
+                    android:text="@string/plv_live_share"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -170,7 +170,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/plvls_mix_layout_title"
+                    android:text="@string/plv_streamer_mix_layout"
                     android:textColor="#99F0F1F5"
                     android:textSize="12sp" />
 
@@ -235,7 +235,7 @@
         android:drawableLeft="@drawable/plvls_setting_exit"
         android:drawablePadding="6dp"
         android:padding="6dp"
-        android:text="退出登录"
+        android:text="@string/plv_live_logout"
         android:textColor="#FF6363"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"

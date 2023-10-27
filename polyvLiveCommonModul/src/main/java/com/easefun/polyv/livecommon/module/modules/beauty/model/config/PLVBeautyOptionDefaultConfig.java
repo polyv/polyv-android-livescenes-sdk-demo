@@ -1,11 +1,14 @@
 package com.easefun.polyv.livecommon.module.modules.beauty.model.config;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
+import com.easefun.polyv.livecommon.R;
 import com.plv.beauty.api.options.PLVBeautyOption;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,18 +49,30 @@ public class PLVBeautyOptionDefaultConfig {
     // 滤镜默认强度
     public static final float DEFAULT_FILTER_VALUE = 0.5F;
 
-    public static final List<String> DEFAULT_FILTER_KEY_ORDER = listOf(
-            "原图",
-            "氧气",
-            "初见",
-            "冷氧",
-            "温柔",
-            "慕斯",
-            "蜜桃",
-            "物语",
-            "樱花",
-            "胶片",
-            "夜色"
-    );
+    private static Map<String, String> getFilterI18nMap(){
+        return new LinkedHashMap<String, String>(){
+            {
+                put("原图", PLVAppUtils.getString(R.string.plv_beauty_filter_original));
+                put("氧气", PLVAppUtils.getString(R.string.plv_beauty_filter_oxygen));
+                put("初见", PLVAppUtils.getString(R.string.plv_beauty_filter_first_blush));
+                put("冷氧", PLVAppUtils.getString(R.string.plv_beauty_filter_cold_oxygen));
+                put("温柔", PLVAppUtils.getString(R.string.plv_beauty_filter_gentle));
+                put("慕斯", PLVAppUtils.getString(R.string.plv_beauty_filter_mousse));
+                put("蜜桃", PLVAppUtils.getString(R.string.plv_beauty_filter_peach));
+                put("物语", PLVAppUtils.getString(R.string.plv_beauty_filter_lore));
+                put("樱花", PLVAppUtils.getString(R.string.plv_beauty_filter_cherry));
+                put("胶片", PLVAppUtils.getString(R.string.plv_beauty_filter_film));
+                put("夜色", PLVAppUtils.getString(R.string.plv_beauty_filter_night));
+            }
+        };
+    }
 
+    public static List<String> getDefaultFilterKeyOrder() {
+        return new ArrayList<>(getFilterI18nMap().values());
+    }
+
+    public static String getFilterI18n(String filterName) {
+        Map<String, String> map = getFilterI18nMap();
+        return map.containsKey(filterName) ? map.get(filterName) : filterName;
+    }
 }

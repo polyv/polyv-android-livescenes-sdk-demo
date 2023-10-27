@@ -1,7 +1,5 @@
 package com.easefun.polyv.liveecommerce.modules.chatroom;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
-
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import android.text.TextPaint;
@@ -15,6 +13,7 @@ import com.easefun.polyv.livecommon.module.utils.span.PLVRelativeImageSpan;
 import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
@@ -49,7 +48,7 @@ public class PLVECChatMessageRedPaperViewHolder extends PLVECChatMessageCommonVi
         }
 
         final CharSequence text = new PLVSpannableStringBuilder()
-                .appendExclude("[红包]", new PLVRelativeImageSpan(itemView.getContext().getResources().getDrawable(R.drawable.plvec_chatroom_red_pack_icon), PLVRelativeImageSpan.ALIGN_CENTER) {
+                .appendExclude("[红包]", new PLVRelativeImageSpan(itemView.getContext().getResources().getDrawable(R.drawable.plvec_chatroom_red_pack_icon), PLVRelativeImageSpan.ALIGN_CENTER) {// no need i18n
                     @Override
                     public Drawable getDrawable() {
                         final Drawable drawable = super.getDrawable();
@@ -57,8 +56,8 @@ public class PLVECChatMessageRedPaperViewHolder extends PLVECChatMessageCommonVi
                         return drawable;
                     }
                 })
-                .append(format("{} 发了一个{}，", redPaperEvent.getUser().getNick(), PLVRedPaperType.matchOrDefault(redPaperEvent.getType(), PLVRedPaperType.DEFAULT_RED_PAPER).typeName))
-                .appendExclude("点击领取", new ClickableSpan() {
+                .append(PLVAppUtils.formatString(R.string.plv_red_paper_send_msg, redPaperEvent.getUser().getNick(), PLVRedPaperType.matchOrDefault(redPaperEvent.getType(), PLVRedPaperType.DEFAULT_RED_PAPER).getTypeName()))
+                .appendExclude(PLVAppUtils.formatString(R.string.plv_red_paper_get), new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
                         adapter.callOnReceiveRedPaper(redPaperEvent);

@@ -108,7 +108,7 @@ public class PLVSAEmptyFragment extends PLVBaseFragment {
             stopLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(View.GONE)
                     .setContent(content)
-                    .setRightButtonText("确认")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm)
                     .setRightBtnListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

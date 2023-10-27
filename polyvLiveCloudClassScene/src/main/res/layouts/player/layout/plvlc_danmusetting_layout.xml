@@ -22,7 +22,7 @@
                 android:id="@+id/plvlc_danmu_setting_speed_titke_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="弹幕速度"
+                android:text="@string/plv_danmu_speed"
                 android:textSize="14sp"
                 android:textColor="#C2C2C2"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -59,7 +59,8 @@
                 app:layout_constraintTop_toBottomOf="@+id/plvlc_danmu_setting_speed_titke_tv"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
-                android:text="缓慢"
+                android:minEms="5"
+                android:text="@string/plv_danmu_speed_slower"
                 android:textSize="14sp"
                 android:textColor="#C2C2C2"/>
 

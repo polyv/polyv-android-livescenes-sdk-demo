@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="8dp"
             android:paddingVertical="8dp"
-            android:text="视频连麦"
+            android:text="@string/plv_linkmic_video_type"
             android:textColor="#F0F1F5"
             android:textSize="14sp" />
 
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="8dp"
             android:paddingVertical="8dp"
-            android:text="音频连麦"
+            android:text="@string/plv_linkmic_audio_type"
             android:textColor="#F0F1F5"
             android:textSize="14sp" />
 

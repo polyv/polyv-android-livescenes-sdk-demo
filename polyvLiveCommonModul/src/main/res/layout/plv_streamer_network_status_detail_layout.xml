@@ -19,7 +19,7 @@
             android:id="@+id/plv_streamer_network_delay_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="网络延迟：0ms"
+            android:text="@string/plv_streamer_network_delay"
             android:textColor="#F0F1F5"
             android:textSize="14sp" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="丢包率：↑0.0% ↓0.0%"
+            android:text="@string/plv_streamer_network_packet_loss"
             android:textColor="#F0F1F5"
             android:textSize="14sp" />
 

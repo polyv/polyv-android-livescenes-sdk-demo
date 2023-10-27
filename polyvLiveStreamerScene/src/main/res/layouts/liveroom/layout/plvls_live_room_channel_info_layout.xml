@@ -28,7 +28,7 @@
             android:layout_marginLeft="44dp"
             android:layout_marginRight="44dp"
             android:gravity="center_vertical"
-            android:text="频道信息"
+            android:text="@string/plv_live_channel_info"
             android:textColor="#F0F1F5"
             android:textSize="16sp" />
 
@@ -140,7 +140,7 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginTop="12dp"
                         android:layout_toRightOf="@+id/plvls_channel_info_live_desc_iv"
-                        android:text="直播介绍"
+                        android:text="@string/plv_live_intro"
                         android:textColor="#F0F1F5"
                         android:textSize="14sp" />
                 </RelativeLayout>

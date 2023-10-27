@@ -48,7 +48,7 @@ public class PLVLCRewardViewHolder extends PLVChatMessageBaseViewHolder<PLVBaseV
                 if(rewardEvent.getObjects()[0] != null ){
                     SpannableStringBuilder message = (SpannableStringBuilder) rewardEvent.getObjects()[0];
                     String msg = message.toString();
-                    String nick = msg.substring(0, msg.lastIndexOf("赠送"));
+                    String nick = msg.substring(0, msg.lastIndexOf(PLVAppUtils.getString(R.string.plv_reward_give)));
                     if(nick.length() > 10){
                         String omitNick = nick.substring(0,8) + "... ";
                         SpannableStringBuilder result = new SpannableStringBuilder(omitNick);

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.download.fragment.PLVPlaybackCacheFragment;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVViewPagerAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVViewPagerHelper;
@@ -22,6 +23,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.indicators.PLVLinePagerIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavigator.titles.PLVColorTransitionPagerTitleView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 
 import java.util.ArrayList;
@@ -41,6 +43,11 @@ public class PLVPlaybackCacheActivity extends PLVBaseActivity implements View.On
     private PagerAdapter viewPagerAdapter;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.useAttachLanguage(newBase));
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plv_playback_cache_activity);
@@ -58,8 +65,8 @@ public class PLVPlaybackCacheActivity extends PLVBaseActivity implements View.On
     }
 
     private void initTab() {
-        playbackCacheFragments.add(PLVPlaybackCacheFragment.create("下载中", true));
-        playbackCacheFragments.add(PLVPlaybackCacheFragment.create("已下载", false));
+        playbackCacheFragments.add(PLVPlaybackCacheFragment.create(PLVAppUtils.getString(R.string.plv_download_downloading), true));
+        playbackCacheFragments.add(PLVPlaybackCacheFragment.create(PLVAppUtils.getString(R.string.plv_download_downloaded), false));
 
         viewPagerAdapter = new PLVViewPagerAdapter(getSupportFragmentManager(), playbackCacheFragments);
         playbackCacheVp.setAdapter(viewPagerAdapter);

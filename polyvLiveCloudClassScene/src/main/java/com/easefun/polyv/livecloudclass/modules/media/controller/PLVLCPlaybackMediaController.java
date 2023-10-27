@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -88,10 +89,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     /**** status **/
     // 进度条是否处于拖动的状态
     private boolean isPbDragging;
-    //已经显示过"可从此处重新打开浮窗"的提示了
+    //已经显示过 可从此处重新打开浮窗 的提示了
     private boolean hasShowReopenFloatingViewTip = false;
 
-    //延迟隐藏"可从此处重新打开浮窗"
+    //延迟隐藏 可从此处重新打开浮窗
     private Disposable reopenFloatingDelay;
 
     //延迟隐藏“控制栏”
@@ -384,10 +385,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
         if (tvStartSendMessageLand != null) {
             if (isChatPlaybackEnabled || !isLiveType) {
-                tvStartSendMessageLand.setText("聊天室暂时关闭");
+                tvStartSendMessageLand.setText(PLVAppUtils.getString(R.string.plv_chat_input_tips_chatroom_close));
                 tvStartSendMessageLand.setEnabled(false);
             } else {
-                tvStartSendMessageLand.setText("跟大家聊点什么吧~");
+                tvStartSendMessageLand.setText(PLVAppUtils.getString(R.string.plv_chat_input_tips_chat));
                 tvStartSendMessageLand.setEnabled(true);
             }
         }
@@ -407,7 +408,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
         if (tvStartSendMessageLand != null) {
-            tvStartSendMessageLand.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            String text = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat));
+            tvStartSendMessageLand.setText(text);
             tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
     }

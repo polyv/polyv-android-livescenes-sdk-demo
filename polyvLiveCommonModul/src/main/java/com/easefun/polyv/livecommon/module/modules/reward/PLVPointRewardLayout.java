@@ -268,7 +268,7 @@ public class PLVPointRewardLayout extends FrameLayout implements IPLVPointReward
      */
     private void exchangeGiftPointRewardLayout(){
         if(rewardDialogView != null){
-            rewardDialogView.getRewardTitleTextView().setText("积分打赏");
+            rewardDialogView.getRewardTitleTextView().setText(R.string.plv_reward_type_point);
             rewardDialogView.getRemainingPointTextView().setVisibility(VISIBLE);
         }
     }
@@ -278,7 +278,7 @@ public class PLVPointRewardLayout extends FrameLayout implements IPLVPointReward
      */
     private void exchangeGiftCashRewardLayout(){
         if(rewardDialogView != null){
-            rewardDialogView.getRewardTitleTextView().setText("道具打赏");
+            rewardDialogView.getRewardTitleTextView().setText(R.string.plv_reward_type_cash);
             rewardDialogView.getRemainingPointTextView().setVisibility(INVISIBLE);
         }
     }

@@ -51,7 +51,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="模式"
+                        android:text="@string/plv_player_mode"
                         android:textColor="#ffffff"
                         android:textSize="18sp" />
 
@@ -66,22 +66,26 @@
 
                     <TextView
                         android:id="@+id/plvec_live_more_low_latency_tv"
-                        android:layout_width="66dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="26dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
-                        android:text="无延迟"
+                        android:text="@string/plv_player_low_latency"
+                        android:minWidth="66dp"
+                        android:paddingHorizontal="6dp"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/plvec_live_more_normal_latency_tv"
-                        android:layout_width="66dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="26dp"
                         android:layout_marginLeft="16dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
-                        android:text="正常延迟"
+                        android:text="@string/plv_player_normal_latency"
+                        android:minWidth="66dp"
+                        android:paddingHorizontal="6dp"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp" />
                 </LinearLayout>

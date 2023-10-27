@@ -311,7 +311,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         backIv = findViewById(R.id.plvec_controller_back_iv);
         backIv.setOnClickListener(this);
         morePopupView = new PLVECMorePopupView();
-        morePopupView.init(moreIv);
+        morePopupView.initLiveMoreLayout(moreIv);
         chatImgScanPopupView = new PLVECChatImgScanPopupView();
         if (getContext() != null) {
             chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
@@ -629,10 +629,10 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 chatInputWindow.requestClose();
             }
         }
-        sendMsgTv.setText(isSelectedQuizStatus ? R.string.plvec_chat_input_tips_quiz
-                : (isCloseRoomStatus ? R.string.plvec_chat_input_tips_close
-                : (isFocusModeStatus ? R.string.plvec_chat_input_tips_focus
-                : R.string.plvec_chat_input_tips_chat)));
+        sendMsgTv.setText(isSelectedQuizStatus ? R.string.plv_chat_input_tips_quiz
+                : (isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2
+                : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus_2
+                : R.string.plv_chat_input_tips_chat_6)));
         sendMsgTv.setOnClickListener(isEnabled ? this : null);
         if (chatInputWindow != null) {
             chatInputWindow.updateHintPair(sendMsgTv.getText().toString(), isEnabled);
@@ -930,7 +930,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // <editor-fold defaultstate="collapsed" desc="更多弹窗 - 布局显示及交互处理">
     private void showMorePopupWindow(View v) {
         boolean isCurrentVideoMode = onViewActionListener == null || onViewActionListener.onGetMediaPlayModeAction() == PolyvMediaPlayMode.MODE_VIDEO;
-        morePopupView.showLiveMoreLayout(v, isCurrentVideoMode, new PLVECMorePopupView.OnLiveMoreClickListener() {
+        morePopupView.showLiveMoreLayout(v, isCurrentVideoMode, liveRoomDataManager.getConfig().getChannelId(), new PLVECMorePopupView.OnLiveMoreClickListener() {
             @Override
             public boolean onPlayModeClick(View view) {
                 if (onViewActionListener != null) {

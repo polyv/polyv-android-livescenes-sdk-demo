@@ -5,6 +5,7 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
 
 import android.app.Activity;
 import androidx.lifecycle.Observer;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -47,6 +48,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -58,6 +60,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
@@ -133,6 +136,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param channelType 频道类型
      * @param viewerId    观众ID
      * @param viewerName  观众昵称
+     * @param langType    观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -142,23 +146,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                              @NonNull PLVLiveChannelType channelType,
                                              @NonNull String viewerId,
                                              @NonNull String viewerName,
-                                             @NonNull String viewerAvatar) {
+                                             @NonNull String viewerAvatar,
+                                             String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_channel_id_is_empty));
         }
         if (channelType == null) {
-            return PLVLaunchResult.error("channelType 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_channel_type_is_null));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_viewer_name_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
@@ -174,8 +180,6 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * 启动回放页面
      * 如果没有输入vid的情况下会加载该频道的往期视频列表，如果输入vid的话就直接播放相应vid的视频，
      * 这样的话就不会加载往期视频列表
-     * 若是想关闭不输入vid播放往期视频列表这个功能的话可以放开下面
-     * PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");的注释
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
@@ -184,6 +188,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
+     * @param langType      观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -196,23 +201,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                                  @NonNull String viewerId,
                                                  @NonNull String viewerName,
                                                  @NonNull String viewerAvatar,
-                                                 PLVPlaybackListType videoListType) {
+                                                 PLVPlaybackListType videoListType,
+                                                 String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_channel_id_is_empty));
         }
         if (channelType == null) {
-            return PLVLaunchResult.error("channelType 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_channel_type_is_null));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_viewer_name_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
@@ -229,6 +236,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -251,6 +263,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
             @Override
             public void run() {
+                PLVLanguageUtil.detachLanguageActivity();
                 PLVFloatingPlayerManager.getInstance().clear();
                 if (mediaLayout != null) {
                     mediaLayout.destroy();
@@ -1207,7 +1220,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             PLVScreenUtils.enterLandscape(this);
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);

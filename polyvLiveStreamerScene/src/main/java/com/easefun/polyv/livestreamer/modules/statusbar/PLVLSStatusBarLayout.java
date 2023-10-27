@@ -410,7 +410,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     public void showAlertDialogNoNetwork() {
         new AlertDialog.Builder(getContext())
                 .setMessage(R.string.plv_streamer_dialog_no_network)
-                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_5, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -496,7 +496,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // <editor-fold defaultstate="collapsed" desc="上下课开关控制">
     private void changeStatesToClassStarted() {
-        plvlsStatusBarClassControlTv.setText("下课");
+        plvlsStatusBarClassControlTv.setText(R.string.plv_streamer_stop);
         plvlsStatusBarClassControlTv.setEnabled(true);
         plvlsStatusBarClassControlTv.setSelected(true);
 
@@ -505,7 +505,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     private void changeStatesToClassOver() {
-        plvlsStatusBarClassControlTv.setText("上课");
+        plvlsStatusBarClassControlTv.setText(R.string.plv_streamer_start);
         plvlsStatusBarClassControlTv.setSelected(false);
         plvlsStatusBarClassControlTv.setEnabled(true);
 

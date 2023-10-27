@@ -139,7 +139,7 @@ public class PLVLSPushDowngradeAlertToastLayout extends FrameLayout {
         }
         presenter.setPushDowngradePreference(PLVPushDowngradePreference.PREFER_BETTER_FLUENCY);
         PLVToast.Builder.context(getContext())
-                .setText("已切换到流畅优先模式")
+                .setText(R.string.plv_streamer_change_to_prefer_fluency)
                 .show();
     }
 

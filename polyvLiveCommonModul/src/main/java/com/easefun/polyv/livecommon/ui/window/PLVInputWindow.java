@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.ui.window;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -68,6 +70,11 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.useAttachLanguage(newBase));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

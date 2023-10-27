@@ -19,7 +19,7 @@
         android:layout_marginLeft="16dp"
         android:gravity="center"
         android:layout_marginTop="14dp"
-        android:text="成员列表"
+        android:text="@string/plv_chat_member_list"
         android:textColor="#F0F1F5"
         android:textSize="16sp" />
 
@@ -46,7 +46,7 @@
         android:layout_toLeftOf="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
         android:background="@drawable/plvls_member_linkmic_control_bg_shape"
         android:gravity="center"
-        android:text="全体下麦"
+        android:text="@string/plv_linkmic_hang_all_off"
         android:textColor="#4399FF"
         android:textSize="12sp" />
 
@@ -60,7 +60,7 @@
         android:layout_marginRight="16dp"
         android:background="@drawable/plvls_member_linkmic_control_bg_shape"
         android:gravity="center"
-        android:text="全体静音"
+        android:text="@string/plv_linkmic_mute_all_audio"
         android:textColor="#4399FF"
         android:textSize="12sp" />
 

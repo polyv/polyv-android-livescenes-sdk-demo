@@ -42,6 +42,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
@@ -232,7 +233,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                     plvsaSettingLiveTitleTv.setText(liveTitle);
                     plvsaSettingLiveTitleTv.setTextColor(Color.parseColor("#F0F1F5"));
                 } else {
-                    plvsaSettingLiveTitleTv.setText("点击输入直播标题");
+                    plvsaSettingLiveTitleTv.setText(R.string.plv_live_input_live_title_hint);
                     plvsaSettingLiveTitleTv.setTextColor(Color.parseColor("#99FFFFFF"));
                 }
             }
@@ -388,7 +389,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private void initStartLiveBtnText() {
-        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plvsa_setting_start_live));
+        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plv_streamer_start_live));
     }
 
     private void initPushResolutionRatioLayout() {
@@ -478,7 +479,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 .setContent(R.string.plv_streamer_dialog_no_network)
                 .setIsNeedLeftBtn(false)
                 .setCancelable(false)
-                .setRightButtonText("确定")
+                .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                 .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {
@@ -505,7 +506,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
         if (liveTitle.length() == 0) {
             PLVToast.Builder.context(getContext())
-                    .setText("直播标题不能为空")
+                    .setText(R.string.plv_live_title_non_null)
                     .build()
                     .show();
             return;
@@ -534,7 +535,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         return;
                     }
                     switchBitrateByUser = false;
-                    String toastText = "已切换为" + PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
+                    String toastText = PLVAppUtils.formatString(R.string.plv_player_change_definition_2, PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId));
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -718,16 +719,16 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 final PLVConfirmDialog confirmDialog = new PLVSAConfirmDialog(getContext());
                 for (String deniedPermission : deniedPermissions) {
                     if (Manifest.permission.CAMERA.equals(deniedPermission)) {
-                        confirmDialog.setTitle("摄像头权限申请")
-                                .setContent("请前往“设置-隐私-摄像头”开启权限")
-                                .setLeftButtonText("取消")
+                        confirmDialog.setTitle(R.string.plv_linkmic_camera_permission_apply)
+                                .setContent(R.string.plv_linkmic_camera_permission_apply_hint)
+                                .setLeftButtonText(R.string.plv_common_dialog_cancel)
                                 .setLeftBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         confirmDialog.hide();
                                     }
                                 })
-                                .setRightButtonText("设置")
+                                .setRightButtonText(R.string.plv_common_dialog_setting)
                                 .setRightBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -737,16 +738,16 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         break;
                     }
                     if (Manifest.permission.RECORD_AUDIO.equals(deniedPermission)) {
-                        confirmDialog.setTitle("麦克风权限申请")
-                                .setContent("请前往“设置-隐私-麦克风”开启权限")
-                                .setLeftButtonText("取消")
+                        confirmDialog.setTitle(R.string.plv_linkmic_microphone_permission_apply)
+                                .setContent(R.string.plv_linkmic_microphone_permission_apply_hint)
+                                .setLeftButtonText(R.string.plv_common_dialog_cancel)
                                 .setLeftBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         confirmDialog.hide();
                                     }
                                 })
-                                .setRightButtonText("设置")
+                                .setRightButtonText(R.string.plv_common_dialog_setting)
                                 .setRightBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

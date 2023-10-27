@@ -83,7 +83,7 @@ public class PLVLCDanmuSettingLayout {
             public void onRangeChangeStep(int step) {
                 if(step >= 0 && step < 5){
                     PLVDanmuSpeedType speedType = PLVDanmuSpeedType.matchByLevel(step);
-                    speedTv.setText(speedType.speedType);
+                    speedTv.setText(speedType.getSpeedType());
                     if(danmuWrapper != null){
                         danmuWrapper.setDanmuSpeed(speedType.speed);
                     }
@@ -119,7 +119,7 @@ public class PLVLCDanmuSettingLayout {
         float progress = (speedType.level) * stepPercent * seekBar.getMaxProgress();
         seekBar.setProgress(progress);
         //根据速度来筛选速度文本
-        speedTv.setText(speedType.speedType);
+        speedTv.setText(speedType.getSpeedType());
         if(danmuWrapper != null) {
             danmuWrapper.setDanmuSpeed(speedType.speed);
         }

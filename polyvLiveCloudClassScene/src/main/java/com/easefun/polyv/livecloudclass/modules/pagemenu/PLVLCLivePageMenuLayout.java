@@ -42,6 +42,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragmen
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
@@ -56,10 +57,12 @@ import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviou
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVLanguageSwitchPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVViewPagerAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVViewPagerHelper;
@@ -74,8 +77,10 @@ import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
@@ -127,6 +132,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLotteryManager lotteryManager = new PLVLotteryManager();
     //更多浮层view
     private PLVLCChatMoreFloatingView chatMoreFloatingView;
+    //语言切换弹窗
+    private PLVLanguageSwitchPopupWindow languageSwitchPopupWindow;
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -299,12 +306,21 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             }
 
             @Override
+            public void onShowLanguageAction() {
+                languageSwitchPopupWindow.show(liveRoomDataManager.getConfig().getChannelId());
+            }
+
+            @Override
             public void onClickDynamicFunction(String event) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onClickChatMoreDynamicFunction(event);
                 }
             }
         });
+    }
+
+    private void initLanguageSwitchPopupWindow() {
+        languageSwitchPopupWindow = new PLVLanguageSwitchPopupWindow(this);
     }
     // </editor-fold>
 
@@ -400,6 +416,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
         initChatPlaybackManager();
         initChatMoreFloatingView();
+        initLanguageSwitchPopupWindow();
 
         chatCommonMessageList.init(liveRoomDataManager);
 
@@ -489,6 +506,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
         if (liveDescFragment != null) {
             liveDescFragment.updateLiveStatus(liveStateEnum);
+        }
+        if (tuWenFragment != null) {
+            tuWenFragment.updateLiveStatus(liveStateEnum);
         }
     }
 
@@ -584,6 +604,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         qaDataBean.setUserPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
         qaDataBean.setUserNick(liveRoomDataManager.getConfig().getUser().getViewerName());
         qaDataBean.setTheme(PLVLiveClassDetailVO.DataBean.QADataBean.THEME_BLACK);
+        qaDataBean.setLocal(PLVLanguageUtil.isENLanguage() ? PLVLiveClassDetailVO.DataBean.QADataBean.LOCALE_EN : PLVLiveClassDetailVO.DataBean.QADataBean.LOCALE_ZH);
         qaDataBean.setSocketMsg();
         questionsAndAnswersFragment.init(qaDataBean.getSocketMsg());
         pageMenuTabFragmentList.add(questionsAndAnswersFragment);
@@ -592,7 +613,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private void addTuWenTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
         tuWenFragment = new PLVLCTuWenFragment();
-        tuWenFragment.init(liveRoomDataManager.getConfig().getChannelId());
+        PLVInteractNativeAppParams appParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+        tuWenFragment.init(liveRoomDataManager.getConfig().getChannelId(),appParams);
         pageMenuTabFragmentList.add(tuWenFragment);
     }
 
@@ -625,6 +647,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     if (onViewActionListener != null) {
                         onViewActionListener.onShowBulletinAction();
                     }
+                }
+
+                @Override
+                public void onShowLanguageAction() {
+                    languageSwitchPopupWindow.show(liveRoomDataManager.getConfig().getChannelId());
                 }
 
                 @Override
@@ -672,7 +699,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             pageMenuTabFragmentList.add(chatFragment);
         }
         if (chatMoreFloatingView != null) {
-            chatMoreFloatingView.setVisibility(!isDisplayEnabled && liveRoomDataManager.getConfig().isLive() ? View.VISIBLE : View.GONE);
+            chatMoreFloatingView.setVisibility(!isDisplayEnabled ? View.VISIBLE : View.GONE);
         }
         if (onViewActionListener != null) {
             onViewActionListener.onChatTabPrepared(isChatPlaybackEnabled(), isDisplayEnabled);
@@ -711,7 +738,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 && !liveRoomDataManager.getConfig().isLive()
                 && liveRoomDataManager.getConfig().getVid().isEmpty()) {
             PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean = new PLVLiveClassDetailVO.DataBean.ChannelMenusBean();
-            channelMenusBean.setName("往期");
+            channelMenusBean.setName(PLVAppUtils.getString(R.string.plv_previous_title));
             addPreviousTab(channelMenusBean);
         }
     }
@@ -769,7 +796,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (liveDescOfflineFragment == null) {
             liveDescOfflineFragment = new PLVLCLiveDescOfflineFragment();
         }
-        pageMenuTabTitleList.add("介绍");
+        pageMenuTabTitleList.add(PLVAppUtils.getString(R.string.plv_live_intro_2));
         pageMenuTabFragmentList.add(liveDescOfflineFragment);
         refreshPageMenuTabAdapter();
     }
@@ -927,9 +954,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getContext())
-                .setTitle("温馨提示")
+                .setTitle(R.string.plv_common_dialog_tip_warm)
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ((Activity) getContext()).finish();

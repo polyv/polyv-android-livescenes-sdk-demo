@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
@@ -30,12 +31,12 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.presenter.usecase.PLV
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
 import com.easefun.polyv.livescenes.linkmic.listener.PolyvLinkMicEventListener;
-import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -238,7 +239,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         linkMicManager.initEngine(param, new PLVLinkMicListener() {
             @Override
             public void onLinkMicEngineCreatedSuccess() {
-                PLVCommonLog.d(TAG, "连麦初始化成功");
+                PLVCommonLog.d(TAG, "连麦初始化成功");// no need i18n
                 linkMicInitState = LINK_MIC_INITIATED;
                 linkMicManager.addEventHandler(eventListener);
 
@@ -259,7 +260,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         myLinkMicId = linkMicManager.getLinkMicUid();
         if (TextUtils.isEmpty(myLinkMicId)) {
             if (linkMicView != null) {
-                linkMicView.onLinkMicError(-1, new Throwable("获取到空的linkMicId"));
+                linkMicView.onLinkMicError(-1, new Throwable(PLVAppUtils.getString(R.string.plv_linkmic_id_empty)));
             }
             return false;
         }
@@ -351,7 +352,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             stopJoinTimeoutCount();
                             if (!linkMicList.isEmpty()) {
                                 //正常情况下不会走这里的逻辑，走到这里的可能是：退出了RTC频道，但是还收到了RTC的用户加入事件。为了安全，还是做一个检查和清空。
-                                PLVCommonLog.w(TAG, "非无延迟观看，加入连麦时，连麦列表不为空！手动清空连麦列表，连麦列表为：\n" + linkMicList.toString());
+                                PLVCommonLog.w(TAG, "非无延迟观看，加入连麦时，连麦列表不为空！手动清空连麦列表，连麦列表为：\n" + linkMicList.toString());// no need i18n
                                 cleanLinkMicListData();
                             }
                             //如果是普通连麦观众，则rtc上麦就表示加入了连麦列表
@@ -456,7 +457,6 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         if (linkMicMsgHandler != null) {
             linkMicMsgHandler.destroy();
         }
-        PolyvLinkMicConfig.getInstance().clear();
     }
 
     @Override
@@ -799,10 +799,10 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     }
                 }
                 if (TextUtils.isEmpty(teacherLinkMicId)) {
-                    PLVCommonLog.d(TAG, "该频道内不存在讲师");
+                    PLVCommonLog.d(TAG, "该频道内不存在讲师");// no need i18n
                 }
                 if (TextUtils.isEmpty(guestLinkMicId)) {
-                    PLVCommonLog.d(TAG, "该频道内不存在嘉宾");
+                    PLVCommonLog.d(TAG, "该频道内不存在嘉宾");// no need i18n
                 }
 
                 //2. 设置初始化的第一画面用户ID
@@ -819,7 +819,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 if (TextUtils.isEmpty(firstScreenLinkMicId)) {
                     firstScreenLinkMicId = data.getJoinList().get(0).getUserId();
                 }
-                PLVCommonLog.d(TAG, "第一画面:" + firstScreenLinkMicId);
+                PLVCommonLog.d(TAG, "第一画面:" + firstScreenLinkMicId);// no need i18n
 
                 if (rtcInvokeStrategy != null && rtcInvokeStrategy.isJoinChannel()) {
                     rtcInvokeStrategy.setFirstScreenLinkMicId(firstScreenLinkMicId, isMuteAllVideo);
@@ -1397,7 +1397,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                     linkMicList.add(0, dataBean);
                 } else if (dataBean.getLinkMicId().equals(myLinkMicId)) {
                     // 添加自己
-                    PLVCommonLog.d(TAG, "onUserJoinSuccess-> 收到自己的joinSuccess事件");
+                    PLVCommonLog.d(TAG, "onUserJoinSuccess-> 收到自己的joinSuccess事件");// no need i18n
                 } else {
                     // 添加观众
                     linkMicList.add(dataBean);
@@ -1592,19 +1592,19 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     private void showRequestPermissionDialog() {
-        new AlertDialog.Builder(ActivityUtils.getTopActivity()).setTitle("提示")
-                .setMessage("通话所需的相机权限和麦克风权限被拒绝，请到应用设置的权限管理中恢复")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(ActivityUtils.getTopActivity()).setTitle(R.string.plv_common_dialog_tip)
+                .setMessage(R.string.plv_linkmic_error_tip_permission_denied)
+                .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         PLVFastPermission.getInstance().jump2Settings(ActivityUtils.getTopActivity());
                         linkMicView.onLeaveLinkMic();
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ActivityUtils.getTopActivity(), "权限不足，申请发言失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivityUtils.getTopActivity(), R.string.plv_linkmic_error_tip_permission_cancel, Toast.LENGTH_SHORT).show();
                         linkMicView.onLeaveLinkMic();
                     }
                 }).setCancelable(false).show();
@@ -1620,9 +1620,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     public static class SortLinkMicListUtils {
         //按第一画面>讲师>自己>嘉宾>管理员>助教>非虚拟用户>虚拟用户类型进行排序
-        private static final String FIRST = "第一画面";
-        private static final String SELF = "自己";
-        private static final String REAL = "非虚拟";
+        private static final String FIRST = "第一画面";// no need i18n
+        private static final String SELF = "自己";// no need i18n
+        private static final String REAL = "非虚拟";// no need i18n
         private static final String REAL_LINK_MIC_RTC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_RTC_JOIN;
         private static final String REAL_LINK_MIC_JOIN = REAL + PLVLinkMicItemDataBean.STATUS_JOIN;
         private static final String REAL_LINK_MIC_JOINING = REAL + PLVLinkMicItemDataBean.STATUS_JOINING;

@@ -41,7 +41,7 @@
             android:layout_toRightOf="@+id/plvsa_member_camera_iv"
             android:gravity="center|left"
             android:minEms="4"
-            android:text="摄像头"
+            android:text="@string/plv_linkmic_camera"
             android:textColor="#FFF0F1F5"
             android:textSize="14sp"
             android:visibility="visible" />
@@ -64,7 +64,7 @@
             android:layout_toRightOf="@+id/plvsa_member_mic_iv"
             android:gravity="center|left"
             android:minEms="4"
-            android:text="麦克风"
+            android:text="@string/plv_linkmic_microphone"
             android:textColor="#FFF0F1F5"
             android:textSize="14sp"
             android:visibility="visible" />
@@ -87,7 +87,7 @@
             android:layout_toRightOf="@+id/plvsa_member_grant_speaker_iv"
             android:gravity="center|left"
             android:minEms="4"
-            android:text="授予主讲权限"
+            android:text="@string/plv_streamer_grant_speaker_permission_6"
             android:textColor="#FFF0F1F5"
             android:textSize="14sp"
             android:visibility="visible" />
@@ -110,7 +110,7 @@
             android:gravity="center|left"
             android:paddingRight="10dp"
             android:minEms="4"
-            android:text="踢出"
+            android:text="@string/plv_chat_kick"
             android:textColor="#FFF0F1F5"
             android:textSize="14sp" />
 
@@ -132,7 +132,7 @@
             android:gravity="center|left"
             android:minEms="4"
             android:singleLine="true"
-            android:text="禁言"
+            android:text="@string/plv_chat_ban"
             android:textColor="#FFF0F1F5"
             android:textSize="14sp" />
     </RelativeLayout>

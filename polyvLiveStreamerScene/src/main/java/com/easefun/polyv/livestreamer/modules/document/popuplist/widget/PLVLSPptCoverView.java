@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.document.popuplist.vo.PLVLSPptVO;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
 /**
  * PPT文档列表项视图
@@ -274,9 +275,9 @@ public class PLVLSPptCoverView extends PLVLSAbsPptViewItem {
             ProgressViewResult parsePptVO(PLVLSPptVO pptVO) {
                 ProgressViewResult result = new ProgressViewResult();
                 result.showType = PLVLSPptUploadProgressView.SHOW_TYPE_TEXT;
-                result.hintContent = "上传失败";
+                result.hintContent = PLVAppUtils.getString(R.string.plvls_document_upload_status_failed);
                 result.hintContentTextColor = Color.parseColor("#F24453");
-                result.buttonText = "重试";
+                result.buttonText = PLVAppUtils.getString(R.string.plvls_document_upload_retry);
                 return result;
             }
         }
@@ -287,7 +288,7 @@ public class PLVLSPptCoverView extends PLVLSAbsPptViewItem {
                 ProgressViewResult result = new ProgressViewResult();
                 result.showType = PLVLSPptUploadProgressView.SHOW_TYPE_TEXT;
                 result.hintAlertIconVisibility = View.GONE;
-                result.hintContent = "上传成功，待转码";
+                result.hintContent = PLVAppUtils.getString(R.string.plvls_document_upload_status_success);
                 result.buttonVisibility = GONE;
                 return result;
             }
@@ -299,7 +300,7 @@ public class PLVLSPptCoverView extends PLVLSAbsPptViewItem {
                 ProgressViewResult result = new ProgressViewResult();
                 result.showType = PLVLSPptUploadProgressView.SHOW_TYPE_TEXT;
                 result.hintAlertIconVisibility = View.GONE;
-                result.hintContent = "正在转码...";
+                result.hintContent = PLVAppUtils.getString(R.string.plvls_document_upload_status_converting);
                 result.buttonVisibility = GONE;
                 return result;
             }
@@ -310,9 +311,9 @@ public class PLVLSPptCoverView extends PLVLSAbsPptViewItem {
             ProgressViewResult parsePptVO(PLVLSPptVO pptVO) {
                 ProgressViewResult result = new ProgressViewResult();
                 result.showType = PLVLSPptUploadProgressView.SHOW_TYPE_TEXT;
-                result.hintContent = "无法解码";
+                result.hintContent = PLVAppUtils.getString(R.string.plvls_document_upload_status_convert_fail);
                 result.hintContentTextColor = Color.parseColor("#F24453");
-                result.buttonText = "帮助";
+                result.buttonText = PLVAppUtils.getString(R.string.plvls_document_upload_help);
                 return result;
             }
         }
@@ -323,8 +324,8 @@ public class PLVLSPptCoverView extends PLVLSAbsPptViewItem {
                 ProgressViewResult result = new ProgressViewResult();
                 result.showType = PLVLSPptUploadProgressView.SHOW_TYPE_TEXT;
                 result.hintAlertIconVisibility = GONE;
-                result.hintContent = "动效丢失，不影响使用";
-                result.buttonText = "知道了";
+                result.hintContent = PLVAppUtils.getString(R.string.plvls_document_upload_status_convert_animate_loss);
+                result.buttonText = PLVAppUtils.getString(R.string.plv_common_dialog_confirm_5);
                 return result;
             }
         }

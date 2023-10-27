@@ -4,7 +4,8 @@
     android:id="@+id/plvec_live_more_floating_ll"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="center"
+    android:gravity="center_horizontal"
+    android:paddingTop="4dp"
     android:minWidth="72dp"
     android:minHeight="72dp"
     android:orientation="vertical"
@@ -23,7 +24,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="小窗播放"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:paddingHorizontal="3dp"
         android:textColor="#CDCDCD"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        tools:text="小窗播放" />
 </LinearLayout>

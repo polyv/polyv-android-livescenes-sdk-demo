@@ -2,8 +2,10 @@ package com.easefun.polyv.livestreamer.scenes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +19,7 @@ import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
@@ -39,6 +42,7 @@ import com.easefun.polyv.livestreamer.modules.streamer.di.PLVLSStreamerModule;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -121,30 +125,31 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                                                  boolean isOpenCamera,
                                                  boolean isFrontCamera) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_channel_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_viewer_name_is_empty));
         }
         if (TextUtils.isEmpty(avatarUrl)) {
-            return PLVLaunchResult.error("avatarUrl 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_avatar_url_is_empty));
         }
         if (TextUtils.isEmpty(actor)) {
-            return PLVLaunchResult.error("actor 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_actor_is_empty));
         }
         if (TextUtils.isEmpty(usertype)) {
-            return PLVLaunchResult.error("usertype 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_user_type_is_empty));
         }
         if (TextUtils.isEmpty(colinMicType)) {
-            return PLVLaunchResult.error("colinMicType 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_colin_mic_type_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, PLVLanguageUtil.LANGUAGE_FOLLOW_SYSTEM);
         Intent intent = new Intent(activity, PLVLSLiveStreamerActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
@@ -162,6 +167,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,6 +194,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PLVLanguageUtil.detachLanguageActivity();
         PLVBeautyInitHelper.getInstance().destroy();
         if (plvlsStatusBarLy != null) {
             plvlsStatusBarLy.destroy();
@@ -240,6 +251,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
     }
     // </editor-fold>
 
@@ -445,11 +461,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                         final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
                         final String text;
                         if (!isGrant) {
-                            text = "已收回主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_remove_speaker_permission_2);
                         } else if (isGuestTransferPermission) {
-                            text = "已移交主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_change_speaker_permission);
                         } else {
-                            text = "已授予主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_2);
                         }
                         PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
                                 .setText(text)
@@ -544,7 +560,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 }
                 plvlsChatroomLy.setOpenMicViewStatus(aBoolean);
                 PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
-                        .setText("已" + (aBoolean ? "开启" : "关闭") + "麦克风")
+                        .setText(PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_microphone_unmute_2 : R.string.plv_linkmic_microphone_mute_2))
                         .build()
                         .show();
             }
@@ -557,7 +573,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 }
                 plvlsChatroomLy.setOpenCameraViewStatus(aBoolean);
                 PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
-                        .setText("已" + (aBoolean ? "开启" : "关闭") + "摄像头")
+                        .setText(PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_camera_unmute_2 : R.string.plv_linkmic_camera_mute_2))
                         .build()
                         .show();
             }
@@ -651,8 +667,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
             final AlertDialog dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setMessage("检测到之前异常退出\n是否恢复直播？")
-                    .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.plv_streamer_recover_hint)
+                    .setPositiveButton(R.string.plv_streamer_stop_stream, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             liveRoomDataManager.setNeedStreamRecover(false);
@@ -660,7 +676,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                             plvlsStreamerLy.stopClass();
                         }
                     })
-                    .setNegativeButton("恢复直播", null)
+                    .setNegativeButton(R.string.plv_streamer_recover_stream, null)
                     .show();
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                 @Override

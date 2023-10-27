@@ -37,6 +37,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
@@ -227,7 +228,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         morePushDowngradePreferenceLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
-        plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+        plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
         if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
             plvsaMoreSettingsLayout.removeView(plvsaMoreShareScreenLl);
@@ -302,7 +303,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             @Override
             public void onStatus(boolean isClose) {
                 plvsaMoreCloseRoomIv.setSelected(isClose);
-                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
             }
         });
     }
@@ -504,7 +505,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
 
                     if (switchBitrateByUser) {
-                        String toastText = "已切换为" + bitrateText;
+                        String toastText = PLVAppUtils.formatString(R.string.plv_player_change_definition_2, bitrateText);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -522,7 +523,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     plvsaMoreMicIv.setSelected(!aBoolean);
 
                     if (attachedToWindow) {
-                        String toastText = "已" + (aBoolean ? "开启" : "关闭") + "麦克风";
+                        String toastText = PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_microphone_unmute_2 : R.string.plv_linkmic_microphone_mute);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -542,7 +543,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     plvsaMoreMirrorIv.setEnabled(enableVideo && !plvsaMoreCameraSwitchIv.isSelected());
 
                     if (attachedToWindow) {
-                        String toastText = "已" + (enableVideo ? "开启" : "关闭") + "摄像头";
+                        String toastText = PLVAppUtils.getString(enableVideo ? R.string.plv_linkmic_camera_unmute_2 : R.string.plv_linkmic_camera_mute);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -662,9 +663,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 @Override
                 public void onSuccess(String s) {
                     plvsaMoreCloseRoomIv.setSelected(!plvsaMoreCloseRoomIv.isSelected());
-                    plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+                    plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
-                    String toastText = "已" + (plvsaMoreCloseRoomIv.isSelected() ? "开启" : "解除") + "全体禁言";
+                    String toastText = PLVAppUtils.getString(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -673,7 +674,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 @Override
                 public void onFailed(Throwable t) {
                     PLVToast.Builder.context(getContext())
-                            .setText("操作失败，请检查网络")
+                            .setText(R.string.plv_chat_network_bad)
                             .build()
                             .show();
                 }
@@ -700,7 +701,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             close();
             if (!isEnableVideo) {
                 PLVToast.Builder.context(getContext())
-                        .setText(getContext().getString(R.string.plvsa_beauty_need_open_camera))
+                        .setText(getContext().getString(R.string.plv_beauty_need_open_camera))
                         .show();
                 return;
             }

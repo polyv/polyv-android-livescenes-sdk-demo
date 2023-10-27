@@ -35,7 +35,7 @@
         android:layout_toStartOf="@+id/plvsa_chatroom_sel_emoji_iv"
         android:background="@drawable/plvsa_chatroom_chat_msg_input_et_bg_shape"
         android:gravity="left|center"
-        android:hint="跟大家聊点什么吧~"
+        android:hint="@string/plv_chat_input_tips_chat"
         android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
         android:maxLength="2000"
         android:paddingLeft="16dp"

@@ -317,7 +317,7 @@ public class PLVDocumentNetPresenter {
                 // 上传失败
                 File file = new File(vo.getFilePath());
                 if (!file.exists()) {
-                    Log.i(TAG, "上次上传失败的文件已经不存在");
+                    Log.i(TAG, "上次上传失败的文件已经不存在");// no need i18n
                     // 文件不存在时直接清除本地缓存
                     plvPptUploadLocalRepository.removeCache(vo.getFileId());
                 } else {

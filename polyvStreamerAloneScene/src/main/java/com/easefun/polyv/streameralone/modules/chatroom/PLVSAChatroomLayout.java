@@ -187,7 +187,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         plvlsChatroomChatMsgRv.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
             public void onChange(int currentUnreadCount) {
-                plvlsChatroomUnreadMsgTv.setText(currentUnreadCount + "条新信息");
+                plvlsChatroomUnreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_4, currentUnreadCount + ""));
             }
         });
 
@@ -344,7 +344,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             } else {
                 String errorTips = getContext().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second;
                 if (PolyvLocalMessage.SENDVALUE_NOONLINE == sendResult.second) {
-                    errorTips = "当前网络不可用，请检查网络设置";
+                    errorTips = PLVAppUtils.getString(R.string.plv_streamer_network_bad_2);
                 }
                 //发送失败
                 PLVToast.Builder.context(getContext())
@@ -373,7 +373,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             } else {
                 String errorTips = getContext().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second;
                 if (PolyvLocalMessage.SENDVALUE_NOONLINE == sendResult.second) {
-                    errorTips = "当前网络不可用，请检查网络设置";
+                    errorTips = PLVAppUtils.getString(R.string.plv_streamer_network_bad_2);
                 }
                 //发送失败
                 PLVToast.Builder.context(getContext())
@@ -659,9 +659,9 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getContext())
-                .setTitle("温馨提示")
+                .setTitle(R.string.plv_common_dialog_tip_warm)
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ((Activity) getContext()).finish();

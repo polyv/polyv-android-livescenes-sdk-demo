@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="2dp"
         android:paddingVertical="4dp"
-        android:text="马上切换"
+        android:text="@string/plv_push_downgrade_alert_toast_confirm"
         android:textColor="#FF6363"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"

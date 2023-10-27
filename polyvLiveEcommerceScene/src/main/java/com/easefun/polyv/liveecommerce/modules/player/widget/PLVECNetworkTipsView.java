@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.concurrent.TimeUnit;
@@ -89,8 +90,8 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     private void initChangeLatencyText() {
-        final String hintText = "您的网络状态糟糕，可尝试在 更多>模式 ";
-        final String clickableText = "切换到正常延迟";
+        final String hintText = PLVAppUtils.getString(R.string.plv_player_network_bad_4);
+        final String clickableText = PLVAppUtils.getString(R.string.plv_player_change_to_normal_latency);
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(hintText);
         builder.append(clickableText);

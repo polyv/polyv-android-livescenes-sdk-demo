@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 
 import java.util.ArrayList;
@@ -95,12 +96,12 @@ public class PLVSARewardGiftAnimView extends FrameLayout {
                         if (!isGift) {
                             try {
                                 Double.parseDouble(rewardContent);
-                                rewardContent = rewardContent + "元";
+                                rewardContent = rewardContent + PLVAppUtils.getString(R.string.plv_reward_yuan);
                             } catch (Exception e) {
                             }
                         }
                         rewardUserNameTv.setText(rewardGiftInfo.getContent().getUnick());
-                        rewardGiftNameTv.setText((isGift ? "赠送" : "打赏") + "    " + rewardContent);
+                        rewardGiftNameTv.setText(PLVAppUtils.getString(isGift ? R.string.plv_reward_give : R.string.plv_reward_text) + "    " + rewardContent);
                         if (isGift) {
                             PLVImageLoader.getInstance().loadImage(gImg, rewardGiftPicIv);
                         } else {

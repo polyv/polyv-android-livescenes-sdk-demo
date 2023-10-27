@@ -1,6 +1,5 @@
 package com.easefun.polyv.livecloudclass.modules.download.widget;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
@@ -21,6 +20,7 @@ import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 
 import java.util.List;
@@ -109,20 +109,20 @@ public class PLVLCPlaybackCacheDownloadProgressButton extends FrameLayout {
         playbackCacheDownloadProgressForegroundTv.setVisibility(isDownloading ? View.VISIBLE : View.GONE);
         if (!isDownloading) {
             if (statusEnum == PLVPlaybackCacheDownloadStatusEnum.NOT_IN_DOWNLOAD_LIST) {
-                playbackCacheDownloadStatusTv.setText("立即下载");
+                playbackCacheDownloadStatusTv.setText(R.string.plv_download_at_once);
                 playbackCacheDownloadStatusTv.updateBackgroundColor(COLOR_DOWNLOAD_STATUS_BACKGROUND_NOT_DOWNLOAD);
             } else if (statusEnum == PLVPlaybackCacheDownloadStatusEnum.DOWNLOADED) {
-                playbackCacheDownloadStatusTv.setText("已下载");
+                playbackCacheDownloadStatusTv.setText(R.string.plv_download_downloaded);
                 playbackCacheDownloadStatusTv.updateBackgroundColor(COLOR_DOWNLOAD_STATUS_BACKGROUND_DOWNLOADED);
             } else if (statusEnum == PLVPlaybackCacheDownloadStatusEnum.DOWNLOAD_FAIL) {
-                playbackCacheDownloadStatusTv.setText("下载失败");
+                playbackCacheDownloadStatusTv.setText(R.string.plv_download_fail);
                 playbackCacheDownloadStatusTv.updateBackgroundColor(COLOR_DOWNLOAD_STATUS_BACKGROUND_DOWNLOADED);
             }
         }
         if (isDownloading) {
             if (PLVPlaybackCacheDownloadStatusEnum.DOWNLOADING.equals(statusEnum)) {
-                playbackCacheDownloadProgressBackgroundTv.setText(format("下载中 {}%", progress));
-                playbackCacheDownloadProgressForegroundTv.setText(format("下载中 {}%", progress));
+                playbackCacheDownloadProgressBackgroundTv.setText(PLVAppUtils.formatString(R.string.plv_download_downloading_2, progress + ""));
+                playbackCacheDownloadProgressForegroundTv.setText(PLVAppUtils.formatString(R.string.plv_download_downloading_2, progress + ""));
             } else {
                 playbackCacheDownloadProgressBackgroundTv.setText(statusEnum.getStatusName());
                 playbackCacheDownloadProgressForegroundTv.setText(statusEnum.getStatusName());
