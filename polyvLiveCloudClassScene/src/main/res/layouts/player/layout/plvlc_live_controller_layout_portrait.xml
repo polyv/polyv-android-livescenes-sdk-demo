@@ -64,7 +64,7 @@
         android:paddingTop="2dp"
         android:paddingRight="6dp"
         android:paddingBottom="2dp"
-        android:text="2.3w次播放"
+        tools:text="2.3w次播放"
         android:textColor="#D0D0D0"
         android:textSize="10sp"
         android:visibility="gone"

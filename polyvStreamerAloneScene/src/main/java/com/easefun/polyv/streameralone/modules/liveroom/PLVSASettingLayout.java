@@ -42,8 +42,10 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
@@ -75,6 +77,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private String channelId;
     //data
     private boolean isFrontCamera;
     private boolean isMirrorMode;
@@ -82,6 +85,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVSASettingTitleInputLayout titleInputLayout;
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
+    //混流布局设置布局
+    private PLVSAMixLayout mixLayout;
     //推流开始倒计时布局
     private IPLVSACountDownWindow countDownWindow;
 
@@ -97,10 +102,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
+    private ImageView plvsaSettingMixIv;
     private ImageView plvsaSettingScreenOrientationIv;
     private TextView plvsaSettingCameraOrientTv;
     private TextView plvsaSettingMirrorTv;
     private TextView plvsaSettingBitrateTv;
+    private TextView plvsaSettingMixTv;
     private TextView plvsaSettingScreenOrientationTv;
     private LinearLayout plvsaSettingBtnLl;
     private PLVRoundRectLayout plvsaSettingBeautyLayout;
@@ -124,6 +131,19 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private boolean isBeautyLayoutShowing = false;
 
     private long lastClickCameraSwitchViewTime;
+
+    private Map<Integer, Integer> bitrateMapIcon = new HashMap<Integer, Integer>() {{
+        put(PLVStreamerConfig.Bitrate.BITRATE_STANDARD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_HIGH, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
+    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -152,10 +172,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
         plvsaSettingBitrateIv = findViewById(R.id.plvsa_setting_bitrate_iv);
+        plvsaSettingMixIv = findViewById(R.id.plvsa_setting_mix_layout_iv);
         plvsaSettingScreenOrientationIv = findViewById(R.id.plvsa_setting_screen_orientation_iv);
         plvsaSettingCameraOrientTv = findViewById(R.id.plvsa_setting_camera_orient_tv);
         plvsaSettingMirrorTv = findViewById(R.id.plvsa_setting_mirror_tv);
         plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
+        plvsaSettingMixTv = findViewById(R.id.plvsa_setting_mix_layout_tv);
         plvsaSettingScreenOrientationTv = findViewById(R.id.plvsa_setting_screen_orientation_tv);
         plvsaSettingBtnLl = findViewById(R.id.plvsa_setting_btn_ll);
         plvsaSettingBeautyLayout = findViewById(R.id.plvsa_setting_beauty_layout);
@@ -174,12 +196,23 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingMirrorTv.setOnClickListener(this);
         plvsaSettingBitrateIv.setOnClickListener(this);
         plvsaSettingBitrateTv.setOnClickListener(this);
+        plvsaSettingMixIv.setOnClickListener(this);
+        plvsaSettingMixTv.setOnClickListener(this);
         plvsaSettingScreenOrientationIv.setOnClickListener(this);
         plvsaSettingScreenOrientationTv.setOnClickListener(this);
         settingPushResolutionRatioLl.setOnClickListener(this);
 
+        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
+            plvsaSettingMixIv.setVisibility(VISIBLE);
+            plvsaSettingMixTv.setVisibility(VISIBLE);
+        } else {
+            plvsaSettingMixIv.setVisibility(GONE);
+            plvsaSettingMixTv.setVisibility(GONE);
+        }
+
         initTitleInputLayout();
         initBitrateLayout();
+        initMixLayout();
         initTitleTextOnClickListener();
         initBeginCountDownWindow();
 
@@ -200,7 +233,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                     plvsaSettingLiveTitleTv.setText(liveTitle);
                     plvsaSettingLiveTitleTv.setTextColor(Color.parseColor("#F0F1F5"));
                 } else {
-                    plvsaSettingLiveTitleTv.setText("点击输入直播标题");
+                    plvsaSettingLiveTitleTv.setText(R.string.plv_live_input_live_title_hint);
                     plvsaSettingLiveTitleTv.setTextColor(Color.parseColor("#99FFFFFF"));
                 }
             }
@@ -236,7 +269,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 if (onViewActionListener != null) {
                     onViewActionListener.onBitrateClick(bitrate);
                 }
-                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrate));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId));
                 updateBitrateIcon(bitrate);
                 PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrate);
             }
@@ -261,6 +294,24 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         });
     }
 
+    private void initMixLayout() {
+        mixLayout = new PLVSAMixLayout(getContext());
+        mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
+            @Override
+            public int getMixInfo() {
+                return onViewActionListener != null ? onViewActionListener.getMixInfo() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                mixLayout.close();
+                if (onViewActionListener != null) {
+                    onViewActionListener.onMixClick(mix);
+                }
+            }
+        });
+    }
+
     /**
      * 初始化直播标题点击事件
      * 点击直播标题时，显示直播标题输入布局
@@ -269,7 +320,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isGuest()){
+                if (isGuest()) {
                     return;
                 }
                 ViewGroup.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -338,7 +389,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private void initStartLiveBtnText() {
-        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plvsa_setting_start_live));
+        plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plv_streamer_start_live));
     }
 
     private void initPushResolutionRatioLayout() {
@@ -362,16 +413,32 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         return PLVSocketUserConstant.USERTYPE_GUEST.equals(userType);
     }
+
+    private void initBitrateMapIcon() {
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            bitrateMapIcon.clear();
+            int i = 0;
+            for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
+                i++;
+                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSASettingLayout定义的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
 
         this.liveTitle = liveRoomDataManager.getConfig().getChannelName();
         plvsaSettingLiveTitleTv.setText(liveTitle);
         titleInputLayout.initTitle(liveTitle);
+        bitrateLayout.init(liveRoomDataManager);
+        mixLayout.init(liveRoomDataManager);
+        initBitrateMapIcon();
         initStartLiveBtnText();
         initPushResolutionRatioLayout();
 
@@ -385,7 +452,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (onViewActionListener != null) {
             Pair<Integer, Integer> bitrateInfo = onViewActionListener.getBitrateInfo();
             if (bitrateInfo != null) {
-                plvsaSettingBitrateTv.setText(PLVStreamerConfig.Bitrate.getText(bitrateInfo.second));
+                plvsaSettingBitrateTv.setText(PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrateInfo.second, channelId));
                 updateBitrateIcon(bitrateInfo.second);
                 PLVLiveLocalActionHelper.getInstance().updateBitrate(bitrateInfo.second);
             }
@@ -412,7 +479,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 .setContent(R.string.plv_streamer_dialog_no_network)
                 .setIsNeedLeftBtn(false)
                 .setCancelable(false)
-                .setRightButtonText("确定")
+                .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                 .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {
@@ -424,14 +491,14 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     @Override
     public boolean onBackPressed() {
-        return bitrateLayout.onBackPressed();
+        return bitrateLayout.onBackPressed() || mixLayout.onBackPressed();
     }
 
     @Override
     public void liveStart() {
         if (onViewActionListener != null) {
-            int currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-            if (currentNetworkQuality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            PLVLinkMicConstant.NetworkQuality currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
+            if (currentNetworkQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                 //如果断网，则不直播，显示弹窗。
                 showAlertDialogNoNetwork();
                 return;
@@ -439,7 +506,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
         if (liveTitle.length() == 0) {
             PLVToast.Builder.context(getContext())
-                    .setText("直播标题不能为空")
+                    .setText(R.string.plv_live_title_non_null)
                     .build()
                     .show();
             return;
@@ -468,7 +535,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         return;
                     }
                     switchBitrateByUser = false;
-                    String toastText = "已切换为" + PLVStreamerConfig.Bitrate.getText(bitrate);
+                    String toastText = PLVAppUtils.formatString(R.string.plv_player_change_definition_2, PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId));
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -614,6 +681,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == R.id.plvsa_setting_bitrate_iv
                 || id == R.id.plvsa_setting_bitrate_tv) {
             bitrateLayout.open();
+        } else if (id == R.id.plvsa_setting_mix_layout_iv
+                || id == R.id.plvsa_setting_mix_layout_tv) {
+            mixLayout.open();
         } else if (id == plvsaSettingScreenOrientationIv.getId()
                 || id == plvsaSettingScreenOrientationTv.getId()) {
             changeScreenOrientation();
@@ -649,16 +719,16 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 final PLVConfirmDialog confirmDialog = new PLVSAConfirmDialog(getContext());
                 for (String deniedPermission : deniedPermissions) {
                     if (Manifest.permission.CAMERA.equals(deniedPermission)) {
-                        confirmDialog.setTitle("摄像头权限申请")
-                                .setContent("请前往“设置-隐私-摄像头”开启权限")
-                                .setLeftButtonText("取消")
+                        confirmDialog.setTitle(R.string.plv_linkmic_camera_permission_apply)
+                                .setContent(R.string.plv_linkmic_camera_permission_apply_hint)
+                                .setLeftButtonText(R.string.plv_common_dialog_cancel)
                                 .setLeftBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         confirmDialog.hide();
                                     }
                                 })
-                                .setRightButtonText("设置")
+                                .setRightButtonText(R.string.plv_common_dialog_setting)
                                 .setRightBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -668,16 +738,16 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         break;
                     }
                     if (Manifest.permission.RECORD_AUDIO.equals(deniedPermission)) {
-                        confirmDialog.setTitle("麦克风权限申请")
-                                .setContent("请前往“设置-隐私-麦克风”开启权限")
-                                .setLeftButtonText("取消")
+                        confirmDialog.setTitle(R.string.plv_linkmic_microphone_permission_apply)
+                                .setContent(R.string.plv_linkmic_microphone_permission_apply_hint)
+                                .setLeftButtonText(R.string.plv_common_dialog_cancel)
                                 .setLeftBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         confirmDialog.hide();
                                     }
                                 })
-                                .setRightButtonText("设置")
+                                .setRightButtonText(R.string.plv_common_dialog_setting)
                                 .setRightBtnListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -693,17 +763,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private void updateBitrateIcon(int selectedBitrate) {
-        switch (selectedBitrate) {
-            case PLVStreamerConfig.Bitrate.BITRATE_STANDARD:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_sd);
-                break;
-            case PLVStreamerConfig.Bitrate.BITRATE_HIGH:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_hd);
-                break;
-            case PLVStreamerConfig.Bitrate.BITRATE_SUPER:
-                plvsaSettingBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_uhd);
-                break;
-            default:
+        Integer iconId = bitrateMapIcon.get(selectedBitrate);
+        if (iconId != null) {
+            plvsaSettingBitrateIv.setImageResource(iconId);
         }
     }
 

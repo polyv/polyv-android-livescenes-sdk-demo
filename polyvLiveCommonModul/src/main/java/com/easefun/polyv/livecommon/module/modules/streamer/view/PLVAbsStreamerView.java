@@ -5,6 +5,10 @@ import androidx.annotation.NonNull;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
+import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
@@ -54,7 +58,12 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onNetworkQuality(int quality) {
+    public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
+
+    }
+
+    @Override
+    public void onUpstreamNetworkStatus(PLVNetworkStatusVO networkStatus) {
 
     }
 
@@ -124,7 +133,7 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onGuestRTCStatusChanged(int pos) {
+    public void onGuestRTCStatusChanged(int pos, boolean isJoinRTC) {
 
     }
 
@@ -150,6 +159,21 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
 
     @Override
     public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
+
+    }
+
+    @Override
+    public void onTeacherInviteMeJoinLinkMic(PLVJoinResponseSEvent event) {
+
+    }
+
+    @Override
+    public void onViewerJoinAnswer(PLVJoinAnswerSEvent joinAnswerEvent, PLVMemberItemDataBean member) {
+
+    }
+
+    @Override
+    public void onLinkMicOpenStateChanged(boolean isVideoLinkMic, boolean isOpen) {
 
     }
 }

@@ -20,7 +20,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="复制"
+            android:text="@string/plv_chat_copy"
             android:textColor="#F0F1F5"
             android:visibility="visible" />
 
@@ -41,7 +41,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="回复"
+            android:text="@string/plv_chat_answer"
             android:textColor="#F0F1F5" />
     </LinearLayout>
 

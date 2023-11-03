@@ -1,5 +1,9 @@
 package com.easefun.polyv.livehiclass.modules.statusbar;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
+
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
@@ -31,9 +35,6 @@ import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
 
 /**
  * 状态栏布局
@@ -322,8 +323,8 @@ public class PLVHCStatusBarLayout extends FrameLayout implements IPLVHCStatusBar
         if (upstreamNetworkStatus == null) {
             return;
         }
-        int upstreamDelay = upstreamNetworkStatus.getUpstreamDelayMs();
-        int downstreamDelay = upstreamNetworkStatus.getDownstreamDelayMs();
+        int upstreamDelay = getOrDefault(upstreamNetworkStatus.getUpDelayMs(), 0);
+        int downstreamDelay = getOrDefault(upstreamNetworkStatus.getDownDelayMs(), 0);
         int delay = Math.max(0, Math.max(upstreamDelay, downstreamDelay));
         plvhcStatusLessonLatencyTv.setText(delay + "ms");
     }

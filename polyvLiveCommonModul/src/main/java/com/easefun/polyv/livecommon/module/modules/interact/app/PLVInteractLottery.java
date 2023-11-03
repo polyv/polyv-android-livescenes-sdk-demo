@@ -159,7 +159,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                 String.class, new PLVrResponseCallback<String>() {
                     @Override
                     public void onSuccess(String s) {
-                        LogUtils.d("抽奖信息上传成功" + s);
+                        LogUtils.d("抽奖信息上传成功" + s);// no need i18n
                         PolyvInteractiveCallbackVO vo = new PolyvInteractiveCallbackVO(PolyvInteractiveCallbackVO.EVENT_LOTTERY, 200);
                         commonControl.sendServerResultToJs(PLVGsonUtil.toJsonSimple(vo));
                     }
@@ -185,7 +185,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                     @Override
                     public void onFailure(PLVResponseBean<String> responseBean) {
                         super.onFailure(responseBean);
-                        PLVCommonLog.e(TAG, "抽奖信息上传失败" + responseBean);
+                        PLVCommonLog.e(TAG, "抽奖信息上传失败" + responseBean);// no need i18n
                         PolyvInteractiveCallbackVO vo = new PolyvInteractiveCallbackVO(PolyvInteractiveCallbackVO.EVENT_LOTTERY, 400);
                         commonControl.sendServerResultToJs(PLVGsonUtil.toJsonSimple(vo));
                     }
@@ -203,7 +203,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                 new PLVrResponseCallback<String>() {
                     @Override
                     public void onSuccess(String s) {
-                        PLVCommonLog.d(TAG, "放弃领奖信息上传成功 " + s);
+                        PLVCommonLog.d(TAG, "放弃领奖信息上传成功 " + s);// no need i18n
                     }
 
                     @Override
@@ -214,7 +214,7 @@ public class PLVInteractLottery extends PLVInteractAppAbs {
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        PLVCommonLog.e(TAG, "放弃领奖信息上传失败");
+                        PLVCommonLog.e(TAG, "放弃领奖信息上传失败");// no need i18n
                         if (e instanceof HttpException) {
                             try {
                                 ResponseBody errorBody = ((HttpException) e).response().errorBody();

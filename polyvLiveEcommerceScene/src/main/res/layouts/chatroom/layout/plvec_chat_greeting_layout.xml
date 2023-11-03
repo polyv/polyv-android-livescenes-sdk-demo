@@ -14,9 +14,9 @@
         android:paddingLeft="@dimen/plvec_margin_common"
         android:paddingRight="3dp"
         android:singleLine="true"
-        android:text="欢迎 xx 进入直播间"
         android:textColor="#ffffff"
         android:textSize="14sp"
         android:visibility="visible"
+        tools:text="欢迎 xx 进入直播间"
         tools:visibility="visible" />
 </merge>

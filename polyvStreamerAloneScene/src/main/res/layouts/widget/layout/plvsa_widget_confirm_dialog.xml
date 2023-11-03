@@ -38,7 +38,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:gravity="center"
         android:layout_marginTop="25dp"
         android:orientation="horizontal"
         android:layout_below="@id/plvsa_confirm_content">
@@ -46,9 +48,10 @@
         <TextView
             android:id="@+id/plvsa_left_confirm_btn"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:paddingHorizontal="6dp"
             android:textColor="#0382FF"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -67,9 +70,10 @@
         <TextView
             android:id="@+id/plvsa_right_confirm_btn"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:paddingHorizontal="6dp"
             android:visibility="visible"
             android:textColor="#FFF"
             android:textSize="14sp"

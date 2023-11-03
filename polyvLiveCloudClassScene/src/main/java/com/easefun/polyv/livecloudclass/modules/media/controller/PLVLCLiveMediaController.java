@@ -39,6 +39,7 @@ import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
@@ -143,13 +144,19 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     //更多布局
     private PLVLCLiveMoreLayout moreLayout;
 
-    //已经显示过"可从此处重新打开浮窗"的提示了
+    //已经显示过 可从此处重新打开浮窗 的提示了
     private boolean hasShowReopenFloatingViewTip = false;
-    //延迟隐藏"可从此处重新打开浮窗"
+    //延迟隐藏 可从此处重新打开浮窗
     private Disposable reopenFloatingDelay;
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 服务端的点赞开关
+    private boolean isLikesSwitchEnabled = true;
+    // 服务端的打赏开关
+    private boolean isRewardSwitchEnabled = true;
+    // 聊天室tab是否可见
+    private boolean isChatDisplayEnabled = true;
     // 主播放器是否正在播放
     private boolean isMainVideoViewPlaying;
     // 是否无延迟观看
@@ -323,14 +330,14 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 if (addedAbilities.contains(PLVUserAbility.LIVE_DOCUMENT_ALLOW_USE_PAINT_ON_LINKMIC)) {
                     updatePaintModeEntrance = true;
                     PLVToast.Builder.context(getContext())
-                            .setText("讲师已授予你画笔权限")
+                            .setText(R.string.plv_ppt_allow_use_paint)
                             .show();
                     show();
                 }
                 if (removedAbilities.contains(PLVUserAbility.LIVE_DOCUMENT_ALLOW_USE_PAINT_ON_LINKMIC)) {
                     updatePaintModeEntrance = true;
                     PLVToast.Builder.context(getContext())
-                            .setText("讲师已收回你的画笔权限")
+                            .setText(R.string.plv_ppt_no_allow_use_paint)
                             .show();
                 }
                 if (updatePaintModeEntrance) {
@@ -456,7 +463,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
-        likesLandIv.setVisibility(isSwitchEnabled ? View.VISIBLE : View.INVISIBLE);
+        this.isLikesSwitchEnabled = isSwitchEnabled;
+        likesLandIv.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -531,9 +539,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
         String viewerCountText = StringUtils.toWString(viewerCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_count, viewerCountText);
 
-        videoViewerCountPortTv.setText(viewerCountText + "次播放");
-        videoViewerCountLandTv.setText(viewerCountText + "次播放");
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
     }
 
     @Override
@@ -638,8 +647,23 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     @Override
     public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
         if (startSendMessageLandIv != null) {
-            startSendMessageLandIv.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            String text = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat));
+            startSendMessageLandIv.setText(text);
             startSendMessageLandIv.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
+        }
+    }
+
+    @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isChatDisplayEnabled = isDisplayEnabled;
+        if (startSendMessageLandIv != null) {
+            startSendMessageLandIv.setVisibility(isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (likesLandIv != null) {
+            likesLandIv.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (rewardView != null) {
+            rewardView.setVisibility(isRewardSwitchEnabled && isChatDisplayEnabled ? VISIBLE : GONE);
         }
     }
 
@@ -655,8 +679,9 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void updateRewardView(boolean enable) {
+        this.isRewardSwitchEnabled = enable;
         if (rewardView != null) {
-            rewardView.setVisibility(enable ? VISIBLE : GONE);
+            rewardView.setVisibility(isRewardSwitchEnabled && isChatDisplayEnabled ? VISIBLE : GONE);
         }
     }
 

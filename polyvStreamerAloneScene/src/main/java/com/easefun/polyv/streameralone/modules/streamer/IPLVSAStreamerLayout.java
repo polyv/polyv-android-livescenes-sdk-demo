@@ -9,6 +9,8 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
 /**
  * 推流和连麦布局的接口定义
@@ -61,6 +63,13 @@ public interface IPLVSAStreamerLayout {
     void setBitrate(@PLVSStreamerConfig.BitrateType int bitrate);
 
     /**
+     * 设置混流布局
+     *
+     * @param mixLayout 混流布局
+     */
+    void setMixLayout(@PLVStreamerConfig.MixStreamType int mixLayout);
+
+    /**
      * 获取推流的码率信息
      *
      * @return 码率信息<最大支持码率, 选择码率>
@@ -68,11 +77,18 @@ public interface IPLVSAStreamerLayout {
     Pair<Integer, Integer> getBitrateInfo();
 
     /**
+     * 获取混流布局信息
+     *
+     * @return 混流布局信息
+     */
+    int getMixInfo();
+
+    /**
      * 获取网络质量
      *
      * @return 网络质量常量
      */
-    int getNetworkQuality();
+    PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
     /**
      * 添加因断网延迟20s断流的状态监听器

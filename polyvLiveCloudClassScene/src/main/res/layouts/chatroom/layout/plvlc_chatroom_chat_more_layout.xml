@@ -4,7 +4,7 @@
     android:id="@+id/plvlc_chat_more_rv"
     android:layout_width="match_parent"
     android:background="#2B2C35"
-    android:layout_gravity="center_horizontal"
+    android:layout_gravity="center_horizontal|bottom"
     android:gravity="center"
     android:padding="10dp"
     android:numColumns="4"

@@ -54,22 +54,50 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <EditText
-        android:id="@+id/chat_input_et"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom"
-        android:background="#ffffff"
-        android:gravity="center_vertical|left"
-        android:hint="跟大家聊点什么吧~"
-        android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
-        android:maxLength="200"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:singleLine="true"
-        android:textColor="#333333"
-        android:textColorHint="#CDCDCD"
-        android:textSize="14sp" />
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:background="#262523"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/quiz_toggle_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:src="@drawable/plvec_chatroom_quiz_sel_m"/>
+
+        <EditText
+            android:id="@+id/chat_input_et"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:background="@drawable/plvec_chatroom_input_corner_bg"
+            android:gravity="center_vertical|left"
+            android:hint="@string/plv_chat_input_tips_chat_6"
+            android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
+            android:maxLength="200"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:singleLine="true"
+            android:textColor="#ffffff"
+            android:textColorHint="#33ffffff"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/chat_send_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginLeft="6dp"
+            android:textSize="14sp"
+            android:textColor="@color/plvec_chatroom_send_fg"
+            android:text="@string/plv_chat_send" />
+    </LinearLayout>
 
     <View
         android:id="@+id/chat_input_bg"

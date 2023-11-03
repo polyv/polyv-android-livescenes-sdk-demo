@@ -20,6 +20,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengt
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVProhibitedWordVO;
 
@@ -208,7 +209,9 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         for (PLVBaseViewData baseViewData : fullDataList) {
             removeFullDataPosition++;
             if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())
+                    || (baseViewData.getData() instanceof IPLVMessageIdEvent
+                    && id.equals(((IPLVMessageIdEvent) baseViewData.getData()).getMessageId()))) {
                 fullDataList.remove(baseViewData);
                 break;
             }
@@ -217,7 +220,9 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         for (PLVBaseViewData baseViewData : specialDataList) {
             removeSpecialDataPosition++;
             if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())
+                    || (baseViewData.getData() instanceof IPLVMessageIdEvent
+                    && id.equals(((IPLVMessageIdEvent) baseViewData.getData()).getMessageId()))) {
                 specialDataList.remove(baseViewData);
                 break;
             }

@@ -10,7 +10,7 @@
         android:id="@+id/plvsa_status_bar_stop_live_tv"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="结束直播"
+        android:text="@string/plv_streamer_stop_stream"
         android:textColor="#FF5459"
         android:textSize="16sp"
         android:gravity="center" />
@@ -24,7 +24,7 @@
         android:id="@+id/plvsa_status_bar_cancel_stop_live_tv"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="取消"
+        android:text="@string/plv_common_dialog_cancel"
         android:textColor="#FFF"
         android:textSize="16sp"
         android:gravity="center" />

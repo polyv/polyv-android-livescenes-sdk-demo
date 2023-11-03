@@ -1,28 +1,31 @@
 package com.easefun.polyv.livecommon.module.modules.ppt.presenter;
 
+import static com.easefun.polyv.businesssdk.api.common.ppt.PolyvLivePPTProcessor.CHAT_LOGIN;
+import static com.easefun.polyv.businesssdk.api.common.ppt.PolyvLivePPTProcessor.SEND_SOCKET_EVENT;
+import static com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog.PPTEvent.PPT_RECEIVE_WEB_MESSAGE;
+
 import androidx.annotation.Nullable;
 
 import com.easefun.polyv.businesssdk.model.ppt.PolyvPPTAuthentic;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
+import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.document.model.PLVChangePPTInfo;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
+import com.plv.socket.event.transmit.PLVChangeDoubleModeEvent;
 import com.plv.socket.impl.PLVSocketMessageObserver;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-
-import static com.easefun.polyv.businesssdk.api.common.ppt.PolyvLivePPTProcessor.CHAT_LOGIN;
-import static com.easefun.polyv.businesssdk.api.common.ppt.PolyvLivePPTProcessor.SEND_SOCKET_EVENT;
-import static com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog.PPTEvent.PPT_RECEIVE_WEB_MESSAGE;
 
 /**
  * date: 2020/9/16
@@ -104,6 +107,16 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         if (view != null) {
                             view.switchPPTViewLocation(true);
                         }
+                    }
+                } else if (PLVEventConstant.Transmit.EVENT_CHANGE_DOUBLE_MODE.equals(event)) {
+                    // 转播房间切换时 切换PPT页面
+                    final PLVChangeDoubleModeEvent changeDoubleModeEvent = PLVGsonUtil.fromJson(PLVChangeDoubleModeEvent.class, message);
+                    if (changeDoubleModeEvent == null || changeDoubleModeEvent.getAutoId() == null || changeDoubleModeEvent.getPageId() == null) {
+                        return;
+                    }
+                    final PLVChangePPTInfo changePPTInfo = new PLVChangePPTInfo(changeDoubleModeEvent.getAutoId(), changeDoubleModeEvent.getPageId());
+                    if (view != null) {
+                        view.sendMsgToWebView(PLVGsonUtil.toJsonSimple(changePPTInfo), PLVLivePPTProcessor.CHANGE_PPT);
                     }
                 }
             }

@@ -56,13 +56,13 @@
 
         <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView
             android:id="@+id/greeting_tv"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_gravity="center_vertical"
+            android:ellipsize="end"
             android:textColor="#ffffff"
             android:textSize="12sp"
-            android:ellipsize="end"
             android:visibility="invisible"
             app:scroll_first_delay="100"
             app:scroll_interval="6000"
@@ -70,58 +70,47 @@
 
         <ImageView
             android:id="@+id/greeting_start_left"
-            android:layout_marginRight="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_centerInParent="true"
-            android:layout_toLeftOf="@id/greeting_tv"
-            android:src="@drawable/plvlc_chatroom_welcome_start_left"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/greeting_tv"
+            android:src="@drawable/plvlc_chatroom_welcome_start_left" />
 
         <ImageView
             android:id="@+id/greeting_start_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="16dp"
             android:layout_toRightOf="@id/greeting_tv"
-            android:layout_centerInParent="true"
-            android:src="@drawable/plvlc_chatroom_welcome_start_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:src="@drawable/plvlc_chatroom_welcome_start_right" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/plvlc_chat_playback_tips_tv"
+    <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLayout
+        android:id="@+id/plvlc_chat_tips_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bulletin_ly"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/plvlc_chatroom_playback_v_bg"
-        android:gravity="center"
-        android:padding="8dp"
-        android:text="聊天重放功能已开启，将会显示历史消息"
-        android:textColor="#FF333333"
-        android:textSize="14sp"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:visibility="gone" />
 
     <!--    积分打赏动画-->
     <com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget
         android:id="@+id/plvlc_point_reward_effect"
-        android:layout_below="@id/greeting_fl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/greeting_fl" />
 
     <!--   积分打赏动画特效 -->
     <com.opensource.svgaplayer.SVGAImageView
         android:id="@+id/plvlc_reward_svg"
-        android:layout_above="@+id/bottom_parent_ly"
-        android:layout_height="306dp"
         android:layout_width="match_parent"
-        app:source="posche.svga"
-        app:autoPlay="true"/>
+        android:layout_height="306dp"
+        android:layout_above="@+id/bottom_parent_ly"
+        app:autoPlay="true"
+        app:source="posche.svga" />
 
     <!--marginTop/(like_iv height) unreadView outOfSight or immerse&fitsSystemWindows cover-->
     <com.easefun.polyv.livecommon.ui.widget.scrollview.PLVNoTouchScrollView
@@ -135,65 +124,141 @@
             android:layout_height="0dp">
 
             <LinearLayout
-                android:layout_width="74dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
                 android:layout_gravity="bottom|right"
-                android:gravity="center|top"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:layout_marginBottom="90dp"
+                android:gravity="end"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/card_enter_view"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:src="@drawable/plv_interact_redpack_gain"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/card_enter_cd_tv"
+                <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCRedpackView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/card_enter_view"
-                    android:background="@drawable/plvlc_interact_card_push_enter_cd_bg"
-                    android:paddingLeft="6dp"
-                    android:paddingRight="6dp"
-                    android:text="00:00:00"
-                    android:textColor="#ADADC0"
-                    android:textSize="10sp"
-                    android:includeFontPadding="false"
                     android:visibility="gone"
+                    app:plvlc_red_pack_hint_position="left"
                     tools:visibility="visible" />
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="72dp" />
-            </LinearLayout>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
 
-            <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
-                android:id="@+id/card_enter_tips_view"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:layout_gravity="bottom|right"
-                android:layout_marginRight="62dp"
-                android:layout_marginBottom="108dp"
-                android:paddingStart="8dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="5dp"
-                android:text="连续观看有奖励哦"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:indicateColor="#FF9D4D"
-                app:indicateEndColor="#F65F49"
-                app:rectRadius="4dp"
-                app:triangleHeight="6dp"
-                app:triangleCenter="true"
-                app:trianglePosition="right"
-                app:triangleWidth="10dp"
-                tools:visibility="visible" />
+                    <ImageView
+                        android:id="@+id/card_enter_view"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/plv_interact_redpack_gain"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/card_enter_cd_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/plvlc_interact_card_push_enter_cd_bg"
+                        android:includeFontPadding="false"
+                        android:paddingHorizontal="6dp"
+                        android:text="00:00"
+                        android:textColor="#ADADC0"
+                        android:textSize="10sp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@+id/card_enter_view"
+                        app:layout_constraintStart_toStartOf="@+id/card_enter_view"
+                        app:layout_constraintTop_toBottomOf="@+id/card_enter_view"
+                        tools:visibility="visible" />
+
+                    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+                        android:id="@+id/card_enter_tips_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginRight="4dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="5dp"
+                        android:text="@string/plv_live_watch_reward"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:visibility="gone"
+                        app:indicateColor="#FF9D4D"
+                        app:indicateEndColor="#F65F49"
+                        app:layout_constraintBottom_toBottomOf="@+id/card_enter_view"
+                        app:layout_constraintEnd_toStartOf="@+id/card_enter_view"
+                        app:layout_constraintTop_toTopOf="@+id/card_enter_view"
+                        app:rectRadius="4dp"
+                        app:triangleCenter="true"
+                        app:triangleHeight="6dp"
+                        app:trianglePosition="right"
+                        app:triangleWidth="10dp"
+                        tools:visibility="visible" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+
+                    <ImageView
+                        android:id="@+id/plvlc_live_lottery_enter_view"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/plv_interact_lottery"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/plvlc_live_lottery_enter_cd_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/plvlc_interact_card_push_enter_cd_bg"
+                        android:includeFontPadding="false"
+                        android:paddingHorizontal="6dp"
+                        android:text="00:00"
+                        android:textColor="#ADADC0"
+                        android:textSize="10sp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@+id/plvlc_live_lottery_enter_view"
+                        app:layout_constraintStart_toStartOf="@+id/plvlc_live_lottery_enter_view"
+                        app:layout_constraintTop_toBottomOf="@+id/plvlc_live_lottery_enter_view"
+                        tools:visibility="visible" />
+
+                    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+                        android:id="@+id/plvlc_live_lottery_enter_tips_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginRight="4dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="5dp"
+                        android:text="@string/plv_live_lottery_no_start"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:visibility="gone"
+                        app:indicateColor="#FF9D4D"
+                        app:indicateEndColor="#F65F49"
+                        app:layout_constraintBottom_toBottomOf="@+id/plvlc_live_lottery_enter_view"
+                        app:layout_constraintEnd_toStartOf="@+id/plvlc_live_lottery_enter_view"
+                        app:layout_constraintTop_toTopOf="@+id/plvlc_live_lottery_enter_view"
+                        app:rectRadius="4dp"
+                        app:triangleCenter="true"
+                        app:triangleHeight="6dp"
+                        app:trianglePosition="right"
+                        app:triangleWidth="10dp"
+                        tools:visibility="visible" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/likes_ly"
@@ -216,11 +281,11 @@
                     android:id="@+id/likes_count_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
                     android:background="#CC202127"
-                    android:textColor="#ADADC0"
                     android:paddingLeft="6dp"
                     android:paddingRight="6dp"
+                    android:text=""
+                    android:textColor="#ADADC0"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -231,7 +296,7 @@
                 android:layout_gravity="bottom"
                 android:background="#d04a90e2"
                 android:gravity="center"
-                android:text="有更多新消息，点击查看"
+                android:text="@string/plv_chat_view_new_msg_5"
                 android:textColor="#ffffff"
                 android:textSize="12sp"
                 android:visibility="gone"

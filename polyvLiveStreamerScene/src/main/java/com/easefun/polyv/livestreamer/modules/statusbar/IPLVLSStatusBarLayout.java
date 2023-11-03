@@ -1,10 +1,15 @@
 package com.easefun.polyv.livestreamer.modules.statusbar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
-import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 
 /**
  * 状态布局的接口定义、
@@ -73,7 +78,12 @@ public interface IPLVLSStatusBarLayout {
      *
      * @param networkQuality 网络状态常量
      */
-    void updateNetworkQuality(int networkQuality);
+    void updateNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality);
+
+    /**
+     * 更新网络状态
+     */
+    void updateNetworkStatus(PLVNetworkStatusVO networkStatusVO);
 
     /**
      * 设置在线人数
@@ -100,8 +110,16 @@ public interface IPLVLSStatusBarLayout {
     /**
      * view交互事件监听器
      */
-    interface OnViewActionListener extends PLVLSMemberLayout.OnViewActionListener
-            , PLVLSMoreSettingLayout.OnViewActionListener, PLVLSLinkMicControlWindow.OnViewActionListener {
+    interface OnViewActionListener extends PLVLSMemberLayout.OnViewActionListener,
+            PLVLSMoreSettingLayout.OnViewActionListener {
+
+        /**
+         * 是否推流开始成功
+         *
+         * @return true：成功，false：未成功
+         */
+        boolean isStreamerStartSuccess();
+
         /**
          * 上下课控制
          *
@@ -114,7 +132,12 @@ public interface IPLVLSStatusBarLayout {
          *
          * @return 网络质量常量
          */
-        int getCurrentNetworkQuality();
+        PLVLinkMicConstant.NetworkQuality getCurrentNetworkQuality();
+
+        @Nullable
+        PLVPushDowngradePreference getCurrentDowngradePreference();
+
+        void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference);
     }
     // </editor-fold>
 }

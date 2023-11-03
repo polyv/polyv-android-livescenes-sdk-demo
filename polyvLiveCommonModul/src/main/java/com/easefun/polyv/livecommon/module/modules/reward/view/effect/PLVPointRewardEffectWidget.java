@@ -18,7 +18,9 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import io.reactivex.functions.Consumer;
@@ -49,10 +51,12 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
     private LinearLayout plvLlPointRewardCount1;
     private PLVPointRewardStrokeTextView plvTvPointRewardEffectCount2;
     private LinearLayout plvLlPointRewardCount2;
+    private View rootView;
 
     private IPLVPointRewardEventProducer.OnPreparedListener onPreparedListener;
 
     private boolean isLandscape = false;
+    private boolean isOpenLandscapeEffect = false;
 
     /**
      * 标志位，用于标记是否release并隐藏动画
@@ -70,7 +74,7 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
 
     public PLVPointRewardEffectWidget(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LayoutInflater.from(context).inflate(R.layout.plv_point_reward_effect, this, true);
+        rootView = LayoutInflater.from(context).inflate(R.layout.plv_point_reward_effect, this, true);
         init();
     }
     // </editor-fold>
@@ -136,7 +140,7 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
             @Override
             public void onFetchSucceed(PLVRewardEvent event) {
                 //如果是横屏，那么抛弃这个打赏事件，不再执行动画
-                if (isLandscape) {
+                if (isLandscape && !isOpenLandscapeEffect) {
                     return;
                 }
 
@@ -175,7 +179,7 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
             @Override
             public void onFetchSucceed(PLVRewardEvent event) {
                 isFetchingBottom = false;
-                if (isLandscape) {
+                if (isLandscape && !isOpenLandscapeEffect) {
                     return;
                 }
                 handleEvent(event, plvTvPointRewardEffectNickname2,
@@ -211,7 +215,7 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
             llGoodCountParent.setVisibility(INVISIBLE);
         }
 
-        tvGoodContent.setText("赠送   " + rewardContent);
+        tvGoodContent.setText(PLVAppUtils.getString(R.string.plv_reward_give) + "   " + rewardContent);
     }
     // </editor-fold>
 
@@ -336,7 +340,14 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
         isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (isLandscape) {
             hideAndReleaseEffect();
+            if (isOpenLandscapeEffect) {
+                showAndPrepareEffect();
+                rootView.setPadding(0, ConvertUtils.dp2px(20),0,0);
+            }
         } else {
+            if (isOpenLandscapeEffect) {
+                rootView.setPadding(0,0,0,0);
+            }
             showAndPrepareEffect();
         }
     }
@@ -363,5 +374,13 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
         isRelease = false;
         this.setVisibility(VISIBLE);
         prepareEventProducer();
+    }
+
+    /**
+     * 设置 横屏时 是否去开始打赏效果
+     * @param isOpen true：横屏时开启打赏效果 默认关闭
+     */
+    public void isOpenLandscapeEffect(boolean isOpen){
+        this.isOpenLandscapeEffect = isOpen;
     }
 }

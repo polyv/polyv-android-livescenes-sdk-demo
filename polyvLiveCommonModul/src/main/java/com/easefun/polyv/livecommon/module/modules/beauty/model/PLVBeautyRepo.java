@@ -9,7 +9,9 @@ import com.easefun.polyv.livecommon.module.modules.beauty.model.datasource.PLVBe
 import com.easefun.polyv.livecommon.module.modules.beauty.model.datasource.PLVBeautySdkDataSource;
 import com.plv.beauty.api.options.PLVBeautyOption;
 import com.plv.beauty.api.options.PLVFilterOption;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -166,10 +168,25 @@ public class PLVBeautyRepo {
         final List<PLVFilterOption> filterOptions = beautyModuleDataSource.getSupportFilterOptions();
         for (PLVFilterOption filterOption : filterOptions) {
             filterOption.intensity(PLVBeautyOptionDefaultConfig.DEFAULT_FILTER_VALUE);
+            try {
+                Class<?> clazz = getBaseFilterClass(filterOption);
+                Field field = clazz.getDeclaredField("name");
+                field.setAccessible(true);
+                field.set(filterOption, PLVBeautyOptionDefaultConfig.getFilterI18n(filterOption.getName()));
+            } catch (Throwable e) {
+                PLVCommonLog.exception(e);
+            }
         }
         return filterOptions;
     }
 
+    private Class<?> getBaseFilterClass(PLVFilterOption filterOption) {
+        Class<?> clazz = filterOption.getClass().getSuperclass();
+        while (clazz != null && !PLVFilterOption.class.equals(clazz)) {
+            clazz = clazz.getSuperclass();
+        }
+        return clazz;
+    }
     // </editor-fold>
 
 }

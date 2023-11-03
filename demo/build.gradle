@@ -25,6 +25,12 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+
+        packagingOptions {
+            pickFirst 'META-INF/proguard/coroutines.pro'
+        }
+
+        resConfigs 'en', 'zh-rCN'
     }
     signingConfigs {
         release {
@@ -85,7 +91,7 @@ dependencies {
     implementation project(':polyvStreamerAloneScene')
     implementation project(':polyvLiveHiClassScene')
 
-    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.0.3'
+    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.1.0'
 
 }
 

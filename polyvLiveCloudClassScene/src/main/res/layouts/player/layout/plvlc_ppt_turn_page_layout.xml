@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="点击回到当前页"
+        android:text="@string/plv_ppt_back_to_current_page"
         android:visibility="invisible"
         android:textColor="#000" />
 

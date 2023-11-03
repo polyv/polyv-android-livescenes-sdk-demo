@@ -9,5 +9,5 @@
         android:layout_height="36dp"
         android:background="#ffffff"
         android:gravity="center"
-        android:text="复制" />
+        android:text="@string/plv_chat_copy" />
 </LinearLayout>

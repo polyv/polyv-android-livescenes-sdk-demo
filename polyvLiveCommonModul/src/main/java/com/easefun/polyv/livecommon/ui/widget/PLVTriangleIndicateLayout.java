@@ -13,6 +13,8 @@ import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -23,6 +25,7 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.expandmenu.utils.DpOrPxUtils;
 import com.plv.foundationsdk.log.PLVCommonLog;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +46,19 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     public static final int MARGIN_TYPE_RIGHT = 1;
     public static final int MARGIN_TYPE_TOP = 2;
     public static final int MARGIN_TYPE_BOTTOM = 3;
+    public static final int MARGIN_TYPE_CENTER = 4;
+    /**
+     * @see #anchorWeakReference
+     * @see #setMarginAnchor(View)
+     */
+    public static final int MARGIN_TYPE_ANCHOR = 5;
 
     private static final int DEFAULT_TRIANGLE_WIDTH = 12; // dp
     private static final int DEFAULT_TRIANGLE_HEIGHT = 8; // dp
     private static final int DEFAULT_TRIANGLE_MARGIN = 0; // dp
     private static final int DEFAULT_TRIANGLE_COLOR = Color.WHITE;
     private static final int DEFAULT_TRIANGLE_POSITION = POSITION_TOP;
-    private static final int DEFAULT_TRIANGLE_MARGIN_TYPE = MARGIN_TYPE_LEFT;
+    private static final int DEFAULT_TRIANGLE_MARGIN_TYPE = MARGIN_TYPE_CENTER;
 
     public static final int ORIENTATION_LEFT_TO_RIGHT = 0;
     public static final int ORIENTATION_BOTTOM_LEFT_TO_TOP_RIGHT = 1;
@@ -81,6 +90,9 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     private float radius;
     private int orientation = ORIENTATION_LEFT_TO_RIGHT;
     private String gradientColors = null;
+
+    @Nullable
+    private WeakReference<View> anchorWeakReference;
 
     private LinearGradient linearGradient = null;
     private Paint paint;
@@ -121,6 +133,19 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
         }
 
         typedArray.recycle();
+    }
+
+    public void setTrianglePosition(int trianglePosition) {
+        if (this.trianglePosition == trianglePosition) {
+            return;
+        }
+        this.trianglePosition = trianglePosition;
+        requestLayout();
+    }
+
+    public void setMarginAnchor(View anchor) {
+        anchorWeakReference = new WeakReference<>(anchor);
+        requestLayout();
     }
 
     @Override
@@ -334,6 +359,12 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
                 leftBottomX = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftBottomX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
+            } else if (triangleMarginType == MARGIN_TYPE_CENTER) {
+                leftBottomX = (int) ((getMeasuredWidth() - triangleWidth) / 2);
+            } else if (triangleMarginType == MARGIN_TYPE_ANCHOR) {
+                int[] layoutParam = getViewParam();
+                int[] anchorParam = getViewParamForAnchor();
+                leftBottomX = (int) (anchorParam[0] - layoutParam[0] + anchorParam[2] / 2 - triangleWidth / 2);
             }
             // leftBottom
             first = new Point(leftBottomX, (int) triangleHeight);
@@ -347,6 +378,12 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
                 leftTopX = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_RIGHT) {
                 leftTopX = (int) (getMeasuredWidth() - triangleMargin - triangleWidth);
+            } else if (triangleMarginType == MARGIN_TYPE_CENTER) {
+                leftTopX = (int) ((getMeasuredWidth() - triangleWidth) / 2);
+            } else if (triangleMarginType == MARGIN_TYPE_ANCHOR) {
+                int[] layoutParam = getViewParam();
+                int[] anchorParam = getViewParamForAnchor();
+                leftTopX = (int) (anchorParam[0] - layoutParam[0] + anchorParam[2] / 2 - triangleWidth / 2);
             }
             // leftTop
             first = new Point(leftTopX, (int) (getMeasuredHeight() - triangleHeight));
@@ -360,6 +397,12 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
                 topY = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
                 topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
+            } else if (triangleMarginType == MARGIN_TYPE_CENTER) {
+                topY = (int) ((getMeasuredHeight() - triangleWidth) / 2);
+            } else if (triangleMarginType == MARGIN_TYPE_ANCHOR) {
+                int[] layoutParam = getViewParam();
+                int[] anchorParam = getViewParamForAnchor();
+                topY = (int) (anchorParam[1] - layoutParam[1] + anchorParam[3] / 2 - triangleWidth / 2);
             }
             // left
             first = new Point(0, (int) (topY + triangleWidth / 2));
@@ -373,6 +416,12 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
                 topY = (int) triangleMargin;
             } else if (triangleMarginType == MARGIN_TYPE_BOTTOM) {
                 topY = (int) (getMeasuredHeight() - triangleMargin - triangleWidth);
+            } else if (triangleMarginType == MARGIN_TYPE_CENTER) {
+                topY = (int) ((getMeasuredHeight() - triangleWidth) / 2);
+            } else if (triangleMarginType == MARGIN_TYPE_ANCHOR) {
+                int[] layoutParam = getViewParam();
+                int[] anchorParam = getViewParamForAnchor();
+                topY = (int) (anchorParam[1] - layoutParam[1] + anchorParam[3] / 2 - triangleWidth / 2);
             }
             // top
             first = new Point((int) (getMeasuredWidth() - triangleHeight), topY);
@@ -414,6 +463,37 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
+    }
+
+    /**
+     * @return int[4]: x, y, width, height,
+     * NonNull, all 0 if anchor is null
+     */
+    @NonNull
+    private int[] getViewParamForAnchor() {
+        final int[] res = new int[4];
+        if (anchorWeakReference == null) {
+            return res;
+        }
+        final View anchor = anchorWeakReference.get();
+        if (anchor == null) {
+            return res;
+        }
+        anchor.getLocationInWindow(res);
+        res[2] = anchor.getWidth();
+        res[3] = anchor.getHeight();
+        return res;
+    }
+
+    /**
+     * @return int[4]: x, y, width, height
+     */
+    private int[] getViewParam() {
+        final int[] res = new int[4];
+        this.getLocationInWindow(res);
+        res[2] = this.getWidth();
+        res[3] = this.getHeight();
+        return res;
     }
 
 }

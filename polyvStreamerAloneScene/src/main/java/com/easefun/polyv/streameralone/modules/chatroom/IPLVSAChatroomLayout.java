@@ -1,5 +1,6 @@
 package com.easefun.polyv.streameralone.modules.chatroom;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -23,9 +24,14 @@ public interface IPLVSAChatroomLayout {
     void init(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
-     * 聊天室登陆
+     * 聊天室登录
      */
     void loginAndLoadHistory();
+
+    /**
+     * 设置回调接口
+     */
+    void setOnViewActionListener(@Nullable PLVSAChatroomLayout.OnViewActionListener onViewActionListener);
 
     /**
      * 呼出聊天信息输入窗口

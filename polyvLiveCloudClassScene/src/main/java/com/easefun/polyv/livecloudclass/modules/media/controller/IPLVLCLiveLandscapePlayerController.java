@@ -57,6 +57,12 @@ public interface IPLVLCLiveLandscapePlayerController {
     ImageView getDanmuSwitchView();
 
     /**
+     * 获取弹幕设置按钮
+     * @return
+     */
+    ImageView getDanmuSettingView();
+
+    /**
      * 获取点赞view
      */
     PLVLCLikeIconView getLikesView();
@@ -117,6 +123,21 @@ public interface IPLVLCLiveLandscapePlayerController {
      * 获取卡片推送入口提示控件
      */
     PLVTriangleIndicateTextView getCardEnterTipsView();
+
+    /**
+     * 获取无条件抽奖入口按钮
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
      * 进入画笔模式控件

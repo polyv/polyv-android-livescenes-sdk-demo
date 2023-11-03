@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -127,6 +128,29 @@ public interface IPLVLCMediaLayout {
      * 获取卡片推送入口提示控件
      */
     PLVTriangleIndicateTextView getCardEnterTipsView();
+
+    /**
+     * 获取无条件抽奖入口按钮
+     * @return
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
+
+    /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
 
     /**
      * 设置view交互事件监听器
@@ -242,7 +266,7 @@ public interface IPLVLCMediaLayout {
     /**
      * 更新网络质量
      */
-    void acceptNetworkQuality(int quality);
+    void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);
 
     void notifyRTCPrepared();
 
@@ -369,6 +393,11 @@ public interface IPLVLCMediaLayout {
      * 获取sessionId
      */
     String getSessionId();
+
+    /**
+     * 获取fileId
+     */
+    String getFileId();
 
     /**
      * 设置聊天回放是否可用

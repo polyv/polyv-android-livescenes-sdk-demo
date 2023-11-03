@@ -158,6 +158,7 @@ public class PLVSACommodityControlLayout extends FrameLayout {
                                         PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager)
                                                 .setAppId(PolyvLiveSDKClient.getInstance().getAppId())
                                                 .setAppSecret(PolyvLiveSDKClient.getInstance().getAppSecret())
+                                                .setAccountId(PolyvLiveSDKClient.getInstance().getUserId())
                                 )
                         );
                     }

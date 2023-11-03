@@ -16,6 +16,8 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLeng
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.util.ArrayList;
@@ -73,6 +75,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO);
 
         void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
     }
 
     public void callOnChatImgClick(View view, String imgUrl) {
@@ -90,6 +94,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     public void callOnShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean) {
         if (onViewActionListener != null) {
             onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
+        }
+    }
+
+    public void callOnReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onReceiveRedPaper(redPaperEvent);
         }
     }
     // </editor-fold>
@@ -122,6 +132,22 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         }
         if (dataList.size() != oldSize) {
             notifyItemRangeInserted(oldSize, dataList.size() - oldSize);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addDataChangedAtLast(PLVBaseViewData baseViewData) {
+        int oldSize = dataList.size();
+        fullDataList.add(baseViewData);
+        if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+            specialDataList.add(baseViewData);
+            if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                focusModeDataList.add(baseViewData);
+            }
+        }
+        if (dataList.size() != oldSize) {
+            notifyItemInserted(dataList.size() - 1);
             return true;
         }
         return false;
@@ -245,7 +271,9 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         for (PLVBaseViewData baseViewData : dataList) {
             removeDataPosition++;
             if (baseViewData.getData() instanceof IPLVIdEvent
-                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())) {
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())
+                    || (baseViewData.getData() instanceof IPLVMessageIdEvent
+                    && id.equals(((IPLVMessageIdEvent) baseViewData.getData()).getMessageId()))) {
                 dataList.remove(baseViewData);
                 break;
             }
@@ -260,6 +288,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         switch (viewType) {
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK:
             case PLVChatMessageItemType.ITEMTYPE_SEND_SPEAK:
+            case PLVChatMessageItemType.ITEMTYPE_RECEIVE_QUIZ:
+            case PLVChatMessageItemType.ITEMTYPE_SEND_QUIZ:
                 viewHolder = new PLVECChatMessageSpeakViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_speak_item, parent, false),
                         this
@@ -276,6 +306,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
             case PLVChatMessageItemType.ITEMTYPE_REWARD:
                 viewHolder = new PLVECChatMessageRewardViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_custom_gift_item, parent, false),
+                        this
+                );
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_RECEIVE_RED_PAPER:
+                viewHolder = new PLVECChatMessageRedPaperViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_red_paper_item, parent, false),
                         this
                 );
                 break;

@@ -22,7 +22,8 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout;
 import com.easefun.polyv.liveecommerce.R;
-import com.plv.business.api.common.player.PLVPlayerConstant;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
 
     private OnViewActionListener onViewActionListener;
 
-    private int lastQuality = -1;
+    private PLVLinkMicConstant.NetworkQuality lastQuality = PLVLinkMicConstant.NetworkQuality.UNKNOWN;
     private int qualityCount = 0;
     private boolean hasShowNotGoodTips = false;
     private boolean hasShowChangeLatencyTips = false;
@@ -89,8 +90,8 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     private void initChangeLatencyText() {
-        final String hintText = "您的网络状态糟糕，可尝试在 更多>模式 ";
-        final String clickableText = "切换到正常延迟";
+        final String hintText = PLVAppUtils.getString(R.string.plv_player_network_bad_4);
+        final String clickableText = PLVAppUtils.getString(R.string.plv_player_change_to_normal_latency);
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(hintText);
         builder.append(clickableText);
@@ -115,7 +116,7 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
         livePlayerNetworkChangeLatencyTv.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
         if (lastQuality != quality) {
             lastQuality = quality;
             qualityCount = 1;
@@ -128,7 +129,7 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     public void reset() {
-        lastQuality = -1;
+        lastQuality = PLVLinkMicConstant.NetworkQuality.UNKNOWN;
         qualityCount = 0;
         hasShowNotGoodTips = false;
         hasShowChangeLatencyTips = false;
@@ -140,11 +141,15 @@ public class PLVECNetworkTipsView extends FrameLayout implements View.OnClickLis
     }
 
     private void tryShow() {
-        if (PLVPlayerConstant.NetQuality.isNoConnection(lastQuality)) {
+        if (lastQuality == PLVLinkMicConstant.NetworkQuality.UNKNOWN) {
+            return;
+        }
+
+        if (lastQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
             tryShowNetNotGoodTips();
-        } else if (PLVPlayerConstant.NetQuality.isNetPoor(lastQuality)) {
+        } else if (lastQuality == PLVLinkMicConstant.NetworkQuality.VERY_BAD) {
             tryShowChangeLatencyTips();
-        } else if (PLVPlayerConstant.NetQuality.isNetMiddleOrWorse(lastQuality)) {
+        } else if (lastQuality.worseThan(PLVLinkMicConstant.NetworkQuality.GOOD)) {
             tryShowNetNotGoodTips();
         }
     }

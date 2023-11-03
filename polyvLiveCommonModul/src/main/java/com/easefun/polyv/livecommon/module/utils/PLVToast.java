@@ -183,7 +183,7 @@ public class PLVToast {
         }
 
         public Builder setText(@StringRes int stringResId) {
-            param.text = param.context.getString(stringResId);
+            param.text = PLVAppUtils.getString(stringResId);
             return this;
         }
 

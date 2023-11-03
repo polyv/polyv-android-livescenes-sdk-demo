@@ -3,79 +3,92 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        layout="@layout/plvec_widget_blur_top_radius_layout"
+    <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+        android:id="@+id/plvec_more_definition_pop_vertical_ly"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:layout_alignParentBottom="true" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/more_ly"
-        android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:layout_alignParentBottom="true"
-        android:clickable="true"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/plvec_margin_common"
-        android:paddingRight="@dimen/plvec_margin_common"
-        android:paddingTop="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="切换清晰度"
-            android:textColor="#ffffff"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:id="@+id/change_definition_ly"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/change_definition_tv_1"
-                android:layout_width="66dp"
-                android:layout_height="26dp"
-                android:background="@drawable/plvec_route_corner_bg_sel"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@color/plvec_route_fg"
-                android:textSize="14sp" />
+            <include
+                layout="@layout/plvec_widget_blur_top_radius_layout"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_alignParentBottom="true" />
 
-            <TextView
-                android:id="@+id/change_definition_tv_2"
-                android:layout_width="66dp"
-                android:layout_height="26dp"
-                android:layout_marginLeft="30dp"
-                android:background="@drawable/plvec_route_corner_bg_sel"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@color/plvec_route_fg"
-                android:textSize="14sp" />
+            <LinearLayout
+                android:id="@+id/more_ly"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_alignParentBottom="true"
+                android:clickable="true"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/plvec_margin_common"
+                android:paddingTop="20dp"
+                android:paddingRight="@dimen/plvec_margin_common">
 
-            <TextView
-                android:id="@+id/change_definition_tv_3"
-                android:layout_width="66dp"
-                android:layout_height="26dp"
-                android:layout_marginLeft="30dp"
-                android:background="@drawable/plvec_route_corner_bg_sel"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@color/plvec_route_fg"
-                android:textSize="14sp" />
-        </LinearLayout>
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plv_player_change_definition"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp" />
 
-    <ImageView
-        android:id="@+id/plvec_playback_more_dialog_close_iv"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/more_ly"
-        android:layout_marginRight="6dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/plvec_popup_close" />
+                <LinearLayout
+                    android:id="@+id/change_definition_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="26dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/change_definition_tv_1"
+                        android:layout_width="66dp"
+                        android:layout_height="26dp"
+                        android:background="@drawable/plvec_route_corner_bg_sel"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/plvec_route_fg"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/change_definition_tv_2"
+                        android:layout_width="66dp"
+                        android:layout_height="26dp"
+                        android:layout_marginLeft="30dp"
+                        android:background="@drawable/plvec_route_corner_bg_sel"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/plvec_route_fg"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/change_definition_tv_3"
+                        android:layout_width="66dp"
+                        android:layout_height="26dp"
+                        android:layout_marginLeft="30dp"
+                        android:background="@drawable/plvec_route_corner_bg_sel"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/plvec_route_fg"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/plvec_playback_more_dialog_close_iv"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_alignTop="@+id/more_ly"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/plvec_popup_close" />
+        </RelativeLayout>
+    </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
 </RelativeLayout>

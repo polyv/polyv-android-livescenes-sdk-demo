@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -30,6 +31,7 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.liveroom.adapter.PLVLSMemberAdapter;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -119,9 +121,9 @@ public class PLVLSMemberLayout extends FrameLayout {
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
                 if (onViewActionListener != null) {
-                    onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
+                    onViewActionListener.onControlUserLinkMic(position, action);
                 }
             }
 
@@ -166,7 +168,7 @@ public class PLVLSMemberLayout extends FrameLayout {
                                         onViewActionListener.closeAllUserLinkMic();
                                     }
                                     PLVToast.Builder.context(getContext())
-                                            .setText("已全体下麦")
+                                            .setText(R.string.plv_linkmic_toast_hang_all_off)
                                             .build()
                                             .show();
                                 }
@@ -192,7 +194,7 @@ public class PLVLSMemberLayout extends FrameLayout {
                             if (onViewActionListener != null) {
                                 onViewActionListener.muteAllUserAudio(!currentIsMuteAll);
                                 v.setSelected(!currentIsMuteAll);
-                                plvlsMemberListLinkMicMuteAllAudioTv.setText(!currentIsMuteAll ? "取消全体静音" : "全体静音");
+                                plvlsMemberListLinkMicMuteAllAudioTv.setText(!currentIsMuteAll ? R.string.plv_linkmic_unmute_all_audio : R.string.plv_linkmic_mute_all_audio);
                             }
                         }
                     };
@@ -207,7 +209,7 @@ public class PLVLSMemberLayout extends FrameLayout {
                                         dialog.dismiss();
                                         runnable.run();
                                         PLVToast.Builder.context(getContext())
-                                                .setText("已全体静音")
+                                                .setText(R.string.plv_linkmic_toast_mute_all_audio)
                                                 .build()
                                                 .show();
                                     }
@@ -247,7 +249,7 @@ public class PLVLSMemberLayout extends FrameLayout {
             );
             menuDrawer.setMenuView(this);
             menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
-            menuDrawer.setMenuSize((int) (landscapeWidth * 0.56));
+            menuDrawer.setMenuSize((int) (landscapeWidth * 0.60));
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
             menuDrawer.openMenu();
@@ -306,7 +308,7 @@ public class PLVLSMemberLayout extends FrameLayout {
         if (memberAdapter.getItemCount() == 0) {
             plvlsMemberCountTv.setText("");//列表中没数据时，不显示在线人数
         } else {
-            plvlsMemberCountTv.setText("(" + Math.max(onlineCount, memberAdapter.getItemCount()) + "人)");
+            plvlsMemberCountTv.setText(PLVAppUtils.formatString(R.string.plv_chat_online_count_3, Math.max(onlineCount, memberAdapter.getItemCount()) + ""));
         }
     }
 
@@ -315,8 +317,8 @@ public class PLVLSMemberLayout extends FrameLayout {
         memberAdapter.setStreamerStatus(isStartedStatus);
     }
 
-    public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
-        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType);
+    public void updateLinkMicMediaType(boolean isVideoLinkMicType, boolean isOpenLinkMic) {
+        memberAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
     }
 
     public boolean onBackPressed() {

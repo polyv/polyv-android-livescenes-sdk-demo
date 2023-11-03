@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--将连麦id和view做绑定的tag的key-->
+    <item name="tag_link_mic_id" type="id" />
+</resources>

@@ -5,6 +5,7 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotEmpty;
 
 import android.app.Activity;
 import androidx.lifecycle.Observer;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -34,20 +35,20 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
-import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
+import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
-import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.config.PLVPlaybackCacheVideoConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -59,7 +60,9 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -67,7 +70,9 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -133,6 +138,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param channelType 频道类型
      * @param viewerId    观众ID
      * @param viewerName  观众昵称
+     * @param langType    观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -144,23 +150,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                              @NonNull String viewerName,
                                              @NonNull String viewerAvatar,
                                              @NonNull String param4,
-                                             @NonNull String param5) {
+                                             @NonNull String param5,
+                                             String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_channel_id_is_empty));
         }
         if (channelType == null) {
-            return PLVLaunchResult.error("channelType 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_channel_type_is_null));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动云课堂直播页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_live_error_viewer_name_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
@@ -178,8 +186,6 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * 启动回放页面
      * 如果没有输入vid的情况下会加载该频道的往期视频列表，如果输入vid的话就直接播放相应vid的视频，
      * 这样的话就不会加载往期视频列表
-     * 若是想关闭不输入vid播放往期视频列表这个功能的话可以放开下面
-     * PLVLaunchResult.error("vid 为空，启动云课堂回放页失败！");的注释
      *
      * @param activity      上下文Activity
      * @param channelId     频道号
@@ -188,6 +194,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param viewerId      观众ID
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
+     * @param langType      观看页语言
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -202,23 +209,25 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                                  @NonNull String viewerAvatar,
                                                  @NonNull String param4,
                                                  @NonNull String param5,
-                                                 PLVPlaybackListType videoListType) {
+                                                 PLVPlaybackListType videoListType,
+                                                 String langType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_channel_id_is_empty));
         }
         if (channelType == null) {
-            return PLVLaunchResult.error("channelType 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_channel_type_is_null));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动云课堂回放页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_viewer_name_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, langType);
         Intent intent = new Intent(activity, PLVLCCloudClassActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_CHANNEL_TYPE, channelType);
@@ -237,6 +246,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,6 +273,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
             @Override
             public void run() {
+                PLVLanguageUtil.detachLanguageActivity();
                 PLVFloatingPlayerManager.getInstance().clear();
                 if (mediaLayout != null) {
                     mediaLayout.destroy();
@@ -314,6 +329,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         ).show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (popoverLayout != null) {
+            popoverLayout.onActivityResult(requestCode, resultCode, data);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
@@ -321,9 +343,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVPlaybackCacheModule.instance)
-                .addModule(PLVPlaybackChapterModule.instance)
-                .addModule(PLVCommodityModule.instance)
+                .addModule(PLVCommonModule.instance)
                 .addModule(PLVLCFloatingWindowModule.instance);
     }
 
@@ -489,6 +509,17 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().showCardPush(event);
                 }
+            }
+        });
+
+
+        //无条件抽奖挂件配置
+        livePageMenuLayout.getLotteryManager().registerView(mediaLayout.getLotteryEnterView(), mediaLayout.getLotteryEnterCdView(), mediaLayout.getLotteryEnterTipsView());
+        livePageMenuLayout.getLotteryManager().setLotteryEnterClickListener(new PLVLotteryManager.OnLotteryEnterClickListener() {
+            @Override
+            public void onClick(PLVShowLotteryEvent event) {
+                //发送显示无条件抽奖
+                popoverLayout.getInteractLayout().showLottery(event);
             }
         });
 
@@ -753,7 +784,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     switch (playerState) {
                         case PREPARED:
                             floatingPPTLayout.show();
-                            livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId());
+                            livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), mediaLayout.getFileId());
                             break;
                         case IDLE:
                             floatingPPTLayout.hide();
@@ -872,8 +903,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onAddedChatTab(boolean isChatPlaybackEnabled) {
+            public void onChatTabPrepared(boolean isChatPlaybackEnabled, boolean isDisplayEnabled) {
                 if (chatLandscapeLayout != null) {
+                    chatLandscapeLayout.setIsDisplayEnabled(isDisplayEnabled);
                     chatLandscapeLayout.setIsChatPlaybackLayout(isChatPlaybackEnabled);
                     chatLandscapeLayout.setIsLiveType(liveRoomDataManager.getConfig().isLive());
                     livePageMenuLayout.getChatPlaybackManager().addOnCallDataListener(chatLandscapeLayout.getChatPlaybackDataListener());
@@ -881,6 +913,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 }
                 if (mediaLayout != null) {
                     mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled, liveRoomDataManager.getConfig().isLive());
+                    mediaLayout.setChatIsDisplayEnabled(isDisplayEnabled);
                 }
             }
 
@@ -917,6 +950,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onReplyMessage(PLVChatQuoteVO chatQuoteVO) {
                 if (mediaLayout != null) {
                     mediaLayout.notifyOnReplyMessage(chatQuoteVO);
+                }
+            }
+
+            @Override
+            public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().receiveRedPaper(redPaperEvent);
                 }
             }
         });
@@ -1116,7 +1156,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onNetworkQuality(int quality) {
+            public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
                 mediaLayout.acceptNetworkQuality(quality);
             }
 
@@ -1192,7 +1232,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             PLVScreenUtils.enterLandscape(this);
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);

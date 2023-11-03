@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:background="#202127"
+    tools:paddingBottom="10dp"
+    tools:paddingEnd="10dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/plvlc_chatroom_red_paper_avatar_iv"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/plvlc_chatroom_ic_viewer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/plvlc_chatroom_red_paper_user_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_chatroom_red_paper_avatar_iv"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/plvlc_chatroom_red_paper_nick_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#ADADC0"
+            android:textSize="12sp"
+            tools:text="nickname" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/plvlc_chatroom_password_red_paper_bg"
+        app:layout_constraintStart_toStartOf="@+id/plvlc_chatroom_red_paper_user_ll"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_chatroom_red_paper_user_ll">
+
+        <TextView
+            android:id="@+id/plvlc_chatroom_red_paper_blessing_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:maxEms="9"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#FCEEBC"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="恭喜发财，大吉大利" />
+
+        <TextView
+            android:id="@+id/plvlc_chatroom_red_paper_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:textColor="#FCEEBC"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/plvlc_chatroom_red_paper_blessing_tv"
+            tools:text="领取红包" />
+
+        <TextView
+            android:id="@+id/plvlc_chatroom_red_paper_type_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="7dp"
+            android:textColor="#99FCEEBC"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="红包" />
+
+        <View
+            android:layout_width="128dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="3dp"
+            android:background="#1AFCEEBC"
+            app:layout_constraintBottom_toTopOf="@id/plvlc_chatroom_red_paper_type_tv"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/plvlc_chatroom_red_paper_receive_mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#66000000"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

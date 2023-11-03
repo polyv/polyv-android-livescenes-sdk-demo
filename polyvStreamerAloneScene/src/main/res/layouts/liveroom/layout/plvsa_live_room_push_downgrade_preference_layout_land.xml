@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvsa_push_downgrade_preference_layout_root"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape_land">
+
+    <TextView
+        android:id="@+id/plvsa_push_downgrade_preference_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="30dp"
+        android:text="@string/plv_push_downgrade_preference_title"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plvsa_push_downgrade_preference_title_tv"
+        android:layout_marginHorizontal="32dp"
+        android:orientation="vertical">
+
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+            android:id="@+id/plvsa_push_downgrade_preference_quality_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp">
+
+            <TextView
+                android:id="@+id/plvsa_push_downgrade_preference_quality_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/plv_push_downgrade_quality_title"
+                android:textColor="#F0F1F5"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plvsa_push_downgrade_preference_quality_desc_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/plv_push_downgrade_quality_desc"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_push_downgrade_preference_quality_title_tv" />
+
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+            android:id="@+id/plvsa_push_downgrade_preference_fluency_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp">
+
+            <TextView
+                android:id="@+id/plvsa_push_downgrade_preference_fluency_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/plv_push_downgrade_fluency_title"
+                android:textColor="#F0F1F5"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plvsa_push_downgrade_preference_fluency_desc_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/plv_push_downgrade_fluency_desc"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_push_downgrade_preference_fluency_title_tv" />
+
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+
+    </LinearLayout>
+
+</RelativeLayout>

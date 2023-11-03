@@ -3,13 +3,20 @@ package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.SurfaceView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
+import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
@@ -92,7 +99,12 @@ public interface IPLVStreamerContract {
          *
          * @param quality 网络状态常量
          */
-        void onNetworkQuality(int quality);
+        void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);
+
+        /**
+         * 推流网络统计
+         */
+        void onUpstreamNetworkStatus(PLVNetworkStatusVO networkStatus);
 
         /**
          * 更新推流时间
@@ -177,7 +189,7 @@ public interface IPLVStreamerContract {
         /**
          * 嘉宾RTC状态改变
          */
-        void onGuestRTCStatusChanged(int pos);
+        void onGuestRTCStatusChanged(int pos, boolean isJoinRTC);
 
         /**
          * 嘉宾多媒体状态改变
@@ -201,6 +213,24 @@ public interface IPLVStreamerContract {
          * @param extra    附加信息，如错误码
          */
         void onScreenShareChange(int position, boolean isShare, int extra);
+
+        /**
+         * 讲师邀请上麦
+         */
+        void onTeacherInviteMeJoinLinkMic(PLVJoinResponseSEvent event);
+
+        /**
+         * 观众响应连麦邀请
+         */
+        void onViewerJoinAnswer(PLVJoinAnswerSEvent joinAnswerEvent, PLVMemberItemDataBean member);
+
+        /**
+         * 连麦开关状态变化回调
+         *
+         * @param isVideoLinkMic true->视频连麦，false->音频连麦
+         * @param isOpen         是否开启连麦
+         */
+        void onLinkMicOpenStateChanged(boolean isVideoLinkMic, boolean isOpen);
     }
     // </editor-fold>
 
@@ -230,7 +260,7 @@ public interface IPLVStreamerContract {
          *
          * @return 网络质量常量
          */
-        int getNetworkQuality();
+        PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
         /**
          * 设置推流码率
@@ -266,11 +296,26 @@ public interface IPLVStreamerContract {
         boolean enableRecordingAudioVolume(boolean enable);
 
         /**
-         * 是否允许录制视频/打开摄像头
+         * 当前是否打开麦克风
+         */
+        boolean isLocalAudioEnabled();
+
+        /**
+         * 是否允许显示本地摄像头画面
          *
          * @param enable true：允许，false：不允许
          */
         boolean enableLocalVideo(boolean enable);
+
+        /**
+         * 当前是否显示摄像头画面
+         */
+        boolean isLocalVideoEnabled();
+
+        /**
+         * 是否允许本地摄像头画面采集
+         */
+        void enableLocalVideoCapture(boolean enable);
 
         /**
          * 开关手电筒，如果前置摄像头没有手电筒，那么前置摄像头是无法打开手电筒的。
@@ -319,6 +364,13 @@ public interface IPLVStreamerContract {
          * @param mixLayoutType 混流布局类型
          */
         void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);
+
+        /**
+         * 获取混流画面布局类型
+         *
+         * @return 混流布局类型
+         */
+        int getMixLayoutType();
 
         /**
          * 设置直播推流，是否需要恢复上一场的流继续推流
@@ -374,22 +426,36 @@ public interface IPLVStreamerContract {
          */
         boolean isScreenSharing();
 
+        /**
+         * 开启连麦
+         *
+         * @param isVideoType 是否视频连麦
+         * @param isOpen      是否开启连麦
+         * @param ack         回调
+         * @return 是否调用成功
+         */
+        boolean openLinkMic(boolean isVideoType, boolean isOpen, Ack ack);
+
+        /**
+         * 关闭连麦
+         */
+        boolean closeLinkMic(Ack ack);
 
         /**
          * 控制成员列表中的用户加入或离开连麦
          *
-         * @param position    成员列表中的位置
-         * @param isAllowJoin true：加入，false：离开
+         * @param position 成员列表中的位置
+         * @param action   具体操作
          */
-        void controlUserLinkMic(int position, boolean isAllowJoin);
+        void controlUserLinkMic(int position, PLVStreamerControlLinkMicAction action);
 
         /**
          * 控制连麦列表中的用户加入或离开连麦
          *
          * @param position    连麦列表中的位置
-         * @param isAllowJoin true：加入，false：离开
+         * @param action 具体操作
          */
-        void controlUserLinkMicInLinkMicList(int position, boolean isAllowJoin);
+        void controlUserLinkMicInLinkMicList(int position, PLVStreamerControlLinkMicAction action);
 
         /**
          * 禁/启用用户媒体
@@ -439,6 +505,16 @@ public interface IPLVStreamerContract {
         void guestTryJoinLinkMic();
 
         /**
+         * 嘉宾发起举手上麦
+         */
+        void guestSendJoinRequest();
+
+        /**
+         * 嘉宾离开连麦
+         */
+        void guestSendLeaveLinkMic();
+
+        /**
          * 设置用户主讲权限
          *
          * @param userId          用户的userId
@@ -454,6 +530,29 @@ public interface IPLVStreamerContract {
          */
         @NonNull
         PLVStreamerData getData();
+
+        /**
+         * 设置弱网条件下的降级策略
+         *
+         * @param pushDowngradePreference 降级策略
+         */
+        void setPushDowngradePreference(@NonNull PLVPushDowngradePreference pushDowngradePreference);
+
+        /**
+         * @return 当前降级策略，当引擎未初始化或不支持降级策略时返回 null
+         */
+        @Nullable
+        PLVPushDowngradePreference getPushDowngradePreference();
+
+        /**
+         * 响应邀请连麦
+         */
+        void answerLinkMicInvitation(boolean accept, boolean isTimeout, boolean openCamera, boolean openMicrophone);
+
+        /**
+         * 获取邀请连麦接受邀请的剩余时间
+         */
+        void getJoinAnswerTimeLeft(PLVSugarUtil.Consumer<Integer> callback);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

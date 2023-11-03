@@ -260,7 +260,7 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
 
         //初始化占位图文案
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
-            plvlsPlaceHolderView.setPlaceHolderText(getContext().getString(R.string.document_no_live_please_wait));
+            plvlsPlaceHolderView.setPlaceHolderText(getContext().getString(R.string.plvls_document_no_live_please_wait));
             plvlsPlaceHolderView.enableRespondLocationSensor(false);
             plvlsPlaceHolderView.setVisibility(VISIBLE);
         }
@@ -309,9 +309,9 @@ public class PLVLSDocumentLayout extends FrameLayout implements IPLVLSDocumentLa
                     if (plvClearMarkConfirmWindow == null) {
                         plvClearMarkConfirmWindow = PLVLSConfirmDialog.Builder.context(getContext())
                                 .setTitleVisibility(GONE)
-                                .setContent("清屏后笔迹将无法恢复，确定清屏吗")
-                                .setLeftButtonText("按错了")
-                                .setRightButtonText("确定")
+                                .setContent(R.string.plv_ppt_clear_mask)
+                                .setLeftButtonText(R.string.plv_common_dialog_click_wrong)
+                                .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                                 .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, View v) {

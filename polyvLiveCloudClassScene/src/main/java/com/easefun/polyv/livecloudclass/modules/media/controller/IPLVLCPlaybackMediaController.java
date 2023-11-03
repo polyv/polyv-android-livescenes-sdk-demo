@@ -48,6 +48,22 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
+     * 获取无条件抽奖入口按钮
+     * @return
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
+
+    /**
      * 设置点赞是否开启/关闭
      *
      * @param isSwitchEnabled
@@ -94,6 +110,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * 设置聊天回放是否可用
      */
     void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);
+
+    /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
 
     /**
      * 更新聊天室房间状态

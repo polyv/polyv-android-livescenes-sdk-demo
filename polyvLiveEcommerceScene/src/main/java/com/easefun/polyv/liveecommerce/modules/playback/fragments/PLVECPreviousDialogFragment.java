@@ -35,6 +35,7 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVECPreviousFragment;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -190,9 +191,9 @@ public class PLVECPreviousDialogFragment extends DialogFragment implements IPLVE
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="添加tab页"
+    // <editor-fold defaultstate="collapsed" desc="添加tab页">
     private void addPreviousTab() {
-        pageTabTitleList.add("回放列表");
+        pageTabTitleList.add(PLVAppUtils.getString(R.string.plv_previous_playback_list));
         previousFragment = new PLVECPreviousFragment();
         previousFragment.setPrviousView(plvPreviousView);
         pageTabFragmentList.add(previousFragment);

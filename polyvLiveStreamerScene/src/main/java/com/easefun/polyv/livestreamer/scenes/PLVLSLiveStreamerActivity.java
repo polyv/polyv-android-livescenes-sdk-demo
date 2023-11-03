@@ -2,8 +2,10 @@ package com.easefun.polyv.livestreamer.scenes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,8 +16,10 @@ import android.view.View;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
-import com.easefun.polyv.livecommon.module.modules.beauty.di.PLVBeautyModule;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
+import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
@@ -31,19 +35,24 @@ import com.easefun.polyv.livestreamer.modules.chatroom.IPLVLSChatroomLayout;
 import com.easefun.polyv.livestreamer.modules.document.IPLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
+import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSPushDowngradeAlertToastLayout;
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.di.PLVLSStreamerModule;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.streamer.linkmic.IPLVLinkMicEventSender;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -82,6 +91,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private IPLVLSChatroomLayout plvlsChatroomLy;
     // 美颜布局
     private IPLVLSBeautyLayout beautyLayout;
+    // 推流降级提示布局
+    private PLVLSPushDowngradeAlertToastLayout pushDowngradeAlertToastLy;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -114,30 +125,31 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                                                  boolean isOpenCamera,
                                                  boolean isFrontCamera) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_channel_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_viewer_name_is_empty));
         }
         if (TextUtils.isEmpty(avatarUrl)) {
-            return PLVLaunchResult.error("avatarUrl 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_avatar_url_is_empty));
         }
         if (TextUtils.isEmpty(actor)) {
-            return PLVLaunchResult.error("actor 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_actor_is_empty));
         }
         if (TextUtils.isEmpty(usertype)) {
-            return PLVLaunchResult.error("usertype 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_user_type_is_empty));
         }
         if (TextUtils.isEmpty(colinMicType)) {
-            return PLVLaunchResult.error("colinMicType 为空，启动手机开播三分屏页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvls_login_streamer_error_colin_mic_type_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, PLVLanguageUtil.LANGUAGE_FOLLOW_SYSTEM);
         Intent intent = new Intent(activity, PLVLSLiveStreamerActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
@@ -156,6 +168,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injectDependency();
@@ -164,6 +181,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         initLiveRoomManager();
         initView();
         initBeautyModule();
+        initPushDowngradeAlertLayout();
 
         checkStreamRecover();
 
@@ -176,6 +194,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PLVLanguageUtil.detachLanguageActivity();
         PLVBeautyInitHelper.getInstance().destroy();
         if (plvlsStatusBarLy != null) {
             plvlsStatusBarLy.destroy();
@@ -233,6 +252,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 })
                 .show();
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 依赖注入">
@@ -240,7 +264,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVBeautyModule.instance)
+                .addModule(PLVCommonModule.instance)
                 .addModule(PLVLSStreamerModule.instance);
     }
 
@@ -262,6 +286,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setupUser(viewerId, viewerName, avatarUrl, role, actor);
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setColinMicType(colinMicType);
+        PLVLiveChannelConfigFiller.setChannelType(PLVLiveChannelType.PPT);
 
         PLVLiveLocalActionHelper.getInstance().enterChannel(channelId);
     }
@@ -283,6 +308,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsDocumentLy = findViewById(R.id.plvls_document_ly);
         plvlsStreamerLy = findViewById(R.id.plvls_streamer_ly);
         plvlsChatroomLy = findViewById(R.id.plvls_chatroom_ly);
+        pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
 
         // 初始化推流和连麦布局
         plvlsStreamerLy.init(liveRoomDataManager);
@@ -351,17 +377,24 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
-            public int getCurrentNetworkQuality() {
+            public PLVLinkMicConstant.NetworkQuality getCurrentNetworkQuality() {
                 return plvlsStreamerLy.getNetworkQuality();
+            }
+
+            @Nullable
+            @Override
+            public PLVPushDowngradePreference getCurrentDowngradePreference() {
+                return plvlsStreamerLy.getStreamerPresenter().getPushDowngradePreference();
+            }
+
+            @Override
+            public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
+                plvlsStreamerLy.setPushDowngradePreference(preference);
             }
 
             @Override
             public boolean isStreamerStartSuccess() {
                 return plvlsStreamerLy.isStreamerStartSuccess();
-            }
-
-            @Override
-            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
             }
 
             @Override
@@ -372,6 +405,16 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onBitrateClick(int bitrate) {
                 plvlsStreamerLy.setBitrate(bitrate);
+            }
+
+            @Override
+            public int getMixInfo() {
+                return plvlsStreamerLy.getMixInfo();
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                plvlsStreamerLy.setMixLayout(mix);
             }
 
             @Override
@@ -406,8 +449,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
-                plvlsStreamerLy.controlUserLinkMic(position, isAllowJoin);
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
+                plvlsStreamerLy.controlUserLinkMic(position, action);
             }
 
             @Override
@@ -418,11 +461,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                         final boolean isGuestTransferPermission = !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
                         final String text;
                         if (!isGrant) {
-                            text = "已收回主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_remove_speaker_permission_2);
                         } else if (isGuestTransferPermission) {
-                            text = "已移交主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_change_speaker_permission);
                         } else {
-                            text = "已授予主讲权限";
+                            text = PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_2);
                         }
                         PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
                                 .setText(text)
@@ -460,13 +503,22 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
         });
         //监听推流网络变化
-        plvlsStreamerLy.addOnNetworkQualityListener(new IPLVOnDataChangedListener<Integer>() {
+        plvlsStreamerLy.addOnNetworkQualityListener(new IPLVOnDataChangedListener<PLVLinkMicConstant.NetworkQuality>() {
             @Override
-            public void onChanged(@Nullable Integer integer) {
-                if (integer == null) {
+            public void onChanged(@Nullable PLVLinkMicConstant.NetworkQuality quality) {
+                if (quality == null) {
                     return;
                 }
-                plvlsStatusBarLy.updateNetworkQuality(integer);
+                plvlsStatusBarLy.updateNetworkQuality(quality);
+            }
+        });
+        plvlsStreamerLy.addOnNetworkStatusListener(new IPLVOnDataChangedListener<PLVNetworkStatusVO>() {
+            @Override
+            public void onChanged(@Nullable PLVNetworkStatusVO networkStatusVO) {
+                if (networkStatusVO == null) {
+                    return;
+                }
+                plvlsStatusBarLy.updateNetworkStatus(networkStatusVO);
             }
         });
         //监听推流的累计时间
@@ -508,7 +560,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 }
                 plvlsChatroomLy.setOpenMicViewStatus(aBoolean);
                 PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
-                        .setText("已" + (aBoolean ? "开启" : "关闭") + "麦克风")
+                        .setText(PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_microphone_unmute_2 : R.string.plv_linkmic_microphone_mute_2))
                         .build()
                         .show();
             }
@@ -521,7 +573,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 }
                 plvlsChatroomLy.setOpenCameraViewStatus(aBoolean);
                 PLVToast.Builder.context(PLVLSLiveStreamerActivity.this)
-                        .setText("已" + (aBoolean ? "开启" : "关闭") + "摄像头")
+                        .setText(PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_camera_unmute_2 : R.string.plv_linkmic_camera_mute_2))
                         .build()
                         .show();
             }
@@ -535,6 +587,10 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 plvlsChatroomLy.setFrontCameraViewStatus(aBoolean);
             }
         });
+    }
+
+    private void initPushDowngradeAlertLayout() {
+        plvlsStreamerLy.getStreamerPresenter().registerView(pushDowngradeAlertToastLy.streamerView);
     }
     // </editor-fold>
 
@@ -557,6 +613,17 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             public boolean onFrontCameraControl(boolean isFront) {
                 PLVLiveLocalActionHelper.getInstance().updateCameraDirection(isFront);
                 return plvlsStreamerLy.setCameraDirection(isFront);
+            }
+
+            @Override
+            public void onKickByServer() {
+                boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+                if (plvlsStreamerLy != null) {
+                    if (!isGuest) {
+                        plvlsStreamerLy.stopClass();
+                    }
+                    plvlsStreamerLy.destroy();
+                }
             }
         });
         //监听聊天室的在线人数变化
@@ -600,8 +667,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
             final AlertDialog dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setMessage("检测到之前异常退出\n是否恢复直播？")
-                    .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.plv_streamer_recover_hint)
+                    .setPositiveButton(R.string.plv_streamer_stop_stream, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             liveRoomDataManager.setNeedStreamRecover(false);
@@ -609,12 +676,12 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                             plvlsStreamerLy.stopClass();
                         }
                     })
-                    .setNegativeButton("恢复直播", null)
+                    .setNegativeButton(R.string.plv_streamer_recover_stream, null)
                     .show();
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (plvlsStreamerLy.getNetworkQuality() == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+                    if (plvlsStreamerLy.getNetworkQuality() == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                         plvlsStatusBarLy.showAlertDialogNoNetwork();
                         return;
                     }

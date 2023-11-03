@@ -12,10 +12,13 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class PLVLCChatMoreLayout extends FrameLayout {
@@ -39,6 +42,10 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      */
     public static final String CHAT_FUNCTION_TYPE_BULLETIN = "CHAT_FUNCTION_TYPE_BULLETIN";
     /**
+     * 语言切换
+     */
+    public static final String CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH = "CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH";
+    /**
      * 消息
      */
     public static final String CHAT_FUNCTION_TYPE_MESSAGE = "CHAT_FUNCTION_TYPE_MESSAGE";
@@ -47,19 +54,28 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      */
     public static final String CHAT_FUNCTION_TYPE_EFFECT = "CHAT_FUNCTION_TYPE_EFFECT";
 
+    /**
+     * 抽奖挂件事件
+     */
+    public static final String CLICK_LOTTERY_PENDANT= "CLICK_LOTTERY_PENDANT";
+
 
     //每行显示的功能模块数量
     public static final int LAYOUT_SPAN_COUNT = 4;
 
     //初始化支持的功能模块
     private final ArrayList<PLVChatFunctionVO> functionList = arrayListOf(
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_ONLY_TEACHER, R.drawable.plvlc_chatroom_btn_view_message_selector, "只看讲师", true),
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_SEND_IMAGE, R.drawable.plvlc_chatroom_btn_img_send, "发送图片", false),
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_OPEN_CAMERA, R.drawable.plvlc_chatroom_btn_camera, "拍摄", false),
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_BULLETIN, R.drawable.plvlc_chatroom_btn_bulletin_show, "公告", true),
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, "消息", false)
-//            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, "屏蔽特效", false)
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_ONLY_TEACHER, R.drawable.plvlc_chatroom_btn_view_message_selector, PLVAppUtils.getString(R.string.plv_live_only_teacher), true),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_SEND_IMAGE, R.drawable.plvlc_chatroom_btn_img_send, PLVAppUtils.getString(R.string.plv_live_send_img), false),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_OPEN_CAMERA, R.drawable.plvlc_chatroom_btn_camera, PLVAppUtils.getString(R.string.plv_live_open_camera), false),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_BULLETIN, R.drawable.plvlc_chatroom_btn_bulletin_show, PLVAppUtils.getString(R.string.plv_live_bulletin), true),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvlc_chatroom_btn_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, PLVAppUtils.getString(R.string.plv_live_message), false)
+//            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, PLVAppUtils.getString(R.string.plv_chat_view_close_effect), false)
     );
+
+    //初始化不支持的事件
+    private ArrayList<String> unacceptFunctions = arrayListOf(CLICK_LOTTERY_PENDANT);
 
     //功能响应监听
     private PLVLCChatFunctionListener functionListener;
@@ -121,13 +137,21 @@ public class PLVLCChatMoreLayout extends FrameLayout {
             return;
         }
 
+        final List<String> sortList = new ArrayList<>();
         List<PLVWebviewUpdateAppStatusVO.Value.Function> functions = functionsVO.getValue().getDataArray();
         for (PLVWebviewUpdateAppStatusVO.Value.Function function : functions) {
+            sortList.add(function.getEvent());
             int index = -1;
             for (int i = 0; i < functionList.size(); i++) {
                 if (function.getEvent().equals(functionList.get(i).getType())) {
                     index = i;
                     break;
+                }
+            }
+
+            for (String unacceptFunction : unacceptFunctions) {
+                if (function.getEvent().equals(unacceptFunction)) {
+                    return;
                 }
             }
 
@@ -139,6 +163,16 @@ public class PLVLCChatMoreLayout extends FrameLayout {
                 functionList.set(index, chatFunctionVO);
             }
         }
+        Collections.sort(functionList, new Comparator<PLVChatFunctionVO>() {
+            @Override
+            public int compare(PLVChatFunctionVO o1, PLVChatFunctionVO o2) {
+                String event1 = o1.getType();
+                String event2 = o2.getType();
+                int index1 = sortList.indexOf(event1);
+                int index2 = sortList.indexOf(event2);
+                return index1 - index2;
+            }
+        });
 
         if (adapter != null) {
             adapter.updateFunctionList(functionList);

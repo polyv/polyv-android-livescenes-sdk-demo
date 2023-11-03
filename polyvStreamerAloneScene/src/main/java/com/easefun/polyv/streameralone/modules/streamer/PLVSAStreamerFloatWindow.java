@@ -23,9 +23,9 @@ import com.easefun.polyv.livecommon.ui.widget.floating.PLVFloatingWindowManager;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -113,7 +113,11 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
 
     public void destroy() {
         PLVFloatingWindowManager.getInstance().destroy();
-        context.unregisterReceiver(receiver);
+        try {
+            context.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+        }
     }
     // </editor-fold >
 
@@ -132,13 +136,13 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         }
 
         @Override
-        public void onNetworkQuality(int quality) {
+        public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
             //处理断网后的回调错误
             if (!PLVNetworkUtils.isConnected(context)) {
-                quality = PLVLinkMicConstant.NetQuality.NET_QUALITY_NO_CONNECTION;
+                quality = PLVLinkMicConstant.NetworkQuality.DISCONNECT;
             }
 
-            if (quality == PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION) {
+            if (quality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
                 if (!isNoNetWork) {
                     updateWhenStreamStop();
                     autoExpand(true, 0);
@@ -266,13 +270,13 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
     private void updateWhenShareScering() {
         plvsaStreamerWindowRoot.setSelected(false);
         plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText("退出投屏");
+        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_exit_share_screen);
     }
 
     private void updateWhenStreamStop() {
         plvsaStreamerWindowRoot.setSelected(true);
         plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText("直播已中断");
+        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_stop_live);
     }
 
     // </editor-fold >

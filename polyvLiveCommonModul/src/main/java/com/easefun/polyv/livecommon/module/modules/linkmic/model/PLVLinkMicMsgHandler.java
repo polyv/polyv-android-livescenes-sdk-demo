@@ -264,7 +264,7 @@ public class PLVLinkMicMsgHandler {
         void onTeacherAllowMeToJoin(PLVJoinResponseSEvent joinResponseEvent);
 
         /**
-         * 僵尸邀请我上麦
+         * 讲师邀请我上麦
          */
         void onTeacherInviteToJoin(PLVJoinResponseSEvent joinResponseSEvent);
 

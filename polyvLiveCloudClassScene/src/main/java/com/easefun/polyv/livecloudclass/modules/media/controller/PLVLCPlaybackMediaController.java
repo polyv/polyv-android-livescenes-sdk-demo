@@ -26,14 +26,13 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLV
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
-import com.easefun.polyv.livecommon.ui.widget.imageview.IPLVVisibilityChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -66,8 +65,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView cardEnterLandView;
     private TextView cardEnterCdLandTv;
     private PLVTriangleIndicateTextView cardEnterTipsLandView;
-    private View likesReferView;
-    private View cardEnterReferView;
+
+    private PLVSimpleImageView lotteryEnterLandView;
+    private TextView lotteryEnterCdLandTv;
+    private PLVTriangleIndicateTextView lotteryEnterTipsLandView;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -88,10 +89,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     /**** status **/
     // 进度条是否处于拖动的状态
     private boolean isPbDragging;
-    //已经显示过"可从此处重新打开浮窗"的提示了
+    //已经显示过 可从此处重新打开浮窗 的提示了
     private boolean hasShowReopenFloatingViewTip = false;
 
-    //延迟隐藏"可从此处重新打开浮窗"
+    //延迟隐藏 可从此处重新打开浮窗
     private Disposable reopenFloatingDelay;
 
     //延迟隐藏“控制栏”
@@ -102,6 +103,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 服务端的点赞开关
+    private boolean isLikesSwitchEnabled = true;
+    // 聊天室tab是否可见
+    private boolean isChatDisplayEnabled = true;
 
     //Listener
     private OnViewActionListener onViewActionListener;
@@ -146,8 +151,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         cardEnterLandView = findViewById(R.id.plvlc_card_enter_land_view);
         cardEnterCdLandTv = findViewById(R.id.plvlc_card_enter_cd_land_tv);
         cardEnterTipsLandView = findViewById(R.id.plvlc_card_enter_tips_land_view);
-        likesReferView = findViewById(R.id.plvlc_refer_view_1);
-        cardEnterReferView = findViewById(R.id.plvlc_refer_view_2);
+
+        lotteryEnterLandView = findViewById(R.id.plvlc_playback_lottery_enter_land_view);
+        lotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_lottery_enter_cd_land_tv);
+        lotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_lottery_enter_tips_land_view);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -190,7 +197,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         }
 
         observeCommodityStatus();
-        observeForFitRightBottomViewLocation();
     }
 
     private void initMoreLayout() {
@@ -229,65 +235,6 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 });
     }
 
-    private void observeForFitRightBottomViewLocation() {
-        ivLikesLand.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, true);
-            }
-        });
-        cardEnterLandView.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, false);
-            }
-        });
-        controllerCommodityLandIv.setVisibilityChangedListener(new IPLVVisibilityChangedListener() {
-            @Override
-            public void onChanged(int visibility) {
-                processRightBottomViewVisibilityChanged(visibility, false);
-            }
-        });
-    }
-
-    private void processRightBottomViewVisibilityChanged(int visibility, boolean isLikesView) {
-        if (likesReferView.getLayoutParams() == null) {
-            return;
-        }
-        boolean isVisible = visibility == View.VISIBLE;
-        if (isLikesView) {
-            if (isVisible || !hasRightBottomViewVisibleExcludeLikesView()) {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
-            } else {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
-            }
-        } else {
-            if (isVisible) {
-                if (ivLikesLand.getVisibility() != View.VISIBLE) {
-                    likesReferView.getLayoutParams().width = ConvertUtils.dp2px(4);
-                }
-            } else if (!hasRightBottomViewVisibleExcludeLikesView()) {
-                likesReferView.getLayoutParams().width = ConvertUtils.dp2px(60);
-            }
-        }
-        MarginLayoutParams mlp = (MarginLayoutParams) cardEnterLandView.getLayoutParams();
-        if (mlp != null) {
-            mlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 44 : 20);
-        }
-        MarginLayoutParams cardEnterReferMlp = (MarginLayoutParams) cardEnterReferView.getLayoutParams();
-        if (cardEnterReferMlp != null) {
-            cardEnterReferMlp.rightMargin = ConvertUtils.dp2px(isRightBottomOnlyCardEnterViewVisible() ? 34 : 10);
-        }
-        likesReferView.requestLayout();
-    }
-
-    private boolean isRightBottomOnlyCardEnterViewVisible() {
-        return cardEnterLandView.getVisibility() == View.VISIBLE && controllerCommodityLandIv.getVisibility() != View.VISIBLE && ivLikesLand.getVisibility() != View.VISIBLE;
-    }
-
-    private boolean hasRightBottomViewVisibleExcludeLikesView() {
-        return cardEnterLandView.getVisibility() == View.VISIBLE || controllerCommodityLandIv.getVisibility() == View.VISIBLE;
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLiveMediaController父接口IPolyvMediaController定义的方法">
@@ -363,8 +310,24 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public ImageView getLotteryEnterView() {
+        return lotteryEnterLandView;
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return lotteryEnterCdLandTv;
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return lotteryEnterTipsLandView;
+    }
+
+    @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
-        ivLikesLand.setVisibility(isSwitchEnabled ? View.VISIBLE : View.INVISIBLE);
+        this.isLikesSwitchEnabled = isSwitchEnabled;
+        ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -422,19 +385,31 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
         if (tvStartSendMessageLand != null) {
             if (isChatPlaybackEnabled || !isLiveType) {
-                tvStartSendMessageLand.setText("聊天室暂时关闭");
+                tvStartSendMessageLand.setText(PLVAppUtils.getString(R.string.plv_chat_input_tips_chatroom_close));
                 tvStartSendMessageLand.setEnabled(false);
             } else {
-                tvStartSendMessageLand.setText("跟大家聊点什么吧~");
+                tvStartSendMessageLand.setText(PLVAppUtils.getString(R.string.plv_chat_input_tips_chat));
                 tvStartSendMessageLand.setEnabled(true);
             }
         }
     }
 
     @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isChatDisplayEnabled = isDisplayEnabled;
+        if (tvStartSendMessageLand != null) {
+            tvStartSendMessageLand.setVisibility(isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+        if (ivLikesLand != null) {
+            ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
+        }
+    }
+
+    @Override
     public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
         if (tvStartSendMessageLand != null) {
-            tvStartSendMessageLand.setText(isCloseRoomStatus ? "聊天室已关闭" : (isFocusModeStatus ? "当前为专注模式，无法发言" : "跟大家聊点什么吧~"));
+            String text = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat));
+            tvStartSendMessageLand.setText(text);
             tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
     }

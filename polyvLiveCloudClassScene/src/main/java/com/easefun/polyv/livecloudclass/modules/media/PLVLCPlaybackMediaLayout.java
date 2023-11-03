@@ -36,15 +36,18 @@ import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCPlaybackM
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCDanmuController;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.IPLVLCLandscapeMessageSender;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
+import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuSettingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
@@ -70,7 +73,9 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -135,8 +140,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private IPLVLCDanmuController danmuController;
     //弹幕包装器
     private PLVLCDanmuWrapper danmuWrapper;
+    //弹幕设置layout
+    private PLVLCDanmuSettingLayout danmuSettingLayout;
     //信息发送输入框弹窗
     private IPLVLCLandscapeMessageSender landscapeMessageSender;
+
+    //商品卡片
+    private PLVLCCommodityPushLayout commodityPushLayout;
 
     //跑马灯
     private PLVMarqueeView marqueeView = null;
@@ -218,6 +228,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         watermarkView = findViewById(R.id.polyv_watermark_view);
         playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvlc_playback_auto_continue_seek_time_hint_layout);
         playbackAutoContinueSeekTimeTv = findViewById(R.id.plvlc_playback_auto_continue_seek_time_tv);
+        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_ly);
 
         initVideoView();
         initPlayErrorView();
@@ -309,6 +320,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                 }
             }
         });
+
+        danmuSettingLayout = new PLVLCDanmuSettingLayout(this);
+        danmuSettingLayout.registerDanWrapper(danmuWrapper);
     }
 
     private void initMediaController() {
@@ -428,6 +442,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
+
+        if(danmuSettingLayout != null){
+            danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+        }
+
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }
 
     @Override
@@ -504,6 +525,26 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public PLVTriangleIndicateTextView getCardEnterTipsView() {
         return mediaController.getCardEnterTipsView();
+    }
+
+    @Override
+    public ImageView getLotteryEnterView() {
+        return mediaController.getLotteryEnterView();
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return mediaController.getLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return mediaController.getLotteryEnterTipsView();
+    }
+
+    @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        mediaController.setChatIsDisplayEnabled(isDisplayEnabled);
     }
 
     @Override
@@ -631,7 +672,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void acceptNetworkQuality(int quality) {
+    public void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
 
     }
 
@@ -744,6 +785,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public String getFileId() {
+        return playbackPlayerPresenter.getFileId();
+    }
+
+    @Override
     public void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType) {
         mediaController.setChatPlaybackEnabled(isChatPlaybackEnabled, isLiveType);
     }
@@ -826,7 +872,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -844,13 +890,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         @Override
         public void onBufferStart() {
             super.onBufferStart();
-            PLVCommonLog.i(TAG, "开始缓冲");
+            PLVCommonLog.i(TAG, "开始缓冲");// no need i18n
         }
 
         @Override
         public void onBufferEnd() {
             super.onBufferEnd();
-            PLVCommonLog.i(TAG, "缓冲结束");
+            PLVCommonLog.i(TAG, "缓冲结束");// no need i18n
         }
 
         @Override
@@ -889,6 +935,14 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         public void onServerDanmuOpen(boolean isServerDanmuOpen) {
             super.onServerDanmuOpen(isServerDanmuOpen);
             danmuWrapper.setOnServerDanmuOpen(isServerDanmuOpen);
+        }
+
+        @Override
+        public void onServerDanmuSpeed(int speed){
+            super.onServerDanmuSpeed(speed);
+            if(danmuSettingLayout != null){
+                danmuSettingLayout.setDanmuSpeedOnServer(speed);
+            }
         }
 
         @Override

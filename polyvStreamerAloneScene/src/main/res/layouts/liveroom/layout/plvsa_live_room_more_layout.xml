@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/plvsa_more_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,7 +15,7 @@
         android:id="@+id/plvsa_more_text_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="更多"
+        android:text="@string/plv_live_more"
         android:textColor="#FFF0F1F5"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -67,7 +68,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="摄像头"
+                        android:text="@string/plv_linkmic_camera"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -97,7 +98,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="麦克风"
+                        android:text="@string/plv_linkmic_microphone"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -127,7 +128,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="翻转"
+                        android:text="@string/plv_streamer_camera_orient"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -157,7 +158,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="镜像"
+                        android:text="@string/plv_streamer_mirror"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -186,7 +187,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="@string/plvsa_beauty_title"
+                        android:text="@string/plv_beauty_selector_beauty_title"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -217,7 +218,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="屏幕共享"
+                        android:text="@string/plvsa_streamer_sharescreen_start"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -247,7 +248,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="高清"
+                        android:text="@string/plv_streamer_bitrate_high"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -277,7 +278,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="闪光灯"
+                        android:text="@string/plv_streamer_flashlight"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -315,7 +316,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:letterSpacing="-0.12"
-                            android:text="开启全体禁言"
+                            android:text="@string/plv_chat_confirm_close_room"
                             android:textColor="#99F0F1F5"
                             android:textSize="12sp"
                             android:translationX="-12dp" />
@@ -334,8 +335,9 @@
                     android:layout_marginEnd="4dp"
                     android:layout_marginBottom="6dp"
                     android:gravity="center|top"
+                    android:orientation="vertical"
                     android:visibility="gone"
-                    android:orientation="vertical">
+                    tools:visibility="visible">
 
                     <ImageView
                         android:id="@+id/plvsa_more_share_iv"
@@ -349,7 +351,67 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center|top"
-                        android:text="分享"
+                        android:text="@string/plv_live_share"
+                        android:textColor="#99F0F1F5"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_more_push_downgrade_preference_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:gravity="center|top"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="12dp"
+                        android:src="@drawable/plvsa_live_room_push_downgrade_preference_icon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top"
+                        android:text="@string/plv_push_downgrade_preference_title"
+                        android:textColor="#99F0F1F5"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_more_mix_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:gravity="center|top"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_more_mix_iv"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="12dp"
+                        android:src="@drawable/plvsa_more_mix_layout_icon" />
+
+                    <TextView
+                        android:id="@+id/plvsa_more_mix_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top"
+                        android:text="@string/plv_streamer_mix_layout"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 

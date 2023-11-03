@@ -19,14 +19,18 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -58,10 +62,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private LinearLayout plvsaStatusBarStreamerTeacherLl;
     private TextView plvsaStatusBarTeacherNameTv;
     private ImageView plvsaStatusBarStreamerMicIv;
-    private PLVRoundRectLayout plvsaStatusBarNetworkStatusLayout;
-    private LinearLayout plvsaStatusBarNetworkStatusLl;
-    private ImageView plvsaStatusBarNetworkStatusIv;
-    private TextView plvsaStatusBarNetworkStatusTv;
+    private PLVStreamerNetworkStatusLayout statusBarNetworkStatusLayout;
+    private PLVSAPushDowngradeAlertLayout statusBarPushDowngradeAlertLayout;
     private PLVRoundRectLayout plvsaStatusBarNotificationLayout;
     private TextView plvsaStatusBarNotificationLabel;
     private TextView plvsaStatusBarNotificationTv;
@@ -127,10 +129,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         plvsaStatusBarStreamerTeacherLl = (LinearLayout) findViewById(R.id.plvsa_status_bar_streamer_teacher_ll);
         plvsaStatusBarTeacherNameTv = (TextView) findViewById(R.id.plvsa_status_bar_teacher_name_tv);
         plvsaStatusBarStreamerMicIv = (ImageView) findViewById(R.id.plvsa_status_bar_streamer_mic_iv);
-        plvsaStatusBarNetworkStatusLayout = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_network_status_layout);
-        plvsaStatusBarNetworkStatusLl = (LinearLayout) findViewById(R.id.plvsa_status_bar_network_status_ll);
-        plvsaStatusBarNetworkStatusIv = (ImageView) findViewById(R.id.plvsa_status_bar_network_status_iv);
-        plvsaStatusBarNetworkStatusTv = (TextView) findViewById(R.id.plvsa_status_bar_network_status_tv);
+        statusBarNetworkStatusLayout = (PLVStreamerNetworkStatusLayout) findViewById(R.id.plvsa_status_bar_network_status_layout);
+        statusBarPushDowngradeAlertLayout = findViewById(R.id.plvsa_status_bar_push_downgrade_alert_layout);
         plvsaStatusBarNotificationLayout = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_notification_layout);
         plvsaStatusBarNotificationLabel = (TextView) findViewById(R.id.plvsa_status_bar_notification_label);
         plvsaStatusBarNotificationTv = (TextView) findViewById(R.id.plvsa_status_bar_notification_tv);
@@ -161,7 +161,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             stopLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(GONE)
                     .setContent(closeContentString)
-                    .setRightButtonText("确认")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm)
                     .setRightBtnListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -182,6 +182,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             name = trimStringLength(name, 15);
             plvsaStatusBarTeacherNameTv.setText(actor + "-" + name);
         }
+        updateViewWithOrientation();
     }
 
     private void initChannelInfoLayout(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -243,7 +244,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     // <editor-fold defaultstate="collapsed" desc="推流 MVP - View">
 
     public IPLVStreamerContract.IStreamerView getStreamerView() {
-        return streamerView;
+        return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
+                .proxyAll(streamerView, statusBarPushDowngradeAlertLayout.streamerView);
     }
 
     private IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
@@ -279,10 +281,10 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                     if(isGuest()){
                         if(isStartedStatus){
                             plvsaStatusBarStreamerTimeRl.setVisibility(VISIBLE);
-                            plvsaStatusBarNetworkStatusLayout.setVisibility(VISIBLE);
+                            statusBarNetworkStatusLayout.setVisibility(VISIBLE);
                         } else {
                             plvsaStatusBarStreamerTimeRl.setVisibility(INVISIBLE);
-                            plvsaStatusBarNetworkStatusLayout.setVisibility(INVISIBLE);
+                            statusBarNetworkStatusLayout.setVisibility(INVISIBLE);
                         }
                     }
                 }
@@ -316,27 +318,16 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         }
 
         @Override
-        public void onNetworkQuality(int quality) {
+        public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
             if (!PLVNetworkUtils.isConnected(getContext())) {
-                quality = PLVLinkMicConstant.NetQuality.NET_QUALITY_NO_CONNECTION;
+                quality = PLVLinkMicConstant.NetworkQuality.DISCONNECT;
             }
+            statusBarNetworkStatusLayout.onNetworkQuality(quality);
+        }
 
-            switch (quality) {
-                case PLVLinkMicConstant.NetQuality.NET_QUALITY_GOOD:
-                    plvsaStatusBarNetworkStatusIv.setImageResource(R.drawable.plvsa_network_signal_3);
-                    plvsaStatusBarNetworkStatusTv.setText("网络良好");
-                    break;
-                case PLVLinkMicConstant.NetQuality.NET_QUALITY_MIDDLE:
-                    plvsaStatusBarNetworkStatusIv.setImageResource(R.drawable.plvsa_network_signal_2);
-                    plvsaStatusBarNetworkStatusTv.setText("网络一般");
-                    break;
-                case PLVLinkMicConstant.NetQuality.NET_QUALITY_POOR:
-                case PLVLinkMicConstant.NetQuality.NET_QUALITY_NO_CONNECTION:
-                default:
-                    plvsaStatusBarNetworkStatusIv.setImageResource(R.drawable.plvsa_network_signal_1);
-                    plvsaStatusBarNetworkStatusTv.setText("网络异常");
-                    break;
-            }
+        @Override
+        public void onUpstreamNetworkStatus(PLVNetworkStatusVO networkStatus) {
+            statusBarNetworkStatusLayout.onNetworkStatus(networkStatus);
         }
 
         @Override
@@ -398,12 +389,12 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
         String notificationText;
         if (!isOpenAudio && !isOpenVideo) {
-            notificationText = "你的摄像头和麦克风已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_camera_microphone_mute_hint);
         } else if (!isOpenAudio) {
-            notificationText = "你的麦克风已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_microphone_mute_hint);
         } else {
             // !isOpenVideo
-            notificationText = "你的摄像头已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_camera_mute_hint);
         }
         plvsaStatusBarNotificationTv.setText(notificationText);
     }
@@ -418,20 +409,19 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         updateViewWithOrientation();
     }
 
-    private void updateViewWithOrientation() {
-        moveNetworkStatusLayout();
-    }
-
     /**
      * 竖屏：网络状态控件在关闭按钮下方
      * 横屏：网络状态控件在关闭按钮左侧
      */
-    private void moveNetworkStatusLayout() {
+    private void updateViewWithOrientation() {
         final int idStatusBarCloseIv = plvsaStatusBarCloseIv.getId();
-        final int idNetworkStatusLayout = plvsaStatusBarNetworkStatusLayout.getId();
+        final int idNetworkStatusLayout = statusBarNetworkStatusLayout.getId();
+        final int idTeacherLayout = plvsaStatusBarStreamerTeacherLayout.getId();
+        final int idNotificationLayout = plvsaStatusBarNotificationLayout.getId();
 
-        ConstraintLayout.LayoutParams networkStatusLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarNetworkStatusLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams networkStatusLayoutParam = (ConstraintLayout.LayoutParams) statusBarNetworkStatusLayout.getLayoutParams();
         ConstraintLayout.LayoutParams teacherLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarStreamerTeacherLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams pushDowngradeLayoutParam = (ConstraintLayout.LayoutParams) statusBarPushDowngradeAlertLayout.getLayoutParams();
         if (PLVScreenUtils.isPortrait(getContext())) {
             networkStatusLayoutParam.topToBottom = idStatusBarCloseIv;
             networkStatusLayoutParam.rightToRight = idStatusBarCloseIv;
@@ -440,13 +430,21 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             networkStatusLayoutParam.endToStart = ConstraintLayout.LayoutParams.UNSET;
             networkStatusLayoutParam.topToTop = ConstraintLayout.LayoutParams.UNSET;
             networkStatusLayoutParam.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
             networkStatusLayoutParam.topMargin = ConvertUtils.dp2px(12);
             networkStatusLayoutParam.rightMargin = 0;
             networkStatusLayoutParam.setMarginEnd(0);
 
             teacherLayoutParam.rightToLeft = idNetworkStatusLayout;
             teacherLayoutParam.endToStart = idNetworkStatusLayout;
+
+            pushDowngradeLayoutParam.topToTop = ConstraintLayout.LayoutParams.UNSET;
+            pushDowngradeLayoutParam.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            pushDowngradeLayoutParam.startToEnd = ConstraintLayout.LayoutParams.UNSET;
+            pushDowngradeLayoutParam.topToBottom = idNotificationLayout;
+            pushDowngradeLayoutParam.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            pushDowngradeLayoutParam.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+            pushDowngradeLayoutParam.leftMargin = 0;
+            pushDowngradeLayoutParam.topMargin = ConvertUtils.dp2px(8);
         } else {
             networkStatusLayoutParam.topToBottom = ConstraintLayout.LayoutParams.UNSET;
             networkStatusLayoutParam.rightToRight = ConstraintLayout.LayoutParams.UNSET;
@@ -455,17 +453,33 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             networkStatusLayoutParam.endToStart = idStatusBarCloseIv;
             networkStatusLayoutParam.topToTop = idStatusBarCloseIv;
             networkStatusLayoutParam.bottomToBottom = idStatusBarCloseIv;
-
             networkStatusLayoutParam.topMargin = 0;
             networkStatusLayoutParam.rightMargin = ConvertUtils.dp2px(8);
             networkStatusLayoutParam.setMarginEnd(ConvertUtils.dp2px(8));
 
             teacherLayoutParam.rightToLeft = ConstraintLayout.LayoutParams.UNSET;
             teacherLayoutParam.endToStart = ConstraintLayout.LayoutParams.UNSET;
+
+            pushDowngradeLayoutParam.topToTop = idTeacherLayout;
+            pushDowngradeLayoutParam.bottomToBottom = idTeacherLayout;
+            pushDowngradeLayoutParam.topToBottom = ConstraintLayout.LayoutParams.UNSET;
+            if (plvsaStatusBarTeacherNameTv.getText().toString().length() > 15) {
+                pushDowngradeLayoutParam.startToEnd = idTeacherLayout;
+                pushDowngradeLayoutParam.startToStart = ConstraintLayout.LayoutParams.UNSET;
+                pushDowngradeLayoutParam.endToEnd = ConstraintLayout.LayoutParams.UNSET;
+                pushDowngradeLayoutParam.leftMargin = ConvertUtils.dp2px(8);
+            } else {
+                pushDowngradeLayoutParam.startToEnd = ConstraintLayout.LayoutParams.UNSET;
+                pushDowngradeLayoutParam.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+                pushDowngradeLayoutParam.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+                pushDowngradeLayoutParam.leftMargin = 0;
+            }
+            pushDowngradeLayoutParam.topMargin = 0;
         }
 
-        plvsaStatusBarNetworkStatusLayout.setLayoutParams(networkStatusLayoutParam);
+        statusBarNetworkStatusLayout.setLayoutParams(networkStatusLayoutParam);
         plvsaStatusBarStreamerTeacherLayout.setLayoutParams(teacherLayoutParam);
+        statusBarPushDowngradeAlertLayout.setLayoutParams(pushDowngradeLayoutParam);
     }
 
     // </editor-fold>

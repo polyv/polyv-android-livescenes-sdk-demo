@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/colorEbonyClay">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+        android:id="@+id/plvec_more_pop_vertical_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/plvec_widget_blur_top_radius_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/more_ly"
+                android:layout_alignBottom="@+id/more_ly"
+                android:layout_alignParentBottom="true" />
+
+            <LinearLayout
+                android:id="@+id/more_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:clickable="true"
+                android:minHeight="130dp"
+                android:orientation="horizontal"
+                android:paddingTop="34dp">
+
+                <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout
+                    android:id="@+id/plvec_more_ly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/plvec_playback_more_dialog_close_iv"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_alignTop="@+id/more_ly"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/plvec_popup_close" />
+
+            <TextView
+                android:id="@+id/plvec_popup_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:layout_alignLeft="@+id/more_ly"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:visibility="gone"
+                android:text="@string/plv_live_more"/>
+        </RelativeLayout>
+    </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
+</RelativeLayout>

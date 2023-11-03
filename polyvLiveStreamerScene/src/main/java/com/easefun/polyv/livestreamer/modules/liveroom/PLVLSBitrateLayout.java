@@ -12,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
 /**
  * @author Hoshiiro
@@ -25,6 +27,8 @@ public class PLVLSBitrateLayout extends FrameLayout {
     private RecyclerView bitrateRv;
 
     private final BitrateAdapter bitrateAdapter = new BitrateAdapter();
+
+    private String channelId;
 
     private OnViewActionListener onViewActionListener;
 
@@ -61,6 +65,10 @@ public class PLVLSBitrateLayout extends FrameLayout {
         bitrateRv.setAdapter(bitrateAdapter);
     }
 
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
+    }
+
     public void updateData(final int maxBitrate, final int currentSelectedBitrate) {
         bitrateAdapter.updateData(maxBitrate, currentSelectedBitrate);
     }
@@ -81,7 +89,7 @@ public class PLVLSBitrateLayout extends FrameLayout {
 
         @Override
         public void onBindViewHolder(@NonNull final PLVLSBitrateLayout.BitrateAdapter.BitrateViewHolder holder, int position) {
-            String bitrateText = getBitrateText(position);
+            String bitrateText = getBitrateText(getBitrate(position));
             holder.plvlsSettingBitrateSelTv.setText(bitrateText);
             if (position == selPosition) {
                 holder.plvlsSettingBitrateSelIndicatorView.setVisibility(View.VISIBLE);
@@ -116,26 +124,12 @@ public class PLVLSBitrateLayout extends FrameLayout {
             notifyDataSetChanged();
         }
 
-        private String getBitrateText(int position) {
-            String bitrateText = "";
-            if (position == 0) {
-                bitrateText = maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? "超清" : maxBitrate == PLVSStreamerConfig.Bitrate.BITRATE_HIGH ? "高清" : "标清";
-            } else if (position == 1) {
-                bitrateText = maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? "高清" : "标清";
-            } else if (position == 2) {
-                bitrateText = "标清";
-            }
-            return bitrateText;
+        private String getBitrateText(int bitrate) {
+            return PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
         }
 
         private int getBitrate(int pos) {
-            if (pos == 0) {
-                return maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? PLVSStreamerConfig.Bitrate.BITRATE_SUPER : maxBitrate == PLVSStreamerConfig.Bitrate.BITRATE_HIGH ? PLVSStreamerConfig.Bitrate.BITRATE_HIGH : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
-            } else if (pos == 1) {
-                return maxBitrate >= PLVSStreamerConfig.Bitrate.BITRATE_SUPER ? PLVSStreamerConfig.Bitrate.BITRATE_HIGH : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
-            } else {
-                return PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
-            }
+            return maxBitrate - pos >= 1 ? maxBitrate - pos : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
         }
 
         class BitrateViewHolder extends RecyclerView.ViewHolder {

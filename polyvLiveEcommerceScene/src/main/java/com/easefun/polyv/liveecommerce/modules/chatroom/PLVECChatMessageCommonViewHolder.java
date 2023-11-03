@@ -14,7 +14,9 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.utils.span.PLVRadiusBackgroundSpan;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
+import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.lang.ref.WeakReference;
@@ -64,7 +66,7 @@ public class PLVECChatMessageCommonViewHolder<Data extends PLVBaseViewData, Adap
         }
         nickSpan = new SpannableStringBuilder(nickName);
         if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
-            nickSpan.append("(我)");
+            nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
         }
         nickSpan.append(": ");
         nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor("#FFD16B")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

@@ -7,7 +7,7 @@ import android.view.ViewParent;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvBaseVideoView;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
 import com.easefun.polyv.mediasdk.player.IjkMediaPlayer;
-
+import com.plv.business.api.common.player.PLVBaseVideoView;
 
 public class PLVVideoSizeUtils {
 
@@ -63,7 +63,7 @@ public class PLVVideoSizeUtils {
     }
 
     //获取视频的宽高
-    public static int[] getVideoWH(PolyvBaseVideoView baseVideoView) {
+    public static int[] getVideoWH(PLVBaseVideoView baseVideoView) {
         if (baseVideoView != null) {
             IjkMediaPlayer mediaPlayer = baseVideoView.getIjkMediaPlayer();
             if (mediaPlayer != null) {

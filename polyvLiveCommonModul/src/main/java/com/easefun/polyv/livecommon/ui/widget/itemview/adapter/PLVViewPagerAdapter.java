@@ -22,6 +22,11 @@ public class PLVViewPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
+    public Parcelable saveState() {
+        return null;
+    }
+
+    @Override
     public void restoreState(Parcelable state, ClassLoader loader) {
         // FIXME 不要做一只鸵鸟
         try {

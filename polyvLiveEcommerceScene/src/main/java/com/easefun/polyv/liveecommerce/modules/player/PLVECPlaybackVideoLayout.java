@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,9 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -254,6 +257,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public PLVPlayerLogoView getLogoView() {
+        return logoView;
+    }
+
+    @Override
     public void setPlayerVolume(int volume) {
         playbackPlayerPresenter.setPlayerVolume(volume);
     }
@@ -287,6 +295,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
+    public void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener) {
+        playbackPlayerPresenter.getData().getPlayerState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
     public void destroy() {
         if (playbackPlayerPresenter != null) {
             playbackPlayerPresenter.destroy();
@@ -307,7 +320,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeLines(int linesPos) {
-        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换线路");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换线路");// no need i18n
     }
 
     @Override
@@ -322,7 +335,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeBitRate(int bitratePos) {
-        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换码率功能");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换码率功能");// no need i18n
     }
 
     @Override
@@ -332,7 +345,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void changeMediaPlayMode(int mediaPlayMode) {
-        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换音视频模式的功能");
+        PLVCommonLog.d(TAG, "直播带货回放场景 暂无切换音视频模式的功能");// no need i18n
     }
 
     @Override
@@ -348,6 +361,41 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     @Override
     public LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO() {
         return null;
+    }
+
+    @Override
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+
+    }
+
+    @Override
+    public void updateWhenLeaveRTC() {
+
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic() {
+
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+
+    }
+
+    @Override
+    public void notifyRTCPrepared() {
+
+    }
+
+    @Override
+    public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
+
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+
     }
     // </editor-fold>
 
@@ -400,6 +448,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     @Override
     public String getSessionId() {
         return playbackPlayerPresenter.getSessionId();
+    }
+
+    @Override
+    public String getFileId() {
+        return playbackPlayerPresenter.getFileId();
     }
     // </editor-fold>
 
@@ -495,7 +548,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -526,13 +579,13 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         @Override
         public void onBufferStart() {
             super.onBufferStart();
-            PLVCommonLog.i(TAG, "开始缓冲");
+            PLVCommonLog.i(TAG, "开始缓冲");// no need i18n
         }
 
         @Override
         public void onBufferEnd() {
             super.onBufferEnd();
-            PLVCommonLog.i(TAG, "缓冲结束");
+            PLVCommonLog.i(TAG, "缓冲结束");// no need i18n
         }
 
         @Override

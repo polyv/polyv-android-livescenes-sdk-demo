@@ -4,6 +4,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVMessageBaseEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
@@ -49,11 +50,11 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
         if (!isGift) {
             try {
                 Double.parseDouble(rewardContent);
-                rewardContent = rewardContent + "元";
+                rewardContent = rewardContent + PLVAppUtils.getString(R.string.plv_reward_yuan);
             } catch (Exception e) {
             }
         }
-        SpannableStringBuilder span = new SpannableStringBuilder(uNick + (isGift ? " 赠送了 " : " 打赏 ") + rewardContent + " ");
+        SpannableStringBuilder span = new SpannableStringBuilder(uNick + (isGift ? PLVAppUtils.getString(R.string.plv_reward_give_2) : PLVAppUtils.getString(R.string.plv_reward_text_2)) + rewardContent + " ");
         PLVCustomGiftEvent customGiftEvent = new PLVCustomGiftEvent(span);
         customGiftEvent.setGiftImg(gImg);
         customGiftEvent.setTime(System.currentTimeMillis());

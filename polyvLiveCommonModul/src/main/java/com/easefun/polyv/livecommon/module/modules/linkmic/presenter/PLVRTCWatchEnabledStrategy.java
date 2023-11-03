@@ -3,11 +3,9 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.presenter;
 import android.app.Activity;
 import android.media.AudioManager;
 import android.text.TextUtils;
-
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.contract.IPLVLinkMicContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicListShowModeGetter;
-import com.easefun.polyv.livescenes.linkmic.IPolyvLinkMicManager;
 import com.easefun.polyv.livescenes.linkmic.manager.PolyvLinkMicConfig;
 import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
@@ -29,7 +27,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
 
     /**** core ****/
     private PLVLinkMicPresenter linkMicPresenter;
-    private IPolyvLinkMicManager linkMicManager;
+    private IPLVLinkMicManager linkMicManager;
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVLinkMicEventListener linkMicEventListener;
@@ -43,7 +41,7 @@ public class PLVRTCWatchEnabledStrategy implements IPLVRTCInvokeStrategy {
 
     // <editor-fold defaultstate="collapsed" desc="初始化">
     public PLVRTCWatchEnabledStrategy(PLVLinkMicPresenter linkMicPresenter,
-                                      final IPolyvLinkMicManager linkMicManager,
+                                      final IPLVLinkMicManager linkMicManager,
                                       IPLVLiveRoomDataManager ipliveRoomDataManager,
                                       OnJoinRTCChannelWatchListener joinRTCChannelWatchListener,
                                       OnJoinLinkMicListener joinLinkMicListener) {

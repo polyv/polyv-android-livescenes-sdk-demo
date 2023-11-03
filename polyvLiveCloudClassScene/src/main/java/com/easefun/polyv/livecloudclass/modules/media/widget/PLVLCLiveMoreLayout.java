@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.widget;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import androidx.annotation.NonNull;
@@ -20,14 +22,13 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 /**
  * date: 2019/6/10 0010
@@ -163,7 +164,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         plvlcLiveControlMoreLatencyRv = root.findViewById(R.id.plvlc_live_control_more_latency_rv);
         plvlcLiveControlMoreLatencyLl = root.findViewById(R.id.plvlc_live_control_more_latency_ll);
         llMoreVertical = root.findViewById(R.id.ll_more_vertical);
-        containerLy = root.findViewById(R.id.container_ly);
+        containerLy = root.findViewById(R.id.plvlc_danmu_container_ly);
     }
 
     private void initLatencyRv() {
@@ -523,7 +524,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
 
         @Override
         public void onBindViewHolder(@NonNull final RvLinesViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-            holder.tvLines.setText("线路" + (position + 1));
+            holder.tvLines.setText(PLVAppUtils.formatString(R.string.plv_player_route_n, (position + 1) + ""));
 
             holder.tvLines.setSelected(position == curSelectPos);
 
@@ -645,8 +646,18 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         }
 
         private enum LatencyType {
-            LOW_LATENCY("无延迟", true),
-            NORMAL_LATENCY("正常延迟", false);
+            LOW_LATENCY("", true) {
+                @Override
+                public String getLatencyName() {
+                    return PLVAppUtils.getString(R.string.plv_player_low_latency);
+                }
+            },
+            NORMAL_LATENCY("", false) {
+                @Override
+                public String getLatencyName() {
+                    return PLVAppUtils.getString(R.string.plv_player_normal_latency);
+                }
+            };
 
             private final String latencyName;
             private final boolean lowLatency;

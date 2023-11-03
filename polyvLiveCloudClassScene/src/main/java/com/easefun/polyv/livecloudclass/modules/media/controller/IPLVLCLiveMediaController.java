@@ -159,6 +159,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
 
     /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
+
+    /**
      * 释放
      */
     void clean();

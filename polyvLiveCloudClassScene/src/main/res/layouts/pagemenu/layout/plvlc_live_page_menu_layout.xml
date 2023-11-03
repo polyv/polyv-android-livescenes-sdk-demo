@@ -7,6 +7,29 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/plvlc_chatroom_empty_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#202127"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/plvlc_chatroom_empty_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/plv_live_no_menu"
+            android:textColor="#66FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -46,4 +69,13 @@
         app:plv_show_on_portrait="true"
         tools:visibility="visible" />
 
+    <com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreFloatingView
+        android:id="@+id/plvlc_chat_more_floating_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="22dp"
+        android:layout_marginBottom="50dp"
+        android:visibility="gone" />
 </RelativeLayout>

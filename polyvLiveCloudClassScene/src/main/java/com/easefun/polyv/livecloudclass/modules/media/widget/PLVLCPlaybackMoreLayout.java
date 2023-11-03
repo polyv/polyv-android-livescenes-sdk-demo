@@ -81,6 +81,7 @@ public class PLVLCPlaybackMoreLayout {
 
         speedVO.add(0.5f);
         speedVO.add(1.0f);
+        speedVO.add(1.25f);
         speedVO.add(1.5f);
         speedVO.add(2.0f);
 
@@ -102,7 +103,7 @@ public class PLVLCPlaybackMoreLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化View">
     private void initView() {
         //父布局
-        containerLy = root.findViewById(R.id.container_ly);
+        containerLy = root.findViewById(R.id.plvlc_danmu_container_ly);
         containerLy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -418,6 +419,9 @@ public class PLVLCPlaybackMoreLayout {
             RvMoreViewHolder(View itemView) {
                 super(itemView);
                 tvSpeed = (TextView) itemView.findViewById(R.id.tv_bitrate);
+                ViewGroup.LayoutParams layoutParams = tvSpeed.getLayoutParams();
+                layoutParams.width = ConvertUtils.dp2px(50);
+                tvSpeed.setLayoutParams(layoutParams);
             }
         }
 

@@ -16,8 +16,10 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
+import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
@@ -59,6 +61,8 @@ public class PLVSABitrateLayout extends FrameLayout {
     // Layout Manager
     private GridLayoutManager bitrateLayoutManager;
 
+    private String channelId;
+
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
     private OnViewActionListener onViewActionListener;
@@ -95,6 +99,10 @@ public class PLVSABitrateLayout extends FrameLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
+    }
+
     public void open() {
         // 更新清晰度数据
         if (onViewActionListener != null && onViewActionListener.getBitrateInfo() != null) {
@@ -246,17 +254,11 @@ public class PLVSABitrateLayout extends FrameLayout {
         }
 
         private String getBitrateTextByBitrate(int bitrate) {
-            return PLVStreamerConfig.Bitrate.getText(bitrate);
+            return PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
         }
 
         private int getBitrate(int pos) {
-            if (pos == 0) {
-                return maxBitrate >= PLVStreamerConfig.Bitrate.BITRATE_SUPER ? PLVStreamerConfig.Bitrate.BITRATE_SUPER : maxBitrate == PLVStreamerConfig.Bitrate.BITRATE_HIGH ? PLVStreamerConfig.Bitrate.BITRATE_HIGH : PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
-            } else if (pos == 1) {
-                return maxBitrate >= PLVStreamerConfig.Bitrate.BITRATE_SUPER ? PLVStreamerConfig.Bitrate.BITRATE_HIGH : PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
-            } else {
-                return PLVStreamerConfig.Bitrate.BITRATE_STANDARD;
-            }
+            return maxBitrate - pos >= 1 ? maxBitrate - pos : PLVSStreamerConfig.Bitrate.BITRATE_STANDARD;
         }
 
         class BitrateViewHolder extends RecyclerView.ViewHolder {

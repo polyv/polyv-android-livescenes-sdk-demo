@@ -6,10 +6,12 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommon
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 /**
@@ -48,6 +50,12 @@ public interface IPLVLCLivePageMenuLayout {
     PLVCardPushManager getCardPushManager();
 
     /**
+     * 获取无条件抽奖挂件管理器
+     * @return
+     */
+    PLVLotteryManager getLotteryManager();
+
+    /**
      * 获取聊天回放管理器
      *
      * @return 聊天回放manager
@@ -80,8 +88,9 @@ public interface IPLVLCLivePageMenuLayout {
      *
      * @param sessionId sessionId
      * @param channelId 频道号
+     * @param fileId    文件Id
      */
-    void onPlaybackVideoPrepared(String sessionId, String channelId);
+    void onPlaybackVideoPrepared(String sessionId, String channelId, String fileId);
 
     /**
      * 回放视频seek完成
@@ -164,9 +173,12 @@ public interface IPLVLCLivePageMenuLayout {
         int getVideoCurrentPosition();
 
         /**
-         * 添加了聊天tab
+         * 聊天tab准备完成
+         *
+         * @param isChatPlaybackEnabled 聊天回放是否可用
+         * @param isDisplayEnabled      是否显示tab
          */
-        void onAddedChatTab(boolean isChatPlaybackEnabled);
+        void onChatTabPrepared(boolean isChatPlaybackEnabled, boolean isDisplayEnabled);
 
         /**
          * 显示积分打赏弹窗
@@ -194,6 +206,11 @@ public interface IPLVLCLivePageMenuLayout {
          * 回调 引用回复消息
          */
         void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
+
+        /**
+         * 回调 拆开红包
+         */
+        void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
 
     }
     // </editor-fold>

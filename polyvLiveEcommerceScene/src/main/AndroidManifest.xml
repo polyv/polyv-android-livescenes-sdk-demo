@@ -16,7 +16,7 @@
         <activity
             android:name=".modules.chatroom.widget.PLVECChatInputWindow"
             android:configChanges="orientation|keyboard|screenSize"
-            android:screenOrientation="behind"
+            android:screenOrientation="sensor"
             android:theme="@style/AppTheme.Translucent" />
 
         <activity

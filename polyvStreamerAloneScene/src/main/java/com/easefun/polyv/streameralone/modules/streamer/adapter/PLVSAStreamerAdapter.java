@@ -18,17 +18,22 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberControlLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberControlTipsLayout;
+import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.util.List;
 import java.util.Locale;
+
+import kotlin.jvm.functions.Function1;
 
 /**
  * 推流和连麦列表适配器
@@ -65,6 +70,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     private boolean isAudioLinkMic;
     //当前用户的连麦ID
     private String myLinkMicId;
+    // 是否已经进入直播界面
+    private boolean isEnterLive = false;
 
     //需要隐藏的item。仅当 itemType = ITEM_TYPE_ONE_BY_MORE 时生效
     private int hideItemIndex = -1;
@@ -122,12 +129,12 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     @Override
     public long getItemId(int position) {
-        return dataList.get(position).getLinkMicId().hashCode();
+        return getFilteredDataList().get(position).getLinkMicId().hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return dataList.get(position).getLinkMicId().hashCode();
+        return getFilteredDataList().get(position).getLinkMicId().hashCode();
     }
 
     @Override
@@ -161,7 +168,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 PLVCommonLog.d(TAG, String.format(Locale.US, "create render view return null at position:%d", position));
             }
         }
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getFilteredDataList().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
         boolean isMuteVideo = itemDataBean.isMuteVideo();
@@ -198,7 +205,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 controlTipsLayout.open(holder.itemView);
             }
         }
-        if (dataList.size() <= 1 && controlTipsLayout != null && controlTipsLayout.isShow()) {
+        if (getFilteredDataList().size() <= 1 && controlTipsLayout != null && controlTipsLayout.isShow()) {
             controlTipsLayout.close();
         }
 
@@ -221,7 +228,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append("（我）");
+            nickString.append(PLVAppUtils.getString(R.string.plv_chat_me));
         }
         if (holder.plvsaStreamerNickTv != null) {
             holder.plvsaStreamerNickTv.setText(nickString.toString());
@@ -270,7 +277,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
             super.onBindViewHolder(holder, position, payloads);
             return;
         }
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getFilteredDataList().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         boolean isMuteVideo = itemDataBean.isMuteVideo();
         boolean isMuteAudio = itemDataBean.isMuteAudio();
@@ -370,7 +377,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     @Override
     public int getItemCount() {
-        return dataList == null ? 0 : dataList.size();
+        return getFilteredDataList() == null ? 0 : getFilteredDataList().size();
     }
     // </editor-fold>
 
@@ -429,9 +436,14 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     //更新主讲模式主视图
     public void updateMainViewHolder() {
-        if (itemType == ITEM_TYPE_ONE_TO_MORE && hideItemIndex < dataList.size()) {
+        if (itemType == ITEM_TYPE_ONE_TO_MORE && hideItemIndex < getFilteredDataList().size()) {
             bindMainHolderView(mainViewHolder, hideItemIndex);
         }
+    }
+
+    public void updateEnterLive(boolean isEnterLive) {
+        this.isEnterLive = isEnterLive;
+        notifyDataSetChanged();
     }
 
     public void setHasSpeakerUser(PLVSocketUserBean user) {
@@ -467,7 +479,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         if (adapterIndex < 0) {
                             return false;
                         }
-                        final PLVLinkMicItemDataBean linkMicItemDataBean = dataList.get(adapterIndex);
+                        final PLVLinkMicItemDataBean linkMicItemDataBean = getFilteredDataList().get(adapterIndex);
                         if ((linkMicItemDataBean != null) && linkMicItemDataBean.isTeacher()
                                 && PLVSocketUserConstant.USERTYPE_TEACHER.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
                             //讲师不需要弹出悬浮窗
@@ -507,7 +519,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                                     return;
                                 }
                                 if (adapterCallback != null) {
-                                    adapterCallback.onControlUserLinkMic(pos, false);
+                                    adapterCallback.onControlUserLinkMic(pos, PLVStreamerControlLinkMicAction.hangUp());
                                 }
                             }
 
@@ -547,7 +559,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         }
                         final StreamerItemViewHolder tempViewHolder = currentTouchItemViewHolder;
                         currentTouchItemViewHolder = null;
-                        final PLVLinkMicItemDataBean linkMicItemDataBean = dataList.get(pos);
+                        final PLVLinkMicItemDataBean linkMicItemDataBean = getFilteredDataList().get(pos);
                         if (adapterCallback != null) {
                             adapterCallback.onControlFullScreen(pos, linkMicItemDataBean, tempViewHolder.switchViewAnchorLayout);
                         }
@@ -615,14 +627,14 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     }
 
     public void callUserFullscreen(String userId, RecyclerView streamerRv) {
-        for (int i = 0; i < dataList.size(); i++) {
-            if (userId.equals(dataList.get(i).getUserId())) {
+        for (int i = 0; i < getFilteredDataList().size(); i++) {
+            if (userId.equals(getFilteredDataList().get(i).getUserId())) {
                 streamerRv.scrollToPosition(i);
 
                 final StreamerItemViewHolder holder = (StreamerItemViewHolder) streamerRv.findViewHolderForAdapterPosition(i);
                 if (holder != null) {
                     if (adapterCallback != null) {
-                        adapterCallback.onControlFullScreen(i, dataList.get(i), holder.switchViewAnchorLayout);
+                        adapterCallback.onControlFullScreen(i, getFilteredDataList().get(i), holder.switchViewAnchorLayout);
                     }
                 }
                 return;
@@ -633,8 +645,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     public void clearFullscreenHolder(RecyclerView streamerRv, PLVLinkMicItemDataBean linkmicItem) {
 
         if (linkmicItem != null) {
-            for (int i = 0; i < dataList.size(); i++) {
-                if (dataList.get(i).getLinkMicId().equals(linkmicItem.getLinkMicId())) {
+            for (int i = 0; i < getFilteredDataList().size(); i++) {
+                if (getFilteredDataList().get(i).getLinkMicId().equals(linkmicItem.getLinkMicId())) {
                     StreamerItemViewHolder holder = (StreamerItemViewHolder) streamerRv.findViewHolderForAdapterPosition(i);
                     if (holder != null && holder.isViewRecycled) {
 //                        adapterCallback.releaseLinkMicRenderView(holder.renderView);
@@ -671,10 +683,10 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         if (itemDataBean.isGuest() && myLinkMicId.equals(itemDataBean.getLinkMicId())) {
             holder.plvsaStreamerGuestLinkStatusTv.setVisibility(View.VISIBLE);
             if (PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(itemDataBean.getStatus())) {
-                holder.plvsaStreamerGuestLinkStatusTv.setText("连麦中");
+                holder.plvsaStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_joined);
                 holder.plvsaStreamerGuestLinkStatusTv.setSelected(true);
             } else {
-                holder.plvsaStreamerGuestLinkStatusTv.setText("未连麦");
+                holder.plvsaStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_un_join);
                 holder.plvsaStreamerGuestLinkStatusTv.setSelected(false);
             }
         } else {
@@ -724,7 +736,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         if (holder.plvsaStreamerBottomLeftLy != null) {
             holder.plvsaStreamerBottomLeftLy.setVisibility(View.GONE);
         }
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getFilteredDataList().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
         boolean isMuteVideo = itemDataBean.isMuteVideo();
@@ -786,13 +798,28 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         //更新屏幕共享占位图显示状态
         holder.plvsaScreenSharePlaceholderView.setVisibility(isMe && isScreenShare ? View.VISIBLE : View.INVISIBLE);
     }
+
+    private List<PLVLinkMicItemDataBean> getFilteredDataList() {
+        if (isEnterLive || myLinkMicId == null) {
+            return dataList;
+        }
+
+        return PLVSequenceWrapper.wrap(dataList)
+                .filter(new Function1<PLVLinkMicItemDataBean, Boolean>() {
+                    @Override
+                    public Boolean invoke(PLVLinkMicItemDataBean linkMicItemDataBean) {
+                        return myLinkMicId.equals(linkMicItemDataBean.getLinkMicId());
+                    }
+                })
+                .toMutableList();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="更新成员控制弹层">
     private void checkHideControlWindow() {
         if (memberControlLayout != null && memberControlLayout.isOpen()) {
-            for (int i = 0; i < dataList.size(); i++) {
-                PLVLinkMicItemDataBean linkMicItemDataBean = dataList.get(i);
+            for (int i = 0; i < getFilteredDataList().size(); i++) {
+                PLVLinkMicItemDataBean linkMicItemDataBean = getFilteredDataList().get(i);
                 if (linkMicItemDataBean.getLinkMicId() != null && linkMicItemDataBean.getLinkMicId().equals(memberControlLayout.getLinkMicUid())) {
                     return;
                 }
@@ -803,7 +830,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
     private void checkUpdateControlWindow(int pos) {
         if (memberControlLayout != null && memberControlLayout.isOpen()) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = dataList.get(pos);
+            PLVLinkMicItemDataBean linkMicItemDataBean = getFilteredDataList().get(pos);
             if (linkMicItemDataBean.getLinkMicId() != null && linkMicItemDataBean.getLinkMicId().equals(memberControlLayout.getLinkMicUid())) {
                 memberControlLayout.bindViewData(linkMicItemDataBean);
             }
@@ -819,7 +846,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - StreamerItemViewHolder定义">
-    static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
+    public static class StreamerItemViewHolder extends RecyclerView.ViewHolder {
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         @Nullable
         private PLVRoundRectLayout plvsaStreamerRoundRectLy;
@@ -876,6 +903,14 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 });
             }
         }
+
+        public void changeRectLyToMatchParent() {
+            if (plvsaStreamerRoundRectLy != null) {
+                ConstraintLayout.LayoutParams rectLyLp = (ConstraintLayout.LayoutParams) plvsaStreamerRoundRectLy.getLayoutParams();
+                rectLyLp.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                plvsaStreamerRoundRectLy.setLayoutParams(rectLyLp);
+            }
+        }
     }
     // </editor-fold>
 
@@ -918,7 +953,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         /**
          * 用户加入或离开连麦控制
          */
-        void onControlUserLinkMic(int position, boolean isAllowJoin);
+        void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action);
 
         /**
          * 授予用户主讲权限

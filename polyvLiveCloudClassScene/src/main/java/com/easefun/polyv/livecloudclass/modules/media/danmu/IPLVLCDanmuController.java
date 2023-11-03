@@ -26,4 +26,11 @@ public interface IPLVLCDanmuController {
      * 释放
      */
     void release();
+
+    /**
+     * 设置弹幕速度
+     *
+     * @param speed 弹幕速度
+     */
+    void setDanmuSpeed(int speed);
 }

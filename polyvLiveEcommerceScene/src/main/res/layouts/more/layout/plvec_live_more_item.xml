@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvec_live_more_floating_ll"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:paddingTop="4dp"
+    android:minWidth="72dp"
+    android:minHeight="72dp"
+    android:orientation="vertical"
+    android:visibility="visible"
+    tools:visibility="visible"
+    tools:background="@color/colorEbonyClay">
+
+    <ImageView
+        android:id="@+id/plvec_live_more_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/plvec_live_more_floating_icon" />
+
+    <TextView
+        android:id="@+id/plvec_live_more_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:paddingHorizontal="3dp"
+        android:textColor="#CDCDCD"
+        android:textSize="12sp"
+        tools:text="小窗播放" />
+</LinearLayout>

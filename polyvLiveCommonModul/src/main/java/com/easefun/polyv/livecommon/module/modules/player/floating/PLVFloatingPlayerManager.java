@@ -54,6 +54,8 @@ public class PLVFloatingPlayerManager {
     private PLVFloatingPlayerView floatingView = null;
     @Nullable
     private PLVViewSwitcher viewSwitcher = null;
+    @Nullable
+    private IPLVFloatingWindow floatingWindow;
 
     private int left = 0;
     private int top = 0;
@@ -102,6 +104,11 @@ public class PLVFloatingPlayerManager {
         return this;
     }
 
+    public PLVFloatingPlayerManager setFloatingWindow(@Nullable IPLVFloatingWindow floatingWindow) {
+        this.floatingWindow = floatingWindow;
+        return this;
+    }
+
     public PLVFloatingPlayerManager setFloatingPosition(int left, int top) {
         this.left = left;
         this.top = top;
@@ -127,6 +134,10 @@ public class PLVFloatingPlayerManager {
         }
         onClosedTaskQueue.add(runnable);
         return this;
+    }
+
+    public IPLVFloatingWindow getFloatingWindow() {
+        return floatingWindow;
     }
 
     public void show() {
@@ -162,6 +173,7 @@ public class PLVFloatingPlayerManager {
     public void clear() {
         hide();
         contentOriginAnchorLayout = null;
+        floatingWindow = null;
         floatingView = null;
         viewSwitcher = null;
         onCreateFloatingViewListener = null;

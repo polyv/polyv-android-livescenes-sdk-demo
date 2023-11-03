@@ -121,7 +121,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
         String actor = itemDataBean.getActor();
-        String status = itemDataBean.getStatus();
 
         holder.onBindLinkMicItem(itemDataBean);
 
@@ -132,7 +131,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append("（我）");
+            nickString.append(R.string.plv_chat_me);
         }
         holder.plvlsStreamerNickTv.setText(nickString.toString());
 
@@ -198,7 +197,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-        String status = itemDataBean.getStatus();
 
         //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
         if (isAudioLinkMic && !isTeacher && !isGuest) {
@@ -376,10 +374,10 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         if (itemDataBean.isGuest()&&myLinkMicId.equals(itemDataBean.getLinkMicId())) {
             holder.plvsStreamerGuestLinkStatusTv.setVisibility(View.VISIBLE);
             if (PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(itemDataBean.getStatus())) {
-                holder.plvsStreamerGuestLinkStatusTv.setText("连麦中");
+                holder.plvsStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_joined);
                 holder.plvsStreamerGuestLinkStatusTv.setSelected(true);
             } else {
-                holder.plvsStreamerGuestLinkStatusTv.setText("未连麦");
+                holder.plvsStreamerGuestLinkStatusTv.setText(R.string.plv_linkmic_un_join);
                 holder.plvsStreamerGuestLinkStatusTv.setSelected(false);
             }
         } else {

@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
 import androidx.annotation.NonNull;
@@ -31,10 +32,15 @@ import com.easefun.polyv.livecommon.module.modules.interact.app.PLVInteractSignI
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractAppAbs;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractWebView;
+import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import java.util.List;
 
 /**
  * date: 2020/8/31
@@ -147,7 +153,22 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void showLottery(PLVShowLotteryEvent showLotteryEvent) {
+
+    }
+
+    @Override
+    public void updateChannelSwitch(List<PLVChatFunctionSwitchVO.DataBean> dataBeanList) {
+
+    }
+
+    @Override
     public void onCallDynamicFunction(String event) {
+
+    }
+
+    @Override
+    public void receiveRedPaper(PLVRedPaperEvent redPaperEvent) {
 
     }
 
@@ -155,9 +176,9 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     public void destroy() {
         if (interactWebView != null) {
             interactWebView.removeAllViews();
-            ViewParent viewParent=interactWebView.getParent();
-            if (viewParent instanceof ViewGroup){
-                ViewGroup viewGroup= (ViewGroup) viewParent;
+            ViewParent viewParent = interactWebView.getParent();
+            if (viewParent instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) viewParent;
                 viewGroup.removeView(interactWebView);
             }
             interactWebView.destroy();
@@ -176,6 +197,16 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+    }
+
+    @Override
+    public void updateOrientationLock(boolean isLock) {
+
     }
     // </editor-fold>
 

@@ -5,10 +5,12 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,20 +42,26 @@ import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
-import com.easefun.polyv.liveecommerce.modules.player.rtc.IPLVECLiveRtcVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.api.common.player.PLVPlayerConstant;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -77,8 +85,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private PLVSwitchViewAnchorLayout livePlayerSwitchAnchorLayout;
     //主播放器渲染视图view
     private PolyvLiveVideoView videoView;
-    // RTC播放器容器视图
-    private IPLVECLiveRtcVideoLayout rtcVideoLayout;
     //子播放器渲染视图view
     private PolyvAuxiliaryVideoview subVideoView;
     //子播放器倒计时显示的view
@@ -121,11 +127,22 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     //Listener
     private IPLVECVideoLayout.OnViewActionListener onViewActionListener;
 
+    //是否加入了RTC
+    private boolean isJoinRTC;
+    //是否加入了连麦
+    private boolean isJoinLinkMic;
+
     /**
      * 暂无直播的图片以及文字
      */
     private ImageView nostreamIv;
     private TextView nostreamTv;
+    
+    //全屏按钮
+    private ImageView fullScreenIv;
+
+    //当宽比高大的时候，可以开启全屏
+    private boolean isCanFullScreen = false;
 
     private TextView livePlayerFloatingPlayingPlaceholderTv;
 
@@ -154,7 +171,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         livePlayerSwitchAnchorLayout = findViewById(R.id.plvec_live_player_switch_anchor_layout);
         videoView = findViewById(R.id.plvec_live_video_view);
-        rtcVideoLayout = findViewById(R.id.plvec_live_rtc_video_container);
 
         playCenterView = findViewById(R.id.play_center);
         hidePlayCenterView();
@@ -181,9 +197,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         livePlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_live_player_floating_playing_placeholder_tv);
 
+        fullScreenIv = findViewById(R.id.plvec_full_screen_iv);
+        fullScreenIv.setOnClickListener(this);
+
         initVideoView();
         initPlayErrorView();
-        initRtcVideoLayout();
         initSubVideoViewChangeListener();
         observeFloatingPlayer();
     }
@@ -195,66 +213,20 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoView.setNoStreamIndicator(nostreamView);
         videoView.setMediaController(mediaController);
 
-        videoView.setOnRTCPlayEventListener(new IPLVLiveListenerEvent.OnRTCPlayEventListener() {
-            @Override
-            public void onRTCLiveStart() {
-                videoView.stopPlay();
-                videoView.setVisibility(View.GONE);
-                rtcVideoLayout.setLiveStart();
-            }
-
-            @Override
-            public void onRTCLiveEnd() {
-                rtcVideoLayout.setLiveEnd();
-                videoView.setVisibility(View.VISIBLE);
-            }
-        });
-
         videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
             @Override
             public void onNetworkQuality(int networkQuality) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.acceptNetworkQuality(networkQuality);
-                }
-            }
-        });
-    }
-
-    private void initRtcVideoLayout() {
-        rtcVideoLayout.setOnViewActionListener(new IPLVECLiveRtcVideoLayout.OnViewActionListener() {
-            @Override
-            public void onRtcPrepared() {
-                videoView.rtcPrepared();
-            }
-
-            @Override
-            public void onSizeChanged(final int width, final int height) {
-                if (!isLowLatency || PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
+                if (onViewActionListener == null) {
                     return;
                 }
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean isPortrait = height > width;
-                        PLVVideoSizeUtils.fitVideoRect(isPortrait, videoView.getParent(), videoViewRect);
-                        rtcVideoLayout.requestLayout();
-                    }
-                });
-            }
-
-            @Override
-            public void onUpdatePlayInfo() {
-                if (isPlaying()) {
-                    hidePlayCenterView();
+                if (PLVPlayerConstant.NetQuality.isNoConnection(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.DISCONNECT);
+                } else if (PLVPlayerConstant.NetQuality.isNetPoor(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.VERY_BAD);
+                } else if (PLVPlayerConstant.NetQuality.isNetMiddleOrWorse(networkQuality)) {
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.POOR);
                 } else {
-                    showPlayCenterView();
-                }
-            }
-
-            @Override
-            public void acceptNetworkQuality(int quality) {
-                if (onViewActionListener != null) {
-                    onViewActionListener.acceptNetworkQuality(quality);
+                    onViewActionListener.acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality.GOOD);
                 }
             }
         });
@@ -317,6 +289,22 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                         videoView.setNeedGestureDetector(!isShowing);
                         subVideoView.setNeedGestureDetector(!isShowing);
                         livePlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? VISIBLE : GONE);
+
+                        if (isShowingBoolean && isCanFullScreen && PLVScreenUtils.isPortrait(getContext())) {
+                            //当开启了悬浮窗 如果当前是在竖屏 那么禁止自动旋转
+                            PLVOrientationManager.getInstance().lockOrientation();
+                        }
+
+                        if(!isShowingBoolean && isCanFullScreen){
+                            if (PLVScreenUtils.isPortrait(getContext())) {
+                                //横屏小窗 进入竖屏，切换回去时需要调整一下播放器的比例
+                                setFitParentVideo();
+                            }
+                        }
+
+                        if(!isShowing && isCanFullScreen){
+                            PLVOrientationManager.getInstance().unlockOrientation();
+                        }
                     }
                 });
     }
@@ -331,8 +319,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         livePlayerPresenter.registerView(livePlayerView);
         livePlayerPresenter.init();
         livePlayerPresenter.setAllowOpenAdHead(isAllowOpenAdHead);
-
-        rtcVideoLayout.init(liveRoomDataManager);
     }
 
     @Override
@@ -343,13 +329,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public void pause() {
         livePlayerPresenter.pause();
-        rtcVideoLayout.pause();
     }
 
     @Override
     public void resume() {
         livePlayerPresenter.resume();
-        rtcVideoLayout.resume();
     }
 
     @Override
@@ -359,11 +343,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public boolean isPlaying() {
-        if (!isLowLatency) {
-            return livePlayerPresenter.isPlaying();
-        } else {
-            return !rtcVideoLayout.isPausing();
-        }
+        return livePlayerPresenter.isPlaying();
     }
 
     @Override
@@ -374,6 +354,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public String getSubVideoViewHerf() {
         return livePlayerPresenter.getSubVideoViewHerf();
+    }
+
+    @Override
+    public PLVPlayerLogoView getLogoView() {
+        return logoView;
     }
 
     @Override
@@ -410,12 +395,14 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
+    public void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener) {
+        livePlayerPresenter.getData().getPlayerState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
     public void destroy() {
         if (audioModeView != null) {
             audioModeView.onHide();
-        }
-        if (rtcVideoLayout != null) {
-            rtcVideoLayout.destroy();
         }
         if (livePlayerPresenter != null) {
             livePlayerPresenter.destroy();
@@ -491,6 +478,60 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         return livePlayerPresenter.getData().getPlayInfoVO();
     }
 
+    @Override
+    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+        isJoinRTC = true;
+
+        if (liveRoomDataManager.isSupportRTC()) {
+            //如果支持RTC，连麦时停止播放器播放，使用rtc视频流+rtc音频流
+            livePlayerPresenter.stop();
+        } else {
+            //如果不支持RTC，连麦时静音播放器，使用播放器的cdn视频流+rtc音频流
+            livePlayerPresenter.setPlayerVolume(0);
+        }
+        //禁用播放器手势
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC);
+    }
+
+    @Override
+    public void updateWhenLeaveRTC() {
+        isJoinRTC = false;
+
+        if (liveRoomDataManager.isSupportRTC()) {
+            startPlay();
+        }
+        //恢复播放器手势
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC);
+        //恢复播放器音量
+        livePlayerPresenter.setPlayerVolume(100);
+    }
+
+    @Override
+    public void updateWhenJoinLinkMic() {
+        isJoinLinkMic = true;
+        videoView.setIsLinkMic(true);
+    }
+
+    @Override
+    public void updateWhenLeaveLinkMic() {
+        isJoinLinkMic = false;
+        videoView.setIsLinkMic(false);
+    }
+
+    @Override
+    public void notifyRTCPrepared() {
+        videoView.rtcPrepared();
+    }
+
+    @Override
+    public void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener) {
+        livePlayerPresenter.getData().getLinkMicState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
+        videoView.setOnRTCPlayEventListener(listener);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的playback方法，空实现">
@@ -541,6 +582,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     @Override
     public String getSessionId() {
+        return null;
+    }
+
+    @Override
+    public String getFileId() {
         return null;
     }
     // </editor-fold>
@@ -619,7 +665,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             }
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告 ：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -666,8 +712,15 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             super.onNoLiveAtPresent();
             fitMode = PLVECFitMode.FIT_VIDEO_RECT_FALSE;
             if (!isVideoViewPlayingInFloatWindow) {
-                PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+                if (PLVScreenUtils.isLandscape(PLVECLiveVideoLayout.this.getContext())) {
+                    setFullScreenVideo();
+                } else {
+                    setFitParentVideo();
+                }
             }
+            isCanFullScreen = false;
+
+            fullScreenIv.setVisibility(GONE);
             ToastUtils.showShort(R.string.plv_player_toast_no_live);
             hidePlayCenterView();
         }
@@ -680,6 +733,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                 PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
             }
             hidePlayCenterView();
+            fullScreenIv.setVisibility(GONE);
         }
 
         @Override
@@ -689,8 +743,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             hidePlayCenterView();
             if (isSubVideoViewShow()) {
                 nostreamIv.setVisibility(View.GONE);
-                nostreamTv.setVisibility(View.GONE);
             }
+            fullScreenIv.setVisibility(GONE);
         }
 
         @Override
@@ -698,14 +752,27 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             super.onPrepared(mediaPlayMode);
             if (mediaPlayMode == PolyvMediaPlayMode.MODE_VIDEO) {
                 fitMode = PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_VIDEOVIEW;
+                int[] videoSize = PLVVideoSizeUtils.getVideoWH(videoView);
+                isCanFullScreen = videoSize[0] >= videoSize[1] ? true : false;
+                if (onViewActionListener != null) {
+                    onViewActionListener.acceptVideoSize(isCanFullScreen);
+                }
                 if (!isVideoViewPlayingInFloatWindow) {
-                    PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+                    if(isCanFullScreen && PLVScreenUtils.isLandscape(getContext())){
+                        setFullScreenVideo();
+                    } else {
+                        PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+                    }
 
                 }
             } else if (mediaPlayMode == PolyvMediaPlayMode.MODE_AUDIO) {
                 fitMode = PLVECFitMode.FIT_VIDEO_RECT_FALSE;
                 if (!isVideoViewPlayingInFloatWindow) {
-                    PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+                    if (isCanFullScreen && PLVScreenUtils.isLandscape(getContext())) {
+                        PLVVideoSizeUtils.fitVideoRect(true, videoView.getParent(), null);
+                    } else {
+                        PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+                    }
                 }
             }
             //水印与视频大小匹配
@@ -716,6 +783,13 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                         ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
                         layoutParams.height = videoView.getIjkVideoView().getRenderView().getView().getHeight();
                         watermarkView.setLayoutParams(layoutParams);
+
+                        //全屏按钮
+                        //如果是宽比高大的话就显示全屏按钮
+                        if (isCanFullScreen && PLVScreenUtils.isPortrait(getContext())) {
+                            setFullScreenIvPosition();
+                        }
+
                     } else {
                         ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
                         layoutParams.height = PLVUIUtil.dip2px(getContext(), 206);
@@ -739,7 +813,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             }
         }
     };
-    // </editor-fold>
+
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 播放暂停按钮的显示、隐藏">
     private void hidePlayCenterView() {
@@ -765,6 +839,61 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="旋转监听">
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //横屏
+            if (isCanFullScreen) {
+                setFullScreenVideo();
+                fullScreenIv.setVisibility(GONE);
+            }
+        } else {
+            if (isCanFullScreen) {
+                String simpleName = ActivityUtils.getTopActivity().getClass().getSimpleName();
+                //当在横屏状态下 点击商品库开启小窗， 那么会创建一个竖屏的商品详情Activity
+                // 这里我们只监控顶层PLVECLiveEcommerceActivity的旋转状态
+                String ecommerceActivityName = getContext().getClass().getSimpleName();
+                if (!isVideoViewPlayingInFloatWindow && simpleName.equals(ecommerceActivityName)) {
+                    setFitParentVideo();
+                }
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //重新计算全屏图标的位置
+                        setFullScreenIvPosition();
+                    }
+                });
+            } else {
+                fullScreenIv.setVisibility(GONE);
+            }
+        }
+    }
+
+    private void setFullScreenIvPosition() {
+        View renderView = videoView.getIjkVideoView().getRenderView().getView();
+        if (renderView != null) {
+            int bottom = renderView.getBottom();
+            FrameLayout.LayoutParams fullScreenIvLayoutParams = (FrameLayout.LayoutParams) fullScreenIv.getLayoutParams();
+            int margin = PLVUIUtil.dip2px(getContext(), 4);
+            fullScreenIvLayoutParams.setMargins(0, margin + bottom, margin, 0);
+            fullScreenIv.setLayoutParams(fullScreenIvLayoutParams);
+            fullScreenIv.setVisibility(VISIBLE);
+        }
+    }
+
+    private void setFullScreenVideo() {
+        videoView.setAspectRatio(PolyvPlayerScreenRatio.AR_16_9_FIT_PARENT);
+        PLVVideoSizeUtils.fitVideoRect(true, videoView.getParent(), null);
+    }
+
+    private void setFitParentVideo() {
+        videoView.setAspectRatio(PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT);
+        PLVVideoSizeUtils.fitVideoRect(false, videoView.getParent(), videoViewRect);
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
@@ -774,6 +903,10 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             }
         } else if (v.getId() == R.id.play_center) {
             resume();
+        } else if (v.getId() == R.id.plvec_full_screen_iv){
+            if(PLVScreenUtils.isPortrait(getContext())){
+                PLVOrientationManager.getInstance().setLandscape((Activity) getContext());
+            }
         }
     }
     // </editor-fold>

@@ -196,6 +196,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onQuizHistoryDataList(List<PLVBaseViewData<PLVBaseEvent>> answerEvents, boolean isNoMoreQuizHistory) {
+
+    }
+
+    @Override
+    public void onQuizHistoryRequestFailed(Throwable throwable) {
+
+    }
+
+    @Override
     public void onKickUsersList(List<PLVSocketUserBean> dataList) {
 
     }

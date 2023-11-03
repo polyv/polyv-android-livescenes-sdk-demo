@@ -27,7 +27,7 @@
         android:layout_height="24dp"
         android:background="@drawable/plvlc_bg_player_audio_mode_play_video_btn"
         android:gravity="center"
-        android:text="播放画面"
+        android:text="@string/plv_player_video_play_mode"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@id/plvlc_iv_audio_mode_img"
         app:layout_constraintLeft_toLeftOf="parent"

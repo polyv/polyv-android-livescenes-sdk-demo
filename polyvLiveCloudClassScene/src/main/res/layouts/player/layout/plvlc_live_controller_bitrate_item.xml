@@ -7,11 +7,13 @@
 
     <TextView
         android:id="@+id/tv_bitrate"
-        android:layout_width="66dp"
+        android:layout_width="wrap_content"
         android:layout_height="26dp"
         android:layout_gravity="center_vertical"
         android:background="@drawable/plvlc_controller_tv_blue_selector"
         android:gravity="center"
+        android:minWidth="66dp"
+        android:paddingHorizontal="6dp"
         android:textColor="@color/plvlc_controller_tv_blue_fg_selector"
         android:textSize="14sp"
         tools:text="超清" />

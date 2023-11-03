@@ -2,7 +2,6 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
@@ -36,15 +35,22 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
-import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.IPLVChatroomManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 更多布局
@@ -58,6 +64,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     // 弹层布局位置
     private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
     private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
+    // 弹层布局尺寸 竖屏高度 横屏宽度
+    private static final int MENU_DRAWER_SIZE_PORT = ConvertUtils.dp2px(270);
+    private static final int MENU_DRAWER_SIZE_LAND = ConvertUtils.dp2px(240);
     // 更多布局高度
     private static final int MORE_LAYOUT_HEIGHT_PORT = ViewGroup.LayoutParams.WRAP_CONTENT;
     private static final int MORE_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -85,6 +94,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreFlashlightTv;
     private ImageView plvsaMoreBitrateIv;
     private TextView plvsaMoreBitrateTv;
+    private ImageView plvsaMoreMixIv;
+    private TextView plvsaMoreMixTv;
+    private View plvsaMoreMixLayout;
     private ImageView plvsaMoreCloseRoomIv;
     private TextView plvsaMoreCloseRoomTv;
     private View plvsaMoreCloseRoomLayout;
@@ -93,15 +105,19 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView plvsaMoreShareScreenTv;
     private LinearLayout moreBeautyLl;
     private LinearLayout moreShareLl;
+    private LinearLayout morePushDowngradePreferenceLl;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
 
     //清晰度设置布局
     private PLVSABitrateLayout bitrateLayout;
-
+    //混流设置布局
+    private PLVSAMixLayout mixLayout;
     //分享布局
     private PLVSAShareLayout shareLayout;
+    // 推流降级布局
+    private final PLVSAPushDowngradePreferenceLayout pushDowngradePreferenceLayout = new PLVSAPushDowngradePreferenceLayout(getContext());
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -120,12 +136,26 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private long lastClickCameraSwitchViewTime;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private String channelId;
 
     /**
      * 限制每800ms点击一次
      **/
     private static final long QUICK_CLICK_LIMIT_TIME = 800;
     private long lastClickTime = 0;
+
+    private Map<Integer, Integer> bitrateMapIcon = new HashMap<Integer, Integer>() {{
+        put(PLVStreamerConfig.Bitrate.BITRATE_STANDARD, R.drawable.plvsa_bitrate_icon_sd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_HIGH, R.drawable.plvsa_bitrate_icon_hd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
+        put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
+    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
+       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
+    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -163,6 +193,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreFlashlightTv = (TextView) findViewById(R.id.plvsa_more_flashlight_tv);
         plvsaMoreBitrateIv = (ImageView) findViewById(R.id.plvsa_more_bitrate_iv);
         plvsaMoreBitrateTv = (TextView) findViewById(R.id.plvsa_more_bitrate_tv);
+        plvsaMoreMixIv = findViewById(R.id.plvsa_more_mix_iv);
+        plvsaMoreMixTv = findViewById(R.id.plvsa_more_mix_tv);
+        plvsaMoreMixLayout = findViewById(R.id.plvsa_more_mix_layout);
         plvsaMoreCloseRoomIv = (ImageView) findViewById(R.id.plvsa_more_close_room_iv);
         plvsaMoreCloseRoomTv = (TextView) findViewById(R.id.plvsa_more_close_room_tv);
         plvsaMoreCloseRoomLayout = findViewById(R.id.plvsa_more_close_room_layout);
@@ -171,7 +204,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreShareScreenTv = findViewById(R.id.plvsa_more_share_screen_tv);
         moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
         moreShareLl = findViewById(R.id.plvsa_more_share_layout);
-
+        morePushDowngradePreferenceLl = findViewById(R.id.plvsa_more_push_downgrade_preference_ll);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -185,17 +218,23 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreFlashlightTv.setOnClickListener(this);
         plvsaMoreBitrateIv.setOnClickListener(this);
         plvsaMoreBitrateTv.setOnClickListener(this);
+        plvsaMoreMixIv.setOnClickListener(this);
+        plvsaMoreMixTv.setOnClickListener(this);
         plvsaMoreCloseRoomIv.setOnClickListener(this);
         plvsaMoreCloseRoomTv.setOnClickListener(this);
         plvsaMoreShareScreenLl.setOnClickListener(this);
         moreBeautyLl.setOnClickListener(this);
         moreShareLl.setOnClickListener(this);
+        morePushDowngradePreferenceLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
-        plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+        plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
-        if(!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
+        if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
             plvsaMoreSettingsLayout.removeView(plvsaMoreShareScreenLl);
+        }
+        if (!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
+            plvsaMoreSettingsLayout.removeView(plvsaMoreMixLayout);
         }
 
         //init bitrateLayout
@@ -216,11 +255,47 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             }
         });
 
+        //init mixLayout
+        mixLayout = new PLVSAMixLayout(getContext());
+        mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
+            @Override
+            public int getMixInfo() {
+                return streamerPresenter != null ? streamerPresenter.getMixLayoutType() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            }
+
+            @Override
+            public void onMixClick(int mix) {
+                mixLayout.close();
+                if (streamerPresenter != null) {
+                    streamerPresenter.setMixLayoutType(mix);
+                }
+            }
+        });
+
         //init shareLayout
         shareLayout = new PLVSAShareLayout(getContext());
 
+        setupPushDowngradeLayout();
         observeBeautyModuleInitResult();
         observeChatroomStatus();
+    }
+
+    private void setupPushDowngradeLayout() {
+        pushDowngradePreferenceLayout.setOnViewActionListener(new PLVSAPushDowngradePreferenceLayout.OnViewActionListener() {
+            @Nullable
+            @Override
+            public PLVPushDowngradePreference getCurrentDowngradePreference() {
+                return streamerPresenter.getPushDowngradePreference();
+            }
+
+            @Override
+            public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
+                if (streamerPresenter.getPushDowngradePreference() == preference) {
+                    return;
+                }
+                streamerPresenter.setPushDowngradePreference(preference);
+            }
+        });
     }
 
     private void observeChatroomStatus() {
@@ -228,7 +303,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             @Override
             public void onStatus(boolean isClose) {
                 plvsaMoreCloseRoomIv.setSelected(isClose);
-                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
             }
         });
     }
@@ -277,14 +352,34 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 });
     }
+
+    private void initBitrateMapIcon() {
+        PLVPushStreamTemplateJsonBean pushStreamTemplateJsonBean = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        if (pushStreamTemplateJsonBean != null && pushStreamTemplateJsonBean.isEnabled()) {
+            bitrateMapIcon.clear();
+            int i = 0;
+            for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
+                i++;
+                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
         if (shareLayout != null) {
             shareLayout.init(liveRoomDataManager);
         }
+        if (bitrateLayout != null) {
+            bitrateLayout.init(liveRoomDataManager);
+        }
+        if (mixLayout != null) {
+            mixLayout.init(liveRoomDataManager);
+        }
+        initBitrateMapIcon();
         observeLiveRoomStatus();
     }
     // </editor-folder>
@@ -300,6 +395,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     (ViewGroup) ((Activity) getContext()).findViewById(R.id.plvsa_live_room_popup_container)
             );
             menuDrawer.setMenuView(this);
+            menuDrawer.setMenuSize(PLVScreenUtils.isPortrait(getContext()) ? MENU_DRAWER_SIZE_PORT : MENU_DRAWER_SIZE_LAND);
             menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
@@ -401,23 +497,15 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     if (bitrate == null || getContext() == null) {
                         return;
                     }
-                    String bitrateText = PLVSStreamerConfig.Bitrate.getText(bitrate);
+                    String bitrateText = PLVStreamerConfig.QualityLevel.getTextCombineTemplate(bitrate, channelId);
                     plvsaMoreBitrateTv.setText(bitrateText);
-                    switch (bitrate) {
-                        case PLVSStreamerConfig.Bitrate.BITRATE_STANDARD:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_sd);
-                            break;
-                        case PLVSStreamerConfig.Bitrate.BITRATE_HIGH:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_hd);
-                            break;
-                        case PLVSStreamerConfig.Bitrate.BITRATE_SUPER:
-                            plvsaMoreBitrateIv.setImageResource(R.drawable.plvsa_bitrate_icon_uhd);
-                            break;
-                        default:
+                    Integer iconId = bitrateMapIcon.get(bitrate);
+                    if (iconId != null) {
+                        plvsaMoreBitrateIv.setImageResource(iconId);
                     }
 
                     if (switchBitrateByUser) {
-                        String toastText = "已切换为" + bitrateText;
+                        String toastText = PLVAppUtils.formatString(R.string.plv_player_change_definition_2, bitrateText);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -435,7 +523,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     plvsaMoreMicIv.setSelected(!aBoolean);
 
                     if (attachedToWindow) {
-                        String toastText = "已" + (aBoolean ? "开启" : "关闭") + "麦克风";
+                        String toastText = PLVAppUtils.getString(aBoolean ? R.string.plv_linkmic_microphone_unmute_2 : R.string.plv_linkmic_microphone_mute);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -455,7 +543,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     plvsaMoreMirrorIv.setEnabled(enableVideo && !plvsaMoreCameraSwitchIv.isSelected());
 
                     if (attachedToWindow) {
-                        String toastText = "已" + (enableVideo ? "开启" : "关闭") + "摄像头";
+                        String toastText = PLVAppUtils.getString(enableVideo ? R.string.plv_linkmic_camera_unmute_2 : R.string.plv_linkmic_camera_mute);
                         PLVToast.Builder.context(getContext())
                                 .setText(toastText)
                                 .build().show();
@@ -566,15 +654,18 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == R.id.plvsa_more_bitrate_iv
                 || id == R.id.plvsa_more_bitrate_tv) {
             bitrateLayout.open();
+        } else if (id == R.id.plvsa_more_mix_iv
+                || id == R.id.plvsa_mix_tv) {
+            mixLayout.open();
         } else if (id == R.id.plvsa_more_close_room_iv
                 || id == R.id.plvsa_more_close_room_tv) {
             PolyvChatroomManager.getInstance().toggleRoomByEvent(new IPolyvChatroomManager.RequestApiListener<String>() {
                 @Override
                 public void onSuccess(String s) {
                     plvsaMoreCloseRoomIv.setSelected(!plvsaMoreCloseRoomIv.isSelected());
-                    plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? "取消全体禁言" : "开启全体禁言");
+                    plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
-                    String toastText = "已" + (plvsaMoreCloseRoomIv.isSelected() ? "开启" : "解除") + "全体禁言";
+                    String toastText = PLVAppUtils.getString(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
                     PLVToast.Builder.context(getContext())
                             .setText(toastText)
                             .build().show();
@@ -583,7 +674,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 @Override
                 public void onFailed(Throwable t) {
                     PLVToast.Builder.context(getContext())
-                            .setText("操作失败，请检查网络")
+                            .setText(R.string.plv_chat_network_bad)
                             .build()
                             .show();
                 }
@@ -598,18 +689,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 return;
             }
 
-            LiveData<Boolean> enableVideo = streamerPresenter.getData().getEnableVideo();
-            if(enableVideo != null && enableVideo.getValue() != null){
-                if(!enableVideo.getValue()){
-                    //屏幕共享需要打开摄像头
-                    PLVToast.Builder.context(getContext())
-                            .setText(getContext().getString(R.string.plvsa_streamer_sharescreen_need_video_first))
-                            .build()
-                            .show();
-                    return;
-                }
-            }
-
             //开始屏幕共享
             if (streamerPresenter != null) {
                 if (!plvsaMoreShareScreenIv.isSelected()) {
@@ -622,7 +701,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             close();
             if (!isEnableVideo) {
                 PLVToast.Builder.context(getContext())
-                        .setText(getContext().getString(R.string.plvsa_beauty_need_open_camera))
+                        .setText(getContext().getString(R.string.plv_beauty_need_open_camera))
                         .show();
                 return;
             }
@@ -630,6 +709,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == moreShareLl.getId()) {
             close();
             shareLayout.open();
+        } else if (id == morePushDowngradePreferenceLl.getId()) {
+            close();
+            pushDowngradePreferenceLayout.open();
         }
     }
     // </editor-fold>

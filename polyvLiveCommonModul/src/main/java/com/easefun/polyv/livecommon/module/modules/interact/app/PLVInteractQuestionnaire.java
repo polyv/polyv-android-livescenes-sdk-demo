@@ -111,7 +111,7 @@ public class PLVInteractQuestionnaire extends PLVInteractAppAbs {
 
     // <editor-fold defaultstate="collapsed" desc="发送结果到server">
     private void sendResultToServer(PolyvQuestionnaireSocketVO socketVO) {
-        PLVCommonLog.d(TAG, "发送调查问卷答案");
+        PLVCommonLog.d(TAG, "发送调查问卷答案");// no need i18n
         socketVO.setNick(viewerName);
         socketVO.setRoomId(channelId);
         socketVO.setUserId(viewerId);

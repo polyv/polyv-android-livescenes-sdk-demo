@@ -1,4 +1,19 @@
-<resources>
-    <string name="plvec_chat_msg_over_length_more">更多</string>
-    <string name="plvec_chat_msg_over_length_fold">收起</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="plvec_live_ecommerce_scene_name">Live Ecommerce</string>
+
+    <!--登录-->
+    <string name="plvec_login_live_error_activity_is_null" translatable="false">activity 为空，启动直播带货直播页失败！</string>
+    <string name="plvec_login_live_error_intent_is_null" translatable="false">intent 为空，启动直播带货直播页失败！</string>
+    <string name="plvec_login_live_error_channel_id_is_empty" translatable="false">channelId 为空，启动直播带货直播页失败</string>
+    <string name="plvec_login_live_error_channel_type_is_null" translatable="false">channelType 为空，启动直播带货直播页失败！</string>
+    <string name="plvec_login_live_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动直播带货直播页失败</string>
+    <string name="plvec_login_live_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动直播带货直播页失败</string>
+
+    <string name="plvec_login_playback_error_activity_is_null" translatable="false">activity 为空，启动直播带货回放页失败！</string>
+    <string name="plvec_login_playback_error_intent_is_null" translatable="false">intent 为空，启动直播带货回放页失败！</string>
+    <string name="plvec_login_playback_error_channel_id_is_empty" translatable="false">channelId 为空，启动直播带货回放页失败</string>
+    <string name="plvec_login_playback_error_vid_is_empty" translatable="false">vid 为空，启动直播带货回放页失败</string>
+    <string name="plvec_login_playback_error_channel_type_is_null" translatable="false">channelType 为空，启动直播带货回放页失败！</string>
+    <string name="plvec_login_playback_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动直播带货回放页失败</string>
+    <string name="plvec_login_playback_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动直播带货回放页失败</string>
 </resources>

@@ -20,6 +20,8 @@
         android:id="@+id/plv_tv_reward_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textColor="#D0D0D0"
         android:textSize="12sp" />
 

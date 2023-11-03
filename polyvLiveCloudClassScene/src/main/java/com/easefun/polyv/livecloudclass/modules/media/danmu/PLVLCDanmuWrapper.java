@@ -30,6 +30,9 @@ public class PLVLCDanmuWrapper {
     View anchorView;
     //横屏弹幕开关按钮
     View danmuSwitchLandView;
+    //横屏弹幕设置
+    View danmuSettingLandView;
+
 
     //页面方向改变监听器
     PLVOrientationManager.OnConfigurationChangedListener onConfigurationChangedListener;
@@ -55,6 +58,10 @@ public class PLVLCDanmuWrapper {
     public void setDanmuSwitchLandView(@NonNull View danmuSwitchLandView) {
         this.danmuSwitchLandView = danmuSwitchLandView;
         init();
+    }
+
+    public void setDanmuSwitchSettingView(@NonNull View danmuSettingLandView) {
+        this.danmuSettingLandView = danmuSettingLandView;
     }
 
     void init() {
@@ -121,6 +128,9 @@ public class PLVLCDanmuWrapper {
             if (danmuSwitchLandView != null) {
                 danmuSwitchLandView.setVisibility(VISIBLE);
             }
+            if(danmuSettingLandView != null) {
+                danmuSettingLandView.setVisibility(!danmuSwitchLandView.isSelected() ? View.VISIBLE : View.GONE);
+            }
             if (isEnableDanmuInPortrait) {
                 if (isDanmuToggleOpen) {
                     if (danmuController != null) {
@@ -156,6 +166,13 @@ public class PLVLCDanmuWrapper {
             if (danmuSwitchLandView != null) {
                 danmuSwitchLandView.setVisibility(GONE);
             }
+        }
+    }
+
+
+    public void setDanmuSpeed(int speed) {
+        if(danmuController != null){
+            danmuController.setDanmuSpeed(speed);
         }
     }
 

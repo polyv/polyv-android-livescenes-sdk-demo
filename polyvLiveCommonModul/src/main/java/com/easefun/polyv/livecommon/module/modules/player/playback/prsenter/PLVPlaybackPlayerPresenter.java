@@ -21,6 +21,7 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
@@ -51,6 +52,7 @@ import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVControlUtils;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
@@ -208,6 +210,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     public String getSessionId() {
         if (videoView != null && videoView.getPlaybackData() != null) {
             return videoView.getPlaybackData().getChannelSessionId();
+        }
+        return null;
+    }
+
+    @Override
+    public String getFileId() {
+        if (videoView != null && videoView.getPlaybackData() != null) {
+            return videoView.getPlaybackData().getFileId();
         }
         return null;
     }
@@ -477,23 +487,23 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     String tips;
                     switch (error.playStage) {
                         case PolyvPlayError.PLAY_STAGE_HEADAD:
-                            tips = "片头广告";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_head_ad);
                             break;
                         case PolyvPlayError.PLAY_STAGE_TAILAD:
-                            tips = "片尾广告";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_tail_ad);
                             break;
                         case PolyvPlayError.PLAY_STAGE_TEASER:
-                            tips = "暖场视频";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_teaser);
                             break;
                         default:
                             if (error.isMainStage()) {
-                                tips = "主视频";
+                                tips = PLVAppUtils.getString(R.string.plv_player_stage_main);
                             } else {
                                 tips = "";
                             }
                             break;
                     }
-                    tips += "播放异常\n" +
+                    tips += PLVAppUtils.getString(R.string.plv_player_error) +
                             error.errorDescribe +
                             "(" + error.errorCode + "-" + error.playStage + ")\n" +
                             error.playPath;
@@ -747,7 +757,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                                                     String msg = PLVMarqueeCommonController.getInstance().getErrorMessage();
                                                     Toast.makeText(
                                                             activity,
-                                                            "".equals(msg) ? "跑马灯验证失败" : msg,
+                                                            "".equals(msg) ? PLVAppUtils.getString(R.string.plv_player_marquee_verify_error) : msg,
                                                             Toast.LENGTH_SHORT
                                                     ).show();
                                                     activity.finish();
@@ -785,6 +795,15 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     }
                 }
             });
+            videoView.setOnDanmuSpeedServerListener(new IPLVVideoViewListenerEvent.OnDanmuSpeedServerListener() {
+                @Override
+                public void OnDanmuSpeedServerListener(int speed) {
+                    IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
+                    if (view != null) {
+                        view.onServerDanmuSpeed(speed);
+                    }
+                }
+            });
             videoView.setOnPPTShowListener(new IPolyvVideoViewListenerEvent.OnPPTShowListener() {
                 @Override
                 public void showPPTView(int visible) {
@@ -819,7 +838,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public boolean onRetryFailed() {
                     if (getView() != null && getView().getRetryLayout() != null) {
-                        ((PLVPlayerRetryLayout) getView().getRetryLayout()).onRetryFailed("重试失败");
+                        ((PLVPlayerRetryLayout) getView().getRetryLayout()).onRetryFailed(PLVAppUtils.getString(R.string.plv_player_retry_fail));
                     }
                     //false表示使用sdk内部逻辑重试，true表示拦截重试逻辑，开发者自己处理
                     return false;
@@ -1004,7 +1023,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         .setFontAlpha(plvWatermarkVO.watermarkOpacity);
                 break;
             default:
-                PLVCommonLog.d(TAG,"设置水印失败，默认为空");
+                PLVCommonLog.d(TAG,"设置水印失败，默认为空");// no need i18n
                 break;
         }
 

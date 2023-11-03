@@ -2,6 +2,7 @@ package com.easefun.polyv.liveecommerce.modules.player;
 
 import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -11,7 +12,10 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 import java.util.List;
 
@@ -70,6 +74,13 @@ public interface IPLVECVideoLayout {
     String getSubVideoViewHerf();
 
     /**
+     * 获取播放器自定义水印
+     *
+     * @return logoview
+     */
+    PLVPlayerLogoView getLogoView();
+
+    /**
      * 设置播放器音量
      *
      * @param volume 音量值，范围：[0,100]
@@ -110,6 +121,13 @@ public interface IPLVECVideoLayout {
      * @param videoViewRect 区域
      */
     void setVideoViewRect(Rect videoViewRect);
+
+    /**
+     * 添加播放器状态的监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener);
 
     /**
      * 销毁，销毁播放器及相关资源
@@ -193,6 +211,39 @@ public interface IPLVECVideoLayout {
      * @return 播放信息数据
      */
     LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO();
+
+    /**
+     * 当加入RTC时，更新布局
+     *
+     * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度
+     */
+    void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth);
+
+    /**
+     * 当离开RTC时，更新布局
+     */
+    void updateWhenLeaveRTC();
+
+    /**
+     * 加入连麦
+     */
+    void updateWhenJoinLinkMic();
+
+    /**
+     * 离开连麦
+     */
+    void updateWhenLeaveLinkMic();
+
+    void notifyRTCPrepared();
+
+    /**
+     * 添加连麦是否开启状态的监听器
+     *
+     * @param listener 监听器
+     */
+    void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener);
+
+    void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -264,6 +315,11 @@ public interface IPLVECVideoLayout {
      * 获取sessionId
      */
     String getSessionId();
+
+    /**
+     * 获取文件Id
+     */
+    String getFileId();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 播放器布局中UI控件 触发的交互事件的回调方法">
@@ -292,7 +348,13 @@ public interface IPLVECVideoLayout {
         /**
          * 网络质量回调
          */
-        void acceptNetworkQuality(int networkQuality);
+        void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality);
+
+        /**
+         * 当前视频是否可以设置全屏
+         * @param isCanFullScreen
+         */
+        void acceptVideoSize(boolean isCanFullScreen);
     }
     // </editor-fold>
 }

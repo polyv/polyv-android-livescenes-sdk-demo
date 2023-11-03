@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-        android:id="@+id/container_ly"
+        android:id="@+id/plvlc_danmu_container_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#CC000000">
@@ -41,7 +41,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minWidth="56dp"
-                        android:text="下载"
+                        android:text="@string/plv_download_name"
                         android:gravity="center"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp" />
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|left"
-                android:text="倍速"
+                android:text="@string/plv_player_speed_2"
                 android:textColor="#C2C2C2"
                 android:textSize="12sp"
                 android:visibility="gone"
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical|right"
-                    android:text="倍速"
+                    android:text="@string/plv_player_speed_2"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp"
                     android:visibility="gone" />

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
-            android:text="全文"
+            android:text="@string/plv_chat_full_text"
             android:textColor="#F0F1F5"
             android:textSize="18sp" />
 
@@ -52,7 +52,7 @@
             android:layout_marginBottom="36dp"
             android:paddingHorizontal="32dp"
             android:paddingVertical="6dp"
-            android:text="复制"
+            android:text="@string/plv_chat_copy"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
             app:plvGradientEndColor="#3399FF"

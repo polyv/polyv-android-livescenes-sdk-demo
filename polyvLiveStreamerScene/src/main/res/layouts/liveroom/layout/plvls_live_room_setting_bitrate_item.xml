@@ -4,6 +4,8 @@
     android:layout_width="66dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
     tools:background="#666666">
 
     <TextView
@@ -11,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="高清"
+        android:text="@string/plv_streamer_bitrate_high"
         android:textColor="@color/plvls_live_room_setting_tv_color_selector"
         android:textSize="14sp" />
 

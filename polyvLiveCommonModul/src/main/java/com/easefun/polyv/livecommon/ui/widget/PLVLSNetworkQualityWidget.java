@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 import com.easefun.polyv.livecommon.R;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
-import com.plv.livescenes.streamer.config.PLVStreamerConfig;
+import com.plv.linkmic.PLVLinkMicConstant;
 
 /**
  * date: 2019/10/12 0012
@@ -94,27 +94,29 @@ public class PLVLSNetworkQualityWidget extends FrameLayout {
     /**
      * 设置网络质量
      *
-     * @param netQuality see{@link PLVStreamerConfig.NetQuality}
+     * @param netQuality
      */
-    public void setNetQuality(int netQuality) {
+    public void setNetQuality(PLVLinkMicConstant.NetworkQuality netQuality) {
         if (!PLVNetworkUtils.isConnected(getContext())) {
-            netQuality = PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION;
+            netQuality = PLVLinkMicConstant.NetworkQuality.DISCONNECT;
         }
 
         switch (netQuality) {
-            case PLVStreamerConfig.NetQuality.NET_QUALITY_GOOD:
+            case EXCELLENT:
+            case GOOD:
                 showHashNetwork(true);
                 plvsIvNetworkStatusSignal.setImageResource(resNetGood);
                 break;
-            case PLVStreamerConfig.NetQuality.NET_QUALITY_MIDDLE:
+            case POOR:
+            case BAD:
                 showHashNetwork(true);
                 plvsIvNetworkStatusSignal.setImageResource(resNetMiddle);
                 break;
-            case PLVStreamerConfig.NetQuality.NET_QUALITY_POOR:
+            case VERY_BAD:
                 showHashNetwork(true);
                 plvsIvNetworkStatusSignal.setImageResource(resNetPoor);
                 break;
-            case PLVStreamerConfig.NetQuality.NET_QUALITY_NO_CONNECTION:
+            case DISCONNECT:
                 if (shouldShowNoNetworkHint) {
                     showHashNetwork(false);
                 } else {

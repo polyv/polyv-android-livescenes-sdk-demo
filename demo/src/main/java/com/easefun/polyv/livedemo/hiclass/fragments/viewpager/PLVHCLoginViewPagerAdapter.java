@@ -49,6 +49,10 @@ public class PLVHCLoginViewPagerAdapter extends FragmentStatePagerAdapter {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="父类方法重写">
+    @Override
+    public Parcelable saveState() {
+        return null;
+    }
 
     @Override
     public void restoreState(Parcelable state, ClassLoader loader) {

@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.popover;
 
+import android.content.Intent;
+
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
@@ -42,6 +44,11 @@ public interface IPLVPopoverLayout {
      * @return 返回true表示拦截事件
      */
     boolean onBackPress();
+
+    /**
+     * ActivityResult回调触发时调用
+     */
+    void onActivityResult(final int requestCode, final int resultCode, final Intent intent);
 
     /**
      * 销毁

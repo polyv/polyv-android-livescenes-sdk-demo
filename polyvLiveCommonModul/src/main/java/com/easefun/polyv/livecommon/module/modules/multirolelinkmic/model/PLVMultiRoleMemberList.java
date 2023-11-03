@@ -458,7 +458,7 @@ public class PLVMultiRoleMemberList {
                 myClassStatusBean = socketUserBean.getClassStatus();
                 socketUserBeanList.remove(socketUserBean);
                 i--;
-                continue;//排除在线列表中的自己，使用本地的数据添加，socket未登陆成功时获取不到
+                continue;//排除在线列表中的自己，使用本地的数据添加，socket未登录成功时获取不到
             }
             if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(socketUserBean.getUserType())) {
                 continue;//过滤讲师
@@ -794,7 +794,7 @@ public class PLVMultiRoleMemberList {
         }
         String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
         if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登陆时，使用频道号
+            loginRoomId = liveRoomDataManager.getConfig().getChannelId();//socket未登录时，使用频道号
         }
         return loginRoomId;
     }

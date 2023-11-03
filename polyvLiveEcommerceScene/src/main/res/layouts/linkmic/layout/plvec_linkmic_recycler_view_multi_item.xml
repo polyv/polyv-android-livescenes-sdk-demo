@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+    android:id="@+id/plvec_linkmic_switch_anchor_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_width="200dp">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_width="200dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvec_linkmic_item_round_rect_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/plvec_linkmic_item_ly_bg_shape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="H,2:3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="none">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
+            android:id="@+id/plvec_linkmic_switch_anchor_item_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/plvec_linkmic_item_ly_bg_shape">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/plvec_linkmic_mute_video" />
+
+                <FrameLayout
+                    android:id="@+id/plvec_link_mic_fl_render_view_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/plvec_link_mic_render_view_pause_placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/plvec_linkmic_pause_placeholder"
+                        tools:visibility="gone" />
+
+                    <!--logoview-->
+                    <com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView
+                        android:id="@+id/plvec_link_mic_logo_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </FrameLayout>
+
+                <!-- 封面图（仅音频模式时展示）-->
+                <ImageView
+                    android:id="@+id/plvec_link_mic_iv_cover_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"/>
+
+                <!-- 昵称和logo-->
+                <LinearLayout
+                    android:id="@+id/plvsa_streamer_bottom_left_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="8dp"
+                    android:layout_toLeftOf="@+id/plvec_link_mic_iv_mic_state"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_marginLeft="6dp"
+                            android:id="@+id/plvec_link_mic_iv_mic_state"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/plvec_linkmic_mic_open" />
+
+                        <TextView
+                            android:id="@+id/plvec_link_mic_tv_nick"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="3dp"
+                            android:layout_marginRight="10dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:textColor="#ffffff"
+                            android:textSize="14sp"
+                            tools:text="你好你好" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!--奖杯-->
+                <LinearLayout
+                    android:id="@+id/plvec_link_mic_ll_cup_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|bottom"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/plvec_linkmic_btn_cup" />
+
+                    <TextView
+                        android:id="@+id/plvec_link_mic_tv_cup_num_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!--网络质量-->
+                <com.easefun.polyv.livecommon.ui.widget.PLVLSNetworkQualityWidget
+                    android:id="@+id/plvec_link_mic_net_quality_view"
+                    android:layout_gravity="top|right"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp" />
+
+            </FrameLayout>
+        </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
+
+        <TextView
+            android:id="@+id/plvec_live_linkmic_floating_playing_placeholder_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#2B3045"
+            android:gravity="center"
+            android:text="@string/plv_player_floating_playing"
+            android:textColor="#E4E4E4"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>

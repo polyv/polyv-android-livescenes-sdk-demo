@@ -82,7 +82,7 @@ public class PLVECRewardGiftAnimView extends FrameLayout {
                     public void accept(Integer integer) throws Exception {
                         setVisibility(View.VISIBLE);
                         rewardUserNameTv.setText(rewardGiftInfo.getUserName());
-                        rewardGiftNameTv.setText("赠送    " + rewardGiftInfo.getGiftName());
+                        rewardGiftNameTv.setText("赠送    " + rewardGiftInfo.getGiftName());// no need i18n
                         rewardGiftPicIv.setImageResource(rewardGiftInfo.getGiftDrawableId());
                         TranslateAnimation animation = new TranslateAnimation(-getWidth(), 0f, 0f, 0f);
                         animation.setDuration(400);

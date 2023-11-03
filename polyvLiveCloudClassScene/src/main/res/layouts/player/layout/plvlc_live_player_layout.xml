@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:background="#2B3045"
         android:gravity="center"
-        android:text="小窗播放中..."
+        android:text="@string/plv_player_floating_playing"
         android:textColor="#E4E4E4"
         android:textSize="14sp"
         android:visibility="gone" />
@@ -116,6 +116,7 @@
         android:layout_marginTop="10dp" />
 
     <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:id="@+id/commodity_push_ly"
         android:layout_width="308dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"

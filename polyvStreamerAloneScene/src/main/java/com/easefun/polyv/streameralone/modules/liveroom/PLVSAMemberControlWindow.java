@@ -17,6 +17,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -119,7 +120,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberCameraIv.setSelected(!isOpenCamera);
         plvsaMemberMicIv.setSelected(!isOpenMic);
         plvsaMemberBanIv.setSelected(isBan);
-        plvsaMemberBanTv.setText(isBan ? "取消禁言" : "禁言");
+        plvsaMemberBanTv.setText(isBan ? R.string.plv_chat_unban : R.string.plv_chat_ban);
 
         //主讲权限
         int speakerViewVisibility = isGuest ? View.VISIBLE : View.GONE;
@@ -127,7 +128,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberGrantSpeakerIv.setVisibility(speakerViewVisibility);
         plvsaMemberGrantSpeakerIv.setSelected(isHasSpeaker);
         plvsaMemberGrantSpeakerTv.setSelected(isHasSpeaker);
-        plvsaMemberGrantSpeakerTv.setText(isHasSpeaker ? "移除主讲权限" : "授予主讲权限");
+        plvsaMemberGrantSpeakerTv.setText(isHasSpeaker ? R.string.plv_streamer_remove_speaker_permission_6 : R.string.plv_streamer_grant_speaker_permission_6);
         if(isHasSpeaker){
             //FIXME 屏幕共享中应该提示，目前没有状态判断
             isNeedPermissionDialogShow = false;
@@ -224,10 +225,10 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
                 || id == R.id.plvsa_member_kick_tv) {
             popupWindow.dismiss();
             new PLVSAConfirmDialog(v.getContext())
-                    .setTitle("确定踢出" + (onViewActionListener != null ? onViewActionListener.getNick() : "") + "吗？")
-                    .setContent("踢出后24小时内无法进入")
-                    .setLeftButtonText("取消")
-                    .setRightButtonText("确定")
+                    .setTitle(PLVAppUtils.formatString(R.string.plv_chat_confirm_kick, onViewActionListener != null ? onViewActionListener.getNick() : ""))
+                    .setContent(R.string.plv_chat_kick_hint)
+                    .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {
@@ -243,10 +244,10 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
             popupWindow.dismiss();
             if (!plvsaMemberBanIv.isSelected()) {
                 new PLVSAConfirmDialog(v.getContext())
-                        .setTitle("确定禁言" + (onViewActionListener != null ? onViewActionListener.getNick() : "") + "吗？")
+                        .setTitle(PLVAppUtils.formatString(R.string.plv_chat_confirm_ban, onViewActionListener != null ? onViewActionListener.getNick() : ""))
                         .setContentVisibility(View.GONE)
-                        .setLeftButtonText("取消")
-                        .setRightButtonText("确定")
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                         .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, View v) {
@@ -272,16 +273,16 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
                 }
                 plvsaMemberGrantSpeakerIv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
                 plvsaMemberGrantSpeakerTv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
-                plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? "移除主讲权限" : "授予主讲权限");
+                plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? R.string.plv_streamer_remove_speaker_permission_6 : R.string.plv_streamer_grant_speaker_permission_6);
                 return;
             }
-            String title = isGrant ? "确定移除ta的":"确定授予ta" ;
-            String content = isGrant ? "移除后主讲人的屏幕共享将会自动结束":"当前已有主讲人，确认后将替换为新的主讲人";
+            String title = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_remove_speaker_permission_4 : R.string.plv_streamer_grant_speaker_permission_4);
+            String content = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_remove_speaker_permission_5 : R.string.plv_streamer_grant_speaker_permission_5);
             new PLVSAConfirmDialog(v.getContext())
-                    .setTitle(title+ "主讲权限吗？")
+                    .setTitle(title)
                     .setContent(content)
-                    .setLeftButtonText("取消")
-                    .setRightButtonText("确定")
+                    .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                    .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                     .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, View v) {
@@ -291,7 +292,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
                             }
                             plvsaMemberGrantSpeakerIv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
                             plvsaMemberGrantSpeakerTv.setSelected(!plvsaMemberGrantSpeakerIv.isSelected());
-                            plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? "移除主讲权限" : "授予主讲权限");
+                            plvsaMemberGrantSpeakerTv.setText(!plvsaMemberGrantSpeakerIv.isSelected() ? R.string.plv_streamer_remove_speaker_permission_6 : R.string.plv_streamer_grant_speaker_permission_6);
 
                         }
                     })
