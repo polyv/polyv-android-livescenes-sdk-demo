@@ -53,8 +53,8 @@ import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
-import com.plv.livescenes.linkmic.IPLVLinkMicManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.linkmic.IPLVLinkMicManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
@@ -94,7 +94,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -143,6 +142,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     /**** 成员列表默认请求数据大小 ****/
     private static final int DEFAULT_MEMBER_PAGE = 1;
     private static final int DEFAULT_MEMBER_LENGTH = 500;
+    public static final int MEMBER_MAX_LENGTH = 500;
 
     /**** View ****/
     //推流和连麦mvp模式的view
@@ -196,9 +196,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     /**** 容器 ****/
     //推流和连麦列表
-    final List<PLVLinkMicItemDataBean> streamerList = new LinkedList<>();
+    private final List<PLVLinkMicItemDataBean> streamerList = new LinkedList<>();
     //成员列表
-    List<PLVMemberItemDataBean> memberList = new LinkedList<>();
+    final List<PLVMemberItemDataBean> memberList = Collections.synchronizedList(new LinkedList<PLVMemberItemDataBean>());
     //rtc回调在连麦中的列表
     final Map<String, PLVLinkMicItemDataBean> rtcJoinMap = new HashMap<>();
 
@@ -214,7 +214,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private Observer<Boolean> beautySwitchStateObserver;
 
     //handler
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    final Handler handler = new Handler(Looper.getMainLooper());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -842,11 +842,13 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public void muteAllUserAudio(final boolean isMute) {
-        for (int i = 0; i < memberList.size(); i++) {
-            @Nullable final PLVLinkMicItemDataBean linkMicItemDataBean = memberList.get(i).getLinkMicItemDataBean();
-            if (linkMicItemDataBean != null && linkMicItemDataBean.isRtcJoinStatus()) {
-                if (!isMyLinkMicId(linkMicItemDataBean.getLinkMicId())) {
-                    muteUserMedia(i, false, isMute);
+        synchronized (memberList) {
+            for (int i = 0; i < memberList.size(); i++) {
+                @Nullable final PLVLinkMicItemDataBean linkMicItemDataBean = memberList.get(i).getLinkMicItemDataBean();
+                if (linkMicItemDataBean != null && linkMicItemDataBean.isRtcJoinStatus()) {
+                    if (!isMyLinkMicId(linkMicItemDataBean.getLinkMicId())) {
+                        muteUserMedia(i, false, isMute);
+                    }
                 }
             }
         }
@@ -1219,13 +1221,19 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         final String roomId = loginRoomId;
         listUsersDisposable = PLVChatApiRequestHelper.getListUsers(roomId, DEFAULT_MEMBER_PAGE, DEFAULT_MEMBER_LENGTH)
                 .retryWhen(new PLVRxBaseRetryFunction(Integer.MAX_VALUE, 3000))
+                .observeOn(Schedulers.io())
+                .doOnNext(new Consumer<PLVListUsersVO>() {
+                    @Override
+                    public void accept(PLVListUsersVO plvsListUsersVO) throws Exception {
+                        generateMemberListWithListUsers(plvsListUsersVO.getUserlist(), true);
+                        //更新聊天室在线人数
+                        PLVChatroomManager.getInstance().setOnlineCount(plvsListUsersVO.getCount());
+                    }
+                })
                 .compose(new PLVRxBaseTransformer<PLVListUsersVO, PLVListUsersVO>())
                 .subscribe(new Consumer<PLVListUsersVO>() {
                     @Override
                     public void accept(PLVListUsersVO plvsListUsersVO) throws Exception {
-                        //更新聊天室在线人数
-                        PLVChatroomManager.getInstance().setOnlineCount(plvsListUsersVO.getCount());
-                        generateMemberListWithListUsers(plvsListUsersVO.getUserlist(), true);
                         //请求连麦列表api
                         requestLinkMicListApiTimer();
                         //定时请求在线列表api
@@ -1250,13 +1258,13 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         return PLVChatApiRequestHelper.getListUsers(roomId, DEFAULT_MEMBER_PAGE, DEFAULT_MEMBER_LENGTH).retry(1);
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(new Consumer<PLVListUsersVO>() {
                     @Override
                     public void accept(PLVListUsersVO plvsListUsersVO) throws Exception {
+                        generateMemberListWithListUsers(plvsListUsersVO.getUserlist(), false);
                         //更新聊天室在线人数
                         PLVChatroomManager.getInstance().setOnlineCount(plvsListUsersVO.getCount());
-                        generateMemberListWithListUsers(plvsListUsersVO.getUserlist(), false);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -1295,7 +1303,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             }
             tempMemberList.add(memberItemDataBean);
         }
-        memberList = tempMemberList;
+        memberList.clear();
+        memberList.addAll(tempMemberList);
         //添加讲师的信息
         Runnable addTeacherTask = new Runnable() {
             @Override
@@ -1313,7 +1322,18 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         };
         addTeacherTask.run();
 
-        callUpdateSortMemberList();
+        SortMemberListUtils.sort(memberList);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onUpdateMemberListData(memberList);
+                    }
+                });
+            }
+        });
     }
 
     private void requestLinkMicListApiTimer() {
@@ -1597,35 +1617,37 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     private boolean updateMemberListLinkMicStatus(List<PLVJoinInfoEvent> joinList, List<PLVLinkMicJoinStatus.WaitListBean> waitList) {
         boolean hasChanged = false;
-        for (PLVMemberItemDataBean plvMemberItemDataBean : memberList) {
-            PLVLinkMicItemDataBean linkMicItemDataBean = plvMemberItemDataBean.getLinkMicItemDataBean();
-            if (linkMicItemDataBean == null
-                    || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.IDLE
-                    || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP
-                    || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_INVITATION
-                    || isMyLinkMicId(linkMicItemDataBean.getLinkMicId())) {
-                continue;
-            }
-            String linkMicId = linkMicItemDataBean.getLinkMicId();
-            boolean isExitLinkMicList = false;
-            for (PLVJoinInfoEvent joinInfoEvent : joinList) {
-                if (linkMicId != null && linkMicId.equals(joinInfoEvent.getUserId())) {
-                    isExitLinkMicList = true;
-                    break;
+        synchronized (memberList) {
+            for (PLVMemberItemDataBean plvMemberItemDataBean : memberList) {
+                PLVLinkMicItemDataBean linkMicItemDataBean = plvMemberItemDataBean.getLinkMicItemDataBean();
+                if (linkMicItemDataBean == null
+                        || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.IDLE
+                        || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_HAND_UP
+                        || linkMicItemDataBean.getStatus() == PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_INVITATION
+                        || isMyLinkMicId(linkMicItemDataBean.getLinkMicId())) {
+                    continue;
                 }
-            }
-            if (!isExitLinkMicList) {
-                for (PLVLinkMicJoinStatus.WaitListBean waitListBean : waitList) {
-                    if (linkMicId != null && linkMicId.equals(waitListBean.getUserId())) {
+                String linkMicId = linkMicItemDataBean.getLinkMicId();
+                boolean isExitLinkMicList = false;
+                for (PLVJoinInfoEvent joinInfoEvent : joinList) {
+                    if (linkMicId != null && linkMicId.equals(joinInfoEvent.getUserId())) {
                         isExitLinkMicList = true;
                         break;
                     }
                 }
-            }
-            if (!isExitLinkMicList) {
-                linkMicItemDataBean.setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
-                rtcJoinMap.remove(linkMicItemDataBean.getLinkMicId());
-                hasChanged = true;
+                if (!isExitLinkMicList) {
+                    for (PLVLinkMicJoinStatus.WaitListBean waitListBean : waitList) {
+                        if (linkMicId != null && linkMicId.equals(waitListBean.getUserId())) {
+                            isExitLinkMicList = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isExitLinkMicList) {
+                    linkMicItemDataBean.setStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
+                    rtcJoinMap.remove(linkMicItemDataBean.getLinkMicId());
+                    hasChanged = true;
+                }
             }
         }
         return hasChanged;
@@ -1823,9 +1845,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Nullable
     private String findChannelTeacherUserId() {
-        for (PLVMemberItemDataBean memberItemDataBean : memberList) {
-            if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(memberItemDataBean.getSocketUserBean().getUserType())) {
-                return memberItemDataBean.getSocketUserBean().getUserId();
+        synchronized (memberList) {
+            for (PLVMemberItemDataBean memberItemDataBean : memberList) {
+                if (PLVSocketUserConstant.USERTYPE_TEACHER.equals(memberItemDataBean.getSocketUserBean().getUserType())) {
+                    return memberItemDataBean.getSocketUserBean().getUserId();
+                }
             }
         }
         return null;
@@ -1858,13 +1882,15 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     private Pair<Integer, PLVMemberItemDataBean> getMemberItemByOnlyLinkMicId(String linkMicId) {
-        for (int i = 0; i < memberList.size(); i++) {
-            PLVMemberItemDataBean memberItemDataBean = memberList.get(i);
-            PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
-            if (linkMicItemDataBean != null) {
-                String linkMicIdForIndex = linkMicItemDataBean.getLinkMicId();
-                if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
-                    return new Pair<>(i, memberItemDataBean);
+        synchronized (memberList) {
+            for (int i = 0; i < memberList.size(); i++) {
+                PLVMemberItemDataBean memberItemDataBean = memberList.get(i);
+                PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
+                if (linkMicItemDataBean != null) {
+                    String linkMicIdForIndex = linkMicItemDataBean.getLinkMicId();
+                    if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
+                        return new Pair<>(i, memberItemDataBean);
+                    }
                 }
             }
         }
@@ -1872,13 +1898,15 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     private Pair<Integer, PLVMemberItemDataBean> getMemberItemByOnlyUserId(String userId) {
-        for (int i = 0; i < memberList.size(); i++) {
-            PLVMemberItemDataBean memberItemDataBean = memberList.get(i);
-            PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
-            if (socketUserBean != null) {
-                String userIdForIndex = socketUserBean.getUserId();
-                if (userId != null && userId.equals(userIdForIndex)) {
-                    return new Pair<>(i, memberItemDataBean);
+        synchronized (memberList) {
+            for (int i = 0; i < memberList.size(); i++) {
+                PLVMemberItemDataBean memberItemDataBean = memberList.get(i);
+                PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
+                if (socketUserBean != null) {
+                    String userIdForIndex = socketUserBean.getUserId();
+                    if (userId != null && userId.equals(userIdForIndex)) {
+                        return new Pair<>(i, memberItemDataBean);
+                    }
                 }
             }
         }
