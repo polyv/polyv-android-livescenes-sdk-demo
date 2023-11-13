@@ -151,6 +151,8 @@ public interface IPLVStreamerContract {
         /**
          * 更新成员列表中的socket用户信息
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onUpdateSocketUserData(int pos);
@@ -158,6 +160,8 @@ public interface IPLVStreamerContract {
         /**
          * 添加成员列表数据
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onAddMemberListData(int pos);
@@ -165,6 +169,8 @@ public interface IPLVStreamerContract {
         /**
          * 移除成员列表数据
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onRemoveMemberListData(int pos);

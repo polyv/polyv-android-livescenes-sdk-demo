@@ -2,11 +2,13 @@ package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
@@ -14,6 +16,7 @@ import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.linkmic.model.PLVJoinRequestSEvent;
@@ -33,7 +36,6 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
 import com.plv.socket.event.ppt.PLVOnSliceStartEvent;
-import com.plv.socket.impl.PLVSocketMessageObserver;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -41,8 +43,11 @@ import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import io.socket.client.Socket;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 推流和连麦的信息处理器
@@ -51,16 +56,21 @@ public class PLVStreamerMsgHandler {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVStreamerMsgHandler";
     private static final String LINK_MIC_TYPE_AUDIO = "audio";
+    //聊天信息处理间隔
+    private static final int CHAT_MESSAGE_TIMESPAN = 500;
+    private static final int MESSAGE_BUFFER__COUNT = 500;
 
     private final PLVStreamerPresenter streamerPresenter;
 
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
-    private PLVSocketMessageObserver.OnMessageListener onMessageListener;
 
     private PLVSStreamerEventListener linkMicEventHandler;
 
     @Nullable
     private String lastFirstScreenUserId;
+
+    //登录登出信息处理的disposable
+    private Disposable messageDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -76,7 +86,9 @@ public class PLVStreamerMsgHandler {
 
     public void destroy() {
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnConnectStatusListener(onConnectStatusListener);
-        PolyvSocketWrapper.getInstance().getSocketObserver().removeOnMessageListener(onMessageListener);
+        if (messageDisposable != null) {
+            messageDisposable.dispose();
+        }
 
         streamerPresenter.getStreamerManager().removeEventHandler(linkMicEventHandler);
     }
@@ -93,215 +105,286 @@ public class PLVStreamerMsgHandler {
                 }
             }
         };
-        onMessageListener = new PLVSocketMessageObserver.OnMessageListener() {
-            @Override
-            public void onMessage(String listenEvent, String event, String message) {
-                switch (event) {
-                    //禁言事件
-                    case PLVBanIpEvent.EVENT:
-                        PLVBanIpEvent banIpEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVBanIpEvent.class);
-                        acceptBanIpEvent(banIpEvent);
-                        break;
-                    //解除禁言事件
-                    case PLVUnshieldEvent.EVENT:
-                        PLVUnshieldEvent unshieldEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVUnshieldEvent.class);
-                        acceptUnshieldEvent(unshieldEvent);
-                        break;
-                    //设置昵称事件
-                    case PLVSetNickEvent.EVENT:
-                        PLVSetNickEvent setNickEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVSetNickEvent.class);
-                        acceptSetNickEvent(setNickEvent);
-                        break;
-                    //踢出用户事件
-                    case PLVKickEvent.EVENT:
-                        PLVKickEvent kickEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVKickEvent.class);
-                        acceptKickEvent(kickEvent);
-                        break;
-                    //用户登录事件
-                    case PLVLoginEvent.EVENT:
-                        PLVLoginEvent loginEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVLoginEvent.class);
-                        acceptLoginEvent(loginEvent);
-                        break;
-                    //用户登出事件
-                    case PLVLogoutEvent.EVENT:
-                        PLVLogoutEvent logoutEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVLogoutEvent.class);
-                        acceptLogoutEvent(logoutEvent);
-                        break;
-                    //sessionId事件
-                    case PLVOnSliceIDEvent.EVENT:
-                        PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceIDEvent.class);
-                        acceptOnSliceIDEvent(onSliceIDEvent);
-                        break;
-                    case PLVEventConstant.Ppt.ON_SLICE_START_EVENT:
-                        PLVOnSliceStartEvent onSliceStartEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceStartEvent.class);
-                        acceptOnSliceStartEvent(onSliceStartEvent);
-                        break;
-                    //用户请求连麦事件
-                    case PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT:
-                        PLVJoinRequestSEvent joinRequestSEvent = PLVGsonUtil.fromJson(PLVJoinRequestSEvent.class, message);
-                        acceptJoinRequestSEvent(joinRequestSEvent);
-                        break;
-                    //用户离开连麦事件
-                    case PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT:
-                        PLVJoinLeaveSEvent joinLeaveSEvent = PLVGsonUtil.fromJson(PLVJoinLeaveSEvent.class, message);
-                        acceptJoinLeaveSEvent(joinLeaveSEvent);
-                        break;
-                    //嘉宾同意/拒绝连麦事件
-                    case PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT:
-                        PLVJoinAnswerSEvent joinAnswerSEvent = PLVGsonUtil.fromJson(PLVJoinAnswerSEvent.class, message);
-                        acceptJoinAnswerSEvent(joinAnswerSEvent);
-                        break;
-                    case PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT:
-                        PLVJoinResponseSEvent joinResponseSEvent = PLVGsonUtil.fromJson(PLVJoinResponseSEvent.class, message);
-                        acceptJoinResponseEvent(joinResponseSEvent);
-                        break;
-                    case PLVEventConstant.LinkMic.TEACHER_SET_PERMISSION:
-                        PLVPPTAuthentic authentic = PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message);
-                        acceptTeacherSetPermissionEvent(authentic);
-                        break;
-                    //嘉宾被禁用观众视频或麦克风
-                    case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
-                        PLVLinkMicMedia micMedia = PLVGsonUtil.fromJson(PLVLinkMicMedia.class, message);
-                        if (micMedia != null) {
-                            boolean isMute = micMedia.isMute();
-                            boolean isAudio = LINK_MIC_TYPE_AUDIO.equals(micMedia.getType());
-                            streamerPresenter.callUpdateGuestMediaStatus(isMute, isAudio);
+
+        messageDisposable = PLVRxBus.get().toObservable(PLVSocketMessage.class)
+                .buffer(CHAT_MESSAGE_TIMESPAN, TimeUnit.MILLISECONDS, MESSAGE_BUFFER__COUNT)//500ms更新一次数据，避免聊天信息刷得太频繁
+                .observeOn(Schedulers.computation())
+                .subscribe(new Consumer<List<PLVSocketMessage>>() {
+                    @Override
+                    public void accept(List<PLVSocketMessage> chatroomMessages) throws Exception {
+                        boolean hasUpdateMemberList = false;
+                        for (PLVSocketMessage socketMessage : chatroomMessages) {
+                            final String message = socketMessage.getMessage();
+                            String event = socketMessage.getEvent();
+                            String listenEvent = socketMessage.getListenEvent();
+
+                            switch (event) {
+                                //禁言事件
+                                case PLVBanIpEvent.EVENT:
+                                    PLVBanIpEvent banIpEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVBanIpEvent.class);
+                                    hasUpdateMemberList = acceptBanIpEvent(banIpEvent) || hasUpdateMemberList;
+                                    break;
+                                //解除禁言事件
+                                case PLVUnshieldEvent.EVENT:
+                                    PLVUnshieldEvent unshieldEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVUnshieldEvent.class);
+                                    hasUpdateMemberList = acceptUnshieldEvent(unshieldEvent) || hasUpdateMemberList;
+                                    break;
+                                //设置昵称事件
+                                case PLVSetNickEvent.EVENT:
+                                    PLVSetNickEvent setNickEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVSetNickEvent.class);
+                                    hasUpdateMemberList = acceptSetNickEvent(setNickEvent) || hasUpdateMemberList;
+                                    break;
+                                //踢出用户事件
+                                case PLVKickEvent.EVENT:
+                                    PLVKickEvent kickEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVKickEvent.class);
+                                    hasUpdateMemberList = acceptKickEvent(kickEvent) || hasUpdateMemberList;
+                                    break;
+                                //用户登录事件
+                                case PLVLoginEvent.EVENT:
+                                    PLVLoginEvent loginEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVLoginEvent.class);
+                                    hasUpdateMemberList = acceptLoginEvent(loginEvent) || hasUpdateMemberList;
+                                    break;
+                                //用户登出事件
+                                case PLVLogoutEvent.EVENT:
+                                    PLVLogoutEvent logoutEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVLogoutEvent.class);
+                                    hasUpdateMemberList = acceptLogoutEvent(logoutEvent) || hasUpdateMemberList;
+                                    break;
+                                //sessionId事件
+                                case PLVOnSliceIDEvent.EVENT:
+                                    final PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceIDEvent.class);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptOnSliceIDEvent(onSliceIDEvent);
+                                        }
+                                    });
+                                    break;
+                                case PLVEventConstant.Ppt.ON_SLICE_START_EVENT:
+                                    final PLVOnSliceStartEvent onSliceStartEvent = PLVEventHelper.toEventModel(listenEvent, event, message, PLVOnSliceStartEvent.class);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptOnSliceStartEvent(onSliceStartEvent);
+                                        }
+                                    });
+                                    break;
+                                //用户请求连麦事件
+                                case PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT:
+                                    final PLVJoinRequestSEvent joinRequestSEvent = PLVGsonUtil.fromJson(PLVJoinRequestSEvent.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptJoinRequestSEvent(joinRequestSEvent);
+                                        }
+                                    });
+                                    break;
+                                //用户离开连麦事件
+                                case PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT:
+                                    final PLVJoinLeaveSEvent joinLeaveSEvent = PLVGsonUtil.fromJson(PLVJoinLeaveSEvent.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptJoinLeaveSEvent(joinLeaveSEvent);
+                                        }
+                                    });
+                                    break;
+                                //嘉宾同意/拒绝连麦事件
+                                case PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT:
+                                    final PLVJoinAnswerSEvent joinAnswerSEvent = PLVGsonUtil.fromJson(PLVJoinAnswerSEvent.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptJoinAnswerSEvent(joinAnswerSEvent);
+                                        }
+                                    });
+                                    break;
+                                case PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT:
+                                    final PLVJoinResponseSEvent joinResponseSEvent = PLVGsonUtil.fromJson(PLVJoinResponseSEvent.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptJoinResponseEvent(joinResponseSEvent);
+                                        }
+                                    });
+                                    break;
+                                case PLVEventConstant.LinkMic.TEACHER_SET_PERMISSION:
+                                    final PLVPPTAuthentic authentic = PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            acceptTeacherSetPermissionEvent(authentic);
+                                        }
+                                    });
+                                    break;
+                                //嘉宾被禁用观众视频或麦克风
+                                case PLVEventConstant.LinkMic.EVENT_MUTE_USER_MICRO:
+                                    final PLVLinkMicMedia micMedia = PLVGsonUtil.fromJson(PLVLinkMicMedia.class, message);
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (micMedia != null) {
+                                                boolean isMute = micMedia.isMute();
+                                                boolean isAudio = LINK_MIC_TYPE_AUDIO.equals(micMedia.getType());
+                                                streamerPresenter.callUpdateGuestMediaStatus(isMute, isAudio);
+                                            }
+                                        }
+                                    });
+                                    break;
+                                // 第一画面切换
+                                case PLVEventConstant.Class.SE_SWITCH_MESSAGE:
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateFirstScreen(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
+                                        }
+                                    });
+                                    break;
+                                // PPT白板和摄像头画面切换
+                                case PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE:
+                                    hasUpdateMemberList = sortMemberListAndCallback(hasUpdateMemberList, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateDocumentStreamerViewPosition(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                        break;
-                    // 第一画面切换
-                    case PLVEventConstant.Class.SE_SWITCH_MESSAGE:
-                        updateFirstScreen(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
-                        break;
-                    // PPT白板和摄像头画面切换
-                    case PLVEventConstant.Class.SE_SWITCH_PPT_MESSAGE:
-                        updateDocumentStreamerViewPosition(PLVGsonUtil.fromJson(PLVPPTAuthentic.class, message));
-                        break;
-                    default:
-                }
-            }
-        };
+                        if (hasUpdateMemberList) {
+                            sortMemberListAndCallback(true, null);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnConnectStatusListener(onConnectStatusListener);
-        PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(onMessageListener,
-                PLVEventConstant.LinkMic.JOIN_REQUEST_EVENT,
-                PLVEventConstant.LinkMic.JOIN_RESPONSE_EVENT,
-                PLVEventConstant.LinkMic.JOIN_SUCCESS_EVENT,
-                PLVEventConstant.LinkMic.JOIN_LEAVE_EVENT,
-                PLVEventConstant.LinkMic.JOIN_ANSWER_EVENT,
-                PLVEventConstant.Class.SE_SWITCH_MESSAGE,
-                Socket.EVENT_MESSAGE);
     }
 
-    private void acceptBanIpEvent(PLVBanIpEvent banIpEvent) {
+    private boolean sortMemberListAndCallback(boolean hasUpdateMemberList, final Runnable runnable) {
+        if (hasUpdateMemberList) {
+            PLVStreamerPresenter.SortMemberListUtils.sort(streamerPresenter.memberList);
+            streamerPresenter.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                            view.onUpdateMemberListData(streamerPresenter.memberList);
+                        }
+                    });
+                    if (runnable != null) {
+                        runnable.run();
+                    }
+                }
+            });
+        } else {
+            if (runnable != null) {
+                streamerPresenter.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        runnable.run();
+                    }
+                });
+            }
+        }
+        // always false
+        return false;
+    }
+
+    private boolean acceptBanIpEvent(PLVBanIpEvent banIpEvent) {
         if (banIpEvent != null) {
             List<PLVSocketUserBean> shieldUsers = banIpEvent.getUserIds();
             if (shieldUsers == null) {
-                return;
+                return false;
             }
             for (PLVSocketUserBean socketUserBean : shieldUsers) {
                 final Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(socketUserBean.getUserId());
                 if (item != null) {
                     PLVSocketUserBean socketUserBeanForItem = item.second.getSocketUserBean();
                     socketUserBeanForItem.setBanned(true);
-                    streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                        @Override
-                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                            view.onUpdateSocketUserData(item.first);
-                        }
-                    });
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    private void acceptUnshieldEvent(PLVUnshieldEvent unshieldEvent) {
+    private boolean acceptUnshieldEvent(PLVUnshieldEvent unshieldEvent) {
         if (unshieldEvent != null) {
             List<PLVSocketUserBean> unShieldUsers = unshieldEvent.getUserIds();
             if (unShieldUsers == null) {
-                return;
+                return false;
             }
             for (PLVSocketUserBean socketUserBean : unShieldUsers) {
                 final Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(socketUserBean.getUserId());
                 if (item != null) {
                     PLVSocketUserBean socketUserBeanForItem = item.second.getSocketUserBean();
                     socketUserBeanForItem.setBanned(false);
-                    streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                        @Override
-                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                            view.onUpdateSocketUserData(item.first);
-                        }
-                    });
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    private void acceptSetNickEvent(PLVSetNickEvent setNickEvent) {
+    private boolean acceptSetNickEvent(PLVSetNickEvent setNickEvent) {
         if (setNickEvent != null && PLVSetNickEvent.STATUS_SUCCESS.equals(setNickEvent.getStatus())) {
             final Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(setNickEvent.getUserId());
             if (item != null) {
                 PLVSocketUserBean socketUserBean = item.second.getSocketUserBean();
                 socketUserBean.setNick(setNickEvent.getNick());
-                streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onUpdateSocketUserData(item.first);
-                    }
-                });
+                return true;
             }
         }
+        return false;
     }
 
-    private void acceptKickEvent(PLVKickEvent kickEvent) {
+    private boolean acceptKickEvent(PLVKickEvent kickEvent) {
         if (kickEvent != null && kickEvent.getUser() != null) {
             final Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(kickEvent.getUser().getUserId());
             if (item != null) {
                 streamerPresenter.memberList.remove(item.second);
-                streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onRemoveMemberListData(item.first);
-                    }
-                });
+                return true;
             }
         }
+        return false;
     }
 
-    private void acceptLoginEvent(PLVLoginEvent loginEvent) {
+    private boolean acceptLoginEvent(PLVLoginEvent loginEvent) {
         if (loginEvent != null && loginEvent.getUser() != null) {
             if (PLVSocketUserConstant.USERSOURCE_CHATROOM.equals(loginEvent.getUser().getUserSource())) {
-                return;//过滤"userSource":"chatroom"的用户
+                return false;//过滤"userSource":"chatroom"的用户
+            }
+            if (streamerPresenter.memberList.size() >= PLVStreamerPresenter.MEMBER_MAX_LENGTH) {
+                return false;
             }
             Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(loginEvent.getUser().getUserId());
             if (item != null) {
-                return;
+                return false;
             }
             PLVMemberItemDataBean memberItemDataBean = new PLVMemberItemDataBean();
             memberItemDataBean.setSocketUserBean(loginEvent.getUser());
             streamerPresenter.memberList.add(memberItemDataBean);
-            PLVStreamerPresenter.SortMemberListUtils.sort(streamerPresenter.memberList);
-            final Pair<Integer, PLVMemberItemDataBean> newItem = streamerPresenter.getMemberItemWithUserId(loginEvent.getUser().getUserId());
-            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                    view.onAddMemberListData(newItem.first);
-                }
-            });
+            return true;
         }
+        return false;
     }
 
-    private void acceptLogoutEvent(PLVLogoutEvent logoutEvent) {
+    private boolean acceptLogoutEvent(PLVLogoutEvent logoutEvent) {
         if (logoutEvent != null) {
             final Pair<Integer, PLVMemberItemDataBean> item = streamerPresenter.getMemberItemWithUserId(logoutEvent.getUserId());
             if (item != null) {
                 streamerPresenter.memberList.remove(item.second);
-                streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onRemoveMemberListData(item.first);
-                    }
-                });
+                return true;
             }
         }
+        return false;
     }
 
     private void acceptOnSliceIDEvent(PLVOnSliceIDEvent onSliceIDEvent) {
@@ -591,34 +674,36 @@ public class PLVStreamerMsgHandler {
             @Override
             public void onRemoteAudioVolumeIndication(PLVAudioVolumeInfo[] speakers) {
                 super.onRemoteAudioVolumeIndication(speakers);
-                for (PLVMemberItemDataBean memberItemDataBean : streamerPresenter.memberList) {
-                    @Nullable PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
-                    if (linkMicItemDataBean == null) {
-                        continue;
-                    }
-                    String linkMicId = linkMicItemDataBean.getLinkMicId();
-                    if (linkMicId == null || linkMicId.equals(streamerPresenter.getStreamerManager().getLinkMicUid())) {
-                        continue;
-                    }
-                    boolean hitInVolumeInfoList = false;
-                    for (PLVAudioVolumeInfo audioVolumeInfo : speakers) {
-                        if (linkMicId.equals(audioVolumeInfo.getUid())) {
-                            hitInVolumeInfoList = true;
-                            //如果总音量不为0，那么设置当前音量，以PLVLinkMicItemDataBean.MAX_VOLUME作为最大值
-                            linkMicItemDataBean.setCurVolume(audioVolumeInfo.getVolume());
-                            break;
+                synchronized (streamerPresenter.memberList) {
+                    for (PLVMemberItemDataBean memberItemDataBean : streamerPresenter.memberList) {
+                        @Nullable PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
+                        if (linkMicItemDataBean == null) {
+                            continue;
+                        }
+                        String linkMicId = linkMicItemDataBean.getLinkMicId();
+                        if (linkMicId == null || linkMicId.equals(streamerPresenter.getStreamerManager().getLinkMicUid())) {
+                            continue;
+                        }
+                        boolean hitInVolumeInfoList = false;
+                        for (PLVAudioVolumeInfo audioVolumeInfo : speakers) {
+                            if (linkMicId.equals(audioVolumeInfo.getUid())) {
+                                hitInVolumeInfoList = true;
+                                //如果总音量不为0，那么设置当前音量，以PLVLinkMicItemDataBean.MAX_VOLUME作为最大值
+                                linkMicItemDataBean.setCurVolume(audioVolumeInfo.getVolume());
+                                break;
+                            }
+                        }
+                        if (!hitInVolumeInfoList) {
+                            linkMicItemDataBean.setCurVolume(0);
                         }
                     }
-                    if (!hitInVolumeInfoList) {
-                        linkMicItemDataBean.setCurVolume(0);
-                    }
+                    streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                        @Override
+                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                            view.onRemoteUserVolumeChanged(streamerPresenter.memberList);
+                        }
+                    });
                 }
-                streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onRemoteUserVolumeChanged(streamerPresenter.memberList);
-                    }
-                });
             }
 
             @Override

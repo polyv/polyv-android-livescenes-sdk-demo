@@ -40,6 +40,7 @@ import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -61,6 +62,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
 
     //dataList
     private List<PLVMemberItemDataBean> dataList;
+    private List<PLVMemberItemDataBean> srcDataList;
     //streamerStatus
     private boolean isStartedStatus;
     //初始打开连麦列表，当列表中存在非特殊身份用户时，显示左滑菜单，3秒后恢复原位
@@ -370,16 +372,23 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     // <editor-fold defaultstate="collapsed" desc="对外API">
     //更新所有数据
     public void update(List<PLVMemberItemDataBean> dataList) {
-        this.dataList = dataList;
+        this.srcDataList = dataList;
+        this.dataList = new ArrayList<>(dataList);
         notifyDataSetChanged();
     }
 
     //移除指定userId的数据
     public int removeData(String userId) {
-        for (int i = 1; i < dataList.size(); i++) {
-            PLVSocketUserBean socketUserBean = dataList.get(i).getSocketUserBean();
+        int pos = removeData(userId, dataList);
+        removeData(userId, srcDataList);
+        return pos;
+    }
+
+    private int removeData(String userId, List<PLVMemberItemDataBean> dataBeans) {
+        for (int i = 1; i < dataBeans.size(); i++) {
+            PLVSocketUserBean socketUserBean = dataBeans.get(i).getSocketUserBean();
             if (userId != null && userId.equals(socketUserBean.getUserId())) {
-                dataList.remove(i);
+                dataBeans.remove(i);
                 return i;
             }
         }
