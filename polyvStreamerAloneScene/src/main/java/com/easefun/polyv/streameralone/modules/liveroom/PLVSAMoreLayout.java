@@ -259,12 +259,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         mixLayout = new PLVSAMixLayout(getContext());
         mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
             @Override
-            public int getMixInfo() {
-                return streamerPresenter != null ? streamerPresenter.getMixLayoutType() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return streamerPresenter != null ? streamerPresenter.getMixLayoutType() : PLVStreamerConfig.MixLayoutType.TILE;
             }
 
             @Override
-            public void onMixClick(int mix) {
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 mixLayout.close();
                 if (streamerPresenter != null) {
                     streamerPresenter.setMixLayoutType(mix);

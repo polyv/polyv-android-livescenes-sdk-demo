@@ -54,6 +54,7 @@ import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.streamer.IPLVStreamerManager;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -260,7 +261,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
-    public void setMixLayout(int mixLayout) {
+    public void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout) {
         streamerPresenter.setMixLayoutType(mixLayout);
     }
 
@@ -270,7 +271,7 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
-    public int getMixInfo() {
+    public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
         return streamerPresenter.getMixLayoutType();
     }
 

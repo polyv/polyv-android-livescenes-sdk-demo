@@ -64,6 +64,7 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -473,8 +474,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
-            public int getMixInfo() {
-                return streamerLayout.getMixInfo();
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return streamerLayout.getMixLayoutType();
             }
 
             @Override
@@ -483,8 +484,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onMixClick(int mix) {
-                streamerLayout.setMixLayout(mix);
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
+                streamerLayout.setMixLayoutType(mix);
             }
 
             @Override

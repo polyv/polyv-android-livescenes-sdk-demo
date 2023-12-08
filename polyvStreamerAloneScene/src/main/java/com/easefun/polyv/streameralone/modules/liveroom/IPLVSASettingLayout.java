@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
 /**
  * 设置页布局的接口定义
@@ -108,7 +109,7 @@ public interface IPLVSASettingLayout {
          *
          * @return 混流布局信息
          */
-        int getMixInfo();
+        PLVStreamerConfig.MixLayoutType getMixLayoutType();
 
         /**
          * 切换码率
@@ -122,7 +123,7 @@ public interface IPLVSASettingLayout {
          *
          * @param mix 混流布局
          */
-        void onMixClick(int mix);
+        void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
 
         /**
          * 获取推流Presenter

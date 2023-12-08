@@ -60,6 +60,7 @@ import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.livescenes.streamer.IPLVStreamerManager;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -334,6 +335,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         linkMicInvitationLayout.setIsOnlyAudio(liveRoomDataManager.isOnlyAudio());
 
         observePushResolutionRatio();
+
+        updateOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
     }
 
     @Override
@@ -380,7 +383,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
-    public void setMixLayout(int mixLayout) {
+    public void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout) {
         streamerPresenter.setMixLayoutType(mixLayout);
     }
 
@@ -390,7 +393,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
-    public int getMixInfo() {
+    public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
         return streamerPresenter.getMixLayoutType();
     }
 
@@ -1025,7 +1028,12 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        updateOnOrientationChanged(isLandscape);
+    }
+
+    private void updateOnOrientationChanged(boolean isLandscape) {
+        if (isLandscape) {
             streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE);
         } else {
             streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);

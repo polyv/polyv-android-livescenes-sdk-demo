@@ -52,4 +52,14 @@
     <string name="plvls_login_streamer_error_actor_is_empty" translatable="false">actor 为空，启动手机开播三分屏页失败！</string>
     <string name="plvls_login_streamer_error_user_type_is_empty" translatable="false">userType 为空，启动手机开播三分屏页失败！</string>
     <string name="plvls_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播三分屏页失败！</string>
+
+    <string name="plvls_live_channel_info_copy_sip_phone_number_success_toast">复制电话连麦号码成功</string>
+    <string name="plvls_live_channel_info_sip_phone_number_text">电话连麦号码 {}</string>
+
+    <string name="plvls_live_member_count_hint_text">成员</string>
+    <string name="plvls_live_member_sip_text">电话连麦</string>
+    <string name="plvls_live_member_sip_calling_in_count_text">待接通({})</string>
+    <string name="plvls_live_member_sip_calling_out_count_text">呼叫中({})</string>
+    <string name="plvls_live_member_sip_connected_count_text">已接通({})</string>
+
 </resources>

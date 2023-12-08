@@ -409,8 +409,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(viewHolder.qualityWidget.getLayoutParams());
                 //切换到主屏幕的时候，不要显示view holder的昵称和麦克风
                 if (newWidth != getItemWidth()) {
-                    viewHolder.tvNick.setVisibility(View.GONE);
-                    viewHolder.ivMicState.setVisibility(View.GONE);
+                    viewHolder.tvNick.setVisibility(viewHolder.showNickInMainScreen ? View.VISIBLE : View.GONE);
+                    viewHolder.ivMicState.setVisibility(viewHolder.showNickInMainScreen ? View.VISIBLE : View.GONE);
                     v.post(new Runnable() {
                         @Override
                         public void run() {
@@ -478,6 +478,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         boolean isGuest = itemDataBean.isGuest();
         boolean isFirstScreen = firstScreenLinkMicId.equals(linkMicId);
         boolean isSelf = myLinkMicId.equals(linkMicId);
+
+        holder.showNickInMainScreen = !isTeacher;
 
         if (isPausing) {
             // 暂停时显示默认的占位图
@@ -867,6 +869,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private boolean isViewRecycled = false;
 
         private boolean isRenderViewSetup = false;
+        // renderView显示在主屏幕时，是否显示昵称
+        private boolean showNickInMainScreen = true;
 
         public LinkMicItemViewHolder(View itemView) {
             super(itemView);

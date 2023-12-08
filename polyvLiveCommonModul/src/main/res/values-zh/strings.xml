@@ -487,6 +487,7 @@
     <string name="plv_common_dialog_setting">设置</string>
     <string name="plv_common_dialog_confirm_4">我知道了</string>
     <string name="plv_common_dialog_confirm_5">知道了</string>
+    <string name="plv_common_text_copy">复制</string>
 
     <!--美颜-->
     <string name="plv_beauty_whiten">美白</string>
