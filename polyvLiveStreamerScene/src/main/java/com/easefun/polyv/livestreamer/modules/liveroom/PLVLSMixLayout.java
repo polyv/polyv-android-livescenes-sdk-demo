@@ -74,7 +74,7 @@ public class PLVLSMixLayout extends FrameLayout {
         this.channelId = liveRoomDataManager.getConfig().getChannelId();
     }
 
-    public void updateData(final int currentSelectedMix) {
+    public void updateData(final PLVStreamerConfig.MixLayoutType currentSelectedMix) {
         mixAdapter.updateData(currentSelectedMix);
     }
 
@@ -83,11 +83,11 @@ public class PLVLSMixLayout extends FrameLayout {
     }
 
     private class MixAdapter extends RecyclerView.Adapter<MixAdapter.MixViewHolder> {
-        private final LinkedHashMap<Integer, String> MIX_LAYOUT_TYPE_MAP = new LinkedHashMap<Integer, String>() {
+        private final LinkedHashMap<PLVStreamerConfig.MixLayoutType, String> MIX_LAYOUT_TYPE_MAP = new LinkedHashMap<PLVStreamerConfig.MixLayoutType, String>() {
             {
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER, PLVAppUtils.getString(R.string.plv_streamer_mix_type_speaker));
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_tile));
-                put(PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SINGLE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_single));
+                put(PLVStreamerConfig.MixLayoutType.SPEAKER, PLVAppUtils.getString(R.string.plv_streamer_mix_type_speaker));
+                put(PLVStreamerConfig.MixLayoutType.TILE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_tile));
+                put(PLVStreamerConfig.MixLayoutType.SINGLE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_single));
             }
         };
         private int selPosition;
@@ -123,7 +123,7 @@ public class PLVLSMixLayout extends FrameLayout {
                     }
                     selPosition = holder.getAdapterPosition();
                     if (onViewActionListener != null) {
-                        onViewActionListener.onMixClick(getMixKeyByPos(selPosition));
+                        onViewActionListener.onChangeMixLayoutType(getMixKeyByPos(selPosition));
                     }
                     notifyDataSetChanged();
                 }
@@ -135,9 +135,9 @@ public class PLVLSMixLayout extends FrameLayout {
             return MIX_LAYOUT_TYPE_MAP.size();
         }
 
-        public void updateData(int selMix) {
+        public void updateData(PLVStreamerConfig.MixLayoutType selMix) {
             int index = 0;
-            for (Map.Entry<Integer, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
+            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
                 if (entry.getKey() == selMix) {
                     this.selPosition = index;
                     break;
@@ -149,7 +149,7 @@ public class PLVLSMixLayout extends FrameLayout {
 
         private String getMixValueByPos(int pos) {
             int index = 0;
-            for (Map.Entry<Integer, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
+            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
                 if (index == pos) {
                     return entry.getValue();
                 }
@@ -158,15 +158,15 @@ public class PLVLSMixLayout extends FrameLayout {
             return "";
         }
 
-        private int getMixKeyByPos(int pos) {
+        private PLVStreamerConfig.MixLayoutType getMixKeyByPos(int pos) {
             int index = 0;
-            for (Map.Entry<Integer, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
+            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
                 if (index == pos) {
                     return entry.getKey();
                 }
                 index++;
             }
-            return PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            return PLVStreamerConfig.MixLayoutType.TILE;
         }
 
         class MixViewHolder extends RecyclerView.ViewHolder {
@@ -182,7 +182,7 @@ public class PLVLSMixLayout extends FrameLayout {
     }
 
     public interface OnViewActionListener {
-        void onMixClick(int mix);
+        void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
     }
 
 }

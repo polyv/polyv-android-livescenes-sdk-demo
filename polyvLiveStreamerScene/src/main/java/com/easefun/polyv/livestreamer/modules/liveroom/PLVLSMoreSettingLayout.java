@@ -37,6 +37,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
@@ -157,9 +158,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         }
         moreSettingMixLayout.setOnViewActionListener(new PLVLSMixLayout.OnViewActionListener() {
             @Override
-            public void onMixClick(int mix) {
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 if (PLVLSMoreSettingLayout.this.onViewActionListener != null) {
-                    PLVLSMoreSettingLayout.this.onViewActionListener.onMixClick(mix);
+                    PLVLSMoreSettingLayout.this.onViewActionListener.onChangeMixLayoutType(mix);
                 }
             }
         });
@@ -256,7 +257,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             moreSettingBitrateLayout.updateData(onViewActionListener.getBitrateInfo().first, onViewActionListener.getBitrateInfo().second);
         }
         if (onViewActionListener != null) {
-            moreSettingMixLayout.updateData(onViewActionListener.getMixInfo());
+            moreSettingMixLayout.updateData(onViewActionListener.getMixLayoutType());
         }
         showLayout(moreSettingSelectLayout);
 
@@ -410,9 +411,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
 
         void onBitrateClick(int bitrate);
 
-        int getMixInfo();
+        PLVStreamerConfig.MixLayoutType getMixLayoutType();
 
-        void onMixClick(int mix);
+        void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
 
         boolean isCurrentLocalVideoEnable();
 

@@ -47,7 +47,7 @@ public interface IPLVLSStreamerLayout {
      *
      * @param mixLayout 混流布局
      */
-    void setMixLayout(@PLVStreamerConfig.MixStreamType int mixLayout);
+    void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout);
 
     /**
      * 获取推流的码率信息
@@ -61,7 +61,7 @@ public interface IPLVLSStreamerLayout {
      *
      * @return 混流布局信息
      */
-    int getMixInfo();
+    PLVStreamerConfig.MixLayoutType getMixLayoutType();
 
     /**
      * 是否允许录制声音

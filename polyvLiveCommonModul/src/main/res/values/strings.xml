@@ -487,6 +487,7 @@
     <string name="plv_common_dialog_setting">Set Up</string>
     <string name="plv_common_dialog_confirm_4">OK</string>
     <string name="plv_common_dialog_confirm_5">OK</string>
+    <string name="plv_common_text_copy">Copy</string>
 
     <!--美颜-->
     <string name="plv_beauty_whiten">Toning</string>

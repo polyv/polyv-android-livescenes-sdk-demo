@@ -6,8 +6,8 @@ import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModu
 import com.easefun.polyv.livecommon.module.modules.linkmic.di.PLVLinkMicModule;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.di.PLVMultiRoomTransmitModule;
 import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
-import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
 import com.easefun.polyv.livecommon.module.modules.redpack.di.PLVRedpackModule;
+import com.easefun.polyv.livecommon.module.modules.streamer.di.PLVSipLinkMicModule;
 import com.plv.foundationsdk.component.di.PLVDependModule;
 
 /**
@@ -25,6 +25,7 @@ public class PLVCommonModule extends PLVDependModule {
         include(PLVRedpackModule.instance);
         include(PLVLinkMicModule.instance);
         include(PLVBeautyModule.instance);
+        include(PLVSipLinkMicModule.instance);
     }
 
 }

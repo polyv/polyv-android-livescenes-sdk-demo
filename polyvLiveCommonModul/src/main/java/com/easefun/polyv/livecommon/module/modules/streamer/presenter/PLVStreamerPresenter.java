@@ -29,6 +29,7 @@ import com.easefun.polyv.livescenes.streamer.listener.IPLVSStreamerOnLiveStatusC
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
@@ -144,6 +145,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private static final int DEFAULT_MEMBER_LENGTH = 500;
     public static final int MEMBER_MAX_LENGTH = 500;
 
+    // 本地存储的各频道推流布局配置
+    private static final PLVAutoSaveKV<Map<String, PLVStreamerConfig.MixLayoutType>> CHANNEL_MIX_LAYOUT_TYPE_KV = new PLVAutoSaveKV<Map<String, PLVStreamerConfig.MixLayoutType>>("plv_streamer_channel_mix_layout_type") {};
+
     /**** View ****/
     //推流和连麦mvp模式的view
     private List<IPLVStreamerContract.IStreamerView> iStreamerViews;
@@ -186,7 +190,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean isFrontMirror = true;
     private int pushPictureResolution = PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE;
     private PLVLinkMicConstant.PushResolutionRatio pushResolutionRatio = PLVLinkMicConstant.PushResolutionRatio.RATIO_16_9;
-    private int mixLayoutType = PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+    private PLVStreamerConfig.MixLayoutType mixLayoutType = PLVStreamerConfig.MixLayoutType.TILE;
     //开始推流是否需要恢复上一场的直播流，继续推流
     private boolean isRecoverStream = false;
     private float localCameraZoomFactor = 1F;
@@ -223,7 +227,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         channelType = liveRoomDataManager.getConfig().getChannelType();
         streamerData = new PLVStreamerData();
         curBitrate = loadBitrate();
-        mixLayoutType = loadMixLayoutType();
+        initMixLayoutType();
 
         String viewerId = liveRoomDataManager.getConfig().getUser().getViewerId();
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
@@ -579,7 +583,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public void setMixLayoutType(int mixLayoutType) {
+    public void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayoutType) {
         this.mixLayoutType = mixLayoutType;
         if (!isInitStreamerManager()) {
             return;
@@ -589,7 +593,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public int getMixLayoutType() {
+    public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
         return mixLayoutType;
     }
 
@@ -1817,14 +1821,43 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     private void saveMixLayoutType() {
-        String key = "plv_key_mix_layout_type_" + channelType.getValue();
-        SPUtils.getInstance().put(key, mixLayoutType);
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        Map<String, PLVStreamerConfig.MixLayoutType> map = CHANNEL_MIX_LAYOUT_TYPE_KV.get();
+        if (map == null) {
+            map = new HashMap<>();
+        }
+        map.put(channelId, mixLayoutType);
+        CHANNEL_MIX_LAYOUT_TYPE_KV.set(map);
     }
 
-    private int loadMixLayoutType() {
-        String key = "plv_key_mix_layout_type_" + channelType.getValue();
-        int defaultMixLayoutType = channelType == PLVLiveChannelType.PPT ? PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_SPEAKER : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
-        return SPUtils.getInstance().getInt(key, defaultMixLayoutType);
+    private void initMixLayoutType() {
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        // 从本地读取
+        PLVStreamerConfig.MixLayoutType targetMixLayoutType = loadLocalMixLayoutType(channelId);
+        if (targetMixLayoutType != null) {
+            mixLayoutType = targetMixLayoutType;
+            return;
+        }
+        // 从后台配置读取
+        targetMixLayoutType = PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_CHANNEL_DEFAULT_MIX_LAYOUT_TYPE);
+        if (targetMixLayoutType != null) {
+            mixLayoutType = targetMixLayoutType;
+            saveMixLayoutType();
+            return;
+        }
+        // 默认配置
+        targetMixLayoutType = PLVStreamerConfig.MixLayoutType.getDefaultMixLayoutType(channelType);
+        mixLayoutType = targetMixLayoutType;
+        saveMixLayoutType();
+    }
+
+    @Nullable
+    private PLVStreamerConfig.MixLayoutType loadLocalMixLayoutType(String channelId) {
+        Map<String, PLVStreamerConfig.MixLayoutType> map = CHANNEL_MIX_LAYOUT_TYPE_KV.get();
+        if (map == null || !map.containsKey(channelId)) {
+            return null;
+        }
+        return map.get(channelId);
     }
     // </editor-fold>
 

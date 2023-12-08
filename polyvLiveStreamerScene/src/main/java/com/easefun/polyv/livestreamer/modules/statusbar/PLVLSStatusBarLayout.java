@@ -3,6 +3,8 @@ package com.easefun.polyv.livestreamer.modules.statusbar;
 import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -25,6 +27,9 @@ import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumen
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingInListState;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingOutListState;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -40,6 +45,7 @@ import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
 import com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSLinkMicControlButton;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
@@ -49,6 +55,7 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.lang.ref.WeakReference;
@@ -88,6 +95,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // PPT文档布局
     private PLVLSPptListLayout pptListLayout;
+
+    private final PLVSipLinkMicViewModel sipLinkMicViewModel = PLVDependManager.getInstance().get(PLVSipLinkMicViewModel.class);
 
     //view交互事件监听器
     private OnViewActionListener onViewActionListener;
@@ -176,6 +185,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         initDocumentMvpView();
         initOnUserAbilityChangeListener();
 
+        observeSipLinkMicListUpdate();
+
         checkUserDocumentPermission();
     }
 
@@ -236,13 +247,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
-            public int getMixInfo() {
-                return onViewActionListener.getMixInfo();
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return onViewActionListener.getMixLayoutType();
             }
 
             @Override
-            public void onMixClick(int mix) {
-                onViewActionListener.onMixClick(mix);
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
+                onViewActionListener.onChangeMixLayoutType(mix);
             }
 
             @Override
@@ -378,6 +389,32 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
         PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
+
+    private void observeSipLinkMicListUpdate() {
+        sipLinkMicViewModel.getCallingInListStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicCallingInListState>() {
+            @Override
+            public void onChanged(@Nullable PLVSipLinkMicCallingInListState sipLinkMicCallingInListState) {
+                if (sipLinkMicCallingInListState == null || sipLinkMicCallingInListState.callingInViewerList.isEmpty()) {
+                    return;
+                }
+                if (!plvlsStatusBarMemberIv.isSelected()) {
+                    plvlsStatusBarMemberLinkmicRequestTipsIv.setVisibility(VISIBLE);
+                }
+            }
+        });
+        sipLinkMicViewModel.getCallingOutListStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicCallingOutListState>() {
+            @Override
+            public void onChanged(@Nullable PLVSipLinkMicCallingOutListState sipLinkMicCallingOutListState) {
+                if (sipLinkMicCallingOutListState == null || sipLinkMicCallingOutListState.callingOutViewerList.isEmpty()) {
+                    return;
+                }
+                if (!plvlsStatusBarMemberIv.isSelected()) {
+                    plvlsStatusBarMemberLinkmicRequestTipsIv.setVisibility(VISIBLE);
+                }
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现父类IPLVLSStatusBarLayout的方法">
@@ -448,6 +485,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         } else {
             changeStatesToClassOver();
         }
+        sipLinkMicViewModel.requestSipChannelInfo();
     }
 
     @Override

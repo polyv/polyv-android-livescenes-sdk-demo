@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#666666">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/plvls_live_room_sip_list_call_in_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="21dp"
+            android:src="@drawable/plvls_live_room_member_sip_call_in_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/plvls_live_room_sip_list_call_in_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvls_live_room_sip_list_call_in_icon"
+            app:layout_constraintStart_toEndOf="@+id/plvls_live_room_sip_list_call_in_icon"
+            app:layout_constraintTop_toTopOf="@+id/plvls_live_room_sip_list_call_in_icon"
+            tools:text="待接通(0)" />
+
+        <LinearLayout
+            android:id="@+id/plvls_live_room_sip_list_call_in_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/plvls_live_room_sip_list_call_in_icon" />
+
+        <ImageView
+            android:id="@+id/plvls_live_room_sip_list_call_out_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="21dp"
+            android:src="@drawable/plvls_live_room_member_sip_call_out_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvls_live_room_sip_list_call_in_ll" />
+
+        <TextView
+            android:id="@+id/plvls_live_room_sip_list_call_out_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvls_live_room_sip_list_call_out_icon"
+            app:layout_constraintStart_toEndOf="@+id/plvls_live_room_sip_list_call_out_icon"
+            app:layout_constraintTop_toTopOf="@+id/plvls_live_room_sip_list_call_out_icon"
+            tools:text="呼叫中(0)" />
+
+        <LinearLayout
+            android:id="@+id/plvls_live_room_sip_list_call_out_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/plvls_live_room_sip_list_call_out_icon" />
+
+        <ImageView
+            android:id="@+id/plvls_live_room_sip_list_connected_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="21dp"
+            android:src="@drawable/plvls_live_room_member_sip_connected_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvls_live_room_sip_list_call_out_ll" />
+
+        <TextView
+            android:id="@+id/plvls_live_room_sip_list_connected_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="#F0F1F5"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvls_live_room_sip_list_connected_icon"
+            app:layout_constraintStart_toEndOf="@+id/plvls_live_room_sip_list_connected_icon"
+            app:layout_constraintTop_toTopOf="@+id/plvls_live_room_sip_list_connected_icon"
+            tools:text="已接通(0)" />
+
+        <LinearLayout
+            android:id="@+id/plvls_live_room_sip_list_connected_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/plvls_live_room_sip_list_connected_icon" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>
