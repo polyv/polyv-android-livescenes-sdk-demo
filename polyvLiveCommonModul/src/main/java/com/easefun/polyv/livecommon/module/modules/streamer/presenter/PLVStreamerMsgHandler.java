@@ -1,10 +1,11 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter;
 
+import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import android.util.Pair;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -12,6 +13,7 @@ import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.ui.widget.PLVCountdownToast;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livescenes.streamer.listener.PLVSStreamerEventListener;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
@@ -40,12 +42,14 @@ import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -66,11 +70,14 @@ public class PLVStreamerMsgHandler {
 
     private PLVSStreamerEventListener linkMicEventHandler;
 
+    private boolean isJoinChannelSuccess;
+
     @Nullable
     private String lastFirstScreenUserId;
 
     //登录登出信息处理的disposable
     private Disposable messageDisposable;
+    private Disposable forceHangUpDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -88,6 +95,9 @@ public class PLVStreamerMsgHandler {
         PolyvSocketWrapper.getInstance().getSocketObserver().removeOnConnectStatusListener(onConnectStatusListener);
         if (messageDisposable != null) {
             messageDisposable.dispose();
+        }
+        if (forceHangUpDisposable != null) {
+            forceHangUpDisposable.dispose();
         }
 
         streamerPresenter.getStreamerManager().removeEventHandler(linkMicEventHandler);
@@ -605,6 +615,18 @@ public class PLVStreamerMsgHandler {
             }
         });
     }
+
+    private void handleGuestForceHangUp() {
+        forceHangUpDisposable = PLVCountdownToast.showShort(R.string.plv_linkmic_focus_hang_up_recreate_toast, 3, new Action() {
+            @Override
+            public void run() throws Exception {
+                Activity activity = ActivityUtils.getTopActivity();
+                if (activity != null) {
+                    activity.recreate();
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="连麦 - 数据监听及处理">
@@ -614,6 +636,7 @@ public class PLVStreamerMsgHandler {
             public void onJoinChannelSuccess(String uid) {
                 super.onJoinChannelSuccess(uid);
                 PLVCommonLog.d(TAG, "onJoinChannelSuccess: " + uid);
+                isJoinChannelSuccess = true;
                 final boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType());
                 final boolean isGuestAutoLinkMic = streamerPresenter.getLiveRoomDataManager().getConfig().isAutoLinkToGuest();
                 if (isGuest) {
@@ -631,6 +654,16 @@ public class PLVStreamerMsgHandler {
             public void onLeaveChannel() {
                 super.onLeaveChannel();
                 PLVCommonLog.d(TAG, "onLeaveChannel");
+            }
+
+            @Override
+            public void onForceHangUp() {
+                super.onForceHangUp();
+                final boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(streamerPresenter.getLiveRoomDataManager().getConfig().getUser().getViewerType());
+                PLVCommonLog.d(TAG, "onForceHangUp: isGuest=" + isGuest + ", isJoinChannelSuccess=" + isJoinChannelSuccess);
+                if (isGuest && isJoinChannelSuccess) {
+                    handleGuestForceHangUp();
+                }
             }
 
             @Override

@@ -283,6 +283,12 @@
     <string name="plv_linkmic_receive_request_tips">Received a new request to join the call</string>
     <string name="plv_linkmic_id_empty">Get an empty linkMicId</string>
     <string name="plv_linkmic_guest_join_timeout">Guest timed out while joining the call!</string>
+    <string name="plv_linkmic_hang_up_tips">Reminder</string>
+    <string name="plv_linkmic_hang_up_normal">Normal termination</string>
+    <string name="plv_linkmic_hang_up_forced">Force disconnect</string>
+    <string name="plv_linkmic_focus_hang_up_message">【%s】Due to unstable network connection, failed to disconnect from the microphone. The forced mic disconnection can be used, and the user will automatically re-enter the room. Alternatively, can initiate a normal mic disconnection again</string>
+    <string name="plv_linkmic_focus_hang_up_message_retry">【%s】Due to unstable network connection, the forced mic disconnection failed. You can try to force mic disconnection again</string>
+    <string name="plv_linkmic_focus_hang_up_recreate_toast">Network loading error, about to re-enter the live broadcast room</string>
 
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">Selecting "End class" will disconnect the live lesson. End class now\?</string>

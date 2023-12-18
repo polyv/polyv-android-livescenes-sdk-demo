@@ -157,6 +157,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     //推流和连麦的socket信息处理器
     private final PLVStreamerMsgHandler streamerMsgHandler;
     private final PLVBeautyRepo beautyRepo = PLVDependManager.getInstance().get(PLVBeautyRepo.class);
+    private PLVForceHangUpHandler forceHangUpHandler = new PLVForceHangUpHandler(this);
 
     /**** 状态 ****/
     //推流引擎初始化状态
@@ -692,9 +693,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     @Override
     public boolean openLinkMic(final boolean isVideoType, final boolean isOpen, final Ack ack) {
-        return PLVLinkMicEventSender.getInstance().openLinkMic(isVideoType, isOpen, new Ack() {
+        return PLVLinkMicEventSender.getInstance().openLinkMic(isVideoType, isOpen, new IPLVLinkMicEventSender.PLVSMainCallAck() {
             @Override
-            public void call(Object... args) {
+            public void onCall(Object... args) {
                 if (ack != null) {
                     ack.call(args);
                 }
@@ -784,8 +785,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             });
         } else if (action instanceof PLVStreamerControlLinkMicAction.HangUpAction) {
             if (linkMicItemDataBean != null) {
-                PLVLinkMicEventSender.getInstance().closeUserLinkMic(linkMicItemDataBean.getLinkMicId(), null);
-                updateMemberListWithLeave(linkMicItemDataBean.getLinkMicId(), false);
+                normalCloseUserLinkMic(linkMicItemDataBean.getLinkMicId(), false);
+                forceHangUpHandler.put(linkMicItemDataBean.getLinkMicId(), linkMicItemDataBean);
             }
         }
     }
@@ -842,6 +843,12 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void closeAllUserLinkMic() {
         PLVLinkMicEventSender.getInstance().closeAllUserLinkMic(liveRoomDataManager.getSessionId(), null);
+        for (Map.Entry<String, PLVLinkMicItemDataBean> linkMicItemDataBeanEntry : rtcJoinMap.entrySet()) {
+            String linkMicId = linkMicItemDataBeanEntry.getKey();
+            if (!isMyLinkMicId(linkMicId)) {
+                forceHangUpHandler.put(linkMicId, linkMicItemDataBeanEntry.getValue());
+            }
+        }
     }
 
     @Override
@@ -1058,6 +1065,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
         handler.removeCallbacksAndMessages(null);
         streamerMsgHandler.destroy();
+        forceHangUpHandler.destroy();
 
         dispose(listUsersDisposable);
         dispose(listUserTimerDisposable);
@@ -1522,9 +1530,15 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         }
     }
 
+    void normalCloseUserLinkMic(final String linkMicUid, boolean isRTCCall) {
+        PLVLinkMicEventSender.getInstance().closeUserLinkMic(linkMicUid, null);
+        updateMemberListWithLeave(linkMicUid, isRTCCall);
+    }
+
     void updateMemberListWithLeave(final String linkMicUid, boolean isRTCCall) {
         if (isRTCCall) {
             rtcJoinMap.remove(linkMicUid);
+            forceHangUpHandler.remove(linkMicUid);
         }
         Pair<Integer, PLVMemberItemDataBean> item = getMemberItemWithUserId(linkMicUid);
         if (item != null && item.second != null) {
@@ -2362,14 +2376,18 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         }
 
         public static List<PLVMemberItemDataBean> sort(List<PLVMemberItemDataBean> memberList) {
-            Collections.sort(memberList, new Comparator<PLVMemberItemDataBean>() {
-                @Override
-                public int compare(PLVMemberItemDataBean o1, PLVMemberItemDataBean o2) {
-                    int io1 = SORT_INDEX.indexOf(getSortType(o1));
-                    int io2 = SORT_INDEX.indexOf(getSortType(o2));
-                    return io1 - io2;
-                }
-            });
+            try {
+                Collections.sort(memberList, new Comparator<PLVMemberItemDataBean>() {
+                    @Override
+                    public int compare(PLVMemberItemDataBean o1, PLVMemberItemDataBean o2) {
+                        int io1 = SORT_INDEX.indexOf(getSortType(o1));
+                        int io2 = SORT_INDEX.indexOf(getSortType(o2));
+                        return io1 - io2;
+                    }
+                });
+            } catch (Exception e) {
+                PLVCommonLog.exception(e);
+            }
             return memberList;
         }
     }
