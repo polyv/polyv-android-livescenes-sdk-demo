@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Pair;
@@ -17,11 +18,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -40,13 +44,20 @@ public class PLVSABitrateLayout extends FrameLayout {
     // 清晰度布局宽度、高度、布局位置
     private static final int BITRATE_LAYOUT_WIDTH_PORT = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int BITRATE_LAYOUT_WIDTH_LAND = ConvertUtils.dp2px(214);
+    private static final int BITRATE_LAYOUT_WIDTH_LAND_TEMPLATE_ENABLE = ConvertUtils.dp2px(304);
     private static final int BITRATE_LAYOUT_HEIGHT_PORT = ConvertUtils.dp2px(214);
+    private static final int BITRATE_LAYOUT_HEIGHT_PORT_TEMPLATE_ENABLE = ConvertUtils.dp2px(426);
     private static final int BITRATE_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int BITRATE_LAYOUT_GRAVITY_PORT = Gravity.BOTTOM;
     private static final int BITRATE_LAYOUT_GRAVITY_LAND = Gravity.END;
     // 清晰度布局背景
     private static final int BITRATE_LAYOUT_BACKGROUND_RES_PORT = R.drawable.plvsa_setting_bitrate_ly_shape;
     private static final int BITRATE_LAYOUT_BACKGROUND_RES_LAND = R.drawable.plvsa_setting_bitrate_ly_shape_land;
+
+    // 青春套餐配置模版
+    private PLVPushStreamTemplateJsonBean pushStreamTemplate;
+    //是否开启青春套餐
+    private boolean isPushStreamTemplateEnable;
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -59,7 +70,7 @@ public class PLVSABitrateLayout extends FrameLayout {
     //adapter
     private BitrateAdapter bitrateAdapter;
     // Layout Manager
-    private GridLayoutManager bitrateLayoutManager;
+    private RecyclerView.LayoutManager bitrateLayoutManager;
 
     private String channelId;
 
@@ -92,15 +103,22 @@ public class PLVSABitrateLayout extends FrameLayout {
         plvsaSettingBitrateRv = findViewById(R.id.plvsa_setting_bitrate_rv);
 
         bitrateAdapter = new BitrateAdapter();
-        bitrateLayoutManager = new GridLayoutManager(getContext(), 3);
-        plvsaSettingBitrateRv.setLayoutManager(bitrateLayoutManager);
-        plvsaSettingBitrateRv.setAdapter(bitrateAdapter);
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.channelId = liveRoomDataManager.getConfig().getChannelId();
+        pushStreamTemplate = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        isPushStreamTemplateEnable = pushStreamTemplate != null && pushStreamTemplate.isEnabled();
+
+        if (isPushStreamTemplateEnable) {
+            bitrateLayoutManager = new LinearLayoutManager(getContext());
+        } else {
+            bitrateLayoutManager = new GridLayoutManager(getContext(), 3);
+        }
+        plvsaSettingBitrateRv.setLayoutManager(bitrateLayoutManager);
+        plvsaSettingBitrateRv.setAdapter(bitrateAdapter);
     }
 
     public void open() {
@@ -110,6 +128,8 @@ public class PLVSABitrateLayout extends FrameLayout {
         }
         updateViewWithOrientation();
 
+        int portraitHeight = (isPushStreamTemplateEnable ? BITRATE_LAYOUT_HEIGHT_PORT_TEMPLATE_ENABLE : BITRATE_LAYOUT_HEIGHT_PORT);
+        int landscapeWidth = (isPushStreamTemplateEnable ? BITRATE_LAYOUT_WIDTH_LAND_TEMPLATE_ENABLE : BITRATE_LAYOUT_WIDTH_LAND);
         if (menuDrawer == null) {
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),
@@ -120,6 +140,7 @@ public class PLVSABitrateLayout extends FrameLayout {
             );
             menuDrawer.setMenuView(this);
             menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
+            menuDrawer.setMenuSize(PLVScreenUtils.isPortrait(getContext()) ? portraitHeight : landscapeWidth);
             menuDrawer.setDrawOverlay(false);
             menuDrawer.setDropShadowEnabled(false);
             menuDrawer.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
@@ -184,21 +205,27 @@ public class PLVSABitrateLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
 
     private void updateViewWithOrientation() {
+        int portraitHeight = (isPushStreamTemplateEnable ? BITRATE_LAYOUT_HEIGHT_PORT_TEMPLATE_ENABLE : BITRATE_LAYOUT_HEIGHT_PORT);
+        int landscapeWidth = (isPushStreamTemplateEnable ? BITRATE_LAYOUT_WIDTH_LAND_TEMPLATE_ENABLE : BITRATE_LAYOUT_WIDTH_LAND);
         Position menuDrawerPosition;
         FrameLayout.LayoutParams bitrateLayoutParam = (LayoutParams) plvsaSettingBitrateLayoutRoot.getLayoutParams();
 
         if (PLVScreenUtils.isPortrait(getContext())) {
             bitrateLayoutParam.width = BITRATE_LAYOUT_WIDTH_PORT;
-            bitrateLayoutParam.height = BITRATE_LAYOUT_HEIGHT_PORT;
+            bitrateLayoutParam.height = portraitHeight;
             bitrateLayoutParam.gravity = BITRATE_LAYOUT_GRAVITY_PORT;
-            bitrateLayoutManager.setSpanCount(BITRATE_LAYOUT_SPAN_PORT);
+            if (bitrateLayoutManager instanceof GridLayoutManager) {
+                ((GridLayoutManager) bitrateLayoutManager).setSpanCount(BITRATE_LAYOUT_SPAN_PORT);
+            }
             plvsaSettingBitrateLayoutRoot.setBackgroundResource(BITRATE_LAYOUT_BACKGROUND_RES_PORT);
             menuDrawerPosition = MENU_DRAWER_POSITION_PORT;
         } else {
-            bitrateLayoutParam.width = BITRATE_LAYOUT_WIDTH_LAND;
+            bitrateLayoutParam.width = landscapeWidth;
             bitrateLayoutParam.height = BITRATE_LAYOUT_HEIGHT_LAND;
             bitrateLayoutParam.gravity = BITRATE_LAYOUT_GRAVITY_LAND;
-            bitrateLayoutManager.setSpanCount(BITRATE_LAYOUT_SPAN_LAND);
+            if (bitrateLayoutManager instanceof GridLayoutManager) {
+                ((GridLayoutManager) bitrateLayoutManager).setSpanCount(BITRATE_LAYOUT_SPAN_LAND);
+            }
             plvsaSettingBitrateLayoutRoot.setBackgroundResource(BITRATE_LAYOUT_BACKGROUND_RES_LAND);
             menuDrawerPosition = MENU_DRAWER_POSITION_LAND;
         }
@@ -206,6 +233,7 @@ public class PLVSABitrateLayout extends FrameLayout {
         plvsaSettingBitrateLayoutRoot.setLayoutParams(bitrateLayoutParam);
         if (menuDrawer != null) {
             menuDrawer.setPosition(menuDrawerPosition);
+            menuDrawer.setMenuSize(PLVScreenUtils.isPortrait(getContext()) ? portraitHeight : landscapeWidth);
         }
     }
 
@@ -219,14 +247,26 @@ public class PLVSABitrateLayout extends FrameLayout {
         @NonNull
         @Override
         public BitrateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new BitrateViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.plvsa_live_room_setting_bitrate_item, parent, false));
+            return new BitrateViewHolder(LayoutInflater.from(parent.getContext()).inflate(isPushStreamTemplateEnable ? R.layout.plvsa_live_room_setting_bitrate_template_enable_item : R.layout.plvsa_live_room_setting_bitrate_item, parent, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull final BitrateViewHolder holder, int position) {
-            String bitrateText = getBitrateTextByBitrate(getBitrate(position));
+            int bitrate = getBitrate(position);
+            String bitrateText = getBitrateTextByBitrate(bitrate);
             holder.plvsaBitrateTv.setText(bitrateText);
             holder.plvsaBitrateParentLy.setSelected(position == selPosition);
+            if (isPushStreamTemplateEnable && holder.plvsaBitrateDescTv != null) {
+                int pos = Math.min(pushStreamTemplate.getVideoParams().size() - 1, bitrate - 1);
+                PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean = pushStreamTemplate.getVideoParams().get(pos);
+                int videoHeight = videoParamsBean.getVideoHeight();
+                int videoBitrate = videoParamsBean.getVideoBitrate();
+                int videoFps = videoParamsBean.getVideoFps();
+                String baseDesc = PLVAppUtils.formatString(R.string.plv_streamer_bitrate_desc, videoBitrate, videoFps);
+                String desc = PLVLanguageUtil.isENLanguage() ? baseDesc : "分辨率：" + videoHeight + "p，" + baseDesc;// no need i18n
+                holder.plvsaBitrateDescTv.setText(desc);
+
+            }
             holder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -264,11 +304,14 @@ public class PLVSABitrateLayout extends FrameLayout {
         class BitrateViewHolder extends RecyclerView.ViewHolder {
             private ViewGroup plvsaBitrateParentLy;
             private TextView plvsaBitrateTv;
+            @Nullable
+            private TextView plvsaBitrateDescTv;
 
             BitrateViewHolder(View itemView) {
                 super(itemView);
                 plvsaBitrateParentLy = itemView.findViewById(R.id.plvsa_bitrate_parent_ly);
                 plvsaBitrateTv = itemView.findViewById(R.id.plvsa_bitrate_tv);
+                plvsaBitrateDescTv = itemView.findViewById(R.id.plvsa_bitrate_desc_tv);
             }
         }
     }

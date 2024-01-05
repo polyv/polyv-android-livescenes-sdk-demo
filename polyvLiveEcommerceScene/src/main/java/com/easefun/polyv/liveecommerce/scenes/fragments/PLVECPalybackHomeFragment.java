@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Looper;
@@ -9,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -28,10 +31,12 @@ import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviou
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
@@ -47,6 +52,7 @@ import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVEC
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
@@ -136,6 +142,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     private boolean hasInitPreviousView = false;
     private Rect videoViewRect;
 
+    private ImageView backIv;
+
     //聊天回放是否打开
     protected boolean isChatPlaybackEnabled;
     //播放器准备完成的聊天回放任务
@@ -169,6 +177,32 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            backIv.setVisibility(View.VISIBLE);
+            if (morePopupView != null) {
+                morePopupView.onLandscape();
+            }
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(true);
+            }
+        } else {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            backIv.setVisibility(View.GONE);
+
+            if (morePopupView != null) {
+                morePopupView.onPortrait();
+            }
+
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(false);
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -183,6 +217,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         totalTimeTv = findViewById(R.id.total_time_tv);
         moreIv = findViewById(R.id.more_iv);
         moreIv.setOnClickListener(this);
+        backIv = findViewById(R.id.plvec_controller_back_iv);
+        backIv.setOnClickListener(this);
         //商品
         commodityIv = findViewById(R.id.playback_commodity_iv);
         commodityIv.setOnClickListener(this);
@@ -363,6 +399,20 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
         }
     }
+
+    @Override
+    public boolean isInterceptViewAction(MotionEvent motionEvent) {
+        if (backIv.getVisibility() == View.VISIBLE) {
+            float x = backIv.getX() + backIv.getWidth();
+            float y = backIv.getY() + backIv.getHeight();
+            if (motionEvent.getX() >= backIv.getX() && motionEvent.getX() <= x
+                    && motionEvent.getY() >= backIv.getY() && motionEvent.getY() <= y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -828,6 +878,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             });
         } else if (id == R.id.playback_commodity_iv) {
             showCommodityLayout();
+        } else if (id == R.id.plvec_controller_back_iv) {
+            if(PLVScreenUtils.isLandscape(getContext())){
+                PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
+            }
         }
     }
     // </editor-fold>

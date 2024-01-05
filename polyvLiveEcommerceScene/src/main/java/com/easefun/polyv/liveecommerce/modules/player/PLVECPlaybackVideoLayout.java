@@ -7,6 +7,7 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,6 +40,7 @@ import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
@@ -51,7 +53,9 @@ import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.List;
@@ -81,6 +85,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private TextView tvCountDown;
     //浮窗关闭按钮
     private ImageView closeFloatingView;
+    //全屏按钮
+    private ImageView fullScreenIv;
+    //当宽比高大的时候，可以开启全屏
+    private boolean isCanFullScreen = false;
+
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
 
@@ -140,6 +149,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         closeFloatingView = findViewById(R.id.close_floating_iv);
         closeFloatingView.setOnClickListener(this);
         videoView.setSubVideoView(subVideoView);
+        fullScreenIv = findViewById(R.id.plvec_full_screen_iv);
+        fullScreenIv.setOnClickListener(this);
 
         playCenterView = findViewById(R.id.play_center);
         hidePlayCenterView();
@@ -205,6 +216,22 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
                         videoView.setNeedGestureDetector(!isShowing);
                         subVideoView.setNeedGestureDetector(!isShowing);
                         playbackPlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? VISIBLE : GONE);
+
+                        if (isShowingBoolean && isCanFullScreen && PLVScreenUtils.isPortrait(getContext())) {
+                            //当开启了悬浮窗 如果当前是在竖屏 那么禁止自动旋转
+                            PLVOrientationManager.getInstance().lockOrientation();
+                        }
+
+                        if(!isShowingBoolean && isCanFullScreen){
+                            if (PLVScreenUtils.isPortrait(getContext())) {
+                                //横屏小窗 进入竖屏，切换回去时需要调整一下播放器的比例
+                                setFitParentVideo(false);
+                            }
+                        }
+
+                        if(!isShowing && isCanFullScreen){
+                            PLVOrientationManager.getInstance().unlockOrientation();
+                        }
                     }
                 });
     }
@@ -503,9 +530,28 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onPrepared() {
             super.onPrepared();
             fitMode = PLVECFitMode.FIT_VIDEO_RATIO_AND_RECT_VIDEOVIEW;
+            int[] videoSize = PLVVideoSizeUtils.getVideoWH(videoView);
+            isCanFullScreen = videoSize[0] >= videoSize[1] ? true : false;
+            if (onViewActionListener != null) {
+                onViewActionListener.acceptVideoSize(isCanFullScreen);
+            }
             if (!isVideoViewPlayingInFloatWindow) {
-                PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
-
+                //在不同横竖屏状态下，播放横屏视频、竖屏视频需要分别采用不同的视频比例
+                if (PLVScreenUtils.isLandscape(getContext())) {
+                    if (isCanFullScreen) {
+                        setFullScreenVideo();
+                    } else {
+                        setFitParentVideo(true);
+                        fullScreenIv.setVisibility(GONE);
+                    }
+                } else {
+                    if (isCanFullScreen) {
+                        setFitParentVideo(false);
+                    } else {
+                        PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+                        fullScreenIv.setVisibility(GONE);
+                    }
+                }
             }
             //需要将水印与视频区域大小匹配
             post(new Runnable() {
@@ -515,6 +561,11 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
                         ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
                         layoutParams.height = videoView.getIjkVideoView().getRenderView().getView().getHeight();
                         watermarkView.setLayoutParams(layoutParams);
+                        //全屏按钮
+                        //如果是宽比高大的话就显示全屏按钮
+                        if (isCanFullScreen && PLVScreenUtils.isPortrait(getContext())) {
+                            setFullScreenIvPosition();
+                        }
                     } else {
                         ViewGroup.LayoutParams layoutParams = watermarkView.getLayoutParams();
                         layoutParams.height = PLVUIUtil.dip2px(getContext(), 206);
@@ -630,6 +681,68 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="旋转监听">
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //横屏
+            if (isCanFullScreen) {
+                setFullScreenVideo();
+                fullScreenIv.setVisibility(GONE);
+            }
+        } else {
+            if (isCanFullScreen) {
+                String simpleName = ActivityUtils.getTopActivity().getClass().getSimpleName();
+                //当在横屏状态下 点击商品库开启小窗， 那么会创建一个竖屏的商品详情Activity
+                // 这里我们只监控顶层PLVECLiveEcommerceActivity的旋转状态
+                String ecommerceActivityName = getContext().getClass().getSimpleName();
+                if (!isVideoViewPlayingInFloatWindow && simpleName.equals(ecommerceActivityName)) {
+                    setFitParentVideo(false);
+                }
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //重新计算全屏图标的位置
+                        setFullScreenIvPosition();
+                    }
+                });
+            } else {
+                PLVVideoSizeUtils.fitVideoRatioAndRect(videoView, videoView.getParent(), videoViewRect);
+                fullScreenIv.setVisibility(GONE);
+                PLVOrientationManager.getInstance().lockOrientation();
+            }
+        }
+    }
+
+    private void setFullScreenIvPosition() {
+        View renderView = videoView.getIjkVideoView().getRenderView().getView();
+        if (renderView != null) {
+            int bottom = renderView.getBottom();
+            FrameLayout.LayoutParams fullScreenIvLayoutParams = (FrameLayout.LayoutParams) fullScreenIv.getLayoutParams();
+            int margin = PLVUIUtil.dip2px(getContext(), 4);
+            ViewGroup videoViewParent = (ViewGroup) videoView.getParent();
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) videoViewParent.getLayoutParams();
+            int topMargin = lp.topMargin;
+            fullScreenIvLayoutParams.setMargins(0, topMargin + margin + bottom, margin, 0);
+            fullScreenIv.setLayoutParams(fullScreenIvLayoutParams);
+            fullScreenIv.setVisibility(VISIBLE);
+            this.requestLayout();
+        }
+    }
+
+    private void setFullScreenVideo() {
+        videoView.setAspectRatio(PolyvPlayerScreenRatio.AR_16_9_FIT_PARENT);
+        PLVVideoSizeUtils.fitVideoRect(true, videoView.getParent(), null);
+    }
+
+    private void setFitParentVideo(boolean isFill) {
+        videoView.setAspectRatio(PolyvPlayerScreenRatio.AR_ASPECT_FIT_PARENT);
+        PLVVideoSizeUtils.fitVideoRect(isFill, videoView.getParent(), videoViewRect);
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
@@ -639,6 +752,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
             }
         } else if (v.getId() == R.id.play_center) {
             resume();
+        } else if (v.getId() == R.id.plvec_full_screen_iv) {
+            if (PLVScreenUtils.isPortrait(getContext())) {
+                PLVOrientationManager.getInstance().setLandscape((Activity) getContext());
+            }
         }
     }
     // </editor-fold>

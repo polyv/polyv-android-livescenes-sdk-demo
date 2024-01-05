@@ -13,8 +13,11 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.easefun.polyv.livestreamer.R;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
 /**
@@ -27,6 +30,11 @@ public class PLVLSBitrateLayout extends FrameLayout {
     private RecyclerView bitrateRv;
 
     private final BitrateAdapter bitrateAdapter = new BitrateAdapter();
+
+    // 青春套餐配置模版
+    private PLVPushStreamTemplateJsonBean pushStreamTemplate;
+    //是否开启青春套餐
+    private boolean isPushStreamTemplateEnable;
 
     private String channelId;
 
@@ -51,7 +59,6 @@ public class PLVLSBitrateLayout extends FrameLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.plvls_live_room_bitrate_layout, this);
 
         findView();
-        initRecyclerView();
     }
 
     private void findView() {
@@ -61,12 +68,15 @@ public class PLVLSBitrateLayout extends FrameLayout {
     }
 
     private void initRecyclerView() {
-        bitrateRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        bitrateRv.setLayoutManager(new LinearLayoutManager(getContext(), isPushStreamTemplateEnable ? LinearLayoutManager.VERTICAL : LinearLayoutManager.HORIZONTAL, false));
         bitrateRv.setAdapter(bitrateAdapter);
     }
 
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.channelId = liveRoomDataManager.getConfig().getChannelId();
+        pushStreamTemplate = PLVStreamerConfig.getPushStreamTemplate(channelId);
+        isPushStreamTemplateEnable = pushStreamTemplate != null && pushStreamTemplate.isEnabled();
+        initRecyclerView();
     }
 
     public void updateData(final int maxBitrate, final int currentSelectedBitrate) {
@@ -84,19 +94,36 @@ public class PLVLSBitrateLayout extends FrameLayout {
         @NonNull
         @Override
         public PLVLSBitrateLayout.BitrateAdapter.BitrateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new PLVLSBitrateLayout.BitrateAdapter.BitrateViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.plvls_live_room_setting_bitrate_item, parent, false));
+            return new PLVLSBitrateLayout.BitrateAdapter.BitrateViewHolder(LayoutInflater.from(parent.getContext()).inflate(isPushStreamTemplateEnable ? R.layout.plvls_live_room_setting_bitrate_template_enable_item : R.layout.plvls_live_room_setting_bitrate_item, parent, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull final PLVLSBitrateLayout.BitrateAdapter.BitrateViewHolder holder, int position) {
-            String bitrateText = getBitrateText(getBitrate(position));
+            int bitrate = getBitrate(position);
+            String bitrateText = getBitrateText(bitrate);
             holder.plvlsSettingBitrateSelTv.setText(bitrateText);
-            if (position == selPosition) {
-                holder.plvlsSettingBitrateSelIndicatorView.setVisibility(View.VISIBLE);
-                holder.plvlsSettingBitrateSelTv.setSelected(true);
-            } else {
-                holder.plvlsSettingBitrateSelIndicatorView.setVisibility(View.GONE);
-                holder.plvlsSettingBitrateSelTv.setSelected(false);
+            if (holder.plvlsSettingBitrateSelIndicatorView != null) {
+                if (position == selPosition) {
+                    holder.plvlsSettingBitrateSelIndicatorView.setVisibility(View.VISIBLE);
+                    holder.plvlsSettingBitrateSelTv.setSelected(true);
+                } else {
+                    holder.plvlsSettingBitrateSelIndicatorView.setVisibility(View.GONE);
+                    holder.plvlsSettingBitrateSelTv.setSelected(false);
+                }
+            }
+            if (holder.plvlsBitrateParentLy != null) {
+                holder.plvlsBitrateParentLy.setSelected(position == selPosition);
+            }
+            if (isPushStreamTemplateEnable && holder.plvlsSettingBitrateDescTv != null) {
+                int pos = Math.min(pushStreamTemplate.getVideoParams().size() - 1, bitrate - 1);
+                PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean = pushStreamTemplate.getVideoParams().get(pos);
+                int videoHeight = videoParamsBean.getVideoHeight();
+                int videoBitrate = videoParamsBean.getVideoBitrate();
+                int videoFps = videoParamsBean.getVideoFps();
+                String baseDesc = PLVAppUtils.formatString(R.string.plv_streamer_bitrate_desc, videoBitrate, videoFps);
+                String desc = PLVLanguageUtil.isENLanguage() ? baseDesc : "分辨率：" + videoHeight + "p，" + baseDesc;// no need i18n
+                holder.plvlsSettingBitrateDescTv.setText(desc);
+
             }
             holder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -134,12 +161,19 @@ public class PLVLSBitrateLayout extends FrameLayout {
 
         class BitrateViewHolder extends RecyclerView.ViewHolder {
             private TextView plvlsSettingBitrateSelTv;
+            @Nullable
             private View plvlsSettingBitrateSelIndicatorView;
+            @Nullable
+            private ViewGroup plvlsBitrateParentLy;
+            @Nullable
+            private TextView plvlsSettingBitrateDescTv;
 
             BitrateViewHolder(View itemView) {
                 super(itemView);
                 plvlsSettingBitrateSelTv = itemView.findViewById(R.id.plvls_setting_bitrate_sel_tv);
                 plvlsSettingBitrateSelIndicatorView = itemView.findViewById(R.id.plvls_setting_bitrate_sel_indicator_view);
+                plvlsBitrateParentLy = itemView.findViewById(R.id.plvls_bitrate_parent_ly);
+                plvlsSettingBitrateDescTv = itemView.findViewById(R.id.plvls_setting_bitrate_desc_tv);
             }
         }
     }

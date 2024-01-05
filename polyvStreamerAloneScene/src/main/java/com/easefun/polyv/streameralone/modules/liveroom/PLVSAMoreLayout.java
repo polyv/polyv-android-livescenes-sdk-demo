@@ -150,12 +150,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
         put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
     }};
-    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
-       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
-       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
-       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
-       put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
-    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -360,8 +354,20 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             int i = 0;
             for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
                 i++;
-                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+                bitrateMapIcon.put(i, getQualityIcon(videoParamsBean.getQualityLevel()));
             }
+        }
+    }
+
+    private int getQualityIcon(String qualityLevel) {
+        if (PLVLinkMicConstant.QualityLevel.isHSD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_hd;
+        } else if (PLVLinkMicConstant.QualityLevel.isSHD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_fhd;
+        } else if (PLVLinkMicConstant.QualityLevel.isFHD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_uhd;
+        } else {
+            return R.drawable.plvsa_bitrate_icon_sd;
         }
     }
     // </editor-fold>

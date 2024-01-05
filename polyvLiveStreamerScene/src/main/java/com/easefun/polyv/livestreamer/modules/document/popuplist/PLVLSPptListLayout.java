@@ -429,7 +429,7 @@ public class PLVLSPptListLayout extends FrameLayout {
                 } else if (fileUri.getPath() != null) {
                     filePath = fileUri.getPath().substring(fileUri.getPath().indexOf("/") + 1);
                 }
-                if (TextUtils.isEmpty(filePath)) {
+                if (TextUtils.isEmpty(filePath) && TextUtils.isEmpty(file.getPath())) {
                     Log.w(TAG, "file path is empty.");
                     PLVToast.Builder.context(getContext())
                             .setText(R.string.plv_ppt_file_uri_is_null_hint)
