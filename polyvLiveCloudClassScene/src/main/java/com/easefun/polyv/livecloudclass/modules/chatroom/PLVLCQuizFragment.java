@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVInputFragment;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
@@ -75,6 +76,8 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
 
     //提示语
     private String tips = getDefaultTips();
+
+    private PLVLiveClassDetailVO.DataBean.TeacherBean teacherInfo;
 
     private boolean firstLoadHistory = true;
     // </editor-fold>
@@ -184,6 +187,10 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
             return;
         }
         this.tips = tips;
+    }
+
+    public void setTeacherInfo(PLVLiveClassDetailVO.DataBean.TeacherBean teacherInfo) {
+        this.teacherInfo = teacherInfo;
     }
     // </editor-folder>
 
@@ -305,8 +312,17 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         tAnswerEvent.setObjects(PLVTextFaceLoader.messageToSpan(tAnswerEvent.getContent(), ConvertUtils.dp2px(14), getContext()));
         PLVSocketUserBean userBean = new PLVSocketUserBean();
         userBean.setUserType(PLVSocketUserConstant.USERTYPE_TEACHER);
-        userBean.setNick("讲师");// no need i18n
-        userBean.setActor("讲师");// no need i18n
+
+        userBean.setNick(PLVAppUtils.getString(R.string.plv_chat_quiz_default_teacher_nick));// no need i18n
+        userBean.setActor(PLVAppUtils.getString(R.string.plv_chat_quiz_default_teacher_actor));// no need i18n
+        if (teacherInfo != null) {
+            if (!TextUtils.isEmpty(teacherInfo.getActor())) {
+                userBean.setActor(teacherInfo.getActor());
+            }
+            if (!TextUtils.isEmpty(teacherInfo.getNickname())) {
+                userBean.setNick(teacherInfo.getNickname());
+            }
+        }
         userBean.setPic(PLVSocketUserConstant.TEACHER_AVATAR_URL);
         tAnswerEvent.setUser(userBean);
 

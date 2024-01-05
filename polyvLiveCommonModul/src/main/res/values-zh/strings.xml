@@ -133,6 +133,8 @@
     <string name="plv_chat_input_tips_chatroom_close_2">聊天室已关闭</string>
     <string name="plv_chat_input_tips_focus">当前为专注模式，无法发言</string>
     <string name="plv_chat_quiz_default_tips">你已进入专属的提问频道，提问内容不会公开</string>
+    <string name="plv_chat_quiz_default_teacher_nick">讲师</string>
+    <string name="plv_chat_quiz_default_teacher_actor">讲师</string>
     <string name="plv_chat_view_new_msg_2">有%s条新消息，点击查看</string>
     <string name="plv_chat_toast_focus">专注模式下无法使用</string>
     <string name="plv_chat_linked_to_other_rooms">已关联其他房间，仅可观看直播内容</string>
@@ -357,6 +359,7 @@
     <string name="plv_streamer_network_very_bad">网络很差</string>
     <string name="plv_streamer_network_disconnect">网络断开</string>
     <string name="plv_streamer_network_cannot_connect">无法连接</string>
+    <string name="plv_streamer_bitrate_desc">码率：%skbps，帧率：%sfps</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>

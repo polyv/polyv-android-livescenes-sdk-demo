@@ -618,11 +618,12 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabFragmentList.add(tuWenFragment);
     }
 
-    private void addQuizTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+    private void addQuizTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean, PLVLiveClassDetailVO detailVO) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
         if (quizFragment == null) {
             quizFragment = new PLVLCQuizFragment();
             quizFragment.setTips(channelMenusBean.getContent());
+            quizFragment.setTeacherInfo(detailVO.getData().getTeacher());
             chatroomPresenter.registerView(quizFragment.getChatroomView());
         }
         pageMenuTabFragmentList.add(quizFragment);
@@ -1173,7 +1174,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             } else if (PLVLiveClassDetailVO.MENUTYPE_CHAT.equals(channelMenusBean.getMenuType())) {
                 checkAddChatTab(channelMenusBean, channelMenusBean.isDisplayEnabled());
             } else if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
-                addQuizTab(channelMenusBean);
+                addQuizTab(channelMenusBean, liveClassDetail);
             } else if (PLVLiveClassDetailVO.MENUTYPE_TEXT.equals(channelMenusBean.getMenuType())) {
                 addTextTab(channelMenusBean);
             } else if (PLVLiveClassDetailVO.MENUTYPE_IFRAME.equals(channelMenusBean.getMenuType())) {

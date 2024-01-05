@@ -133,6 +133,8 @@
     <string name="plv_chat_input_tips_chatroom_close_2">Chatroom is closed</string>
     <string name="plv_chat_input_tips_focus">Currently in focus mode, unable to speak</string>
     <string name="plv_chat_quiz_default_tips">You have entered the exclusive question channel, and the content of the question will not be made public</string>
+    <string name="plv_chat_quiz_default_teacher_nick">Instructor</string>
+    <string name="plv_chat_quiz_default_teacher_actor">Instructor</string>
     <string name="plv_chat_view_new_msg_2">%s new messages</string>
     <string name="plv_chat_toast_focus">Cannot be used in focus mode</string>
     <string name="plv_chat_linked_to_other_rooms">Chatroom occupied, video only.</string>
@@ -357,6 +359,7 @@
     <string name="plv_streamer_network_very_bad">Network very bad</string>
     <string name="plv_streamer_network_disconnect">Network disconnected</string>
     <string name="plv_streamer_network_cannot_connect">Network unavailable</string>
+    <string name="plv_streamer_bitrate_desc">Bitrate: %skbps, Frame Rate: %sfps</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>
