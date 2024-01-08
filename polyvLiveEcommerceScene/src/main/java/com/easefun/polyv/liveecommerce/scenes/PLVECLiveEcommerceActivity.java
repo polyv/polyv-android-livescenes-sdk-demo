@@ -345,9 +345,6 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             PLVScreenUtils.exitFullScreen(this);
             closeIm.setVisibility(View.VISIBLE);
             floatingWindow.setLanderScreen(false);
-            if (!isLive) {
-                PLVOrientationManager.getInstance().lockOrientation();
-            }
         }
     }
     // </editor-fold>
@@ -867,6 +864,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                     PLVOrientationManager.getInstance().unlockOrientation();
                 } else {
                     PLVOrientationManager.getInstance().lockOrientation();;
+                }
+                if (!isCanFullScreen && PLVScreenUtils.isLandscape(PLVECLiveEcommerceActivity.this)) {
+                    PLVOrientationManager.getInstance().unlockOrientation();
                 }
             }
         });

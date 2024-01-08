@@ -15,6 +15,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -151,6 +152,8 @@ public interface IPLVStreamerContract {
         /**
          * 更新成员列表中的socket用户信息
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onUpdateSocketUserData(int pos);
@@ -158,6 +161,8 @@ public interface IPLVStreamerContract {
         /**
          * 添加成员列表数据
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onAddMemberListData(int pos);
@@ -165,6 +170,8 @@ public interface IPLVStreamerContract {
         /**
          * 移除成员列表数据
          *
+         * @deprecated
+         * @see #onUpdateMemberListData(List)
          * @param pos 成员列表中的位置
          */
         void onRemoveMemberListData(int pos);
@@ -363,14 +370,14 @@ public interface IPLVStreamerContract {
          *
          * @param mixLayoutType 混流布局类型
          */
-        void setMixLayoutType(@PLVSStreamerConfig.MixStreamType int mixLayoutType);
+        void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayoutType);
 
         /**
          * 获取混流画面布局类型
          *
          * @return 混流布局类型
          */
-        int getMixLayoutType();
+        PLVStreamerConfig.MixLayoutType getMixLayoutType();
 
         /**
          * 设置直播推流，是否需要恢复上一场的流继续推流

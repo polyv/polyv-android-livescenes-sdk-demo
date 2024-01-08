@@ -114,7 +114,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     // <editor-fold defaultstate="collapsed" desc="对外API">
     //更新所有数据
     public void update(List<PLVMemberItemDataBean> dataList) {
-        this.dataBeanList = dataList;
+        this.dataBeanList = new ArrayList<>(dataList);
         notifyDataSetChanged();
         checkHideControlWindow();
     }

@@ -1,13 +1,18 @@
 package com.easefun.polyv.liveecommerce.modules.chatroom.widget;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
+
 import android.content.Context;
+import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.text.Editable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -21,6 +26,8 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import org.xml.sax.XMLReader;
 
 import java.util.concurrent.TimeUnit;
 
@@ -98,7 +105,7 @@ public class PLVECBulletinView extends FrameLayout {
                     startAnimation(scaleAnimation);
                 }
                 gonggaoTv.setVisibility(View.INVISIBLE);
-                gonggaoTv.setText(Html.fromHtml(bulletinVO.getContent()));
+                gonggaoTv.setText(convertToHtml(bulletinVO.getContent()));
                 gonggaoTv.setMovementMethod(LinkMovementMethod.getInstance());
                 gonggaoTv.setOnGetRollDurationListener(new PLVMarqueeTextView.OnGetRollDurationListener() {
                     @Override
@@ -180,6 +187,28 @@ public class PLVECBulletinView extends FrameLayout {
                 }
             }
         });
+    }
+
+    private Spanned convertToHtml(String origin) {
+        final Html.TagHandler tagHandler = new Html.TagHandler() {
+            @Override
+            public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
+                if ("img".equalsIgnoreCase(tag)) {
+                    ImageSpan[] spans = output.getSpans(0, output.length(), ImageSpan.class);
+                    if (spans != null) {
+                        for (ImageSpan span : spans) {
+                            output.replace(output.getSpanStart(span), output.getSpanEnd(span), getString(R.string.plvec_live_detail_bulletin_image_alt_text));
+                            output.removeSpan(span);
+                        }
+                    }
+                }
+            }
+        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(origin, Html.FROM_HTML_MODE_COMPACT, null, tagHandler);
+        } else {
+            return Html.fromHtml(origin, null, tagHandler);
+        }
     }
 
     public interface OnVisibilityChangedListener {

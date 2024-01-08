@@ -1,8 +1,13 @@
 package com.easefun.polyv.livestreamer.modules.liveroom;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import androidx.annotation.NonNull;
@@ -11,16 +16,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicUiState;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.imageScan.PLVChatImageViewerFragment;
@@ -32,7 +43,7 @@ import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
-import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
@@ -56,6 +67,9 @@ import io.reactivex.functions.Consumer;
  */
 public class PLVLSChannelInfoLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private final PLVSipLinkMicViewModel sipLinkMicViewModel = PLVDependManager.getInstance().get(PLVSipLinkMicViewModel.class);
+
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //布局弹层
@@ -76,6 +90,14 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
     private TextView plvlsChannelInfoChannelIdTv;
     private RelativeLayout plvlsChannelInfoParentLy;
     private ScrollView plvlsChannelInfoSv;
+    private LinearLayout channelSipCallInNumberLl;
+    private ImageView channelSipCallInNumberIv;
+    private TextView channelSipCallInNumberTv;
+    private TextView channelSipCallInNumberCopyTv;
+
+    @Nullable
+    private String sipCallInNumber = null;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -96,6 +118,10 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        sipLinkMicViewModel.updateIsSupportSip(PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.STREAMER_CHANNEL_SIP_ENABLED));
+
         observeLiveRoomData();
     }
     // </editor-fold>
@@ -109,9 +135,48 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
         plvlsChannelInfoChannelIdTv = findViewById(R.id.plvls_channel_info_channel_id_tv);
         plvlsChannelInfoParentLy = findViewById(R.id.plvls_channel_info_parent_ly);
         plvlsChannelInfoSv = findViewById(R.id.plvls_channel_info_sv);
+        channelSipCallInNumberLl = findViewById(R.id.plvls_channel_sip_call_in_number_ll);
+        channelSipCallInNumberIv = findViewById(R.id.plvls_channel_sip_call_in_number_iv);
+        channelSipCallInNumberTv = findViewById(R.id.plvls_channel_sip_call_in_number_tv);
+        channelSipCallInNumberCopyTv = findViewById(R.id.plvls_channel_sip_call_in_number_copy_tv);
 
         blurView = findViewById(R.id.blur_ly);
         PLVBlurUtils.initBlurView(blurView);
+
+        setOnClickCopySipNumber();
+        observeSipCallInNumber();
+    }
+
+    private void setOnClickCopySipNumber() {
+        channelSipCallInNumberCopyTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sipCallInNumber == null) {
+                    return;
+                }
+                ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("sipCallInNumber", sipCallInNumber);
+                clipboardManager.setPrimaryClip(clipData);
+                PLVToast.Builder.context(getContext()).setText(R.string.plvls_live_channel_info_copy_sip_phone_number_success_toast).show();
+            }
+        });
+    }
+
+    private void observeSipCallInNumber() {
+        sipLinkMicViewModel
+                .getUiStateLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicUiState>() {
+                    @Override
+                    public void onChanged(@Nullable final PLVSipLinkMicUiState sipLinkMicUiState) {
+                        if (sipLinkMicUiState == null) {
+                            return;
+                        }
+                        final boolean showSipLayout = sipLinkMicUiState.sipEnable && !TextUtils.isEmpty(sipLinkMicUiState.sipCallInNumber);
+                        channelSipCallInNumberLl.setVisibility(showSipLayout ? VISIBLE : GONE);
+                        channelSipCallInNumberTv.setText(format(getString(R.string.plvls_live_channel_info_sip_phone_number_text), sipLinkMicUiState.sipCallInNumber));
+                        sipCallInNumber = sipLinkMicUiState.sipCallInNumber;
+                    }
+                });
     }
     // </editor-fold>
 
@@ -282,7 +347,7 @@ public class PLVLSChannelInfoLayout extends FrameLayout {
                 }
                 PolyvLiveClassDetailVO.DataBean dataBean = liveClassDetailVO.getData();
                 String channelName = dataBean.getName();//频道名称
-                String liveStartTime = StringUtils.isEmpty(dataBean.getStartTime()) ? PLVAppUtils.getString(R.string.plv_live_nothing) : dataBean.getStartTime();//直播开始时间
+                String liveStartTime = StringUtils.isEmpty(dataBean.getStartTime()) ? getString(R.string.plv_live_nothing) : dataBean.getStartTime();//直播开始时间
                 String channelId = dataBean.getChannelId() + "";//频道id
 
                 plvlsChannelInfoChannelNameTv.setText(channelName);

@@ -138,12 +138,6 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         put(PLVStreamerConfig.Bitrate.BITRATE_SUPER, R.drawable.plvsa_bitrate_icon_fhd);
         put(PLVStreamerConfig.Bitrate.BITRATE_SUPER_HIGH, R.drawable.plvsa_bitrate_icon_uhd);
     }};
-    private final Map<String, Integer> qualityLevelMapIcon = new HashMap<String, Integer>() {{
-        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_LSD, R.drawable.plvsa_bitrate_icon_sd);
-        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_HSD, R.drawable.plvsa_bitrate_icon_hd);
-        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_SHD, R.drawable.plvsa_bitrate_icon_fhd);
-        put(PLVLinkMicConstant.QualityLevel.QUALITY_LEVEL_FHD, R.drawable.plvsa_bitrate_icon_uhd);
-    }};
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -298,15 +292,15 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         mixLayout = new PLVSAMixLayout(getContext());
         mixLayout.setOnViewActionListener(new PLVSAMixLayout.OnViewActionListener() {
             @Override
-            public int getMixInfo() {
-                return onViewActionListener != null ? onViewActionListener.getMixInfo() : PLVStreamerConfig.MixStream.MIX_LAYOUT_TYPE_TILE;
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return onViewActionListener != null ? onViewActionListener.getMixLayoutType() : PLVStreamerConfig.MixLayoutType.TILE;
             }
 
             @Override
-            public void onMixClick(int mix) {
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 mixLayout.close();
                 if (onViewActionListener != null) {
-                    onViewActionListener.onMixClick(mix);
+                    onViewActionListener.onChangeMixLayoutType(mix);
                 }
             }
         });
@@ -421,8 +415,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             int i = 0;
             for (PLVPushStreamTemplateJsonBean.VideoParamsBean videoParamsBean : pushStreamTemplateJsonBean.getVideoParams()) {
                 i++;
-                bitrateMapIcon.put(i, qualityLevelMapIcon.get(videoParamsBean.getQualityLevel()));
+                bitrateMapIcon.put(i, getQualityIcon(videoParamsBean.getQualityLevel()));
             }
+        }
+    }
+
+    private int getQualityIcon(String qualityLevel) {
+       if (PLVLinkMicConstant.QualityLevel.isHSD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_hd;
+        } else if (PLVLinkMicConstant.QualityLevel.isSHD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_fhd;
+        } else if (PLVLinkMicConstant.QualityLevel.isFHD(qualityLevel)) {
+            return R.drawable.plvsa_bitrate_icon_uhd;
+        } else {
+            return R.drawable.plvsa_bitrate_icon_sd;
         }
     }
     // </editor-fold>
@@ -442,6 +448,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         initStartLiveBtnText();
         initPushResolutionRatioLayout();
 
+        updateOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
         setupDefaultPushResolution(liveRoomDataManager);
     }
 
@@ -603,14 +610,18 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        updateOnOrientationChanged(isLandscape);
+    }
 
-        updatePushResolutionRatioOnOrientationChanged(newConfig);
+    private void updateOnOrientationChanged(boolean isLandscape) {
+        updatePushResolutionRatioOnOrientationChanged(isLandscape);
 
         MarginLayoutParams settingConfigLayoutParam = (MarginLayoutParams) plvsaSettingConfigLy.getLayoutParams();
         MarginLayoutParams settingButtonLayoutParam = (MarginLayoutParams) plvsaSettingBtnLl.getLayoutParams();
         int liveTitleMaxLines;
 
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isLandscape) {
             settingConfigLayoutParam.width = ConvertUtils.dp2px(450);
             settingButtonLayoutParam.width = ConvertUtils.dp2px(450);
             settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND;
@@ -629,14 +640,17 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingLiveTitleTv.setMaxLines(liveTitleMaxLines);
     }
 
-    private void updatePushResolutionRatioOnOrientationChanged(Configuration newConfig) {
+    private void updatePushResolutionRatioOnOrientationChanged(boolean isLandscape) {
+        if (liveRoomDataManager == null) {
+            return;
+        }
         final boolean userAllowChangeRatio = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RATIO);
         final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
         if (!userAllowChangeRatio || !channelAllowChangeRatio) {
             return;
         }
 
-        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (!isLandscape) {
             // 竖屏推流只支持 16:9
             if (streamerPresenter != null) {
                 streamerPresenter.setPushResolutionRatio(PLVLinkMicConstant.PushResolutionRatio.RATIO_16_9);

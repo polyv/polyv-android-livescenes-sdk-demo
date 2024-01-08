@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
 import androidx.annotation.IntRange;
+import android.text.TextUtils;
 
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -29,6 +30,8 @@ public class PLVLinkMicItemDataBean {
     private String linkMicId;
     //用户Id
     private String userId;
+    //登录Id(登录socket的Id)
+    private String loginId;
     //是否mute视频
     private boolean muteVideo;
     //是否mute音频
@@ -260,6 +263,16 @@ public class PLVLinkMicItemDataBean {
         this.userId = userId;
     }
 
+    public String getLoginId() {
+        if (TextUtils.isEmpty(loginId)) {
+            return userId;
+        }
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
 
     public boolean isScreenShare() {
         return isScreenShare;
@@ -337,6 +350,7 @@ public class PLVLinkMicItemDataBean {
                 "nick='" + nick + '\'' +
                 ", linkMicId='" + linkMicId + '\'' +
                 ", userId='" + userId + '\'' +
+                ", loginId='" + loginId + '\'' +
                 ", muteVideo=" + muteVideo +
                 ", muteAudio=" + muteAudio +
                 ", cupNum=" + cupNum +

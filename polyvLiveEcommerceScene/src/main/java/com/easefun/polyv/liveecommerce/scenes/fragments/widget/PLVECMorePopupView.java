@@ -132,16 +132,34 @@ public class PLVECMorePopupView {
     public void initPlaybackMoreLayout(View v) {
         if (playbackMorePopupWindow == null) {
             playbackMorePopupWindow = new PopupWindow(v.getContext());
-            View view = initPopupWindow(v, R.layout.plvec_live_more_popup_layout, playbackMorePopupWindow);
+            rootview = initPopupWindow(v, R.layout.plvec_live_more_popup_layout, playbackMorePopupWindow);
+            titleTv = rootview.findViewById(R.id.plvec_popup_title_tv);
+            orientationLayout = rootview.findViewById(R.id.plvec_more_pop_vertical_ly);
 
-            PLVBlurUtils.initBlurView((PLVBlurView) view.findViewById(R.id.blur_ly));
-            moreLayout = view.findViewById(R.id.plvec_more_ly);
+            orientationLayout.setOnLandscape(new Runnable() {
+                @Override
+                public void run() {
+                    onLandscape();
+                }
+            });
+
+            orientationLayout.setOnPortrait(new Runnable() {
+                @Override
+                public void run() {
+                    onPortrait();
+                }
+            });
+
+            PLVBlurUtils.initBlurView((PLVBlurView) rootview.findViewById(R.id.blur_ly));
+            moreLayout = rootview.findViewById(R.id.plvec_more_ly);
+
         }
     }
 
     public void onPortrait() {
         isOnLandscape = false;
         initPortraitChangeLayout(rootview,liveMorePopupWindow);
+        initPortraitChangeLayout(rootview,playbackMorePopupWindow);
         titleTv.setVisibility(View.GONE);
 
     }
@@ -149,7 +167,10 @@ public class PLVECMorePopupView {
     public void onLandscape() {
         isOnLandscape = true;
         initLandscapeChangeLayout(rootview,liveMorePopupWindow);
-        titleTv.setVisibility(View.VISIBLE);
+        initLandscapeChangeLayout(rootview,playbackMorePopupWindow);
+        if (titleTv != null) {
+            titleTv.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -464,7 +485,7 @@ public class PLVECMorePopupView {
                             if (speedPopupView == null) {
                                 speedPopupView = new PLVSpeedPopupView(v);
                             }
-                            speedPopupView.show(currentSpeed, new PLVSpeedPopupView.OnViewActionListener() {
+                            speedPopupView.show(isOnLandscape, currentSpeed, new PLVSpeedPopupView.OnViewActionListener() {
                                 @Override
                                 public void onChangeSpeedClick(View v, float speed) {
                                     if (playbackMoreClickListener != null) {
