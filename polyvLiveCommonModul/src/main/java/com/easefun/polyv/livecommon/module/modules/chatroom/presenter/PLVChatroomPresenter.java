@@ -127,6 +127,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -144,6 +145,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     public static final int GET_CHAT_HISTORY_COUNT = 10;
     //聊天信息处理间隔
     private static final int CHAT_MESSAGE_TIMESPAN = 500;
+    //定时获取观看热度间隔
+    private static final int GET_PAGE_VIEW_TIMESPAN = 60;
 
     // model
     private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
@@ -195,6 +198,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     //请求踢出的用户列表的disposable
     private Disposable kickUsersDisposable;
+    //定时获取观看热度的disposable
+    private Disposable getPageViewDisposable;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -222,6 +227,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         this.liveRoomDataManager = liveRoomDataManager;
         chatroomData = new PLVChatroomData();
         subscribeChatroomMessage();
+        requestPageViewTimer();
         observeLiveRoomData();
     }
     // </editor-fold>
@@ -776,6 +782,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         if (chatEmotionImagesDisposable != null){
             chatEmotionImagesDisposable.dispose();
+        }
+        if (getPageViewDisposable != null) {
+            getPageViewDisposable.dispose();
         }
         if (kickUsersDisposable != null) {
             kickUsersDisposable.dispose();
@@ -1540,6 +1549,30 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         });
     }
     // </editor-fold>
+    
+    // <editor-folder defaultstate="collapsed" desc="数据获取 - 定时获取更新观看热度">
+    private void requestPageViewTimer() {
+        getPageViewDisposable = Observable.interval(0, GET_PAGE_VIEW_TIMESPAN, TimeUnit.SECONDS)
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return PLVChatApiRequestHelper.getPageView(liveRoomDataManager.getConfig().getChannelId());
+                    }
+                })
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        viewerCount = aLong;
+                        chatroomData.postViewerCountData(viewerCount);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 观察直播间的数据">
     private void observeLiveRoomData() {
