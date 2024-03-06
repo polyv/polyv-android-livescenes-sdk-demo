@@ -35,11 +35,11 @@ public interface IPLVLSStatusBarLayout {
     void setOnViewActionListener(OnViewActionListener listener);
 
     /**
-     * 获取成员列表布局中的streamerView
+     * 获取streamerView
      *
      * @return streamerView
      */
-    IPLVStreamerContract.IStreamerView getMemberLayoutStreamerView();
+    IPLVStreamerContract.IStreamerView getStreamerView();
 
     /**
      * 显示无网络时的对话框

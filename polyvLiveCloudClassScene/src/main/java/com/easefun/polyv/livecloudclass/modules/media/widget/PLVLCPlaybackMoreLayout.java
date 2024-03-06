@@ -72,6 +72,8 @@ public class PLVLCPlaybackMoreLayout {
     //倍速列表数据
     private List<Float> speedVO = new ArrayList<>();
 
+    private boolean enableSpeedControl = true;
+
     private Handler handler = new Handler(Looper.getMainLooper());
     // </editor-fold>
 
@@ -216,6 +218,11 @@ public class PLVLCPlaybackMoreLayout {
         rvAdapter.updateSpeedListData(speedVO, speedPos);
         showSpeed(true);
     }
+
+    public void setEnableSpeedControl(boolean enableSpeedControl) {
+        this.enableSpeedControl = enableSpeedControl;
+        showSpeed(true);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="状态更新">
@@ -336,7 +343,7 @@ public class PLVLCPlaybackMoreLayout {
     }
 
     public void showSpeed(boolean show) {
-        if (show && rvAdapter.getItemCount() > 1) {
+        if (show && enableSpeedControl && rvAdapter.getItemCount() > 1) {
             llSpeed.setVisibility(View.VISIBLE);
             if (ScreenUtils.isLandscape()) {
                 landscapeSpeedTv.setVisibility(View.VISIBLE);

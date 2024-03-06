@@ -151,6 +151,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
+    // 服务端的PPT翻页开关
+    private boolean isServerEnablePptTurnPage = true;
     // 服务端的点赞开关
     private boolean isLikesSwitchEnabled = true;
     // 服务端的打赏开关
@@ -475,7 +477,23 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void setServerEnablePptTurnPage(boolean serverEnablePptTurnPage) {
+        this.isServerEnablePptTurnPage = serverEnablePptTurnPage;
+        if (!isServerEnablePptTurnPage) {
+            if (pptTurnPageLandLayout != null) {
+                pptTurnPageLandLayout.setVisibility(View.GONE);
+            }
+            if (pptTurnPagePortLayout != null) {
+                pptTurnPagePortLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
     public void setTurnPageLayoutStatus(boolean isShow) {
+        if (!isServerEnablePptTurnPage) {
+            isShow = false;
+        }
         pptTurnPageLandLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
         pptTurnPagePortLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }

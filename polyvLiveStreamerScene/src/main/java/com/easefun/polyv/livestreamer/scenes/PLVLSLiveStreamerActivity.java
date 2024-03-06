@@ -330,7 +330,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsStatusBarLy.init(liveRoomDataManager);
 
         // 注册成员列表中的streamerView，并请求成员列表接口
-        plvlsStreamerLy.getStreamerPresenter().registerView(plvlsStatusBarLy.getMemberLayoutStreamerView());
+        plvlsStreamerLy.getStreamerPresenter().registerView(plvlsStatusBarLy.getStreamerView());
         plvlsStreamerLy.getStreamerPresenter().requestMemberList();
 
         // 初始化聊天室布局

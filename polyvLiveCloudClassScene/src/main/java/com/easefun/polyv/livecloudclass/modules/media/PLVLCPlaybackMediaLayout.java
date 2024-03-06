@@ -442,6 +442,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
+        mediaController.initData(liveRoomDataManager);
 
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());

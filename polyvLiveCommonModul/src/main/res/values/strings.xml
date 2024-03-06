@@ -360,6 +360,8 @@
     <string name="plv_streamer_network_disconnect">Network disconnected</string>
     <string name="plv_streamer_network_cannot_connect">Network unavailable</string>
     <string name="plv_streamer_bitrate_desc">Bitrate: %skbps, Frame Rate: %sfps</string>
+    <string name="plv_streamer_open_audio_linkmic_toast">Audio call has been enabled</string>
+    <string name="plv_streamer_open_video_linkmic_toast">Video call has been enabled</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>

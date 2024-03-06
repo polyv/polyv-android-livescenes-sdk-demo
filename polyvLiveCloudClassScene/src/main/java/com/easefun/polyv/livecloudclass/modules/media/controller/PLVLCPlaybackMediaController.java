@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackMoreLayout;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
@@ -33,6 +34,9 @@ import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -100,6 +104,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     //player presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter;
+
+    private IPLVLiveRoomDataManager liveRoomDataManager;
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
@@ -290,6 +296,22 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public void initData(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+        String channelId = liveRoomDataManager.getConfig().getChannelId();
+        boolean enableSpeedControl = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_SPEED_CONTROL_ENABLE);
+        boolean enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = PLVChannelFeatureManager.onChannel(channelId)
+                .getOrDefault(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY, PLVLivePlaybackSeekBarStrategy.ALLOW_SEEK);
+
+        ivPlayPausePort.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        ivPlayPauseLand.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        moreLayout.setEnableSpeedControl(enableSpeedControl);
+        sbPlayProgressPort.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+        sbPlayProgressLand.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
     public View getLandscapeDanmuSwitchView() {
         return ivDanmuSwitchLand;
     }
@@ -344,6 +366,15 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     @Override
     public void playOrPause() {
+        boolean enablePlayButton = true;
+        if (liveRoomDataManager != null) {
+            String channelId = liveRoomDataManager.getConfig().getChannelId();
+            enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        }
+        if (!enablePlayButton) {
+            return;
+        }
+
         if (playerPresenter.isPlaying()) {
             playerPresenter.pause();
             ivPlayPausePort.setSelected(false);

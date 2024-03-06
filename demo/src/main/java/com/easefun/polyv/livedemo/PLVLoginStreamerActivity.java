@@ -209,7 +209,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
             return;
         }
         updateLoginViewStatus(true);
-        final String channelId = plvlsLoginInputChannelEt.getText().toString();
+        final String channelId = plvlsLoginInputChannelEt.getText().toString().trim();
         final String nick = plvlsLoginInputNickEt.getText().toString().trim();
         final String password = plvlsLoginInputPwdEt.getText().toString();
 

@@ -5,6 +5,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
@@ -24,6 +25,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * @param playerPresenter 回放播放器presenter
      */
     void setPlaybackPlayerPresenter(IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter);
+
+    /**
+     * 初始化数据
+     *
+     * @param liveRoomDataManager
+     */
+    void initData(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
      * 获取横屏弹幕的开关按钮
