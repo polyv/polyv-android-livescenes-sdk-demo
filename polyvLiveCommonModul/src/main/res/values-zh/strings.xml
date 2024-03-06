@@ -360,6 +360,8 @@
     <string name="plv_streamer_network_disconnect">网络断开</string>
     <string name="plv_streamer_network_cannot_connect">无法连接</string>
     <string name="plv_streamer_bitrate_desc">码率：%skbps，帧率：%sfps</string>
+    <string name="plv_streamer_open_audio_linkmic_toast">已开启音频连麦</string>
+    <string name="plv_streamer_open_video_linkmic_toast">已开启视频连麦</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>

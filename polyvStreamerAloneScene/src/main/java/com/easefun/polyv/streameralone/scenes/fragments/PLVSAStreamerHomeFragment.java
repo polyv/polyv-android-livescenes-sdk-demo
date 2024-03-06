@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeauty
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -177,6 +178,16 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         });
     }
 
+    private void initAutoOpenLinkMic(IPLVLiveRoomDataManager liveRoomDataManager) {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN)) {
+            return;
+        }
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        final boolean isAutoOpenLinkMic = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_ENABLE);
+        final String autoOpenLinkMicType = PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_TYPE);
+        plvsaToolBarLinkmicIv.performAutoOpenLinkMic(isAutoOpenLinkMic, "video".equals(autoOpenLinkMicType));
+    }
+
     private void observeBeautyLayoutStatus() {
         if (getActivity() == null) {
             return;
@@ -209,6 +220,30 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                     }
                 });
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Streamer - Mvp View">
+
+    private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
+
+        @Override
+        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+            if (homeFragmentLayout == null) {
+                return;
+            }
+            presenter.getData().getStreamerStatus().observe((LifecycleOwner) homeFragmentLayout.getContext(), new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isLive) {
+                    if (Boolean.TRUE.equals(isLive)) {
+                        if (liveRoomDataManager != null) {
+                            initAutoOpenLinkMic(liveRoomDataManager);
+                        }
+                    }
+                }
+            });
+        }
+    };
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -272,6 +307,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     public IPLVStreamerContract.IStreamerView getStreamerView() {
         return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
                 .proxyAll(
+                        streamerView,
                         nullable(new PLVSugarUtil.Supplier<IPLVStreamerContract.IStreamerView>() {
                             @Override
                             public IPLVStreamerContract.IStreamerView get() {

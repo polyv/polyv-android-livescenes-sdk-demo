@@ -48,10 +48,15 @@ import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVPlaybackVideoParams;
 import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.exts.Nullables;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVControlUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
 import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
@@ -223,7 +228,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void seekTo(int duration) {
-        if (videoView != null) {
+        if (videoView != null && checkCanSeekTo(duration)) {
             videoView.seekTo(duration);
         }
     }
@@ -233,9 +238,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null && videoView.isInPlaybackStateEx()) {
             int seekPosition = (int) ((long) videoView.getDuration() * progress / max);
             if (!videoView.isCompletedState()) {
-                videoView.seekTo(seekPosition);
+                seekTo(seekPosition);
             } else if (seekPosition < videoView.getDuration()) {
-                videoView.seekTo(seekPosition);
+                seekTo(seekPosition);
                 videoView.start();
             }
         }
@@ -651,6 +656,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeLeftListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeLeftListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    if (!checkAllowSwipeSeek()) {
+                        return;
+                    }
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
@@ -665,7 +673,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             if (view != null) {
                                 boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
                                 if (result) {
-                                    videoView.seekTo(fastForwardPos);
+                                    seekTo(fastForwardPos);
                                     if (videoView.isCompletedState()) {
                                         videoView.start();
                                     }
@@ -688,6 +696,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeRightListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeRightListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    if (!checkAllowSwipeSeek()) {
+                        return;
+                    }
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
@@ -702,9 +713,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                                 boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
                                 if (result) {
                                     if (!videoView.isCompletedState()) {
-                                        videoView.seekTo(fastForwardPos);
+                                        seekTo(fastForwardPos);
                                     } else if (fastForwardPos < videoView.getDuration()) {
-                                        videoView.seekTo(fastForwardPos);
+                                        seekTo(fastForwardPos);
                                         videoView.start();
                                     }
                                 }
@@ -1090,6 +1101,54 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             resultList.add(resultVO);
         }
         return resultList;
+    }
+
+    private boolean checkAllowSwipeSeek() {
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = getSeekBarStrategy();
+        if (seekBarStrategy == null) {
+            return false;
+        }
+        switch (seekBarStrategy) {
+            case ALLOW_SEEK:
+            case ALLOW_SEEK_PLAYED:
+                return true;
+            case NOT_ALLOW_SEEK:
+            case INVISIBLE:
+            default:
+                return false;
+        }
+    }
+
+    private boolean checkCanSeekTo(long position) {
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = getSeekBarStrategy();
+        if (seekBarStrategy == null) {
+            return false;
+        }
+        switch (seekBarStrategy) {
+            case ALLOW_SEEK:
+                return true;
+            case ALLOW_SEEK_PLAYED:
+                int videoPlayedPosition = Nullables.of(new PLVSugarUtil.Supplier<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return playbackPlayerRepo.getPlaybackProgress(playbackDataVO).getPosition();
+                    }
+                }).getOrDefault(0);
+                return position < videoPlayedPosition;
+            case NOT_ALLOW_SEEK:
+            case INVISIBLE:
+            default:
+                return false;
+        }
+    }
+
+    @Nullable
+    private PLVLivePlaybackSeekBarStrategy getSeekBarStrategy() {
+        if (liveRoomDataManager == null) {
+            return null;
+        }
+        return PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY);
     }
     // </editor-fold>
 }

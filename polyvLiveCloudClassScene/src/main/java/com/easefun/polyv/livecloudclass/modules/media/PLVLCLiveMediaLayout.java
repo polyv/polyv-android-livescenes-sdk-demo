@@ -85,6 +85,8 @@ import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -658,6 +660,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         this.liveRoomDataManager = liveRoomDataManager;
         floatingWindow.setLiveRoomData(liveRoomDataManager);
 
+        initWithLiveRoomData(liveRoomDataManager);
         observeLiveRoomData();
 
         livePlayerPresenter = new PLVLivePlayerPresenter(liveRoomDataManager);
@@ -673,6 +676,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
+    }
+
+    private void initWithLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
+        mediaController.setServerEnablePptTurnPage(
+                PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_PPT_ENABLE_TURN_PAGE)
+        );
     }
 
     @Override

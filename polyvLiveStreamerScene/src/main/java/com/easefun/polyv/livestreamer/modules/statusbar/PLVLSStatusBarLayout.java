@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerCon
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingInListState;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingOutListState;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -68,6 +69,9 @@ import java.util.Locale;
 public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBarLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final int WHAT_HIDE_USER_REQUEST_TIPS = 1;
+
+    @Nullable
+    private IPLVLiveRoomDataManager liveRoomDataManager = null;
 
     //view
     private TextView plvlsStatusBarChannelInfoTv;
@@ -390,6 +394,16 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
 
+    private void initAutoOpenLinkMic(IPLVLiveRoomDataManager liveRoomDataManager) {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN)) {
+            return;
+        }
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        final boolean isAutoOpenLinkMic = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_ENABLE);
+        final String autoOpenLinkMicType = PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_TYPE);
+        plvlsStatusBarLinkmicIv.performAutoOpenLinkMic(isAutoOpenLinkMic, "video".equals(autoOpenLinkMicType));
+    }
+
     private void observeSipLinkMicListUpdate() {
         sipLinkMicViewModel.getCallingInListStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicCallingInListState>() {
             @Override
@@ -417,9 +431,31 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="Streamer - Mvp View">
+
+    private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
+
+        @Override
+        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+            presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isLive) {
+                    if (Boolean.TRUE.equals(isLive)) {
+                        if (liveRoomDataManager != null) {
+                            initAutoOpenLinkMic(liveRoomDataManager);
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现父类IPLVLSStatusBarLayout的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
         channelInfoLayout.init(liveRoomDataManager);
         memberLayout.init(liveRoomDataManager);
         moreSettingLayout.init(liveRoomDataManager);
@@ -438,9 +474,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     @Override
-    public IPLVStreamerContract.IStreamerView getMemberLayoutStreamerView() {
+    public IPLVStreamerContract.IStreamerView getStreamerView() {
         return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
-                .proxyAll(memberLayout.getStreamerView(), plvlsStatusBarLinkmicIv.streamerView);
+                .proxyAll(
+                        streamerView,
+                        memberLayout.getStreamerView(),
+                        plvlsStatusBarLinkmicIv.streamerView
+                );
     }
 
     @Override

@@ -189,6 +189,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable quizHistoryDisposable;
     //历史记录是否包含打赏事件
     private boolean isHistoryContainRewardEvent;
+    // 最旧一条聊天消息的时间戳
+    private Long oldestChatHistoryTimestamp = null;
+    // 跟最旧一条聊天消息时间戳相同的消息数量（包含最旧一条）
+    private Long oldestChatHistoryTimestampCount = null;
 
     //分组Id
     private String groupId;
@@ -523,9 +527,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (chatHistoryDisposable != null) {
             chatHistoryDisposable.dispose();
         }
-        int start = getChatHistoryTime * getChatHistoryCount;
-        int end = (getChatHistoryTime + 1) * getChatHistoryCount - 1;
-        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), start, end, 1, 1)
+        final String userId = liveRoomDataManager.getConfig().getUser().getViewerId();
+        final String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount)
                 .map(new Function<String, JSONArray>() {
                     @Override
                     public JSONArray apply(String responseBody) throws Exception {
@@ -815,6 +819,13 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 String messageSource = jsonObject.optString("msgSource");
                 JSONObject jsonObject_user = jsonObject.optJSONObject("user");
                 JSONObject jsonObject_content = jsonObject.optJSONObject("content");
+                Long messageTimestamp = jsonObject.optLong("time");
+                if (oldestChatHistoryTimestamp == null || messageTimestamp < oldestChatHistoryTimestamp) {
+                    oldestChatHistoryTimestamp = messageTimestamp;
+                    oldestChatHistoryTimestampCount = 1L;
+                } else if (oldestChatHistoryTimestamp.equals(messageTimestamp)) {
+                    oldestChatHistoryTimestampCount++;
+                }
                 if (!TextUtils.isEmpty(messageSource)) {
                     //收/发红包/图片信息/打赏信息，这里仅取图片信息
                     if (PLVHistoryConstant.MSGSOURCE_CHATIMG.equals(messageSource)) {

@@ -55,6 +55,8 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -255,6 +257,15 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void pause() {
+        boolean enablePlayButton = true;
+        if (liveRoomDataManager != null) {
+            String channelId = liveRoomDataManager.getConfig().getChannelId();
+            enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        }
+        if (!enablePlayButton) {
+            return;
+        }
+
         playbackPlayerPresenter.pause();
     }
 
