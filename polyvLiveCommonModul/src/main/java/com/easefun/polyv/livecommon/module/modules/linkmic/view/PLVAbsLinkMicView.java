@@ -54,12 +54,22 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
     }
 
     @Override
-    public void onJoinRtcChannel() {
+    public void onStartRtcWatch() {
 
     }
 
     @Override
-    public void onLeaveRtcChannel() {
+    public void onStopRtcWatch() {
+
+    }
+
+    @Override
+    public void onStartPureRtcWatch() {
+
+    }
+
+    @Override
+    public void onStopPureRtcWatch() {
 
     }
 
@@ -173,4 +183,8 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
 
     }
 
+    @Override
+    public void onUpdateLinkMicType(boolean isAudio) {
+
+    }
 }

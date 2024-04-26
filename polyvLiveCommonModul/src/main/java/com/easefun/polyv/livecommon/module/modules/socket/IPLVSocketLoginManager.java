@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 
 /**
  * socket登录管理器的接口，聊天、连麦、PPT、互动等功能都依赖于socket通信
@@ -92,6 +93,11 @@ public interface IPLVSocketLoginManager {
          * 自己的重新登录事件
          */
         void onReloginEvent(@NonNull PLVReloginEvent reloginEvent);
+
+        /**
+         * 直播间推流状态回调
+         */
+        void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent);
     }
     // </editor-fold>
 }

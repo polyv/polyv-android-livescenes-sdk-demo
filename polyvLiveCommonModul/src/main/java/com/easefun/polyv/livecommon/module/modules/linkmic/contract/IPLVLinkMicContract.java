@@ -69,14 +69,24 @@ public interface IPLVLinkMicContract {
         void onPrepareLinkMicList(String linkMicUid, PLVLinkMicListShowMode linkMicListShowMode, List<PLVLinkMicItemDataBean> linkMicList);
 
         /**
-         * 加入rtc频道
+         * 进入rtc观看
          */
-        void onJoinRtcChannel();
+        void onStartRtcWatch();
 
         /**
-         * 离开rtc频道
+         * 退出rtc观看
          */
-        void onLeaveRtcChannel();
+        void onStopRtcWatch();
+
+        /**
+         * 进入rtc纯流观看
+         */
+        void onStartPureRtcWatch();
+
+        /**
+         * 退出rtc纯流观看
+         */
+        void onStopPureRtcWatch();
 
         /**
          * 改变连麦列表显示模式
@@ -222,6 +232,13 @@ public interface IPLVLinkMicContract {
          * @param newPos               新的第一画面的位置
          */
         void updateFirstScreenChanged(String firstScreenLinkMicId, int oldPos, int newPos);
+
+        /**
+         * 连麦类型更新回调
+         *
+         * @param isAudio 是否音频连麦
+         */
+        void onUpdateLinkMicType(boolean isAudio);
     }
 
     interface IPLVLinkMicPresenter {
@@ -296,6 +313,16 @@ public interface IPLVLinkMicContract {
         void muteAllVideo(boolean mute);
 
         /**
+         * 本地音频是否打开
+         */
+        boolean isEnableLocalAudio();
+
+        /**
+         * 本地视频是否打开
+         */
+        boolean isEnableLocalVideo();
+
+        /**
          * 切换前后置摄像头方向
          */
         void switchCamera();
@@ -351,6 +378,16 @@ public interface IPLVLinkMicContract {
          * @param renderView 渲染器
          */
         void releaseRenderView(View renderView);
+
+        /**
+         * 设置rtc混流观看渲染
+         */
+        void setupMixStreamView(View renderView);
+
+        /**
+         * 释放rtc混流观看渲染视图
+         */
+        void releaseMixStreamView(View renderView);
 
         /**
          * 是否加入连麦

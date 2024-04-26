@@ -13,7 +13,7 @@
         android:id="@+id/plvsa_member_online_count_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="在线人数"
+        android:text="@string/plv_chat_online_count_2"
         android:textColor="#FFF0F1F5"
         android:textSize="18sp" />
 

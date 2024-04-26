@@ -2,9 +2,13 @@ package com.easefun.polyv.livecommon.ui.util;
 
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
+import android.app.Activity;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 
 import java.lang.ref.WeakReference;
 
@@ -14,6 +18,9 @@ import java.lang.ref.WeakReference;
 public class PLVViewUtil {
 
     private static final int TAG_VIEW_UTIL_SHOW_DURATION = R.id.plv_view_util_show_view_for_duration_tag;
+    private static final Point POINT = new Point();
+    private static final Rect RECT = new Rect(0, 0, 0, 0);
+    private static final int[] LOCATION = new int[2];
 
     public static void showViewForDuration(final View view, final long durationInMillis) {
         if (view == null) {
@@ -38,4 +45,17 @@ public class PLVViewUtil {
         });
     }
 
+    public static boolean isViewVisible(View view) {
+        try {
+            ((Activity) view.getContext()).getWindowManager().getDefaultDisplay().getSize(POINT);
+            final int screenWidth = POINT.x;
+            final int screenHeight = POINT.y;
+            RECT.set(0, 0, screenWidth, screenHeight);
+            view.getLocationInWindow(LOCATION);
+            return view.getLocalVisibleRect(RECT);
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+        }
+        return false;
+    }
 }

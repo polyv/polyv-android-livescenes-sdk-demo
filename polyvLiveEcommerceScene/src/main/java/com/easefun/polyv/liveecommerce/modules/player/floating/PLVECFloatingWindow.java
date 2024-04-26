@@ -17,9 +17,11 @@ import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
+import com.easefun.polyv.liveecommerce.R;
 import com.plv.business.api.common.player.PLVBaseVideoView;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
@@ -37,6 +39,7 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     private boolean requestShowByCommodityPage = false;
     private boolean requestShowByUser = false;
+    private boolean isLanderScreen = false;
     @Nullable
     private PLVSwitchViewAnchorLayout contentAnchorLayout;
     @Nullable
@@ -79,6 +82,10 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     public void setLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+    }
+
+    public void setLanderScreen(boolean isLanderScreen){
+        this.isLanderScreen = isLanderScreen;
     }
 
     /**
@@ -132,6 +139,9 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     // 根据视频宽高适配悬浮窗宽高
     private int[] getFloatingSize() {
+        if (isLanderScreen) {
+            return new int[]{ConvertUtils.dp2px(240), ConvertUtils.dp2px(134)};
+        }
         int width = ConvertUtils.dp2px(90);
         int height = ConvertUtils.dp2px(160);
         boolean isPortrait = orientation != PLVFloatingEnums.Orientation.LANDSCAPE;
@@ -268,8 +278,8 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
         } else {
             final Activity topActivity = ActivityUtils.getTopActivity();
             new AlertDialog.Builder(topActivity == null ? context : topActivity)
-                    .setMessage("悬浮小窗播放功能需要在应用设置中开启悬浮窗权限，是否前往开启权限？")
-                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    .setMessage(PLVAppUtils.getString(R.string.plv_player_floating_permission_apply_tips))
+                    .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_3), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PLVFloatPermissionUtils.requestPermission((Activity) context, new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
@@ -282,7 +292,7 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                             });
                         }
                     })
-                    .setNegativeButton("否", null)
+                    .setNegativeButton(PLVAppUtils.getString(R.string.plv_common_dialog_cancel_2), null)
                     .show();
 
         }

@@ -28,7 +28,7 @@
             android:layout_marginLeft="44dp"
             android:layout_marginRight="44dp"
             android:gravity="center_vertical"
-            android:text="频道信息"
+            android:text="@string/plv_live_channel_info"
             android:textColor="#F0F1F5"
             android:textSize="16sp" />
 
@@ -100,7 +100,7 @@
                         android:layout_toRightOf="@+id/plvls_channel_info_start_time_iv"
                         android:textColor="#F0F1F5"
                         android:textSize="14sp"
-                        tools:text="2015/05/09 10:00" />
+                        tools:text="直播时间 2015/05/09 10:00" />
 
                     <ImageView
                         android:id="@+id/plvls_channel_info_channel_id_iv"
@@ -122,7 +122,43 @@
                         android:layout_toRightOf="@+id/plvls_channel_info_channel_id_iv"
                         android:textColor="#F0F1F5"
                         android:textSize="14sp"
-                        tools:text="1111111" />
+                        tools:text="频道号 1111111" />
+
+                    <LinearLayout
+                        android:id="@+id/plvls_channel_sip_call_in_number_ll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/plvls_channel_info_start_time_iv"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/plvls_channel_sip_call_in_number_iv"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/plvls_live_room_sip_icon" />
+
+                        <TextView
+                            android:id="@+id/plvls_channel_sip_call_in_number_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:textColor="#F0F1F5"
+                            android:textSize="14sp"
+                            tools:text="电话连麦号码 1392839900142443234246" />
+
+                        <TextView
+                            android:id="@+id/plvls_channel_sip_call_in_number_copy_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:text="@string/plv_common_text_copy"
+                            android:textColor="#2C96FF"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
 
                     <ImageView
                         android:id="@+id/plvls_channel_info_live_desc_iv"
@@ -136,11 +172,11 @@
                         android:id="@+id/plvls_channel_info_live_desc_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/plvls_channel_info_start_time_iv"
+                        android:layout_below="@+id/plvls_channel_sip_call_in_number_ll"
                         android:layout_marginLeft="8dp"
                         android:layout_marginTop="12dp"
                         android:layout_toRightOf="@+id/plvls_channel_info_live_desc_iv"
-                        android:text="直播介绍"
+                        android:text="@string/plv_live_intro"
                         android:textColor="#F0F1F5"
                         android:textSize="14sp" />
                 </RelativeLayout>

@@ -97,15 +97,25 @@
 
             <TextView
                 android:id="@+id/plvls_streamer_guest_link_status_tv"
-                android:layout_width="41dp"
+                android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
                 android:background="@drawable/plvls_linkmic_guest_status_selector"
                 android:gravity="center"
-                android:text="未连麦"
+                android:minWidth="41dp"
+                android:paddingHorizontal="4dp"
+                android:text="@string/plv_linkmic_un_join"
                 android:textColor="#FFF0F1F5"
                 android:textSize="11sp" />
+
+            <com.easefun.polyv.livestreamer.modules.streamer.widget.PLVLSLinkMicDurationLayout
+                android:id="@+id/plvls_streamer_linkmic_duration_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/plvls_streamer_guest_link_status_tv"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="5dp" />
 
             <ImageView
                 android:id="@+id/plvls_streamer_speaker_permission_status_iv"
@@ -113,7 +123,7 @@
                 android:layout_height="16dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="2dp"
-                android:layout_toRightOf="@id/plvls_streamer_guest_link_status_tv"
+                android:layout_toRightOf="@id/plvls_streamer_linkmic_duration_layout"
                 android:src="@drawable/plvls_streamer_speaker"
                 android:visibility="invisible" />
 

@@ -27,6 +27,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -42,6 +43,7 @@ import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
@@ -72,6 +74,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private PLVLiveScene liveScene;
     private OnOpenInsideWebViewListener onOpenInsideWebViewListener;
     private PLVInsideWebViewLayout insideWebViewLayout;
+
+    //是否锁定到竖屏
+    private boolean isLockPortrait = false;
 
     private static final List<String> JS_HANDLER = listOf(
             PLVInteractJSBridgeEventConst.V2_GET_NATIVE_APP_PARAMS_INFO,
@@ -180,6 +185,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         // 回放暂时只支持卡片推送互动
         String watchStatus = liveRoomDataManager.getConfig().isLive() ? PLVInteractWebView2.WATCH_STATUS_LIVE : PLVInteractWebView2.WATCH_STATUS_PLAYBACK;
         plvlcInteractWeb.setWatchStatus(watchStatus);
+        plvlcInteractWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVInteractWebView2.LANG_EN : PLVInteractWebView2.LANG_ZH);
         plvlcInteractWeb.loadWeb();
         observeLiveData();
     }
@@ -214,6 +220,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     @Override
     public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
         String data = PLVGsonUtil.toJsonSimple(showPushCardEvent);
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
+    public void showLottery(PLVShowLotteryEvent showLotteryEvent) {
+        String data = PLVGsonUtil.toJsonSimple(showLotteryEvent);
         plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
             @Override
             public void onCallBack(String s) {
@@ -297,6 +314,11 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void updateOrientationLock(boolean isLock) {
+        this.isLockPortrait = isLock;
+    }
+
+    @Override
     public void destroy() {
         if (plvlcInteractWeb != null) {
             plvlcInteractWeb.removeAllViews();
@@ -377,7 +399,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private void processWebViewVisibility(boolean close) {
         Log.d(TAG, "processWebViewVisibility close: " + close);
         setVisibility(close ? View.INVISIBLE : View.VISIBLE);
-        if (close) {
+        if (close && !isLockPortrait) {
             //隐藏的时候解锁屏幕方向锁定
             PLVOrientationManager.getInstance().unlockOrientation();
         }
@@ -386,7 +408,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
 
     private void processWebViewUpdateAppStatus(String data, CallBackFunction callBackFunction) {
         PLVWebviewUpdateAppStatusVO appStatusVO = PLVGsonUtil.fromJson(PLVWebviewUpdateAppStatusVO.class, data);
-        liveRoomDataManager.getInteractStatusData().postValue(appStatusVO);
+        liveRoomDataManager.getInteractStatusData().setValue(appStatusVO);
     }
 
     private String getNativeAppPramsInfo() {

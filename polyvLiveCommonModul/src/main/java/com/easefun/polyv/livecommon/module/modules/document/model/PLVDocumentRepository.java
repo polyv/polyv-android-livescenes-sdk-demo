@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.annotation.Nullable;
 import android.util.SparseArray;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livescenes.document.PLVSDocumentWebProcessor;
@@ -17,6 +18,7 @@ import com.easefun.polyv.livescenes.upload.IPLVSDocumentUploadManager;
 import com.easefun.polyv.livescenes.upload.OnPLVSDocumentUploadListener;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.document.PLVDocumentWebProcessor;
@@ -254,7 +256,7 @@ public class PLVDocumentRepository {
         if (jsModel != null) {
             plvsPptJsModelLiveData.postValue(PLVStatefulData.success(jsModel));
         } else {
-            plvsPptJsModelLiveData.postValue(PLVStatefulData.<PLVSPPTJsModel>error("没有缓存对应的文档列表，请先打开该PPT文档"));
+            plvsPptJsModelLiveData.postValue(PLVStatefulData.<PLVSPPTJsModel>error(PLVAppUtils.getString(R.string.plv_ppt_no_cache_hint)));
         }
     }
 

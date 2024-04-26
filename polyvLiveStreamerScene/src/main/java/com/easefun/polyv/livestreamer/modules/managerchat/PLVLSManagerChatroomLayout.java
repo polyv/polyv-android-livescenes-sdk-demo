@@ -1,5 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.managerchat;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -53,8 +55,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 /**
  * @author Hoshiiro
@@ -461,7 +461,7 @@ public class PLVLSManagerChatroomLayout extends FrameLayout implements View.OnCl
         final boolean isInputTextEmpty = TextUtils.isEmpty(lastInputText);
         final boolean showInputHint = !isNetworkConnected || isInputTextEmpty;
         if (showInputHint) {
-            final String hintText = isNetworkConnected ? getContext().getString(R.string.plvls_manager_chatroom_input_tv_hint) : getContext().getString(R.string.plvls_manager_chatroom_input_tv_hint_network_disconnect);
+            final String hintText = isNetworkConnected ? getContext().getString(R.string.plv_chat_input_tips_chat_5) : getContext().getString(R.string.plvls_manager_chatroom_input_tv_hint_network_disconnect);
             managerChatroomInputTv.setText("");
             managerChatroomInputTv.setHint(hintText);
         } else {

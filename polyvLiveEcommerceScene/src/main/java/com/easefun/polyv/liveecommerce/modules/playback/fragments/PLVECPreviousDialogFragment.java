@@ -1,6 +1,7 @@
 package com.easefun.polyv.liveecommerce.modules.playback.fragments;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -35,6 +36,8 @@ import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.commonnavi
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVECPreviousFragment;
+import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -76,15 +79,11 @@ public class PLVECPreviousDialogFragment extends DialogFragment implements IPLVE
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        Window window = getDialog().getWindow();
-        window.setGravity(Gravity.BOTTOM);
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        window.getDecorView().setPadding(0, 0, 0, 0);
-        WindowManager.LayoutParams layoutParams = window.getAttributes();
-        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(layoutParams);
-
+        if (PLVScreenUtils.isPortrait(getContext())) {
+            initPortrait();
+        } else {
+            initLandscape();
+        }
         contentView = inflater.inflate(R.layout.plvec_playback_more_video_layout, container, false);
         initView(contentView);
         addPreviousTab();
@@ -108,6 +107,16 @@ public class PLVECPreviousDialogFragment extends DialogFragment implements IPLVE
         }
         transaction.commit();
         super.show(manager, tag);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            initLandscape();
+        } else {
+            initPortrait();
+        }
     }
 
     @Override
@@ -188,11 +197,34 @@ public class PLVECPreviousDialogFragment extends DialogFragment implements IPLVE
             }
         });
     }
+
+    private void initLandscape() {
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.RIGHT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.getDecorView().setPadding(0, 0, 0, 0);
+        WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.width = ConvertUtils.dp2px(375);
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        window.setAttributes(layoutParams);
+    }
+
+    private void initPortrait() {
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.BOTTOM);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.getDecorView().setPadding(0, 0, 0, 0);
+        WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(layoutParams);
+    }
+
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="添加tab页"
+    // <editor-fold defaultstate="collapsed" desc="添加tab页">
     private void addPreviousTab() {
-        pageTabTitleList.add("回放列表");
+        pageTabTitleList.add(PLVAppUtils.getString(R.string.plv_previous_playback_list));
         previousFragment = new PLVECPreviousFragment();
         previousFragment.setPrviousView(plvPreviousView);
         pageTabFragmentList.add(previousFragment);

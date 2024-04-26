@@ -71,7 +71,7 @@ public class PLVWatermarkCommonController {
                         channelJsonWaterMarkVO.watermarkOpacity);
                 break;
             default:
-                PLVCommonLog.d(TAG,"channelJsonWaterMarkVO.watermarkType 类别出错");
+                PLVCommonLog.d(TAG,"channelJsonWaterMarkVO.watermarkType 类别出错");// no need i18n
                 break;
         }
 

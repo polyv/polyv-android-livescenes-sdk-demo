@@ -32,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical|right"
-                    android:text="模式"
+                    android:text="@string/plv_player_mode"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp" />
 
@@ -44,8 +44,10 @@
 
                     <TextView
                         android:id="@+id/tv_play_video_switch"
-                        android:layout_width="80dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="26dp"
+                        android:minWidth="80dp"
+                        android:paddingHorizontal="4dp"
                         android:layout_gravity="center_vertical"
                         android:background="@drawable/plvlc_controller_tv_blue_selector"
                         android:button="@null"
@@ -56,8 +58,10 @@
 
                     <TextView
                         android:id="@+id/tv_only_audio_switch"
-                        android:layout_width="80dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="26dp"
+                        android:minWidth="80dp"
+                        android:paddingHorizontal="4dp"
                         android:layout_gravity="center_vertical"
                         android:background="@drawable/plvlc_controller_tv_blue_selector"
                         android:button="@null"
@@ -82,7 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|right"
-                    android:text="清晰度"
+                    android:text="@string/plv_player_definition"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp" />
 
@@ -106,7 +110,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|right"
-                    android:text="线路"
+                    android:text="@string/plv_player_route"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp" />
 
@@ -130,7 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|right"
-                    android:text="延迟"
+                    android:text="@string/plv_player_latency"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp" />
 

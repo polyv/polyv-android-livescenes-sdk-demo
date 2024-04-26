@@ -2,22 +2,23 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:parentTag="android.widget.FrameLayout">
 
     <FrameLayout
         android:id="@+id/plvec_linkmic_fl_media_linkmic_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0E141E"
+        android:layout_height="match_parent"
+        android:background="@drawable/plvec_player_bg"
         android:visibility="gone"
         tools:visibility="visible">
         <!-- 连麦列表-->
         <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView
             android:id="@+id/plvec_link_mic_rv_linkmic_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#0E141E"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/plvec_player_bg"
             android:overScrollMode="never" />
     </FrameLayout>
 

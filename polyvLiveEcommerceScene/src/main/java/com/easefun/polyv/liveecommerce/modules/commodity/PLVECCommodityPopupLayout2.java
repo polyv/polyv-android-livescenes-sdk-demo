@@ -5,6 +5,7 @@ import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 import android.app.Activity;
 import androidx.lifecycle.Observer;
 import android.content.Context;
+import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
@@ -16,15 +17,17 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
-import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
@@ -35,9 +38,11 @@ import net.plv.android.jsbridge.CallBackFunction;
 public class PLVECCommodityPopupLayout2 extends FrameLayout {
 
     private PLVProductWebView commodityPopupWebView;
+    private boolean isLandspace = false;
 
     @Nullable
-    private PLVMenuDrawer menuDrawer;
+    private PLVMenuDrawer menuDrawerPortrait;
+    private PLVMenuDrawer menuDrawerLandspace;
 
     @Nullable
     private Observer<String> sessionIdObserver;
@@ -69,6 +74,7 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
 
     private void initWebView() {
         commodityPopupWebView
+                .setLang(PLVLanguageUtil.isENLanguage() ? PLVProductWebView.LANG_EN : PLVProductWebView.LANG_ZH)
                 .setOnNeedUpdateNativeAppParamsInfoHandler(new BridgeHandler() {
                     @Override
                     public void handler(String s, CallBackFunction callBackFunction) {
@@ -104,36 +110,83 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
     }
 
     public void show() {
-        if (menuDrawer == null) {
-            menuDrawer = PLVMenuDrawer.attach(
-                    (Activity) getContext(),
-                    PLVMenuDrawer.Type.OVERLAY,
-                    Position.BOTTOM,
-                    PLVMenuDrawer.MENU_DRAG_CONTAINER,
-                    ((Activity) getContext()).<ViewGroup>findViewById(R.id.plvec_popup_container)
-            );
-            menuDrawer.setMenuView(this);
-            menuDrawer.setMenuSize((int) (ScreenUtils.getScreenOrientatedHeight() * 0.6F));
-            menuDrawer.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
-            menuDrawer.setDrawOverlay(false);
-            menuDrawer.setDropShadowEnabled(false);
-            menuDrawer.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
-                @Override
-                public void onDrawerStateChange(int oldState, int newState) {
-                    if (newState == PLVMenuDrawer.STATE_CLOSED) {
-                        menuDrawer.detachToContainer();
-                    }
-                }
-
-                @Override
-                public void onDrawerSlide(float openRatio, int offsetPixels) {
-
-                }
-            });
+        if (isLandspace) {
+            showLandspaceMenDrawer();
         } else {
-            menuDrawer.attachToContainer();
+            showPortraitMenDrawer();
         }
-        menuDrawer.openMenu();
+    }
+
+    private void showLandspaceMenDrawer() {
+        menuDrawerLandspace = PLVMenuDrawer.attach(
+                (Activity) getContext(),
+                PLVMenuDrawer.Type.OVERLAY,
+                Position.END,
+                PLVMenuDrawer.MENU_DRAG_CONTAINER,
+                ((Activity) getContext()).<ViewGroup>findViewById(R.id.plvec_popup_container)
+        );
+        menuDrawerLandspace.setMenuView(this);
+        menuDrawerLandspace.setMenuSize((int) (ConvertUtils.dp2px(375)));
+        menuDrawerLandspace.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
+        menuDrawerLandspace.setDrawOverlay(false);
+        menuDrawerLandspace.setDropShadowEnabled(false);
+        menuDrawerLandspace.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
+            @Override
+            public void onDrawerStateChange(int oldState, int newState) {
+                if (newState == PLVMenuDrawer.STATE_CLOSED) {
+                    menuDrawerLandspace.detachToContainer();
+                }
+            }
+
+            @Override
+            public void onDrawerSlide(float openRatio, int offsetPixels) {
+
+            }
+        });
+        if (menuDrawerPortrait != null) {
+            menuDrawerPortrait.closeMenu();
+        }
+        menuDrawerLandspace.openMenu();
+
+        if (commodityPopupWebView != null) {
+            commodityPopupWebView.sendOpenProductEvent();
+        }
+    }
+
+    private void showPortraitMenDrawer() {
+
+        menuDrawerPortrait = PLVMenuDrawer.attach(
+                (Activity) getContext(),
+                PLVMenuDrawer.Type.OVERLAY,
+                Position.BOTTOM,
+                PLVMenuDrawer.MENU_DRAG_CONTAINER,
+                ((Activity) getContext()).<ViewGroup>findViewById(R.id.plvec_popup_container)
+        );
+        menuDrawerPortrait.setMenuView(this);
+        menuDrawerPortrait.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
+        menuDrawerPortrait.setDrawOverlay(false);
+        menuDrawerPortrait.setDropShadowEnabled(false);
+        menuDrawerPortrait.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
+            @Override
+            public void onDrawerStateChange(int oldState, int newState) {
+                if (newState == PLVMenuDrawer.STATE_CLOSED) {
+                    menuDrawerPortrait.detachToContainer();
+                }
+            }
+
+            @Override
+            public void onDrawerSlide(float openRatio, int offsetPixels) {
+
+            }
+        });
+        if (menuDrawerLandspace != null) {
+            menuDrawerLandspace.closeMenu();
+        }
+        menuDrawerPortrait.openMenu();
+
+        if (commodityPopupWebView != null) {
+            commodityPopupWebView.sendOpenProductEvent();
+        }
     }
 
     private void observeLiveRoomDataManager() {
@@ -168,4 +221,25 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
         return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
     }
 
+    public void setLandspace(boolean isLandspace){
+        this.isLandspace = isLandspace;
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (PLVScreenUtils.isLandscape(getContext())) {
+            isLandspace = true;
+            if (menuDrawerPortrait != null && menuDrawerPortrait.isMenuVisible()) {
+                menuDrawerPortrait.closeMenu();
+                showLandspaceMenDrawer();
+            }
+        } else {
+            isLandspace = false;
+            if (menuDrawerLandspace != null && menuDrawerLandspace.isMenuVisible()) {
+                menuDrawerLandspace.closeMenu();
+                showPortraitMenDrawer();
+            }
+        }
+    }
 }

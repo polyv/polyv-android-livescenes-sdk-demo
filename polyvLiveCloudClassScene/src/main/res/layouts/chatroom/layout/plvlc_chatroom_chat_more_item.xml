@@ -34,6 +34,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:text="@string/plv_chat_view_special_message"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textColor="#ffffff"
         android:textSize="12sp" />
 </RelativeLayout>

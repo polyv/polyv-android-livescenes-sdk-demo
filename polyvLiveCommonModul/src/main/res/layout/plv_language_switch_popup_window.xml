@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#ffffff"
+        app:mode="leftTop|rightTop"
+        app:radius="10dp">
+
+        <TextView
+            android:id="@+id/plv_language_switch_zh_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/plv_live_language_switch_zh"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/plv_line_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/plv_language_switch_zh_tv"
+            android:background="#f2f2f2" />
+
+        <TextView
+            android:id="@+id/plv_language_switch_en_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plv_line_1"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/plv_live_language_switch_en"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/plv_line_2"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_below="@+id/plv_language_switch_en_tv"
+            android:background="#f2f2f2" />
+
+        <TextView
+            android:id="@+id/plv_language_switch_cancel_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plv_line_2"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/plv_common_dialog_cancel"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

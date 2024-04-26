@@ -2,9 +2,11 @@ package com.easefun.polyv.liveecommerce.modules.player;
 
 import androidx.lifecycle.LiveData;
 import android.graphics.Rect;
+import androidx.annotation.Nullable;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
@@ -129,6 +131,8 @@ public interface IPLVECVideoLayout {
      */
     void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener);
 
+    void updatePlayCenterView();
+
     /**
      * 销毁，销毁播放器及相关资源
      */
@@ -211,6 +215,12 @@ public interface IPLVECVideoLayout {
      * @return 播放信息数据
      */
     LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO();
+
+    /**
+     * 获取rtc混流观看视图容器
+     */
+    @Nullable
+    ViewGroup getRtcMixStreamContainer();
 
     /**
      * 当加入RTC时，更新布局
@@ -349,6 +359,26 @@ public interface IPLVECVideoLayout {
          * 网络质量回调
          */
         void acceptNetworkQuality(PLVLinkMicConstant.NetworkQuality networkQuality);
+
+        /**
+         * 当前视频是否可以设置全屏
+         * @param isCanFullScreen
+         */
+        void acceptVideoSize(boolean isCanFullScreen);
+
+        /**
+         * rtc是否以混流形式播放
+         *
+         * @return
+         */
+        boolean isPlayRtcAsMixStream();
+
+        /**
+         * rtc混流是否正在播放
+         *
+         * @return
+         */
+        boolean isRtcMixStreamPlaying();
     }
     // </editor-fold>
 }

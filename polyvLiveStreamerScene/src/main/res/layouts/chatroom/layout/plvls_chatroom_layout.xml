@@ -39,7 +39,7 @@
             android:paddingTop="5dp"
             android:paddingRight="8dp"
             android:paddingBottom="5dp"
-            android:text="x条新信息"
+            tools:text="x条新信息"
             android:textColor="#4399FF"
             android:textSize="12sp"
             android:visibility="gone"
@@ -143,7 +143,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:singleLine="true"
-                android:text="有话要说&#046;&#046;&#046;"
+                android:text="@string/plv_chat_input_tips_chat_5"
                 android:textColor="#99F0F1F5"
                 android:textSize="14sp" />
         </LinearLayout>

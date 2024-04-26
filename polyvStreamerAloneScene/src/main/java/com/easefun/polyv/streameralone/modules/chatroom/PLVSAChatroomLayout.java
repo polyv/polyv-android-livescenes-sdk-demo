@@ -61,6 +61,7 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -94,6 +95,10 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
 
     //handler
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    @Nullable
+    private OnViewActionListener onViewActionListener = null;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -182,7 +187,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         plvlsChatroomChatMsgRv.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
             public void onChange(int currentUnreadCount) {
-                plvlsChatroomUnreadMsgTv.setText(currentUnreadCount + "条新信息");
+                plvlsChatroomUnreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_4, currentUnreadCount + ""));
             }
         });
 
@@ -235,6 +240,11 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         //请求一次历史记录
         chatroomPresenter.setHistoryContainRewardEvent(true);
         chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
+    }
+
+    @Override
+    public void setOnViewActionListener(@Nullable OnViewActionListener onViewActionListener) {
+        this.onViewActionListener = onViewActionListener;
     }
 
     @Override
@@ -334,7 +344,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             } else {
                 String errorTips = getContext().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second;
                 if (PolyvLocalMessage.SENDVALUE_NOONLINE == sendResult.second) {
-                    errorTips = "当前网络不可用，请检查网络设置";
+                    errorTips = PLVAppUtils.getString(R.string.plv_streamer_network_bad_2);
                 }
                 //发送失败
                 PLVToast.Builder.context(getContext())
@@ -363,7 +373,7 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
             } else {
                 String errorTips = getContext().getString(R.string.plv_chat_toast_send_msg_failed) + ": " + sendResult.second;
                 if (PolyvLocalMessage.SENDVALUE_NOONLINE == sendResult.second) {
-                    errorTips = "当前网络不可用，请检查网络设置";
+                    errorTips = PLVAppUtils.getString(R.string.plv_streamer_network_bad_2);
                 }
                 //发送失败
                 PLVToast.Builder.context(getContext())
@@ -621,23 +631,37 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         }
 
         @Override
+        public void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent) {
+            if (PLVRoomPushStatusEvent.STATUS_FORBID.equals(roomPushStatusEvent.getStatus())) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onKickByServer();
+                }
+                showExitDialog(R.string.plv_chat_toast_kicked_streamer);
+            }
+        }
+
+        @Override
         public void onLoginRefuseEvent(@NonNull PLVLoginRefuseEvent loginRefuseEvent) {
-            super.onLoginRefuseEvent(loginRefuseEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_been_kicked);
         }
 
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
-            super.onReloginEvent(reloginEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
         }
     };
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getContext())
-                .setTitle("温馨提示")
+                .setTitle(R.string.plv_common_dialog_tip_warm)
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ((Activity) getContext()).finish();
@@ -664,5 +688,18 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         chatroomPresenter.getChatEmotionImages();
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="接口回调">
+
+    public interface OnViewActionListener {
+
+        /**
+         * 被踢出直播间
+         */
+        void onKickByServer();
+
+    }
+
+    // </editor-fold>
 
 }

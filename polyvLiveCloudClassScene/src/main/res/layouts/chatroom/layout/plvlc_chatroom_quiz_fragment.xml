@@ -2,15 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#202127">
 
-    <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
-        android:id="@+id/chat_msg_rv"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/plvlc_chatroom_quiz_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_parent_ly"
-        android:overScrollMode="never"
-        android:paddingBottom="6dp" />
+        android:paddingBottom="6dp">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView
+            android:id="@+id/chat_msg_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.pressedview.PLVPressedBgTextView
+        android:id="@+id/unread_msg_tv"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:layout_above="@+id/bottom_parent_ly"
+        android:background="#d04a90e2"
+        android:gravity="center"
+        android:text="@string/plv_chat_view_new_msg_5"
+        android:textColor="#ffffff"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/bottom_parent_ly"

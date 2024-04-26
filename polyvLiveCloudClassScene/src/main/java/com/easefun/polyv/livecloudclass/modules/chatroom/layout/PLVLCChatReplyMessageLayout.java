@@ -87,7 +87,7 @@ public class PLVLCChatReplyMessageLayout extends FrameLayout {
 
         chatReplyNameTv.setText(format("{}：", chatQuoteVO.getNick()));
         if (isImageContent) {
-            chatReplyContentTv.setText("[图片]");
+            chatReplyContentTv.setText("[图片]");// no need i18n
         } else {
             chatReplyContentTv.setText((CharSequence) chatQuoteVO.getObjects()[0]);
         }

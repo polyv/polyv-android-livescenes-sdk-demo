@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#202127">
 
     <RelativeLayout
@@ -35,7 +36,7 @@
                 android:gravity="top"
                 android:maxEms="12"
                 android:singleLine="true"
-                android:text="直播标题"
+                tools:text="直播标题"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -51,7 +52,7 @@
                 android:paddingTop="@dimen/dm_3"
                 android:paddingRight="@dimen/dm_5"
                 android:paddingBottom="@dimen/dm_3"
-                android:text="暂无直播"
+                android:text="@string/plv_player_toast_no_live"
                 android:textColor="@color/red"
                 android:textSize="14sp" />
 
@@ -69,7 +70,7 @@
                 android:layout_below="@id/split_view"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="24dp"
-                android:text="正处于无网观看模式"
+                android:text="@string/plv_live_in_offline_play_mode"
                 android:textColor="#ADADC0"
                 android:textSize="12sp" />
 

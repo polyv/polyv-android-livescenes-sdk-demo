@@ -9,12 +9,15 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import android.view.MotionEvent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -25,7 +28,10 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.login.PLVKickEvent;
@@ -50,6 +56,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
     //卡片推送管理器
     protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
+    //抽奖挂件管理器
+    protected PLVLotteryManager lotteryManager = new PLVLotteryManager();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -71,6 +79,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         initSocketLoginManager();
 
         observeChatroomData();
+        observeClassDetailVO();
+        observeInteractEntranceData();
+        observeInteractStatusData();
     }
 
     @Override
@@ -82,6 +93,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         if (cardPushManager != null) {
             cardPushManager.disposeCardPushAllTask();
         }
+        if (lotteryManager != null) {
+            lotteryManager.destroy();
+        }
         destroySocketLoginManager();
     }
     // </editor-fold>
@@ -89,10 +103,6 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
-
-        observeClassDetailVO();
-        observeInteractEntranceData();
-        observeInteractStatusData();
     }
     // </editor-fold>
 
@@ -126,6 +136,14 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void acceptOpenCommodity() {
     }
 
+    //处理咨询提问菜单打开
+    protected void acceptOpenQuiz(@NonNull PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+    }
+
+    //处理咨询提问菜单关闭
+    protected void acceptCloseQuiz() {
+    }
+
     //处理获取到的聊天回放开关
     protected void acceptChatPlaybackEnable(boolean isChatPlaybackEnable) {
     }
@@ -134,12 +152,23 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        acceptLotteryVO(webviewUpdateAppStatusVO);
+    }
+
+    private void acceptLotteryVO(PLVWebviewUpdateAppStatusVO  webviewUpdateAppStatusVO) {
+        if (lotteryManager != null) {
+            lotteryManager.acceptLotteryVo(webviewUpdateAppStatusVO);
+        }
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
     public PLVCardPushManager getCardPushManager() {
         return cardPushManager;
+    }
+
+    public PLVLotteryManager getLotteryManager() {
+        return lotteryManager;
     }
 
     //获取聊天室的公告信息
@@ -199,6 +228,15 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
      * @param time 时间，单位：毫秒
      */
     public void onPlaybackVideoSeekComplete(int time) {
+    }
+
+    /**
+     * 主页fragment某些布局与videoLayout重叠，这里决定什么情况下进行拦截处理
+     * @param motionEvent
+     * @return
+     */
+    public boolean isInterceptViewAction(MotionEvent motionEvent){
+        return false;
     }
     // </editor-fold>
 
@@ -285,9 +323,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getActivity())
-                .setTitle("温馨提示")
+                .setTitle(PLVAppUtils.getString(R.string.plv_common_dialog_tip_warm))
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_2), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         getActivity().finish();
@@ -313,11 +351,29 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         updateWatchInfo(dataBean.getCoverImage(), dataBean.getPublisher());
                         //根据商品列表开关来显示/隐藏商品库按钮
                         if (classDetailVO.isOpenCommodity()) {
+                            PLVDependManager.getInstance().get(PLVCommodityViewModel.class).notifyHasProductLayout(true);
                             acceptOpenCommodity();
                         }
                         //聊天回放开关
                         boolean isChatPlaybackEnable = classDetailVO.getData().isChatPlaybackEnabled();
                         acceptChatPlaybackEnable(isChatPlaybackEnable);
+                        //频道菜单
+                        List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = dataBean.getChannelMenus();
+                        boolean isOpenQuiz = false;
+                        for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
+                            if (channelMenusBean == null) {
+                                continue;
+                            }
+                            //咨询提问菜单
+                            if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
+                                isOpenQuiz = true;
+                                acceptOpenQuiz(channelMenusBean);
+                                break;
+                            }
+                        }
+                        if (!isOpenQuiz) {
+                            acceptCloseQuiz();
+                        }
                     }
                 }
             }

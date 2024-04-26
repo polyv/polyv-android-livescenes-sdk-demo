@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.linkmic.model;
 
 import androidx.annotation.IntRange;
+import android.text.TextUtils;
 
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.event.PLVEventHelper;
@@ -15,11 +16,11 @@ import java.util.Map;
  * description:连麦列表item对应的数据实体
  */
 public class PLVLinkMicItemDataBean {
-    public static final String STATUS_IDLE = "idle";//空闲
-    public static final String STATUS_WAIT = "wait";//等待同意
-    public static final String STATUS_JOINING = "joining";//加入中
-    public static final String STATUS_JOIN = "join";//已加入列表
-    public static final String STATUS_RTC_JOIN = "rtcJoin";//已加入rtc
+    public static final LinkMicStatus STATUS_IDLE = LinkMicStatus.IDLE;
+    public static final LinkMicStatus STATUS_WAIT = LinkMicStatus.WAIT_ACCEPT_HAND_UP;
+    public static final LinkMicStatus STATUS_JOINING = LinkMicStatus.JOINING;
+    public static final LinkMicStatus STATUS_JOIN = LinkMicStatus.JOIN;
+    public static final LinkMicStatus STATUS_RTC_JOIN = LinkMicStatus.RTC_JOIN;
     //最大音量值
     public static final int MAX_VOLUME = 100;
 
@@ -29,6 +30,8 @@ public class PLVLinkMicItemDataBean {
     private String linkMicId;
     //用户Id
     private String userId;
+    //登录Id(登录socket的Id)
+    private String loginId;
     //是否mute视频
     private boolean muteVideo;
     //是否mute音频
@@ -55,16 +58,20 @@ public class PLVLinkMicItemDataBean {
     private boolean isFirstScreen = false;
     //是否在屏幕共享
     private boolean isScreenShare = false;
+    // 屏幕共享是否在屏幕流上
+    private boolean isScreenShareInScreenStream = false;
     // 是否全屏观看
     private transient boolean isFullScreen = false;
 
     //linkMic status
-    private String status = STATUS_IDLE;
+    private LinkMicStatus status = STATUS_IDLE;
     private Map<Integer, MuteMedia> muteVideoInRtcJoinListMap = new HashMap<>();
     private Map<Integer, MuteMedia> muteAudioInRtcJoinListMap = new HashMap<>();
 
     //流类型
     private int streamType = PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX;
+
+    private long linkMicStartTimestamp = System.currentTimeMillis();
 
     public MuteMedia getMuteVideoInRtcJoinList() {
         return getMuteVideoInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
@@ -113,11 +120,11 @@ public class PLVLinkMicItemDataBean {
                 || PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX == this.streamType;
     }
 
-    public String getStatus() {
+    public LinkMicStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(LinkMicStatus status) {
         this.status = status;
         callStatusMethodTouch();
     }
@@ -260,6 +267,16 @@ public class PLVLinkMicItemDataBean {
         this.userId = userId;
     }
 
+    public String getLoginId() {
+        if (TextUtils.isEmpty(loginId)) {
+            return userId;
+        }
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
 
     public boolean isScreenShare() {
         return isScreenShare;
@@ -267,6 +284,15 @@ public class PLVLinkMicItemDataBean {
 
     public void setScreenShare(boolean screenShared) {
         isScreenShare = screenShared;
+    }
+
+    public boolean isScreenShareInScreenStream() {
+        return isScreenShareInScreenStream;
+    }
+
+    public PLVLinkMicItemDataBean setScreenShareInScreenStream(boolean screenShareInScreenStream) {
+        isScreenShareInScreenStream = screenShareInScreenStream;
+        return this;
     }
 
     public boolean isFirstScreen() {
@@ -285,6 +311,15 @@ public class PLVLinkMicItemDataBean {
 
     public boolean isFullScreen() {
         return isFullScreen;
+    }
+
+    public PLVLinkMicItemDataBean setLinkMicStartTimestamp(long linkMicStartTimestamp) {
+        this.linkMicStartTimestamp = linkMicStartTimestamp;
+        return this;
+    }
+
+    public long getLinkMicStartTimestamp() {
+        return linkMicStartTimestamp;
     }
 
     public static class MuteMedia {
@@ -337,6 +372,7 @@ public class PLVLinkMicItemDataBean {
                 "nick='" + nick + '\'' +
                 ", linkMicId='" + linkMicId + '\'' +
                 ", userId='" + userId + '\'' +
+                ", loginId='" + loginId + '\'' +
                 ", muteVideo=" + muteVideo +
                 ", muteAudio=" + muteAudio +
                 ", cupNum=" + cupNum +
@@ -356,5 +392,47 @@ public class PLVLinkMicItemDataBean {
                 ", streamType=" + streamType +
                 ", statusMethodCallListener=" + statusMethodCallListener +
                 '}';
+    }
+
+    public enum LinkMicStatus {
+        /**
+         * 未连麦
+         */
+        IDLE("idle"),
+        /**
+         * 等待同意举手上麦
+         */
+        WAIT_ACCEPT_HAND_UP("wait"),
+        /**
+         * 等待接受邀请上麦
+         */
+        WAIT_ACCEPT_INVITATION("no_server_name"),
+        /**
+         * 加入中
+         */
+        JOINING("joining"),
+        /**
+         * 已加入连麦列表
+         */
+        JOIN("join"),
+        /**
+         * 已加入rtc
+         */
+        RTC_JOIN("rtcJoin");
+
+        private final String serverName;
+
+        LinkMicStatus(String serverName) {
+            this.serverName = serverName;
+        }
+
+        public static LinkMicStatus match(String serverName) {
+            for (LinkMicStatus value : values()) {
+                if (value.serverName.equals(serverName)) {
+                    return value;
+                }
+            }
+            return IDLE;
+        }
     }
 }

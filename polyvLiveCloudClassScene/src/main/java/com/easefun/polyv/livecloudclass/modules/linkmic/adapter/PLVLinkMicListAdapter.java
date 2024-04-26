@@ -31,12 +31,14 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -65,7 +67,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
 
     /**** data ****/
-    private List<PLVLinkMicItemDataBean> dataList;
+    private List<PLVLinkMicItemDataBean> dataList = Collections.emptyList();
     private Map<String, Bitmap> linkMicIdSnapshotBitmapMap = new HashMap<>();
 
     /**** listener ****/
@@ -408,8 +410,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(viewHolder.qualityWidget.getLayoutParams());
                 //切换到主屏幕的时候，不要显示view holder的昵称和麦克风
                 if (newWidth != getItemWidth()) {
-                    viewHolder.tvNick.setVisibility(View.GONE);
-                    viewHolder.ivMicState.setVisibility(View.GONE);
+                    viewHolder.tvNick.setVisibility(viewHolder.showNickInMainScreen ? View.VISIBLE : View.GONE);
+                    viewHolder.ivMicState.setVisibility(viewHolder.showNickInMainScreen ? View.VISIBLE : View.GONE);
                     v.post(new Runnable() {
                         @Override
                         public void run() {
@@ -478,6 +480,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         boolean isFirstScreen = firstScreenLinkMicId.equals(linkMicId);
         boolean isSelf = myLinkMicId.equals(linkMicId);
 
+        holder.showNickInMainScreen = !isTeacher;
+
         if (isPausing) {
             // 暂停时显示默认的占位图
             holder.linkMicRenderViewPausePlaceholder.setVisibility(View.VISIBLE);
@@ -531,7 +535,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append("（我）");
+            nickString.append(PLVAppUtils.getString(R.string.plv_chat_me));
         }
         holder.tvNick.setText(nickString.toString());
 
@@ -675,10 +679,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
     private void bindVideoMute(@NonNull LinkMicItemViewHolder holder, boolean isMuteVideo, String linkMicId) {
-        final boolean holderIsMuted = holder.flRenderViewContainer.getVisibility() != View.VISIBLE;
-        if (holderIsMuted == isMuteVideo) {
-            return;
-        }
         //是否关闭摄像头
         if (isMuteVideo) {
             holder.flRenderViewContainer.setVisibility(View.INVISIBLE);
@@ -866,6 +866,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private boolean isViewRecycled = false;
 
         private boolean isRenderViewSetup = false;
+        // renderView显示在主屏幕时，是否显示昵称
+        private boolean showNickInMainScreen = true;
 
         public LinkMicItemViewHolder(View itemView) {
             super(itemView);

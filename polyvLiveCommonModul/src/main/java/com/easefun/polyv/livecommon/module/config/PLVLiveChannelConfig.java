@@ -2,7 +2,9 @@ package com.easefun.polyv.livecommon.module.config;
 
 import android.text.TextUtils;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.PLVSystemUtils;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.login.model.PLVLoginVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
@@ -144,7 +146,7 @@ public class PLVLiveChannelConfig {
      */
     public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor, String param4, String param5){
         user.viewerId = TextUtils.isEmpty(viewerId) ? PLVSystemUtils.getAndroidId(Utils.getApp()) + "" : viewerId;
-        user.viewerName = TextUtils.isEmpty(viewerName) ? "观众" + PLVSystemUtils.getAndroidId(Utils.getApp()) : viewerName;
+        user.viewerName = TextUtils.isEmpty(viewerName) ? PLVAppUtils.getString(R.string.plv_chat_viewer) + PLVSystemUtils.getAndroidId(Utils.getApp()) : viewerName;
         user.viewerAvatar = TextUtils.isEmpty(viewerAvatar) ? PLVSocketUserConstant.STUDENT_AVATAR_URL : viewerAvatar;
         user.viewerType = TextUtils.isEmpty(viewerType) ? PLVSocketUserConstant.USERTYPE_STUDENT : viewerType;
         user.actor = actor;

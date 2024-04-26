@@ -48,11 +48,13 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeV
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -80,8 +82,11 @@ import com.plv.business.api.common.player.PLVPlayerConstant;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -119,6 +124,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PLVSwitchViewAnchorLayout playerSwitchAnchor;
     private FrameLayout flLivePlayerSwitchView;
     private View playerView;
+    private FrameLayout livePlayerRtcMixStreamVideoContainer;
     //主播放器渲染视图view
     private PolyvLiveVideoView videoView;
     //子播放器渲染视图view
@@ -180,6 +186,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     //直播开始时间
     private String liveStartTime;
 
+    //商品卡片
+    private PLVLCCommodityPushLayout commodityPushLayout;
+
     //横屏时为连麦预留的右偏移量
     private int landscapeMarginRightForLinkMicLayout;
     //是否加入了RTC
@@ -235,6 +244,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         flLivePlayerSwitchView = findViewById(R.id.plvlc_playback_fl_player_switch_view_parent);
         videoView = findViewById(R.id.live_video_view);
         playerView = videoView.findViewById(PolyvBaseVideoView.IJK_VIDEO_ID);
+        livePlayerRtcMixStreamVideoContainer = findViewById(R.id.plvlc_live_player_rtc_mix_stream_video_container);
         subVideoView = findViewById(R.id.sub_video_view);
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
@@ -253,6 +263,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
+        commodityPushLayout = findViewById(R.id.commodity_push_ly);
 
         //初始化
         svgaParser = new SVGAParser(getContext());
@@ -532,6 +543,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 //才处理播放器的switch逻辑
                 if (childOfAnchor == flLivePlayerSwitchView) {
                     videoView.removeView(playerView);
+                    videoView.removeView(livePlayerRtcMixStreamVideoContainer);
                     videoView.removeView(screenshotIV);
                     videoView.removeView(audioModeView);
                     videoView.removeView(coverImageView);
@@ -541,6 +553,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.removeView(stopStreamView);
 
                     flLivePlayerSwitchView.addView(playerView);
+                    flLivePlayerSwitchView.addView(livePlayerRtcMixStreamVideoContainer);
                     flLivePlayerSwitchView.addView(screenshotIV);
                     flLivePlayerSwitchView.addView(audioModeView);
                     flLivePlayerSwitchView.addView(coverImageView);
@@ -566,6 +579,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 if (childOfAnchor == flLivePlayerSwitchView) {
                     flLivePlayerSwitchView.removeAllViews();
                     videoView.addView(playerView, 0);
+                    videoView.addView(livePlayerRtcMixStreamVideoContainer);
                     videoView.addView(screenshotIV);
                     videoView.addView(audioModeView);
                     videoView.addView(coverImageView);
@@ -651,6 +665,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         this.liveRoomDataManager = liveRoomDataManager;
         floatingWindow.setLiveRoomData(liveRoomDataManager);
 
+        initWithLiveRoomData(liveRoomDataManager);
         observeLiveRoomData();
 
         livePlayerPresenter = new PLVLivePlayerPresenter(liveRoomDataManager);
@@ -663,6 +678,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
+
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
+    }
+
+    private void initWithLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
+        mediaController.setServerEnablePptTurnPage(
+                PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_PPT_ENABLE_TURN_PAGE)
+        );
     }
 
     @Override
@@ -748,6 +773,26 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public PLVTriangleIndicateTextView getCardEnterTipsView() {
         return mediaController.getLandscapeController().getCardEnterTipsView();
+    }
+
+    @Override
+    public ImageView getLotteryEnterView() {
+        return mediaController.getLandscapeController().getLotteryEnterView();
+    }
+
+    @Override
+    public TextView getLotteryEnterCdView() {
+        return mediaController.getLandscapeController().getLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
+        return mediaController.getLandscapeController().getLotteryEnterTipsView();
+    }
+
+    @Override
+    public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
+        mediaController.setChatIsDisplayEnabled(isDisplayEnabled);
     }
 
     @Override
@@ -885,8 +930,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         return liveMarkToolControllerLayout.isInPaintMode();
     }
 
+    @Nullable
     @Override
-    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+    public ViewGroup getRtcMixStreamContainer() {
+        return livePlayerRtcMixStreamVideoContainer;
+    }
+
+    @Override
+    public void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
 
@@ -917,13 +968,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updateWhenLeaveRTC() {
+    public void updateWhenLeaveRtcWatch() {
         isJoinRTC = false;
         landscapeMarginRightForLinkMicLayout = 0;
 
         mediaController.updateWhenLeaveRtc();
 
-        if (liveRoomDataManager.isSupportRTC()) {
+        if (liveRoomDataManager.isSupportRTC() && livePlayerPresenter.getData().getPlayerState().getValue() == PLVPlayerState.PREPARED) {
             startPlay();
         }
         //恢复播放器手势
@@ -1172,7 +1223,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         public void onSubVideoViewCountDown(boolean isOpenAdHead, int totalTime, int remainTime, int adStage) {
             if (isOpenAdHead) {
                 llAuxiliaryCountDown.setVisibility(VISIBLE);
-                tvCountDown.setText("广告：" + remainTime + "s");
+                tvCountDown.setText(PLVAppUtils.formatString(R.string.plv_player_advertising_count_down, remainTime + ""));
             }
         }
 
@@ -1336,7 +1387,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         startTimeCountDown = new CountDownTimer(timeSpanMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String timeText = "倒计时：" + TimeUtils.toCountDownTime(millisUntilFinished);
+                String timeText = PLVAppUtils.formatString(R.string.plv_player_start_live_count_down, TimeUtils.toCountDownTime(millisUntilFinished));
                 timeCountDownTv.setText(timeText);
                 timeCountDownTv.setVisibility(View.VISIBLE);
             }

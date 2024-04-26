@@ -20,31 +20,31 @@ public class PLVCustomGiftBean {
         String giftName = "";
         switch (giftType) {
             case GIFTTYPE_FLOWER:
-                giftName = "鲜花";
+                giftName = "鲜花";// no need i18n
                 break;
             case GIFTTYPE_COFFEE:
-                giftName = "咖啡";
+                giftName = "咖啡";// no need i18n
                 break;
             case GIFTTYPE_LIKES:
-                giftName = "点赞";
+                giftName = "点赞";// no need i18n
                 break;
             case GIFTTYPE_CLAP:
-                giftName = "掌声";
+                giftName = "掌声";// no need i18n
                 break;
             case GIFTTYPE_666:
-                giftName = "666";
+                giftName = "666";// no need i18n
                 break;
             case GIFTTYPE_STARLET:
-                giftName = "小星星";
+                giftName = "小星星";// no need i18n
                 break;
             case GIFTTYPE_DIAMOND:
-                giftName = "钻石";
+                giftName = "钻石";// no need i18n
                 break;
             case GIFTTYPE_SPORTSCAR:
-                giftName = "跑车";
+                giftName = "跑车";// no need i18n
                 break;
             case GIFTTYPE_ROCKET:
-                giftName = "火箭";
+                giftName = "火箭";// no need i18n
                 break;
             default:
                 break;

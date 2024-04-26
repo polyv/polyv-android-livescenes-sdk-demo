@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:indicateColor="#BF1B202D"
+    app:rectRadius="12dp"
+    app:triangleHeight="8dp"
+    app:triangleMarginType="center"
+    app:trianglePosition="top"
+    app:triangleWidth="12dp">
+
+    <LinearLayout
+        android:id="@+id/plvls_status_bar_guest_linkmic_control_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="16dp">
+
+        <ImageView
+            android:id="@+id/plvls_status_bar_guest_linkmic_control_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="2dp"
+            android:src="@drawable/plvls_linkmic_video_sel" />
+
+        <TextView
+            android:id="@+id/plvls_status_bar_guest_linkmic_control_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#4399FF"
+            android:textSize="14sp"
+            tools:text="取消申请连麦" />
+
+    </LinearLayout>
+
+</com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>

@@ -15,6 +15,7 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
 
 import java.lang.reflect.Method;
@@ -76,7 +77,7 @@ public class HuaweiUtils {
             Log.e(TAG, Log.getStackTraceString(e));
         } catch (Exception e) {
             //抛出异常时提示信息
-            Toast.makeText(fragment.getActivity(), "进入设置页面失败，请手动设置", Toast.LENGTH_LONG).show();
+            Toast.makeText(fragment.getActivity(), R.string.plv_live_go_to_setting_page_error_hint, Toast.LENGTH_LONG).show();
             Log.e(TAG, Log.getStackTraceString(e));
         }
     }

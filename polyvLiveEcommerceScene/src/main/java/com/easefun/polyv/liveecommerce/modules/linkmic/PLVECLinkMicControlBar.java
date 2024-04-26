@@ -39,6 +39,7 @@ import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWind
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -69,6 +70,8 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     private static final boolean AUTO_HIDE_WHEN_JOINED = true;
     //竖屏下初始位置的y偏移
     private static final int DP_ORIGIN_MARGIN_TOP_PORTRAIT = 466;
+    //初始化位置->横屏margin top
+    private static final int DP_ORIGIN_MARGIN_TOP_LANDSCAPE = 87;
 
     //View
     //--竖屏
@@ -97,6 +100,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     private boolean isMicrophoneOpen = true;
     private boolean isPortrait;
     private boolean isAudioState = false;
+    private boolean isTeacherOpenLinkMic = false;
 
     //Listener
     private OnPLCLinkMicControlBarListener onPLCLinkMicControlBarListener;
@@ -186,7 +190,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         //设置竖屏点击监听器
         setPortraitClickListener();
         //设置竖屏初始化位置
-        floatingViewPortraitRoot.setInitLocation(0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_PORTRAIT), 0, 0);
+        floatingViewPortraitRoot.setInitLocation(0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_PORTRAIT), 0, PLVScreenUtils.dip2px(DP_ORIGIN_MARGIN_TOP_LANDSCAPE));
 
         //设置屏幕方向
         isPortrait = PLVScreenUtils.isPortrait(getContext());
@@ -224,6 +228,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     //设置讲师开启或关闭连麦
     @Override
     public void setIsTeacherOpenLinkMic(boolean isTeacherOpenLinkMic) {
+        this.isTeacherOpenLinkMic = isTeacherOpenLinkMic;
+        if (isJoinLinkMic()) {
+            return;
+        }
         if (isTeacherOpenLinkMic) {
             if (state != PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
                 return;
@@ -273,6 +281,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         isCameraFront = true;
         isMicrophoneOpen = true;
 
+        setOrientation(isPortrait);
         animateMoveToShowBiggestWidth();
 
         tvRequestTip.postDelayed(new Runnable() {
@@ -309,6 +318,14 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     @Override
     public void setAudioState(boolean isAudio) {
         isAudioState = isAudio;
+
+        if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN || state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE) {
+            if (isAudioState) {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+            } else {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+            }
+        }
     }
 
     //设置下麦
@@ -320,8 +337,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
 
         if (state != PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
             state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN;
-            animateMoveToShowMiddleWidth();
-            startAutoHideCountDown();
+            if (isTeacherOpenLinkMic) {
+                animateMoveToShowMiddleWidth();
+                startAutoHideCountDown();
+            }
         }
 
         if (isAudioState) {
@@ -338,6 +357,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
                 ll4BtnParent.setVisibility(INVISIBLE);
             }
         }, DURATION_MS_LINK_MIC_OPEN_OFF);
+
+        if (!isTeacherOpenLinkMic) {
+            setIsTeacherOpenLinkMic(false);
+        }
     }
 
     @Override
@@ -353,7 +376,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         }
         if (state == PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC) {
             tvRequestTip.setText(new PLVSpannableStringBuilder(getContext().getString(R.string.plv_linkmic_tip_requesting_link_mic))
-                    .appendExclude("\n排队" + orderText, new AbsoluteSizeSpan(ConvertUtils.sp2px(12)) {
+                    .appendExclude(PLVAppUtils.formatString(R.string.plv_linkmic_apply_pending, orderText), new AbsoluteSizeSpan(ConvertUtils.sp2px(12)) {
                         @Override
                         public void updateDrawState(@NonNull TextPaint ds) {
                             super.updateDrawState(ds);
@@ -516,14 +539,11 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
             return;
         }
-        if (isPortrait) {
-            floatingViewPortraitRoot.setVisibility(VISIBLE);
-            //旋转到竖屏时，如果当前上麦了，那么将控制条拉到最长
-            if (state.ordinal() >= PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS.ordinal()) {
-                clickRingSetting();
-            }
-        } else {
-            floatingViewPortraitRoot.setVisibility(GONE);
+        //直播带货场景的横竖屏都使用同一样式 连麦条
+        floatingViewPortraitRoot.setVisibility(VISIBLE);
+        //旋转到竖屏时，如果当前上麦了，那么将控制条拉到最长
+        if (state.ordinal() >= PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS.ordinal()) {
+            clickRingSetting();
         }
     }
     // </editor-fold>
@@ -580,9 +600,9 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
                                 IPLVLinkMicTraceLogSender iplvLinkMicTraceLogSender = new PLVLinkMicTraceLogSender();
                                 iplvLinkMicTraceLogSender.setLogModuleClass(PLVLinkMicELog.class);
                                 if (state.equals(PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC)) {
-                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CANCEL_LINK_MIC, "waitingUserDidCancelLinkMic，state为" + state);// no need i18n
                                 } else {
-                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);
+                                    iplvLinkMicTraceLogSender.submitTraceLog(PLVLinkMicELog.LinkMicTraceLogEvent.USER_CLOSE_LINK_MIC, "joinedUserDidCloseLinkMic，state为" + state);// no need i18n
                                 }
                                 handleRingOff();
                                 dialog.dismiss();
@@ -681,7 +701,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     private boolean toastWhenFloatingPlayerShowing() {
         if (PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing()) {
             PLVToast.Builder.context(getContext())
-                    .setText("小窗播放中，不支持连麦")
+                    .setText(PLVAppUtils.getString(R.string.plv_linkmic_floating_player_showing_tips))
                     .show();
             return true;
         }
@@ -733,6 +753,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
          * 加入连麦成功，布局收起
          */
         STATE_JOIN_LINK_MIC_SUCCESS_COLLAPSE,
+    }
+
+    private boolean isJoinLinkMic() {
+        return state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS || state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS_COLLAPSE;
     }
 
     // </editor-fold>

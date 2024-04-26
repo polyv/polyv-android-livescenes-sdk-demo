@@ -30,6 +30,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 
@@ -54,6 +55,8 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     private TextView commoditySrcPriceTv;
     private ImageView commodityDialogCloseIv;
     private ImageView commodityEnterIv;
+
+    private View anchorView;
 
     private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
@@ -117,6 +120,9 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
                         if (uiState == null) {
                             return;
                         }
+                        if (anchorView != null) {
+                            anchorView.setVisibility(uiState.hasProductView ? View.VISIBLE : View.GONE);
+                        }
                         if (uiState.productContentBeanPushToShow != null) {
                             updateProduct(uiState.productContentBeanPushToShow);
                         }
@@ -130,6 +136,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     // <editor-fold defaultstate="collapsed" desc="对外API">
 
     public void setAnchor(View view) {
+        this.anchorView = view;
         commodityPushLayoutRoot.setMarginAnchor(view);
     }
 
@@ -238,7 +245,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         commoditySrcPriceTv.setVisibility(hideSrcPrice ? GONE : VISIBLE);
         if (productContentBean.isNormalProduct()) {
             commoditySrcPriceTv.setText("¥" + productContentBean.getPrice());
-            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? "免费" : ("¥" + productContentBean.getRealPrice()));
+            commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? PLVAppUtils.getString(R.string.plv_commodity_free) : ("¥" + productContentBean.getRealPrice()));
         } else if (productContentBean.isFinanceProduct()) {
             commodityRealPriceTv.setText(productContentBean.getYield());
         }

@@ -26,6 +26,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
@@ -75,6 +76,8 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     //是否聊天回放布局
     private boolean isChatPlaybackLayout;
+    //是否可见
+    private boolean isDisplayEnabled = true;
     private boolean isLiveType;
 
     private OnRoomStatusListener onRoomStatusListener;
@@ -109,7 +112,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         chatCommonMessageList.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
             public void onChange(int currentUnreadCount) {
-                unreadMsgTv.setText(currentUnreadCount + "条新消息");
+                unreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_4, currentUnreadCount + ""));
             }
         });
         chatCommonMessageList.attachToParent(swipeLoadView, true);//聊天信息列表附加到下拉控件中
@@ -117,6 +120,11 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
 
     public void setIsChatPlaybackLayout(boolean isChatPlaybackLayout) {
         this.isChatPlaybackLayout = isChatPlaybackLayout;
+    }
+
+    public void setIsDisplayEnabled(boolean isDisplayEnabled) {
+        this.isDisplayEnabled = isDisplayEnabled;
+        toggle(toShow);
     }
 
     public void setIsLiveType(boolean isLiveType) {
@@ -171,6 +179,16 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     }
     // </editor-fold>
 
+    // <editor-folder defaultstate="collapsed" desc="API - 方法重写">
+    @Override
+    public void setVisibility(int visibility) {
+        if (!isDisplayEnabled && visibility == View.VISIBLE) {
+            return;
+        }
+        super.setVisibility(visibility);
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="聊天回放">
     private IPLVChatPlaybackCallDataListener chatPlaybackDataListener = new PLVChatPlaybackCallDataExListener() {
 
@@ -188,7 +206,7 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         public void onHasNotAddedData() {
             if (unreadMsgTv != null) {
                 if (unreadMsgTv.getVisibility() != View.VISIBLE) {
-                    unreadMsgTv.setText("有新消息，点击查看");
+                    unreadMsgTv.setText(R.string.plv_chat_view_new_msg_3);
                     unreadMsgTv.setVisibility(View.VISIBLE);
                 }
             }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvls_bitrate_parent_ly"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="24dp"
+    android:paddingLeft="16dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+        android:id="@+id/plvls_bitrate_parent_dv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="12dp">
+
+        <TextView
+            android:id="@+id/plvls_setting_bitrate_sel_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:text="@string/plv_push_downgrade_quality_title"
+            android:textColor="#F0F1F5"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/plvls_setting_bitrate_desc_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/plv_push_downgrade_quality_desc"
+            android:textColor="#99F0F1F5"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvls_setting_bitrate_sel_tv" />
+
+    </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+</RelativeLayout>

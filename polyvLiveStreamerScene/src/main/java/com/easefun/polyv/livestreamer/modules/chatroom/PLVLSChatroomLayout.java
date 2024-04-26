@@ -77,6 +77,7 @@ import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
+import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         plvlsChatroomChatMsgRv.addOnUnreadCountChangeListener(new PLVMessageRecyclerView.OnUnreadCountChangeListener() {
             @Override
             public void onChange(int currentUnreadCount) {
-                plvlsChatroomUnreadMsgTv.setText(currentUnreadCount + "条新信息");
+                plvlsChatroomUnreadMsgTv.setText(PLVAppUtils.formatString(R.string.plv_chat_view_new_msg_4, currentUnreadCount + ""));
             }
         });
 
@@ -674,23 +675,37 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         }
 
         @Override
+        public void onRoomPushStatusEvent(@NonNull PLVRoomPushStatusEvent roomPushStatusEvent) {
+            if (PLVRoomPushStatusEvent.STATUS_FORBID.equals(roomPushStatusEvent.getStatus())) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onKickByServer();
+                }
+                showExitDialog(R.string.plv_chat_toast_kicked_streamer);
+            }
+        }
+
+        @Override
         public void onLoginRefuseEvent(@NonNull PLVLoginRefuseEvent loginRefuseEvent) {
-            super.onLoginRefuseEvent(loginRefuseEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_been_kicked);
         }
 
         @Override
         public void onReloginEvent(@NonNull PLVReloginEvent reloginEvent) {
-            super.onReloginEvent(reloginEvent);
+            if (onViewActionListener != null) {
+                onViewActionListener.onKickByServer();
+            }
             showExitDialog(R.string.plv_chat_toast_account_login_elsewhere);
         }
     };
 
     private void showExitDialog(int messageId) {
         new AlertDialog.Builder(getContext())
-                .setTitle("温馨提示")
+                .setTitle(R.string.plv_common_dialog_tip_warm)
                 .setMessage(messageId)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ((Activity) getContext()).finish();
@@ -765,10 +780,10 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     private void changeInputWindowState(boolean isEnableInput) {
         plvlsChatroomToolbarOpenInputWindowTv.setFocusable(isEnableInput);
         if (isEnableInput) {
-            plvlsChatroomToolbarOpenInputWindowTv.setText("有话要说...");
+            plvlsChatroomToolbarOpenInputWindowTv.setText(R.string.plv_chat_input_tips_chat_4);
         } else {
             //聊天室断开无法连接时，不允许输入
-            plvlsChatroomToolbarOpenInputWindowTv.setText("聊天室连接失败");
+            plvlsChatroomToolbarOpenInputWindowTv.setText(R.string.plv_chat_toast_login_failed);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic.widget;
 
 import static com.plv.foundationsdk.component.livedata.PLVLiveDataExt.mutableLiveData;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVTimeUnit.millis;
@@ -37,6 +36,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -60,6 +60,8 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
     public static final int CANCEL_BY_TIMEOUT = 2;
     public static final int CANCEL_BY_PERMISSION = 3;
 
+    private static final boolean INVITATION_DEFAULT_OPEN_MICROPHONE = true;
+
     private PortLayout portLayout;
     private LandLayout landLayout;
     private PLVMenuDrawer menuDrawer;
@@ -70,7 +72,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
 
     private volatile long acceptInviteLinkMicLimitTs = 0;
     private final MutableLiveData<Boolean> isOpenCamera = mutableLiveData(false);
-    private final MutableLiveData<Boolean> isOpenMicrophone = mutableLiveData(false);
+    private final MutableLiveData<Boolean> isOpenMicrophone = mutableLiveData(INVITATION_DEFAULT_OPEN_MICROPHONE);
 
     private OnViewActionListener onViewActionListener = null;
 
@@ -128,7 +130,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
     }
 
     private void prepareBgm() {
-        bgmSoundId = bgmSoundPool.load(getContext(), R.raw.plvlc_linkmic_invitation_bgm, 1);
+        bgmSoundId = bgmSoundPool.load(getContext(), R.raw.plv_linkmic_invitation_bgm, 1);
     }
 
     private void observeOpenStateChanged() {
@@ -150,7 +152,6 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                 final boolean open = getOrDefault(openBoolean, false);
                 portLayout.microphoneSwitch().setChecked(open);
                 landLayout.microphoneSwitch().setChecked(open);
-                changeMicrophone(open);
             }
         });
     }
@@ -169,11 +170,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             startPlayBgm();
             show();
         } else if (!(newState instanceof PLVViewerLinkMicState.InvitingLinkMicState)) {
-            hide();
-            stopPlayBgm();
-            stopUpdateTimeLeft();
-            stopFetchAcceptInviteLinkMicLimit();
+            stop();
         }
+    }
+
+    public void updateDeviceOpenState(boolean openAudio, boolean openVideo) {
+        isOpenMicrophone.postValue(openAudio);
+        isOpenCamera.postValue(openVideo);
     }
 
     public void setIsOnlyAudio(boolean isOnlyAudio) {
@@ -181,6 +184,8 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             return;
         }
         this.isOnlyAudio = isOnlyAudio;
+        stop();
+
         for (View view : portLayout.cameraViews()) {
             view.setVisibility(isOnlyAudio ? View.GONE : View.VISIBLE);
         }
@@ -198,15 +203,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             portLayout.onlyAudioHintView().setVisibility(View.GONE);
             landLayout.onlyAudioHintView().setVisibility(View.GONE);
         }
-        portLayout.titleTextView().setText(format("邀请你{}连麦", isOnlyAudio ? "语音" : "视频"));
-        landLayout.titleTextView().setText(format("邀请你{}连麦", isOnlyAudio ? "语音" : "视频"));
+        String format = PLVAppUtils.formatStringWithId(R.string.plv_linkmic_invitation, isOnlyAudio ? R.string.plv_linkmic_type_audio : R.string.plv_linkmic_type_video);
+        portLayout.titleTextView().setText(format);
+        landLayout.titleTextView().setText(format);
     }
 
     public void destroy() {
-        hide();
-        stopPlayBgm();
-        stopUpdateTimeLeft();
-        stopFetchAcceptInviteLinkMicLimit();
+        stop();
     }
 
     @Override
@@ -274,6 +277,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
         }
     }
 
+    private void stop() {
+        hide();
+        stopPlayBgm();
+        stopUpdateTimeLeft();
+        stopFetchAcceptInviteLinkMicLimit();
+    }
+
     private void startFetchAcceptInviteLinkMicLimit() {
         stopFetchAcceptInviteLinkMicLimit();
         fetchAcceptInviteLinkMicLimitDisposable = PLVRxTimer.timer(
@@ -312,15 +322,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                     public void accept(Long aLong) throws Exception {
                         final int timeLeftInSecond = (int) ((acceptInviteLinkMicLimitTs - System.currentTimeMillis()) / 1000);
                         if (timeLeftInSecond <= 0) {
-                            hide();
+                            stop();
                             cancelInvitation(CANCEL_BY_TIMEOUT);
-                            stopPlayBgm();
-                            stopUpdateTimeLeft();
-                            stopFetchAcceptInviteLinkMicLimit();
                             return;
                         }
-                        portLayout.cancelInvitationTextView().setText(format("暂不连麦({}s)", timeLeftInSecond));
-                        landLayout.cancelInvitationTextView().setText(format("暂不连麦({}s)", timeLeftInSecond));
+                        String format = PLVAppUtils.formatString(R.string.plv_linkmic_not_yet, timeLeftInSecond + "");
+                        portLayout.cancelInvitationTextView().setText(format);
+                        landLayout.cancelInvitationTextView().setText(format);
                     }
                 });
     }
@@ -382,37 +390,12 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                         public void onCallback() {
                             hide();
                             cancelInvitation(CANCEL_BY_PERMISSION);
-                            showPermissionDialog("参与直播需要摄像头权限，请前往系统设置开启权限");
+                            showPermissionDialog(PLVAppUtils.getString(R.string.plv_linkmic_camera_permission_apply_tips));
                         }
                     }
             );
         } else {
             PLVCameraVideoSource.INSTANCE.closeCamera();
-        }
-    }
-
-    private void changeMicrophone(boolean open) {
-        if (menuDrawer == null || menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_CLOSED) {
-            return;
-        }
-        if (open) {
-            requirePermission(
-                    listOf(Manifest.permission.RECORD_AUDIO),
-                    new PLVSugarUtil.Callback() {
-                        @Override
-                        public void onCallback() {
-
-                        }
-                    },
-                    new PLVSugarUtil.Callback() {
-                        @Override
-                        public void onCallback() {
-                            hide();
-                            cancelInvitation(CANCEL_BY_PERMISSION);
-                            showPermissionDialog("参与直播需要麦克风权限，请前往系统设置开启权限");
-                        }
-                    }
-            );
         }
     }
 
@@ -452,7 +435,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                     public void onCallback() {
                         hide();
                         cancelInvitation(CANCEL_BY_PERMISSION);
-                        showPermissionDialog(format("参与直播需要{}权限，请前往系统设置开启权限", onlyAudio ? "麦克风" : "摄像头和麦克风"));
+                        showPermissionDialog(PLVAppUtils.formatStringWithId(R.string.plv_linkmic_permission_apply_tips, onlyAudio ? R.string.plv_linkmic_permission_microphone : R.string.plv_linkmic_permission_camera_and_microphone));
                     }
                 }
         );
@@ -479,17 +462,17 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
 
     private void showPermissionDialog(String content) {
         new PLVConfirmDialog(getContext())
-                .setTitle("提示")
+                .setTitle(R.string.plv_common_dialog_tip)
                 .setContent(content)
                 .setCancelable(true)
-                .setLeftButtonText("取消")
+                .setLeftButtonText(R.string.plv_common_dialog_cancel)
                 .setLeftBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {
                         dialog.dismiss();
                     }
                 })
-                .setRightButtonText("前往设置")
+                .setRightButtonText(R.string.plv_common_dialog_go_to_setting)
                 .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, View v) {

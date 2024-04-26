@@ -80,7 +80,7 @@ public class PLVLSBeautyViewHolder extends PLVLSAbsBeautyViewHolder {
         }
 
         bindImage(beautyOptionEnum.iconResId);
-        bindText(beautyOptionEnum.name);
+        bindText(beautyOptionEnum.getName());
         bindLayout(beautyOptionVO);
         bindOnClickListener(beautyOptionVO);
         updateUiState(
@@ -98,7 +98,7 @@ public class PLVLSBeautyViewHolder extends PLVLSAbsBeautyViewHolder {
         }
 
         bindImage(detailOptionEnum.iconResId);
-        bindText(detailOptionEnum.name);
+        bindText(detailOptionEnum.getName());
         bindLayout(beautyOptionVO);
         bindOnClickListener(beautyOptionVO);
         updateUiState(

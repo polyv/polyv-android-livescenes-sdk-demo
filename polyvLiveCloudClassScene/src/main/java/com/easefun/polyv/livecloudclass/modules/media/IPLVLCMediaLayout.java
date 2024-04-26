@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.media;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Pair;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -130,6 +131,29 @@ public interface IPLVLCMediaLayout {
     PLVTriangleIndicateTextView getCardEnterTipsView();
 
     /**
+     * 获取无条件抽奖入口按钮
+     * @return
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
+
+    /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
+
+    /**
      * 设置view交互事件监听器
      *
      * @param listener 监听器
@@ -215,16 +239,22 @@ public interface IPLVLCMediaLayout {
     boolean isInPaintMode();
 
     /**
+     * 获取rtc混流观看视图容器
+     */
+    @Nullable
+    ViewGroup getRtcMixStreamContainer();
+
+    /**
      * 当加入RTC时，更新布局
      *
      * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度
      */
-    void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth);
+    void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth);
 
     /**
      * 当离开RTC时，更新布局
      */
-    void updateWhenLeaveRTC();
+    void updateWhenLeaveRtcWatch();
 
     void updateWhenLinkMicOpenStatusChanged(boolean isOpen);
 

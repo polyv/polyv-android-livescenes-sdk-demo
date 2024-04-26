@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.media.AudioManager;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.adapter.PLVLinkMicListAdapter;
+import com.easefun.polyv.livecloudclass.modules.linkmic.handler.PLVLCRtcMixStreamHandler;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicInvitationLayout;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
@@ -49,6 +51,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -92,6 +95,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     //滑动提示状态：不可见，由于已经滑动了
     private static final int TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_SCROLLED = 2;
 
+    //是否都使用横屏推流分辨率
+    private static final boolean USE_LANDSCAPE_RESOLUTION = true;
+
     //Presenter
     private IPLVLinkMicContract.IPLVLinkMicPresenter linkMicPresenter;
 
@@ -111,6 +117,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private PLVViewSwitcher teacherLocationViewSwitcher;
 
     private final List<Runnable> onUserJoinPendingTask = new LinkedList<>();
+
+    private PLVLCRtcMixStreamHandler rtcMixStreamHandler;
 
     //Listener
     private OnPLVLinkMicLayoutListener onPLVLinkMicLayoutListener;
@@ -243,6 +251,21 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //init方向
         curIsLandscape = PLVScreenUtils.isLandscape(getContext());
     }
+
+    private void setupMixStreamHandler() {
+        rtcMixStreamHandler = new PLVLCRtcMixStreamHandler(
+                linkMicPresenter,
+                new PLVLCRtcMixStreamHandler.OnHandlerCallbackListener() {
+                    @Nullable
+                    @Override
+                    public ViewGroup onRequireMixStreamContainer() {
+                        if (onPLVLinkMicLayoutListener == null) {
+                            return null;
+                        }
+                        return onPLVLinkMicLayoutListener.onRequireMixStreamVideoContainer();
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化连麦控制条">
@@ -313,12 +336,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         this.liveRoomDataManager = liveRoomDataManager;
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
+        setupMixStreamHandler();
         initLinkMicControlBar(linkMicControlBar);
         updatePushResolution(curIsLandscape);
         observeOnAudioState(liveRoomDataManager);
         observeLinkMicQueueOrder();
     }
-
 
     @Override
     public void destroy() {
@@ -381,16 +404,26 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void pause() {
         linkMicListAdapter.pauseAllRenderView();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            rtcMixStreamHandler.stop();
+        }
     }
 
     @Override
     public void resume() {
         linkMicListAdapter.resumeAllRenderView();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            rtcMixStreamHandler.start();
+        }
     }
 
     @Override
     public boolean isPausing() {
-        return linkMicListAdapter.isPausing();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            return !rtcMixStreamHandler.isPlaying();
+        } else {
+            return linkMicListAdapter.isPausing();
+        }
     }
 
     @Override
@@ -490,7 +523,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void setWatchLowLatency(boolean watchLowLatency) {
-        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch()) {
+        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() || PLVLinkMicConfig.getInstance().isLowLatencyMixRtcWatch()) {
             linkMicPresenter.setWatchRtc(watchLowLatency);
         }
     }
@@ -570,17 +603,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onLinkMicStateChanged(PLVViewerLinkMicState oldState, PLVViewerLinkMicState newState) {
         linkMicInvitationLayout.setIsOnlyAudio(linkMicPresenter.getIsAudioLinkMic());
+        linkMicInvitationLayout.updateDeviceOpenState(linkMicPresenter.isEnableLocalAudio(), linkMicPresenter.isEnableLocalVideo());
         linkMicInvitationLayout.onLinkMicStateChanged(oldState, newState);
     }
 
     @Override
     public void onJoinChannelTimeout() {
-        ToastUtils.showShort("加入频道超时，请重试");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_time_out));
     }
 
     @Override
     public void onLinkMicMemberReachLimit() {
-        PLVToast.Builder.context(getContext()).setText("连麦人数已达上限").show();
+        PLVToast.Builder.context(getContext()).setText(PLVAppUtils.getString(R.string.plv_linkmic_dialog_reach_the_interact_num_limit_2)).show();
     }
 
     @Override
@@ -613,7 +647,33 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onJoinRtcChannel() {
+    public void onStartRtcWatch() {
+        //启动前台服务
+        Activity activity = (Activity) getContext();
+        PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
+        activity.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
+        rtcMixStreamHandler.onStartRtcWatch();
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onStartRtcWatch();
+        }
+    }
+
+    @Override
+    public void onStopRtcWatch() {
+        //停止前台服务
+        PLVForegroundService.stopForegroundService();
+        Activity activity = (Activity) getContext();
+        activity.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+
+        rtcMixStreamHandler.onStopRtcWatch();
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onStopRtcWatch();
+        }
+    }
+
+    @Override
+    public void onStartPureRtcWatch() {
         curTryScrollViewState = TRY_SCROLL_VIEW_STATE_INVISIBLE_BY_LACK;
         //显示连麦根布局
         flMediaLinkMicRoot.setKeepScreenOn(true);
@@ -622,16 +682,17 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         linkMicListAdapter.updateAllItem();
         //启动前台服务
         Activity activity = (Activity) getContext();
-        PLVForegroundService.startForegroundService(activity.getClass(), "云课堂", R.drawable.ic_launcher);
+        PLVForegroundService.startForegroundService(activity.getClass(), PLVAppUtils.getString(R.string.plvlc_cloud_class_scene_name), R.drawable.ic_launcher);
 
+        rtcMixStreamHandler.onStartPureRtcWatch();
         if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onJoinRtcChannel();
+            onPLVLinkMicLayoutListener.onStartPureRtcWatch();
         }
         isMediaShowInLinkMicList = false;
     }
 
     @Override
-    public void onLeaveRtcChannel() {
+    public void onStopPureRtcWatch() {
         //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
         //这里实际存在3种情况：
         //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
@@ -671,11 +732,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         isMediaShowInLinkMicList = false;
         teacherLocationViewSwitcher = null;
         setMediaInLinkMicListLinkMicId(null);
-        //停止前台服务
-        PLVForegroundService.stopForegroundService();
+
+        rtcMixStreamHandler.onStopPureRtcWatch();
         //回调离开连麦
         if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onLeaveRtcChannel();
+            onPLVLinkMicLayoutListener.onStopPureRtcWatch();
         }
     }
 
@@ -688,7 +749,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public void onJoinLinkMic() {
         //我，加入频道成功
         PLVCommonLog.d(TAG, "onJoinLinkMic");
-        ToastUtils.showShort("上麦成功");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_success));
         // 连麦时不允许小窗播放
         PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
         // 连麦成功不再暂停rtc观看
@@ -795,12 +856,12 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onTeacherHangupMe() {
-        ToastUtils.showShort("主播已结束您的连麦");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_teacher_hangup_me));
     }
 
     @Override
     public void onNotInLinkMicList() {
-        ToastUtils.showShort("连麦重连超时，请重新上麦");
+        ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_reconnect_timeout_please_try_again));
         linkMicPresenter.leaveLinkMic();
     }
 
@@ -850,7 +911,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 }
             }
             if (curSpeakingUser != null) {
-                //设置正在发言的用户的昵称，包括字样："..." 和 "等"
+                //设置正在发言的用户的昵称，包括字样：'...' 和 '等'
                 String userNick = curSpeakingUser.getNick();
                 StringBuilder userNickSBuilder = new StringBuilder();
                 if (userNick.length() > 8) {
@@ -860,7 +921,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 }
 
                 if (moreThanOneUserSpeaking) {
-                    userNickSBuilder.append("...等");
+                    userNickSBuilder.append(PLVAppUtils.getString(R.string.plv_linkmic_more_than_one_user_speaking));
                 }
                 tvSpeakingUsersText.setText(userNickSBuilder.toString());
                 llSpeakingUsers.setVisibility(VISIBLE);
@@ -961,6 +1022,11 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         isMediaShowInLinkMicList = !toMainScreen;
         setMediaInLinkMicListLinkMicId(isMediaShowInLinkMicList ? String.valueOf(firstScreenSwitchView.getTag(R.id.tag_link_mic_id)) : null);
+    }
+
+    @Override
+    public void onUpdateLinkMicType(boolean isAudio) {
+        linkMicInvitationLayout.setIsOnlyAudio(isAudio);
     }
 
     // </editor-fold>
@@ -1082,7 +1148,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     private void updatePushResolution(boolean isLandscape) {
         if (linkMicPresenter != null) {
-            linkMicPresenter.setPushPictureResolutionType(isLandscape ?
+            linkMicPresenter.setPushPictureResolutionType(isLandscape || USE_LANDSCAPE_RESOLUTION ?
                     PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE :
                     PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
         }

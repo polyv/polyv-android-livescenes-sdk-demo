@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/colorEbonyClay">
+
+    <TextView
+        android:id="@+id/plvls_member_sip_linkmic_item_avatar_tv"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/plvls_live_room_member_sip_linkmic_viewer_avatar_bg"
+        android:gravity="center"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="00" />
+
+    <TextView
+        android:id="@+id/plvls_member_sip_linkmic_item_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="#F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/plvls_member_sip_linkmic_item_avatar_tv"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="100 0000 0000" />
+
+    <ImageView
+        android:id="@+id/plvls_member_sip_linkmic_item_audio_volume_iv"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/plvls_streamer_mic_open" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

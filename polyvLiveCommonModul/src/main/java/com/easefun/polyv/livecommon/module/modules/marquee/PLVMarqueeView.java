@@ -161,6 +161,10 @@ public class PLVMarqueeView extends RelativeLayout implements IPLVMarqueeView {
      * 设置 动画类型和参数
      */
     private void setMarqueeAnimationType(PLVMarqueeAnimationVO animationVO) {
+        if (marqueeAnimation != null) {
+            marqueeAnimation.stop();
+            marqueeAnimation.destroy();
+        }
         mainTextView.clearAnimation();
         secondTextView.clearAnimation();
 

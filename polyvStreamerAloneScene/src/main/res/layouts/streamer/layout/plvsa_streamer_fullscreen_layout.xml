@@ -15,9 +15,8 @@
 
         <!--占位View，PLVSwitchViewAnchorLayout 的 child 不能为 0，否则无法切换  -->
         <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_width="1dp"
+            android:layout_height="1dp" />
 
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 

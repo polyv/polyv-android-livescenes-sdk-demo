@@ -25,6 +25,12 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+
+        packagingOptions {
+            pickFirst 'META-INF/proguard/coroutines.pro'
+        }
+
+        resConfigs 'en', 'zh-rCN'
     }
     signingConfigs {
         release {
@@ -65,8 +71,8 @@ android {
         }
     }
     packagingOptions {
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/*/libc++_shared.so'
+        exclude 'lib/*/*_extension.so'
     }
 }
 
@@ -83,9 +89,8 @@ dependencies {
     implementation project(':polyvLiveCloudClassScene')
     implementation project(':polyvLiveStreamerScene')
     implementation project(':polyvStreamerAloneScene')
-    implementation project(':polyvLiveHiClassScene')
 
-    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.0.5'
+    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.1.1'
 
 }
 

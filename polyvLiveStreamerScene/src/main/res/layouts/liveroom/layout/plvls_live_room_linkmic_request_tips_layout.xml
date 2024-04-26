@@ -25,7 +25,7 @@
             android:id="@+id/plvls_linkmic_video_type_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="收到新的连麦申请"
+            android:text="@string/plv_linkmic_receive_request_tips"
             android:textColor="#F0F1F5"
             android:textSize="14sp" />
     </LinearLayout>

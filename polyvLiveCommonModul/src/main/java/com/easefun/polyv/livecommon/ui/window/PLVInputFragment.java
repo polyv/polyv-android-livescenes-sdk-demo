@@ -97,7 +97,8 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
 
         FrameLayout content = getActivity().findViewById(android.R.id.content);
         final View childOfContent = content.getChildAt(0);
-        childOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        final ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener;
+        childOfContent.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             public void onGlobalLayout() {//all call
                 int usableHeightNow = computeUsableHeight(childOfContent);
                 int usableHeightSansKeyboard = childOfContent.getRootView().getHeight();
@@ -122,6 +123,16 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
                     }
                     willShowPopupLayout = false;
                 }
+            }
+        });
+        childOfContent.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                childOfContent.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
             }
         });
     }
@@ -208,6 +219,9 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
     }
 
     private void moveInputLayoutToSrcWindow() {
+        if (inputLayout == null || fragmentView == null || inputLayout.getParent() == null) {
+            return;
+        }
         if (inputLayout.getParent().equals(fragmentView)) {
             willShowKeyBoard = false;
             fragmentView.removeView(inputLayout);

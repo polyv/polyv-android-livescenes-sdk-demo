@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Looper;
@@ -9,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,16 +24,19 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousAdapter;
 import com.easefun.polyv.livecommon.module.modules.previous.customview.PLVPreviousView;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
+import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;
@@ -46,8 +52,13 @@ import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVEC
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.model.PLVPlaybackListVO;
+import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
@@ -134,6 +145,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     private boolean hasInitPreviousView = false;
     private Rect videoViewRect;
 
+    private ImageView backIv;
+
     //聊天回放是否打开
     protected boolean isChatPlaybackEnabled;
     //播放器准备完成的聊天回放任务
@@ -167,6 +180,32 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             chatPlaybackTipsTv.removeCallbacks(playbackTipsRunnable);
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            backIv.setVisibility(View.VISIBLE);
+            if (morePopupView != null) {
+                morePopupView.onLandscape();
+            }
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(true);
+            }
+        } else {
+            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+            backIv.setVisibility(View.GONE);
+
+            if (morePopupView != null) {
+                morePopupView.onPortrait();
+            }
+
+            if (commodityPopupLayout != null) {
+                commodityPopupLayout.setLandspace(false);
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
@@ -181,14 +220,19 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         totalTimeTv = findViewById(R.id.total_time_tv);
         moreIv = findViewById(R.id.more_iv);
         moreIv.setOnClickListener(this);
+        backIv = findViewById(R.id.plvec_controller_back_iv);
+        backIv.setOnClickListener(this);
         //商品
         commodityIv = findViewById(R.id.playback_commodity_iv);
         commodityIv.setOnClickListener(this);
         moreVideoListIv = findViewById(R.id.more_video_list_iv);
         moreVideoListIv.setVisibility(View.GONE);
         morePopupView = new PLVECMorePopupView();
+        morePopupView.initPlaybackMoreLayout(moreIv);
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
+        // 追踪商品卡片曝光事件
+        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
 
         previousPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
         previousPopupView = new PLVECPreviousDialogFragment();
@@ -230,6 +274,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }
             }
         });
+        // 追踪红包曝光事件
+        PLVTrackLogHelper.trackReadRedpack(chatMsgRv, chatMessageAdapter.getDataList(), liveRoomDataManager);
         //未读信息view
         unreadMsgTv = findViewById(R.id.unread_msg_tv);
         chatMsgRv.addUnreadView(unreadMsgTv);
@@ -253,6 +299,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
 
+        //无条件抽奖
+        lotteryManager.registerView((ImageView) findViewById(R.id.plvec_playback_lottery_enter_view), (TextView) findViewById(R.id.plvec_playback_lottery_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.plvec_playback_lottery_enter_tips_view));
+
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
 
@@ -265,14 +314,27 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     @Override
     public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
         super.init(liveRoomDataManager);
+
         runAfterOnActivityCreated(new Runnable() {
             @Override
             public void run() {
+                updateControlVisibility();
                 commodityPopupLayout.init(liveRoomDataManager);
             }
         });
     }
 
+    private void updateControlVisibility() {
+        String channelId = liveRoomDataManager.getConfig().getChannelId();
+        boolean enableSpeedControl = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_SPEED_CONTROL_ENABLE);
+        boolean enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = PLVChannelFeatureManager.onChannel(channelId)
+                .getOrDefault(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY, PLVLivePlaybackSeekBarStrategy.ALLOW_SEEK);
+
+        playControlIv.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        morePopupView.setEnableSpeedControl(enableSpeedControl);
+        playProgressSb.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+    }
 
     // </editor-fold>
 
@@ -345,6 +407,28 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         //后于播放器准备完成回调时，这时检测是否要触发加载聊天回放
         checkStartChatPlayback();
     }
+
+    @Override
+    protected void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
+        super.acceptInteractStatusData(webviewUpdateAppStatusVO);
+        if (morePopupView != null) {
+            morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
+        }
+    }
+
+    @Override
+    public boolean isInterceptViewAction(MotionEvent motionEvent) {
+        if (backIv.getVisibility() == View.VISIBLE) {
+            float x = backIv.getX() + backIv.getWidth();
+            float y = backIv.getY() + backIv.getHeight();
+            if (motionEvent.getX() >= backIv.getX() && motionEvent.getX() <= x
+                    && motionEvent.getY() >= backIv.getY() && motionEvent.getY() <= y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -775,11 +859,18 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
         } else if (id == R.id.more_iv) {
             float currentSpeed = onViewActionListener == null ? 1 : onViewActionListener.onGetSpeedAction();
-            morePopupView.showPlaybackMoreLayout(v, currentSpeed, new PLVECMorePopupView.OnPlaybackMoreClickListener() {
+            morePopupView.showPlaybackMoreLayout(v, currentSpeed, liveRoomDataManager.getConfig().getChannelId(), new PLVECMorePopupView.OnPlaybackMoreClickListener() {
                 @Override
                 public void onChangeSpeedClick(View view, float speed) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onChangeSpeedClick(view, speed);
+                    }
+                }
+
+                @Override
+                public void onClickDynamicFunction(String event) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onClickDynamicFunction(event);
                     }
                 }
             });
@@ -803,6 +894,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             });
         } else if (id == R.id.playback_commodity_iv) {
             showCommodityLayout();
+        } else if (id == R.id.plvec_controller_back_iv) {
+            if(PLVScreenUtils.isLandscape(getContext())){
+                PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
+            }
         }
     }
     // </editor-fold>
@@ -845,6 +940,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          * 回调 拆开红包
          */
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        /**
+         * 点击了动态功能控件
+         *
+         * @param event 动态功能的event data
+         */
+        void onClickDynamicFunction(String event);
     }
     // </editor-fold>
 }

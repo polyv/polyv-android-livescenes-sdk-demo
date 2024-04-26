@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:gravity="bottom"
     android:orientation="vertical">
 
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="测试文字"
+            tools:text="测试文字"
             android:textColor="#F0F1F5"
             android:textSize="12sp" />
 
@@ -85,7 +86,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/plvls_chatroom_chat_msg_send_tv_selector"
             android:gravity="center"
-            android:text="发送"
+            android:text="@string/plv_chat_send"
             android:textColor="#F0F1F5" />
 
         <EditText
@@ -100,7 +101,7 @@
             android:layout_toRightOf="@+id/plvls_chatroom_sel_img_iv"
             android:background="@drawable/plvls_chatroom_chat_msg_input_et_bg_shape"
             android:gravity="left|center"
-            android:hint="有话要说…"
+            android:hint="@string/plv_chat_input_tips_chat_5"
             android:imeOptions="actionSend|flagNoFullscreen|flagNoExtractUi"
             android:maxLength="2000"
             android:paddingLeft="16dp"

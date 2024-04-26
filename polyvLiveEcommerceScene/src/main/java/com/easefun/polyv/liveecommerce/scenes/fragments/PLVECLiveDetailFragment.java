@@ -1,12 +1,12 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.text.Html;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +31,8 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="变量">
     //公告布局
     private ViewGroup bulletinBlurLy;
-    private TextView bulletinMsgTv;
+    @Nullable
+    private PLVSafeWebView liveDetailBulletinWebView;
     //直播介绍布局
     private ViewGroup introBlurLy;
     private PLVSafeWebView introWebView;
@@ -79,12 +80,24 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
             introWebView = null;
         }
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int marginPortrait = getResources().getDimensionPixelSize(R.dimen.plvec_margin_common);
+        int marginLandscape = getResources().getDimensionPixelSize(R.dimen.plvec_landscape_margin_common);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            view.setPadding(marginLandscape,0,marginLandscape, marginPortrait);
+        } else {
+            view.setPadding(marginPortrait,0,marginPortrait,marginPortrait);
+        }
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
         bulletinBlurLy = findViewById(R.id.bulletin_ly);
-        bulletinMsgTv = findViewById(R.id.bulletin_msg_tv);
         introBlurLy = findViewById(R.id.intro_ly);
         introEmtTv = findViewById(R.id.intro_emt_tv);
 
@@ -125,8 +138,21 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
 
     // <editor-fold defaultstate="collapsed" desc="公告 - 显示、隐藏">
     private void showBulletin(PolyvBulletinVO bulletinVO) {
-        bulletinMsgTv.setText(Html.fromHtml(bulletinVO.getContent()));
-        bulletinMsgTv.setMovementMethod(LinkMovementMethod.getInstance());
+        if (liveDetailBulletinWebView == null) {
+            liveDetailBulletinWebView = createWebView();
+            if (liveDetailBulletinWebView == null) {
+                return;
+            }
+        }
+
+        if (liveDetailBulletinWebView.getParent() instanceof ViewGroup) {
+            ((ViewGroup) liveDetailBulletinWebView.getParent()).removeView(liveDetailBulletinWebView);
+        }
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = ConvertUtils.dp2px(16);
+        bulletinBlurLy.addView(liveDetailBulletinWebView, lp);
+
+        liveDetailBulletinWebView.loadDataWithBaseURL(null, PLVWebViewContentUtils.toWebViewContent(bulletinVO.getContent()), "text/html; charset=UTF-8", "utf-8", null);
         bulletinBlurLy.setVisibility(View.VISIBLE);
     }
 
@@ -150,18 +176,14 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
 
     private void loadWebView(String content) {
         if (introWebView == null) {
-            introWebView = new PLVSafeWebView(getContext());
-            introWebView.clearFocus();
-            introWebView.setFocusable(false);
-            introWebView.setFocusableInTouchMode(false);
-            introWebView.setBackgroundColor(Color.TRANSPARENT);
-            introWebView.setHorizontalScrollBarEnabled(false);
-            introWebView.setVerticalScrollBarEnabled(false);
+            introWebView = createWebView();
+            if (introWebView == null) {
+                return;
+            }
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             lp.topMargin = ConvertUtils.dp2px(16);
             introWebView.setLayoutParams(lp);
             introBlurLy.addView(introWebView);
-            PLVWebViewHelper.initWebView(getContext(), introWebView);
             introWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         } else {
             if (introWebView.getParent() != null) {
@@ -171,6 +193,26 @@ public class PLVECLiveDetailFragment extends PLVBaseFragment {
             introWebView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);
         }
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="工具方法">
+
+    @Nullable
+    private PLVSafeWebView createWebView() {
+        Context context = getContext();
+        if (context == null) {
+            return null;
+        }
+        PLVSafeWebView webView = new PLVSafeWebView(context);
+        webView.setFocusable(false);
+        webView.setFocusableInTouchMode(false);
+        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setVerticalScrollBarEnabled(false);
+        PLVWebViewHelper.initWebView(getContext(), webView);
+        return webView;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">

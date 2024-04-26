@@ -69,7 +69,7 @@
                 android:layout_below="@+id/plvsa_streamer_screen_share_iv"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
-                android:text="您正在共享屏幕"
+                android:text="@string/plvsa_streamer_screenshare_ing"
                 android:textColor="#F0F1F5"
                 android:textSize="12sp" />
         </RelativeLayout>
@@ -121,17 +121,27 @@
 
         <TextView
             android:id="@+id/plvsa_streamer_guest_link_status_tv"
-            android:layout_width="41dp"
+            android:layout_width="wrap_content"
             android:layout_height="16dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/plvsa_linkmic_guest_status_selector"
             android:gravity="center"
-            android:text="未连麦"
+            android:text="@string/plv_linkmic_un_join"
+            android:minWidth="41dp"
+            android:paddingHorizontal="4dp"
             android:textColor="#FFF0F1F5"
             android:textSize="11sp"
             android:visibility="invisible"
             tools:visibility="visible"/>
+
+        <com.easefun.polyv.streameralone.modules.streamer.widget.PLVSALinkMicDurationLayout
+            android:id="@+id/plvsa_streamer_linkmic_duration_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/plvsa_streamer_guest_link_status_tv"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="5dp" />
 
         <ImageView
             android:id="@+id/plvsa_streamer_grant_speaker_iv"
@@ -139,7 +149,7 @@
             android:layout_height="16dp"
             android:layout_marginLeft="6dp"
             android:layout_marginTop="2dp"
-            android:layout_toRightOf="@id/plvsa_streamer_guest_link_status_tv"
+            android:layout_toRightOf="@id/plvsa_streamer_linkmic_duration_layout"
             android:src="@drawable/plvsa_streamer_grant_speaker"
             android:visibility="invisible"
             tools:visibility="visible"/>

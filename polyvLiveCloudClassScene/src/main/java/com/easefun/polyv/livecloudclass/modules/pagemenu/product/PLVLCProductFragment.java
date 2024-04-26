@@ -23,6 +23,9 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Hoshiiro
  */
@@ -30,6 +33,7 @@ public class PLVLCProductFragment extends PLVBaseFragment {
 
     private View rootView;
     private PLVLCProductLayout pageMenuProductLayout;
+    private List<Runnable> doAfterInitViewTasks;
 
     private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
@@ -51,6 +55,7 @@ public class PLVLCProductFragment extends PLVBaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initView();
+        runAfterInitView();
     }
 
     @Override
@@ -59,6 +64,37 @@ public class PLVLCProductFragment extends PLVBaseFragment {
         if (onConfigurationChangedListener != null) {
             PLVOrientationManager.getInstance().removeOnConfigurationChangedListener(onConfigurationChangedListener);
             onConfigurationChangedListener = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (pageMenuProductLayout != null) {
+            pageMenuProductLayout.destroy();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            Runnable sendOpenProductEventRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (pageMenuProductLayout != null) {
+                        pageMenuProductLayout.sendOpenProductEvent();
+                    }
+                }
+            };
+            if (pageMenuProductLayout != null) {
+                sendOpenProductEventRunnable.run();
+            } else {
+                if (doAfterInitViewTasks == null) {
+                    doAfterInitViewTasks = new ArrayList<>(1);
+                }
+                doAfterInitViewTasks.add(sendOpenProductEventRunnable);
+            }
         }
     }
 
@@ -115,6 +151,16 @@ public class PLVLCProductFragment extends PLVBaseFragment {
                 });
     }
 
+    private void runAfterInitView() {
+        if (doAfterInitViewTasks != null) {
+            for (Runnable task : doAfterInitViewTasks) {
+                task.run();
+            }
+            doAfterInitViewTasks.clear();
+            doAfterInitViewTasks = null;
+        }
+    }
+
     public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
         runAfterOnActivityCreated(new Runnable() {
             @Override
@@ -131,7 +177,7 @@ public class PLVLCProductFragment extends PLVBaseFragment {
         @Nullable
         private PLVSugarUtil.Consumer<View> onMenuHideCallback;
 
-        public void show(ViewGroup container, View productLayout) {
+        public void show(ViewGroup container, PLVLCProductLayout productLayout) {
             if (productLayout.getParent() != null) {
                 ((ViewGroup) productLayout.getParent()).removeView(productLayout);
             }
@@ -174,6 +220,8 @@ public class PLVLCProductFragment extends PLVBaseFragment {
                 menuDrawer.attachToContainer();
                 menuDrawer.openMenu();
             }
+
+            productLayout.sendOpenProductEvent();
         }
 
         public void hide() {

@@ -5,6 +5,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
@@ -24,6 +25,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * @param playerPresenter 回放播放器presenter
      */
     void setPlaybackPlayerPresenter(IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter);
+
+    /**
+     * 初始化数据
+     *
+     * @param liveRoomDataManager
+     */
+    void initData(IPLVLiveRoomDataManager liveRoomDataManager);
 
     /**
      * 获取横屏弹幕的开关按钮
@@ -46,6 +54,22 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * 获取卡片推送入口提示控件
      */
     PLVTriangleIndicateTextView getCardEnterTipsView();
+
+    /**
+     * 获取无条件抽奖入口按钮
+     * @return
+     */
+    ImageView getLotteryEnterView();
+
+    /**
+     * 获取无条件抽奖入口倒计时控件
+     */
+    TextView getLotteryEnterCdView();
+
+    /**
+     * 获取无条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
      * 设置点赞是否开启/关闭
@@ -94,6 +118,13 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * 设置聊天回放是否可用
      */
     void setChatPlaybackEnabled(boolean isChatPlaybackEnabled, boolean isLiveType);
+
+    /**
+     * 设置聊天tab是否显示
+     *
+     * @param isDisplayEnabled 聊天tab是否显示
+     */
+    void setChatIsDisplayEnabled(boolean isDisplayEnabled);
 
     /**
      * 更新聊天室房间状态

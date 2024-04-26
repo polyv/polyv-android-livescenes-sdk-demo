@@ -37,6 +37,7 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAMessageAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLengthMessageLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgTipsWindow;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
@@ -251,7 +252,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.GONE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + t.getMessage())
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()))
                             .build()
                             .show();
                 }
@@ -266,7 +267,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.GONE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + sendValue)
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, sendValue + ""))
                             .build()
                             .show();
                 }
@@ -312,7 +313,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         failedImageItemLl.setVisibility(View.VISIBLE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + t.getMessage())
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()))
                             .build()
                             .show();
                 }
@@ -348,7 +349,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
             if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + "(我)";
+                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
@@ -461,7 +462,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         chatMsgOverLengthControlLl.setVisibility(View.VISIBLE);
         chatMsgOverLengthSplitLine.setVisibility(View.VISIBLE);
-        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plvsa_chat_msg_over_length_more : R.string.plvsa_chat_msg_over_length_fold);
+        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plv_chat_msg_over_length_more : R.string.plv_chat_msg_over_length_fold);
         chatMsgTv.setMaxLines(isOverLengthContentFolding ? 5 : Integer.MAX_VALUE);
     }
     // </editor-fold>
@@ -611,7 +612,7 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private SpannableStringBuilder generateNickSpan(String nickName) {
         SpannableStringBuilder nickSpan = new SpannableStringBuilder(nickName);
         if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
-            nickSpan.append("(我)");
+            nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
         }
         nickSpan.append(": ");
         nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor("#FFD16B")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

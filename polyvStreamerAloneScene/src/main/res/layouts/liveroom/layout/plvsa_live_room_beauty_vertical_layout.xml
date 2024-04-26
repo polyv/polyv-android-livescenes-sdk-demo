@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:text="@string/plvsa_beauty_switch_label"
+            android:text="@string/plv_beauty_switch_label"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:padding="4dp"
-                android:text="@string/plvsa_beauty_selector_beauty_title"
+                android:text="@string/plv_beauty_selector_beauty_title"
                 android:textColor="#F0F1F5"
                 android:textSize="14sp" />
 
@@ -116,7 +116,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:padding="4dp"
-                android:text="@string/plvsa_beauty_selector_filter_title"
+                android:text="@string/plv_beauty_selector_filter_title"
                 android:textColor="#F0F1F5"
                 android:textSize="14sp" />
 
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:padding="4dp"
-                android:text="@string/plvsa_beauty_selector_detail_title"
+                android:text="@string/plv_beauty_selector_detail_title"
                 android:textColor="#F0F1F5"
                 android:textSize="14sp" />
 
@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:includeFontPadding="false"
-                android:text="@string/plvsa_beauty_reset_title"
+                android:text="@string/plv_beauty_reset_title"
                 android:textColor="#F0F1F5"
                 android:textSize="14sp" />
 

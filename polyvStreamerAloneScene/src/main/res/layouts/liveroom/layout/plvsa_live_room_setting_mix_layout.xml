@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/plvsa_setting_mix_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="214dp"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape">
+
+    <TextView
+        android:id="@+id/plvsa_setting_mix_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        android:text="@string/plv_streamer_mix_layout"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/plvsa_setting_mix_rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:layout_below="@id/plvsa_setting_mix_tv"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

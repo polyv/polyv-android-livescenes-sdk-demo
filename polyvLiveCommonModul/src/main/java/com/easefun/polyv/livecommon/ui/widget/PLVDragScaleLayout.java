@@ -485,7 +485,7 @@ public class PLVDragScaleLayout extends FrameLayout implements View.OnTouchListe
     private void checkFlagsConflict() {
         final int conflictFlags = (flagDragMode & flagScaleMode | FLAG_MULTI_TOUCH) ^ FLAG_MULTI_TOUCH;
         if (conflictFlags != 0) {
-            PLVCommonLog.e(TAG, "不能将同一flag同时应用在拖拽和缩放模式上");
+            PLVCommonLog.e(TAG, "不能将同一flag同时应用在拖拽和缩放模式上");// no need i18n
             flagDragMode = flagDragMode - conflictFlags;
             flagScaleMode = flagScaleMode - conflictFlags;
         }

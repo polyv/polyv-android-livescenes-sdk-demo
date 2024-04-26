@@ -76,7 +76,7 @@ public class PLVPlaybackCacheConfig {
         }
 
         if (storageList.isEmpty()) {
-            PLVCommonLog.e(TAG, "没有可用的存储设备,后续不能使用视频缓存功能");
+            PLVCommonLog.e(TAG, "没有可用的存储设备,后续不能使用视频缓存功能");// no need i18n
             return "";
         } else {
             return storageList.get(0).getAbsolutePath() + File.separator + "playback_cache";

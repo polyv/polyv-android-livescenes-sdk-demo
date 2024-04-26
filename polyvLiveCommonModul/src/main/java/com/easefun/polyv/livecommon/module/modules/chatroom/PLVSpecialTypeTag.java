@@ -12,6 +12,10 @@ public class PLVSpecialTypeTag {
         this.userId = userId;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public boolean isMySelf() {
         return userId != null && userId.equals(PLVSocketWrapper.getInstance().getLoginVO().getUserId());
     }

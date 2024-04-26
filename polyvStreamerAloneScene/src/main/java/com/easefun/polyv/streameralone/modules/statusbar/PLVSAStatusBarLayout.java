@@ -26,6 +26,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -160,7 +161,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             stopLiveConfirmDialog = new PLVSAConfirmDialog(getContext())
                     .setTitleVisibility(GONE)
                     .setContent(closeContentString)
-                    .setRightButtonText("确认")
+                    .setRightButtonText(R.string.plv_common_dialog_confirm)
                     .setRightBtnListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -388,12 +389,12 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
         String notificationText;
         if (!isOpenAudio && !isOpenVideo) {
-            notificationText = "你的摄像头和麦克风已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_camera_microphone_mute_hint);
         } else if (!isOpenAudio) {
-            notificationText = "你的麦克风已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_microphone_mute_hint);
         } else {
             // !isOpenVideo
-            notificationText = "你的摄像头已关闭";
+            notificationText = PLVAppUtils.getString(R.string.plv_linkmic_camera_mute_hint);
         }
         plvsaStatusBarNotificationTv.setText(notificationText);
     }

@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractAppAbs;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractWebView;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
@@ -152,6 +153,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void showLottery(PLVShowLotteryEvent showLotteryEvent) {
+
+    }
+
+    @Override
     public void updateChannelSwitch(List<PLVChatFunctionSwitchVO.DataBean> dataBeanList) {
 
     }
@@ -195,6 +201,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+    }
+
+    @Override
+    public void updateOrientationLock(boolean isLock) {
 
     }
     // </editor-fold>

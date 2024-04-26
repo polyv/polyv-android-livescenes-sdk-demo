@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="#666666">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#BF1B202D" />
+
+    <ImageView
+        android:id="@+id/plvls_linkmic_type_setting_back_iv"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="14dp"
+        android:src="@drawable/plv_back_ic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/plv_linkmic_setting"
+        android:textColor="#F0F1F5"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvls_linkmic_type_setting_back_iv"
+        app:layout_constraintStart_toEndOf="@+id/plvls_linkmic_type_setting_back_iv"
+        app:layout_constraintTop_toTopOf="@+id/plvls_linkmic_type_setting_back_iv" />
+
+    <View
+        android:id="@+id/plvls_linkmic_type_setting_separator_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="36dp"
+        android:background="#14F0F1F5"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_type_setting_back_iv" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_hint_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/plv_linkmic_setting_default_linkmic_type"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plvls_linkmic_type_setting_separator_line" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_audio_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="@string/plv_linkmic_setting_linkmic_type_audio"
+        android:textColor="#4399FF"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/plvls_linkmic_type_setting_hint_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_type_setting_hint_title_tv" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+        android:id="@+id/plvls_linkmic_type_setting_audio_selected_indicate_view"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintEnd_toEndOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:layout_constraintStart_toStartOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:plvMainColor="#4399FF"
+        app:plvMainRadius="2dp" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_video_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/plv_linkmic_setting_linkmic_type_video"
+        android:textColor="#F0F1F5"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:layout_constraintStart_toEndOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:layout_constraintTop_toTopOf="@+id/plvls_linkmic_type_setting_audio_tv" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_video_unavailable_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/plv_linkmic_setting_linkmic_type_unavailable_hint"
+        android:textColor="#99F0F1F5"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        app:layout_constraintStart_toEndOf="@+id/plvls_linkmic_type_setting_video_tv"
+        app:layout_constraintTop_toTopOf="@+id/plvls_linkmic_type_setting_audio_tv"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+        android:id="@+id/plvls_linkmic_type_setting_video_selected_indicate_view"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="2dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/plvls_linkmic_type_setting_video_unavailable_tv"
+        app:layout_constraintStart_toStartOf="@+id/plvls_linkmic_type_setting_video_tv"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_type_setting_video_tv"
+        app:plvMainColor="#4399FF"
+        app:plvMainRadius="2dp"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_hint_switch_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="36dp"
+        android:text="@string/plv_linkmic_setting_linkmic_type_switch_hint"
+        android:textColor="#878B93"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_type_setting_audio_tv" />
+
+    <TextView
+        android:id="@+id/plvls_linkmic_type_setting_hint_default_setting_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/plv_linkmic_setting_linkmic_type_default_setting_hint"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

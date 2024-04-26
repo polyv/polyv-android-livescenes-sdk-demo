@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.modules.chatroom.model.enums.PLVRedPaperType;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -102,7 +103,7 @@ public class PLVLCRedPaperPortViewHolder extends PLVChatMessageBaseViewHolder<PL
         });
         String showName = nickName;
         if (loginUserId != null && loginUserId.equals(userId)) {
-            showName = showName + "(我)";
+            showName = showName + PLVAppUtils.getString(R.string.plv_chat_me_2);
         }
         if (actor != null) {
             showName = actor + "-" + showName;
@@ -129,8 +130,8 @@ public class PLVLCRedPaperPortViewHolder extends PLVChatMessageBaseViewHolder<PL
         });
 
         final PLVRedPaperType redPaperType = PLVRedPaperType.matchOrDefault(redPaperEvent.getType(), PLVRedPaperType.DEFAULT_RED_PAPER);
-        chatroomRedPaperBlessingTv.setText(redPaperType.defaultBlessingMessage);
-        chatroomRedPaperTypeTv.setText(redPaperType.typeName);
+        chatroomRedPaperBlessingTv.setText(redPaperType.getDefaultBlessingMessage());
+        chatroomRedPaperTypeTv.setText(redPaperType.getTypeName());
 
         observeRedPaperStatus(redPaperEvent);
     }
@@ -151,23 +152,23 @@ public class PLVLCRedPaperPortViewHolder extends PLVChatMessageBaseViewHolder<PL
                         }
                         switch (redPaperReceiveType) {
                             case AVAILABLE:
-                                chatroomRedPaperStatusTv.setText("领取红包");
+                                chatroomRedPaperStatusTv.setText(R.string.plv_red_paper_receive);
                                 chatroomRedPaperReceiveMask.setVisibility(View.GONE);
                                 break;
                             case AVAILABLE_CLICKED:
-                                chatroomRedPaperStatusTv.setText("领取红包");
+                                chatroomRedPaperStatusTv.setText(R.string.plv_red_paper_receive);
                                 chatroomRedPaperReceiveMask.setVisibility(View.VISIBLE);
                                 break;
                             case RECEIVED:
-                                chatroomRedPaperStatusTv.setText("已领取");
+                                chatroomRedPaperStatusTv.setText(R.string.plv_red_paper_received);
                                 chatroomRedPaperReceiveMask.setVisibility(View.VISIBLE);
                                 break;
                             case RUN_OUT:
-                                chatroomRedPaperStatusTv.setText("已领完");
+                                chatroomRedPaperStatusTv.setText(R.string.plv_red_paper_run_out);
                                 chatroomRedPaperReceiveMask.setVisibility(View.VISIBLE);
                                 break;
                             case EXPIRED:
-                                chatroomRedPaperStatusTv.setText("已失效");
+                                chatroomRedPaperStatusTv.setText(R.string.plv_red_paper_expired);
                                 chatroomRedPaperReceiveMask.setVisibility(View.VISIBLE);
                                 break;
                             default:

@@ -31,6 +31,7 @@
             android:background="@drawable/plvec_linkmic_item_ly_bg_shape">
 
             <ImageView
+                android:id="@+id/plvec_linkmic_separate_mask_iv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"

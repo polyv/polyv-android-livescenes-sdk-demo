@@ -3,7 +3,9 @@ package com.easefun.polyv.livecommon.module.modules.player;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
+import com.easefun.polyv.livecommon.R;
 import com.plv.foundationsdk.log.elog.logcode.play.PLVErrorCodePlayVideoInfo;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +14,6 @@ import java.util.List;
  * 播放失败的提示信息工具
  */
 public class PLVPlayErrorMessageUtils {
-    private static String TIPS_LIVE_LOAD_SLOW = "视频加载缓慢，请切换线路或退出重进";
-    private static String TIPS_PLAYBACK_LOAD_SLOW = "视频加载缓慢，请刷新或退出重进";
-    private static String TIPS_RESTRICT_WATCH = "存在观看限制，暂不支持进入%s";
-    private static String TIPS_SUGGEST_EXIT = "视频加载失败，请退出重进%s";
-    private static String TIPS_SUGGEST_REFRESH = "视频加载失败，请检查网络或退出重进%s";
     // 建议退出重进的错误码集合
     private static List<Integer> ERROR_CODE_SUGGEST_EXIT = new ArrayList<Integer>() {
         {
@@ -27,6 +24,26 @@ public class PLVPlayErrorMessageUtils {
             add(PLVErrorCodePlayVideoInfo.ErrorCode.LIVE_RESTRICT_WATCH_ERROR);
         }
     };
+
+    private static String getTipsLiveLoadSlow() {
+        return PLVAppUtils.getString(R.string.plv_player_live_load_slow_hint);
+    }
+
+    private static String getTipsPlaybackLoadSlow() {
+        return PLVAppUtils.getString(R.string.plv_player_playback_load_slow_hint);
+    }
+
+    private static String getTipsRestrictWatch() {
+        return PLVAppUtils.getString(R.string.plv_player_restrict_watch_hint);
+    }
+
+    private static String getTipsSuggestExit() {
+        return PLVAppUtils.getString(R.string.plv_player_suggest_exit_hint);
+    }
+
+    private static String getTipsSuggestRefresh() {
+        return PLVAppUtils.getString(R.string.plv_player_suggest_refresh_hint);
+    }
 
     public static void showOnPlayError(IPLVPlayErrorView playErrorView, PolyvPlayError playErrorReason, boolean isLive) {
         PlayErrorContent playErrorContent = buildPlayErrorContent(playErrorReason, isLive);
@@ -46,20 +63,20 @@ public class PLVPlayErrorMessageUtils {
         boolean isShowRefreshView;
 
         if (playErrorReason == null) {
-            errorTips = isLive ? TIPS_LIVE_LOAD_SLOW : TIPS_PLAYBACK_LOAD_SLOW;
+            errorTips = isLive ? getTipsLiveLoadSlow() : getTipsPlaybackLoadSlow();
             isShowChangeLinesView = isLive;
             isShowRefreshView = true;
         } else {
             int errorCode = playErrorReason.errorCode;
-            String errorCodeInfo = "(错误码:" + errorCode + ")";
+            String errorCodeInfo = PLVAppUtils.formatString(R.string.plv_player_error_code, errorCode + "");
             if (ERROR_CODE_SUGGEST_EXIT.contains(errorCode)) {
                 errorTips = errorCode == PLVErrorCodePlayVideoInfo.ErrorCode.LIVE_RESTRICT_WATCH_ERROR
-                        ? String.format(TIPS_RESTRICT_WATCH, playErrorReason.errorDescribe + errorCodeInfo)
-                        : String.format(TIPS_SUGGEST_EXIT, errorCodeInfo);
+                        ? String.format(getTipsRestrictWatch(), playErrorReason.errorDescribe + errorCodeInfo)
+                        : String.format(getTipsSuggestExit(), errorCodeInfo);
                 isShowChangeLinesView = false;
                 isShowRefreshView = false;
             } else {
-                errorTips = String.format(TIPS_SUGGEST_REFRESH, errorCodeInfo);
+                errorTips = String.format(getTipsSuggestRefresh(), errorCodeInfo);
                 isShowChangeLinesView = false;
                 isShowRefreshView = true;
             }

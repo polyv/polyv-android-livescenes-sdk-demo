@@ -31,6 +31,7 @@ import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
@@ -133,13 +134,13 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
             titleTv.setText(classDetailVO.getData().getName());
             //设置主持人名称
             String publisher = classDetailVO.getData().getPublisher();
-            publisherTv.setText(TextUtils.isEmpty(classDetailVO.getData().getPublisher()) ? "主持人" : publisher);
+            publisherTv.setText(TextUtils.isEmpty(classDetailVO.getData().getPublisher()) ? PLVAppUtils.getString(R.string.plv_live_publisher_default) : publisher);
             //设置直播图标
             PLVImageLoader.getInstance().loadImage(classDetailVO.getData().getCoverImage(), liveCoverIV);
             //设置直播状态
             updateStatusViewWithClassDetail();
             //设置直播开始时间
-            String liveStartTime = "直播时间：" + (StringUtils.isEmpty(classDetailVO.getData().getStartTime()) ? "无" : classDetailVO.getData().getStartTime());
+            String liveStartTime = PLVAppUtils.getString(R.string.plv_live_start_time) + (StringUtils.isEmpty(classDetailVO.getData().getStartTime()) ? PLVAppUtils.getString(R.string.plv_live_nothing) : classDetailVO.getData().getStartTime());
             startTimeTv.setText(liveStartTime);
             //设置点赞数
             if (likesCount == 0) {

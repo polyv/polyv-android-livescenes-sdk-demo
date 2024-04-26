@@ -25,14 +25,14 @@ public interface IPLVLCPPTView {
     void initLivePPT(OnPLVLCLivePPTViewListener onPLVLCPPTViewListener);
 
     /**
-     * 进入rtc频道
+     * 进入rtc观看模式
      */
-    void notifyJoinRtcChannel();
+    void notifyStartRtcWatch();
 
     /**
-     * 退出rtc频道
+     * 退出rtc观看模式
      */
-    void notifyLeaveRtcChannel();
+    void notifyStopRtcWatch();
 
     /**
      * 设置是否无延迟观看

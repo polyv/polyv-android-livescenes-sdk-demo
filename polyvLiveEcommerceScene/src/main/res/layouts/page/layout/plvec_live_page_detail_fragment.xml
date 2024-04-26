@@ -50,18 +50,9 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/plvec_detail_gonggao"
                     android:drawablePadding="8dp"
-                    android:text="公告"
+                    android:text="@string/plv_live_bulletin"
                     android:textColor="#333333"
                     android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/bulletin_msg_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/plvec_margin_common"
-                    android:lineSpacingExtra="4dp"
-                    android:textColor="#000000"
-                    android:textSize="12sp" />
             </LinearLayout>
 
             <!--直播介绍布局-->
@@ -88,7 +79,7 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/plvec_intro"
                         android:drawablePadding="8dp"
-                        android:text="直播介绍"
+                        android:text="@string/plv_live_intro"
                         android:textColor="#333333"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -98,7 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="暂无直播介绍~"
+                    android:text="@string/plv_live_no_intro"
                     android:textColor="#000000"
                     android:textSize="14sp"
                     android:visibility="invisible"

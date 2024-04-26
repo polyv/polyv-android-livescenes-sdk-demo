@@ -76,6 +76,7 @@
         android:layout_marginTop="10dp" />
 
     <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
+        android:id="@+id/plvlc_commodity_push_ly"
         android:layout_width="308dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -155,7 +156,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="您上次观看至 "
+                android:text="@string/plv_player_continue_play_tips_f"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 
@@ -170,7 +171,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=", 已为您自动续播"
+                android:text="@string/plv_player_continue_play_tips_s"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 

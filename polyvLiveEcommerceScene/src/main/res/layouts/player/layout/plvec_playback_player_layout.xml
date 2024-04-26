@@ -36,6 +36,7 @@
                 android:padding="8dp"
                 android:src="@drawable/plvec_commodity_push_close"
                 android:visibility="gone" />
+
         </FrameLayout>
 
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
@@ -62,7 +63,7 @@
         android:layout_height="match_parent"
         android:background="#2B3045"
         android:gravity="center"
-        android:text="小窗播放中..."
+        android:text="@string/plv_player_floating_playing"
         android:textColor="#E4E4E4"
         android:textSize="14sp"
         android:visibility="gone" />
@@ -81,6 +82,16 @@
         android:layout_height="72dp"
         android:layout_gravity="center"
         android:src="@drawable/plvec_play_center" />
+
+
+    <ImageView
+        android:id="@+id/plvec_full_screen_iv"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_gravity="end|right"
+        android:layout_marginRight="4dp"
+        android:visibility="visible"
+        android:src="@drawable/plvec_controller_fullscreen"/>
 
     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
         android:id="@+id/plvec_playback_auto_continue_seek_time_hint_layout"
@@ -105,7 +116,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="您上次观看至 "
+                android:text="@string/plv_player_continue_play_tips_f"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 
@@ -120,7 +131,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=", 已为您自动续播"
+                android:text="@string/plv_player_continue_play_tips_s"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 

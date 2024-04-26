@@ -19,6 +19,7 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.listener.IPolyvVideoViewListenerEvent;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.businesssdk.model.video.PolyvLiveMarqueeVO;
+import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
@@ -47,9 +48,15 @@ import com.plv.business.model.video.PLVBaseVideoParams;
 import com.plv.business.model.video.PLVPlaybackVideoParams;
 import com.plv.business.model.video.PLVWatermarkVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.exts.Nullables;
 import com.plv.foundationsdk.config.PLVPlayOption;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVControlUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
 import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
@@ -221,7 +228,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void seekTo(int duration) {
-        if (videoView != null) {
+        if (videoView != null && checkCanSeekTo(duration)) {
             videoView.seekTo(duration);
         }
     }
@@ -231,9 +238,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null && videoView.isInPlaybackStateEx()) {
             int seekPosition = (int) ((long) videoView.getDuration() * progress / max);
             if (!videoView.isCompletedState()) {
-                videoView.seekTo(seekPosition);
+                seekTo(seekPosition);
             } else if (seekPosition < videoView.getDuration()) {
-                videoView.seekTo(seekPosition);
+                seekTo(seekPosition);
                 videoView.start();
             }
         }
@@ -484,23 +491,23 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     String tips;
                     switch (error.playStage) {
                         case PolyvPlayError.PLAY_STAGE_HEADAD:
-                            tips = "片头广告";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_head_ad);
                             break;
                         case PolyvPlayError.PLAY_STAGE_TAILAD:
-                            tips = "片尾广告";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_tail_ad);
                             break;
                         case PolyvPlayError.PLAY_STAGE_TEASER:
-                            tips = "暖场视频";
+                            tips = PLVAppUtils.getString(R.string.plv_player_stage_teaser);
                             break;
                         default:
                             if (error.isMainStage()) {
-                                tips = "主视频";
+                                tips = PLVAppUtils.getString(R.string.plv_player_stage_main);
                             } else {
                                 tips = "";
                             }
                             break;
                     }
-                    tips += "播放异常\n" +
+                    tips += PLVAppUtils.getString(R.string.plv_player_error) +
                             error.errorDescribe +
                             "(" + error.errorCode + "-" + error.playStage + ")\n" +
                             error.playPath;
@@ -649,6 +656,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeLeftListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeLeftListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    if (!checkAllowSwipeSeek()) {
+                        return;
+                    }
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
@@ -663,7 +673,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                             if (view != null) {
                                 boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, false);
                                 if (result) {
-                                    videoView.seekTo(fastForwardPos);
+                                    seekTo(fastForwardPos);
                                     if (videoView.isCompletedState()) {
                                         videoView.start();
                                     }
@@ -686,6 +696,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnGestureSwipeRightListener(new IPolyvVideoViewListenerEvent.OnGestureSwipeRightListener() {
                 @Override
                 public void callback(boolean start, boolean end, int times) {
+                    if (!checkAllowSwipeSeek()) {
+                        return;
+                    }
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (videoView.isInPlaybackStateEx()) {
                         if (fastForwardPos == 0) {
@@ -700,9 +713,9 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                                 boolean result = view.onProgressChanged(fastForwardPos, videoView.getDuration(), end, true);
                                 if (result) {
                                     if (!videoView.isCompletedState()) {
-                                        videoView.seekTo(fastForwardPos);
+                                        seekTo(fastForwardPos);
                                     } else if (fastForwardPos < videoView.getDuration()) {
-                                        videoView.seekTo(fastForwardPos);
+                                        seekTo(fastForwardPos);
                                         videoView.start();
                                     }
                                 }
@@ -754,7 +767,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                                                     String msg = PLVMarqueeCommonController.getInstance().getErrorMessage();
                                                     Toast.makeText(
                                                             activity,
-                                                            "".equals(msg) ? "跑马灯验证失败" : msg,
+                                                            "".equals(msg) ? PLVAppUtils.getString(R.string.plv_player_marquee_verify_error) : msg,
                                                             Toast.LENGTH_SHORT
                                                     ).show();
                                                     activity.finish();
@@ -835,7 +848,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 @Override
                 public boolean onRetryFailed() {
                     if (getView() != null && getView().getRetryLayout() != null) {
-                        ((PLVPlayerRetryLayout) getView().getRetryLayout()).onRetryFailed("重试失败");
+                        ((PLVPlayerRetryLayout) getView().getRetryLayout()).onRetryFailed(PLVAppUtils.getString(R.string.plv_player_retry_fail));
                     }
                     //false表示使用sdk内部逻辑重试，true表示拦截重试逻辑，开发者自己处理
                     return false;
@@ -1020,7 +1033,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         .setFontAlpha(plvWatermarkVO.watermarkOpacity);
                 break;
             default:
-                PLVCommonLog.d(TAG,"设置水印失败，默认为空");
+                PLVCommonLog.d(TAG,"设置水印失败，默认为空");// no need i18n
                 break;
         }
 
@@ -1088,6 +1101,54 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             resultList.add(resultVO);
         }
         return resultList;
+    }
+
+    private boolean checkAllowSwipeSeek() {
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = getSeekBarStrategy();
+        if (seekBarStrategy == null) {
+            return false;
+        }
+        switch (seekBarStrategy) {
+            case ALLOW_SEEK:
+            case ALLOW_SEEK_PLAYED:
+                return true;
+            case NOT_ALLOW_SEEK:
+            case INVISIBLE:
+            default:
+                return false;
+        }
+    }
+
+    private boolean checkCanSeekTo(long position) {
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = getSeekBarStrategy();
+        if (seekBarStrategy == null) {
+            return false;
+        }
+        switch (seekBarStrategy) {
+            case ALLOW_SEEK:
+                return true;
+            case ALLOW_SEEK_PLAYED:
+                int videoPlayedPosition = Nullables.of(new PLVSugarUtil.Supplier<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return playbackPlayerRepo.getPlaybackProgress(playbackDataVO).getPosition();
+                    }
+                }).getOrDefault(0);
+                return position < videoPlayedPosition;
+            case NOT_ALLOW_SEEK:
+            case INVISIBLE:
+            default:
+                return false;
+        }
+    }
+
+    @Nullable
+    private PLVLivePlaybackSeekBarStrategy getSeekBarStrategy() {
+        if (liveRoomDataManager == null) {
+            return null;
+        }
+        return PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY);
     }
     // </editor-fold>
 }

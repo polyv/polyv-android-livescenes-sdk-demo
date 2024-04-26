@@ -39,7 +39,7 @@
             android:paddingTop="5dp"
             android:paddingRight="8dp"
             android:paddingBottom="5dp"
-            android:text="x条新信息"
+            tools:text="x条新信息"
             android:textColor="#4399FF"
             android:textSize="12sp"
             android:visibility="gone"

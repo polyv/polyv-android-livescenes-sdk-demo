@@ -27,7 +27,7 @@
         android:layout_centerVertical="true"
         android:layout_weight="1"
         android:background="@drawable/plvlc_et_chat_corner"
-        android:hint="我也来聊几句"
+        android:hint="@string/plv_chat_input_tips_chat_2"
         android:imeOptions="actionSend|flagNoFullscreen"
         android:maxLength="200"
         android:paddingLeft="8dp"

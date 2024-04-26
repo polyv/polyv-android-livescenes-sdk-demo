@@ -40,7 +40,7 @@
         android:id="@+id/plvec_playback_item_mask"
         android:layout_width="88dp"
         android:layout_height="32dp"
-        android:text="播放中"
+        android:text="@string/plv_player_playing"
         android:textSize="14sp"
         android:gravity="center"
         android:background="@drawable/plvec_shape_previous_playbacking_mask"

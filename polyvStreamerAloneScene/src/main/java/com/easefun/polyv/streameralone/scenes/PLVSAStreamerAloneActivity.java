@@ -3,6 +3,7 @@ package com.easefun.polyv.streameralone.scenes;
 import android.app.Activity;
 import android.app.AlertDialog;
 import androidx.lifecycle.Observer;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -30,6 +31,7 @@ import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -53,11 +55,16 @@ import com.easefun.polyv.streameralone.scenes.fragments.PLVSAStreamerHomeFragmen
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.config.PLVLiveChannelType;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -144,33 +151,34 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                                                  @NonNull String usertype,
                                                  @NonNull String colinMicType) {
         if (activity == null) {
-            return PLVLaunchResult.error("activity 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_activity_is_null));
         }
         if (TextUtils.isEmpty(channelId)) {
-            return PLVLaunchResult.error("channelId 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_channel_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerId)) {
-            return PLVLaunchResult.error("viewerId 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_viewer_id_is_empty));
         }
         if (TextUtils.isEmpty(viewerName)) {
-            return PLVLaunchResult.error("viewerName 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_viewer_name_is_empty));
         }
         if (TextUtils.isEmpty(avatarUrl)) {
-            return PLVLaunchResult.error("avatarUrl 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_avatar_url_is_empty));
         }
         if (TextUtils.isEmpty(actor)) {
-            return PLVLaunchResult.error("actor 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_actor_is_empty));
         }
         if (TextUtils.isEmpty(channelName)) {
-            return PLVLaunchResult.error("channelName 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_channel_name_is_empty));
         }
         if (TextUtils.isEmpty(usertype)) {
-            return PLVLaunchResult.error("usertype 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_user_type_is_empty));
         }
         if (TextUtils.isEmpty(colinMicType)) {
-            return PLVLaunchResult.error("colinMicType 为空，启动手机开播纯视频页失败！");
+            return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvsa_login_streamer_error_colin_mic_type_is_empty));
         }
 
+        PLVLanguageUtil.checkOverrideLanguage(channelId, PLVLanguageUtil.LANGUAGE_FOLLOW_SYSTEM);
         Intent intent = new Intent(activity, PLVSAStreamerAloneActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID, channelId);
         intent.putExtra(EXTRA_VIEWER_ID, viewerId);
@@ -186,6 +194,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(PLVLanguageUtil.attachLanguageActivity(newBase, this));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -221,6 +234,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PLVLanguageUtil.detachLanguageActivity();
         PLVBeautyInitHelper.getInstance().destroy();
         if (streamerLayout != null) {
             streamerLayout.destroy();
@@ -322,6 +336,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         PLVLiveChannelConfigFiller.setupChannelId(channelId);
         PLVLiveChannelConfigFiller.setupChannelName(channelName);
         PLVLiveChannelConfigFiller.setColinMicType(colinMicType);
+        PLVLiveChannelConfigFiller.setChannelType(PLVLiveChannelType.ALONE);
 
         PLVLiveLocalActionHelper.getInstance().enterChannel(channelId);
     }
@@ -404,7 +419,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(PLVLanguageUtil.setToConfiguration(newConfig, this));
         if (PLVScreenUtils.isPortrait(this)) {
             plvsaRootLayout.setBackgroundResource(RES_BACKGROUND_PORT);
         } else {
@@ -421,7 +436,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             public void onStartLiveAction() {
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
-                homeFragment.chatroomLogin();
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.startLive();
                 //开始直播后，请求成员列表接口
@@ -433,7 +447,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 //嘉宾进入直播间
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
-                homeFragment.chatroomLogin();
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.enterLive();
                 //开始直播后，请求成员列表接口
@@ -461,8 +474,18 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return streamerLayout.getMixLayoutType();
+            }
+
+            @Override
             public void onBitrateClick(int bitrate) {
                 streamerLayout.setBitrate(bitrate);
+            }
+
+            @Override
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
+                streamerLayout.setMixLayoutType(mix);
             }
 
             @Override
@@ -568,10 +591,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             @Override
             public void onViewCreated() {
                 homeFragment.init(liveRoomDataManager);
+                homeFragment.chatroomLogin();
                 //注册streamerView
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getMoreLayoutStreamerView());
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getMemberLayoutStreamerView());
-                streamerLayout.getStreamerPresenter().registerView(homeFragment.getStatusBarLayoutStreamerView());
+                streamerLayout.getStreamerPresenter().registerView(homeFragment.getStreamerView());
 
                 //监听用户连麦请求的变化
                 streamerLayout.addOnUserRequestListener(new IPLVOnDataChangedListener<String>() {
@@ -580,7 +602,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         if (s == null) {
                             return;
                         }
-                        homeFragment.updateUserRequestStatus();
+                        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                            homeFragment.updateUserRequestStatus();
+                        }
                     }
                 });
             }
@@ -620,6 +644,17 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 linkMicLocalShareData.isOpenLinkMic = isOpen;
                 linkMicLocalShareData.isVideoLinkMic = isVideoLinkMicType;
             }
+
+            @Override
+            public void onKickByServer() {
+                boolean isGuest = PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
+                if (streamerLayout != null) {
+                    if (!isGuest) {
+                        streamerLayout.stopLive();
+                    }
+                    streamerLayout.destroy();
+                }
+            }
         });
 
         emptyFragment.setOnViewActionListener(new PLVSAEmptyFragment.OnViewActionListener() {
@@ -631,7 +666,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         if (s == null) {
                             return;
                         }
-                        linkMicRequestTipsLayout.show();
+                        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+                            linkMicRequestTipsLayout.show();
+                        }
                     }
                 });
             }
@@ -692,8 +729,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         if(liveRoomDataManager.isNeedStreamRecover() && isTeacher){
             final AlertDialog dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setMessage("检测到之前异常退出\n是否恢复直播？")
-                    .setPositiveButton("结束直播", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.plv_streamer_recover_hint)
+                    .setPositiveButton(R.string.plv_streamer_stop_stream, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             liveRoomDataManager.setNeedStreamRecover(false);
@@ -701,7 +738,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                             streamerLayout.getStreamerPresenter().stopLiveStream();
                         }
                     })
-                    .setNegativeButton("恢复直播", null)
+                    .setNegativeButton(R.string.plv_streamer_recover_stream, null)
                     .show();
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                 @Override

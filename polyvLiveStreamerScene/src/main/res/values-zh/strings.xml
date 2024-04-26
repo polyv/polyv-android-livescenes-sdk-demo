@@ -1,0 +1,68 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="plvls_app_name">POLYV开播</string>
+
+    <string name="plvls_document_upload_tips">
+        1. 18:00-19:00 为上传高峰期，排队时间较长，请错峰上传；
+        \n2. 文档最大支持 500M，不超过 1000页；
+        \n3. 仅支持未加密且不含音视频的 ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 格式；
+        \n4. wps 或含特殊字体、付费字体的文档请先转为 pdf 再上传
+    </string>
+    <string name="plvls_document_upload_choose_convert_type">请选择转码方式</string>
+    <string name="plvls_document_upload_choose_convert_type_hint">
+    快速转码：不含PPT动效，速度较快
+    \n动画转码：含PPT动效，速度较慢，仅支持Microsoft Office 保存的PPT
+    </string>
+    <string name="plvls_document_no_live_please_wait">直播尚未开始，请稍作等待</string>
+
+    <string name="plvls_document_usage_not_permeitted">被授权后才可以使用课节功能</string>
+    <string name="plvls_document_fast_transcoding">快速转码</string>
+    <string name="plvls_document_animation_transcoding">动画转码（较慢）</string>
+    <string name="plvls_document_upload_continue_hint">本地有文档上次上传中断，是否重新上传</string>
+    <string name="plvls_document_convert_fail_hint">暂不支持加密文档，请确保文档已解密 或 转为PDF文件 重试。如无法解决请联系客服。</string>
+    <string name="plvls_document_reupload">重新上传</string>
+    <string name="plvls_document_all">所有文档<xliff:g>&#160;</xliff:g></string>
+    <string name="plvls_document_number">共%s个</string>
+    <string name="plvls_document_page">共%s页</string>
+    <string name="plvls_document_add_whiteboard_success_hint">新增白板成功</string>
+    <string name="plvls_document_upload_status_failed">上传失败</string>
+    <string name="plvls_document_upload_status_success">上传成功，待转码</string>
+    <string name="plvls_document_upload_status_converting">正在转码...</string>
+    <string name="plvls_document_upload_status_convert_fail">无法解码</string>
+    <string name="plvls_document_upload_status_convert_animate_loss">动效丢失，不影响使用</string>
+    <string name="plvls_document_upload_retry">重试</string>
+    <string name="plvls_document_upload_help">帮助</string>
+    <string name="plvls_document_upload_hint">上传须知</string>
+    <string name="plvls_document_go_back_view_all_hint">返回查看所有文档</string>
+
+    <string name="plvls_manager_chatroom_title_tv_name">管理员私聊</string>
+    <string name="plvls_manager_chatroom_more_message_scroll_to_bottom">返回底部</string>
+    <string name="plvls_manager_chatroom_more_message_has_unread_message">{}条新消息</string>
+    <string name="plvls_manager_chatroom_unread_message_notify">您当前有 {} 条私聊消息，请及时查看</string>
+    <string name="plvls_manager_chatroom_input_tv_hint_network_disconnect">当前无网络，请设置网络再参与互动</string>
+    <string name="plvls_manager_chatroom_input_hint_check_network">请检查网络设置</string>
+    <string name="plvls_manager_chatroom_private_chat_hint">私聊</string>
+
+    <!--登录-->
+    <string name="plvls_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_channel_id_is_empty" translatable="false">channelId 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_avatar_url_is_empty" translatable="false">avatarUrl 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_actor_is_empty" translatable="false">actor 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_user_type_is_empty" translatable="false">userType 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播三分屏页失败！</string>
+
+    <string name="plvls_live_channel_info_copy_sip_phone_number_success_toast">复制电话连麦号码成功</string>
+    <string name="plvls_live_channel_info_sip_phone_number_text">电话连麦号码 {}</string>
+
+    <string name="plvls_live_member_count_hint_text">成员</string>
+    <string name="plvls_live_member_sip_text">电话连麦</string>
+    <string name="plvls_live_member_sip_calling_in_count_text">待接通({})</string>
+    <string name="plvls_live_member_sip_calling_out_count_text">呼叫中({})</string>
+    <string name="plvls_live_member_sip_connected_count_text">已接通({})</string>
+
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_title">“连麦”功能更新啦</string>
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_content">点击此功能按钮可开启观众连麦</string>
+
+</resources>

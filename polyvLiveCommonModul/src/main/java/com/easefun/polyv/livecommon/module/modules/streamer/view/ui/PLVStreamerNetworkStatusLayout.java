@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.util.PLVPopupHelper;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
@@ -38,15 +39,6 @@ public class PLVStreamerNetworkStatusLayout extends FrameLayout {
             pair(PLVLinkMicConstant.NetworkQuality.DISCONNECT, R.drawable.plv_streamer_network_status_bad_icon)
     );
 
-    private static final Map<PLVLinkMicConstant.NetworkQuality, String> QUALITY_DESCRIPTION_MAP = mapOf(
-            pair(PLVLinkMicConstant.NetworkQuality.EXCELLENT, "网络优秀"),
-            pair(PLVLinkMicConstant.NetworkQuality.GOOD, "网络良好"),
-            pair(PLVLinkMicConstant.NetworkQuality.POOR, "网络一般"),
-            pair(PLVLinkMicConstant.NetworkQuality.BAD, "网络较差"),
-            pair(PLVLinkMicConstant.NetworkQuality.VERY_BAD, "网络很差"),
-            pair(PLVLinkMicConstant.NetworkQuality.DISCONNECT, "网络断开")
-    );
-
     private int backgroundColorNetworkGood = PLVFormatUtils.parseColor("#331B202D");
     private int backgroundColorNetworkModerate = PLVFormatUtils.parseColor("#331B202D");
     private int backgroundColorNetworkBad = PLVFormatUtils.parseColor("#331B202D");
@@ -60,6 +52,17 @@ public class PLVStreamerNetworkStatusLayout extends FrameLayout {
     private final PLVStreamerNetworkStatusDetailLayout streamerNetworkStatusDetailLayout = createDetailLayout(getContext());
 
     private PLVLinkMicConstant.NetworkQuality lastNetworkQuality = null;
+
+    private static Map<PLVLinkMicConstant.NetworkQuality, String> getQualityDescriptionMap() {
+        return mapOf(
+                pair(PLVLinkMicConstant.NetworkQuality.EXCELLENT, PLVAppUtils.getString(R.string.plv_streamer_network_excellent)),
+                pair(PLVLinkMicConstant.NetworkQuality.GOOD, PLVAppUtils.getString(R.string.plv_streamer_network_good)),
+                pair(PLVLinkMicConstant.NetworkQuality.POOR, PLVAppUtils.getString(R.string.plv_streamer_network_poor)),
+                pair(PLVLinkMicConstant.NetworkQuality.BAD, PLVAppUtils.getString(R.string.plv_streamer_network_bad_3)),
+                pair(PLVLinkMicConstant.NetworkQuality.VERY_BAD, PLVAppUtils.getString(R.string.plv_streamer_network_very_bad)),
+                pair(PLVLinkMicConstant.NetworkQuality.DISCONNECT, PLVAppUtils.getString(R.string.plv_streamer_network_disconnect))
+        );
+    }
 
     public PLVStreamerNetworkStatusLayout(@NonNull Context context) {
         super(context);
@@ -150,8 +153,9 @@ public class PLVStreamerNetworkStatusLayout extends FrameLayout {
         if (QUALITY_IMAGE_MAP.containsKey(networkQuality)) {
             streamerNetworkStatusIv.setImageResource(QUALITY_IMAGE_MAP.get(networkQuality));
         }
-        if (QUALITY_DESCRIPTION_MAP.containsKey(networkQuality)) {
-            streamerNetworkStatusTv.setText(QUALITY_DESCRIPTION_MAP.get(networkQuality));
+        Map<PLVLinkMicConstant.NetworkQuality, String> map = getQualityDescriptionMap();
+        if (map.containsKey(networkQuality)) {
+            streamerNetworkStatusTv.setText(map.get(networkQuality));
         }
     }
 

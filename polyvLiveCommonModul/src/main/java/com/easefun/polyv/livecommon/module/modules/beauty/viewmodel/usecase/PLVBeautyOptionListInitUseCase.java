@@ -37,11 +37,12 @@ public class PLVBeautyOptionListInitUseCase {
 
     public List<PLVFilterOption> initFilterOptionList() {
         final List<PLVFilterOption> repoFilterOptionList = beautyRepo.getFilterOptionList();
+        final List<String> defaultFilterKeyList = PLVBeautyOptionDefaultConfig.getDefaultFilterKeyOrder();
         Collections.sort(repoFilterOptionList, new Comparator<PLVFilterOption>() {
             @Override
             public int compare(PLVFilterOption o1, PLVFilterOption o2) {
-                final int k1 = PLVBeautyOptionDefaultConfig.DEFAULT_FILTER_KEY_ORDER.indexOf(o1.getName());
-                final int k2 = PLVBeautyOptionDefaultConfig.DEFAULT_FILTER_KEY_ORDER.indexOf(o2.getName());
+                final int k1 = defaultFilterKeyList.indexOf(o1.getName());
+                final int k2 = defaultFilterKeyList.indexOf(o2.getName());
                 final int key1 = k1 < 0 ? Integer.MAX_VALUE : k1;
                 final int key2 = k2 < 0 ? Integer.MAX_VALUE : k2;
                 return key1 == key2 ? 0 : key1 < key2 ? -1 : 1;

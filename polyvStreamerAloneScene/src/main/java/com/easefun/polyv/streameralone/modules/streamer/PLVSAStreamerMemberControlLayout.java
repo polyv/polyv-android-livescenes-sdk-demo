@@ -30,6 +30,7 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAControlAdapter;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
@@ -62,11 +63,11 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
     private PLVSAControlAdapter controlAdapter;
     //成员控制的图片资源和文本
     private List<Pair<Integer, String>> list = new ArrayList(Arrays.asList(
-            new Pair<Integer, String>(R.drawable.plvsa_more_camera_selector, "摄像头"),
-            new Pair<Integer, String>(R.drawable.plvsa_more_mic_selector, "麦克风"),
-            new Pair<Integer, String>(R.drawable.plvsa_streamer_down_linkmic, "下麦"),
-            new Pair<Integer, String>(R.drawable.plvsa_streamer_speaker, "授予主讲\n权限"),
-            new Pair<Integer, String>(R.drawable.plvsa_streamer_fullscreen, "全屏")
+            new Pair<Integer, String>(R.drawable.plvsa_more_camera_selector, PLVAppUtils.getString(R.string.plv_linkmic_camera)),
+            new Pair<Integer, String>(R.drawable.plvsa_more_mic_selector, PLVAppUtils.getString(R.string.plv_linkmic_microphone)),
+            new Pair<Integer, String>(R.drawable.plvsa_streamer_down_linkmic, PLVAppUtils.getString(R.string.plv_linkmic_hang_off)),
+            new Pair<Integer, String>(R.drawable.plvsa_streamer_speaker, PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_3)),
+            new Pair<Integer, String>(R.drawable.plvsa_streamer_fullscreen, PLVAppUtils.getString(R.string.plv_live_full_screen))
     ));
     //对应功能在list中的position
     private int CONTROL_CAMERA = 0;
@@ -154,10 +155,10 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
                     final int pos = position;
                     final boolean isDownLinkmic = isSelected;
                     new PLVSAConfirmDialog(view.getContext())
-                            .setTitle("确定下麦吗？")
+                            .setTitle(R.string.plv_linkmic_confirm_hang_off)
                             .setContentVisibility(View.GONE)
-                            .setLeftButtonText("取消")
-                            .setRightButtonText("确定")
+                            .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                            .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                             .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, View v) {
@@ -174,7 +175,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
                     final boolean isGrant = isSelected;
                     final int pos = position;
                     if (!isNeedPermissionDialogShow) {
-                        String text = isGrant ? "授予主讲\n权限" : "移除主讲\n权限";
+                        String text = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_grant_speaker_permission_3 : R.string.plv_streamer_remove_speaker_permission_3);
                         list.set(pos, new Pair<Integer, String>(list.get(pos).first, text));
                         if (onViewActionListener != null) {
                             onViewActionListener.onClickGrantSpeaker(!isGrant);
@@ -182,18 +183,18 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
                         controlAdapter.updateItemSelectStatus(pos, !isGrant);
                         return;
                     }
-                    String title = isGrant ? "确定移除ta的" : "确定授予ta";
-                    String content = isGrant ? "移除后主讲人的屏幕共享将会自动结束" : "当前已有主讲人，确认后将替换为新的主讲人";
+                    String title = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_remove_speaker_permission_4 : R.string.plv_streamer_grant_speaker_permission_4);
+                    String content = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_remove_speaker_permission_5 : R.string.plv_streamer_grant_speaker_permission_5);
                     new PLVSAConfirmDialog(view.getContext())
-                            .setTitle(title + "主讲权限吗？")
+                            .setTitle(title)
                             .setContent(content)
-                            .setLeftButtonText("取消")
-                            .setRightButtonText("确定")
+                            .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                            .setRightButtonText(R.string.plv_common_dialog_confirm_2)
                             .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, View v) {
                                     dialog.dismiss();
-                                    String text = isGrant ? "授予主讲\n权限" : "移除主讲\n权限";
+                                    String text = PLVAppUtils.getString(isGrant ? R.string.plv_streamer_grant_speaker_permission_3 : R.string.plv_streamer_remove_speaker_permission_3);
                                     list.set(pos, new Pair<Integer, String>(list.get(pos).first, text));
                                     if (onViewActionListener != null) {
                                         onViewActionListener.onClickGrantSpeaker(!isGrant);
@@ -290,7 +291,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
         // 主讲权限
         if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) && linkMicItemDataBean.isGuest()) {
             // 讲师授权
-            String text = !linkMicItemDataBean.isHasSpeaker() ? "授予主讲\n权限" : "移除主讲\n权限";
+            String text = PLVAppUtils.getString(!linkMicItemDataBean.isHasSpeaker() ? R.string.plv_streamer_grant_speaker_permission_3 : R.string.plv_streamer_remove_speaker_permission_3);
             list.set(CONTROL_GRANT_SPEAKER, new Pair<>(list.get(CONTROL_GRANT_SPEAKER).first, text));
             controlAdapter.updateItemSelectStatus(CONTROL_GRANT_SPEAKER, linkMicItemDataBean.isHasSpeaker());
             if (linkMicItemDataBean.isHasSpeaker()) {
@@ -304,7 +305,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
                 && linkMicItemDataBean.isGuest()
                 && allowGuestTransferSpeaker) {
             // 嘉宾授权
-            String text = !linkMicItemDataBean.isHasSpeaker() ? "移交主讲\n权限" : "移除主讲\n权限";
+            String text = PLVAppUtils.getString(!linkMicItemDataBean.isHasSpeaker() ? R.string.plv_streamer_change_speaker_permission_2 : R.string.plv_streamer_remove_speaker_permission_3);
             list.set(CONTROL_GRANT_SPEAKER, new Pair<>(list.get(CONTROL_GRANT_SPEAKER).first, text));
             controlAdapter.updateItemSelectStatus(CONTROL_GRANT_SPEAKER, linkMicItemDataBean.isHasSpeaker());
             controlAdapter.updateItemVisibility(CONTROL_GRANT_SPEAKER, true);

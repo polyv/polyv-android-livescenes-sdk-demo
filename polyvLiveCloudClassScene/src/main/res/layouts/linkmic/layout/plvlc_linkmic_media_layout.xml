@@ -78,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="正在发言"
+            android:text="@string/plv_linkmic_speaking"
             android:textColor="#FFD0D0D0" />
 
     </LinearLayout>

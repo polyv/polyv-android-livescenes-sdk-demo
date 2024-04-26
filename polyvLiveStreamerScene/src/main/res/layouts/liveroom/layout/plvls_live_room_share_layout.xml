@@ -76,7 +76,7 @@
                         android:paddingTop="8dp"
                         android:paddingLeft="6dp"
                         android:paddingRight="6dp"
-                        android:text="微信好友"
+                        android:text="@string/plv_live_weixin_friend"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -105,7 +105,7 @@
                         android:paddingTop="8dp"
                         android:paddingLeft="6dp"
                         android:paddingRight="6dp"
-                        android:text="朋友圈"
+                        android:text="@string/plv_live_pengyouquan"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -135,7 +135,7 @@
                         android:paddingTop="8dp"
                         android:paddingLeft="6dp"
                         android:paddingRight="6dp"
-                        android:text="保存图片"
+                        android:text="@string/plv_live_save_img"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -165,7 +165,7 @@
                         android:paddingTop="8dp"
                         android:paddingLeft="6dp"
                         android:paddingRight="6dp"
-                        android:text="复制链接"
+                        android:text="@string/plv_live_copy_link"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
 
@@ -190,7 +190,7 @@
             android:layout_marginBottom="8dp"
             android:drawablePadding="6dp"
             android:padding="6dp"
-            android:text="关闭"
+            android:text="@string/plv_live_close"
             android:minEms="5"
             android:gravity="center"
             android:textColor="#F0F1F5"

@@ -1,8 +1,11 @@
 package com.easefun.polyv.livestreamer.modules.statusbar;
 
 import static com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter.AUTO_ID_WHITE_BOARD;
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.AlertDialog;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -17,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -25,7 +27,13 @@ import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocum
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingInListState;
+import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingOutListState;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -35,28 +43,48 @@ import com.easefun.polyv.livestreamer.modules.document.popuplist.PLVLSPptListLay
 import com.easefun.polyv.livestreamer.modules.liveroom.IPLVLSCountDownView;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSChannelInfoLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSClassBeginCountDownWindow;
-import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicControlWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSLinkMicRequestTipsWindow;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
+import com.easefun.polyv.livestreamer.modules.liveroom.widget.PLVLSNewLinkMicFirstIntroLayout;
+import com.easefun.polyv.livestreamer.modules.statusbar.widget.PLVLSLinkMicControlButton;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
-import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.exts.Lazy;
+import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
+import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
+import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
+import io.socket.client.Ack;
+
 /**
  * 状态栏布局
  */
 public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBarLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = PLVLSStatusBarLayout.class.getSimpleName();
+
     private static final int WHAT_HIDE_USER_REQUEST_TIPS = 1;
+    private static final int WHAT_NO_SUCCESS_CALLBACK_AFTER_START_CLASS = 2;
+
+    @Nullable
+    private IPLVLiveRoomDataManager liveRoomDataManager = null;
+    @Nullable
+    private IPLVStreamerContract.IStreamerPresenter streamerPresenter = null;
 
     //view
     private TextView plvlsStatusBarChannelInfoTv;
@@ -67,9 +95,10 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     private ImageView plvlsStatusBarSettingIv;
     private ImageView plvlsStatusBarMemberIv;
     private View plvlsStatusBarMemberLinkmicRequestTipsIv;
-    private ImageView plvlsStatusBarLinkmicIv;
+    private PLVLSLinkMicControlButton plvlsStatusBarLinkmicIv;
     private ImageView plvlsStatusBarDocumentIv;
     private ImageView plvlsStatusBarWhiteboardIv;
+    private ImageView statusBarAllowViewerLinkmicIv;
 
     //频道信息布局
     private PLVLSChannelInfoLayout channelInfoLayout;
@@ -77,8 +106,6 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     private PLVLSMoreSettingLayout moreSettingLayout;
     //成员列表布局
     private PLVLSMemberLayout memberLayout;
-    //连麦开关布局
-    private PLVLSLinkMicControlWindow linkMicControlWindow;
     //连麦请求提示布局
     private PLVLSLinkMicRequestTipsWindow linkMicRequestTipsWindow;
     //推流开始倒计时布局
@@ -86,6 +113,15 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // PPT文档布局
     private PLVLSPptListLayout pptListLayout;
+    // 引导布局
+    private Lazy<PLVLSNewLinkMicFirstIntroLayout> newLinkMicFirstIntroLayout = new Lazy<PLVLSNewLinkMicFirstIntroLayout>() {
+        @Override
+        public PLVLSNewLinkMicFirstIntroLayout onLazyInit() {
+            return new PLVLSNewLinkMicFirstIntroLayout(getContext());
+        }
+    };
+
+    private final PLVSipLinkMicViewModel sipLinkMicViewModel = PLVDependManager.getInstance().get(PLVSipLinkMicViewModel.class);
 
     //view交互事件监听器
     private OnViewActionListener onViewActionListener;
@@ -111,14 +147,25 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     private int linkMicShowType = 0;
 
     //handler
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            if (WHAT_HIDE_USER_REQUEST_TIPS == msg.what) {
-                hideUserRequestTips();
+            switch (msg.what) {
+                case WHAT_HIDE_USER_REQUEST_TIPS:
+                    hideUserRequestTips();
+                    break;
+                case WHAT_NO_SUCCESS_CALLBACK_AFTER_START_CLASS:
+                    if (pendingTaskOnNoSuccessCallbackAfterStartClass != null) {
+                        pendingTaskOnNoSuccessCallbackAfterStartClass.run();
+                        pendingTaskOnNoSuccessCallbackAfterStartClass = null;
+                    }
+                    break;
+                default:
             }
         }
     };
+    @Nullable
+    private Runnable pendingTaskOnNoSuccessCallbackAfterStartClass;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -151,11 +198,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         plvlsStatusBarLinkmicIv = findViewById(R.id.plvls_status_bar_linkmic_iv);
         plvlsStatusBarDocumentIv = findViewById(R.id.plvls_status_bar_document_iv);
         plvlsStatusBarWhiteboardIv = findViewById(R.id.plvls_status_bar_whiteboard_iv);
+        statusBarAllowViewerLinkmicIv = findViewById(R.id.plvls_status_bar_allow_viewer_linkmic_iv);
 
         channelInfoLayout = new PLVLSChannelInfoLayout(getContext());
         moreSettingLayout = new PLVLSMoreSettingLayout(getContext());
         memberLayout = new PLVLSMemberLayout(getContext());
-        linkMicControlWindow = new PLVLSLinkMicControlWindow(this);
         linkMicRequestTipsWindow = new PLVLSLinkMicRequestTipsWindow(this);
         countDownView = new PLVLSClassBeginCountDownWindow(this);
         pptListLayout = new PLVLSPptListLayout(getContext());
@@ -165,9 +212,9 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         plvlsStatusBarShareIv.setOnClickListener(this);
         plvlsStatusBarSettingIv.setOnClickListener(this);
         plvlsStatusBarMemberIv.setOnClickListener(this);
-        plvlsStatusBarLinkmicIv.setOnClickListener(this);
         plvlsStatusBarDocumentIv.setOnClickListener(this);
         plvlsStatusBarWhiteboardIv.setOnClickListener(this);
+        statusBarAllowViewerLinkmicIv.setOnClickListener(new PLVDebounceClicker.OnClickListener(this, 1000));
 
         initCountDownView();
         initLinkMicControlView();
@@ -175,6 +222,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         initMemberLayout();
         initDocumentMvpView();
         initOnUserAbilityChangeListener();
+
+        observeSipLinkMicListUpdate();
 
         checkUserDocumentPermission();
     }
@@ -187,6 +236,15 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 if (onViewActionListener != null) {
                     onViewActionListener.onClassControl(true);
                 }
+                pendingTaskOnNoSuccessCallbackAfterStartClass = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (plvlsStatusBarClassControlTv != null) {
+                            plvlsStatusBarClassControlTv.setEnabled(true);
+                        }
+                    }
+                };
+                handler.sendMessageDelayed(handler.obtainMessage(WHAT_NO_SUCCESS_CALLBACK_AFTER_START_CLASS), seconds(3).toMillis());
             }
 
             @Override
@@ -197,22 +255,15 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     private void initLinkMicControlView() {
-        //初始化连麦开关页监听器
-        linkMicControlWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                plvlsStatusBarLinkmicIv.setSelected(false);
-            }
-        });
-        linkMicControlWindow.setOnViewActionListener(new PLVLSLinkMicControlWindow.OnViewActionListener() {
+        plvlsStatusBarLinkmicIv.setOnViewActionListener(new PLVLSLinkMicControlButton.OnViewActionListener() {
             @Override
             public boolean isStreamerStartSuccess() {
                 return onViewActionListener != null && onViewActionListener.isStreamerStartSuccess();
             }
 
             @Override
-            public void updateLinkMicMediaType(boolean isVideoLinkMicType) {
-                memberLayout.updateLinkMicMediaType(isVideoLinkMicType);
+            public void onLinkMicOpenStateChanged(boolean isVideoLinkMicType, boolean isOpenLinkMic) {
+                memberLayout.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
             }
         });
     }
@@ -243,6 +294,16 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return onViewActionListener.getMixLayoutType();
+            }
+
+            @Override
+            public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
+                onViewActionListener.onChangeMixLayoutType(mix);
+            }
+
+            @Override
             public boolean isCurrentLocalVideoEnable() {
                 return onViewActionListener.isCurrentLocalVideoEnable();
             }
@@ -267,18 +328,6 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     private void initMemberLayout() {
         //初始化成员变量页的监听器
-        memberLayout.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
-            @Override
-            public void onDrawerStateChange(int oldState, int newState) {
-                if (newState == PLVMenuDrawer.STATE_CLOSED) {
-                    plvlsStatusBarMemberIv.setSelected(false);
-                }
-            }
-
-            @Override
-            public void onDrawerSlide(float openRatio, int offsetPixels) {
-            }
-        });
         memberLayout.setOnViewActionListener(new PLVLSMemberLayout.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
@@ -302,9 +351,9 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
-            public void onControlUserLinkMic(int position, boolean isAllowJoin) {
+            public void onControlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
                 if (onViewActionListener != null) {
-                    onViewActionListener.onControlUserLinkMic(position, isAllowJoin);
+                    onViewActionListener.onControlUserLinkMic(position, action);
                 }
             }
 
@@ -375,20 +424,82 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
         PLVUserAbilityManager.myAbility().addUserAbilityChangeListener(new WeakReference<>(onUserAbilityChangeCallback));
     }
+
+    private void initAutoOpenLinkMic(IPLVLiveRoomDataManager liveRoomDataManager) {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN)) {
+            return;
+        }
+        final String channelId = liveRoomDataManager.getConfig().getChannelId();
+        final boolean isAutoOpenLinkMic = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_ENABLE);
+        final String autoOpenLinkMicType = PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_TYPE);
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        plvlsStatusBarLinkmicIv.performAutoOpenLinkMic(isAutoOpenLinkMic, "video".equals(autoOpenLinkMicType), isNewLinkMicStrategy);
+    }
+
+    private void observeSipLinkMicListUpdate() {
+        sipLinkMicViewModel.getCallingInListStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicCallingInListState>() {
+            @Override
+            public void onChanged(@Nullable PLVSipLinkMicCallingInListState sipLinkMicCallingInListState) {
+                if (sipLinkMicCallingInListState == null || sipLinkMicCallingInListState.callingInViewerList.isEmpty()) {
+                    return;
+                }
+                if (!plvlsStatusBarMemberIv.isSelected()) {
+                    plvlsStatusBarMemberLinkmicRequestTipsIv.setVisibility(VISIBLE);
+                }
+            }
+        });
+        sipLinkMicViewModel.getCallingOutListStateLiveData().observe((LifecycleOwner) getContext(), new Observer<PLVSipLinkMicCallingOutListState>() {
+            @Override
+            public void onChanged(@Nullable PLVSipLinkMicCallingOutListState sipLinkMicCallingOutListState) {
+                if (sipLinkMicCallingOutListState == null || sipLinkMicCallingOutListState.callingOutViewerList.isEmpty()) {
+                    return;
+                }
+                if (!plvlsStatusBarMemberIv.isSelected()) {
+                    plvlsStatusBarMemberLinkmicRequestTipsIv.setVisibility(VISIBLE);
+                }
+            }
+        });
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Streamer - Mvp View">
+
+    private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
+
+        @Override
+        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+            streamerPresenter = presenter;
+            presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isLive) {
+                    if (Boolean.TRUE.equals(isLive)) {
+                        if (liveRoomDataManager != null) {
+                            initAutoOpenLinkMic(liveRoomDataManager);
+                        }
+                    }
+                }
+            });
+        }
+    };
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现父类IPLVLSStatusBarLayout的方法">
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
         channelInfoLayout.init(liveRoomDataManager);
         memberLayout.init(liveRoomDataManager);
         moreSettingLayout.init(liveRoomDataManager);
         userType = liveRoomDataManager.getConfig().getUser().getViewerType();
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(userType)) {
             plvlsStatusBarClassControlTv.setVisibility(GONE);
-            plvlsStatusBarLinkmicIv.setVisibility(GONE);
+            final boolean isAutoLinkMic = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_GUEST_AUTO_LINKMIC_ENABLE);
+            plvlsStatusBarLinkmicIv.setVisibility(isAutoLinkMic ? GONE : VISIBLE);
         }
         updateLinkMicShowType(liveRoomDataManager.isOnlyAudio());
+        updateLinkMicStrategy(liveRoomDataManager);
     }
 
     @Override
@@ -397,15 +508,20 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     @Override
-    public IPLVStreamerContract.IStreamerView getMemberLayoutStreamerView() {
-        return memberLayout.getStreamerView();
+    public IPLVStreamerContract.IStreamerView getStreamerView() {
+        return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
+                .proxyAll(
+                        streamerView,
+                        memberLayout.getStreamerView(),
+                        plvlsStatusBarLinkmicIv.streamerView
+                );
     }
 
     @Override
     public void showAlertDialogNoNetwork() {
         new AlertDialog.Builder(getContext())
                 .setMessage(R.string.plv_streamer_dialog_no_network)
-                .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.plv_common_dialog_confirm_5, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -443,6 +559,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         } else {
             changeStatesToClassOver();
         }
+        sipLinkMicViewModel.requestSipChannelInfo();
     }
 
     @Override
@@ -491,7 +608,9 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // <editor-fold defaultstate="collapsed" desc="上下课开关控制">
     private void changeStatesToClassStarted() {
-        plvlsStatusBarClassControlTv.setText("下课");
+        pendingTaskOnNoSuccessCallbackAfterStartClass = null;
+
+        plvlsStatusBarClassControlTv.setText(R.string.plv_streamer_stop);
         plvlsStatusBarClassControlTv.setEnabled(true);
         plvlsStatusBarClassControlTv.setSelected(true);
 
@@ -500,14 +619,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     private void changeStatesToClassOver() {
-        plvlsStatusBarClassControlTv.setText("上课");
+        plvlsStatusBarClassControlTv.setText(R.string.plv_streamer_start);
         plvlsStatusBarClassControlTv.setSelected(false);
         plvlsStatusBarClassControlTv.setEnabled(true);
 
         plvlsStatusBarStreamerTimeTv.setVisibility(View.GONE);
-
-        //下课后，由于会清除连麦开关状态，因此需重置相关view的状态
-        linkMicControlWindow.resetLinkMicControlView();
     }
 
     private void toggleClassStates(boolean isWillStart) {
@@ -541,9 +657,71 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="音频开播控制">
+    // <editor-fold defaultstate="collapsed" desc="连麦配置">
     private void updateLinkMicShowType(boolean isOnlyAudio) {
         linkMicShowType = isOnlyAudio ? 1 : 0;
+    }
+
+    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
+        if (!canControlLinkMic) {
+            return;
+        }
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        if (!isNewLinkMicStrategy) {
+            plvlsStatusBarLinkmicIv.setVisibility(View.VISIBLE);
+            statusBarAllowViewerLinkmicIv.setVisibility(View.GONE);
+        } else {
+            plvlsStatusBarLinkmicIv.setVisibility(View.GONE);
+            statusBarAllowViewerLinkmicIv.setVisibility(View.VISIBLE);
+            if (!PLVLSNewLinkMicFirstIntroLayout.hasShownFirstIntro()) {
+                newLinkMicFirstIntroLayout.get().show();
+            }
+        }
+    }
+
+    private void switchAllowViewerLinkMic(final boolean toAllow) {
+        if (streamerPresenter == null) {
+            return;
+        }
+        final boolean isNetworkConnected = PLVNetworkUtils.isConnected(getContext());
+        if (!isNetworkConnected) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_allow_viewer_linkmic_fail_toast)
+                    .show();
+            return;
+        }
+
+        boolean success;
+        if (toAllow) {
+            success = streamerPresenter.allowViewerRaiseHand(new Ack() {
+                @Override
+                public void call(Object... args) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plv_streamer_allow_viewer_linkmic_toast)
+                            .show();
+                    statusBarAllowViewerLinkmicIv.setActivated(true);
+                }
+            });
+        } else {
+            success = streamerPresenter.disallowViewerRaiseHand(new Ack() {
+                @Override
+                public void call(Object... args) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plv_streamer_disallow_viewer_linkmic_toast)
+                            .show();
+                    statusBarAllowViewerLinkmicIv.setActivated(false);
+                }
+            });
+        }
+
+        if (!success) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_allow_viewer_linkmic_fail_toast)
+                    .show();
+            PLVCommonLog.d(TAG, "switchAllowViewerLinkMic fail, toAllow:" + toAllow);
+        }
     }
     // </editor-fold >
 
@@ -598,7 +776,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     // <editor-fold defaultstate="collapsed" desc="用户请求连麦的提示处理">
     private void showUserRequestTips(String uid) {
-        if (memberLayout.isOpen()) {
+        if (memberLayout.isOpen() || !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
             return;
         }
         plvlsStatusBarMemberLinkmicRequestTipsIv.setVisibility(View.VISIBLE);
@@ -628,23 +806,14 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             v.setSelected(!v.isSelected());
             moreSettingLayout.open();
         } else if (id == R.id.plvls_status_bar_member_iv) {
-            v.setSelected(!v.isSelected());
             memberLayout.open();
             hideUserRequestTips();
-        } else if (id == R.id.plvls_status_bar_linkmic_iv) {
-            if (onViewActionListener != null && !onViewActionListener.isStreamerStartSuccess() && !v.isSelected()) {
-                PLVToast.Builder.context(getContext())
-                        .setText(R.string.plv_streamer_toast_can_not_linkmic_before_the_class)
-                        .build()
-                        .show();
-                return;
-            }
-            v.setSelected(!v.isSelected());
-            linkMicControlWindow.show(v, linkMicControlWindow.getShowType());
         } else if (id == R.id.plvls_status_bar_document_iv) {
             processSelectDocument();
         } else if (id == R.id.plvls_status_bar_whiteboard_iv) {
             processSelectWhiteBoard();
+        } else if (id == statusBarAllowViewerLinkmicIv.getId()) {
+            switchAllowViewerLinkMic(!statusBarAllowViewerLinkmicIv.isActivated());
         }
     }
     // </editor-fold>

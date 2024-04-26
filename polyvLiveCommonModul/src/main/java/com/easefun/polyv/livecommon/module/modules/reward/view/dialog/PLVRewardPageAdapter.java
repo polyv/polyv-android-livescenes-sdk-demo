@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.reward.view.dialog;
 
+import android.os.Parcelable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -43,6 +44,10 @@ public class PLVRewardPageAdapter extends FragmentStatePagerAdapter {
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="生命周期，重写方法">
+    @Override
+    public Parcelable saveState() {
+        return null;
+    }
 
     @Override
     public Fragment getItem(final int position) {

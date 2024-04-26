@@ -3,33 +3,34 @@ package com.easefun.polyv.liveecommerce.modules.chatroom.widget;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.TypedArray;
 import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.CycleInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.easefun.polyv.livecommon.module.utils.PLVBezierEvaluator;
+import com.easefun.polyv.livecommon.ui.widget.imageview.IPLVVisibilityChangedListener;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Random;
-
-import static com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView.Const.BEAT_ZOOM_RATIO;
-import static com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView.Const.DURATION_FLY_LOVE_ICON;
 
 
 public class PLVECLikeIconView extends RelativeLayout {
@@ -43,9 +44,15 @@ public class PLVECLikeIconView extends RelativeLayout {
     private Random random = new Random();
 
     private FrameLayout loveIconContainer;
-    private ImageView heartView;
 
-    private HeartBeatAnimation heartBeatAnimation;
+    private int srcWH;
+    private int topViewId;
+    private ViewGroup topView;
+
+    private IPLVVisibilityChangedListener visibilityChangedListener;
+    private ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener;
+
+    private boolean avoidTopView = false;
 
     public PLVECLikeIconView(Context context) {
         this(context, null);
@@ -57,12 +64,17 @@ public class PLVECLikeIconView extends RelativeLayout {
 
     public PLVECLikeIconView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVECLikeIconView, defStyleAttr, 0);
+        srcWH = a.getDimensionPixelSize(R.styleable.PLVECLikeIconView_src_wh, ConvertUtils.dp2px(46));
+        topViewId = a.getResourceId(R.styleable.PLVECLikeIconView_top_view, 0);
+        a.recycle();
         init();
     }
 
     private void init() {
         initInterpolator();
         initChild();
+        initViewTreeObserver();
     }
 
     private void initChild() {
@@ -73,58 +85,74 @@ public class PLVECLikeIconView extends RelativeLayout {
 
 
         //圆背景
-        View bg = new View(getContext());
-        bg.setBackgroundResource(R.drawable.plvec_like_bg);
-        Drawable heart = getResources().getDrawable(R.drawable.plvec_like_0);
-        float d = ConvertUtils.dp2px(32);
+        final View bg = new View(getContext());
+        bg.setBackgroundResource(R.drawable.plvec_chatroom_btn_like);
+        float d = srcWH;
         LayoutParams bgLp = new LayoutParams((int) d, (int) d);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bgLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        bgLp.addRule(Gravity.CENTER);
-        bgLp.bottomMargin = PLVScreenUtils.dip2px(getContext(), 3);
-        bgLp.rightMargin = PLVScreenUtils.dip2px(getContext(), 6);
+//        bgLp.bottomMargin = ConvertUtils.dp2px(5);
+        /**
+         * ///暂时保留，以后有必要时再使用
+         *  bgLp.addRule(Gravity.CENTER);
+         *  bgLp.bottomMargin = PolyvScreenUtils.dip2px(getContext(), 3);
+         */
+
+
+        bgLp.rightMargin = PLVScreenUtils.dip2px(getContext(), 16);
         bg.setLayoutParams(bgLp);
         bg.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onButtonClickListener != null) {
-                    heartBeatAnimation.beat();
                     onButtonClickListener.onClick(PLVECLikeIconView.this);
                 }
+                bg.startAnimation(createClickAnimation());
             }
         });
-
-        //心跳
-        heartView = new ImageView(getContext());
-        //心跳动效
-        heartBeatAnimation = new HeartBeatAnimation(heartView);
-        heartView.setImageDrawable(heart);
-        LayoutParams heartLp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        heartLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        heartLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        heartLp.addRule(Gravity.CENTER);
-        heartLp.bottomMargin = (int) (bgLp.bottomMargin + d / 2 - heart.getIntrinsicHeight() / 2) - 3;
-        heartLp.rightMargin = (int) (bgLp.rightMargin + d / 2 - heart.getIntrinsicWidth() / 2);
-        heartView.setLayoutParams(heartLp);
-
 
         //圆背景
         addView(bg);
         //漂浮爱心容器
         addView(loveIconContainer);
-        //心跳爱心
-        addView(heartView);
     }
 
     private void initInterpolator() {
         interpolators = new Interpolator[]{
-                new LinearInterpolator()
-                ///暂时保留，以后可以替换使用
                 /**
+                 * 暂时保留，以后有必要时再使用
                 new AccelerateDecelerateInterpolator(),
                 new AccelerateInterpolator(),
                 new DecelerateInterpolator(),**/
+                new LinearInterpolator()
+
         };
+    }
+
+    private void initViewTreeObserver() {
+        getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (topViewId != 0 && topView == null) {
+                    topView = ((Activity) getContext()).findViewById(topViewId);
+                }
+                avoidTopView = topView != null && hasShownChildView(topView);
+            }
+        });
+    }
+
+    private boolean hasShownChildView(View view) {
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                boolean result = hasShownChildView(((ViewGroup) view).getChildAt(i));
+                if (result) {
+                    return true;
+                }
+            }
+        } else {
+            return view.isShown();
+        }
+        return false;
     }
 
     @Override
@@ -134,38 +162,74 @@ public class PLVECLikeIconView extends RelativeLayout {
         height = getMeasuredHeight();
     }
 
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+        if (visibilityChangedListener != null) {
+            visibilityChangedListener.onChanged(visibility);
+        }
+    }
+
+    public void setAvoidTopView(boolean avoidTopView) {
+        this.avoidTopView = avoidTopView;
+    }
+
+    public void setVisibilityChangedListener(IPLVVisibilityChangedListener listener) {
+        this.visibilityChangedListener = listener;
+    }
+
     private OnClickListener onButtonClickListener;
 
     public void setOnButtonClickListener(@Nullable OnClickListener l) {
         onButtonClickListener = l;
     }
 
+    private AnimationSet createClickAnimation() {
+
+        CycleInterpolator interpolator = new CycleInterpolator(1);
+
+        Animation rotateAnimation = new RotateAnimation(0f, -30f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+
+        Animation scaleAnimation = new ScaleAnimation(1.0f, 1.2f, 1.0f, 1.2f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+
+        AnimationSet animatorSet = new AnimationSet(true);
+        animatorSet.setDuration(200);
+        animatorSet.setInterpolator(interpolator);
+//        animatorSet.addAnimation(rotateAnimation);
+        animatorSet.addAnimation(scaleAnimation);
+        return animatorSet;
+
+    }
+
     @Override
     protected void onDetachedFromWindow() {
-        heartBeatAnimation.destroy();
         removeAllViews();
+        getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
         super.onDetachedFromWindow();
     }
 
     private void startAnimator(ImageView view) {
         if (height <= 0 || width <= 0)
             return;
-        //曲线的两个顶点
-        PointF pointF1 = new PointF(
-                random.nextInt(Math.max(2, width - ConvertUtils.dp2px(16))),
-                random.nextInt(height / 2) + height / 2.5f);
-        PointF pointF2 = new PointF(
-                random.nextInt(Math.max(2, width - ConvertUtils.dp2px(16))),
-                random.nextInt(height / 2));
-        PointF pointStart = new PointF(heartView.getLeft() + (float) heartView.getDrawable().getIntrinsicWidth() / 2 - (float) iconWidth / 2,
-                height - heartView.getDrawable().getIntrinsicHeight() - iconHeight);
-        PointF pointEnd = new PointF(random.nextInt(Math.max(2, width - ConvertUtils.dp2px(16))), 0);
-
+        PointF pointF1, pointF2, pointStart, pointEnd;
+        if (avoidTopView) {
+            pointF1 = new PointF(iconWidth, height / 4.0f);
+            pointF2 = new PointF(iconWidth, height / 4.0f);
+            pointStart = new PointF(Math.max(2, (width - iconWidth - ConvertUtils.dp2px(28))), (height - srcWH));
+            pointEnd = new PointF(Math.max(iconWidth, random.nextInt(Math.max(2, width - iconWidth - ConvertUtils.dp2px(28)))), 0);
+        } else {
+            pointF1 = new PointF(Math.max(2, (width - iconWidth - ConvertUtils.dp2px(16))), height / 3.0f);
+            pointF2 = new PointF(Math.max(2, (width - iconWidth - ConvertUtils.dp2px(16))), height / 3.0f);
+            pointStart = new PointF(Math.max(2, (width - iconWidth - ConvertUtils.dp2px(18))), (height - srcWH));
+            pointEnd = new PointF(Math.max(iconWidth, random.nextInt(Math.max(2, width - ConvertUtils.dp2px(16))) + ConvertUtils.dp2px(6)), 0);
+        }
         //贝塞尔估值器
         PLVBezierEvaluator evaluator = new PLVBezierEvaluator(pointF1, pointF2);
         ValueAnimator animator = ValueAnimator.ofObject(evaluator, pointStart, pointEnd);
         animator.setTarget(view);
-        animator.setDuration(DURATION_FLY_LOVE_ICON);
+        animator.setDuration(Const.DURATION_FLY_LOVE_ICON);
         animator.addUpdateListener(new UpdateListener(view));
         animator.addListener(new AnimatorListener(view, (ViewGroup) view.getParent()));
         animator.setInterpolator(interpolators[random.nextInt(interpolators.length)]);
@@ -173,11 +237,20 @@ public class PLVECLikeIconView extends RelativeLayout {
         animator.start();
     }
 
-    private int[] srcs = new int[]{
-            R.drawable.plvec_like_1,
-            R.drawable.plvec_like_2,
-            R.drawable.plvec_like_3,
-            R.drawable.plvec_like_4};
+
+    private int[] imageId = new int[]{
+            R.drawable.plvec_chatroom_btn_like_1,
+            R.drawable.plvec_chatroom_btn_like_2,
+            R.drawable.plvec_chatroom_btn_like_3,
+            R.drawable.plvec_chatroom_btn_like_4,
+            R.drawable.plvec_chatroom_btn_like_5,
+            R.drawable.plvec_chatroom_btn_like_6,
+            R.drawable.plvec_chatroom_btn_like_7,
+            R.drawable.plvec_chatroom_btn_like_8,
+            R.drawable.plvec_chatroom_btn_like_9,
+            R.drawable.plvec_chatroom_btn_like_10,
+    };
+    private Random randomColor = new Random();
 
     public void addLoveIcon(final int count) {
         if (height <= 0 || width <= 0)
@@ -185,19 +258,17 @@ public class PLVECLikeIconView extends RelativeLayout {
         post(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < count; i++) {
-                    ImageView view = new ImageView(getContext());
-                    view.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    view.setImageResource(srcs[random.nextInt(srcs.length)]);
-                    view.setBackgroundColor(Color.TRANSPARENT);
-                    int scale = random.nextInt(5) + 6;
-                    iconWidth = view.getDrawable().getIntrinsicWidth() * scale / 10;
-                    iconHeight = view.getDrawable().getIntrinsicHeight() * scale / 10;
+                ImageView view = new ImageView(getContext());
+                view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                view.setImageResource(imageId[random.nextInt(imageId.length)]);
+                int scale = random.nextInt(4) + 7;
+                iconWidth = view.getDrawable().getIntrinsicWidth() * scale / 10;
+                iconHeight = view.getDrawable().getIntrinsicHeight() * scale / 10;
+                LayoutParams bgLp = new LayoutParams(iconWidth, iconHeight);
+                view.setLayoutParams(bgLp);
 
-                    view.setLayoutParams(new FrameLayout.LayoutParams(iconWidth, iconHeight, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
-                    loveIconContainer.addView(view);
-                    startAnimator(view);
-                }
+                addView(view, 0);
+                startAnimator(view);
             }
         });
     }
@@ -218,6 +289,9 @@ public class PLVECLikeIconView extends RelativeLayout {
                 view.setX(pointF.x);
                 view.setY(pointF.y);
                 view.setAlpha(1 - animation.getAnimatedFraction() + 0.1f);
+                //刚出现时有从小到大的效果
+                view.setScaleX(Math.min(1.2f, 0.5f + animation.getAnimatedFraction()));
+                view.setScaleY(Math.min(1.2f, 0.5f + animation.getAnimatedFraction()));
             }
         }
     }
@@ -225,17 +299,17 @@ public class PLVECLikeIconView extends RelativeLayout {
     private static class AnimatorListener extends AnimatorListenerAdapter {
 
         private WeakReference<View> iv;
-        private WeakReference<ViewGroup> parentReference;
+        private WeakReference<ViewGroup> parent;
 
         AnimatorListener(View iv, ViewGroup parent) {
             this.iv = new WeakReference<>(iv);
-            this.parentReference = new WeakReference<>(parent);
+            this.parent = new WeakReference<>(parent);
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             View view = iv.get();
-            ViewGroup parent = this.parentReference.get();
+            ViewGroup parent = this.parent.get();
             if (null != view
                     && null != parent) {
                 parent.removeView(view);
@@ -259,56 +333,6 @@ public class PLVECLikeIconView extends RelativeLayout {
 
         //漂浮爱心的持续时间
         static final int DURATION_FLY_LOVE_ICON = 2000;
-    }
-
-    //心跳动画
-    private static class HeartBeatAnimation {
-        private static final int FIRST_DURATION = 50;
-        private static final int SECOND_DURATION = 300;
-
-
-        private WeakReference<View> target;
-
-        private Animation first;
-
-        HeartBeatAnimation(View view) {
-            target = new WeakReference<>(view);
-
-            //第二阶段的动画。
-            final Animation second = new ScaleAnimation(BEAT_ZOOM_RATIO, 1f, BEAT_ZOOM_RATIO, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5F);
-            second.setDuration(SECOND_DURATION);
-            //第一阶段的动画。
-            first = new ScaleAnimation(1f, BEAT_ZOOM_RATIO, 1f, BEAT_ZOOM_RATIO, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            first.setDuration(FIRST_DURATION);
-            first.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {/**/}
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (target.get() != null) {
-                        target.get().startAnimation(second);
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {/**/}
-            });
-        }
-
-        void beat() {
-            if (target.get() != null) {
-                target.get().startAnimation(first);
-            }
-        }
-
-        //移除引用
-        void destroy() {
-            if (target.get() != null) {
-                target.get().clearAnimation();
-                target.clear();
-            }
-        }
     }
 
 }

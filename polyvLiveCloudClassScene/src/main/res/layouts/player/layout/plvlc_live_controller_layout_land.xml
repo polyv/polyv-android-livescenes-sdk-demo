@@ -61,7 +61,7 @@
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@+id/video_name_land_tv"
         android:gravity="center_vertical"
-        android:text="2.3w次播放"
+        tools:text="2.3w次播放"
         android:textColor="#D0D0D0"
         android:textSize="12sp"
         android:visibility="gone"
@@ -248,7 +248,7 @@
             android:paddingTop="4dp"
             android:paddingEnd="8dp"
             android:paddingBottom="4dp"
-            android:text="连续观看有奖励哦"
+            android:text="@string/plv_live_watch_reward"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:visibility="gone"
@@ -264,6 +264,56 @@
             app:triangleWidth="10dp"
             tools:visibility="visible" />
 
+        <com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView
+            android:id="@+id/plvlc_live_lottery_enter_view"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/plv_interact_lottery"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv"
+            android:layout_marginEnd="16dp"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvlc_live_lottery_enter_cd_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00:00"
+            android:textColor="#ADADC0"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/plvlc_live_lottery_enter_view"
+            app:layout_constraintStart_toStartOf="@+id/plvlc_live_lottery_enter_view"
+            app:layout_constraintTop_toBottomOf="@+id/plvlc_live_lottery_enter_view"
+            tools:visibility="visible" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+            android:id="@+id/plvlc_live_lottery_enter_tips_view"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:text="@string/plv_live_lottery_no_start"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:indicateColor="#FF9D4D"
+            app:indicateEndColor="#F65F49"
+            app:layout_constraintBottom_toTopOf="@+id/plvlc_live_lottery_enter_view"
+            app:layout_constraintEnd_toEndOf="@+id/plvlc_live_lottery_enter_view"
+            app:layout_constraintStart_toStartOf="@+id/plvlc_live_lottery_enter_view"
+            app:rectRadius="4dp"
+            app:triangleCenter="true"
+            app:triangleHeight="6dp"
+            app:trianglePosition="bottom"
+            app:triangleWidth="10dp"
+            tools:visibility="visible" />
+
         <ImageView
             android:id="@+id/plvlc_live_player_controller_enter_paint_iv"
             android:layout_width="36dp"
@@ -271,7 +321,7 @@
             android:layout_marginEnd="16dp"
             android:src="@drawable/plvlc_controller_paint_mode_icon"
             android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/plvlc_card_enter_view"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_live_lottery_enter_view"
             app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv"
             tools:visibility="visible" />
 
@@ -289,7 +339,7 @@
             android:gravity="center"
             android:imeOptions="flagNoFullscreen|flagNoExtractUi"
             android:singleLine="true"
-            android:text="跟大家聊点什么吧~"
+            android:text="@string/plv_chat_input_tips_chat"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -82,7 +82,7 @@
         android:clickable="true"
         android:background="@drawable/plvlc_tv_selected_send_message"
         android:gravity="center"
-        android:text="发送"
+        android:text="@string/plv_chat_send"
         android:enabled="false"
         android:textColor="#ffffff"
         android:textSize="14sp" />

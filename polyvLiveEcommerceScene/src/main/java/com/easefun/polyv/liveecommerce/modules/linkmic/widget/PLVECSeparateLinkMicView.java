@@ -39,6 +39,9 @@ public class PLVECSeparateLinkMicView extends PLVDragScaleLayout {
     private PLVLSNetworkQualityWidget linkmicSepareteNetworkQualityView;
     private ImageView linkmicSepareteMicVolumeIv;
     private TextView linkmicSepareteNameTv;
+    private ImageView linkmicSeparateMaskIv;
+
+    private boolean isAudio = false;
 
     @Nullable
     private PLVLinkMicItemDataBean itemDataBeanShowSeparate = null;
@@ -75,6 +78,7 @@ public class PLVECSeparateLinkMicView extends PLVDragScaleLayout {
         linkmicSepareteNetworkQualityView = findViewById(R.id.plvec_linkmic_separete_network_quality_view);
         linkmicSepareteMicVolumeIv = findViewById(R.id.plvec_linkmic_separete_mic_volume_iv);
         linkmicSepareteNameTv = findViewById(R.id.plvec_linkmic_separete_name_tv);
+        linkmicSeparateMaskIv = findViewById(R.id.plvec_linkmic_separate_mask_iv);
 
         linkmicSepareteNetworkQualityView.shouldShowNoNetworkHint(false);
         linkmicSepareteNetworkQualityView.setNetQualityRes(
@@ -104,6 +108,15 @@ public class PLVECSeparateLinkMicView extends PLVDragScaleLayout {
         setupSeparateLinkMicView();
         setupPositionWhenFirstShow();
         updateBindingProperties(null);
+    }
+
+    public void setIsAudio(boolean isAudio) {
+        this.isAudio = isAudio;
+        if (isAudio) {
+            linkmicSeparateMaskIv.setImageResource(R.drawable.plvec_linkmic_mute_video_audio);
+        } else {
+            linkmicSeparateMaskIv.setImageResource(R.drawable.plvec_linkmic_mute_video);
+        }
     }
 
     public void updateBindingProperties(@Nullable String linkMicId) {

@@ -35,6 +35,7 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengthMessageLayout;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgTipsWindow;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
@@ -255,7 +256,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.GONE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + t.getMessage())
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()))
                             .build()
                             .show();
                 }
@@ -270,7 +271,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         imgLoadingView.setVisibility(View.GONE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + sendValue)
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, sendValue + ""))
                             .build()
                             .show();
                 }
@@ -316,7 +317,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                         failedImageItemLl.setVisibility(View.VISIBLE);
                     }
                     PLVToast.Builder.context(itemView.getContext())
-                            .setText("发送图片失败: " + t.getMessage())
+                            .setText(PLVAppUtils.formatString(R.string.plv_chat_send_img_fail, t.getMessage()))
                             .build()
                             .show();
                 }
@@ -338,7 +339,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         final PLVSpannableStringBuilder textSpan = new PLVSpannableStringBuilder();
         final int textColor = Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF");
         if (isManagerChatMsg) {
-            textSpan.appendExclude("私聊",
+            textSpan.appendExclude(PLVAppUtils.getString(R.string.plvls_manager_chatroom_private_chat_hint),
                     new PLVRoundRectSpan()
                             .backgroundColor(Color.parseColor("#57A2FF"))
                             .textColor(Color.parseColor("#313540"))
@@ -354,7 +355,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         textSpan.appendExclude(nickName, new ForegroundColorSpan(textColor));
         if (isMsgSendByMyself) {
-            textSpan.appendExclude("(我)", new ForegroundColorSpan(textColor));
+            textSpan.appendExclude(PLVAppUtils.getString(R.string.plv_chat_me_2), new ForegroundColorSpan(textColor));
         }
         textSpan.appendExclude(": ", new ForegroundColorSpan(textColor));
         if (nickName != null) {
@@ -377,7 +378,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
             if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + "(我)";
+                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
@@ -489,7 +490,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         chatMsgOverLengthControlLl.setVisibility(View.VISIBLE);
         chatMsgOverLengthSplitLine.setVisibility(View.VISIBLE);
-        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plvls_chat_msg_over_length_more : R.string.plvls_chat_msg_over_length_fold);
+        chatMsgOverLengthMoreBtn.setText(isOverLengthContentFolding ? R.string.plv_chat_msg_over_length_more : R.string.plv_chat_msg_over_length_fold);
         chatMsgTv.setMaxLines(isOverLengthContentFolding ? 5 : Integer.MAX_VALUE);
     }
     // </editor-fold>
