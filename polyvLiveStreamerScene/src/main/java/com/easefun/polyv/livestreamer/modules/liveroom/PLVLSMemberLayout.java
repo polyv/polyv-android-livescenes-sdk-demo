@@ -46,6 +46,10 @@ import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSMemberTabIndicateTextView;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -91,6 +95,9 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     private FrameLayout memberListLayout;
     private RecyclerView memberListRv;
     private PLVLSSipLinkMicMemberLayout memberSipLinkmicLayout;
+    private TextView memberListLinkmicConfigTv;
+
+    private final PLVLSLinkMicTypeSettingLayout linkMicTypeSettingLayout = new PLVLSLinkMicTypeSettingLayout(getContext());
 
     private final MemberListOperationDispatcher memberListOperationDispatcher = new MemberListOperationDispatcher();
 
@@ -171,6 +178,7 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
             memberListLinkMicMuteAllAudioTv.setVisibility(INVISIBLE);
         }
         updateMemberListLinkMicShowType(liveRoomDataManager.isOnlyAudio());
+        updateLinkMicStrategy(liveRoomDataManager);
     }
     // </editor-fold>
 
@@ -213,11 +221,13 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         memberListLayout = findViewById(R.id.plvls_member_list_layout);
         memberListRv = findViewById(R.id.plvls_member_list_rv);
         memberSipLinkmicLayout = findViewById(R.id.plvls_member_sip_linkmic_layout);
+        memberListLinkmicConfigTv = findViewById(R.id.plvls_member_list_linkmic_config_tv);
 
         memberListLinkMicDownAllTv.setOnClickListener(this);
         memberListLinkMicMuteAllAudioTv.setOnClickListener(this);
         memberListTv.setOnClickListener(this);
         memberSipLinkmicListLayout.setOnClickListener(this);
+        memberListLinkmicConfigTv.setOnClickListener(this);
     }
 
     private void initTabLayout() {
@@ -327,7 +337,11 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     }
 
     public IPLVStreamerContract.IStreamerView getStreamerView() {
-        return streamerView;
+        return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
+                .proxyAll(
+                        streamerView,
+                        linkMicTypeSettingLayout.getStreamerView()
+                );
     }
 
     public void setOnlineCount(int onlineCount) {
@@ -458,7 +472,7 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     };
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="音频开播">
+    // <editor-fold defaultstate="collapsed" desc="连麦类型控制">
 
     /**
      * 更新成员列表显示类型
@@ -468,6 +482,13 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         if(memberAdapter != null){
             memberAdapter.setOnlyShowAudioUI(isOnlyAudio);
         }
+    }
+
+    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        memberListLinkmicConfigTv.setVisibility(canControlLinkMic && isNewLinkMicStrategy ? View.VISIBLE : View.GONE);
     }
     // </editor-fold >
 
@@ -504,6 +525,8 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
             memberListOperationDispatcher.selectView(memberListTv);
         } else if (id == memberSipLinkmicListLayout.getId()) {
             memberListOperationDispatcher.selectView(memberSipLinkmicListLayout);
+        } else if (id == memberListLinkmicConfigTv.getId()) {
+            linkMicTypeSettingLayout.show();
         }
     }
 

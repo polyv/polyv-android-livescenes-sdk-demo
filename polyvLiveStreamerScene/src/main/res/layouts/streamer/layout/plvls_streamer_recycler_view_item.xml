@@ -109,13 +109,21 @@
                 android:textColor="#FFF0F1F5"
                 android:textSize="11sp" />
 
+            <com.easefun.polyv.livestreamer.modules.streamer.widget.PLVLSLinkMicDurationLayout
+                android:id="@+id/plvls_streamer_linkmic_duration_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/plvls_streamer_guest_link_status_tv"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="5dp" />
+
             <ImageView
                 android:id="@+id/plvls_streamer_speaker_permission_status_iv"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="2dp"
-                android:layout_toRightOf="@id/plvls_streamer_guest_link_status_tv"
+                android:layout_toRightOf="@id/plvls_streamer_linkmic_duration_layout"
                 android:src="@drawable/plvls_streamer_speaker"
                 android:visibility="invisible" />
 

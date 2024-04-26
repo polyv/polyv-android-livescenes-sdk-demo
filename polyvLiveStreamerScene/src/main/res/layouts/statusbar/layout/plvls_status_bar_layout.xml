@@ -11,10 +11,10 @@
         android:id="@+id/plvls_status_bar_channel_info_tv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:minWidth="84dp"
         android:background="@drawable/plvls_status_bar_channel_info_tv_shape"
         android:drawableRight="@drawable/plvls_status_bar_enter"
         android:gravity="center_vertical"
+        android:minWidth="84dp"
         android:paddingLeft="12dp"
         android:paddingRight="8dp"
         android:text="@string/plv_live_channel_info"
@@ -51,11 +51,11 @@
         android:id="@+id/plvls_status_bar_class_control_tv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:background="@drawable/plvls_status_bar_start_class_tv_drawable_selector"
+        android:gravity="center"
         android:minWidth="48dp"
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
-        android:background="@drawable/plvls_status_bar_start_class_tv_drawable_selector"
-        android:gravity="center"
         android:text="@string/plv_streamer_start"
         android:textColor="@color/plvls_status_bar_start_class_tv_color_selector"
         app:layout_constraintRight_toRightOf="parent" />
@@ -109,6 +109,18 @@
         android:src="@drawable/plvls_status_bar_linkmic_iv_selector"
         app:layout_constraintRight_toLeftOf="@+id/plvls_status_bar_member_iv" />
 
+    <ImageView
+        android:id="@+id/plvls_status_bar_allow_viewer_linkmic_iv"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/plvls_status_bar_allow_viewer_linkmic_icon"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/plvls_status_bar_linkmic_iv"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
     <!--文档-->
     <ImageView
         android:id="@+id/plvls_status_bar_document_iv"
@@ -116,7 +128,7 @@
         android:layout_height="match_parent"
         android:layout_marginRight="16dp"
         android:src="@drawable/plvls_status_bar_document_iv_selector"
-        app:layout_constraintRight_toLeftOf="@+id/plvls_status_bar_linkmic_iv" />
+        app:layout_constraintRight_toLeftOf="@+id/plvls_status_bar_allow_viewer_linkmic_iv" />
 
     <!--白板-->
     <ImageView

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -28,20 +29,29 @@ import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyVie
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
+import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
+import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.IPLVChatroomManager;
@@ -52,11 +62,14 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.socket.client.Ack;
+
 /**
  * 更多布局
  */
 public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = PLVSAMoreLayout.class.getSimpleName();
 
     // 按钮表格每行显示数量
     private static final int GRID_COLUMN_COUNT_PORT = 5;
@@ -106,6 +119,15 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private LinearLayout moreBeautyLl;
     private LinearLayout moreShareLl;
     private LinearLayout morePushDowngradePreferenceLl;
+    private LinearLayout moreAllowViewerLinkmicLayout;
+    private ImageView moreAllowViewerLinkmicIv;
+    private TextView moreAllowViewerLinkmicTv;
+    private LinearLayout moreLinkmicSettingLayout;
+    private ImageView moreLinkmicSettingIv;
+    private TextView moreLinkmicSettingTv;
+    private LinearLayout moreHangUpViewerLinkmicLayout;
+    private ImageView moreHangUpViewerLinkmicIv;
+    private TextView moreHangUpViewerLinkmicTv;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -118,6 +140,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private PLVSAShareLayout shareLayout;
     // 推流降级布局
     private final PLVSAPushDowngradePreferenceLayout pushDowngradePreferenceLayout = new PLVSAPushDowngradePreferenceLayout(getContext());
+    // 连麦设置布局
+    private final PLVSAMoreLinkMicSettingLayout linkMicSettingLayout = new PLVSAMoreLinkMicSettingLayout(getContext());
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -199,6 +223,15 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
         moreShareLl = findViewById(R.id.plvsa_more_share_layout);
         morePushDowngradePreferenceLl = findViewById(R.id.plvsa_more_push_downgrade_preference_ll);
+        moreAllowViewerLinkmicLayout = findViewById(R.id.plvsa_more_allow_viewer_linkmic_layout);
+        moreAllowViewerLinkmicIv = findViewById(R.id.plvsa_more_allow_viewer_linkmic_iv);
+        moreAllowViewerLinkmicTv = findViewById(R.id.plvsa_more_allow_viewer_linkmic_tv);
+        moreLinkmicSettingLayout = findViewById(R.id.plvsa_more_linkmic_setting_layout);
+        moreLinkmicSettingIv = findViewById(R.id.plvsa_more_linkmic_setting_iv);
+        moreLinkmicSettingTv = findViewById(R.id.plvsa_more_linkmic_setting_tv);
+        moreHangUpViewerLinkmicLayout = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_layout);
+        moreHangUpViewerLinkmicIv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_iv);
+        moreHangUpViewerLinkmicTv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_tv);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -220,6 +253,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreBeautyLl.setOnClickListener(this);
         moreShareLl.setOnClickListener(this);
         morePushDowngradePreferenceLl.setOnClickListener(this);
+        moreAllowViewerLinkmicLayout.setOnClickListener(new PLVDebounceClicker.OnClickListener(this, 1000));
+        moreLinkmicSettingLayout.setOnClickListener(this);
+        moreHangUpViewerLinkmicLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
@@ -387,6 +423,18 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         }
         initBitrateMapIcon();
         observeLiveRoomStatus();
+        updateLinkMicStrategy(liveRoomDataManager);
+    }
+
+    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        if (!canControlLinkMic || !isNewLinkMicStrategy) {
+            plvsaMoreSettingsLayout.removeView(moreAllowViewerLinkmicLayout);
+            plvsaMoreSettingsLayout.removeView(moreLinkmicSettingLayout);
+            plvsaMoreSettingsLayout.removeView(moreHangUpViewerLinkmicLayout);
+        }
     }
     // </editor-folder>
 
@@ -464,7 +512,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     }
 
     public IPLVStreamerContract.IStreamerView getStreamerView() {
-        return streamerView;
+        return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
+                .proxyAll(streamerView, linkMicSettingLayout.streamerView);
     }
 
     public boolean onBackPressed() {
@@ -698,7 +747,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             //开始屏幕共享
             if (streamerPresenter != null) {
                 if (!plvsaMoreShareScreenIv.isSelected()) {
-                    streamerPresenter.requestShareScreen((Activity) getContext());
+                    final PLVCustomScreenShareData customScreenShareData = new PLVCustomScreenShareData();
+                    customScreenShareData.notificationIcon = R.drawable.plvsa_ic_launcher;
+                    customScreenShareData.notificationText = "正在录制/投射您的屏幕";
+                    streamerPresenter.requestShareScreen((Activity) getContext(), customScreenShareData);
                 } else {
                     streamerPresenter.exitShareScreen();
                 }
@@ -718,7 +770,82 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == morePushDowngradePreferenceLl.getId()) {
             close();
             pushDowngradePreferenceLayout.open();
+        } else if (id == moreAllowViewerLinkmicLayout.getId()) {
+            switchAllowViewerLinkMic(!moreAllowViewerLinkmicLayout.isActivated());
+        } else if (id == moreLinkmicSettingLayout.getId()) {
+            close();
+            linkMicSettingLayout.open();
+        } else if (id == moreHangUpViewerLinkmicLayout.getId()) {
+            closeAllViewerLinkMic();
         }
+    }
+
+    private void switchAllowViewerLinkMic(final boolean toAllow) {
+        if (streamerPresenter == null) {
+            return;
+        }
+        final boolean isNetworkConnected = PLVNetworkUtils.isConnected(getContext());
+        if (!isNetworkConnected) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_allow_viewer_linkmic_fail_toast)
+                    .show();
+            return;
+        }
+
+        boolean success;
+        if (toAllow) {
+            success = streamerPresenter.allowViewerRaiseHand(new Ack() {
+                @Override
+                public void call(Object... args) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plv_streamer_allow_viewer_linkmic_toast)
+                            .show();
+                    moreAllowViewerLinkmicLayout.setActivated(true);
+                }
+            });
+        } else {
+            success = streamerPresenter.disallowViewerRaiseHand(new Ack() {
+                @Override
+                public void call(Object... args) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(R.string.plv_streamer_disallow_viewer_linkmic_toast)
+                            .show();
+                    moreAllowViewerLinkmicLayout.setActivated(false);
+                }
+            });
+        }
+
+        if (!success) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_allow_viewer_linkmic_fail_toast)
+                    .show();
+            PLVCommonLog.d(TAG, "switchAllowViewerLinkMic fail, toAllow:" + toAllow);
+        }
+    }
+
+    private void closeAllViewerLinkMic() {
+        if (streamerPresenter == null) {
+            return;
+        }
+        PLVSAConfirmDialog.Builder.context(getContext())
+                .setTitle(R.string.plv_common_dialog_tip)
+                .setContent(R.string.plv_linkmic_dialog_hang_all_off_confirm_ask)
+                .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                .setRightButtonText(R.string.plv_common_dialog_confirm)
+                .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, View v) {
+                        dialog.dismiss();
+                        if (streamerPresenter != null) {
+                            streamerPresenter.closeAllUserLinkMic();
+                            PLVToast.Builder.context(getContext())
+                                    .setText(R.string.plv_linkmic_toast_hang_all_off)
+                                    .build()
+                                    .show();
+                        }
+                    }
+                })
+                .show();
     }
     // </editor-fold>
 

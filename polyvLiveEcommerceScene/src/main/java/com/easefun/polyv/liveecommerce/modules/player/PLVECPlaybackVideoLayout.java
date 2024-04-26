@@ -117,6 +117,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private boolean isVideoViewPlayingInFloatWindow;
     //播放器及其布局在VideoLayout中设置的适配方式
     private int fitMode = PLVECFitMode.FIT_NONE;
+    private PLVPlayInfoVO playInfoVO;
 
     //Listener
     private ViewTreeObserver.OnGlobalLayoutListener onSubVideoViewLayoutListener;
@@ -401,6 +402,12 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         return null;
     }
 
+    @Nullable
+    @Override
+    public ViewGroup getRtcMixStreamContainer() {
+        return null;
+    }
+
     @Override
     public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
 
@@ -658,17 +665,24 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
         @Override
         public void updatePlayInfo(PLVPlayInfoVO playInfoVO) {
-            if (playInfoVO != null && isInPlaybackState()
-                    && !playInfoVO.isPlaying()) {
-                showPlayCenterView();
-            } else {
-                hidePlayCenterView();
-            }
+            PLVECPlaybackVideoLayout.this.playInfoVO = playInfoVO;
+            updatePlayCenterView();
         }
     };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 播放暂停按钮的显示、隐藏">
+
+    @Override
+    public void updatePlayCenterView() {
+        if (playInfoVO != null && isInPlaybackState()
+                && !playInfoVO.isPlaying()) {
+            showPlayCenterView();
+        } else {
+            hidePlayCenterView();
+        }
+    }
+
     private void hidePlayCenterView() {
         playCenterView.setVisibility(GONE);
     }

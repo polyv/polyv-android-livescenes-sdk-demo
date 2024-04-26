@@ -143,7 +143,7 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onScreenShareChange(int position, boolean isShare, int extra) {
+    public void onScreenShareChange(int position, boolean isShare, int extra, String userId, boolean isMyself) {
 
     }
 

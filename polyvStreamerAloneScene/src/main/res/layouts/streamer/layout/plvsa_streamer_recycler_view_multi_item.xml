@@ -135,13 +135,21 @@
             android:visibility="invisible"
             tools:visibility="visible"/>
 
+        <com.easefun.polyv.streameralone.modules.streamer.widget.PLVSALinkMicDurationLayout
+            android:id="@+id/plvsa_streamer_linkmic_duration_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/plvsa_streamer_guest_link_status_tv"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="5dp" />
+
         <ImageView
             android:id="@+id/plvsa_streamer_grant_speaker_iv"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginLeft="6dp"
             android:layout_marginTop="2dp"
-            android:layout_toRightOf="@id/plvsa_streamer_guest_link_status_tv"
+            android:layout_toRightOf="@id/plvsa_streamer_linkmic_duration_layout"
             android:src="@drawable/plvsa_streamer_grant_speaker"
             android:visibility="invisible"
             tools:visibility="visible"/>

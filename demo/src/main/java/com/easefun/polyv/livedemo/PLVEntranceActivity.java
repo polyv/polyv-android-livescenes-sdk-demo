@@ -8,7 +8,6 @@ import android.util.SparseArray;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
-import com.easefun.polyv.livedemo.hiclass.PLVLoginHiClassActivity;
 
 /**
  * @author suhongtao
@@ -19,7 +18,6 @@ public class PLVEntranceActivity extends PLVBaseActivity implements View.OnClick
             new SparseArray<Class<? extends Activity>>() {{
                 put(R.id.plv_entrance_live_streamer_btn, PLVLoginStreamerActivity.class);
                 put(R.id.plv_entrance_live_cloudclass_btn, PLVLoginWatcherActivity.class);
-                put(R.id.plv_entrance_hi_class_btn, PLVLoginHiClassActivity.class);
             }};
 
     @Override

@@ -1,6 +1,8 @@
 package com.easefun.polyv.liveecommerce.modules.linkmic;
 
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -104,6 +106,13 @@ public interface IPLVECLinkMicLayout {
     boolean isJoinChannel();
 
     /**
+     * 是否正在播放RTC混流
+     *
+     * @return
+     */
+    boolean isPlayRtcAsMixStream();
+
+    /**
      * Media是否被切换到连麦列表了
      *
      * @return true表示media在连麦列表，false表示media不在连麦列表
@@ -168,6 +177,12 @@ public interface IPLVECLinkMicLayout {
     interface OnPLVLinkMicLayoutListener {
 
         // <editor-fold defaultstate="collapsed" desc="连麦事件监听">
+
+        /**
+         * 获取rtc混流观看视图容器
+         */
+        @Nullable
+        ViewGroup onRequireMixStreamVideoContainer();
 
         /**
          * 加入rtc

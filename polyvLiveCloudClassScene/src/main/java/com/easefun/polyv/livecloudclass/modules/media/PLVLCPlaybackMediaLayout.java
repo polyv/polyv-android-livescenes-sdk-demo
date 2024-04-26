@@ -637,13 +637,19 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     }
 
+    @Nullable
     @Override
-    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+    public ViewGroup getRtcMixStreamContainer() {
+        return null;
+    }
+
+    @Override
+    public void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth) {
 
     }
 
     @Override
-    public void updateWhenLeaveRTC() {
+    public void updateWhenLeaveRtcWatch() {
 
     }
 

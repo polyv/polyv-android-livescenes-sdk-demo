@@ -17,7 +17,8 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
  * <p>
  * 该接口的实现有不同的行为，例如有不同的RTC引擎的调用组合，不同的事件回调时机等。
  * 例如可参考：
- * {@link PLVRTCWatchEnabledStrategy}
+ * {@link PLVRTCPureStreamWatchStrategy}
+ * {@link PLVRTCMixStreamWatchStrategy}
  * {@link PLVRTCWatchDisabledStrategy}
  */
 public interface IPLVRTCInvokeStrategy {

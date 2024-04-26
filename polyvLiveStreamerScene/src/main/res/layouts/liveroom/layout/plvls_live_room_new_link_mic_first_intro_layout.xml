@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    tools:background="#0D1016">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+        android:id="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="all"
+        app:radius="4dp"
+        tools:layout_marginStart="150dp"
+        tools:layout_marginTop="150dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvls_live_room_new_link_mic_first_intro_mic_icon_background" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingVertical="5dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="6dp"
+            android:src="@drawable/plvls_status_bar_allow_viewer_linkmic_inactive" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvls_live_room_new_link_mic_first_intro_mic_icon_foreground" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        app:indicateColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
+        app:layout_constraintStart_toStartOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
+        app:rectRadius="16dp"
+        app:triangleHeight="8dp"
+        app:triangleMarginType="center"
+        app:trianglePosition="top"
+        app:triangleWidth="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="44dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plvls_live_room_new_link_mic_first_intro_hint_title"
+                android:textColor="#3D3D3D"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/plvls_live_room_new_link_mic_first_intro_hint_content"
+                android:textColor="#999999"
+                android:textSize="12sp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+                android:id="@+id/plvls_live_room_new_link_mic_first_intro_confirm_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="11dp"
+                android:text="@string/plv_common_dialog_confirm_5"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:plvGradientColors="#0080FF, #3399FF"
+                app:plvGradientOrientation="leftRight"
+                app:plvRadius="18dp" />
+
+        </LinearLayout>
+
+    </com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout>
+
+</android.support.constraint.ConstraintLayout>

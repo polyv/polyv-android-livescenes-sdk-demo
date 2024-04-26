@@ -100,6 +100,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     private boolean isMicrophoneOpen = true;
     private boolean isPortrait;
     private boolean isAudioState = false;
+    private boolean isTeacherOpenLinkMic = false;
 
     //Listener
     private OnPLCLinkMicControlBarListener onPLCLinkMicControlBarListener;
@@ -227,6 +228,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     //设置讲师开启或关闭连麦
     @Override
     public void setIsTeacherOpenLinkMic(boolean isTeacherOpenLinkMic) {
+        this.isTeacherOpenLinkMic = isTeacherOpenLinkMic;
+        if (isJoinLinkMic()) {
+            return;
+        }
         if (isTeacherOpenLinkMic) {
             if (state != PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
                 return;
@@ -276,6 +281,7 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
         isCameraFront = true;
         isMicrophoneOpen = true;
 
+        setOrientation(isPortrait);
         animateMoveToShowBiggestWidth();
 
         tvRequestTip.postDelayed(new Runnable() {
@@ -312,6 +318,14 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
     @Override
     public void setAudioState(boolean isAudio) {
         isAudioState = isAudio;
+
+        if (state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN || state == PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE) {
+            if (isAudioState) {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_audio_link_mic);
+            } else {
+                tvRequestTip.setText(R.string.plv_linkmic_tip_request_video_link_mic);
+            }
+        }
     }
 
     //设置下麦
@@ -323,8 +337,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
 
         if (state != PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE) {
             state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_OPEN;
-            animateMoveToShowMiddleWidth();
-            startAutoHideCountDown();
+            if (isTeacherOpenLinkMic) {
+                animateMoveToShowMiddleWidth();
+                startAutoHideCountDown();
+            }
         }
 
         if (isAudioState) {
@@ -341,6 +357,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
                 ll4BtnParent.setVisibility(INVISIBLE);
             }
         }, DURATION_MS_LINK_MIC_OPEN_OFF);
+
+        if (!isTeacherOpenLinkMic) {
+            setIsTeacherOpenLinkMic(false);
+        }
     }
 
     @Override
@@ -731,6 +751,10 @@ public class PLVECLinkMicControlBar extends FrameLayout implements IPLVECLinkMic
          * 加入连麦成功，布局收起
          */
         STATE_JOIN_LINK_MIC_SUCCESS_COLLAPSE,
+    }
+
+    private boolean isJoinLinkMic() {
+        return state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS || state == PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS_COLLAPSE;
     }
 
     // </editor-fold>

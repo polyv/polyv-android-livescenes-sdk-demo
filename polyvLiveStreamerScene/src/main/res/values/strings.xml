@@ -63,4 +63,7 @@
     <string name="plvls_live_member_sip_calling_out_count_text">Calling Out({})</string>
     <string name="plvls_live_member_sip_connected_count_text">Connected({})</string>
 
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_title">New Voice Chat available</string>
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_content">Click here to allow viewer requesting voice chat</string>
+
 </resources>

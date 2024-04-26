@@ -32,6 +32,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- rtc混流观看视图容器 -->
+        <FrameLayout
+            android:id="@+id/plvlc_live_player_rtc_mix_stream_video_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <!-- 截图view -->
         <ImageView
             android:id="@+id/screenshot_iv"

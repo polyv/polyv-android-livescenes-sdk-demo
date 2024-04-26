@@ -16,7 +16,6 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -59,7 +58,6 @@ import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -140,18 +138,22 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         //init adapter
         streamerAdapter = new PLVLSStreamerAdapter(new PLVLSStreamerAdapter.OnStreamerAdapterCallback() {
             @Override
-            public SurfaceView createLinkMicRenderView() {
-                return streamerPresenter.createRenderView(Utils.getApp());
+            public View createLinkMicRenderView() {
+                View renderView = streamerPresenter.createTextureRenderView(getContext());
+                if (renderView == null) {
+                    renderView = streamerPresenter.createRenderView(getContext());
+                }
+                return renderView;
             }
 
             @Override
-            public void releaseLinkMicRenderView(SurfaceView renderView) {
+            public void releaseLinkMicRenderView(View renderView) {
                 streamerPresenter.releaseRenderView(renderView);
             }
 
             @Override
-            public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
-                streamerPresenter.setupRenderView(surfaceView, linkMicId);
+            public void setupRenderView(View renderView, String linkMicId) {
+                streamerPresenter.setupRenderView(renderView, linkMicId);
             }
         });
         streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());

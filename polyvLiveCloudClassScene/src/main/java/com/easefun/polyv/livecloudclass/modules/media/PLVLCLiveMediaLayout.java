@@ -124,6 +124,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PLVSwitchViewAnchorLayout playerSwitchAnchor;
     private FrameLayout flLivePlayerSwitchView;
     private View playerView;
+    private FrameLayout livePlayerRtcMixStreamVideoContainer;
     //主播放器渲染视图view
     private PolyvLiveVideoView videoView;
     //子播放器渲染视图view
@@ -243,6 +244,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         flLivePlayerSwitchView = findViewById(R.id.plvlc_playback_fl_player_switch_view_parent);
         videoView = findViewById(R.id.live_video_view);
         playerView = videoView.findViewById(PolyvBaseVideoView.IJK_VIDEO_ID);
+        livePlayerRtcMixStreamVideoContainer = findViewById(R.id.plvlc_live_player_rtc_mix_stream_video_container);
         subVideoView = findViewById(R.id.sub_video_view);
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
@@ -541,6 +543,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 //才处理播放器的switch逻辑
                 if (childOfAnchor == flLivePlayerSwitchView) {
                     videoView.removeView(playerView);
+                    videoView.removeView(livePlayerRtcMixStreamVideoContainer);
                     videoView.removeView(screenshotIV);
                     videoView.removeView(audioModeView);
                     videoView.removeView(coverImageView);
@@ -550,6 +553,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.removeView(stopStreamView);
 
                     flLivePlayerSwitchView.addView(playerView);
+                    flLivePlayerSwitchView.addView(livePlayerRtcMixStreamVideoContainer);
                     flLivePlayerSwitchView.addView(screenshotIV);
                     flLivePlayerSwitchView.addView(audioModeView);
                     flLivePlayerSwitchView.addView(coverImageView);
@@ -575,6 +579,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 if (childOfAnchor == flLivePlayerSwitchView) {
                     flLivePlayerSwitchView.removeAllViews();
                     videoView.addView(playerView, 0);
+                    videoView.addView(livePlayerRtcMixStreamVideoContainer);
                     videoView.addView(screenshotIV);
                     videoView.addView(audioModeView);
                     videoView.addView(coverImageView);
@@ -925,8 +930,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         return liveMarkToolControllerLayout.isInPaintMode();
     }
 
+    @Nullable
     @Override
-    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+    public ViewGroup getRtcMixStreamContainer() {
+        return livePlayerRtcMixStreamVideoContainer;
+    }
+
+    @Override
+    public void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
 
@@ -957,13 +968,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updateWhenLeaveRTC() {
+    public void updateWhenLeaveRtcWatch() {
         isJoinRTC = false;
         landscapeMarginRightForLinkMicLayout = 0;
 
         mediaController.updateWhenLeaveRtc();
 
-        if (liveRoomDataManager.isSupportRTC()) {
+        if (liveRoomDataManager.isSupportRTC() && livePlayerPresenter.getData().getPlayerState().getValue() == PLVPlayerState.PREPARED) {
             startPlay();
         }
         //恢复播放器手势
