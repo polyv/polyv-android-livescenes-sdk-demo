@@ -609,7 +609,7 @@ public class PLVECMorePopupView {
         if (moreLayout == null) {
             return;
         }
-        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_RATE, enableSpeedControl);
+        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_RATE, enableSpeedControl && playbackMorePopupWindow != null);
     }
 
     private void updatePlayModeVisibility() {

@@ -62,4 +62,7 @@
     <string name="plvls_live_member_sip_calling_out_count_text">呼叫中({})</string>
     <string name="plvls_live_member_sip_connected_count_text">已接通({})</string>
 
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_title">“连麦”功能更新啦</string>
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_content">点击此功能按钮可开启观众连麦</string>
+
 </resources>

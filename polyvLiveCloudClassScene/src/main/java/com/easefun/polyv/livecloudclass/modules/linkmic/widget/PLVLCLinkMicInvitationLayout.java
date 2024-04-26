@@ -60,6 +60,8 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
     public static final int CANCEL_BY_TIMEOUT = 2;
     public static final int CANCEL_BY_PERMISSION = 3;
 
+    private static final boolean INVITATION_DEFAULT_OPEN_MICROPHONE = true;
+
     private PortLayout portLayout;
     private LandLayout landLayout;
     private PLVMenuDrawer menuDrawer;
@@ -70,7 +72,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
 
     private volatile long acceptInviteLinkMicLimitTs = 0;
     private final MutableLiveData<Boolean> isOpenCamera = mutableLiveData(false);
-    private final MutableLiveData<Boolean> isOpenMicrophone = mutableLiveData(false);
+    private final MutableLiveData<Boolean> isOpenMicrophone = mutableLiveData(INVITATION_DEFAULT_OPEN_MICROPHONE);
 
     private OnViewActionListener onViewActionListener = null;
 
@@ -150,7 +152,6 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                 final boolean open = getOrDefault(openBoolean, false);
                 portLayout.microphoneSwitch().setChecked(open);
                 landLayout.microphoneSwitch().setChecked(open);
-                changeMicrophone(open);
             }
         });
     }
@@ -169,11 +170,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             startPlayBgm();
             show();
         } else if (!(newState instanceof PLVViewerLinkMicState.InvitingLinkMicState)) {
-            hide();
-            stopPlayBgm();
-            stopUpdateTimeLeft();
-            stopFetchAcceptInviteLinkMicLimit();
+            stop();
         }
+    }
+
+    public void updateDeviceOpenState(boolean openAudio, boolean openVideo) {
+        isOpenMicrophone.postValue(openAudio);
+        isOpenCamera.postValue(openVideo);
     }
 
     public void setIsOnlyAudio(boolean isOnlyAudio) {
@@ -181,6 +184,8 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             return;
         }
         this.isOnlyAudio = isOnlyAudio;
+        stop();
+
         for (View view : portLayout.cameraViews()) {
             view.setVisibility(isOnlyAudio ? View.GONE : View.VISIBLE);
         }
@@ -204,10 +209,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
     }
 
     public void destroy() {
-        hide();
-        stopPlayBgm();
-        stopUpdateTimeLeft();
-        stopFetchAcceptInviteLinkMicLimit();
+        stop();
     }
 
     @Override
@@ -275,6 +277,13 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
         }
     }
 
+    private void stop() {
+        hide();
+        stopPlayBgm();
+        stopUpdateTimeLeft();
+        stopFetchAcceptInviteLinkMicLimit();
+    }
+
     private void startFetchAcceptInviteLinkMicLimit() {
         stopFetchAcceptInviteLinkMicLimit();
         fetchAcceptInviteLinkMicLimitDisposable = PLVRxTimer.timer(
@@ -313,11 +322,8 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
                     public void accept(Long aLong) throws Exception {
                         final int timeLeftInSecond = (int) ((acceptInviteLinkMicLimitTs - System.currentTimeMillis()) / 1000);
                         if (timeLeftInSecond <= 0) {
-                            hide();
+                            stop();
                             cancelInvitation(CANCEL_BY_TIMEOUT);
-                            stopPlayBgm();
-                            stopUpdateTimeLeft();
-                            stopFetchAcceptInviteLinkMicLimit();
                             return;
                         }
                         String format = PLVAppUtils.formatString(R.string.plv_linkmic_not_yet, timeLeftInSecond + "");
@@ -390,31 +396,6 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
             );
         } else {
             PLVCameraVideoSource.INSTANCE.closeCamera();
-        }
-    }
-
-    private void changeMicrophone(boolean open) {
-        if (menuDrawer == null || menuDrawer.getDrawerState() == PLVMenuDrawer.STATE_CLOSED) {
-            return;
-        }
-        if (open) {
-            requirePermission(
-                    listOf(Manifest.permission.RECORD_AUDIO),
-                    new PLVSugarUtil.Callback() {
-                        @Override
-                        public void onCallback() {
-
-                        }
-                    },
-                    new PLVSugarUtil.Callback() {
-                        @Override
-                        public void onCallback() {
-                            hide();
-                            cancelInvitation(CANCEL_BY_PERMISSION);
-                            showPermissionDialog(PLVAppUtils.getString(R.string.plv_linkmic_microphone_permission_apply_tips));
-                        }
-                    }
-            );
         }
     }
 

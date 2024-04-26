@@ -185,7 +185,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         final String channelId = liveRoomDataManager.getConfig().getChannelId();
         final boolean isAutoOpenLinkMic = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_ENABLE);
         final String autoOpenLinkMicType = PLVChannelFeatureManager.onChannel(channelId).get(PLVChannelFeature.STREAMER_DEFAULT_OPEN_LINKMIC_TYPE);
-        plvsaToolBarLinkmicIv.performAutoOpenLinkMic(isAutoOpenLinkMic, "video".equals(autoOpenLinkMicType));
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        plvsaToolBarLinkmicIv.performAutoOpenLinkMic(isAutoOpenLinkMic, "video".equals(autoOpenLinkMicType), isNewLinkMicStrategy);
     }
 
     private void observeBeautyLayoutStatus() {
@@ -265,6 +266,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         observeStatusBarLayout();
         observeCommodityControlSwitch(liveRoomDataManager);
         updateGuestLayout();
+        updateLinkMicStrategy(liveRoomDataManager);
     }
 
     public void chatroomLogin(){
@@ -396,6 +398,20 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
             return;
         }
         homeFragmentLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
+        if (!canControlLinkMic) {
+            return;
+        }
+        final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+        if (!isNewLinkMicStrategy) {
+            plvsaToolBarLinkmicIv.setVisibility(View.VISIBLE);
+        } else {
+            plvsaToolBarLinkmicIv.setVisibility(View.GONE);
+        }
     }
     // </editor-fold >
 

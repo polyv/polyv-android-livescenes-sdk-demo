@@ -20,7 +20,6 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -67,7 +66,6 @@ import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -248,18 +246,22 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         //init adapter
         streamerAdapter = new PLVSAStreamerAdapter(plvsaStreamerRvLayout.getRecyclerView(), liveRoomDataManager, new PLVSAStreamerAdapter.OnStreamerAdapterCallback() {
             @Override
-            public SurfaceView createLinkMicRenderView() {
-                return streamerPresenter.createRenderView(Utils.getApp());
+            public View createLinkMicRenderView() {
+                View renderView = streamerPresenter.createTextureRenderView(getContext());
+                if (renderView == null) {
+                    renderView = streamerPresenter.createRenderView(getContext());
+                }
+                return renderView;
             }
 
             @Override
-            public void releaseLinkMicRenderView(SurfaceView renderView) {
+            public void releaseLinkMicRenderView(View renderView) {
                 streamerPresenter.releaseRenderView(renderView);
             }
 
             @Override
-            public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
-                streamerPresenter.setupRenderView(surfaceView, linkMicId);
+            public void setupRenderView(View renderView, String linkMicId) {
+                streamerPresenter.setupRenderView(renderView, linkMicId);
             }
 
             @Override
@@ -671,27 +673,29 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         }
 
         @Override
-        public void onScreenShareChange(final int position, final boolean isShare, int extra) {
-            super.onScreenShareChange(position, isShare, extra);
-            String msg;
+        public void onScreenShareChange(final int position, final boolean isShare, int extra, String userId, boolean isMyself) {
+            super.onScreenShareChange(position, isShare, extra, userId, isMyself);
             streamerAdapter.updateUserScreenSharing(position, isShare);
-            if(isShare){
-                showFloatWindow();
-            } else {
-                hideFloatWindow();
-            }
-            if(extra == IPLVScreenShareListener.PLV_SCREEN_SHARE_OK){
-                msg = isShare ? getContext().getString(R.string.plvsa_streamer_sharescreen_start_tip) : getContext().getString(R.string.plvsa_streamer_sharescreen_already_stop);
-                if(!isShare && !PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_GRANT_PERMISSION_SHARE_SCREEN)){
-                    msg = getContext().getString(R.string.plvsa_streamer_remove_speaker_and_stop_screenshare);
-                }
-            } else {
-                msg = getContext().getString(R.string.plvsa_streamer_sharescreen_error) + extra;
-            }
-            PLVToast.Builder.context(getContext())
-                    .setText(msg)
-                    .build().show();
 
+            if (isMyself) {
+                if (isShare) {
+                    showFloatWindow();
+                } else {
+                    hideFloatWindow();
+                }
+                String msg;
+                if (extra == IPLVScreenShareListener.PLV_SCREEN_SHARE_OK) {
+                    msg = isShare ? getContext().getString(R.string.plvsa_streamer_sharescreen_start_tip) : getContext().getString(R.string.plvsa_streamer_sharescreen_already_stop);
+                    if (!isShare && !PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_GRANT_PERMISSION_SHARE_SCREEN)) {
+                        msg = getContext().getString(R.string.plvsa_streamer_remove_speaker_and_stop_screenshare);
+                    }
+                } else {
+                    msg = getContext().getString(R.string.plvsa_streamer_sharescreen_error) + extra;
+                }
+                PLVToast.Builder.context(getContext())
+                        .setText(msg)
+                        .build().show();
+            }
         }
 
         @Override

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="plvsa_streamer_alone_scene_name">POLYV Live</string>
 
     <string name="plvsa_setting_enter_live">Enter the live room</string>
@@ -18,6 +18,7 @@
     <string name="plvsa_float_window_permission_denied_and_not_show">Permissions are limited and the floating window will not be opened</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">Double click the window to enlarge</string>
     <string name="plvsa_streamer_double_click_exit_fullscreen">Double click to exit full screen</string>
+    <string name="plvsa_streamer_allow_viewer_linkmic">Allow voice chat</string>
 
     <!--登录-->
     <string name="plvsa_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播纯视频页失败！</string>

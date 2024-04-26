@@ -3,5 +3,4 @@ include ':demo',
         ':polyvLiveEcommerceScene',
         ':polyvLiveCloudClassScene',
         ':polyvLiveStreamerScene', 
-        ':polyvStreamerAloneScene',
-        ':polyvLiveHiClassScene'
+        ':polyvStreamerAloneScene'

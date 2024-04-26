@@ -65,7 +65,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     private IPLVPPTContract.IPLVPPTPresenter presenter;
 
     private boolean isLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
-    private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch();
+    private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() || PLVLinkMicConfig.getInstance().isLowLatencyMixRtcWatch();
 
     private boolean isPPTChannelType;
     // </editor-fold>
@@ -198,13 +198,13 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
 
     @Override
-    public void notifyJoinRtcChannel() {
+    public void notifyStartRtcWatch() {
         isRtcWatch = true;
         updateMsgDelayTime();
     }
 
     @Override
-    public void notifyLeaveRtcChannel() {
+    public void notifyStopRtcWatch() {
         isRtcWatch = false;
         updateMsgDelayTime();
     }

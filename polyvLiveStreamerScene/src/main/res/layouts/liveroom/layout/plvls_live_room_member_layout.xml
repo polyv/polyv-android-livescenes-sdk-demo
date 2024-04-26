@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,11 +16,11 @@
         android:id="@+id/plvls_member_list_tab_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.easefun.polyv.livestreamer.ui.widget.PLVLSMemberTabIndicateTextView
             android:id="@+id/plvls_member_list_tv"
@@ -76,50 +76,69 @@
         android:id="@+id/plvls_member_list_link_mic_down_all_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_marginTop="13dp"
         android:layout_marginEnd="8dp"
-        android:layout_toStartOf="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
         android:background="@drawable/plvls_member_linkmic_control_bg_shape"
         android:gravity="center"
-        android:text="@string/plv_linkmic_hang_all_off"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
+        android:text="@string/plv_linkmic_hang_all_off"
         android:textColor="#4399FF"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/plvls_member_list_link_mic_mute_all_audio_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/plvls_member_linkmic_control_bg_shape"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="@string/plv_linkmic_mute_all_audio"
+        android:textColor="#4399FF"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/plvls_member_list_linkmic_config_tv"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="36dp" />
+
+    <TextView
+        android:id="@+id/plvls_member_list_linkmic_config_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
         android:layout_marginEnd="36dp"
         android:background="@drawable/plvls_member_linkmic_control_bg_shape"
         android:gravity="center"
-        android:text="@string/plv_linkmic_mute_all_audio"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
+        android:text="@string/plv_linkmic_setting"
         android:textColor="#4399FF"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/plvls_member_split_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/plvls_member_list_tab_layout"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="36dp"
-        android:background="#14F0F1F5" />
+        android:background="#14F0F1F5"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_member_list_tab_layout" />
 
     <FrameLayout
         android:id="@+id/plvls_member_list_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/plvls_member_split_view"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="36dp">
+        android:layout_marginEnd="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_member_split_view">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/plvls_member_list_rv"
@@ -132,9 +151,10 @@
     <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSSipLinkMicMemberLayout
         android:id="@+id/plvls_member_sip_linkmic_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/plvls_member_split_view"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="36dp" />
+        android:layout_marginEnd="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_member_split_view" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

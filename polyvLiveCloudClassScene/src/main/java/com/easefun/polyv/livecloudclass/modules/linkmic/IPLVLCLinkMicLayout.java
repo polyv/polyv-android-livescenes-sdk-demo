@@ -1,5 +1,8 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic;
 
+import androidx.annotation.Nullable;
+import android.view.ViewGroup;
+
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -163,14 +166,30 @@ public interface IPLVLCLinkMicLayout {
         // <editor-fold defaultstate="collapsed" desc="连麦事件监听">
 
         /**
-         * 加入rtc
+         * 获取rtc混流观看视图容器
          */
-        void onJoinRtcChannel();
+        @Nullable
+        ViewGroup onRequireMixStreamVideoContainer();
 
         /**
-         * 离开rtc
+         * 进入rtc观看模式
          */
-        void onLeaveRtcChannel();
+        void onStartRtcWatch();
+
+        /**
+         * 退出rtc观看模式
+         */
+        void onStopRtcWatch();
+
+        /**
+         * 进入rtc纯流观看模式
+         */
+        void onStartPureRtcWatch();
+
+        /**
+         * 离开rtc纯流观看模式
+         */
+        void onStopPureRtcWatch();
 
         void onChannelLinkMicOpenStatusChanged(boolean isOpen);
 

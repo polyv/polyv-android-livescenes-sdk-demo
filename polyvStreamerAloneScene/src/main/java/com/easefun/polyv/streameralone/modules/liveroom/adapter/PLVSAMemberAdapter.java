@@ -29,6 +29,8 @@ import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberControlWindow
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -353,9 +355,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                     final boolean isGuest = currentMemberItemDataBean.getSocketUserBean().isGuest();
                     final boolean isViewer = isViewerUserType(currentMemberItemDataBean.getSocketUserBean().getUserType());
-                    final boolean canInviteLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+                    final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(PLVSocketWrapper.getInstance().getLoginVO().getChannelId())
+                            .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+                    final boolean canInviteLinkMicOld = !isNewLinkMicStrategy
+                            && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
                             && (isOpenLinkMic || isGuest || isViewer)
                             && (isChannelAllowInviteLinkMic || isGuest || isViewer);
+                    final boolean canInviteLinkMicNew = isNewLinkMicStrategy
+                            && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+                            && (isChannelAllowInviteLinkMic || isGuest || isViewer);
+                    final boolean canInviteLinkMic = canInviteLinkMicNew || canInviteLinkMicOld;
                     final boolean notNeedAnswer = !isChannelAllowInviteLinkMic && (isGuest || isViewer);
                     switch (currentMemberItemDataBean.getLinkMicStatus()) {
                         case WAIT_ACCEPT_HAND_UP:
@@ -613,9 +622,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         private boolean isShowControlButton(PLVMemberItemDataBean memberItemDataBean) {
             final PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
             final boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
-            final boolean canInviteLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+            final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(PLVSocketWrapper.getInstance().getLoginVO().getChannelId())
+                    .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
+            final boolean canInviteLinkMicOld = !isNewLinkMicStrategy
+                    && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
                     && (isOpenLinkMic || socketUserBean.isGuest())
                     && isChannelAllowInviteLinkMic;
+            final boolean canInviteLinkMicNew = isNewLinkMicStrategy
+                    && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_INVITE_LINK_MIC)
+                    && isChannelAllowInviteLinkMic;
+            final boolean canInviteLinkMic = canInviteLinkMicNew || canInviteLinkMicOld;
 
             if (isMyself || !isHasPermission || !isStartedStatus) {
                 return false;

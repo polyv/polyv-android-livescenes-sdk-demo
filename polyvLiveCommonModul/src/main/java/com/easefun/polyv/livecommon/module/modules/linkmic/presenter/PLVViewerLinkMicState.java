@@ -104,6 +104,11 @@ public abstract class PLVViewerLinkMicState {
         public void onTeacherNotAllowToJoin() {
             notifyStateChanged(this, new NoLinkMicState(this));
         }
+
+        @Override
+        public void onTeacherNotAllowRaiseHand() {
+            notifyStateChanged(this, new NoLinkMicState(this));
+        }
     }
 
     /**
@@ -267,6 +272,12 @@ public abstract class PLVViewerLinkMicState {
      * 讲师不同意上麦 joinResponse, value = 0
      */
     public void onTeacherNotAllowToJoin() {
+    }
+
+    /**
+     * 讲师不允许举手
+     */
+    public void onTeacherNotAllowRaiseHand() {
     }
 
     protected PLVViewerLinkMicState notifyStateChanged(PLVViewerLinkMicState fromState, PLVViewerLinkMicState newState) {

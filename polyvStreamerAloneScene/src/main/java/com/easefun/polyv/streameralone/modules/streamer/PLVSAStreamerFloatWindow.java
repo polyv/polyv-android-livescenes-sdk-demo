@@ -155,10 +155,12 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         }
 
         @Override
-        public void onScreenShareChange(int position, boolean isShare, int extra) {
-            super.onScreenShareChange(position, isShare, extra);
-            //是否正在屏幕共享
-            isSharing = streamerPresenter.isScreenSharing();
+        public void onScreenShareChange(int position, boolean isShare, int extra, String userId, boolean isMyself) {
+            super.onScreenShareChange(position, isShare, extra, userId, isMyself);
+            if (isMyself) {
+                //是否正在屏幕共享
+                isSharing = streamerPresenter.isScreenSharing();
+            }
         }
     };
     // </editor-fold >

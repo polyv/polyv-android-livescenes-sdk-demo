@@ -68,7 +68,7 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
         return this;
     }
 
-    public void performAutoOpenLinkMic(boolean isOpen, boolean isVideoLinkMicType) {
+    public void performAutoOpenLinkMic(boolean isOpen, boolean isVideoLinkMicType, boolean isNewLinkMicStrategy) {
         if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN)) {
             return;
         }
@@ -76,9 +76,11 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
             boolean isOpenSuccess = changeLinkMicOpenState(isVideoLinkMicType, true);
             if (isOpenSuccess) {
                 currentState = currentState.nextState(ChangeStateReason.ON_CLICK);
-                PLVToast.Builder.context(getContext())
-                        .setText(isVideoLinkMicType ? R.string.plv_streamer_open_video_linkmic_toast : R.string.plv_streamer_open_audio_linkmic_toast)
-                        .show();
+                if (!isNewLinkMicStrategy) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(isVideoLinkMicType ? R.string.plv_streamer_open_video_linkmic_toast : R.string.plv_streamer_open_audio_linkmic_toast)
+                            .show();
+                }
             }
         } else if (currentState instanceof TeacherStateLinkMicOpened && !isOpen) {
             changeLinkMicOpenState(isVideoLinkMicType, false);

@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.SurfaceView;
+import android.view.TextureView;
+import android.view.View;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -15,6 +17,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
@@ -219,7 +222,7 @@ public interface IPLVStreamerContract {
          * @param isShare  是否开始屏幕共享
          * @param extra    附加信息，如错误码
          */
-        void onScreenShareChange(int position, boolean isShare, int extra);
+        void onScreenShareChange(int position, boolean isShare, int extra, String userId, boolean isMyself);
 
         /**
          * 讲师邀请上麦
@@ -393,11 +396,19 @@ public interface IPLVStreamerContract {
         SurfaceView createRenderView(Context context);
 
         /**
+         * 创建渲染器
+         *
+         * @param context 上下文
+         * @return 渲染器
+         */
+        TextureView createTextureRenderView(Context context);
+
+        /**
          * 释放渲染器
          *
          * @param renderView 渲染器
          */
-        void releaseRenderView(SurfaceView renderView);
+        void releaseRenderView(View renderView);
 
         /**
          * 为特定的连麦ID的用户设置连麦渲染器
@@ -405,7 +416,7 @@ public interface IPLVStreamerContract {
          * @param renderView 渲染器
          * @param linkMicId  连麦ID
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 开始推流
@@ -424,9 +435,10 @@ public interface IPLVStreamerContract {
 
         /**
          * 请求屏幕共享
+         *
          * @param activity
          */
-        void requestShareScreen(Activity activity);
+        void requestShareScreen(Activity activity, PLVCustomScreenShareData customScreenShareData);
 
         /**
          * 是否正在屏幕共享
@@ -447,6 +459,23 @@ public interface IPLVStreamerContract {
          * 关闭连麦
          */
         boolean closeLinkMic(Ack ack);
+
+        /**
+         * 允许观众举手连麦
+         */
+        boolean allowViewerRaiseHand(Ack ack);
+
+        /**
+         * 关闭观众举手连麦
+         */
+        boolean disallowViewerRaiseHand(Ack ack);
+
+        /**
+         * 更改连麦类型 音频/视频
+         *
+         * @param isVideoType 是否视频连麦
+         */
+        boolean changeLinkMicType(boolean isVideoType);
 
         /**
          * 控制成员列表中的用户加入或离开连麦
@@ -560,6 +589,14 @@ public interface IPLVStreamerContract {
          * 获取邀请连麦接受邀请的剩余时间
          */
         void getJoinAnswerTimeLeft(PLVSugarUtil.Consumer<Integer> callback);
+
+        /**
+         * 获取连麦用户数量
+         *
+         * @param userTypes 指定用户类型，传空时表示所有用户类型
+         * @return 指定用户类型的连麦用户数量
+         */
+        int countLinkMicUser(@Nullable List<String> userTypes);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

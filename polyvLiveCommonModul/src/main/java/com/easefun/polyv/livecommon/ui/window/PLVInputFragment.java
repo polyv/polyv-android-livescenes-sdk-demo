@@ -219,6 +219,9 @@ public abstract class PLVInputFragment extends PLVBaseFragment {
     }
 
     private void moveInputLayoutToSrcWindow() {
+        if (inputLayout == null || fragmentView == null || inputLayout.getParent() == null) {
+            return;
+        }
         if (inputLayout.getParent().equals(fragmentView)) {
             willShowKeyBoard = false;
             fragmentView.removeView(inputLayout);

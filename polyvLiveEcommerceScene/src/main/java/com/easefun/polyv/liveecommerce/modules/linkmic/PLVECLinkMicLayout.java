@@ -39,6 +39,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.linkmic.adapter.PLVLinkMicListAdapter;
+import com.easefun.polyv.liveecommerce.modules.linkmic.handler.PLVECRtcMixStreamHandler;
 import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECLinkMicInvitationLayout;
 import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
@@ -99,6 +100,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private PLVViewSwitcher teacherLocationViewSwitcher;
 
     private final List<Runnable> onUserJoinPendingTask = new LinkedList<>();
+
+    private PLVECRtcMixStreamHandler rtcMixStreamHandler;
 
     //Listener
     private OnPLVLinkMicLayoutListener onPLVLinkMicLayoutListener;
@@ -198,6 +201,21 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             }
         });
     }
+
+    private void setupMixStreamHandler() {
+        rtcMixStreamHandler = new PLVECRtcMixStreamHandler(
+                linkMicPresenter,
+                new PLVECRtcMixStreamHandler.OnHandlerCallbackListener() {
+                    @Nullable
+                    @Override
+                    public ViewGroup onRequireMixStreamContainer() {
+                        if (onPLVLinkMicLayoutListener == null) {
+                            return null;
+                        }
+                        return onPLVLinkMicLayoutListener.onRequireMixStreamVideoContainer();
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化连麦控制条">
@@ -269,6 +287,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         liveChannelType = liveRoomDataManager.getConfig().getChannelType();
         linkMicPresenter = new PLVLinkMicPresenter(liveRoomDataManager, this);
         linkMicPresenter.setEcommerceLinkMicItemSort(true);
+        setupMixStreamHandler();
         initLinkMicControlBar(linkMicControlBar);
         updatePushResolution(false);
         observeOnAudioState(liveRoomDataManager);
@@ -335,16 +354,26 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void pause() {
         linkMicListAdapter.pauseAllRenderView();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            rtcMixStreamHandler.stop();
+        }
     }
 
     @Override
     public void resume() {
         linkMicListAdapter.resumeAllRenderView();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            rtcMixStreamHandler.start();
+        }
     }
 
     @Override
     public boolean isPausing() {
-        return linkMicListAdapter.isPausing();
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream()) {
+            return !rtcMixStreamHandler.isPlaying();
+        } else {
+            return linkMicListAdapter.isPausing();
+        }
     }
 
     @Override
@@ -363,6 +392,11 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public boolean isJoinChannel() {
         return linkMicPresenter.isJoinChannel();
+    }
+
+    @Override
+    public boolean isPlayRtcAsMixStream() {
+        return rtcMixStreamHandler.isPlayRtcAsMixStream();
     }
 
     @Override
@@ -427,7 +461,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void setWatchLowLatency(boolean watchLowLatency) {
-        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch()) {
+        if (PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() || PLVLinkMicConfig.getInstance().isLowLatencyMixRtcWatch()) {
             linkMicPresenter.setWatchRtc(watchLowLatency);
         }
     }
@@ -530,6 +564,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onLinkMicStateChanged(PLVViewerLinkMicState oldState, PLVViewerLinkMicState newState) {
         linkMicInvitationLayout.setIsOnlyAudio(linkMicPresenter.getIsAudioLinkMic());
+        linkMicInvitationLayout.updateDeviceOpenState(linkMicPresenter.isEnableLocalAudio(), linkMicPresenter.isEnableLocalVideo());
         linkMicInvitationLayout.onLinkMicStateChanged(oldState, newState);
     }
 
@@ -565,7 +600,31 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     }
 
     @Override
-    public void onJoinRtcChannel() {
+    public void onStartRtcWatch() {
+        //启动前台服务
+        Activity activity = (Activity) getContext();
+        PLVForegroundService.startForegroundService(activity.getClass(), "直播带货", R.drawable.ic_launcher);
+
+        rtcMixStreamHandler.onStartRtcWatch();
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onJoinRtcChannel();
+        }
+    }
+
+    @Override
+    public void onStopRtcWatch() {
+        //停止前台服务
+        PLVForegroundService.stopForegroundService();
+
+        rtcMixStreamHandler.onStopRtcWatch();
+        //回调离开连麦
+        if (onPLVLinkMicLayoutListener != null) {
+            onPLVLinkMicLayoutListener.onLeaveRtcChannel();
+        }
+    }
+
+    @Override
+    public void onStartPureRtcWatch() {
         //显示连麦根布局
         flMediaLinkMicRoot.setKeepScreenOn(true);
         flMediaLinkMicRoot.setVisibility(VISIBLE);
@@ -576,14 +635,12 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         Activity activity = (Activity) getContext();
         PLVForegroundService.startForegroundService(activity.getClass(), PLVAppUtils.getString(R.string.plvec_live_ecommerce_scene_name), R.drawable.ic_launcher);
 
-        if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onJoinRtcChannel();
-        }
+        rtcMixStreamHandler.onStartPureRtcWatch();
         isMediaShowInLinkMicList = false;
     }
 
     @Override
-    public void onLeaveRtcChannel() {
+    public void onStopPureRtcWatch() {
         //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
         //这里实际存在3种情况：
         //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
@@ -621,12 +678,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         isMediaShowInLinkMicList = false;
         teacherLocationViewSwitcher = null;
         setMediaInLinkMicListLinkMicId(null);
-        //停止前台服务
-        PLVForegroundService.stopForegroundService();
-        //回调离开连麦
-        if (onPLVLinkMicLayoutListener != null) {
-            onPLVLinkMicLayoutListener.onLeaveRtcChannel();
-        }
+
+        rtcMixStreamHandler.onStopPureRtcWatch();
     }
 
     @Override
@@ -779,6 +832,11 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onSwitchPPTViewLocation(boolean toMainScreen) {
+    }
+
+    @Override
+    public void onUpdateLinkMicType(boolean isAudio) {
+        linkMicInvitationLayout.setIsOnlyAudio(isAudio);
     }
 
     // </editor-fold>

@@ -529,9 +529,10 @@ public class PLVStreamerMsgHandler {
         if (authentic == null || authentic.getUserId() == null) {
             return;
         }
+        final String linkMicId = authentic.getUserId();
         //memberlist和streamerlist排序可能不同
-        Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(authentic.getUserId());
-        Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getLinkMicItemWithLinkMicId(authentic.getUserId());
+        Pair<Integer, PLVMemberItemDataBean> memberItem = streamerPresenter.getMemberItemWithLinkMicId(linkMicId);
+        Pair<Integer, PLVLinkMicItemDataBean> streamerItem = streamerPresenter.getLinkMicItemWithLinkMicId(linkMicId);
         final boolean isCurrentUser = authentic.getUserId().equals(streamerPresenter.getStreamerManager().getLinkMicUid());
         final PLVSocketUserBean bean = (memberItem != null && memberItem.second != null) ? memberItem.second.getSocketUserBean() : null;
 
@@ -544,12 +545,14 @@ public class PLVStreamerMsgHandler {
             }
             streamerPresenter.onCurrentSpeakerChanged(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
         } else if (PLVPPTAuthentic.PermissionType.SCREEN_SHARE.equals(authentic.getType())) {
+            final boolean isScreenShare = !authentic.hasNoAthuentic();
             if (memberItem != null && memberItem.second != null && memberItem.second.getLinkMicItemDataBean() != null) {
-                memberItem.second.getLinkMicItemDataBean().setScreenShare(!authentic.hasNoAthuentic());
+                memberItem.second.getLinkMicItemDataBean().setScreenShare(isScreenShare);
             }
             if (streamerItem != null && streamerItem.second != null) {
-                streamerItem.second.setScreenShare(!authentic.hasNoAthuentic());
+                streamerItem.second.setScreenShare(isScreenShare);
             }
+            streamerPresenter.updateMixLayoutWhenScreenShare(isScreenShare, linkMicId);
         } else if (PLVPPTAuthentic.TYPE_VOICE.equals(authentic.getType())) {
             if (isCurrentUser) {
                 if ("0".equals(authentic.getStatus())) {

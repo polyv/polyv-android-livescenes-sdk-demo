@@ -52,6 +52,8 @@ public class PLVStreamerData {
     private MutableLiveData<Integer> curLinkMicCount = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> enableShareScreen = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> videoLinkMicType = new MutableLiveData<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流状态">
@@ -177,13 +179,21 @@ public class PLVStreamerData {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="连麦人数">
+    // <editor-fold defaultstate="collapsed" desc="连麦控制">
     public void postLinkMicCount(int count) {
         curLinkMicCount.postValue(count);
     }
 
     public LiveData<Integer> getLinkMicCount() {
         return curLinkMicCount;
+    }
+
+    public void postVideoLinkMicType(boolean isVideoLinkMicType) {
+        videoLinkMicType.postValue(isVideoLinkMicType);
+    }
+
+    public LiveData<Boolean> getVideoLinkMicType() {
+        return videoLinkMicType;
     }
     // </editor-fold >
 

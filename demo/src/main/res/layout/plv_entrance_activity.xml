@@ -31,13 +31,5 @@
             android:onClick="onClick"
             android:text="云直播观看" />
 
-        <Button
-            android:id="@+id/plv_entrance_hi_class_btn"
-            style="@style/plv_entrance_button_style"
-            android:layout_marginTop="-16dp"
-            android:background="@drawable/plv_entrance_hi_class_bg"
-            android:onClick="onClick"
-            android:text="互动学堂" />
-
     </LinearLayout>
 </RelativeLayout>
