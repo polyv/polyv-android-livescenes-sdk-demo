@@ -568,6 +568,13 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
                         .show();
             }
         }
+
+        @Override
+        public void onCheckMessageMaxLength(int maxLength) {
+            if (chatMessageAdapter != null) {
+                chatMessageAdapter.removeDataChanged(PLVChatroomPresenter.CHAT_MESSAGE_MAX_LENGTH);
+            }
+        }
     };
     // </editor-fold>
 

@@ -146,6 +146,25 @@
         android:src="@drawable/plvlc_controller_back" />
 
     <TextView
+        android:id="@+id/plvlc_playback_viewer_count_port_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plvlc_playback_controller_port_tv_video_name"
+        android:layout_alignLeft="@+id/plvlc_playback_controller_port_tv_video_name"
+        android:layout_marginTop="-4dp"
+        android:background="@drawable/plvlc_controller_viewer_count_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="6dp"
+        android:paddingTop="2dp"
+        android:paddingRight="6dp"
+        android:paddingBottom="2dp"
+        tools:text="2.3w次播放"
+        android:textColor="#D0D0D0"
+        android:textSize="10sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
         android:id="@+id/plvlc_playback_player_controller_tv_reopen_floating_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

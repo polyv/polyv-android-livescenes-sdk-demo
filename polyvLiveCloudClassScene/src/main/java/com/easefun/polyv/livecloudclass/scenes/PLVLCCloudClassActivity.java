@@ -952,10 +952,18 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         livePageMenuLayout.addOnViewerCountListener(new IPLVOnDataChangedListener<Long>() {
             @Override
             public void onChanged(@Nullable Long l) {
-                if (l == null) {
+                mediaLayout.updateViewerCount(l);
+            }
+        });
+
+        // 当前页面 监听 聊天室在线人数变化
+        livePageMenuLayout.addOnViewOnlineCountData(new IPLVOnDataChangedListener<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                if (integer == null) {
                     return;
                 }
-                mediaLayout.updateViewerCount(l);
+                mediaLayout.updateViewOnlineCount(integer);
             }
         });
     }

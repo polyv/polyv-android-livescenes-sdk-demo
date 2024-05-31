@@ -45,6 +45,7 @@
     <string name="plv_player_advertising_count_down">Advertising time<xliff:g> : %ss</xliff:g></string>
     <string name="plv_player_start_live_count_down">Countdown: %s</string>
     <string name="plv_player_viewer_count">%s views</string>
+    <string name="plv_player_viewer_online_count">%s online</string>
     <string name="plv_player_network_bad">Your current network status is unstable. It is recommended that you switch to</string>
     <string name="plv_player_translating">Converting, please wait</string>
     <string name="plv_player_latency">Delay</string>
@@ -401,6 +402,8 @@
     <string name="plv_live_state_playback">Replaying</string>
     <string name="plv_live_state_playback_cached">Cached</string>
     <string name="plv_live_more">More</string>
+    <string name="plv_live_more_base">Base</string>
+    <string name="plv_live_more_interact">Interact</string>
     <string name="plv_live_bulletin">Bulletin</string>
     <string name="plv_live_bulletin_2">Bulletin:<xliff:g>&#160;</xliff:g></string>
     <string name="plv_live_intro">Intro</string>
@@ -443,6 +446,11 @@
     <string name="plv_live_save_img_failed">Failed to save picture</string>
     <string name="plv_live_save_img_failed_2">Failed to save picture (%s)</string>
     <string name="plv_live_save_img_path">Picture saved in: %s</string>
+    <string name="plv_live_no_save_record_permission_hint">Storage permission denied to save record, please restore it in app permissions settings</string>
+    <string name="plv_live_allow_permission_save_record_hint">Please grant storage permission before save sign in record</string>
+    <string name="plv_live_save_sign_in_failed">Failed to save Sign in Record</string>
+    <string name="plv_live_save_record_path">Sign in record saved in: %s</string>
+    <string name="plv_live_save_record_failed_2">Failed to save record (%s)</string>
     <string name="plv_live_message_parse_error">Message parsing error</string>
     <string name="plv_live_loading_hint">Loading, please wait</string>
     <string name="plv_live_go_to_setting_page_error_hint">Failed to enter the settings page, please set it manually</string>
@@ -450,6 +458,8 @@
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_hint">Change language to re-enter live stream, confirm to switch</string>
+    <!--互动-->
+    <string name="plv_live_more_interact_signin">Sign in</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">Confirm to exit playback</string>
     <!--回放-往期-->

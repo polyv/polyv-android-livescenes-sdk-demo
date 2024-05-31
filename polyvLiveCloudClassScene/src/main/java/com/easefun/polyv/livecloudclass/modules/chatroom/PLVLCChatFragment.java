@@ -1017,6 +1017,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 ToastUtils.showShort(getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
             }
         }
+
+        @Override
+        public void onCheckMessageMaxLength(int maxLength) {
+            if (isChatPlaybackLayout || !isLiveType) {
+                return;
+            }
+            if (chatCommonMessageList != null) {
+                chatCommonMessageList.removeChatMessage(maxLength, false);
+            }
+        }
     };
 
     public IPLVChatroomContract.IChatroomView getChatroomView() {

@@ -100,4 +100,17 @@
         android:clickable="true"
         android:visibility="gone" />
 
+    <!-- 可以在全屏下根据键盘弹起的布局-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <com.easefun.polyv.livecommon.module.modules.interact.PLVStreamerInteractLayout
+            android:id="@+id/plvsa_interact_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>

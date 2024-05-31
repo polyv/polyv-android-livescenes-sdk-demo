@@ -23,9 +23,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class PLVECGreetingView extends FrameLayout {
     private static final String TAG = "PLVECGreetingView";
+    private static final int LOGIN_EVENT_MAX_LENGTH = 100;
     private TextView greetTv;
     private List<PLVLoginEvent> loginEventList = new ArrayList<>();
     private boolean isStart;
@@ -118,7 +120,7 @@ public class PLVECGreetingView extends FrameLayout {
                         startAnimation(animation);
                     }
                 })
-                .delay(500 + 2 * 1000, TimeUnit.MILLISECONDS)
+                .delay(500 + 2 * 1000, TimeUnit.MILLISECONDS, Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Object>() {
                     @Override
@@ -137,6 +139,9 @@ public class PLVECGreetingView extends FrameLayout {
         post(new Runnable() {
             @Override
             public void run() {
+                if (loginEventList.size() >= LOGIN_EVENT_MAX_LENGTH) {
+                    return;
+                }
                 loginEventList.add(loginEvent);
                 if (!isStart) {
                     isStart = !isStart;

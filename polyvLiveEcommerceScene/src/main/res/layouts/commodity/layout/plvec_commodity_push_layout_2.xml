@@ -46,6 +46,90 @@
                 android:textColor="#ffffff"
                 android:textSize="12sp"
                 tools:text="3" />
+
+            <RelativeLayout
+                android:id="@+id/plvec_product_image_effect_rl"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:paddingLeft="3dp"
+                android:visibility="gone"
+                android:background="@drawable/plvec_greet_bg">
+
+                <TextView
+                    android:id="@+id/plvec_product_image_effect_tv"
+                    android:text="投递中"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_centerVertical="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/plvec_product_image_effect_mul"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/plvec_product_image_effect_tv"
+                    android:text="x"
+                    android:layout_marginLeft="4dp"
+                    android:textColor="#FFFFFF"
+                    android:layout_alignBaseline="@+id/plvec_product_image_effect_tv"
+                    android:textSize="8sp"/>
+
+                <TextView
+                    android:id="@+id/plvec_product_image_effect_num"
+                    android:text="0"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_toRightOf="@+id/plvec_product_image_effect_mul"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/plvec_product_image_effect_tv"/>
+            </RelativeLayout>
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:id="@+id/plvec_product_title_effect_rl"
+            android:layout_width="86dp"
+            android:layout_height="18dp"
+            android:background="@drawable/plvec_greet_bg"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_commodity_name_ll"
+            app:layout_constraintLeft_toRightOf="@+id/plvec_commodity_cover_ly"
+            android:visibility="gone"
+            android:paddingLeft="3dp"
+            android:layout_marginTop="4dp"
+            app:mode="all"
+            app:radius="8dp">
+
+            <TextView
+                android:id="@+id/plvec_product_title_effect_tv"
+                android:text="投递中"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/plvec_product_title_effect_mul"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/plvec_product_title_effect_tv"
+                android:text="x"
+                android:layout_marginLeft="4dp"
+                android:textColor="#FFFFFF"
+                android:layout_alignBaseline="@+id/plvec_product_title_effect_tv"
+                android:textSize="8sp"/>
+
+            <TextView
+                android:id="@+id/plvec_product_title_effect_num"
+                android:text="0"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:layout_toRightOf="@+id/plvec_product_title_effect_mul"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/plvec_product_title_effect_tv"/>
+
         </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
         <LinearLayout
@@ -91,7 +175,7 @@
             android:layout_marginEnd="22dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/plvec_commodity_cover_ly"
+            app:layout_constraintStart_toEndOf="@+id/plvec_product_title_effect_rl"
             app:layout_constraintTop_toBottomOf="@+id/plvec_commodity_name_ll" />
 
         <TextView
@@ -107,7 +191,7 @@
             android:textColor="#99333333"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/plvec_commodity_cover_ly"
+            app:layout_constraintStart_toEndOf="@+id/plvec_product_title_effect_rl"
             app:layout_constraintTop_toBottomOf="@+id/plvec_commodity_feature_tag_ll"
             tools:text="商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述" />
 

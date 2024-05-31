@@ -25,12 +25,14 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.info.PLVInteractInfo;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.google.gson.GsonBuilder;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
@@ -40,6 +42,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
@@ -85,7 +88,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVInteractJSBridgeEventConst.V2_WEB_VIEW_UPDATE_APP_STATUS,
             PLVInteractJSBridgeEventConst.V2_SHOW_WEB_VIEW,
             PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT,
-            PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT
+            PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT,
+            PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO
     );
     // </editor-fold >
 
@@ -162,7 +166,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT:
                 processCallAppEvent(param, callBackFunction);
                 break;
-
+            case PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO:
+                processGetInteractInfo(param, callBackFunction);
+                break;
         }
     }
 
@@ -186,7 +192,6 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         String watchStatus = liveRoomDataManager.getConfig().isLive() ? PLVInteractWebView2.WATCH_STATUS_LIVE : PLVInteractWebView2.WATCH_STATUS_PLAYBACK;
         plvlcInteractWeb.setWatchStatus(watchStatus);
         plvlcInteractWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVInteractWebView2.LANG_EN : PLVInteractWebView2.LANG_ZH);
-        plvlcInteractWeb.loadWeb();
         observeLiveData();
     }
 
@@ -361,6 +366,26 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
                 }
             }
         });
+
+        //频道详情信息
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                if (polyvLiveClassDetailVOPLVStatefulData != null && polyvLiveClassDetailVOPLVStatefulData.getData() != null) {
+                    // 切换语言环境后，所有接口需要重新请求，等接口请求完毕后，再重新加载webview
+                    plvlcInteractWeb.loadWeb();
+
+                    String info = updateChannelInfo(polyvLiveClassDetailVOPLVStatefulData.getData().getData());
+                    PLVCommonLog.d(TAG, "=== send:" + info);
+                    plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO, info, new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
     }
     // </editor-fold >
 
@@ -417,6 +442,24 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             return PLVGsonUtil.toJsonSimple(nativeAppParams);
         }
         return "";
+    }
+
+    private void processGetInteractInfo(String param, final CallBackFunction callBackFunction) {
+        if (liveRoomDataManager != null && liveRoomDataManager.getClassDetailVO().getValue().getData() != null) {
+            String jsonInfo = updateChannelInfo(liveRoomDataManager.getClassDetailVO().getValue().getData().getData());
+            callBackFunction.onCallBack(jsonInfo);
+            PLVCommonLog.d(TAG, "processGetInteractInfo: " + jsonInfo);
+        }
+    }
+
+    private String updateChannelInfo(PLVLiveClassDetailVO.DataBean data) {
+        final PLVInteractInfo info = new PLVInteractInfo();
+        final PLVInteractInfo.LotteryData lotteryData = new PLVInteractInfo.LotteryData();
+        lotteryData.setLotteryTextCN(data.getLotteryGiftButtonTextCH());
+        lotteryData.setLotteryTextEN(data.getLotteryGiftButtonTextEN());
+        info.setLotteryData(lotteryData);
+        String jsonInfo = PLVGsonUtil.toJsonSimple(info);
+        return jsonInfo;
     }
 
     /**

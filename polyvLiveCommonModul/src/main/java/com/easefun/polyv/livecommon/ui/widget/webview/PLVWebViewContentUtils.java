@@ -15,7 +15,7 @@ public class PLVWebViewContentUtils {
         String style = "style=\" width:100%;\"";
         String breakStyle = "word-break:break-all;";
         String colorStyle = "color:" + color + ";";
-        content = content.replaceAll("img src=\"//", "img src=\\\"https://");
+        content = content.replaceAll("src=\"//", "src=\\\"https://");
         content = content.replace("<img ", "<img " + style + " ");
         content = content.replaceAll("<li>", "<li style=\"" + colorStyle + "\">");
         content = content.replaceAll("<p>", "<p style=\"" + breakStyle + colorStyle + "\">");

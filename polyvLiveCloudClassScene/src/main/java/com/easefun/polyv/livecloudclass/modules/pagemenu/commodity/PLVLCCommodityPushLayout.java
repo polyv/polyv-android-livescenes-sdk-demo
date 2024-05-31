@@ -8,10 +8,14 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,21 +23,32 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
+import com.easefun.polyv.livecommon.ui.widget.gif.RelativeImageSpan;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.event.commodity.PLVProductClickBean;
+import com.plv.socket.event.commodity.PLVProductClickTimesEvent;
 import com.plv.socket.event.commodity.PLVProductContentBean;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +58,11 @@ import java.util.List;
  */
 public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+
+    private final String NORMAL = "normal";
+    private final String FINANCE = "finance";
+    private final String POSITION = "position";
+
     private PLVRoundRectLayout commodityCoverLy;
     private ImageView commodityCoverIv;
     private TextView commodityCoverNumberTv;
@@ -56,10 +76,25 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
     private ImageView commodityDialogCloseIv;
     private ImageView commodityEnterIv;
 
+    private RelativeLayout productEffectImgRl;
+    private TextView productEffectImgTv;
+    private TextView productEffectImgNumTv;
+    private TextView productEffectImgMulTv;
+
+    private PLVRoundRectLayout productEffectTitleRl;
+    private TextView productEffectTitleTv;
+    private TextView productEffectTitleNumTv;
+    private TextView productEffectTitleMulTv;
+
+
     private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
 
     @Nullable
     private PLVProductContentBean productContentBean;
+
+    private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVLiveClassDetailVO.DataBean.ProductHotEffectBean productHotEffectBean;
+    boolean productHotEffectEnable = false;
 
     private boolean showOnPortrait = true;
     private boolean showOnLandscape = true;
@@ -95,6 +130,11 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         observeCommodityViewModel();
     }
 
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+        observeOnProductHotEffect();
+    }
+
     private void findView() {
         commodityCoverLy = findViewById(R.id.plvlc_commodity_cover_ly);
         commodityCoverIv = findViewById(R.id.plvlc_commodity_cover_iv);
@@ -109,9 +149,20 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         commodityDialogCloseIv = findViewById(R.id.plvlc_commodity_dialog_close_iv);
         commodityEnterIv = findViewById(R.id.plvlc_commodity_enter_iv);
 
+        productEffectImgRl = findViewById(R.id.plvlc_product_image_effect_rl);
+        productEffectImgTv = findViewById(R.id.plvlc_product_image_effect_tv);
+        productEffectImgNumTv = findViewById(R.id.plvlc_product_image_effect_num);
+        productEffectImgMulTv = findViewById(R.id.plvlc_product_image_effect_mul);
+
+        productEffectTitleRl = findViewById(R.id.plvlc_product_title_effect_rl);
+        productEffectTitleTv = findViewById(R.id.plvlc_product_title_effect_tv);
+        productEffectTitleNumTv = findViewById(R.id.plvlc_product_title_effect_num);
+        productEffectTitleMulTv = findViewById(R.id.plvlc_product_title_effect_mul);
+
         commodityDialogCloseIv.setOnClickListener(this);
         commodityEnterIv.setOnClickListener(this);
         this.setOnClickListener(this);
+
     }
 
     private void parseAttrs(@Nullable AttributeSet attributeSet) {
@@ -139,6 +190,35 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
                         checkUpdateVisibility();
                     }
                 });
+
+        commodityViewModel.getProductClickTimesLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVProductClickTimesEvent>() {
+                    @Override
+                    public void onChanged(@Nullable PLVProductClickTimesEvent plvProductClickTimesEvent) {
+                        updateProductClickTimes(plvProductClickTimesEvent);
+                    }
+                });
+    }
+
+    private void observeOnProductHotEffect() {
+        if (liveRoomDataManager != null) {
+            liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> polyvLiveClassDetailVOPLVStatefulData) {
+                    liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                    if (polyvLiveClassDetailVOPLVStatefulData == null || !polyvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                        return;
+                    }
+                    PLVLiveClassDetailVO liveClassDetail = polyvLiveClassDetailVOPLVStatefulData.getData();
+                    if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                        return;
+                    }
+
+                    productHotEffectEnable = liveClassDetail.getData().isProductHotEffectEnabled();
+                    productHotEffectBean = liveClassDetail.getData().getProductHotEffectTips();
+                }
+            });
+        }
     }
     // </editor-fold>
 
@@ -158,6 +238,8 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         parseProductFeatureTag(productContentBean);
         bindPrice(productContentBean);
         bindEnterIcon(productContentBean);
+
+        bindProductEffect(productContentBean);
     }
 
     @MainThread
@@ -166,6 +248,36 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
         final boolean fitOrientation = (!isLandscape && showOnPortrait) || (isLandscape && showOnLandscape);
         final boolean needShow = show && fitOrientation;
         setVisibility(needShow ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateProductClickTimes(PLVProductClickTimesEvent productClickTimesEvent) {
+        if (productContentBean != null) {
+            long times = productClickTimesEvent.getTimes();
+            if (productContentBean.getProductId() == productClickTimesEvent.getProductId()) {
+                times = Math.min(9999, times);
+                String timesStr = times >= 9999 ? "9999+" : times + "";
+                productEffectTitleNumTv.setVisibility(VISIBLE);
+                productEffectImgNumTv.setVisibility(VISIBLE);
+                productEffectImgMulTv.setVisibility(VISIBLE);
+                productEffectTitleMulTv.setVisibility(VISIBLE);
+                productEffectTitleNumTv.setText(timesStr);
+                productEffectImgNumTv.setText(timesStr);
+            }
+        }
+    }
+
+    private Spannable generateRewardSpan(String text) {
+        SpannableStringBuilder span = new SpannableStringBuilder(" " + text);
+
+        Drawable drawable;
+        ImageSpan imageSpan;
+
+        drawable = this.getResources().getDrawable(R.drawable.plvlc_product_hot_effect_icon);
+        imageSpan = new RelativeImageSpan(drawable, RelativeImageSpan.ALIGN_CENTER);
+
+        drawable.setBounds(0, 0, ConvertUtils.dp2px(10), ConvertUtils.dp2px(12));
+        span.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return span;
     }
     // </editor-fold>
 
@@ -262,11 +374,47 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
             commodityRealPriceTv.setText(productContentBean.isFreeForPay() ? PLVAppUtils.getString(R.string.plv_commodity_free) : ("¥" + productContentBean.getRealPrice()));
         } else if (productContentBean.isFinanceProduct()) {
             commodityRealPriceTv.setText(productContentBean.getYield());
+        } else if (productContentBean.isPositionProduct()) {
+            commodityRealPriceTv.setText(productContentBean.getTreatment());
         }
     }
 
     private void bindEnterIcon(PLVProductContentBean productContentBean) {
         commodityEnterIv.setImageResource(TextUtils.isEmpty(getProductLink(productContentBean)) ? R.drawable.plvlc_commodity_enter_disabled : R.drawable.plvlc_commodity_enter);
+    }
+
+    private void bindProductEffect(PLVProductContentBean productContentBean) {
+        if (productHotEffectEnable && productHotEffectBean != null) {
+            String productEffectTitle = "";
+            productEffectImgNumTv.setVisibility(GONE);
+            productEffectTitleNumTv.setVisibility(GONE);
+            productEffectImgMulTv.setVisibility(GONE);
+            productEffectTitleMulTv.setVisibility(GONE);
+            String type = productContentBean.getProductType();
+            if (type.equals(NORMAL)) {
+                productEffectTitle = productHotEffectBean.getNormalProductTips();
+            } else if (type.equals(FINANCE)) {
+                productEffectTitle = productHotEffectBean.getFinanceProductTips();
+            } else if (type.equals(POSITION)) {
+                productEffectTitle = productHotEffectBean.getJobProductTips();
+            }
+            if (TextUtils.isEmpty(productEffectTitle)) {
+                return;
+            }
+
+            // 处理带有图片的情况
+            if (!TextUtils.isEmpty(productContentBean.getCover())) {
+                productEffectImgRl.setVisibility(VISIBLE);
+                productEffectTitleRl.setVisibility(GONE);
+                commodityCoverNumberTv.setVisibility(GONE);
+                productEffectImgTv.setText(generateRewardSpan(productEffectTitle));
+            } else {
+                //没有带有图片的情况
+                productEffectImgRl.setVisibility(GONE);
+                productEffectTitleRl.setVisibility(VISIBLE);
+                productEffectTitleTv.setText(generateRewardSpan(productEffectTitle));
+            }
+        }
     }
 
     /**
@@ -280,6 +428,17 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
                     .show();
             return false;
         }
+
+        //发送点击卡片事件
+        PLVProductClickBean clickBean = new PLVProductClickBean();
+        PLVProductClickBean.DataBean dataBean = new PLVProductClickBean.DataBean();
+        dataBean.setType(productContentBean.getProductType());
+        dataBean.setPositionName(productContentBean.getName());
+        dataBean.setProductId(productContentBean.getProductId());
+        dataBean.setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+        clickBean.setData(dataBean);
+        clickBean.setRoomId(liveRoomDataManager.getConfig().getChannelId());
+        PLVSocketWrapper.getInstance().emit(PLVEventConstant.Chatroom.EVENT_PRODUCT, new Gson().toJson(clickBean));
         PLVLCCommodityDetailActivity.start(getContext(), link);
         return true;
     }

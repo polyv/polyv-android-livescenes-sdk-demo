@@ -332,6 +332,10 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                 );
     }
 
+    public PLVSAMoreLayout getMoreLayout() {
+        return moreLayout;
+    }
+
     public boolean onBackPressed() {
         return plvsaChatroomLayout.onBackPressed()
                 || moreLayout.onBackPressed()

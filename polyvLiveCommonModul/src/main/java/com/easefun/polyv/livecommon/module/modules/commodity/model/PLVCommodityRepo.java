@@ -13,6 +13,7 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.event.commodity.PLVProductClickTimesEvent;
 import com.plv.socket.event.commodity.PLVProductEvent;
 
 import io.reactivex.Emitter;
@@ -37,7 +38,15 @@ public class PLVCommodityRepo implements IPLVLifecycleAwareDependComponent {
         }
     });
 
+    public Observable<PLVProductClickTimesEvent> productClickTimesObservable = Observable.create(new ObservableOnSubscribe<PLVProductClickTimesEvent>() {
+        @Override
+        public void subscribe(@NonNull ObservableEmitter<PLVProductClickTimesEvent> emitter) throws Exception {
+            productClickTimesEmitter = emitter;
+        }
+    });
+
     private Emitter<PLVCommodityProductVO> productEmitter;
+    private Emitter<PLVProductClickTimesEvent> productClickTimesEmitter;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -65,14 +74,21 @@ public class PLVCommodityRepo implements IPLVLifecycleAwareDependComponent {
                                 return PLVSocketWrapper.getInstance().getLoginVO().getChannelId();
                             }
                         }) != null;
-                        return isMessageEvent && isProductEvent && checkSocketValid;
+                        final boolean isProductClickTimesEvent = PLVEventConstant.Chatroom.EVENT_PRODUCT_CLICK_TIMES.equals(message.getEvent());
+                        return (isMessageEvent && isProductEvent && checkSocketValid) || isProductClickTimesEvent;
                     }
                 })
                 .doOnNext(new Consumer<PLVSocketMessage>() {
                     @Override
                     public void accept(PLVSocketMessage message) throws Exception {
-                        final PLVProductEvent productEvent = PLVGsonUtil.fromJson(PLVProductEvent.class, message.getMessage());
-                        productEmitter.onNext(new PLVCommodityProductVO(productEvent, message));
+                        if (PLVEventConstant.Chatroom.EVENT_PRODUCT_MESSAGE.equals(message.getEvent())) {
+                            final PLVProductEvent productEvent = PLVGsonUtil.fromJson(PLVProductEvent.class, message.getMessage());
+                            productEmitter.onNext(new PLVCommodityProductVO(productEvent, message));
+                        }
+                        if (PLVEventConstant.Chatroom.EVENT_PRODUCT_CLICK_TIMES.equals(message.getEvent())) {
+                            PLVProductClickTimesEvent clickTimes = PLVGsonUtil.fromJson(PLVProductClickTimesEvent.class, message.getMessage());
+                            productClickTimesEmitter.onNext(clickTimes);
+                        }
                     }
                 })
                 .doOnError(new Consumer<Throwable>() {

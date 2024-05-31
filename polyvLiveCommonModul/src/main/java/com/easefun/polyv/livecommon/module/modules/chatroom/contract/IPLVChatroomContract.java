@@ -282,6 +282,13 @@ public interface IPLVChatroomContract {
          * @param dataList 数据列表
          */
         void onKickUsersList(List<PLVSocketUserBean> dataList);
+
+        /**
+         * 检查聊天消息最大数量
+         *
+         * @param maxLength 最大长度
+         */
+        void onCheckMessageMaxLength(int maxLength);
     }
     // </editor-fold>
 

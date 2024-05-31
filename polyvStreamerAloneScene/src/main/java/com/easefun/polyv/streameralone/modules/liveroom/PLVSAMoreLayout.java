@@ -128,6 +128,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private LinearLayout moreHangUpViewerLinkmicLayout;
     private ImageView moreHangUpViewerLinkmicIv;
     private TextView moreHangUpViewerLinkmicTv;
+    private LinearLayout moreInteractSigninLl;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -232,6 +233,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreHangUpViewerLinkmicLayout = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_layout);
         moreHangUpViewerLinkmicIv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_iv);
         moreHangUpViewerLinkmicTv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_tv);
+        moreInteractSigninLl = findViewById(R.id.plvsa_more_interact_signin_layout);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -256,6 +258,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreAllowViewerLinkmicLayout.setOnClickListener(new PLVDebounceClicker.OnClickListener(this, 1000));
         moreLinkmicSettingLayout.setOnClickListener(this);
         moreHangUpViewerLinkmicLayout.setOnClickListener(this);
+        moreInteractSigninLl.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
@@ -433,7 +436,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         if (!canControlLinkMic || !isNewLinkMicStrategy) {
             plvsaMoreSettingsLayout.removeView(moreAllowViewerLinkmicLayout);
             plvsaMoreSettingsLayout.removeView(moreLinkmicSettingLayout);
-            plvsaMoreSettingsLayout.removeView(moreHangUpViewerLinkmicLayout);
         }
     }
     // </editor-folder>
@@ -777,6 +779,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             linkMicSettingLayout.open();
         } else if (id == moreHangUpViewerLinkmicLayout.getId()) {
             closeAllViewerLinkMic();
+        } else if (id == moreInteractSigninLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowSignInAction();
+            }
         }
     }
 
@@ -900,6 +906,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
     public interface OnViewActionListener {
+        /**
+         * 显示签到
+         */
+        void onShowSignInAction();
     }
     // </editor-fold>
 }

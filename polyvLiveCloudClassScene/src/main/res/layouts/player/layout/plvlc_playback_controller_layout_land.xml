@@ -93,6 +93,21 @@
         android:textColor="#ffffff"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/plvlc_playback_count_land_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plvlc_playback_controller_land_tv_video_name"
+        android:layout_alignBottom="@+id/plvlc_playback_controller_land_tv_video_name"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/plvlc_playback_controller_land_tv_video_name"
+        android:gravity="center_vertical"
+        tools:text="2.3w次播放"
+        android:textColor="#D0D0D0"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <ImageView
         android:id="@+id/plvlc_playback_controller_land_iv_back"
         android:layout_width="40dp"

@@ -307,6 +307,13 @@ public class PLVECChatFragment extends PLVBaseFragment {
                 }
             });
         }
+
+        @Override
+        public void onCheckMessageMaxLength(int maxLength) {
+            if (chatMessageAdapter != null) {
+                chatMessageAdapter.removeDataChanged(maxLength);
+            }
+        }
     };
     // </editor-fold>
 }

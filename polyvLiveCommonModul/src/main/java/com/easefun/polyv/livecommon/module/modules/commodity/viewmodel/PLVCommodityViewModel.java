@@ -14,6 +14,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.commodity.PLVProductClickTimesEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -32,6 +33,7 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
     private final PLVCommodityRepo commodityRepo;
 
     private final MutableLiveData<PLVCommodityUiState> commodityUiStateLiveData = new MutableLiveData<>();
+    private final MutableLiveData<PLVProductClickTimesEvent> productClickTimesLiveData = new MutableLiveData<>();
     private final PLVCommodityUiState commodityUiState = new PLVCommodityUiState();
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -69,7 +71,26 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                 .retry()
                 .subscribe();
 
+        final Disposable clickTimesDisposable = commodityRepo.productClickTimesObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .doOnNext(new Consumer<PLVProductClickTimesEvent>() {
+                    @Override
+                    public void accept(PLVProductClickTimesEvent plvProductClickTimesEvent) throws Exception {
+                        productClickTimesLiveData.postValue(plvProductClickTimesEvent);
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                })
+                .retry()
+                .subscribe();
+
         compositeDisposable.add(disposable);
+        compositeDisposable.add(clickTimesDisposable);
     }
 
     @WorkerThread
@@ -155,6 +176,10 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
 
     public LiveData<PLVCommodityUiState> getCommodityUiStateLiveData() {
         return commodityUiStateLiveData;
+    }
+
+    public LiveData<PLVProductClickTimesEvent> getProductClickTimesLiveData() {
+        return productClickTimesLiveData;
     }
 
 }

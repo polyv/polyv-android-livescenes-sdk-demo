@@ -57,7 +57,6 @@ import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviou
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
-import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVMyProgressManager;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -431,6 +430,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (!NetworkUtils.isConnected()) {
             tryAddOfflineDescTabForPlaybackCache();
         }
+        commodityPushLayout.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
 
@@ -478,6 +478,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     @Override
     public void addOnViewerCountListener(IPLVOnDataChangedListener<Long> listener) {
         chatroomPresenter.getData().getViewerCountData().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public void addOnViewOnlineCountData(IPLVOnDataChangedListener<Integer> listener) {
+        chatroomPresenter.getData().getOnlineCountData().observe((LifecycleOwner) getContext(), listener);
     }
 
     @Override
@@ -603,10 +608,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         qaDataBean.setUserId(liveRoomDataManager.getConfig().getUser().getViewerId());
         qaDataBean.setUserPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
         qaDataBean.setUserNick(liveRoomDataManager.getConfig().getUser().getViewerName());
-        qaDataBean.setTheme(PLVLiveClassDetailVO.DataBean.QADataBean.THEME_BLACK);
-        qaDataBean.setLocal(PLVLanguageUtil.isENLanguage() ? PLVLiveClassDetailVO.DataBean.QADataBean.LOCALE_EN : PLVLiveClassDetailVO.DataBean.QADataBean.LOCALE_ZH);
         qaDataBean.setSocketMsg();
-        questionsAndAnswersFragment.init(qaDataBean.getSocketMsg());
+        questionsAndAnswersFragment.init(qaDataBean.getSocketMsg(), liveRoomDataManager);
         pageMenuTabFragmentList.add(questionsAndAnswersFragment);
     }
 
