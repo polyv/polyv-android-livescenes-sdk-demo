@@ -141,6 +141,10 @@ import io.socket.client.Ack;
 public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPresenter {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVChatroomPresenter";
+    //聊天消息最大数量
+    public static final int CHAT_MESSAGE_MAX_LENGTH = 500;
+    //定时检查聊天消息最大数量间隔
+    public static final int CHECK_CHAT_MESSAGE_MAX_LENGTH_TIMESPAN = 30;
     //默认获取的历史记录条数
     public static final int GET_CHAT_HISTORY_COUNT = 10;
     //聊天信息处理间隔
@@ -204,6 +208,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable kickUsersDisposable;
     //定时获取观看热度的disposable
     private Disposable getPageViewDisposable;
+    //定时检查聊天消息最大数量disposable
+    private Disposable observeChatMessageListMaxLengthDisposable;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -233,6 +239,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         subscribeChatroomMessage();
         requestPageViewTimer();
         observeLiveRoomData();
+        observeChatMessageListMaxLength();
     }
     // </editor-fold>
 
@@ -792,6 +799,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         if (kickUsersDisposable != null) {
             kickUsersDisposable.dispose();
+        }
+        if (observeChatMessageListMaxLengthDisposable != null) {
+            observeChatMessageListMaxLengthDisposable.dispose();
         }
         liveRoomDataManager.getFunctionSwitchVO().removeObserver(functionSwitchObserver);
         liveRoomDataManager.getClassDetailVO().removeObserver(classDetailVOObserver);
@@ -1629,6 +1639,33 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="检查聊天消息最大数量">
+    private void observeChatMessageListMaxLength() {
+        if (observeChatMessageListMaxLengthDisposable != null) {
+            observeChatMessageListMaxLengthDisposable.dispose();
+        }
+        observeChatMessageListMaxLengthDisposable = Observable.interval(CHECK_CHAT_MESSAGE_MAX_LENGTH_TIMESPAN, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        callbackToView(new ViewRunnable() {
+
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onCheckMessageMaxLength(CHAT_MESSAGE_MAX_LENGTH);
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view回调">
     private void callbackToView(ViewRunnable runnable) {

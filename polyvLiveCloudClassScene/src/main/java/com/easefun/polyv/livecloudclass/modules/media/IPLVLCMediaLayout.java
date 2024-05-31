@@ -224,6 +224,12 @@ public interface IPLVLCMediaLayout {
     void updateViewerCount(long viewerCount);
 
     /**
+     * 更新在线观看人数
+     * @param onlineCount 在线人数
+     */
+    void updateViewOnlineCount(int onlineCount);
+
+    /**
      * 更新ppt状态数据变更
      */
     void updatePPTStatusChange(PLVPPTStatus plvpptStatus);

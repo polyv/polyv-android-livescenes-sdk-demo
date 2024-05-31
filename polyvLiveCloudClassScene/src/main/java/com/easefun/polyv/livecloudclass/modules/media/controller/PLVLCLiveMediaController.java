@@ -564,6 +564,18 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void updateViewerOnlineCount(int onlineCount) {
+        videoViewerCountPortTv.setVisibility(View.VISIBLE);
+        videoViewerCountLandTv.setVisibility(View.VISIBLE);
+
+        String viewerCountText = StringUtils.toWString(onlineCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
+
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
+    }
+
+    @Override
     public void updateWhenJoinRtc(boolean isHideRefreshButton) {
         isRtcChannelWatch = true;
         hideRefreshButtonInRtcChannel = isHideRefreshButton;

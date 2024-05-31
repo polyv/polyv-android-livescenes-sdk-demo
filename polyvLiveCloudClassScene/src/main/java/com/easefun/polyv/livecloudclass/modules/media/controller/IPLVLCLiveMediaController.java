@@ -87,6 +87,12 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateViewerCount(long viewerCount);
 
     /**
+     * 更新在线观看人数
+     * @param onlineCount 观看人数
+     */
+    void updateViewerOnlineCount(int onlineCount);
+
+    /**
      * 当子播放器点击唤起控制栏时，更新布局
      */
     void updateWhenSubVideoViewClick(boolean mainVideoViewPlaying);
