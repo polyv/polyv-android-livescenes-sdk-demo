@@ -609,6 +609,13 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                         .show();
             }
         }
+
+        @Override
+        public void onCheckMessageMaxLength(int maxLength) {
+            if (chatMessageAdapter != null) {
+                chatMessageAdapter.removeDataChanged(maxLength);
+            }
+        }
     };
     // </editor-fold>
 

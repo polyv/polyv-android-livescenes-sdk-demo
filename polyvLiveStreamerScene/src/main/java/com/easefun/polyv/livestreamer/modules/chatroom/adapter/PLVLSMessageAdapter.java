@@ -234,6 +234,27 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         return false;
     }
 
+    public boolean removeDataChanged(int maxLength) {
+        int oldSize = dataList.size();
+        if (fullDataList.size() > maxLength) {
+//            fullDataList.removeAll(fullDataList.subList(0, fullDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(fullDataList.subList(fullDataList.size() - maxLength, fullDataList.size()));
+            fullDataList.clear();
+            fullDataList.addAll(retainList);
+        }
+        if (specialDataList.size() > maxLength) {
+//            specialDataList.removeAll(specialDataList.subList(0, specialDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(specialDataList.subList(specialDataList.size() - maxLength, specialDataList.size()));
+            specialDataList.clear();
+            specialDataList.addAll(retainList);
+        }
+        if (dataList.size() != oldSize) {
+            notifyDataSetChanged();
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeAllDataChanged() {
         int oldSize = dataList.size();
         fullDataList.clear();

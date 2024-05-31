@@ -448,6 +448,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
 
+        commodityPushLayout.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }
@@ -496,6 +497,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void updateOnClickCloseFloatingView() {
         mediaController.show();
         mediaController.updateOnClickCloseFloatingView();
+    }
+
+    @Override
+    public void updateViewerCount(long viewerCount) {
+        mediaController.updateViewerCount(viewerCount);
     }
 
     @Override
@@ -628,7 +634,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void updateViewerCount(long viewerCount) {
+    public void updateViewOnlineCount(int onlineCount) {
 
     }
 

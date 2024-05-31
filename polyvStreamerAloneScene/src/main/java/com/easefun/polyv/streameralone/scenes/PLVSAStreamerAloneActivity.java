@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHe
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -47,6 +48,7 @@ import com.easefun.polyv.streameralone.modules.beauty.PLVSABeautyLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.IPLVSASettingLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSACleanUpLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMoreLayout;
 import com.easefun.polyv.streameralone.modules.streamer.IPLVSAStreamerLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFullscreenLayout;
@@ -121,6 +123,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private PLVSAEmptyFragment emptyFragment;
 
     private Group maskGroup;
+
+    // 互动布局
+    private IPLVStreamerInteractLayout interactLayout;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -249,6 +254,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         if (liveRoomDataManager != null) {
             liveRoomDataManager.destroy();
         }
+        if (interactLayout != null) {
+            interactLayout.destroy();
+        }
     }
 
     @Override
@@ -264,6 +272,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     @Override
     public void onBackPressed() {
+        if (interactLayout != null && interactLayout.onBackPress()) {
+            return;
+        }
         if (settingLayout != null && settingLayout.onBackPressed()) {
             return;
         } else if (settingLayout != null && settingLayout.isShown()) {
@@ -363,6 +374,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
         fullscreenLayout = findViewById(R.id.plvsa_fullscreen_view);
         maskGroup = findViewById(R.id.plvsa_mask_group);
+        interactLayout = findViewById(R.id.plvsa_interact_layout);
+        interactLayout.init(liveRoomDataManager);
 
         //初始化推流和连麦布局
         streamerLayout.init(liveRoomDataManager);
@@ -396,6 +409,20 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         maskGroup.setVisibility(isBeautyLayoutShowing ? View.GONE : View.VISIBLE);
                     }
                 });
+    }
+
+    private void observeMoreLayout() {
+        PLVSAMoreLayout moreLayout = homeFragment.getMoreLayout();
+        if (moreLayout != null) {
+            moreLayout.setOnViewActionListener(new PLVSAMoreLayout.OnViewActionListener() {
+                @Override
+                public void onShowSignInAction() {
+                    if (interactLayout != null) {
+                        interactLayout.showSignIn();
+                    }
+                }
+            });
+        }
     }
     // </editor-fold>
 
@@ -607,6 +634,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         }
                     }
                 });
+                observeMoreLayout();
             }
 
             @Override

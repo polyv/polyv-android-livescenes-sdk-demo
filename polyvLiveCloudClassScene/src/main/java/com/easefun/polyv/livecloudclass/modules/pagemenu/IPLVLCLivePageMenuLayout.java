@@ -84,6 +84,12 @@ public interface IPLVLCLivePageMenuLayout {
     void addOnViewerCountListener(IPLVOnDataChangedListener<Long> listener);
 
     /**
+     * 添加在线人数监听器
+     * @param listener 在线人数
+     */
+    void addOnViewOnlineCountData(IPLVOnDataChangedListener<Integer> listener);
+
+    /**
      * 回放视频准备完成
      *
      * @param sessionId sessionId

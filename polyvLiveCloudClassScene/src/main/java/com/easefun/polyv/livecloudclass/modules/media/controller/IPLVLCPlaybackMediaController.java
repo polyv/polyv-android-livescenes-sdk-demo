@@ -134,6 +134,19 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
 
     /**
+     * 更新观看热度
+     *
+     * @param viewerCount 热度数
+     */
+    void updateViewerCount(long viewerCount);
+
+    /**
+     * 更新在线观看人数
+     * @param onlineCount 观看人数
+     */
+    void updateViewerOnlineCount(int onlineCount);
+
+    /**
      * 释放
      */
     void clean();

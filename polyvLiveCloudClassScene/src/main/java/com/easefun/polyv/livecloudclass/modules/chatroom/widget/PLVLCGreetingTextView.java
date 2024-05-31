@@ -23,9 +23,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 //need parent layout
 public class PLVLCGreetingTextView extends PLVMarqueeTextView {
+    private static final int LOGIN_EVENT_MAX_LENGTH = 100;
     private List<PLVLoginEvent> loginEventList = new ArrayList<>();
     private boolean isStart;
     private Disposable acceptLoginDisposable;
@@ -132,7 +134,7 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
                 .flatMap(new Function<Integer, ObservableSource<?>>() {
                     @Override
                     public ObservableSource<?> apply(Integer integer) throws Exception {
-                        return Observable.timer(rollDuration + getStayTime() * 1000, TimeUnit.MILLISECONDS);
+                        return Observable.timer(rollDuration + getStayTime() * 1000, TimeUnit.MILLISECONDS, Schedulers.io());
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -149,6 +151,9 @@ public class PLVLCGreetingTextView extends PLVMarqueeTextView {
     }
 
     public void acceptLoginEvent(final PLVLoginEvent loginEvent) {
+        if (loginEventList.size() >= LOGIN_EVENT_MAX_LENGTH) {
+            return;
+        }
         loginEventList.add(loginEvent);
         if (!isStart) {
             isStart = !isStart;

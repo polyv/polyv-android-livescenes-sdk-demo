@@ -68,4 +68,18 @@
         app:layout_constraintStart_toStartOf="@+id/plvls_document_ly"
         app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
 
+    <!-- 可以在全屏下根据键盘弹起的布局-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:fitsSystemWindows="true">
+
+        <com.easefun.polyv.livecommon.module.modules.interact.PLVStreamerInteractLayout
+            android:id="@+id/plvsa_interact_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

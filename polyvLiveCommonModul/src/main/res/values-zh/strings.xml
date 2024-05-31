@@ -45,6 +45,7 @@
     <string name="plv_player_advertising_count_down">广告<xliff:g> : %ss</xliff:g></string>
     <string name="plv_player_start_live_count_down">倒计时: %s</string>
     <string name="plv_player_viewer_count">%s次播放</string>
+    <string name="plv_player_viewer_online_count">%s人在线</string>
     <string name="plv_player_network_bad">您当前网络状态不稳定，建议您切换至</string>
     <string name="plv_player_translating">正在转换中，请稍等...</string>
     <string name="plv_player_latency">延迟</string>
@@ -401,6 +402,8 @@
     <string name="plv_live_state_playback">回放中</string>
     <string name="plv_live_state_playback_cached">已缓存</string>
     <string name="plv_live_more">更多</string>
+    <string name="plv_live_more_base">基础</string>
+    <string name="plv_live_more_interact">互动</string>
     <string name="plv_live_bulletin">公告</string>
     <string name="plv_live_bulletin_2">公告:<xliff:g>&#160;</xliff:g></string>
     <string name="plv_live_intro">直播介绍</string>
@@ -443,6 +446,11 @@
     <string name="plv_live_save_img_failed">保存图片失败</string>
     <string name="plv_live_save_img_failed_2">图片保存失败(%s)</string>
     <string name="plv_live_save_img_path">图片保存在: %s</string>
+    <string name="plv_live_no_save_record_permission_hint">保存签到记录所需的存储权限被拒绝，请到应用设置的权限管理中恢复</string>
+    <string name="plv_live_allow_permission_save_record_hint">请允许存储权限后再保存签到记录</string>
+    <string name="plv_live_save_sign_in_failed">签到记录保存失败</string>
+    <string name="plv_live_save_record_path">签到记录保存在: %s</string>
+    <string name="plv_live_save_record_failed_2">签到记录保存失败(%s)</string>
     <string name="plv_live_message_parse_error">消息解析错误</string>
     <string name="plv_live_loading_hint">加载中，请稍后</string>
     <string name="plv_live_go_to_setting_page_error_hint">进入设置页面失败，请手动设置</string>
@@ -450,6 +458,8 @@
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_hint">切换语言将为您重新进入直播间，请点击\"确定\"后切换</string>
+    <!--互动-->
+    <string name="plv_live_more_interact_signin">签到</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
     <!--回放-往期-->

@@ -231,6 +231,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         morePopupView.initPlaybackMoreLayout(moreIv);
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
+        commodityPushLayout2.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
 

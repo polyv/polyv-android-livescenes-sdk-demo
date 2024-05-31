@@ -80,7 +80,10 @@ import com.plv.livescenes.streamer.mix.PLVRTCMixUser;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.socket.log.PLVELogSender;
+import com.plv.socket.socketio.PLVSocketIOObservable;
+import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
@@ -658,8 +661,20 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 return;
             //已经初始化
             case STREAMER_MIC_INITIATED:
-                streamerManager.startLiveStream(isRecoverStream);
-                break;
+                // socket连接成功后，再开始推流
+                if (PLVSocketManager.getInstance().isOnlineStatus()) {
+                    streamerManager.startLiveStream(isRecoverStream);
+                } else {
+                    PLVSocketWrapper.getInstance().getSocketObserver().addOnConnectStatusListener(new PLVSocketIOObservable.OnConnectStatusListener() {
+                        @Override
+                        public void onStatus(PLVSocketStatus status) {
+                            if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS) {
+                                PLVSocketWrapper.getInstance().getSocketObserver().removeOnConnectStatusListener(this);
+                                streamerManager.startLiveStream(isRecoverStream);
+                            }
+                        }
+                    });
+                }
             default:
                 break;
         }

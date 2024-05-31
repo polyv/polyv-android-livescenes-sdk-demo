@@ -63,6 +63,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private LinearLayout moreSettingMixItemLayout;
     private LinearLayout moreSettingShareItemLayout;
     private LinearLayout morePushDowngradeItemLayout;
+    private LinearLayout moreInteractSigninLl;
     private PLVLSBitrateLayout moreSettingBitrateLayout;
     private PLVLSMixLayout moreSettingMixLayout;
     private PLVLSPushDowngradePreferenceLayout morePushDowngradePreferenceLayout;
@@ -130,6 +131,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingExitSeparator = findViewById(R.id.plvls_more_setting_exit_separator);
         moreSettingExitTv = findViewById(R.id.plvls_more_setting_exit_tv);
         moreSettingExitGroup = findViewById(R.id.plvls_more_setting_exit_group);
+        moreInteractSigninLl = findViewById(R.id.plvls_more_interact_signin_layout);
 
         moreSettingExitTv.setOnClickListener(this);
         moreSettingBeautyItemLayout.setOnClickListener(this);
@@ -137,6 +139,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingMixItemLayout.setOnClickListener(this);
         morePushDowngradeItemLayout.setOnClickListener(this);
         moreSettingShareItemLayout.setOnClickListener(this);
+        moreInteractSigninLl.setOnClickListener(this);
     }
 
     private void initBitrateLayout() {
@@ -401,6 +404,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         } else if (id == moreSettingShareItemLayout.getId()) {
             close();
             shareLayout.open();
+        }else if (id == moreInteractSigninLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowSignInAction();
+            }
         }
     }
     // </editor-fold>
@@ -421,6 +428,11 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         PLVPushDowngradePreference getCurrentDowngradePreference();
 
         void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference);
+
+        /**
+         * 显示签到
+         */
+        void onShowSignInAction();
     }
     // </editor-fold>
 }

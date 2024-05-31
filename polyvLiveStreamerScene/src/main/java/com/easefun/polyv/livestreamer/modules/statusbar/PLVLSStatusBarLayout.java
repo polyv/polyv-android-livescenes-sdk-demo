@@ -323,6 +323,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     onViewActionListener.onDowngradePreferenceChanged(preference);
                 }
             }
+
+            @Override
+            public void onShowSignInAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowSignInAction();
+                }
+            }
         });
     }
 

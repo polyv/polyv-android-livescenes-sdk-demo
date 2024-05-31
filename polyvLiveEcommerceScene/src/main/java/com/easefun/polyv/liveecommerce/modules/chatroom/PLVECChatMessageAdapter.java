@@ -17,8 +17,8 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.IPLVMessageIdEvent;
-import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.redpack.PLVRedPaperEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -232,6 +232,33 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                 removePosition = removeFocusModeDataPosition;
             }
             notifyItemRemoved(removePosition);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeDataChanged(int maxLength) {
+        int oldSize = dataList.size();
+        if (fullDataList.size() > maxLength) {
+//            fullDataList.removeAll(fullDataList.subList(0, fullDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(fullDataList.subList(fullDataList.size() - maxLength, fullDataList.size()));
+            fullDataList.clear();
+            fullDataList.addAll(retainList);
+        }
+        if (specialDataList.size() > maxLength) {
+//            specialDataList.removeAll(specialDataList.subList(0, specialDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(specialDataList.subList(specialDataList.size() - maxLength, specialDataList.size()));
+            specialDataList.clear();
+            specialDataList.addAll(retainList);
+        }
+        if (focusModeDataList.size() > maxLength) {
+//            focusModeDataList.removeAll(focusModeDataList.subList(0, focusModeDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(focusModeDataList.subList(focusModeDataList.size() - maxLength, focusModeDataList.size()));
+            focusModeDataList.clear();
+            focusModeDataList.addAll(retainList);
+        }
+        if (dataList.size() != oldSize) {
+            notifyDataSetChanged();
             return true;
         }
         return false;

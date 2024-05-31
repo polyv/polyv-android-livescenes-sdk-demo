@@ -38,6 +38,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -73,6 +74,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView lotteryEnterLandView;
     private TextView lotteryEnterCdLandTv;
     private PLVTriangleIndicateTextView lotteryEnterTipsLandView;
+    //观看热度
+    private TextView videoViewerCountLandTv;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -85,6 +88,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private ImageView ivTopGradientPort;
     private TextView tvVideoNamePort;
     private RelativeLayout rlRootPort;
+    //观看热度
+    private TextView videoViewerCountPortTv;
     /**** 更多布局 **/
     private PLVLCPlaybackMoreLayout moreLayout;
     //重新打开悬浮窗提示
@@ -161,6 +166,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         lotteryEnterLandView = findViewById(R.id.plvlc_playback_lottery_enter_land_view);
         lotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_lottery_enter_cd_land_tv);
         lotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_lottery_enter_tips_land_view);
+        videoViewerCountLandTv = findViewById(R.id.plvlc_playback_count_land_tv);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -174,6 +180,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivTopGradientPort = findViewById(R.id.plvlc_playback_controller_port_iv_top_gradient);
         tvVideoNamePort = findViewById(R.id.plvlc_playback_controller_port_tv_video_name);
         rlRootPort = findViewById(R.id.plvlc_playback_controller_port_rl_root);
+        videoViewerCountPortTv = findViewById(R.id.plvlc_playback_viewer_count_port_tv);
 
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_playback_player_controller_tv_reopen_floating_view);
 
@@ -443,6 +450,29 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             tvStartSendMessageLand.setText(text);
             tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
+    }
+
+    public void updateViewerCount(long viewerCount) {
+        videoViewerCountPortTv.setVisibility(View.VISIBLE);
+        videoViewerCountLandTv.setVisibility(View.VISIBLE);
+
+        String viewerCountText = StringUtils.toWString(viewerCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_count, viewerCountText);
+
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
+    }
+
+    @Override
+    public void updateViewerOnlineCount(int onlineCount) {
+        videoViewerCountPortTv.setVisibility(View.VISIBLE);
+        videoViewerCountLandTv.setVisibility(View.VISIBLE);
+
+        String viewerCountText = StringUtils.toWString(onlineCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
+
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
     }
 
     @Override
