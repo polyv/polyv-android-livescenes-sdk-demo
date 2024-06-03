@@ -577,7 +577,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                     }
                 } else {
                     if (!videoLayout.isSubVideoViewShow()) {
-                        if (!(linkMicLayout != null && linkMicLayout.isJoinChannel())) {
+                        if (!(linkMicLayout != null && linkMicLayout.isJoinChannel()) && !videoLayout.isPlaying()) {
                             videoResume();
                         }
                     }
@@ -587,15 +587,23 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                if (!videoLayout.isSubVideoViewShow()) {
-                    if (!(linkMicLayout != null && linkMicLayout.isJoinChannel())) {
-                        if (videoLayout.isPlaying()) {
-                            videoPause();
-                        } else {
-                            videoResume();
-                        }
+                if (videoLayout.isSubVideoViewShow()) {
+                    return true;
+                }
+                if (linkMicLayout == null || (!linkMicLayout.isJoinChannel() && !linkMicLayout.isPlayRtcAsMixStream())) {
+                    if (videoLayout.isPlaying()) {
+                        videoPause();
+                    } else {
+                        videoResume();
+                    }
+                } else {
+                    if (linkMicLayout.isPausing()) {
+                        linkMicLayout.resume();
+                    } else {
+                        linkMicLayout.pause();
                     }
                 }
+                videoLayout.updatePlayCenterView();
                 return true;
             }
 
@@ -869,6 +877,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                     PLVOrientationManager.getInstance().unlockOrientation();
                 }
             }
+
+            @Override
+            public boolean isPlayRtcAsMixStream() {
+                return linkMicLayout != null && linkMicLayout.isPlayRtcAsMixStream();
+            }
+
+            @Override
+            public boolean isRtcMixStreamPlaying() {
+                return linkMicLayout != null && linkMicLayout.isPlayRtcAsMixStream() && !linkMicLayout.isPausing();
+            }
         });
         //监听播放状态
         videoLayout.addOnPlayerStateListener(new IPLVOnDataChangedListener<PLVPlayerState>() {
@@ -961,6 +979,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         linkMicLayout.setLogoView(plvPlayerLogoView);
         //设置连麦布局监听器
         linkMicLayout.setOnPLVLinkMicLayoutListener(new IPLVECLinkMicLayout.OnPLVLinkMicLayoutListener() {
+
+            @Nullable
+            @Override
+            public ViewGroup onRequireMixStreamVideoContainer() {
+                if (videoLayout == null) {
+                    return null;
+                }
+                return videoLayout.getRtcMixStreamContainer();
+            }
+
             @Override
             public void onJoinRtcChannel() {
                 //更新播放器布局

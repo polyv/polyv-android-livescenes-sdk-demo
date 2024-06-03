@@ -964,10 +964,18 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         livePageMenuLayout.addOnViewerCountListener(new IPLVOnDataChangedListener<Long>() {
             @Override
             public void onChanged(@Nullable Long l) {
-                if (l == null) {
+                mediaLayout.updateViewerCount(l);
+            }
+        });
+
+        // 当前页面 监听 聊天室在线人数变化
+        livePageMenuLayout.addOnViewOnlineCountData(new IPLVOnDataChangedListener<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                if (integer == null) {
                     return;
                 }
-                mediaLayout.updateViewerCount(l);
+                mediaLayout.updateViewOnlineCount(integer);
             }
         });
     }
@@ -1094,8 +1102,34 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         linkMicLayout.setLogoView(plvPlayerLogoView);
         //设置连麦布局监听器
         linkMicLayout.setOnPLVLinkMicLayoutListener(new IPLVLCLinkMicLayout.OnPLVLinkMicLayoutListener() {
+
+            @Nullable
             @Override
-            public void onJoinRtcChannel() {
+            public ViewGroup onRequireMixStreamVideoContainer() {
+                if (mediaLayout == null) {
+                    return null;
+                }
+                return mediaLayout.getRtcMixStreamContainer();
+            }
+
+            @Override
+            public void onStartRtcWatch() {
+                //更新PPT的延迟时间为0
+                floatingPPTLayout.getPPTView().notifyStartRtcWatch();
+                //更新播放器布局
+                mediaLayout.updateWhenStartRtcWatch(linkMicLayout.getLandscapeWidth());
+            }
+
+            @Override
+            public void onStopRtcWatch() {
+                //重置PPT延迟时间
+                floatingPPTLayout.getPPTView().notifyStopRtcWatch();
+                //更新播放器布局
+                mediaLayout.updateWhenLeaveRtcWatch();
+            }
+
+            @Override
+            public void onStartPureRtcWatch() {
                 if (liveRoomDataManager.getConfig().isPPTChannelType()) {
                     //对于三分屏频道，如果PPT此时还在悬浮窗，则将PPT从悬浮窗切到主屏幕，将播放器从主屏幕切到悬浮窗
                     if (floatingPPTLayout.isPPTInFloatingLayout()) {
@@ -1105,20 +1139,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 }
                 //隐藏悬浮窗
                 floatingPPTLayout.hide();
-                //更新PPT的延迟时间为0
-                floatingPPTLayout.getPPTView().notifyJoinRtcChannel();
-                //更新播放器布局
-                mediaLayout.updateWhenJoinRTC(linkMicLayout.getLandscapeWidth());
             }
 
             @Override
-            public void onLeaveRtcChannel() {
+            public void onStopPureRtcWatch() {
                 //显示悬浮窗
                 floatingPPTLayout.show();
-                //重置PPT延迟时间
-                floatingPPTLayout.getPPTView().notifyLeaveRtcChannel();
-                //更新播放器布局
-                mediaLayout.updateWhenLeaveRTC();
             }
 
             @Override

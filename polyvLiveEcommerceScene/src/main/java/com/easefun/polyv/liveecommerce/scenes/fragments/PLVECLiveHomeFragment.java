@@ -329,6 +329,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         commodityPushLayout = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout.setAnchor(commodityIv);
+        commodityPushLayout.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, true, liveRoomDataManager);
 
@@ -421,6 +422,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     @Override
     protected void updateWatchCount(long watchCount) {
+//        watchInfoLy.updateWatchCount(watchCount);
+    }
+
+    @Override
+    protected void updateWatchInfo(long watchCount) {
         watchInfoLy.updateWatchCount(watchCount);
     }
 

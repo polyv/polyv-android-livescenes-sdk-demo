@@ -54,6 +54,13 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void setServerEnablePPT(boolean enable);
 
     /**
+     * 设置服务端的PPT翻页开关
+     *
+     * @param enable true表示打开PPT翻页，false表示关闭PPT翻页
+     */
+    void setServerEnablePptTurnPage(boolean enable);
+
+    /**
      * 设置翻页控件状态
      *
      * @param isShow true表示打开翻页控件，false表示关闭翻页控件
@@ -80,6 +87,12 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * @param viewerCount 热度数
      */
     void updateViewerCount(long viewerCount);
+
+    /**
+     * 更新在线观看人数
+     * @param onlineCount 观看人数
+     */
+    void updateViewerOnlineCount(int onlineCount);
 
     /**
      * 当子播放器点击唤起控制栏时，更新布局

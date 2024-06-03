@@ -54,6 +54,9 @@ import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoVie
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
@@ -228,6 +231,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         morePopupView.initPlaybackMoreLayout(moreIv);
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
+        commodityPushLayout2.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
 
@@ -311,14 +315,27 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     @Override
     public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
         super.init(liveRoomDataManager);
+
         runAfterOnActivityCreated(new Runnable() {
             @Override
             public void run() {
+                updateControlVisibility();
                 commodityPopupLayout.init(liveRoomDataManager);
             }
         });
     }
 
+    private void updateControlVisibility() {
+        String channelId = liveRoomDataManager.getConfig().getChannelId();
+        boolean enableSpeedControl = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_SPEED_CONTROL_ENABLE);
+        boolean enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = PLVChannelFeatureManager.onChannel(channelId)
+                .getOrDefault(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY, PLVLivePlaybackSeekBarStrategy.ALLOW_SEEK);
+
+        playControlIv.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        morePopupView.setEnableSpeedControl(enableSpeedControl);
+        playProgressSb.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+    }
 
     // </editor-fold>
 

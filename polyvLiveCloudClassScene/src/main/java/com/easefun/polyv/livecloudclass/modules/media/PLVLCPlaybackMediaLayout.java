@@ -442,11 +442,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
+        mediaController.initData(liveRoomDataManager);
 
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
 
+        commodityPushLayout.init(liveRoomDataManager);
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }
@@ -495,6 +497,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     public void updateOnClickCloseFloatingView() {
         mediaController.show();
         mediaController.updateOnClickCloseFloatingView();
+    }
+
+    @Override
+    public void updateViewerCount(long viewerCount) {
+        mediaController.updateViewerCount(viewerCount);
     }
 
     @Override
@@ -627,7 +634,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void updateViewerCount(long viewerCount) {
+    public void updateViewOnlineCount(int onlineCount) {
 
     }
 
@@ -636,13 +643,19 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     }
 
+    @Nullable
     @Override
-    public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
+    public ViewGroup getRtcMixStreamContainer() {
+        return null;
+    }
+
+    @Override
+    public void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth) {
 
     }
 
     @Override
-    public void updateWhenLeaveRTC() {
+    public void updateWhenLeaveRtcWatch() {
 
     }
 

@@ -141,6 +141,10 @@ import io.socket.client.Ack;
 public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPresenter {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVChatroomPresenter";
+    //聊天消息最大数量
+    public static final int CHAT_MESSAGE_MAX_LENGTH = 500;
+    //定时检查聊天消息最大数量间隔
+    public static final int CHECK_CHAT_MESSAGE_MAX_LENGTH_TIMESPAN = 30;
     //默认获取的历史记录条数
     public static final int GET_CHAT_HISTORY_COUNT = 10;
     //聊天信息处理间隔
@@ -189,6 +193,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable quizHistoryDisposable;
     //历史记录是否包含打赏事件
     private boolean isHistoryContainRewardEvent;
+    // 最旧一条聊天消息的时间戳
+    private Long oldestChatHistoryTimestamp = null;
+    // 跟最旧一条聊天消息时间戳相同的消息数量（包含最旧一条）
+    private Long oldestChatHistoryTimestampCount = null;
 
     //分组Id
     private String groupId;
@@ -200,6 +208,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable kickUsersDisposable;
     //定时获取观看热度的disposable
     private Disposable getPageViewDisposable;
+    //定时检查聊天消息最大数量disposable
+    private Disposable observeChatMessageListMaxLengthDisposable;
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -229,6 +239,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         subscribeChatroomMessage();
         requestPageViewTimer();
         observeLiveRoomData();
+        observeChatMessageListMaxLength();
     }
     // </editor-fold>
 
@@ -523,9 +534,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (chatHistoryDisposable != null) {
             chatHistoryDisposable.dispose();
         }
-        int start = getChatHistoryTime * getChatHistoryCount;
-        int end = (getChatHistoryTime + 1) * getChatHistoryCount - 1;
-        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), start, end, 1, 1)
+        final String userId = liveRoomDataManager.getConfig().getUser().getViewerId();
+        final String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount)
                 .map(new Function<String, JSONArray>() {
                     @Override
                     public JSONArray apply(String responseBody) throws Exception {
@@ -789,6 +800,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (kickUsersDisposable != null) {
             kickUsersDisposable.dispose();
         }
+        if (observeChatMessageListMaxLengthDisposable != null) {
+            observeChatMessageListMaxLengthDisposable.dispose();
+        }
         liveRoomDataManager.getFunctionSwitchVO().removeObserver(functionSwitchObserver);
         liveRoomDataManager.getClassDetailVO().removeObserver(classDetailVOObserver);
         PolyvChatroomManager.getInstance().destroy();//销毁，会移除实例及所有的监听器
@@ -815,6 +829,13 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 String messageSource = jsonObject.optString("msgSource");
                 JSONObject jsonObject_user = jsonObject.optJSONObject("user");
                 JSONObject jsonObject_content = jsonObject.optJSONObject("content");
+                Long messageTimestamp = jsonObject.optLong("time");
+                if (oldestChatHistoryTimestamp == null || messageTimestamp < oldestChatHistoryTimestamp) {
+                    oldestChatHistoryTimestamp = messageTimestamp;
+                    oldestChatHistoryTimestampCount = 1L;
+                } else if (oldestChatHistoryTimestamp.equals(messageTimestamp)) {
+                    oldestChatHistoryTimestampCount++;
+                }
                 if (!TextUtils.isEmpty(messageSource)) {
                     //收/发红包/图片信息/打赏信息，这里仅取图片信息
                     if (PLVHistoryConstant.MSGSOURCE_CHATIMG.equals(messageSource)) {
@@ -1618,6 +1639,33 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="检查聊天消息最大数量">
+    private void observeChatMessageListMaxLength() {
+        if (observeChatMessageListMaxLengthDisposable != null) {
+            observeChatMessageListMaxLengthDisposable.dispose();
+        }
+        observeChatMessageListMaxLengthDisposable = Observable.interval(CHECK_CHAT_MESSAGE_MAX_LENGTH_TIMESPAN, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        callbackToView(new ViewRunnable() {
+
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onCheckMessageMaxLength(CHAT_MESSAGE_MAX_LENGTH);
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view回调">
     private void callbackToView(ViewRunnable runnable) {

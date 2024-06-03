@@ -42,6 +42,8 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
 
     private int exitFullscreenTipCount = 0;
     private int enterFullscreenTipCount = 0;
+    @Nullable
+    private ViewGroup.LayoutParams layoutParamBeforeFullScreen = null;
 
     private boolean isFullscreened = false;
 
@@ -94,6 +96,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
         changeSurfaceViewOnZMediaOverlay(switchViewAnchorLayout, true);
         fullscreenSwitcher.registerSwitchView(switchViewAnchorLayout, plvsaStreamerFullscreenView);
         fullscreenSwitcher.switchView();
+        changeContentLayoutParamAfterChangedToFullScreen(getAnchorLayout());
         setVisibility(View.VISIBLE);
         isFullscreened = true;
 
@@ -117,6 +120,7 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
             listener.onExitFullscreen(linkmicItem, fullscreenSwitcher);
         }
         if (fullscreenSwitcher.isViewSwitched()) {
+            changeContentLayoutParamBeforeExitFullScreen(getAnchorLayout());
             fullscreenSwitcher.switchView();
         }
         isFullscreened = false;
@@ -170,6 +174,46 @@ public class PLVSAStreamerFullscreenLayout extends RelativeLayout implements Vie
             }
         }
     };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="布局控制">
+
+    /**
+     * 切换视频画面至全屏
+     */
+    private void changeContentLayoutParamAfterChangedToFullScreen(PLVSwitchViewAnchorLayout targetParent) {
+        if (targetParent == null) {
+            return;
+        }
+        View target = targetParent.findViewById(R.id.plvsa_streamer_round_rect_ly);
+        if (target == null) {
+            return;
+        }
+        final ViewGroup.LayoutParams lp = target.getLayoutParams();
+        layoutParamBeforeFullScreen = new ViewGroup.LayoutParams(lp);
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        target.setLayoutParams(lp);
+    }
+
+    /**
+     * 切换视频画面回到原来列表布局的尺寸
+     */
+    private void changeContentLayoutParamBeforeExitFullScreen(PLVSwitchViewAnchorLayout targetParent) {
+        if (targetParent == null || layoutParamBeforeFullScreen == null) {
+            return;
+        }
+        View target = targetParent.findViewById(R.id.plvsa_streamer_round_rect_ly);
+        if (target == null) {
+            return;
+        }
+        final ViewGroup.LayoutParams lp = target.getLayoutParams();
+        lp.width = layoutParamBeforeFullScreen.width;
+        lp.height = layoutParamBeforeFullScreen.height;
+        target.setLayoutParams(lp);
+        layoutParamBeforeFullScreen = null;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">

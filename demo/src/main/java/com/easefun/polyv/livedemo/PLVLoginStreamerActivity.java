@@ -209,7 +209,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
             return;
         }
         updateLoginViewStatus(true);
-        final String channelId = plvlsLoginInputChannelEt.getText().toString();
+        final String channelId = plvlsLoginInputChannelEt.getText().toString().trim();
         final String nick = plvlsLoginInputNickEt.getText().toString().trim();
         final String password = plvlsLoginInputPwdEt.getText().toString();
 
@@ -236,6 +236,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                 String loginNick = TextUtils.isEmpty(nick) ? loginVO.getTeacherNickname() : nick;
 
                 PLVLiveChannelType liveChannelType = loginVO.getLiveChannelTypeNew();
+                PLVLiveChannelConfigFiller.setupAccount(loginVO.getUseId(), loginVO.getAppId(), loginVO.getAppSecret());
                 if (PLVLiveChannelType.PPT.equals(liveChannelType)) {
                     //进入手机开播三分屏场景
                     final boolean isOpenCamera = "N".equals(loginVO.getIsOnlyAudio());

@@ -193,6 +193,16 @@ public class PLVLCChatCommonMessageList {
         messageAdapter.removeDataChanged(id);
     }
 
+    public void removeChatMessage(int mexLength, boolean isLandscapeLayout) {
+        if (chatMsgRv.getParent() == null) {
+            return;
+        }
+        if (this.isLandscapeLayout != isLandscapeLayout) {
+            return;
+        }
+        messageAdapter.removeDataChanged(mexLength);
+    }
+
     public void removeAllChatMessage(boolean isLandscapeLayout) {
         if (chatMsgRv.getParent() == null) {
             return;

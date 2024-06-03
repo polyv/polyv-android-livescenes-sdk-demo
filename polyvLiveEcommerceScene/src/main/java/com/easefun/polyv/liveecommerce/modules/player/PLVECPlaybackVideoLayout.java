@@ -55,6 +55,8 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -115,6 +117,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private boolean isVideoViewPlayingInFloatWindow;
     //播放器及其布局在VideoLayout中设置的适配方式
     private int fitMode = PLVECFitMode.FIT_NONE;
+    private PLVPlayInfoVO playInfoVO;
 
     //Listener
     private ViewTreeObserver.OnGlobalLayoutListener onSubVideoViewLayoutListener;
@@ -255,6 +258,15 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void pause() {
+        boolean enablePlayButton = true;
+        if (liveRoomDataManager != null) {
+            String channelId = liveRoomDataManager.getConfig().getChannelId();
+            enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        }
+        if (!enablePlayButton) {
+            return;
+        }
+
         playbackPlayerPresenter.pause();
     }
 
@@ -387,6 +399,12 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public LiveData<com.easefun.polyv.livecommon.module.modules.player.live.presenter.data.PLVPlayInfoVO> getLivePlayInfoVO() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public ViewGroup getRtcMixStreamContainer() {
         return null;
     }
 
@@ -647,17 +665,24 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
         @Override
         public void updatePlayInfo(PLVPlayInfoVO playInfoVO) {
-            if (playInfoVO != null && isInPlaybackState()
-                    && !playInfoVO.isPlaying()) {
-                showPlayCenterView();
-            } else {
-                hidePlayCenterView();
-            }
+            PLVECPlaybackVideoLayout.this.playInfoVO = playInfoVO;
+            updatePlayCenterView();
         }
     };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 播放暂停按钮的显示、隐藏">
+
+    @Override
+    public void updatePlayCenterView() {
+        if (playInfoVO != null && isInPlaybackState()
+                && !playInfoVO.isPlaying()) {
+            showPlayCenterView();
+        } else {
+            hidePlayCenterView();
+        }
+    }
+
     private void hidePlayCenterView() {
         playCenterView.setVisibility(GONE);
     }

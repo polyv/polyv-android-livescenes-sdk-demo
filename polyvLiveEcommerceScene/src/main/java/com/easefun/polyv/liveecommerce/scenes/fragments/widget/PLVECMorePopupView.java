@@ -75,6 +75,7 @@ public class PLVECMorePopupView {
 
     //播放状态view的显示状态
     private int playStatusViewVisibility = View.GONE;
+    private boolean enableSpeedControl = true;
 
     private boolean isJoinRtcChannel = false;
     private boolean isJoinLinkMic = false;
@@ -439,6 +440,11 @@ public class PLVECMorePopupView {
         morely.setLayoutParams(morelyParams);
     }
 
+    public void setEnableSpeedControl(boolean enableSpeedControl) {
+        this.enableSpeedControl = enableSpeedControl;
+        updateSpeedControlVisibility();
+    }
+
     //暖场/无直播时隐藏切换音视频模式、切换线路相关的按钮
     public void updatePlayStateView(int visibility) {
         this.playStatusViewVisibility = visibility;
@@ -476,7 +482,6 @@ public class PLVECMorePopupView {
     public void showPlaybackMoreLayout(final View v, final float currentSpeed, final String channelId, final OnPlaybackMoreClickListener clickListener) {
         this.playbackMoreClickListener = clickListener;
         if (moreLayout != null) {
-            moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_RATE, true);
             moreLayout.setFunctionListener(new PLVECFunctionListener() {
                 @Override
                 public void onFunctionCallback(String type, String data, View iconView) {
@@ -592,11 +597,19 @@ public class PLVECMorePopupView {
     // <editor-fold defaultstate="collapsed" desc="内部处理 - UI显示">
 
     private void updateSubViewVisibility() {
+        updateSpeedControlVisibility();
         updatePlayModeVisibility();
         updateLineViewVisibility();
         updateDefinitionViewVisibility();
         updateLatencyLayoutVisibility();
         updateFloatingControlVisibility();
+    }
+
+    private void updateSpeedControlVisibility() {
+        if (moreLayout == null) {
+            return;
+        }
+        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_RATE, enableSpeedControl && playbackMorePopupWindow != null);
     }
 
     private void updatePlayModeVisibility() {

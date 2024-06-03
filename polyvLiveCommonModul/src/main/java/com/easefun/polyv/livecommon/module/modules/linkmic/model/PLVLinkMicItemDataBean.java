@@ -58,6 +58,8 @@ public class PLVLinkMicItemDataBean {
     private boolean isFirstScreen = false;
     //是否在屏幕共享
     private boolean isScreenShare = false;
+    // 屏幕共享是否在屏幕流上
+    private boolean isScreenShareInScreenStream = false;
     // 是否全屏观看
     private transient boolean isFullScreen = false;
 
@@ -68,6 +70,8 @@ public class PLVLinkMicItemDataBean {
 
     //流类型
     private int streamType = PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX;
+
+    private long linkMicStartTimestamp = System.currentTimeMillis();
 
     public MuteMedia getMuteVideoInRtcJoinList() {
         return getMuteVideoInRtcJoinList(PLVLinkMicConstant.RenderStreamType.STREAM_TYPE_MIX);
@@ -282,6 +286,15 @@ public class PLVLinkMicItemDataBean {
         isScreenShare = screenShared;
     }
 
+    public boolean isScreenShareInScreenStream() {
+        return isScreenShareInScreenStream;
+    }
+
+    public PLVLinkMicItemDataBean setScreenShareInScreenStream(boolean screenShareInScreenStream) {
+        isScreenShareInScreenStream = screenShareInScreenStream;
+        return this;
+    }
+
     public boolean isFirstScreen() {
         return isFirstScreen;
     }
@@ -298,6 +311,15 @@ public class PLVLinkMicItemDataBean {
 
     public boolean isFullScreen() {
         return isFullScreen;
+    }
+
+    public PLVLinkMicItemDataBean setLinkMicStartTimestamp(long linkMicStartTimestamp) {
+        this.linkMicStartTimestamp = linkMicStartTimestamp;
+        return this;
+    }
+
+    public long getLinkMicStartTimestamp() {
+        return linkMicStartTimestamp;
     }
 
     public static class MuteMedia {

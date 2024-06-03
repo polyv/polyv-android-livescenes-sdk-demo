@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Environment;
 import android.webkit.MimeTypeMap;
 
 import com.plv.foundationsdk.permission.PLVFastPermission;
@@ -19,6 +20,13 @@ public class PLVFileChooseUtils {
 
     public static void openDirChooseFile(Activity activity, int requestCode, String[] mimeTypes) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                intent = new Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                activity.startActivity(intent);
+                return;
+            }
+        }
         if (mimeTypes != null) {
             if (Build.VERSION.SDK_INT >= 19) {
                 intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);

@@ -1,13 +1,13 @@
 package com.easefun.polyv.livestreamer.modules.streamer.adapter;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -20,11 +20,13 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
+import com.easefun.polyv.livestreamer.modules.streamer.widget.PLVLSLinkMicDurationLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 推流和连麦列表适配器
@@ -32,6 +34,8 @@ import java.util.Locale;
 public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdapter.StreamerItemViewHolder> {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = "PLVLSStreamerAdapter";
+
+    private static final boolean SHOW_MEMBER_LINKMIC_DURATION_FOR_TEACHER = true;
 
     private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
     private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
@@ -56,7 +60,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     private String myLinkMicId;
 
     @Nullable
-    private SurfaceView localRenderView;
+    private View localRenderView;
 
     //音频开播模式，只允许音频开播与连麦
     private boolean isOnlyAudio = false;
@@ -77,17 +81,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     @Override
     public StreamerItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvls_streamer_recycler_view_item, parent, false);
-
-        SurfaceView renderView = adapterCallback.createLinkMicRenderView();
-
-        StreamerItemViewHolder viewHolder = new StreamerItemViewHolder(itemView);
-        viewHolder.renderView = renderView;
-        if (renderView != null) {
-            viewHolder.plvlsStreamerRenderViewContainer.addView(renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        } else {
-            PLVCommonLog.e(TAG, "create render view return null");
-        }
-        return viewHolder;
+        return new StreamerItemViewHolder(itemView);
     }
 
     @Override
@@ -102,16 +96,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
     @Override
     public void onBindViewHolder(@NonNull StreamerItemViewHolder holder, int position) {
-        if (holder.isViewRecycled) {
-            holder.isViewRecycled = false;
-            holder.renderView = adapterCallback.createLinkMicRenderView();
-            if (holder.renderView != null) {
-                holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                holder.isRenderViewSetup = false;
-            } else {
-                PLVCommonLog.d(TAG, String.format(Locale.US, "create render view return null at position:%d", position));
-            }
-        }
         PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
@@ -135,29 +119,10 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         }
         holder.plvlsStreamerNickTv.setText(nickString.toString());
 
-        if (!isAudioLinkMic) {
-            //如果是视频连麦，则渲染所有用户类型
-            if (holder.renderView != null && !holder.isRenderViewSetup) {
-                adapterCallback.setupRenderView(holder.renderView, linkMicId);
-                holder.isRenderViewSetup = true;
-            }
-        } else {
-            //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
-            if (isTeacher || isGuest) {
-                if (holder.renderView != null && !holder.isRenderViewSetup) {
-                    adapterCallback.setupRenderView(holder.renderView, linkMicId);
-                    holder.isRenderViewSetup = true;
-                }
-            } else {
-                holder.plvlsStreamerRenderViewContainer.setVisibility(View.GONE);
-                isMuteVideo = true;
-            }
-        }
-
         bindCoverImage(holder, isOnlyAudio, isTeacher);
 
         //是否关闭摄像头
-        bindVideoMute(holder, isMuteVideo, linkMicId);
+        bindVideoMute(holder, itemDataBean);
 
         //设置本地渲染器
         if (myLinkMicId.equals(linkMicId)) {
@@ -182,6 +147,13 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             streamerViewPositionManager.updateFirstIndexLinkMicId(linkMicId);
         }
         streamerViewPositionManager.updateStreamerView(linkMicId, holder.streamerItemSwitchAnchorLayout);
+
+        final boolean showLinkMicDuration = SHOW_MEMBER_LINKMIC_DURATION_FOR_TEACHER
+                && PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)
+                && !itemDataBean.isTeacher();
+        if (showLinkMicDuration) {
+            holder.streamerLinkmicDurationLayout.start(itemDataBean);
+        }
     }
 
     @Override
@@ -197,11 +169,6 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
-
-        //如果是音频连麦，则只渲染用户类型：讲师、嘉宾
-        if (isAudioLinkMic && !isTeacher && !isGuest) {
-            isMuteVideo = true;
-        }
 
         for (Object payload : payloads) {
             switch (payload.toString()) {
@@ -237,7 +204,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     break;
                 case PAYLOAD_UPDATE_VIDEO_MUTE:
                     //是否关闭摄像头
-                    bindVideoMute(holder, isMuteVideo, linkMicId);
+                    bindVideoMute(holder, itemDataBean);
                     break;
                 case PAYLOAD_UPDATE_GUEST_STATUS:
                     updateGuestViewStatus(holder, itemDataBean);
@@ -268,10 +235,10 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         // 2.非本地的渲染视图：如果是本地渲染器，那么也不要销毁，因为滑动列表的时候还是要保持一个本地摄像头推流的
         // 3.非已切换到主屏的渲染视图：主屏一直显示在画面上，不要销毁以保持显示
         if (holder.renderView != null && holder.renderView != localRenderView && !holder.streamerItemSwitchAnchorLayout.isViewSwitched()) {
-            holder.isViewRecycled = true;
             holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
             adapterCallback.releaseLinkMicRenderView(holder.renderView);
             holder.renderView = null;
+            holder.streamerLinkmicDurationLayout.stop();
         }
         PLVCommonLog.d(TAG, "onViewRecycled pos=" + holder.getAdapterPosition() + " holder=" + holder.toString());
     }
@@ -347,26 +314,43 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
-    private void bindVideoMute(@NonNull StreamerItemViewHolder holder, boolean isMuteVideo, String linkMicId) {
-        //是否关闭摄像头
-        if(holder.plvlsPlaceholderView != null) {
-            if (isMuteVideo) {
-                holder.plvlsPlaceholderView.setVisibility(View.VISIBLE);
-            } else {
-                holder.plvlsPlaceholderView.setVisibility(View.INVISIBLE);
+    private void bindVideoMute(@NonNull StreamerItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean) {
+        final boolean isTeacher = itemDataBean.isTeacher();
+        final boolean isGuest = itemDataBean.isGuest();
+        final boolean lastIsMute = holder.renderView == null;
+        boolean isMute = itemDataBean.isMuteVideo();
 
-                // 摄像头开启后需要重新配置，以免出现黑屏
-                if (adapterCallback != null) {
-                    if (holder.renderView != null) {
-                        adapterCallback.releaseLinkMicRenderView(holder.renderView);
-                        holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
-                    }
-                    holder.renderView = adapterCallback.createLinkMicRenderView();
-                    holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    adapterCallback.setupRenderView(holder.renderView, linkMicId);
-                }
+        // 如果是音频连麦，则只渲染用户类型：讲师、嘉宾
+        if (isAudioLinkMic) {
+            if (!isTeacher && !isGuest) {
+                isMute = true;
             }
         }
+
+        PLVCommonLog.d(TAG, format("bindVideoMute mute[{}] linkMicId[{}]", isMute, itemDataBean.getLinkMicId()));
+
+        if (holder.plvlsPlaceholderView != null) {
+            holder.plvlsPlaceholderView.setVisibility(isMute ? View.VISIBLE : View.GONE);
+        }
+
+        final boolean needBindRenderView = lastIsMute != isMute || holder.lastBindVideoLinkMicId == null || !holder.lastBindVideoLinkMicId.equals(itemDataBean.getLinkMicId());
+        if (needBindRenderView) {
+            if (isMute) {
+                if (holder.renderView != null) {
+                    holder.plvlsStreamerRenderViewContainer.removeView(holder.renderView);
+                    adapterCallback.releaseLinkMicRenderView(holder.renderView);
+                }
+                holder.renderView = null;
+            } else {
+                if (holder.renderView == null) {
+                    holder.renderView = adapterCallback.createLinkMicRenderView();
+                    holder.plvlsStreamerRenderViewContainer.addView(holder.renderView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                }
+                adapterCallback.setupRenderView(holder.renderView, itemDataBean.getLinkMicId());
+            }
+        }
+
+        holder.lastBindVideoLinkMicId = itemDataBean.getLinkMicId();
     }
 
     //更新嘉宾状态
@@ -421,18 +405,15 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private TextView plvlsStreamerNickTv;
         private ImageView plvlsStreamerCoverImage;
         @Nullable
-        private SurfaceView renderView;
+        private View renderView;
         private PLVRoundRectLayout roundRectLayout;
         private TextView plvsStreamerGuestLinkStatusTv;
         private ImageView plvlsStreamerSpeakerPermissionStatusIv;
         private View plvlsPlaceholderView;
+        private PLVLSLinkMicDurationLayout streamerLinkmicDurationLayout;
 
         private PLVLinkMicItemDataBean linkMicItemDataBean;
-
-        //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
-        private boolean isViewRecycled = false;
-
-        private boolean isRenderViewSetup = false;
+        private String lastBindVideoLinkMicId = null;
 
         public StreamerItemViewHolder(View itemView) {
             super(itemView);
@@ -445,6 +426,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
             plvlsPlaceholderView = itemView.findViewById(R.id.plvsa_no_streamer_placeholder);
             plvlsStreamerSpeakerPermissionStatusIv = itemView.findViewById(R.id.plvls_streamer_speaker_permission_status_iv);
+            streamerLinkmicDurationLayout = itemView.findViewById(R.id.plvls_streamer_linkmic_duration_layout);
 
             observeSwitchPositionToUpdateViewSize();
         }
@@ -480,7 +462,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                 }
 
                 private void rebindItemIfRecycled() {
-                    if (isViewRecycled && linkMicItemDataBean != null && dataList.contains(linkMicItemDataBean)) {
+                    if (renderView == null && linkMicItemDataBean != null && dataList.contains(linkMicItemDataBean)) {
                         onBindViewHolder(StreamerItemViewHolder.this, dataList.indexOf(linkMicItemDataBean));
                     }
                 }
@@ -497,23 +479,23 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
          *
          * @return 渲染器
          */
-        SurfaceView createLinkMicRenderView();
+        View createLinkMicRenderView();
 
         /**
          * 释放渲染器
          *
          * @param renderView 渲染器
          */
-        void releaseLinkMicRenderView(SurfaceView renderView);
+        void releaseLinkMicRenderView(View renderView);
 
         /**
          * 安装SurfaceView。
          * 将创建好的SurfaceView与连麦ID关联，并设置到SDK
          *
-         * @param surfaceView 渲染器
+         * @param renderView 渲染器
          * @param linkMicId   连麦ID
          */
-        void setupRenderView(SurfaceView surfaceView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
     }
     // </editor-fold>
 }

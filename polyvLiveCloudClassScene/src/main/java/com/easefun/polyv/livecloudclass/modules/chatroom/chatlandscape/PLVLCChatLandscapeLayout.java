@@ -424,6 +424,16 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
             dataList.add(new PLVBaseViewData(emotionEvent, PLVChatMessageItemType.ITEMTYPE_EMOTION, emotionEvent.isSpecialTypeOrMe() ? new PLVSpecialTypeTag(emotionEvent.getUserId()) : null));
             addChatMessageToList(dataList, emotionEvent.isLocal());
         }
+
+        @Override
+        public void onCheckMessageMaxLength(int maxLength) {
+            if (isChatPlaybackLayout || !isLiveType) {
+                return;
+            }
+            if (chatCommonMessageList != null) {
+                chatCommonMessageList.removeChatMessage(maxLength, true);
+            }
+        }
     };
 
     public IPLVChatroomContract.IChatroomView getChatroomView() {

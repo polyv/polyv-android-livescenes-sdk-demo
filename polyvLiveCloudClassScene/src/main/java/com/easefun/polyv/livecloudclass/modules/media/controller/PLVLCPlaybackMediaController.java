@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackMoreLayout;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
@@ -33,7 +34,11 @@ import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -69,6 +74,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView lotteryEnterLandView;
     private TextView lotteryEnterCdLandTv;
     private PLVTriangleIndicateTextView lotteryEnterTipsLandView;
+    //观看热度
+    private TextView videoViewerCountLandTv;
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
@@ -81,6 +88,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private ImageView ivTopGradientPort;
     private TextView tvVideoNamePort;
     private RelativeLayout rlRootPort;
+    //观看热度
+    private TextView videoViewerCountPortTv;
     /**** 更多布局 **/
     private PLVLCPlaybackMoreLayout moreLayout;
     //重新打开悬浮窗提示
@@ -100,6 +109,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     //player presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter;
+
+    private IPLVLiveRoomDataManager liveRoomDataManager;
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
@@ -155,6 +166,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         lotteryEnterLandView = findViewById(R.id.plvlc_playback_lottery_enter_land_view);
         lotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_lottery_enter_cd_land_tv);
         lotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_lottery_enter_tips_land_view);
+        videoViewerCountLandTv = findViewById(R.id.plvlc_playback_count_land_tv);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -168,6 +180,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivTopGradientPort = findViewById(R.id.plvlc_playback_controller_port_iv_top_gradient);
         tvVideoNamePort = findViewById(R.id.plvlc_playback_controller_port_tv_video_name);
         rlRootPort = findViewById(R.id.plvlc_playback_controller_port_rl_root);
+        videoViewerCountPortTv = findViewById(R.id.plvlc_playback_viewer_count_port_tv);
 
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_playback_player_controller_tv_reopen_floating_view);
 
@@ -290,6 +303,22 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public void initData(IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.liveRoomDataManager = liveRoomDataManager;
+        String channelId = liveRoomDataManager.getConfig().getChannelId();
+        boolean enableSpeedControl = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_SPEED_CONTROL_ENABLE);
+        boolean enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        PLVLivePlaybackSeekBarStrategy seekBarStrategy = PLVChannelFeatureManager.onChannel(channelId)
+                .getOrDefault(PLVChannelFeature.LIVE_PLAYBACK_SEEK_BAR_STRATEGY, PLVLivePlaybackSeekBarStrategy.ALLOW_SEEK);
+
+        ivPlayPausePort.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        ivPlayPauseLand.setVisibility(enablePlayButton ? View.VISIBLE : View.GONE);
+        moreLayout.setEnableSpeedControl(enableSpeedControl);
+        sbPlayProgressPort.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+        sbPlayProgressLand.setVisibility(seekBarStrategy != PLVLivePlaybackSeekBarStrategy.INVISIBLE ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
     public View getLandscapeDanmuSwitchView() {
         return ivDanmuSwitchLand;
     }
@@ -344,6 +373,15 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     @Override
     public void playOrPause() {
+        boolean enablePlayButton = true;
+        if (liveRoomDataManager != null) {
+            String channelId = liveRoomDataManager.getConfig().getChannelId();
+            enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
+        }
+        if (!enablePlayButton) {
+            return;
+        }
+
         if (playerPresenter.isPlaying()) {
             playerPresenter.pause();
             ivPlayPausePort.setSelected(false);
@@ -412,6 +450,29 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             tvStartSendMessageLand.setText(text);
             tvStartSendMessageLand.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
+    }
+
+    public void updateViewerCount(long viewerCount) {
+        videoViewerCountPortTv.setVisibility(View.VISIBLE);
+        videoViewerCountLandTv.setVisibility(View.VISIBLE);
+
+        String viewerCountText = StringUtils.toWString(viewerCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_count, viewerCountText);
+
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
+    }
+
+    @Override
+    public void updateViewerOnlineCount(int onlineCount) {
+        videoViewerCountPortTv.setVisibility(View.VISIBLE);
+        videoViewerCountLandTv.setVisibility(View.VISIBLE);
+
+        String viewerCountText = StringUtils.toWString(onlineCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
+
+        videoViewerCountPortTv.setText(text);
+        videoViewerCountLandTv.setText(text);
     }
 
     @Override

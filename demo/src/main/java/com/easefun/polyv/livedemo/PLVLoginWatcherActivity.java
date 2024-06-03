@@ -369,10 +369,10 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     private void loginLive() {
         PLVFloatingPlayerManager.getInstance().clear();
 
-        final String appId = etLiveAppId.getText().toString();
-        final String appSecret = etLiveAppSecert.getText().toString();
-        final String userId = etLiveUserId.getText().toString();
-        final String channelId = etLiveChannelId.getText().toString();
+        final String appId = etLiveAppId.getText().toString().trim();
+        final String appSecret = etLiveAppSecert.getText().toString().trim();
+        final String userId = etLiveUserId.getText().toString().trim();
+        final String channelId = etLiveChannelId.getText().toString().trim();
         loginManager.loginLiveNew(appId, appSecret, userId, channelId, new IPLVSceneLoginManager.OnLoginListener<PLVLiveLoginResult>() {
             @Override
             public void onLoginSuccess(PLVLiveLoginResult plvLiveLoginResult) {
@@ -420,11 +420,11 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录回放">
     private void loginPlayback() {
-        final String appId = etPlaybackAppId.getText().toString();
-        final String appSecret = etPlaybackAppSecret.getText().toString();
-        final String userId = etPlaybackUserId.getText().toString();
-        final String channelId = etPlaybackChannelId.getText().toString();
-        final String vid = etPlaybackVideoId.getText().toString();
+        final String appId = etPlaybackAppId.getText().toString().trim();
+        final String appSecret = etPlaybackAppSecret.getText().toString().trim();
+        final String userId = etPlaybackUserId.getText().toString().trim();
+        final String channelId = etPlaybackChannelId.getText().toString().trim();
+        final String vid = etPlaybackVideoId.getText().toString().trim();
 
         loginManager.loginPlaybackNew(appId, appSecret, userId, channelId, vid, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
             @Override
@@ -493,9 +493,9 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     }
 
     private void loginPlaybackOffline(final String channelId, final String vid, final PLVLiveChannelType channelType, final String tempStoreFileId) {
-        final String appId = etPlaybackAppId.getText().toString();
-        final String appSecret = etPlaybackAppSecret.getText().toString();
-        final String userId = etPlaybackUserId.getText().toString();
+        final String appId = etPlaybackAppId.getText().toString().trim();
+        final String appSecret = etPlaybackAppSecret.getText().toString().trim();
+        final String userId = etPlaybackUserId.getText().toString().trim();
 
         loginManager.loginPlaybackOffline(appId, appSecret, userId, channelId, vid, channelType, new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
             @Override

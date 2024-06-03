@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
@@ -94,6 +95,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private IPLVLSBeautyLayout beautyLayout;
     // 推流降级提示布局
     private PLVLSPushDowngradeAlertToastLayout pushDowngradeAlertToastLy;
+    // 互动布局
+    private IPLVStreamerInteractLayout interactLayout;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -310,6 +313,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsStreamerLy = findViewById(R.id.plvls_streamer_ly);
         plvlsChatroomLy = findViewById(R.id.plvls_chatroom_ly);
         pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
+        interactLayout = findViewById(R.id.plvsa_interact_layout);
+        interactLayout.init(liveRoomDataManager);
 
         // 初始化推流和连麦布局
         plvlsStreamerLy.init(liveRoomDataManager);
@@ -330,7 +335,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsStatusBarLy.init(liveRoomDataManager);
 
         // 注册成员列表中的streamerView，并请求成员列表接口
-        plvlsStreamerLy.getStreamerPresenter().registerView(plvlsStatusBarLy.getMemberLayoutStreamerView());
+        plvlsStreamerLy.getStreamerPresenter().registerView(plvlsStatusBarLy.getStreamerView());
         plvlsStreamerLy.getStreamerPresenter().requestMemberList();
 
         // 初始化聊天室布局
@@ -391,6 +396,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference) {
                 plvlsStreamerLy.setPushDowngradePreference(preference);
+            }
+
+            @Override
+            public void onShowSignInAction() {
+                interactLayout.showSignIn();
             }
 
             @Override

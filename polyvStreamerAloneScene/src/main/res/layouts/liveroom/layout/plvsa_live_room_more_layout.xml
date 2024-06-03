@@ -31,393 +31,546 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/plvsa_more_text_tv">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <GridLayout
-                android:id="@+id/plvsa_more_settings_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
-                android:clipChildren="false"
-                android:columnCount="5"
-                android:paddingBottom="24dp">
+            <TextView
+                android:id="@+id/plvsa_more_settings_base_tv"
+                android:text="@string/plv_live_more_base"
+                android:textSize="14sp"
+                android:textColor="#FFF0F1F5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+
+                <GridLayout
+                    android:id="@+id/plvsa_more_settings_layout"
+                    app:layout_constraintTop_toBottomOf="@+id/plvsa_more_settings_base_tv"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_camera_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_camera_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_camera_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_linkmic_camera"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_mic_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_mic_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_mic_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_linkmic_microphone"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_camera_switch_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_camera_switch_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_camera_switch_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_streamer_camera_orient"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_mirror_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_mirror_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_mirror_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_streamer_mirror"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/plvsa_more_beauty_ll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_beauty_icon" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_beauty_selector_beauty_title"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/plvsa_more_share_screen_ll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_share_screen_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="10dp"
-                        android:src="@drawable/plvsa_streamer_share_screen_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_share_screen_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plvsa_streamer_sharescreen_start"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_bitrate_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_bitrate_icon_hd" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_bitrate_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_streamer_bitrate_high"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_flashlight_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_flashlight_selector" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_flashlight_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_streamer_flashlight"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/plvsa_more_close_room_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
+                    android:layout_marginBottom="14dp"
                     android:clipChildren="false"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
+                    android:columnCount="5"
+                    android:paddingBottom="24dp">
 
-                    <ImageView
-                        android:id="@+id/plvsa_more_close_room_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_close_room_selector" />
-
-                    <FrameLayout
-                        android:layout_width="52dp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:clipChildren="false">
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_camera_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_camera_selector" />
 
                         <TextView
-                            android:id="@+id/plvsa_more_close_room_tv"
-                            android:layout_width="80dp"
+                            android:id="@+id/plvsa_more_camera_tv"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
-                            android:letterSpacing="-0.12"
-                            android:text="@string/plv_chat_confirm_close_room"
+                            android:text="@string/plv_linkmic_camera"
                             android:textColor="#99F0F1F5"
-                            android:textSize="12sp"
-                            android:translationX="-12dp" />
-                    </FrameLayout>
+                            android:textSize="12sp" />
 
-                </LinearLayout>
+                    </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/plvsa_more_share_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_share_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_share" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_share_tv"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
                         android:gravity="center|top"
-                        android:text="@string/plv_live_share"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
+                        android:orientation="vertical">
 
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/plvsa_more_mic_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_mic_selector" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_mic_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_linkmic_microphone"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_camera_switch_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_camera_switch_selector" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_camera_switch_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_camera_orient"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_mirror_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_mirror_selector" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_mirror_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_mirror"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_beauty_ll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_beauty_icon" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_beauty_selector_beauty_title"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_share_screen_ll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_share_screen_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="10dp"
+                            android:src="@drawable/plvsa_streamer_share_screen_selector" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_share_screen_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plvsa_streamer_sharescreen_start"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_bitrate_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_bitrate_icon_hd" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_bitrate_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_bitrate_high"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_flashlight_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_flashlight_selector" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_flashlight_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_flashlight"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_close_room_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:clipChildren="false"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_close_room_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_close_room_selector" />
+
+                        <FrameLayout
+                            android:layout_width="52dp"
+                            android:layout_height="wrap_content"
+                            android:clipChildren="false">
+
+                            <TextView
+                                android:id="@+id/plvsa_more_close_room_tv"
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:gravity="center|top"
+                                android:letterSpacing="-0.12"
+                                android:text="@string/plv_chat_confirm_close_room"
+                                android:textColor="#99F0F1F5"
+                                android:textSize="12sp"
+                                android:translationX="-12dp" />
+                        </FrameLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_share_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_share_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_share" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_share_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_live_share"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_push_downgrade_preference_ll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_live_room_push_downgrade_preference_icon" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_push_downgrade_preference_title"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_allow_viewer_linkmic_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_allow_viewer_linkmic_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_allow_viewer_linkmic_icon" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_allow_viewer_linkmic_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plvsa_streamer_allow_viewer_linkmic"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_hang_up_viewer_linkmic_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_hang_up_viewer_linkmic_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_hang_up_viewer_linkmic_icon" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_hang_up_viewer_linkmic_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_linkmic_hang_all_off"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_linkmic_setting_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_linkmic_setting_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_linkmic_setting_icon" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_linkmic_setting_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_linkmic_setting"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_mix_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvsa_more_mix_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_more_mix_layout_icon" />
+
+                        <TextView
+                            android:id="@+id/plvsa_more_mix_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_mix_layout"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                </GridLayout>
+            <TextView
+                android:id="@+id/plvsa_more_settings_interact_tv"
+                android:text="@string/plv_live_more_interact"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_more_settings_layout"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:textSize="14sp"
+                android:textColor="#FFF0F1F5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <GridLayout
+                android:id="@+id/plvsa_more_settings_interact_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:columnCount="5"
+                android:layout_marginBottom="14dp"
+                android:paddingBottom="34dp"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_more_settings_interact_tv"
+                app:layout_constraintLeft_toLeftOf="parent">
 
                 <LinearLayout
-                    android:id="@+id/plvsa_more_push_downgrade_preference_ll"
+                    android:id="@+id/plvsa_more_interact_signin_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="6dp"
                     android:layout_marginEnd="4dp"
                     android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/plvsa_more_interact_signin_iv"
                         android:layout_width="52dp"
                         android:layout_height="52dp"
                         android:padding="12dp"
-                        android:src="@drawable/plvsa_live_room_push_downgrade_preference_icon" />
+                        android:src="@drawable/plvsa_more_interact_signin" />
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/plvsa_more_interact_signin_tv"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_push_downgrade_preference_title"
+                        android:layout_gravity="center"
+                        android:text="@string/plv_live_more_interact_signin"
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/plvsa_more_mix_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_rowWeight="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="6dp"
-                    android:gravity="center|top"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/plvsa_more_mix_iv"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:padding="12dp"
-                        android:src="@drawable/plvsa_more_mix_layout_icon" />
-
-                    <TextView
-                        android:id="@+id/plvsa_more_mix_tv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
-                        android:text="@string/plv_streamer_mix_layout"
-                        android:textColor="#99F0F1F5"
-                        android:textSize="12sp" />
-
                 </LinearLayout>
             </GridLayout>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

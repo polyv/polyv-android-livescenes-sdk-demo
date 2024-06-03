@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.media;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Pair;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -223,6 +224,12 @@ public interface IPLVLCMediaLayout {
     void updateViewerCount(long viewerCount);
 
     /**
+     * 更新在线观看人数
+     * @param onlineCount 在线人数
+     */
+    void updateViewOnlineCount(int onlineCount);
+
+    /**
      * 更新ppt状态数据变更
      */
     void updatePPTStatusChange(PLVPPTStatus plvpptStatus);
@@ -238,16 +245,22 @@ public interface IPLVLCMediaLayout {
     boolean isInPaintMode();
 
     /**
+     * 获取rtc混流观看视图容器
+     */
+    @Nullable
+    ViewGroup getRtcMixStreamContainer();
+
+    /**
      * 当加入RTC时，更新布局
      *
      * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度
      */
-    void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth);
+    void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth);
 
     /**
      * 当离开RTC时，更新布局
      */
-    void updateWhenLeaveRTC();
+    void updateWhenLeaveRtcWatch();
 
     void updateWhenLinkMicOpenStatusChanged(boolean isOpen);
 

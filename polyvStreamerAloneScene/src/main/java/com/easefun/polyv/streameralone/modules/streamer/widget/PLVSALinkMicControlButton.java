@@ -68,6 +68,26 @@ public class PLVSALinkMicControlButton extends SVGAImageView {
         return this;
     }
 
+    public void performAutoOpenLinkMic(boolean isOpen, boolean isVideoLinkMicType, boolean isNewLinkMicStrategy) {
+        if (PLVUserAbilityManager.myAbility().notHasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN)) {
+            return;
+        }
+        if (currentState instanceof TeacherStateLinkMicClosed && isOpen) {
+            boolean isOpenSuccess = changeLinkMicOpenState(isVideoLinkMicType, true);
+            if (isOpenSuccess) {
+                currentState = currentState.nextState(ChangeStateReason.ON_CLICK);
+                if (!isNewLinkMicStrategy) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(isVideoLinkMicType ? R.string.plv_streamer_open_video_linkmic_toast : R.string.plv_streamer_open_audio_linkmic_toast)
+                            .show();
+                }
+            }
+        } else if (currentState instanceof TeacherStateLinkMicOpened && !isOpen) {
+            changeLinkMicOpenState(isVideoLinkMicType, false);
+            currentState = currentState.nextState(ChangeStateReason.ON_CLICK);
+        }
+    }
+
     public final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
 
         @Override

@@ -45,6 +45,7 @@
     <string name="plv_player_advertising_count_down">广告<xliff:g> : %ss</xliff:g></string>
     <string name="plv_player_start_live_count_down">倒计时: %s</string>
     <string name="plv_player_viewer_count">%s次播放</string>
+    <string name="plv_player_viewer_online_count">%s人在线</string>
     <string name="plv_player_network_bad">您当前网络状态不稳定，建议您切换至</string>
     <string name="plv_player_translating">正在转换中，请稍等...</string>
     <string name="plv_player_latency">延迟</string>
@@ -211,8 +212,8 @@
     <string name="plv_linkmic_dialog_hang_off">挂断</string>
     <string name="plv_linkmic_error_tip_permission_denied">通话所需的相机权限和麦克风权限被拒绝，请到应用设置的权限管理中恢复</string>
     <string name="plv_linkmic_error_tip_permission_cancel">权限不足，申请发言失败</string>
-    <string name="plv_linkmic_dialog_hang_all_off_confirm_ask">确定全体下麦吗?</string>
-    <string name="plv_linkmic_dialog_mute_all_audio_confirm_ask">确定全体静音吗?</string>
+    <string name="plv_linkmic_dialog_hang_all_off_confirm_ask">确认下麦所有连麦观众吗？</string>
+    <string name="plv_linkmic_dialog_mute_all_audio_confirm_ask">确定全员静音吗?</string>
     <string name="plv_linkmic_dialog_reach_the_interact_num_limit">当前连麦人数已达上限</string>
     <string name="plv_linkmic_error_tip_have_not_opened">尚未开通，请联系管理员</string>
     <string name="plv_linkmic_video_type_open_success_tip">已开启视频连麦，观众可以申请连麦</string>
@@ -274,14 +275,22 @@
     <string name="plv_linkmic_audio_type">音频连麦</string>
     <string name="plv_linkmic_empty_linkmic_tips">有人正在申请连麦</string>
     <string name="plv_linkmic_control_tips">点击可管理上麦成员哦</string>
-    <string name="plv_linkmic_toast_hang_all_off">已全体下麦</string>
-    <string name="plv_linkmic_unmute_all_audio">取消全体静音</string>
-    <string name="plv_linkmic_mute_all_audio">全体静音</string>
-    <string name="plv_linkmic_toast_mute_all_audio">已全体静音</string>
+    <string name="plv_linkmic_toast_hang_all_off">已下麦观众</string>
+    <string name="plv_linkmic_unmute_all_audio">取消全员静音</string>
+    <string name="plv_linkmic_mute_all_audio">全员静音</string>
+    <string name="plv_linkmic_config">连麦管理</string>
+    <string name="plv_linkmic_setting">连麦设置</string>
+    <string name="plv_linkmic_setting_default_linkmic_type">默认连麦方式</string>
+    <string name="plv_linkmic_setting_linkmic_type_audio">语音连麦</string>
+    <string name="plv_linkmic_setting_linkmic_type_video">视频连麦</string>
+    <string name="plv_linkmic_setting_linkmic_type_unavailable_hint">(待开通)</string>
+    <string name="plv_linkmic_setting_linkmic_type_switch_hint">注：更改连麦方式时，需要确保当前无人正在连麦</string>
+    <string name="plv_linkmic_setting_linkmic_type_default_setting_hint">若需要固定该配置项，请前往云直播后台-频道设置-高级设置-观看页设置-连麦设置修改</string>
+    <string name="plv_linkmic_toast_mute_all_audio">已全员静音</string>
     <string name="plv_linkmic_cancel_apply">取消申请连麦</string>
     <string name="plv_linkmic_stop">结束连麦</string>
     <string name="plv_linkmic_hangup_user">已取消%s的连麦</string>
-    <string name="plv_linkmic_hang_all_off">全体下麦</string>
+    <string name="plv_linkmic_hang_all_off">观众下麦</string>
     <string name="plv_linkmic_receive_request_tips">收到新的连麦申请</string>
     <string name="plv_linkmic_id_empty">获取到空的linkMicId</string>
     <string name="plv_linkmic_guest_join_timeout">嘉宾上麦超时！</string>
@@ -360,6 +369,13 @@
     <string name="plv_streamer_network_disconnect">网络断开</string>
     <string name="plv_streamer_network_cannot_connect">无法连接</string>
     <string name="plv_streamer_bitrate_desc">码率：%skbps，帧率：%sfps</string>
+    <string name="plv_streamer_open_audio_linkmic_toast">已开启音频连麦</string>
+    <string name="plv_streamer_open_video_linkmic_toast">已开启视频连麦</string>
+    <string name="plv_streamer_allow_viewer_linkmic_toast">已开启观众连麦</string>
+    <string name="plv_streamer_disallow_viewer_linkmic_toast">已关闭观众连麦</string>
+    <string name="plv_streamer_switch_linkmic_type_hint_viewer_connecting_text">当前有用户在连麦，无法切换连麦方式，若要切换，需将麦上用户全部下麦，确认切换连麦方式吗？</string>
+    <string name="plv_streamer_switch_linkmic_type_confirm_text">切换并下麦所有用户</string>
+    <string name="plv_streamer_allow_viewer_linkmic_fail_toast">当前网络信号弱，开启失败，请检查网络！</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>
@@ -386,6 +402,8 @@
     <string name="plv_live_state_playback">回放中</string>
     <string name="plv_live_state_playback_cached">已缓存</string>
     <string name="plv_live_more">更多</string>
+    <string name="plv_live_more_base">基础</string>
+    <string name="plv_live_more_interact">互动</string>
     <string name="plv_live_bulletin">公告</string>
     <string name="plv_live_bulletin_2">公告:<xliff:g>&#160;</xliff:g></string>
     <string name="plv_live_intro">直播介绍</string>
@@ -428,6 +446,11 @@
     <string name="plv_live_save_img_failed">保存图片失败</string>
     <string name="plv_live_save_img_failed_2">图片保存失败(%s)</string>
     <string name="plv_live_save_img_path">图片保存在: %s</string>
+    <string name="plv_live_no_save_record_permission_hint">保存签到记录所需的存储权限被拒绝，请到应用设置的权限管理中恢复</string>
+    <string name="plv_live_allow_permission_save_record_hint">请允许存储权限后再保存签到记录</string>
+    <string name="plv_live_save_sign_in_failed">签到记录保存失败</string>
+    <string name="plv_live_save_record_path">签到记录保存在: %s</string>
+    <string name="plv_live_save_record_failed_2">签到记录保存失败(%s)</string>
     <string name="plv_live_message_parse_error">消息解析错误</string>
     <string name="plv_live_loading_hint">加载中，请稍后</string>
     <string name="plv_live_go_to_setting_page_error_hint">进入设置页面失败，请手动设置</string>
@@ -435,6 +458,8 @@
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_hint">切换语言将为您重新进入直播间，请点击\"确定\"后切换</string>
+    <!--互动-->
+    <string name="plv_live_more_interact_signin">签到</string>
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">确认退出回放</string>
     <!--回放-往期-->
