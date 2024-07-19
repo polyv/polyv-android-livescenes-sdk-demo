@@ -16,6 +16,17 @@
             android:layout_height="match_parent" />
     </com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout>
 
+    <TextView
+        android:id="@+id/plvlc_playback_player_floating_playing_placeholder_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2B3045"
+        android:gravity="center"
+        android:text="@string/plv_player_floating_playing"
+        android:textColor="#E4E4E4"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
     <!-- 回放播放器 -->
     <com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView
         android:id="@+id/plvlc_playback_video_view"

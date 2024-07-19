@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -35,6 +36,22 @@ public interface IPLVInteractLayout {
      * 设置打开链接所需的参数监听器
      */
     void setOnOpenInsideWebViewListener(PLVInteractLayout2.OnOpenInsideWebViewListener listener);
+
+    /**
+     * 设置点击商品监听回调
+     */
+    void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener);
+
+    /**
+     * 展示职业详情
+     * @param event
+     */
+    void onShowJobDetail(PLVShowJobDetailEvent event);
+
+    /**
+     * 展示跳转微信复制的页面
+     */
+    void onShowOpenLink();
 
     /**
      * 显示公告

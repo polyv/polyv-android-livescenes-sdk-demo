@@ -445,6 +445,11 @@ public class PLVECMorePopupView {
         updateSpeedControlVisibility();
     }
 
+    public void updatePlaybackPlayStateView(int visibility) {
+        this.playStatusViewVisibility = visibility;
+        updateFloatingControlVisibility();
+    }
+
     //暖场/无直播时隐藏切换音视频模式、切换线路相关的按钮
     public void updatePlayStateView(int visibility) {
         this.playStatusViewVisibility = visibility;
@@ -507,6 +512,11 @@ public class PLVECMorePopupView {
                             }
                             languageSwitchPopupWindow.show(channelId);
                             hideMoreWindow();
+                            break;
+                        case MORE_FUNCTION_TYPE_FLOATING:
+                            final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
+                            floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                            hideAll();
                             break;
                         default:
                             if (clickListener != null) {

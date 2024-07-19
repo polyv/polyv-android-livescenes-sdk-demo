@@ -39,6 +39,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuFragment;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuSettingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
@@ -52,6 +53,7 @@ import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackPlayerPresenter;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -79,6 +81,8 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.commodity.PLVProductContentBean;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -121,6 +125,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //倒计时
     private LinearLayout llAuxiliaryCountDown;
     private TextView tvCountDown;
+    private TextView playbackPlayerFloatingPlayingPlaceholderTv;
     // Logo
     private PLVPlayerLogoView logoView;
     //载入状态指示器
@@ -156,6 +161,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     //播放器presenter
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playbackPlayerPresenter;
+    private PLVLCFloatingWindow floatingWindow;
     private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
     //listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
@@ -223,6 +229,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         switchAnchorPlayer = findViewById(R.id.plvlc_playback_switch_anchor_player);
 
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
+        playbackPlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvlc_playback_player_floating_playing_placeholder_tv);
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
         llAuxiliaryCountDown.setVisibility(GONE);
         watermarkView = findViewById(R.id.polyv_watermark_view);
@@ -240,6 +247,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         initChatLandscapeLayout();
         initLayoutWH();
 
+        initFloatingPlayer();
         observePlaybackChapterSeekEvent();
     }
 
@@ -345,6 +353,13 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                     onViewActionListener.onSendLikesAction();
                 }
             }
+
+            @Override
+            public void onClickFloating() {
+                if (floatingWindow != null) {
+                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                }
+            }
         });
     }
 
@@ -416,6 +431,20 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         });
     }
 
+    private void initFloatingPlayer() {
+        floatingWindow = PLVDependManager.getInstance().get(PLVLCFloatingWindow.class);
+        floatingWindow.bindContentView(switchAnchorPlayer);
+
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean isShowingBoolean) {
+                        final boolean isShowing = isShowingBoolean != null && isShowingBoolean;
+                        playbackPlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? View.VISIBLE : View.GONE);
+                    }
+                });
+    }
+
     private void observePlaybackChapterSeekEvent() {
         playbackChapterViewModel.getSeekToChapterLiveData()
                 .observe((LifecycleOwner) getContext(), new Observer<Event<Integer>>() {
@@ -435,6 +464,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        floatingWindow.setLiveRoomData(liveRoomDataManager);
 
         observeLiveRoomData();
 
@@ -449,6 +479,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         commodityPushLayout.init(liveRoomDataManager);
+        commodityPushLayout.setCommodityPushListener(new PLVLCCommodityPushLayout.ICommodityPushListener() {
+            @Override
+            public void showJobDetail(PLVProductContentBean bean) {
+                if (onViewActionListener != null) {
+                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
+                    event.setData(bean);
+                    onViewActionListener.onShowJobDetail(event);
+                }
+            }
+        });
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
     }

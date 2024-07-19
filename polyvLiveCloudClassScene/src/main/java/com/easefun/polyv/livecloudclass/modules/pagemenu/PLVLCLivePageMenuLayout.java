@@ -38,6 +38,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescOffli
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackPreviousFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
@@ -77,6 +78,7 @@ import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
@@ -91,8 +93,10 @@ import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -431,6 +435,16 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             tryAddOfflineDescTabForPlaybackCache();
         }
         commodityPushLayout.init(liveRoomDataManager);
+        commodityPushLayout.setCommodityPushListener(new PLVLCCommodityPushLayout.ICommodityPushListener() {
+            @Override
+            public void showJobDetail(PLVProductContentBean bean) {
+                if (onViewActionListener != null) {
+                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
+                    event.setData(bean);
+                    onViewActionListener.onShowJobDetail(event);
+                }
+            }
+        });
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
 
@@ -758,6 +772,19 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             productFragment = new PLVLCProductFragment();
         }
         productFragment.init(liveRoomDataManager);
+        productFragment.setOnViewActionListener(new PLVLCProductLayout.OnViewActionListener() {
+            @Override
+            public void onShowJobDetail(PLVShowJobDetailEvent param) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowJobDetail(param);
+                }
+            }
+
+            @Override
+            public void onShowOpenLink() {
+                onViewActionListener.onShowOpenLink();
+            }
+        });
         pageMenuTabTitleList.add(menuName);
         pageMenuTabFragmentList.add(productFragment);
         return true;

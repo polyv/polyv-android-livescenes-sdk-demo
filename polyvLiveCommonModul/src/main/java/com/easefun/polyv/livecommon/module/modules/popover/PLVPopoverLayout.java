@@ -80,6 +80,12 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
         plvLayoutInteract.setOnOpenInsideWebViewListener(listener);
     }
 
+
+    @Override
+    public void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener) {
+        plvLayoutInteract.setOnClickProductListener(listener);
+    }
+
     @Override
     public IPLVInteractLayout getInteractLayout() {
         return plvLayoutInteract;

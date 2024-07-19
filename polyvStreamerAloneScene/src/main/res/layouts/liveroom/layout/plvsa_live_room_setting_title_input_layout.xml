@@ -16,7 +16,6 @@
         android:hint="@string/plv_live_input_live_title_hint"
         android:textColorHint="#99FFFFFF"
         android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
-        android:maxLength="50"
         android:background="@null"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"

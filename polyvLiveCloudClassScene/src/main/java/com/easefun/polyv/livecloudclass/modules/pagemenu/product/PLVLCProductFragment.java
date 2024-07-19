@@ -39,6 +39,8 @@ public class PLVLCProductFragment extends PLVBaseFragment {
 
     private final ProductLandscapeLayoutHelper landscapeLayoutHelper = new ProductLandscapeLayoutHelper();
 
+    private PLVLCProductLayout.OnViewActionListener listener;
+
     @Nullable
     private PLVOrientationManager.OnConfigurationChangedListener onConfigurationChangedListener;
 
@@ -103,6 +105,7 @@ public class PLVLCProductFragment extends PLVBaseFragment {
         setOnLandscapeMenuHideListener();
         observeOnOrientationChanged();
         observeShowProductViewOnLandscape();
+        addOnViewActionListener();
     }
 
     private void findView() {
@@ -151,6 +154,10 @@ public class PLVLCProductFragment extends PLVBaseFragment {
                 });
     }
 
+    private void addOnViewActionListener() {
+        pageMenuProductLayout.setOnViewShowListener(listener);
+    }
+
     private void runAfterInitView() {
         if (doAfterInitViewTasks != null) {
             for (Runnable task : doAfterInitViewTasks) {
@@ -168,6 +175,10 @@ public class PLVLCProductFragment extends PLVBaseFragment {
                 pageMenuProductLayout.init(liveRoomDataManager);
             }
         });
+    }
+
+    public void setOnViewActionListener(PLVLCProductLayout.OnViewActionListener listener) {
+        this.listener = listener;
     }
 
     private static class ProductLandscapeLayoutHelper {

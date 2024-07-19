@@ -3,13 +3,17 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -28,7 +32,9 @@ import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.modules.interact.info.PLVInteractInfo;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -41,17 +47,22 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
+import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
+import com.plv.socket.event.interact.PLVShowOpenLinkEvent;
+import com.plv.socket.event.interact.PLVOpenOtherAppEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
 import com.plv.socket.event.interact.PLVUpdateChannelSwitchEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
@@ -77,6 +88,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private PLVLiveScene liveScene;
     private OnOpenInsideWebViewListener onOpenInsideWebViewListener;
     private PLVInsideWebViewLayout insideWebViewLayout;
+    private OnClickProductListener onClickProductListener;
 
     //是否锁定到竖屏
     private boolean isLockPortrait = false;
@@ -89,7 +101,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVInteractJSBridgeEventConst.V2_SHOW_WEB_VIEW,
             PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT,
             PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT,
-            PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO
+            PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO,
+            PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON
     );
     // </editor-fold >
 
@@ -169,6 +182,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO:
                 processGetInteractInfo(param, callBackFunction);
                 break;
+            case PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON:
+                processClickProductEvent(param, callBackFunction);
+                break;
         }
     }
 
@@ -198,6 +214,52 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     @Override
     public void setOnOpenInsideWebViewListener(OnOpenInsideWebViewListener onOpenInsideWebViewListener) {
         this.onOpenInsideWebViewListener = onOpenInsideWebViewListener;
+    }
+
+    @Override
+    public void setOnClickProductListener(OnClickProductListener listener) {
+        this.onClickProductListener = listener;
+    }
+
+    @Override
+    public void onShowJobDetail(PLVShowJobDetailEvent event) {
+        String data = PLVGsonUtil.toJsonSimple(event);
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String data) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + data);
+            }
+        });
+    }
+
+    @Override
+    public void onShowOpenLink() {
+        if (liveRoomDataManager != null && liveRoomDataManager.getClassDetailVO().getValue().getData() != null) {
+            PLVLiveClassDetailVO.DataBean classDetail = liveRoomDataManager.getClassDetailVO().getValue().getData().getData();
+            String link = classDetail.getWatchUrl();
+
+            boolean isOpenPay = classDetail.isProductPayOrderEnabled();
+            if (!isOpenPay) {
+                ToastUtils.showLong(getResources().getString(R.string.plv_interact_no_support_buy));
+                return;
+            }
+
+            PLVShowOpenLinkEvent linkEvent = new PLVShowOpenLinkEvent();
+            PLVShowOpenLinkEvent.ShowOpenLinkTypeBean bean = new PLVShowOpenLinkEvent.ShowOpenLinkTypeBean();
+            bean.setUrl(link);
+            bean.setTitle(getResources().getString(R.string.plv_interact_open_weixin_buy));
+            // 目前只支持copyToWeixin 跳转到微信
+            bean.setBtnType("copyToWeixin");
+            linkEvent.setData(bean);
+            String data = PLVGsonUtil.toJsonSimple(linkEvent);
+            // SDK不处理，由集成用户自己处理
+//            plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+//                @Override
+//                public void onCallBack(String data) {
+//                    PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + data);
+//                }
+//            });
+        }
     }
 
     @Override
@@ -399,6 +461,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVChangeRedpackStatusEvent.EVENT:
                 processChangeRedpackStatusEvent(param);
                 return;
+            case PLVOpenOtherAppEvent.WEIXIN_EVENT:
+                processOpenOtherAppEvent(param);
+                return;
             default:
         }
         if (callAppEvent.isOpenLinkEvent()) {
@@ -452,6 +517,33 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         }
     }
 
+    private void processClickProductEvent(String param, final CallBackFunction callBackFunction) {
+        if (onClickProductListener != null) {
+            if (!PLVDebounceClicker.tryClick(this.getClass().getName(), seconds(1).toMillis())) {
+                return;
+            }
+            final PLVInteractProductOnClickDataVO onClickDataVO = PLVGsonUtil.fromJson(PLVInteractProductOnClickDataVO.class, param);
+            if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
+                return;
+            }
+
+            if (onClickDataVO.getData().isInnerBuy()) {
+                onShowOpenLink();
+                return;
+            }
+
+            final String productLink = onClickDataVO.getData().getLinkByType();
+            if (TextUtils.isEmpty(productLink)) {
+                PLVToast.Builder.context(getContext())
+                        .setText(R.string.plv_commodity_toast_empty_link)
+                        .show();
+                return;
+            }
+            onClickProductListener.onClickProduct(productLink);
+
+        }
+    }
+
     private String updateChannelInfo(PLVLiveClassDetailVO.DataBean data) {
         final PLVInteractInfo info = new PLVInteractInfo();
         final PLVInteractInfo.LotteryData lotteryData = new PLVInteractInfo.LotteryData();
@@ -488,6 +580,35 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         redpackViewModel.updateRedPaperReceiveStatus(changeRedpackStatusEvent.getValue().getRedpackId(), PLVRedPaperReceiveType.match(changeRedpackStatusEvent.getValue().getStatus()));
     }
 
+    private void processOpenOtherAppEvent(String message) {
+
+        PLVOpenOtherAppEvent openOtherAppEvent = PLVGsonUtil.fromJson(PLVOpenOtherAppEvent.class, message);
+        String value = ""; 
+        if (openOtherAppEvent == null || openOtherAppEvent.getValue() == null) {
+            return;
+        } else {
+            value = openOtherAppEvent.getValue().getUrl();
+        }
+        try {
+            // 复制字段
+            ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            // 创建普通字符型ClipData
+            ClipData mClipData = ClipData.newPlainText("Label", value);
+            // 将ClipData内容放到系统剪贴板里。
+            cm.setPrimaryClip(mClipData);
+
+            //跳转到微信
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("weixin://"));
+            ActivityUtils.startActivity(intent);
+
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+            ToastUtils.showLong(R.string.plv_chat_copy_success);
+        }
+
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类">
@@ -521,6 +642,10 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         public void setContainerView(ViewGroup containerView) {
             this.containerView = containerView;
         }
+    }
+
+    public interface OnClickProductListener {
+        void onClickProduct(String link);
     }
     // </editor-fold>
 }

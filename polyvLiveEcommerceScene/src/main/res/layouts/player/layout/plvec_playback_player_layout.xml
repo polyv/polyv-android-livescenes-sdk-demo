@@ -57,6 +57,15 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp" />
 
+    <ImageView
+        android:id="@+id/plvec_full_screen_iv"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_gravity="end|right"
+        android:layout_marginRight="4dp"
+        android:visibility="visible"
+        android:src="@drawable/plvec_controller_fullscreen"/>
+
     <TextView
         android:id="@+id/plvec_playback_player_floating_playing_placeholder_tv"
         android:layout_width="match_parent"
@@ -82,16 +91,6 @@
         android:layout_height="72dp"
         android:layout_gravity="center"
         android:src="@drawable/plvec_play_center" />
-
-
-    <ImageView
-        android:id="@+id/plvec_full_screen_iv"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_gravity="end|right"
-        android:layout_marginRight="4dp"
-        android:visibility="visible"
-        android:src="@drawable/plvec_controller_fullscreen"/>
 
     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
         android:id="@+id/plvec_playback_auto_continue_seek_time_hint_layout"

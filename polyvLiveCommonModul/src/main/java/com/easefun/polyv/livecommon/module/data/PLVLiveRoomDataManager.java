@@ -313,16 +313,18 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     //更新频道名称 - 请求
 
     @Override
-    public void requestUpdateChannelName() {
+    public void requestUpdateChannelName(final IUpdateChannelNameListener listener) {
         liveRoomDataRequester.requestUpdateChannelName(new PLVLiveRoomDataRequester.IPLVNetRequestListener<String>() {
             @Override
             public void onSuccess(String s) {
                 channelNameData.postValue(PLVStatefulData.success(s));
+                listener.onAfter();
             }
 
             @Override
             public void onFailed(String msg, Throwable throwable) {
                 channelNameData.postValue(PLVStatefulData.<String>error(msg, throwable));
+                listener.onAfter();
             }
         });
     }

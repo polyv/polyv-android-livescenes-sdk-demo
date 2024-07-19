@@ -60,6 +60,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private ImageView ivSubviewShowLand;
     private SeekBar sbPlayProgressLand;
     private ImageView btnMoreLand;
+    private ImageView floatingLandIv;
     private ImageView ivBackLand;
     private TextView tvVideoNameLand;
     private PLVLCLikeIconView ivLikesLand;
@@ -84,6 +85,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private ImageView iVFullScreenPort;
     private ImageView ivSubviewShowPort;
     private ImageView btnMorePort;
+    // 小窗按钮
+    private ImageView floatingIv;
     private ImageView ivBackPort;
     private ImageView ivTopGradientPort;
     private TextView tvVideoNamePort;
@@ -152,6 +155,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivSubviewShowLand = findViewById(R.id.plvlc_playback_controller_land_iv_subview_show_land);
         sbPlayProgressLand = findViewById(R.id.plvlc_playback_controller_land_sb_playprogress);
         btnMoreLand = findViewById(R.id.plvlc_playback_controller_land_bt_more);
+        floatingLandIv = findViewById(R.id.plvlc_playback_control_floating_land_iv);
         ivBackLand = findViewById(R.id.plvlc_playback_controller_land_iv_back);
         tvVideoNameLand = findViewById(R.id.plvlc_playback_controller_land_tv_video_name);
         ivLikesLand = findViewById(R.id.plvlc_playback_controller_land_iv_likes);
@@ -176,6 +180,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         iVFullScreenPort = findViewById(R.id.plvlc_playback_controller_port_iv_full_screen);
         ivSubviewShowPort = findViewById(R.id.plvlc_playback_controller_port_iv_subview_show);
         btnMorePort = findViewById(R.id.plvlc_playback_controller_port_btn_controller_more);
+        floatingIv = findViewById(R.id.plvlc_playback_control_floating_iv);
         ivBackPort = findViewById(R.id.plvlc_playback_controller_port_iv_back);
         ivTopGradientPort = findViewById(R.id.plvlc_playback_controller_port_iv_top_gradient);
         tvVideoNamePort = findViewById(R.id.plvlc_playback_controller_port_tv_video_name);
@@ -194,6 +199,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         ivSubviewShowPort.setOnClickListener(this);
         btnMoreLand.setOnClickListener(this);
         btnMorePort.setOnClickListener(this);
+        floatingLandIv.setOnClickListener(this);
+        floatingIv.setOnClickListener(this);
         ivBackPort.setOnClickListener(this);
         ivLikesLand.setOnButtonClickListener(this);
         tvStartSendMessageLand.setOnClickListener(this);
@@ -674,6 +681,11 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             }
         } else if (id == controllerCommodityLandIv.getId()) {
             commodityViewModel.showProductLayoutOnLandscape();
+        } else if (id == floatingIv.getId()
+                || id == floatingLandIv.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onClickFloating();
+            }
         }
     }
     // </editor-fold>

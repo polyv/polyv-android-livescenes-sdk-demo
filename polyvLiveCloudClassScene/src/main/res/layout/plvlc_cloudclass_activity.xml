@@ -90,7 +90,6 @@
             android:layout="@layout/plv_popover_layout_stub"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -69,7 +69,9 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -232,6 +234,17 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
         commodityPushLayout2.setAnchor(commodityIv);
         commodityPushLayout2.init(liveRoomDataManager);
+        commodityPushLayout2.setCommodityPushListener(new PLVECCommodityPushLayout2.ICommodityPushListener() {
+            @Override
+            public void showJobDetail(PLVProductContentBean bean) {
+                if (onViewActionListener != null) {
+                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
+                    event.setData(bean);
+                    onViewActionListener.onShowJobDetail(event);
+                }
+            }
+        });
+
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
 
@@ -243,6 +256,22 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         if (getContext() != null) {
             chatOverLengthMessageLayout = new PLVECChatOverLengthMessageLayout(getContext());
             commodityPopupLayout = new PLVECCommodityPopupLayout2(getContext());
+            commodityPopupLayout = new PLVECCommodityPopupLayout2(getContext());
+            commodityPopupLayout.setOnViewActionListener(new PLVECCommodityPopupLayout2.OnViewActionListener() {
+                @Override
+                public void onShowJobDetail(PLVShowJobDetailEvent param) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowJobDetail(param);
+                    }
+                }
+
+                @Override
+                public void onShowOpenLink() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowOpenLink();
+                    }
+                }
+            });
         }
         greetLy = findViewById(R.id.greet_ly);
         chatMsgRv = findViewById(R.id.chat_msg_rv);
@@ -437,6 +466,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     @Override
     public void setPlayerState(PLVPlayerState state) {
         if (state == PLVPlayerState.PREPARED) {
+            if (morePopupView != null) {
+                morePopupView.updatePlaybackPlayStateView(View.VISIBLE);
+            }
             if (onViewActionListener != null) {
                 totalTimeTv.setText(PLVTimeUtils.generateTime(onViewActionListener.onGetDurationAction(), true));
             }
@@ -948,6 +980,19 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          * @param event 动态功能的event data
          */
         void onClickDynamicFunction(String event);
+
+        /**
+         * 展示职位详情
+         * @param param
+         */
+        void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        /**
+         * 展示用于跳转微信复制的二维码
+         */
+        void onShowOpenLink();
+
+
     }
     // </editor-fold>
 }

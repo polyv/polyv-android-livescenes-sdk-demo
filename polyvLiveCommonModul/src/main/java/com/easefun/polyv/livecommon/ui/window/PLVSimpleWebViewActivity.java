@@ -87,11 +87,6 @@ public abstract class PLVSimpleWebViewActivity extends PLVBaseActivity {
         if (TextUtils.isEmpty(urlOrHtmlText())) {
             return;
         }
-        if (urlOrHtmlText().startsWith("weixin://")) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlOrHtmlText()));
-            ActivityUtils.startActivity(intent);
-            return;
-        }
         if (!isLoadUrl()) {
             String content = PLVWebViewContentUtils.toWebViewContent(urlOrHtmlText());
             webView.loadDataWithBaseURL(null, content, "text/html; charset=UTF-8", null, null);

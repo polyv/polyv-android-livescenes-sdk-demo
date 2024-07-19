@@ -23,6 +23,7 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -516,6 +517,12 @@ public interface IPLVLCMediaLayout {
          * 回调文本画笔工具内容变更
          */
         void onFinishChangeTextContent(String content);
+
+        /**
+         * 回调 展示职位详情
+         */
+        void onShowJobDetail(PLVShowJobDetailEvent param);
+
     }
     // </editor-fold>
 

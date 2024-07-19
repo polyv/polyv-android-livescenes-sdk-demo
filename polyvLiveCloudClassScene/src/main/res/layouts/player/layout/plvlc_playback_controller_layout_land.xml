@@ -160,6 +160,15 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/plvlc_playback_control_floating_land_iv"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="14dp"
+            android:padding="8dp"
+            android:src="@drawable/plvlc_live_controller_floating_icon" />
+
+        <ImageView
             android:id="@+id/plvlc_playback_controller_land_bt_more"
             android:layout_width="40dp"
             android:layout_height="40dp"

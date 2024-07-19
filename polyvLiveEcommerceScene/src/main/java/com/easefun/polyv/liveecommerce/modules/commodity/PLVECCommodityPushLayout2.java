@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -75,6 +76,8 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     private TextView commoditySrcPriceTv;
     private ImageView commodityDialogCloseIv;
     private ImageView commodityEnterIv;
+    private LinearLayout commodityPriceLl;
+
 
     private RelativeLayout productEffectImgRl;
     private TextView productEffectImgTv;
@@ -86,11 +89,14 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
     private TextView productEffectTitleNumTv;
     private TextView productEffectTitleMulTv;
 
+    private TextView commodityPositionKnowTv;
+    private PLVRoundRectGradientTextView commodityPositionEnterTv;
+
     private IPLVLiveRoomDataManager liveRoomDataManager;
     boolean productHotEffectEnable = false;
     private PLVLiveClassDetailVO.DataBean.ProductHotEffectBean productHotEffectBean;
 
-
+    private ICommodityPushListener listener;
 
     private View anchorView;
 
@@ -142,6 +148,8 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         commoditySrcPriceTv = findViewById(R.id.plvec_commodity_src_price_tv);
         commodityDialogCloseIv = findViewById(R.id.plvec_commodity_dialog_close_iv);
         commodityEnterIv = findViewById(R.id.plvec_commodity_enter_iv);
+        commodityPriceLl = findViewById(R.id.plvec_commodity_price_ll);
+
 
         productEffectImgRl = findViewById(R.id.plvec_product_image_effect_rl);
         productEffectImgTv = findViewById(R.id.plvec_product_image_effect_tv);
@@ -153,9 +161,18 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         productEffectTitleNumTv = findViewById(R.id.plvec_product_title_effect_num);
         productEffectTitleMulTv = findViewById(R.id.plvec_product_title_effect_mul);
 
+        commodityPositionEnterTv = findViewById(R.id.plvec_commodity_position_entry_tv);
+        commodityPositionKnowTv = findViewById(R.id.plvec_commodity_position_know_tv);
+
         commodityDialogCloseIv.setOnClickListener(this);
         commodityEnterIv.setOnClickListener(this);
         this.setOnClickListener(this);
+        commodityPositionEnterTv.setOnClickListener(this);
+        commodityPositionKnowTv.setOnClickListener(this);
+    }
+
+    public void setCommodityPushListener(ICommodityPushListener listener) {
+        this.listener = listener;
     }
 
     private void observeCommodityViewModel() {
@@ -173,6 +190,10 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
                             updateProduct(uiState.productContentBeanPushToShow);
                         }
                         isNeedShow = uiState.productContentBeanPushToShow != null;
+                        if (uiState.productContentBeanPushToShow != null) {
+                            // 推送大卡片时不要显示
+                            isNeedShow &= !uiState.productContentBeanPushToShow.isBigProduct();
+                        }
                         checkUpdateVisibility();
                     }
                 });
@@ -232,7 +253,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         bindCover(productContentBean);
         bindProductName(productContentBean);
 
-        final boolean hasProductDesc = !TextUtils.isEmpty(productContentBean.getProductDesc());
+        final boolean hasProductDesc = !TextUtils.isEmpty(productContentBean.getProductDesc()) && !productContentBean.isPositionProduct();
         commodityProductDescTv.setVisibility(hasProductDesc ? View.VISIBLE : View.GONE);
         commodityProductDescTv.setText(productContentBean.getProductDesc());
 
@@ -241,6 +262,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         bindEnterIcon(productContentBean);
 
         bindProductEffect(productContentBean);
+        processCommodityPosition(productContentBean);
     }
 
     @MainThread
@@ -288,6 +310,16 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
             isNeedShow = false;
             commodityViewModel.onCloseProductPush();
             checkUpdateVisibility();
+        } else if (id == commodityPositionEnterTv.getId()) {
+            if (enterCommodity()) {
+                isNeedShow = false;
+                commodityViewModel.onCloseProductPush();
+                checkUpdateVisibility();
+            }
+        } else if (id == commodityPositionKnowTv.getId()) {
+            if (listener != null) {
+                listener.showJobDetail(productContentBean);
+            }
         } else if (id == commodityEnterIv.getId() || v == this) {
             if (enterCommodity()) {
                 isNeedShow = false;
@@ -317,6 +349,8 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         commodityNameNumberTv.setVisibility(showCover ? GONE : VISIBLE);
 
         commodityNameTv.setText(productContentBean.getName());
+        commodityPositionKnowTv.setText(getResources().getString(R.string.plv_commodity_position_details));
+        commodityPositionEnterTv.setText(productContentBean.getBtnShow());
     }
 
     private void parseProductFeatureTag(PLVProductContentBean productContentBean) {
@@ -331,7 +365,10 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
             return;
         }
 
-        final int allowShowFeatureTagCount = 2;
+        int allowShowFeatureTagCount = 2;
+        if (productContentBean.isPositionProduct()) {
+            allowShowFeatureTagCount = 3;
+        }
         final List<String> validFeatureTags = new ArrayList<>(allowShowFeatureTagCount);
         for (String featureTag : featureTags) {
             if (TextUtils.isEmpty(featureTag)) {
@@ -403,6 +440,50 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         }
     }
 
+    private void processCommodityPosition(PLVProductContentBean productContentBean) {
+        boolean isPosition = productContentBean.isPositionProduct();
+        int idCommodityPriceLl = commodityPriceLl.getId();
+        int idCommodityCoverLy = commodityCoverLy.getId();
+        ConstraintLayout.LayoutParams commodityPositionEnterLayoutParam = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
+
+        ConstraintLayout.LayoutParams commodityPriceLlParam = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
+
+        // 处理带有图片的情况
+        if (!TextUtils.isEmpty(productContentBean.getCover())) {
+            commodityPositionEnterLayoutParam.topToBottom = idCommodityPriceLl;
+            commodityPositionEnterLayoutParam.topMargin = ConvertUtils.dp2px(4);
+            commodityPositionEnterLayoutParam.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+            commodityPositionEnterLayoutParam.rightMargin = ConvertUtils.dp2px(22);
+
+        } else {
+            // 处理没有图片的情况
+            commodityPositionEnterLayoutParam.topToTop = idCommodityPriceLl;
+            commodityPositionEnterLayoutParam.topMargin = 0;
+            commodityPositionEnterLayoutParam.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+            commodityPositionEnterLayoutParam.rightMargin = ConvertUtils.dp2px(22);
+        }
+
+        commodityPriceLlParam.startToEnd = idCommodityCoverLy;
+        commodityPriceLlParam.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        commodityPriceLlParam.leftMargin = ConvertUtils.dp2px(8);
+        commodityPriceLlParam.topMargin = ConvertUtils.dp2px(8);
+
+        if (isPosition && !TextUtils.isEmpty(productContentBean.getCover())) {
+            commodityPriceLlParam.bottomMargin = ConvertUtils.dp2px(40);
+        } else {
+            commodityPriceLlParam.bottomMargin = ConvertUtils.dp2px(12);
+        }
+
+        commodityPositionEnterTv.setLayoutParams(commodityPositionEnterLayoutParam);
+        commodityPriceLl.setLayoutParams(commodityPriceLlParam);
+
+        commodityPositionKnowTv.setVisibility(isPosition ? VISIBLE : GONE);
+        commodityPositionEnterTv.setVisibility(isPosition ? VISIBLE : GONE);
+        commodityEnterIv.setVisibility(isPosition ? GONE : VISIBLE);
+    }
+
     /**
      * @return {@code true} -> 跳转成功
      */
@@ -458,5 +539,11 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         return productContentBean.getLinkByType();
     }
 
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="接口">
+    public interface ICommodityPushListener {
+        void showJobDetail(PLVProductContentBean bean);
+    }
     // </editor-fold>
 }
