@@ -441,6 +441,9 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                         if (adapterIndex < 0) {
                             return false;
                         }
+                        if (getFilteredDataList().isEmpty() || adapterIndex > getFilteredDataList().size() - -1) {
+                            return false;
+                        }
                         final PLVLinkMicItemDataBean linkMicItemDataBean = getFilteredDataList().get(adapterIndex);
                         if ((linkMicItemDataBean != null) && linkMicItemDataBean.isTeacher()
                                 && PLVSocketUserConstant.USERTYPE_TEACHER.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {

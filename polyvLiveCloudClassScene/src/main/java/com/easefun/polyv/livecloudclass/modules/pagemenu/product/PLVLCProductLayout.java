@@ -22,6 +22,7 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
@@ -38,6 +39,8 @@ public class PLVLCProductLayout extends FrameLayout {
 
     @Nullable
     private IPLVLiveRoomDataManager liveRoomDataManager;
+
+    private OnViewActionListener listener;
 
     public PLVLCProductLayout(@NonNull Context context) {
         this(context, null);
@@ -79,6 +82,12 @@ public class PLVLCProductLayout extends FrameLayout {
                         if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
                             return;
                         }
+                        if (onClickDataVO.getData().isInnerBuy()) {
+                            if (listener != null) {
+                                listener.onShowOpenLink();
+                            }
+                            return;
+                        }
                         final String productLink = onClickDataVO.getData().getLinkByType();
                         if (TextUtils.isEmpty(productLink)) {
                             PLVToast.Builder.context(getContext())
@@ -87,6 +96,15 @@ public class PLVLCProductLayout extends FrameLayout {
                             return;
                         }
                         PLVLCCommodityDetailActivity.start(getContext(), productLink);
+                    }
+                })
+                .setOnReceiverEventShowJobDetailHandler(new BridgeHandler() {
+                    @Override
+                    public void handler(String data, CallBackFunction function) {
+                        if (listener != null) {
+                            PLVShowJobDetailEvent event =PLVGsonUtil.fromJson(PLVShowJobDetailEvent.class, data);
+                            listener.onShowJobDetail(event);
+                        }
                     }
                 })
                 .loadWeb();
@@ -101,6 +119,10 @@ public class PLVLCProductLayout extends FrameLayout {
         if (productWebView != null) {
             productWebView.sendOpenProductEvent();
         }
+    }
+
+    public void setOnViewShowListener(OnViewActionListener listener) {
+        this.listener = listener;
     }
 
     public void destroy() {
@@ -139,6 +161,12 @@ public class PLVLCProductLayout extends FrameLayout {
             return null;
         }
         return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+    }
+
+    public interface OnViewActionListener {
+        void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        void onShowOpenLink();
     }
 
 }

@@ -334,14 +334,19 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 isSettingFinished = true;
                 updateVisibility();
                 liveRoomDataManager.getConfig().setupChannelName(liveTitle);
-                liveRoomDataManager.requestUpdateChannelName();
-                if (onViewActionListener != null) {
-                    if (isGuest()) {
-                        onViewActionListener.onEnterLiveAction();
-                    } else {
-                        onViewActionListener.onStartLiveAction();
+                liveRoomDataManager.requestUpdateChannelName(new IPLVLiveRoomDataManager.IUpdateChannelNameListener() {
+                    @Override
+                    public void onAfter() {
+                        if (onViewActionListener != null) {
+                            if (isGuest()) {
+                                onViewActionListener.onEnterLiveAction();
+                            } else {
+                                onViewActionListener.onStartLiveAction();
+                            }
+                        }
                     }
-                }
+                });
+
             }
 
             @Override

@@ -27,6 +27,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
@@ -39,6 +40,7 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
 
     private PLVProductWebView commodityPopupWebView;
     private boolean isLandspace = false;
+    private OnViewActionListener listener;
 
     @Nullable
     private PLVMenuDrawer menuDrawerPortrait;
@@ -91,6 +93,12 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                         if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
                             return;
                         }
+                        if (onClickDataVO.getData().isInnerBuy()) {
+                            if (listener != null) {
+                                listener.onShowOpenLink();
+                            }
+                            return;
+                        }
                         final String productLink = onClickDataVO.getData().getLinkByType();
                         if (TextUtils.isEmpty(productLink)) {
                             PLVToast.Builder.context(getContext())
@@ -99,6 +107,15 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                             return;
                         }
                         PLVECCommodityDetailActivity.start(getContext(), productLink);
+                    }
+                })
+                .setOnReceiverEventShowJobDetailHandler(new BridgeHandler() {
+                    @Override
+                    public void handler(String data, CallBackFunction function) {
+                        if (listener != null) {
+                            PLVShowJobDetailEvent event = PLVGsonUtil.fromJson(PLVShowJobDetailEvent.class, data);
+                            listener.onShowJobDetail(event);
+                        }
                     }
                 })
                 .loadWeb();
@@ -164,8 +181,11 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
         );
         menuDrawerPortrait.setMenuView(this);
         menuDrawerPortrait.setTouchMode(PLVMenuDrawer.TOUCH_MODE_BEZEL);
+        menuDrawerPortrait.setMenuSize(ConvertUtils.dp2px(519));
         menuDrawerPortrait.setDrawOverlay(false);
         menuDrawerPortrait.setDropShadowEnabled(false);
+        menuDrawerPortrait.setAdjustKeyBoard(true);
+
         menuDrawerPortrait.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
             @Override
             public void onDrawerStateChange(int oldState, int newState) {
@@ -241,5 +261,15 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                 showPortraitMenDrawer();
             }
         }
+    }
+
+    public void setOnViewActionListener(OnViewActionListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnViewActionListener {
+        void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        void onShowOpenLink();
     }
 }

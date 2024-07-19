@@ -3,17 +3,27 @@ package com.easefun.polyv.livecommon.ui.widget.menudrawer;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+
+import com.plv.foundationsdk.utils.PLVControlUtils;
 
 public class OverlayDrawer extends DraggableDrawer {
 
     private static final String TAG = "OverlayDrawer";
 
     private int mPeekSize;
+
+    private int usableHeightPrevious;
+    private int keyboardHeight;
+
+    private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
 
     private Runnable mRevealRunnable = new Runnable() {
         @Override
@@ -62,6 +72,39 @@ public class OverlayDrawer extends DraggableDrawer {
         mPeekSize = dpToPx(20);
     }
 
+    private void possiblyResize() {
+        Rect r = new Rect();
+        getWindowVisibleDisplayFrame(r);
+        int usableHeightNow = r.bottom - r.top;
+        if (usableHeightNow != usableHeightPrevious) {
+            int navigationBarHeight = PLVControlUtils.getNavigationBarHeight(getContext());
+            int usableHeightSansKeyboard = getRootView().getHeight() - navigationBarHeight;
+            int heightDifference = usableHeightSansKeyboard - usableHeightNow;
+            if (heightDifference > (usableHeightSansKeyboard / 4)) {
+                keyboardHeight = heightDifference;
+            } else {
+                keyboardHeight = 0;
+            }
+            requestLayout();
+            usableHeightPrevious = usableHeightNow;
+        }
+    }
+
+    private void initKeyboard() {
+        FrameLayout content = ((Activity) getContext()).findViewById(android.R.id.content);
+        content.getChildAt(0).getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                possiblyResize();
+            }
+        });
+    }
+
+    private void closeKeyboard() {
+        FrameLayout content = ((Activity) getContext()).findViewById(android.R.id.content);
+        content.getChildAt(0).getViewTreeObserver().removeOnGlobalLayoutListener(keyboardListener);
+    }
+
     @Override
     protected void drawOverlay(Canvas canvas) {
         final int width = getWidth();
@@ -106,11 +149,17 @@ public class OverlayDrawer extends DraggableDrawer {
                 break;
         }
 
+        if (mAdjustKeyboardEnable) {
+            initKeyboard();
+        }
         animateOffsetTo(animateTo, 0, animate);
     }
 
     @Override
     public void closeMenu(boolean animate) {
+        if (mAdjustKeyboardEnable) {
+            closeKeyboard();
+        }
         animateOffsetTo(0, 0, animate);
     }
 
@@ -280,7 +329,11 @@ public class OverlayDrawer extends DraggableDrawer {
                     break;
 
                 case BOTTOM:
-                    mMenuContainer.layout(0, height - mMenuSize, width, height);
+                    if (mAdjustKeyboardEnable) {
+                        mMenuContainer.layout(0, height - mMenuSize - keyboardHeight, width, height);
+                    } else {
+                        mMenuContainer.layout(0, height - mMenuSize, width, height);
+                    }
                     break;
             }
 

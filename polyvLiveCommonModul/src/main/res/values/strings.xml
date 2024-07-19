@@ -199,6 +199,10 @@
     <string name="plv_commodity_free">Free</string>
     <string name="plv_commodity_empty">This product is not yet launched, please stay tuned</string>
     <string name="plv_commodity_buy">Buy</string>
+    <string name="plv_commodity_recommend">Recommend</string>
+    <string name="plv_commodity_knowledge">Knowledge</string>
+    <string name="plv_commodity_now_knowledge">Knowledge</string>
+    <string name="plv_commodity_position_details">Position Details</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">Call failed</string>
@@ -285,7 +289,7 @@
     <string name="plv_linkmic_setting_linkmic_type_video">Video</string>
     <string name="plv_linkmic_setting_linkmic_type_unavailable_hint">(Unavailable)</string>
     <string name="plv_linkmic_setting_linkmic_type_switch_hint">Note: Before switching voice chat type, you should make sure nobody connected</string>
-    <string name="plv_linkmic_setting_linkmic_type_default_setting_hint">To config default voice chat type, change it on Cloud live backend - Channel setting - Advanced features - Viewing page settings - Voice chat setting</string>
+    <string name="plv_linkmic_setting_linkmic_type_default_setting_hint">To set a default voice chat method, adjust the settings in the Channel > Role Permissions > Functional Configuration</string>
     <string name="plv_linkmic_toast_mute_all_audio">Mute all enabled</string>
     <string name="plv_linkmic_cancel_apply">Retract your request</string>
     <string name="plv_linkmic_stop">Hang up</string>
@@ -460,6 +464,10 @@
     <string name="plv_live_language_switch_hint">Change language to re-enter live stream, confirm to switch</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">Sign in</string>
+    <string name="plv_interact_open_weixin_buy">Buy in WeChat only.</string>
+    <string name="plv_interact_open_weixin_but_fail">Open WeChat failed! Please check if WeChat is already installed</string>
+    <string name="plv_interact_no_support_buy">Purchase not currently supported</string>
+
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">Confirm to exit playback</string>
     <!--回放-往期-->

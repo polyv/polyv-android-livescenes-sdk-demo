@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,6 +39,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.google.android.flexbox.FlexboxLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -58,6 +58,7 @@ import com.plv.livescenes.chatroom.IPLVChatroomManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ConstraintLayout plvsaMoreLayout;
     private TextView plvsaMoreTextTv;
     private ViewGroup plvsaMoreSettingsSv;
-    private GridLayout plvsaMoreSettingsLayout;
+    private FlexboxLayout plvsaMoreSettingsLayout;
     private ImageView plvsaMoreCameraIv;
     private TextView plvsaMoreCameraTv;
     private ImageView plvsaMoreMicIv;
@@ -199,7 +200,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreLayout = (ConstraintLayout) findViewById(R.id.plvsa_more_layout);
         plvsaMoreTextTv = (TextView) findViewById(R.id.plvsa_more_text_tv);
         plvsaMoreSettingsSv = findViewById(R.id.plvsa_more_settings_sv);
-        plvsaMoreSettingsLayout = (GridLayout) findViewById(R.id.plvsa_more_settings_layout);
+        plvsaMoreSettingsLayout = (FlexboxLayout) findViewById(R.id.plvsa_more_settings_layout);
         plvsaMoreCameraIv = (ImageView) findViewById(R.id.plvsa_more_camera_iv);
         plvsaMoreCameraTv = (TextView) findViewById(R.id.plvsa_more_camera_tv);
         plvsaMoreMicIv = (ImageView) findViewById(R.id.plvsa_more_mic_iv);
@@ -336,7 +337,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             @Override
             public void onStatus(boolean isClose) {
                 plvsaMoreCloseRoomIv.setSelected(isClose);
-                plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
+                postToMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
+                    }
+                });
             }
         });
     }
@@ -377,11 +383,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                         lastShowBeautyLayout = showBeautyLayout;
 
                         moreBeautyLl.setVisibility(showBeautyLayout ? View.VISIBLE : View.GONE);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) moreBeautyLl.getLayoutParams();
-                            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, showBeautyLayout ? 1 : 0, 1F);
-                            moreBeautyLl.setLayoutParams(lp);
-                        }
                     }
                 });
     }
@@ -498,11 +499,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     public void updateCloseRoomLayout(boolean hide){
         plvsaMoreCloseRoomLayout.setVisibility(hide ? View.GONE : View.VISIBLE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) plvsaMoreCloseRoomLayout.getLayoutParams();
-            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, plvsaMoreCloseRoomLayout.getVisibility() == View.VISIBLE ? 1 : 0, 1F);
-            plvsaMoreCloseRoomLayout.setLayoutParams(lp);
-        }
     }
 
     public void setOnDrawerStateChangeListener(PLVMenuDrawer.OnDrawerStateChangeListener listener) {
@@ -720,12 +716,16 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 @Override
                 public void onSuccess(String s) {
                     plvsaMoreCloseRoomIv.setSelected(!plvsaMoreCloseRoomIv.isSelected());
-                    plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
-
-                    String toastText = PLVAppUtils.getString(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
-                    PLVToast.Builder.context(getContext())
-                            .setText(toastText)
-                            .build().show();
+                    postToMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
+                            String toastText = PLVAppUtils.getString(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
+                            PLVToast.Builder.context(getContext())
+                                    .setText(toastText)
+                                    .build().show();
+                        }
+                    });
                 }
 
                 @Override
@@ -770,7 +770,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             close();
             shareLayout.open();
         } else if (id == morePushDowngradePreferenceLl.getId()) {
-            close();
             pushDowngradePreferenceLayout.open();
         } else if (id == moreAllowViewerLinkmicLayout.getId()) {
             switchAllowViewerLinkMic(!moreAllowViewerLinkmicLayout.isActivated());
@@ -882,14 +881,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             menuPosition = MENU_DRAWER_POSITION_PORT;
             moreLayoutParam.height = MORE_LAYOUT_HEIGHT_PORT;
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_PORT;
-            plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_PORT);
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_PORT);
             settingLayoutParam.topMargin = ConvertUtils.dp2px(10);
         } else {
             menuPosition = MENU_DRAWER_POSITION_LAND;
             moreLayoutParam.height = MORE_LAYOUT_HEIGHT_LAND;
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_LAND;
-            plvsaMoreSettingsLayout.setColumnCount(GRID_COLUMN_COUNT_LAND);
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_LAND);
             settingLayoutParam.topToBottom = R.id.plvsa_more_text_tv;
             settingLayoutParam.topMargin = ConvertUtils.dp2px(plvsaMoreSettingsLayout.getChildCount() > 9 ? 48 : 0);

@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.ui.window;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
@@ -12,7 +10,6 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSafeWebView;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
-import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
  * 仅包含webView的Activity
@@ -85,11 +82,6 @@ public abstract class PLVSimpleWebViewActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="加载webView">
     private void loadWebView() {
         if (TextUtils.isEmpty(urlOrHtmlText())) {
-            return;
-        }
-        if (urlOrHtmlText().startsWith("weixin://")) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlOrHtmlText()));
-            ActivityUtils.startActivity(intent);
             return;
         }
         if (!isLoadUrl()) {

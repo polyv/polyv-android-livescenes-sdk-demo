@@ -46,14 +46,13 @@
                 android:layout_height="wrap_content"/>
 
 
-                <GridLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/plvsa_more_settings_layout"
                     app:layout_constraintTop_toBottomOf="@+id/plvsa_more_settings_base_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="14dp"
-                    android:clipChildren="false"
-                    android:columnCount="5"
+                    app:flexWrap="wrap"
                     android:paddingBottom="24dp">
 
                     <LinearLayout
@@ -77,7 +76,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_camera_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_linkmic_camera"
@@ -107,7 +106,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_mic_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_linkmic_microphone"
@@ -137,7 +136,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_camera_switch_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_streamer_camera_orient"
@@ -167,7 +166,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_mirror_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_streamer_mirror"
@@ -196,7 +195,7 @@
                             android:src="@drawable/plvsa_more_beauty_icon" />
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_beauty_selector_beauty_title"
@@ -227,7 +226,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_share_screen_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plvsa_streamer_sharescreen_start"
@@ -287,7 +286,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_flashlight_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_streamer_flashlight"
@@ -318,21 +317,21 @@
                             android:src="@drawable/plvsa_more_close_room_selector" />
 
                         <FrameLayout
-                            android:layout_width="52dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipChildren="false">
 
                             <TextView
                                 android:id="@+id/plvsa_more_close_room_tv"
-                                android:layout_width="80dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="center|top"
-                                android:letterSpacing="-0.12"
-                                android:text="@string/plv_chat_confirm_close_room"
+                                android:letterSpacing="-0.18"
+                                android:text="@string/plv_chat_confirm_close_room"                                android:translationX="-0dp"
                                 android:textColor="#99F0F1F5"
-                                android:textSize="12sp"
-                                android:translationX="-12dp" />
+                                android:textSize="12sp" />
                         </FrameLayout>
+
 
                     </LinearLayout>
 
@@ -360,7 +359,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_share_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_live_share"
@@ -389,7 +388,7 @@
                             android:src="@drawable/plvsa_live_room_push_downgrade_preference_icon" />
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_push_downgrade_preference_title"
@@ -420,7 +419,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_allow_viewer_linkmic_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plvsa_streamer_allow_viewer_linkmic"
@@ -451,7 +450,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_hang_up_viewer_linkmic_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_linkmic_hang_all_off"
@@ -482,7 +481,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_linkmic_setting_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_linkmic_setting"
@@ -513,7 +512,7 @@
 
                         <TextView
                             android:id="@+id/plvsa_more_mix_tv"
-                            android:layout_width="match_parent"
+                            android:layout_width="52dp"
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_streamer_mix_layout"
@@ -521,7 +520,7 @@
                             android:textSize="12sp" />
 
                     </LinearLayout>
-                </GridLayout>
+                </com.google.android.flexbox.FlexboxLayout>
             <TextView
                 android:id="@+id/plvsa_more_settings_interact_tv"
                 android:text="@string/plv_live_more_interact"
@@ -532,12 +531,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <GridLayout
+            <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/plvsa_more_settings_interact_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
-                android:columnCount="5"
+                app:flexWrap="wrap"
                 android:layout_marginBottom="14dp"
                 android:paddingBottom="34dp"
                 app:layout_constraintTop_toBottomOf="@+id/plvsa_more_settings_interact_tv"
@@ -569,7 +568,7 @@
                         android:textColor="#99F0F1F5"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </GridLayout>
+            </com.google.android.flexbox.FlexboxLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

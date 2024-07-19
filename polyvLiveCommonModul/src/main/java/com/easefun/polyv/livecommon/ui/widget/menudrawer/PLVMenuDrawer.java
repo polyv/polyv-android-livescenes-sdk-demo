@@ -199,6 +199,8 @@ public abstract class PLVMenuDrawer extends ViewGroup {
      */
     protected boolean mDropShadowEnabled;
 
+    protected boolean mAdjustKeyboardEnable;
+
     /**
      * The color of the drop shadow.
      */
@@ -1203,6 +1205,10 @@ public abstract class PLVMenuDrawer extends ViewGroup {
     public void setDropShadowEnabled(boolean enabled) {
         mDropShadowEnabled = enabled;
         invalidate();
+    }
+
+    public void setAdjustKeyBoard(boolean enable) {
+        mAdjustKeyboardEnable = enable;
     }
 
     protected GradientDrawable.Orientation getDropShadowOrientation() {

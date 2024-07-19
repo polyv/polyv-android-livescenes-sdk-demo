@@ -197,7 +197,7 @@ public interface IPLVLiveRoomDataManager {
     /**
      * 更新频道名称
      */
-    void requestUpdateChannelName();
+    void requestUpdateChannelName(IUpdateChannelNameListener listener);
 
     /**
      * 获取详情课节数据
@@ -217,4 +217,13 @@ public interface IPLVLiveRoomDataManager {
      */
     void destroy();
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="5、接口">
+
+    interface IUpdateChannelNameListener {
+        void onAfter();
+    }
+    // </editor-fold>
+
+
 }

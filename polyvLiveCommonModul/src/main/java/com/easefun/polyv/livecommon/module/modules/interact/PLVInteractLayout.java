@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractAppAbs;
 import com.easefun.polyv.livescenes.feature.interact.PLVInteractWebView;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -132,6 +133,21 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
 
     @Override
     public void setOnOpenInsideWebViewListener(PLVInteractLayout2.OnOpenInsideWebViewListener listener) {
+
+    }
+
+    @Override
+    public void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener) {
+
+    }
+
+    @Override
+    public void onShowJobDetail(PLVShowJobDetailEvent param) {
+
+    }
+
+    @Override
+    public void onShowOpenLink() {
 
     }
 

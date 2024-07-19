@@ -27,6 +27,8 @@ import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 public class PLVSASettingTitleInputLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
+    final int MAX_TITLE_LENGTH = 150;
+
     private View rootView;
     private EditText plvsaLiveRoomSettingTitleInputEt;
     private TextView plvsaLiveRoomSettingTitleLengthTv;
@@ -73,16 +75,25 @@ public class PLVSASettingTitleInputLayout extends FrameLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                title = s.toString().trim();
-                plvsaLiveRoomSettingTitleLengthTv.setText(String.valueOf(title.length()));
+                String str = s.toString();
+                int titleLength = processTextLength(str) / 2;
+                plvsaLiveRoomSettingTitleLengthTv.setText(String.valueOf(titleLength >= MAX_TITLE_LENGTH ? MAX_TITLE_LENGTH : titleLength));
+                plvsaLiveRoomSettingTitleInputEt.setSelection(str.length());
                 if (onTitleChangeListener != null) {
-                    onTitleChangeListener.onChange(title);
+                    onTitleChangeListener.onChange(s.toString());
                 }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                String str = s.toString();
+                // 防止一次输入多个字符导致超出限制
+                int length = processTextLength(str) / 2;
+                if (length > MAX_TITLE_LENGTH) {
+                    int diff = length - MAX_TITLE_LENGTH;
+                    String strdiff = str.substring(0, str.length() - diff);
+                    plvsaLiveRoomSettingTitleInputEt.setText(strdiff);
+                }
             }
         });
 
@@ -151,6 +162,29 @@ public class PLVSASettingTitleInputLayout extends FrameLayout {
         //隐藏状态栏情况下才需计算
         return r.bottom;//待完善，横屏为r.bottom，竖屏时为r.bottom-r.top+navbarHeight，存在刘海屏需-r.top，不存在刘海时需使用0(r.top有值)
     }
+
+    private int processTextLength(String text) {
+        int length = 0;
+        // 判断是否是中文
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            Character.UnicodeBlock block = Character.UnicodeBlock.of(chars[i]);
+            boolean isChinese = block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                    || block == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+                    || block == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+                    || block == Character.UnicodeBlock.GENERAL_PUNCTUATION;
+
+            if (isChinese) {
+                length += 2;
+            } else {
+                length++;
+            }
+        }
+        return length;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="View父类方法重写">
@@ -180,7 +214,7 @@ public class PLVSASettingTitleInputLayout extends FrameLayout {
     public void initTitle(String title) {
         this.title = title;
         plvsaLiveRoomSettingTitleInputEt.setText(title);
-        plvsaLiveRoomSettingTitleLengthTv.setText(String.valueOf(title.length()));
+        plvsaLiveRoomSettingTitleLengthTv.setText(String.valueOf(processTextLength(title) / 2));
     }
 
     public void setOnTitleChangeListener(OnTitleChangeListener onTitleChangeListener) {

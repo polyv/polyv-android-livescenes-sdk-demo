@@ -420,6 +420,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="登录回放">
     private void loginPlayback() {
+        PLVFloatingPlayerManager.getInstance().clear();
+
         final String appId = etPlaybackAppId.getText().toString().trim();
         final String appSecret = etPlaybackAppSecret.getText().toString().trim();
         final String userId = etPlaybackUserId.getText().toString().trim();

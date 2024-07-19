@@ -196,16 +196,17 @@
             tools:text="商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述" />
 
         <LinearLayout
+            android:id="@+id/plvec_commodity_price_ll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="22dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@+id/plvec_commodity_enter_iv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/plvec_commodity_cover_ly"
-            app:layout_constraintTop_toTopOf="@+id/plvec_commodity_enter_iv">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/plvec_commodity_cover_ly">
 
             <TextView
                 android:id="@+id/plvec_commodity_real_price_tv"
@@ -231,6 +232,40 @@
 
         </LinearLayout>
 
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvec_commodity_position_entry_tv"
+            android:layout_width="64dp"
+            android:layout_height="24dp"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="立即投递"
+            android:visibility="gone"
+            android:paddingHorizontal="7dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="4dp"
+            app:plvRadius="456dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/plvec_commodity_price_ll"
+            android:layout_marginEnd="22dp"
+            android:layout_marginBottom="12dp"
+            app:plvGradientColors="#F15D5D"/>
+
+        <TextView
+            android:id="@+id/plvec_commodity_position_know_tv"
+            android:layout_width="64dp"
+            android:layout_height="24dp"
+            android:textSize="12sp"
+            android:textColor="#F15D5D"
+            android:text="立即了解"
+            android:visibility="gone"
+            android:paddingHorizontal="7dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="4dp"
+            android:background="@drawable/plv_push_card_know_btn_bg"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toLeftOf="@+id/plvec_commodity_position_entry_tv"
+            app:layout_constraintTop_toTopOf="@+id/plvec_commodity_position_entry_tv"/>
+
         <ImageView
             android:id="@+id/plvec_commodity_dialog_close_iv"
             android:layout_width="24dp"
@@ -248,6 +283,7 @@
             android:layout_marginBottom="12dp"
             android:src="@drawable/plvec_commodity_enter"
             app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

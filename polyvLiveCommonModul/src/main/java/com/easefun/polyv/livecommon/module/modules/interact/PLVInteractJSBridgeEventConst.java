@@ -68,6 +68,8 @@ public class PLVInteractJSBridgeEventConst {
     public static final String V2_WEB_VIEW_UPDATE_APP_STATUS = "webViewUpdateAppStatus";
     public static final String V2_LOCK_TO_PORTRAIT = "lockToPortrait";
     public static final String V2_GET_INTERACT_INFO = "getInteractInfo";
+    public static final String V2_CLICK_PRODUCT_BUTTON = "clickProductButton";
+
 
     //native2js
     public static final String V2_UPDATE_NATIVE_APP_PARAMS_INFO = "updateNativeAppParamsInfo";

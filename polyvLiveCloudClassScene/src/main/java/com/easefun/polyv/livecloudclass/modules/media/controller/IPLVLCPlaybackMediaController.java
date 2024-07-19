@@ -174,6 +174,11 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
          * 发送点赞
          */
         void onSendLikesAction();
+
+        /**
+         * 小窗点击事件
+         */
+        void onClickFloating();
     }
     // </editor-fold>
 }

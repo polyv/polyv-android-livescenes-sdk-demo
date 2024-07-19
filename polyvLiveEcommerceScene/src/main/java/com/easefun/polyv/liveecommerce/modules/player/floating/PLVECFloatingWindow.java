@@ -219,7 +219,15 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                                 requestShowByUser = false;
                                 restoreContentLayoutParam();
                                 PLVFloatingPlayerManager.getInstance().clear();
-                                AppUtils.bring2Front(contentAnchorLayout.getContext());
+                                boolean result = AppUtils.bring2Front(contentAnchorLayout.getContext());
+                                if (!result) {
+                                    PLVAppUtils.postToMainThread(600, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AppUtils.bring2Front(contentAnchorLayout.getContext());
+                                        }
+                                    });
+                                }
                                 savedIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 final boolean needReLogin = ((Activity) contentAnchorLayout.getContext()).isFinishing();
                                 if (needReLogin) {

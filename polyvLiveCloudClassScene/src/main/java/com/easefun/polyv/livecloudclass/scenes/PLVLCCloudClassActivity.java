@@ -27,6 +27,7 @@ import com.easefun.polyv.livecloudclass.modules.media.IPLVLCMediaLayout;
 import com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCLiveLandscapeChannelController;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindowModule;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityDetailActivity;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCFloatingPPTLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
@@ -70,6 +71,7 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -124,6 +126,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private PLVViewSwitcher pptViewSwitcher = new PLVViewSwitcher();
 
     private PLVPlayerLogoView plvPlayerLogoView;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -485,6 +488,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
         });
 
+        popoverLayout.setOnClickProductListener(new PLVInteractLayout2.OnClickProductListener() {
+
+            @Override
+            public void onClickProduct(String link) {
+                if (!TextUtils.isEmpty(link)) {
+                    PLVLCCommodityDetailActivity.start(PLVLCCloudClassActivity.this, link);
+                }
+            }
+        });
+
         // 页面菜单布局
         livePageMenuLayout = findViewById(R.id.plvlc_live_page_menu_layout);
         livePageMenuLayout.init(liveRoomDataManager);
@@ -705,6 +718,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     return;
                 }
                 floatingPPTLayout.getPPTView().notifyPaintUpdateTextContent(content);
+            }
+
+            @Override
+            public void onShowJobDetail(PLVShowJobDetailEvent param) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().onShowJobDetail(param);
+                }
             }
         });
 
@@ -945,6 +965,20 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().receiveRedPaper(redPaperEvent);
+                }
+            }
+
+            @Override
+            public void onShowJobDetail(PLVShowJobDetailEvent param) {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().onShowJobDetail(param);
+                }
+            }
+
+            @Override
+            public void onShowOpenLink() {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().onShowOpenLink();
                 }
             }
         });

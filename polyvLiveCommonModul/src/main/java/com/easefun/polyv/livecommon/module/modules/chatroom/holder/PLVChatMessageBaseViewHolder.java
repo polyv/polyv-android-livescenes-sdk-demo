@@ -117,6 +117,9 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             PLVSpeakEvent speakEvent = (PLVSpeakEvent) messageData;
             fillFieldFromUser(speakEvent.getUser());
             int validIndex = Math.min(speakEvent.getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) speakEvent.getObjects()[validIndex];
             isFullMessage = !speakEvent.isOverLength();
             fullMessageOnOverLength = speakEvent.getOverLengthFullMessage();
@@ -130,6 +133,9 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         } else if (messageData instanceof PolyvLocalMessage) {//本地的发言事件信息
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvLocalMessage) messageData).getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) ((PolyvLocalMessage) messageData).getObjects()[validIndex];
             isOverLengthFoldingMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_FOLD;
             isOverLengthShowAloneMessage = speakMsg.length() > CHAT_MESSAGE_OVER_LENGTH_TO_SHOW_ALONE;
@@ -163,11 +169,17 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         } else if (messageData instanceof PolyvQuestionMessage) {//本地的提问信息
             fillFieldFromLoginVO(PolyvSocketWrapper.getInstance().getLoginVO());
             int validIndex = Math.min(((PolyvQuestionMessage) messageData).getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) ((PolyvQuestionMessage) messageData).getObjects()[validIndex];
         } else if (messageData instanceof PLVTAnswerEvent) {//接收的回答信息
             PLVTAnswerEvent tAnswerEvent = (PLVTAnswerEvent) messageData;
             fillFieldFromUser(tAnswerEvent.getUser());
             int validIndex = Math.min(tAnswerEvent.getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) tAnswerEvent.getObjects()[validIndex];
             //如msgType为image类型说明发送的speakMsg为json串
             if(tAnswerEvent.getMsgType()!=null && tAnswerEvent.getMsgType().equalsIgnoreCase(PLVTAnswerEvent.TYPE_IMAGE)){
@@ -186,6 +198,9 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             PLVSpeakHistoryEvent speakHistoryEvent = (PLVSpeakHistoryEvent) messageData;
             fillFieldFromUser(speakHistoryEvent.getUser());
             int validIndex = Math.min(speakHistoryEvent.getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) speakHistoryEvent.getObjects()[validIndex];
             isFullMessage = !speakHistoryEvent.isOverLength();
             fullMessageOnOverLength = speakHistoryEvent.getOverLengthFullMessage();
@@ -199,6 +214,9 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             PLVFileShareHistoryEvent speakHistoryEvent = (PLVFileShareHistoryEvent) messageData;
             fillFieldFromUser(speakHistoryEvent.getUser());
             int validIndex = Math.min(speakHistoryEvent.getObjects().length - 1, msgIndex);
+            if (validIndex == -1) {
+                return;
+            }
             speakMsg = (CharSequence) speakHistoryEvent.getObjects()[validIndex];
             speakFileData = speakHistoryEvent.getFileData();
             chatQuoteVO = speakHistoryEvent.getQuote();
@@ -245,6 +263,9 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             actor = chatPlaybackData.getActor();
             if (chatPlaybackData.getObjects() != null) {
                 int validIndex = Math.min(chatPlaybackData.getObjects().length - 1, msgIndex);
+                if (validIndex == -1) {
+                    return;
+                }
                 speakMsg = (CharSequence) chatPlaybackData.getObjects()[validIndex];
                 chatQuoteVO = chatPlaybackData.getChatQuoteVO();
                 if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {

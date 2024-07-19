@@ -93,6 +93,8 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.commodity.PLVProductContentBean;
+import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -680,6 +682,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         commodityPushLayout.init(liveRoomDataManager);
+        commodityPushLayout.setCommodityPushListener(new PLVLCCommodityPushLayout.ICommodityPushListener() {
+            @Override
+            public void showJobDetail(PLVProductContentBean bean) {
+                if (onViewActionListener != null) {
+                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
+                    event.setData(bean);
+                    onViewActionListener.onShowJobDetail(event);
+                }
+            }
+        });
 
         // 追踪商品卡片曝光事件
         PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
