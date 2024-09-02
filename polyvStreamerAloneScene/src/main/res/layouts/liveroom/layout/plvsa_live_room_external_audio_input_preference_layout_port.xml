@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvsa_external_audio_input_preference_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape">
+
+    <TextView
+        android:id="@+id/plvsa_external_audio_input_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/plv_streamer_external_audio_input_title"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvsa_external_audio_input_desc_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/plv_streamer_external_audio_input_desc"
+        android:textColor="#F0F1F5"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/plvsa_external_audio_input_title_tv" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="53dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_external_audio_input_desc_tv">
+
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+            android:id="@+id/plvsa_external_audio_input_enable_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="20dp">
+
+            <TextView
+                android:id="@+id/plvsa_external_audio_input_adaptive_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/plv_streamer_external_audio_input_enable_text"
+                android:textColor="#F0F1F5"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+            android:id="@+id/plvsa_external_audio_input_disable_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="20dp">
+
+            <TextView
+                android:id="@+id/plvsa_external_audio_input_balance_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/plv_streamer_external_audio_input_disable_text"
+                android:textColor="#F0F1F5"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

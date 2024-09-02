@@ -27,6 +27,7 @@ import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
 import com.easefun.polyv.livestreamer.R;
@@ -91,6 +92,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private IPLVLSStreamerLayout plvlsStreamerLy;
     // 聊天室布局
     private IPLVLSChatroomLayout plvlsChatroomLy;
+    // 评论上墙布局
+    private PLVToTopView toTopView;
     // 美颜布局
     private IPLVLSBeautyLayout beautyLayout;
     // 推流降级提示布局
@@ -312,6 +315,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsDocumentLy = findViewById(R.id.plvls_document_ly);
         plvlsStreamerLy = findViewById(R.id.plvls_streamer_ly);
         plvlsChatroomLy = findViewById(R.id.plvls_chatroom_ly);
+        toTopView = findViewById(R.id.plvls_chatroom_to_top_view);
         pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
         interactLayout.init(liveRoomDataManager);
@@ -350,6 +354,13 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
         // 初始化美颜布局
         beautyLayout = new PLVLSBeautyLayout(this);
+
+        // 初始化评论上墙布局
+        toTopView.setIsLiveType(true);
+        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+            toTopView.setCancelTopStyle();
+        }
+         plvlsChatroomLy.getChatroomPresenter().registerView(toTopView.getChatroomView());
     }
     // </editor-fold>
 
@@ -635,6 +646,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                     }
                     plvlsStreamerLy.destroy();
                 }
+            }
+
+            @Override
+            public boolean isStreamerStartSuccess() {
+                return plvlsStreamerLy.isStreamerStartSuccess();
             }
         });
         //监听聊天室的在线人数变化

@@ -189,6 +189,8 @@
     <string name="plv_chat_member_list">Member list</string>
     <string name="plv_chat_baned">[Banned]</string>
     <string name="plv_chat_viewer">Viewer</string>
+    <string name="plv_chat_pin">Pin</string>
+    <string name="plv_chat_pin_cancel">Unpin</string>
     <string name="plv_chat_copy_success">Copy success</string>
     <string name="plv_chat_answer">Reply</string>
     <string name="plv_chat_input_tips_focus_2">In focus mode</string>
@@ -317,6 +319,19 @@
     <string name="plv_push_downgrade_fluency_desc">When network condition is poor, video fluency is prioritized but may cause lower clarity</string>
     <string name="plv_push_downgrade_alert_toast_text">The network condition is currently poor. It\'s recommended to switch to fluency mode</string>
     <string name="plv_push_downgrade_alert_toast_confirm">Switch now</string>
+    <string name="plv_streamer_denoise_setting_title">Noise Reduction</string>
+    <string name="plv_streamer_denoise_adaptive_title">Adaptive</string>
+    <string name="plv_streamer_denoise_adaptive_desc">Smartly refines audio for meetings and education</string>
+    <string name="plv_streamer_denoise_balance_title">Balanced</string>
+    <string name="plv_streamer_denoise_balance_desc">Delivers targeted noise cancellation to minimize environmental sounds, preserving speech and key audio for atmospheric live broadcasts.</string>
+    <string name="plv_streamer_external_audio_input_title">External Device</string>
+    <string name="plv_streamer_external_audio_input_desc">For live streaming with an external mic, enable this feature to switch to media volume for clear audio capture.</string>
+    <string name="plv_streamer_external_audio_input_enable_text">Enable</string>
+    <string name="plv_streamer_external_audio_input_disable_text">Disable</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_title">Reminder</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_desc">Caution: With media volume, app sounds and media playback will also be broadcasted. Use with care.</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_confirm_text">Turn on</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_cancel_text">Turn off</string>
     <string name="plv_streamer_notify_speaking_with_mute_audio">You are muted, please turn on the microphone and speak</string>
     <string name="plv_streamer_grant_speaker_permission">The anchor has granted your permission to lecture</string>
     <string name="plv_streamer_remove_speaker_permission">The anchor has withdrawn your permission to lecture</string>
@@ -380,6 +395,7 @@
     <string name="plv_streamer_switch_linkmic_type_hint_viewer_connecting_text">Can not switch voice chat type because viewers are connecting. To continue, all connected viewers will be hanged up. Confirm to switch type?</string>
     <string name="plv_streamer_switch_linkmic_type_confirm_text">Switch and hang up viewers</string>
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">Weak network signal, activation failed. Check your connection!</string>
+    <string name="plv_streamer_toast_call_streamer_start">Please start the live stream first</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>
@@ -530,6 +546,7 @@
     <string name="plv_common_dialog_confirm_4">OK</string>
     <string name="plv_common_dialog_confirm_5">OK</string>
     <string name="plv_common_text_copy">Copy</string>
+    <string name="plv_common_toast_network_error">Network error, please try again later</string>
 
     <!--美颜-->
     <string name="plv_beauty_whiten">Toning</string>

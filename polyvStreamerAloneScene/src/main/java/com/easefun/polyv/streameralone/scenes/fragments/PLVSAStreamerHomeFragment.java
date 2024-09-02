@@ -22,11 +22,13 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -48,6 +50,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -99,6 +102,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     private View plvsaToolBarMemberLinkmicRequestTipsView;
     private TextView plvsaToolBarLinkmicTypeTip;
     private ImageView toolBarCommodityControlIv;
+    // 评论上墙布局
+    private PLVToTopView toTopView;
 
     // 聊天室消息列表观察者
     private RecyclerView.AdapterDataObserver chatMessageDataObserver;
@@ -144,6 +149,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaToolBarMemberLinkmicRequestTipsView = findViewById(R.id.plvsa_tool_bar_member_linkmic_request_tips_view);
         plvsaToolBarLinkmicTypeTip = findViewById(R.id.plvsa_tool_bar_linkmic_type_tip);
         toolBarCommodityControlIv = findViewById(R.id.plvsa_tool_bar_commodity_control_iv);
+        toTopView = findViewById(R.id.plvsa_chatroom_to_top_view);
 
         plvsaToolBarCallInputTv.setOnClickListener(this);
         plvsaToolBarMoreIv.setOnClickListener(this);
@@ -156,6 +162,13 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         moreLayout = new PLVSAMoreLayout(view.getContext());
         memberLayout = new PLVSAMemberLayout(view.getContext());
         commodityControlLayout = new PLVSACommodityControlLayout(view.getContext());
+
+        // 初始化评论上墙布局
+        toTopView.setShowEnabled(false);
+        toTopView.setIsLiveType(true);
+        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+            toTopView.setCancelTopStyle();
+        }
 
         observeBeautyLayoutStatus();
 
@@ -273,6 +286,10 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         plvsaChatroomLayout.loginAndLoadHistory();
     }
 
+    public IPLVChatroomContract.IChatroomPresenter getChatroomPresenter() {
+        return plvsaChatroomLayout.getChatroomPresenter();
+    }
+
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
     }
@@ -280,6 +297,18 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     public void updateChannelName() {
         if (plvsaStatusBarLayout != null && liveRoomDataManager != null) {
             plvsaStatusBarLayout.updateChannelName(liveRoomDataManager.getConfig().getChannelName());
+        }
+    }
+
+    public void updateToTopView(boolean enabled) {
+        if (toTopView != null) {
+            toTopView.setShowEnabled(enabled);
+        }
+    }
+
+    public void registerToTopView() {
+        if (toTopView != null) {
+            getChatroomPresenter().registerView(toTopView.getChatroomView());
         }
     }
 
@@ -362,6 +391,14 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateViewWithOrientation();
+        if (getContext() != null) {
+            ConstraintLayout.LayoutParams toTopViewLayoutParams = (ConstraintLayout.LayoutParams) toTopView.getLayoutParams();
+            if (PLVScreenUtils.isPortrait(getContext())) {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(132), 0, 0);
+            } else {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(48), 0, 0);
+            }
+        }
     }
 
     private void updateViewWithOrientation() {
@@ -487,6 +524,14 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                     onViewActionListener.onKickByServer();
                 }
             }
+
+            @Override
+            public boolean isStreamerStartSuccess() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isStreamerStartSuccess();
+                }
+                return false;
+            }
         });
     }
 
@@ -608,6 +653,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         void onLinkMicMediaTypeUpdate(boolean isVideoLinkMicType, boolean isOpen);
 
         void onKickByServer();
+
+        boolean isStreamerStartSuccess();
     }
     // </editor-fold>
 

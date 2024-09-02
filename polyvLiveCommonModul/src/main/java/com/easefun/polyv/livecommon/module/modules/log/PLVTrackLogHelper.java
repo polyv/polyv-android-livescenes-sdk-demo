@@ -91,6 +91,15 @@ public class PLVTrackLogHelper {
     }
 
     /**
+     * 追踪上报商品卡片点击事件，当点击商品卡片时，则会上报
+     */
+    public static void trackClickProductPush(IPLVLiveRoomDataManager liveRoomDataManager, PLVProductContentBean productContentBean) {
+        PLVTrackLog.TrackLogBaseData trackLogBaseData = getTrackLogBaseData(liveRoomDataManager);
+        // 上报商品卡片点击事件
+        PLVTrackLog.getInstance().reportClickProductPushEvent(trackLogBaseData, productContentBean);
+    }
+
+    /**
      * 追踪上报红包曝光事件，当红包消息在 列表中出现并且界面内可见 或者 从不可见到可见，并且停留时间为500ms{@link PLVTrackLog#READ_REDPACK_NEED_TIME}时，则会上报
      */
     public static void trackReadRedpack(final RecyclerView chatRecyclerView, final List<PLVBaseViewData> dataList, final IPLVLiveRoomDataManager liveRoomDataManager) {

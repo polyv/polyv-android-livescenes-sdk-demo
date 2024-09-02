@@ -106,6 +106,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private TextView chatMsgOverLengthMoreBtn;
 
     private boolean isOverLengthContentFolding = true;
+    private PolyvSendChatImageListener sendChatImageListener;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -143,6 +144,10 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
 
         initView();
         addOnSendImgListener();
+    }
+
+    public void recycle() {
+        PolyvChatroomManager.getInstance().removeSendChatImageListener(sendChatImageListener);
     }
     // </editor-fold>
 
@@ -210,7 +215,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     }
 
     private void addOnSendImgListener() {
-        PolyvChatroomManager.getInstance().addSendChatImageListener(new PolyvSendChatImageListener() {
+        PolyvChatroomManager.getInstance().addSendChatImageListener(sendChatImageListener = new PolyvSendChatImageListener() {
             @Override
             public void onUploadFail(PolyvSendLocalImgEvent localImgEvent, Throwable t) {
                 localImgEvent.setSendStatus(PolyvSendLocalImgEvent.SENDSTATUS_FAIL);

@@ -8,7 +8,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+    <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
         android:id="@+id/plvsa_bitrate_parent_dv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,5 +40,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/plvsa_bitrate_tv" />
 
-    </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+    </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 </RelativeLayout>

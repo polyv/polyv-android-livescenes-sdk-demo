@@ -1,6 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.scaleToRange;
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,6 +35,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.ui.widget.PLVBeadWidget;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -50,6 +54,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -89,6 +94,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVSAMixLayout mixLayout;
     //推流开始倒计时布局
     private IPLVSACountDownWindow countDownWindow;
+    // 降噪配置布局
+    private final PLVSADenoisePreferenceLayout denoisePreferenceLayout = new PLVSADenoisePreferenceLayout(getContext());
+    // 外接设备布局
+    private final PLVSAExternalAudioInputPreferenceLayout externalAudioInputPreferenceLayout = new PLVSAExternalAudioInputPreferenceLayout(getContext());
 
     // 推流Presenter
     @Nullable
@@ -99,6 +108,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ConstraintLayout plvsaSettingConfigLy;
     private TextView plvsaSettingLiveTitleTv;
     private View plvsaSettingLiveTitleSplitView;
+    private HorizontalScrollView settingActionScrollContainer;
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
@@ -116,6 +126,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVOrientationSensibleLinearLayout settingPushResolutionRatioLl;
     private ImageView settingPushResolutionRatioIv;
     private TextView settingPushResolutionRatioTv;
+    private LinearLayout settingDenoiseLayout;
+    private LinearLayout settingExternalAudioInputLayout;
+    private PLVBeadWidget settingActionScrollIndicator;
 
     private String liveTitle;
 
@@ -163,6 +176,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingConfigLy = findViewById(R.id.plvsa_setting_config_ly);
         plvsaSettingLiveTitleTv = findViewById(R.id.plvsa_setting_live_title_tv);
         plvsaSettingLiveTitleSplitView = findViewById(R.id.plvsa_setting_live_title_split_view);
+        settingActionScrollContainer = findViewById(R.id.plvsa_setting_action_scroll_container);
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
         plvsaSettingBitrateIv = findViewById(R.id.plvsa_setting_bitrate_iv);
@@ -180,6 +194,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingPushResolutionRatioLl = findViewById(R.id.plvsa_setting_push_resolution_ratio_ll);
         settingPushResolutionRatioIv = findViewById(R.id.plvsa_setting_push_resolution_ratio_iv);
         settingPushResolutionRatioTv = findViewById(R.id.plvsa_setting_push_resolution_ratio_tv);
+        settingDenoiseLayout = findViewById(R.id.plvsa_setting_denoise_layout);
+        settingExternalAudioInputLayout = findViewById(R.id.plvsa_setting_external_audio_input_layout);
+        settingActionScrollIndicator = findViewById(R.id.plvsa_setting_action_scroll_indicator);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
         plvsaSettingBeautyLayout.setOnClickListener(this);
@@ -195,6 +212,23 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingScreenOrientationIv.setOnClickListener(this);
         plvsaSettingScreenOrientationTv.setOnClickListener(this);
         settingPushResolutionRatioLl.setOnClickListener(this);
+        settingDenoiseLayout.setOnClickListener(this);
+        settingExternalAudioInputLayout.setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            settingActionScrollContainer.setOnScrollChangeListener(new OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    updateScrollContainerIndicator();
+                }
+            });
+        }
+        post(new Runnable() {
+            @Override
+            public void run() {
+                updateScrollContainerIndicator();
+            }
+        });
 
         if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
             plvsaSettingMixIv.setVisibility(VISIBLE);
@@ -209,6 +243,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         initMixLayout();
         initTitleTextOnClickListener();
         initBeginCountDownWindow();
+        initDenoiseLayout();
+        initExternalAudioInputLayout();
 
         observeBeautyModuleInitResult();
         observeBeautyLayoutStatus();
@@ -354,6 +390,47 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 // 倒计时取消，重新显示设置布局
                 isSettingFinished = false;
                 updateVisibility();
+            }
+        });
+    }
+
+    private void initDenoiseLayout() {
+        denoisePreferenceLayout.setOnViewActionListener(new PLVSADenoisePreferenceLayout.OnViewActionListener() {
+            @Nullable
+            @Override
+            public PLVLinkMicDenoiseType getCurrentDenoiseType() {
+                if (streamerPresenter != null) {
+                    return streamerPresenter.getData().getDenoiseType().getValue();
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public void onDenoiseChanged(@NonNull PLVLinkMicDenoiseType denoiseType) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setDenoiseType(denoiseType);
+                }
+            }
+        });
+    }
+
+    private void initExternalAudioInputLayout() {
+        externalAudioInputPreferenceLayout.setOnViewActionListener(new PLVSAExternalAudioInputPreferenceLayout.OnViewActionListener() {
+            @Override
+            public boolean currentIsEnableExternalAudioInput() {
+                if (streamerPresenter != null) {
+                    return streamerPresenter.getData().getUseExternalAudioInput().getValue();
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public void onEnableExternalAudioInputChanged(boolean enable) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setIsUseExternalAudioInput(enable);
+                }
             }
         });
     }
@@ -617,6 +694,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         super.onConfigurationChanged(newConfig);
         final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
         updateOnOrientationChanged(isLandscape);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                updateScrollContainerIndicator();
+            }
+        });
     }
 
     private void updateOnOrientationChanged(boolean isLandscape) {
@@ -710,6 +793,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
         } else if (id == settingPushResolutionRatioLl.getId()) {
             changePushResolutionRatio();
+        } else if (id == settingDenoiseLayout.getId()) {
+            denoisePreferenceLayout.open();
+        } else if (id == settingExternalAudioInputLayout.getId()) {
+            externalAudioInputPreferenceLayout.open();
         }
     }
     // </editor-fold>
@@ -786,6 +873,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (iconId != null) {
             plvsaSettingBitrateIv.setImageResource(iconId);
         }
+    }
+
+    private void updateScrollContainerIndicator() {
+        int maxSize = settingActionScrollContainer.getChildAt(0).getWidth();
+        if (maxSize <= 0) {
+            maxSize = 1;
+        }
+        int pageSize = settingActionScrollContainer.getWidth();
+        if (pageSize <= 0) {
+            pageSize = 1;
+        }
+        int currentOffset = settingActionScrollContainer.getScrollX();
+        settingActionScrollIndicator.setBeadCount(maxSize / pageSize + 1);
+        settingActionScrollIndicator.setCurrentSelectedIndex((int) (scaleToRange(currentOffset, 0F, maxSize - pageSize, 0F, maxSize / pageSize) + 0.5));
     }
 
     private void changeScreenOrientation() {

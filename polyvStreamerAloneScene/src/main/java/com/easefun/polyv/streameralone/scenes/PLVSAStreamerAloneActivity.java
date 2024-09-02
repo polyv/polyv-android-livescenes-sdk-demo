@@ -463,6 +463,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             public void onStartLiveAction() {
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
+                homeFragment.updateToTopView(true);
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.startLive();
                 //开始直播后，请求成员列表接口
@@ -474,6 +475,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 //嘉宾进入直播间
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());
                 homeFragment.updateChannelName();
+                homeFragment.updateToTopView(true);
                 topLayerViewPager.setVisibility(View.VISIBLE);
                 streamerLayout.enterLive();
                 //开始直播后，请求成员列表接口
@@ -619,6 +621,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             public void onViewCreated() {
                 homeFragment.init(liveRoomDataManager);
                 homeFragment.chatroomLogin();
+                homeFragment.registerToTopView();
                 //注册streamerView
                 streamerLayout.getStreamerPresenter().registerView(homeFragment.getStreamerView());
 
@@ -682,6 +685,14 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                     }
                     streamerLayout.destroy();
                 }
+            }
+
+            @Override
+            public boolean isStreamerStartSuccess() {
+                if (streamerLayout != null) {
+                    return streamerLayout.isStreamerStartSuccess();
+                }
+                return false;
             }
         });
 

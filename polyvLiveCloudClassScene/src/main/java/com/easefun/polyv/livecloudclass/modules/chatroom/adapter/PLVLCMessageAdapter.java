@@ -129,6 +129,14 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     }
 
     @Override
+    public void onViewRecycled(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVLCMessageAdapter> holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof PLVLCMessageViewHolder) {
+            ((PLVLCMessageViewHolder) holder).recycle();
+        }
+    }
+
+    @Override
     public int getItemViewType(int position) {
         return dataList.get(position).getItemType();
     }

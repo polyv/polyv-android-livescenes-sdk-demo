@@ -38,6 +38,15 @@
         android:visibility="invisible"
         tools:visibility="visible" />
 
+    <!-- 评论上墙布局 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
+        android:id="@+id/plvec_chatroom_to_top_view"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="82dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true" />
+
     <!--播放控制按钮-->
     <RelativeLayout
         android:id="@+id/play_control_ly"

@@ -41,6 +41,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoOverScrollViewPager;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.livecommon.ui.widget.textview.PLVDrawableListenerTextView;
@@ -164,6 +165,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     //互动入口
     private PLVInteractEntranceLayout interactEntranceView;
+    //评论上墙布局
+    private PLVToTopView toTopView;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -201,6 +204,10 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         super.onConfigurationChanged(newConfig);
         int marginPortrait = getResources().getDimensionPixelSize(R.dimen.plvec_margin_common);
         int marginLandscape = getResources().getDimensionPixelSize(R.dimen.plvec_landscape_margin_common);
+        RelativeLayout.LayoutParams toTopViewLayoutParams = null;
+        if (toTopView != null) {
+            toTopViewLayoutParams = (RelativeLayout.LayoutParams) toTopView.getLayoutParams();
+        }
         RelativeLayout.LayoutParams sendMsgTvLayoutParams = (RelativeLayout.LayoutParams) sendMsgTv.getLayoutParams();
         RelativeLayout.LayoutParams chatViewPagerLayoutParams = (RelativeLayout.LayoutParams) chatViewPager.getLayoutParams();
         RelativeLayout.LayoutParams blackTabLayoutParams = (RelativeLayout.LayoutParams) blackTabLayout.getLayoutParams();
@@ -219,6 +226,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 commodityPopupLayout.setLandspace(true);
             }
             effectWidgetLayoutParams.removeRule(RelativeLayout.ABOVE);
+            if (toTopViewLayoutParams != null) {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(16), 0, 0);
+            }
         } else {
             view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             chatViewPagerLayoutParams.leftMargin = marginPortrait;
@@ -236,6 +246,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             effectWidgetLayoutParams.addRule(RelativeLayout.ABOVE, R.id.greet_ly);
+            if (toTopViewLayoutParams != null) {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(82), 0, 0);
+            }
         }
     }
 
@@ -372,6 +385,10 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
         });
 
+        //评论上墙
+        toTopView = findViewById(R.id.plvec_chatroom_to_top_view);
+        toTopView.setIsLiveType(true);
+
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
 
@@ -440,6 +457,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         chatroomPresenter.registerView(chatroomView);
         chatroomPresenter.registerView(chatFragment.getChatroomView());
         chatroomPresenter.registerView(quizFragment.getChatroomView());
+        chatroomPresenter.registerView(toTopView.getChatroomView());
     }
 
     @Override
@@ -522,6 +540,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         } else if (state == PLVPlayerState.NO_LIVE || state == PLVPlayerState.LIVE_END) {
             morePopupView.hideAll();
             morePopupView.updatePlayStateView(View.GONE);
+        }
+        if (toTopView != null) {
+            toTopView.setShowEnabled(state != PLVPlayerState.NO_LIVE && state != PLVPlayerState.LIVE_END);
         }
     }
 

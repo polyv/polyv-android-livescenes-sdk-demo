@@ -17,7 +17,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 /**
  * @author Hoshiiro
  */
-public class PLVDowngradePreferenceCardView extends ConstraintLayout {
+public class PLVStreamerPreferenceCardView extends ConstraintLayout {
 
     private final Drawable strokeDrawable = getResources().getDrawable(R.drawable.plv_push_downgrade_preference_check_stroke);
     private final Drawable checkIconDrawable = getResources().getDrawable(R.drawable.plv_push_downgrade_preference_check_icon);
@@ -28,17 +28,17 @@ public class PLVDowngradePreferenceCardView extends ConstraintLayout {
     private final RectF viewSizeRect = new RectF();
     private final Paint backgroundPaint = new Paint();
 
-    public PLVDowngradePreferenceCardView(@NonNull Context context) {
+    public PLVStreamerPreferenceCardView(@NonNull Context context) {
         super(context);
         init();
     }
 
-    public PLVDowngradePreferenceCardView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PLVStreamerPreferenceCardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public PLVDowngradePreferenceCardView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PLVStreamerPreferenceCardView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }

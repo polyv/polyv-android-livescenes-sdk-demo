@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvsa_external_audio_input_layout_root"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape_land">
+
+    <TextView
+        android:id="@+id/plvsa_external_audio_input_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/plv_streamer_external_audio_input_title"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvsa_external_audio_input_desc_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/plv_streamer_external_audio_input_desc"
+        android:textColor="#99F0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_external_audio_input_title_tv" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_external_audio_input_desc_tv">
+
+        <LinearLayout
+            android:id="@+id/plvsa_external_audio_input_enable_card_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/plvsa_external_audio_input_enable_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plv_streamer_external_audio_input_enable_text"
+                android:textColor="#4399FF"
+                android:textSize="16sp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvsa_external_audio_input_enable_indicate_view"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="4dp"
+                app:plvMainColor="#4399FF"
+                app:plvMainRadius="2dp" />
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="24dp"
+            android:layout_height="1dp" />
+
+        <LinearLayout
+            android:id="@+id/plvsa_external_audio_input_disable_card_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/plvsa_external_audio_input_disable_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plv_streamer_external_audio_input_disable_text"
+                android:textColor="#4399FF"
+                android:textSize="16sp" />
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
+                android:id="@+id/plvsa_external_audio_input_disable_indicate_view"
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="4dp"
+                app:plvMainColor="#4399FF"
+                app:plvMainRadius="2dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

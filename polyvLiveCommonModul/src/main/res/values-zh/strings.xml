@@ -191,6 +191,8 @@
     <string name="plv_chat_viewer">观众</string>
     <string name="plv_chat_copy_success">复制成功</string>
     <string name="plv_chat_answer">回复</string>
+    <string name="plv_chat_pin">上墙</string>
+    <string name="plv_chat_pin_cancel">下墙</string>
     <string name="plv_chat_input_tips_focus_2">当前为专注模式..</string>
     <string name="plv_chat_input_tips_chat_6">聊点什么吧~</string>
     <string name="plv_chat_input_tips_quiz">发起提问</string>
@@ -317,6 +319,19 @@
     <string name="plv_push_downgrade_fluency_desc">当网络状态差时，优先保证画面流畅度，但清晰度会下降</string>
     <string name="plv_push_downgrade_alert_toast_text">当前网络较差，建议切换为流畅模式</string>
     <string name="plv_push_downgrade_alert_toast_confirm">马上切换</string>
+    <string name="plv_streamer_denoise_setting_title">降噪</string>
+    <string name="plv_streamer_denoise_adaptive_title">自适应降噪</string>
+    <string name="plv_streamer_denoise_adaptive_desc">提供声源智能识别和降噪的能力，适用于会议、教育培训等大多数直播场景</string>
+    <string name="plv_streamer_denoise_balance_title">均衡降噪</string>
+    <string name="plv_streamer_denoise_balance_desc">提供统一的降噪效果，主要减少背景中的环境噪音，对人声和主要声音有较好的保留效果，适用于氛围型直播场景</string>
+    <string name="plv_streamer_external_audio_input_title">外接设备</string>
+    <string name="plv_streamer_external_audio_input_desc">适用于直播过程中通过外接麦克风收集音量的场景，开启此功能后将切换至媒体音量，保证正常收音。</string>
+    <string name="plv_streamer_external_audio_input_enable_text">开启</string>
+    <string name="plv_streamer_external_audio_input_disable_text">关闭</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_title">温馨提示</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_desc">注意，媒体音量下，使用手机应用所产生提示音、音视频声音也将被采集并直播出去，请谨慎开启！</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_confirm_text">确认开启</string>
+    <string name="plv_streamer_external_audio_input_enable_alert_cancel_text">不开启</string>
     <string name="plv_streamer_notify_speaking_with_mute_audio">您已静音，请开启麦克风后发言</string>
     <string name="plv_streamer_grant_speaker_permission">您已被授予主讲权限</string>
     <string name="plv_streamer_remove_speaker_permission">您已被移除主讲权限</string>
@@ -380,6 +395,7 @@
     <string name="plv_streamer_switch_linkmic_type_hint_viewer_connecting_text">当前有用户在连麦，无法切换连麦方式，若要切换，需将麦上用户全部下麦，确认切换连麦方式吗？</string>
     <string name="plv_streamer_switch_linkmic_type_confirm_text">切换并下麦所有用户</string>
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">当前网络信号弱，开启失败，请检查网络！</string>
+    <string name="plv_streamer_toast_call_streamer_start">请先发起直播</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暂无相关文档</string>
@@ -530,6 +546,7 @@
     <string name="plv_common_dialog_confirm_4">我知道了</string>
     <string name="plv_common_dialog_confirm_5">知道了</string>
     <string name="plv_common_text_copy">复制</string>
+    <string name="plv_common_toast_network_error">网络异常，请稍后重试</string>
 
     <!--美颜-->
     <string name="plv_beauty_whiten">美白</string>

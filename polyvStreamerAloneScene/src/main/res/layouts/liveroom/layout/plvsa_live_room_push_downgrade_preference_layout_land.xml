@@ -25,7 +25,7 @@
         android:layout_marginHorizontal="32dp"
         android:orientation="vertical">
 
-        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
             android:id="@+id/plvsa_push_downgrade_preference_quality_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,13 +57,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/plvsa_push_downgrade_preference_quality_title_tv" />
 
-        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="12dp" />
 
-        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
             android:id="@+id/plvsa_push_downgrade_preference_fluency_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/plvsa_push_downgrade_preference_fluency_title_tv" />
 
-        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView>
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 
     </LinearLayout>
 

@@ -1,51 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:id="@+id/plvsa_denoise_layout_root"
+    android:layout_width="300dp"
     android:layout_height="match_parent"
-    tools:background="#1B202D">
+    android:layout_gravity="end"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape_land">
 
     <TextView
-        android:id="@+id/plvls_push_downgrade_title_tv"
+        android:id="@+id/plvsa_denoise_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/plv_push_downgrade_preference_title"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/plv_streamer_denoise_setting_title"
         android:textColor="#F0F1F5"
-        android:textSize="16sp"
-        android:layout_marginTop="13dp"
-        android:layout_marginStart="16dp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/plvls_push_downgrade_title_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginHorizontal="16dp"
-        android:background="#1AF0F1F5"
-        app:layout_constraintTop_toBottomOf="@+id/plvls_push_downgrade_title_tv" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="30dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/plvls_push_downgrade_title_separator">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_title_tv">
 
         <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
-            android:id="@+id/plvls_push_downgrade_preference_quality_card_view"
+            android:id="@+id/plvsa_denoise_adaptive_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingVertical="12dp">
 
             <TextView
-                android:id="@+id/plvls_push_downgrade_preference_quality_title_tv"
+                android:id="@+id/plvsa_denoise_adaptive_title_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:text="@string/plv_push_downgrade_quality_title"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/plv_streamer_denoise_adaptive_title"
                 android:textColor="#F0F1F5"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -54,17 +48,17 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/plvls_push_downgrade_preference_quality_desc_tv"
+                android:id="@+id/plvsa_denoise_adaptive_desc_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="4dp"
-                android:text="@string/plv_push_downgrade_quality_desc"
+                android:text="@string/plv_streamer_denoise_adaptive_desc"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plvls_push_downgrade_preference_quality_title_tv" />
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_adaptive_title_tv" />
 
         </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 
@@ -73,17 +67,17 @@
             android:layout_height="12dp" />
 
         <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
-            android:id="@+id/plvls_push_downgrade_preference_fluency_card_view"
+            android:id="@+id/plvsa_denoise_balance_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingVertical="12dp">
 
             <TextView
-                android:id="@+id/plvls_push_downgrade_preference_fluency_title_tv"
+                android:id="@+id/plvsa_denoise_balance_title_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:text="@string/plv_push_downgrade_fluency_title"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/plv_streamer_denoise_balance_title"
                 android:textColor="#F0F1F5"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -92,17 +86,17 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/plvls_push_downgrade_preference_fluency_desc_tv"
+                android:id="@+id/plvsa_denoise_balance_desc_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="4dp"
-                android:text="@string/plv_push_downgrade_fluency_desc"
+                android:text="@string/plv_streamer_denoise_balance_desc"
                 android:textColor="#99F0F1F5"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plvls_push_downgrade_preference_fluency_title_tv" />
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_balance_title_tv" />
 
         </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 

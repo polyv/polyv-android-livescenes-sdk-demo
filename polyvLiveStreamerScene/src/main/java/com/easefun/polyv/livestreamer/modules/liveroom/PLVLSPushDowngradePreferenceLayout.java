@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVDowngradePreferenceCardView;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView;
 import com.easefun.polyv.livestreamer.R;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 
@@ -20,10 +20,10 @@ public class PLVLSPushDowngradePreferenceLayout extends FrameLayout {
 
     private TextView pushDowngradeTitleTv;
     private View pushDowngradeTitleSeparator;
-    private PLVDowngradePreferenceCardView pushDowngradePreferenceQualityCardView;
+    private PLVStreamerPreferenceCardView pushDowngradePreferenceQualityCardView;
     private TextView pushDowngradePreferenceQualityTitleTv;
     private TextView pushDowngradePreferenceQualityDescTv;
-    private PLVDowngradePreferenceCardView pushDowngradePreferenceFluencyCardView;
+    private PLVStreamerPreferenceCardView pushDowngradePreferenceFluencyCardView;
     private TextView pushDowngradePreferenceFluencyTitleTv;
     private TextView pushDowngradePreferenceFluencyDescTv;
 

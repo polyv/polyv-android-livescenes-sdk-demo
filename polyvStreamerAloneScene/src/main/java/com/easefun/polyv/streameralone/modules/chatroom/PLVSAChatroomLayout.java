@@ -49,6 +49,8 @@ import com.easefun.polyv.streameralone.modules.chatroom.adapter.holder.PLVSAMess
 import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLengthMessageLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgInputWindow;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -181,6 +183,19 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
                     chatOverLengthMessageLayout.show(chatMessageDataBean);
                 }
             }
+
+            @Override
+            public boolean isStreamerStartSuccess() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isStreamerStartSuccess();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isPinMsgEnabled() {
+                return PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.LIVE_PIN_MSG_ENABLED);
+            }
         });
         plvlsChatroomChatMsgRv.setAdapter(chatMessageAdapter);
         plvlsChatroomChatMsgRv.addUnreadView(plvlsChatroomUnreadMsgTv);
@@ -232,6 +247,11 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         this.chatroomPresenter.init();
 
         initSocketLoginManager();
+    }
+
+    @Override
+    public IPLVChatroomContract.IChatroomPresenter getChatroomPresenter() {
+        return chatroomPresenter;
     }
 
     @Override
@@ -705,6 +725,10 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
          */
         void onKickByServer();
 
+        /**
+         * 是否推流开始
+         */
+        boolean isStreamerStartSuccess();
     }
 
     // </editor-fold>

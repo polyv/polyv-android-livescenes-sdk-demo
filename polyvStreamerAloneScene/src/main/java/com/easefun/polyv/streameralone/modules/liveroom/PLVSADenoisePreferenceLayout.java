@@ -16,29 +16,29 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.component.exts.Lazy;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
-import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * @author Hoshiiro
  */
-public class PLVSAPushDowngradePreferenceLayout extends FrameLayout {
+public class PLVSADenoisePreferenceLayout extends FrameLayout {
 
     private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
     private static final Position MENU_DRAWER_POSITION_LAND = Position.RIGHT;
-    private static final int MENU_DRAWER_SIZE_PORT = ConvertUtils.dp2px(350);
+    private static final int MENU_DRAWER_SIZE_PORT = ConvertUtils.dp2px(420);
     private static final int MENU_DRAWER_SIZE_LAND = ConvertUtils.dp2px(300);
 
-    private final Lazy<AbsPushDowngradeLayout> portLayout = new Lazy<AbsPushDowngradeLayout>() {
+    private final Lazy<AbsDenoiseLayout> portLayout = new Lazy<AbsDenoiseLayout>() {
         @Override
-        public AbsPushDowngradeLayout onLazyInit() {
-            return new PushDowngradeLayoutPort(getContext());
+        public AbsDenoiseLayout onLazyInit() {
+            return new DenoiseLayoutPort(getContext());
         }
     };
-    private final Lazy<AbsPushDowngradeLayout> landLayout = new Lazy<AbsPushDowngradeLayout>() {
+    private final Lazy<AbsDenoiseLayout> landLayout = new Lazy<AbsDenoiseLayout>() {
         @Override
-        public AbsPushDowngradeLayout onLazyInit() {
-            return new PushDowngradeLayoutLand(getContext());
+        public AbsDenoiseLayout onLazyInit() {
+            return new DenoiseLayoutLand(getContext());
         }
     };
 
@@ -46,15 +46,15 @@ public class PLVSAPushDowngradePreferenceLayout extends FrameLayout {
 
     private OnViewActionListener onViewActionListener;
 
-    public PLVSAPushDowngradePreferenceLayout(@NonNull Context context) {
+    public PLVSADenoisePreferenceLayout(@NonNull Context context) {
         super(context);
     }
 
-    public PLVSAPushDowngradePreferenceLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PLVSADenoisePreferenceLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PLVSAPushDowngradePreferenceLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PLVSADenoisePreferenceLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -95,13 +95,22 @@ public class PLVSAPushDowngradePreferenceLayout extends FrameLayout {
             });
             menuDrawer.openMenu();
         } else {
+            menuDrawer.setMenuView(getLayoutImpl());
+            menuDrawer.setPosition(isPortrait() ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND);
+            menuDrawer.setMenuSize(isPortrait() ? MENU_DRAWER_SIZE_PORT : MENU_DRAWER_SIZE_LAND);
             menuDrawer.attachToContainer();
             menuDrawer.openMenu();
         }
-        getLayoutImpl().updateCurrentPreference();
+        getLayoutImpl().updateCurrentDenoiseType(null);
     }
 
-    public PLVSAPushDowngradePreferenceLayout setOnViewActionListener(OnViewActionListener onViewActionListener) {
+    public void close() {
+        if (menuDrawer != null) {
+            menuDrawer.closeMenu();
+        }
+    }
+
+    public PLVSADenoisePreferenceLayout setOnViewActionListener(OnViewActionListener onViewActionListener) {
         this.onViewActionListener = onViewActionListener;
         return this;
     }
@@ -110,75 +119,82 @@ public class PLVSAPushDowngradePreferenceLayout extends FrameLayout {
         return PLVScreenUtils.isPortrait(getContext());
     }
 
-    private AbsPushDowngradeLayout getLayoutImpl() {
+    private AbsDenoiseLayout getLayoutImpl() {
         return isPortrait() ? portLayout.get() : landLayout.get();
     }
 
-    private abstract class AbsPushDowngradeLayout extends FrameLayout {
+    private abstract class AbsDenoiseLayout extends FrameLayout {
 
-        protected PLVStreamerPreferenceCardView pushDowngradePreferenceQualityCardView;
-        protected PLVStreamerPreferenceCardView pushDowngradePreferenceFluencyCardView;
+        protected PLVStreamerPreferenceCardView denoiseAdaptiveCardView;
+        protected PLVStreamerPreferenceCardView denoiseBalanceCardView;
 
-        public AbsPushDowngradeLayout(@NonNull Context context) {
+        public AbsDenoiseLayout(@NonNull Context context) {
             super(context);
         }
 
         protected final void setOnClickListener() {
-            pushDowngradePreferenceQualityCardView.setOnClickListener(new OnClickListener() {
+            denoiseAdaptiveCardView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (onViewActionListener != null) {
-                        onViewActionListener.onDowngradePreferenceChanged(PLVPushDowngradePreference.PREFER_BETTER_QUALITY);
-                        updateCurrentPreference();
+                        onViewActionListener.onDenoiseChanged(PLVLinkMicDenoiseType.ADAPTIVE);
+                        updateCurrentDenoiseType(PLVLinkMicDenoiseType.ADAPTIVE);
+                        close();
                     }
                 }
             });
-            pushDowngradePreferenceFluencyCardView.setOnClickListener(new OnClickListener() {
+            denoiseBalanceCardView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (onViewActionListener != null) {
-                        onViewActionListener.onDowngradePreferenceChanged(PLVPushDowngradePreference.PREFER_BETTER_FLUENCY);
-                        updateCurrentPreference();
+                        onViewActionListener.onDenoiseChanged(PLVLinkMicDenoiseType.BALANCE);
+                        updateCurrentDenoiseType(PLVLinkMicDenoiseType.BALANCE);
+                        close();
                     }
                 }
             });
         }
 
-        protected final void updateCurrentPreference() {
-            if (onViewActionListener == null) {
+        protected final void updateCurrentDenoiseType(@Nullable PLVLinkMicDenoiseType denoiseType) {
+            if (denoiseType == null) {
+                if (onViewActionListener != null) {
+                    denoiseType = onViewActionListener.getCurrentDenoiseType();
+                }
+            }
+            if (denoiseType == null) {
                 return;
             }
-            pushDowngradePreferenceQualityCardView.setSelected(onViewActionListener.getCurrentDowngradePreference() == PLVPushDowngradePreference.PREFER_BETTER_QUALITY);
-            pushDowngradePreferenceFluencyCardView.setSelected(onViewActionListener.getCurrentDowngradePreference() == PLVPushDowngradePreference.PREFER_BETTER_FLUENCY);
+            denoiseAdaptiveCardView.setSelected(denoiseType == PLVLinkMicDenoiseType.ADAPTIVE);
+            denoiseBalanceCardView.setSelected(denoiseType == PLVLinkMicDenoiseType.BALANCE);
         }
 
     }
 
-    private class PushDowngradeLayoutPort extends AbsPushDowngradeLayout {
+    private class DenoiseLayoutPort extends AbsDenoiseLayout {
 
-        public PushDowngradeLayoutPort(@NonNull Context context) {
+        public DenoiseLayoutPort(@NonNull Context context) {
             super(context);
         }
 
         {
-            LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_push_downgrade_preference_layout_port, this);
-            pushDowngradePreferenceQualityCardView = findViewById(R.id.plvsa_push_downgrade_preference_quality_card_view);
-            pushDowngradePreferenceFluencyCardView = findViewById(R.id.plvsa_push_downgrade_preference_fluency_card_view);
+            LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_denoise_preference_layout_port, this);
+            denoiseAdaptiveCardView = findViewById(R.id.plvsa_denoise_adaptive_card_view);
+            denoiseBalanceCardView = findViewById(R.id.plvsa_denoise_balance_card_view);
             setOnClickListener();
         }
 
     }
 
-    private class PushDowngradeLayoutLand extends AbsPushDowngradeLayout {
+    private class DenoiseLayoutLand extends AbsDenoiseLayout {
 
-        public PushDowngradeLayoutLand(@NonNull Context context) {
+        public DenoiseLayoutLand(@NonNull Context context) {
             super(context);
         }
 
         {
-            LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_push_downgrade_preference_layout_land, this);
-            pushDowngradePreferenceQualityCardView = findViewById(R.id.plvsa_push_downgrade_preference_quality_card_view);
-            pushDowngradePreferenceFluencyCardView = findViewById(R.id.plvsa_push_downgrade_preference_fluency_card_view);
+            LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_denoise_preference_layout_land, this);
+            denoiseAdaptiveCardView = findViewById(R.id.plvsa_denoise_adaptive_card_view);
+            denoiseBalanceCardView = findViewById(R.id.plvsa_denoise_balance_card_view);
             setOnClickListener();
         }
 
@@ -187,9 +203,9 @@ public class PLVSAPushDowngradePreferenceLayout extends FrameLayout {
     public interface OnViewActionListener {
 
         @Nullable
-        PLVPushDowngradePreference getCurrentDowngradePreference();
+        PLVLinkMicDenoiseType getCurrentDenoiseType();
 
-        void onDowngradePreferenceChanged(@NonNull PLVPushDowngradePreference preference);
+        void onDenoiseChanged(@NonNull PLVLinkMicDenoiseType denoiseType);
 
     }
 

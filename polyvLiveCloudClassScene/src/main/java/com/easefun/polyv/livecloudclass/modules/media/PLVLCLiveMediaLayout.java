@@ -71,6 +71,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -163,6 +164,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     //横屏聊天区
     private PLVLCChatLandscapeLayout chatLandscapeLayout;
+    //评论上墙区
+    private PLVToTopView toTopView;
 
     //弹幕
     private IPLVLCDanmuController danmuController;
@@ -264,6 +267,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         liveMarkToolControllerLayout = findViewById(R.id.plvlc_live_mark_tool_controller_layout);
         mediaController = findViewById(R.id.controller_view);
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
+        toTopView = findViewById(R.id.plvlc_chatroom_to_top_view);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
         commodityPushLayout = findViewById(R.id.commodity_push_ly);
 
@@ -767,6 +771,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public PLVLCChatLandscapeLayout getChatLandscapeLayout() {
         return chatLandscapeLayout;
+    }
+
+    @Override
+    public PLVToTopView getToTopView() {
+        return toTopView;
     }
 
     @Override
@@ -1274,6 +1283,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         public void onNoLiveAtPresent() {
             super.onNoLiveAtPresent();
             ToastUtils.showShort(R.string.plv_player_toast_no_live);
+            if (toTopView != null) {
+                toTopView.setShowEnabled(false);
+            }
         }
 
         @Override
@@ -1281,6 +1293,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             super.onLiveEnd();
             Log.i(TAG, "onLiveEnd: ");
             startLiveTimeCountDown(liveStartTime);
+            if (toTopView != null) {
+                toTopView.setShowEnabled(false);
+            }
         }
 
         @Override
@@ -1290,6 +1305,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             stopLiveCountDown();
             mediaController.updateWhenVideoViewPrepared();
             mediaController.show();
+            if (toTopView != null) {
+                toTopView.setShowEnabled(true);
+            }
         }
 
         @Override

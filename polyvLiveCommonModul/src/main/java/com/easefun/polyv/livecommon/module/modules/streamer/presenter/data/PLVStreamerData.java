@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 
 /**
  * 推流和连麦的数据，主要用于提供给 非mvp的v 监听/获取推流和连麦的数据
@@ -54,6 +55,8 @@ public class PLVStreamerData {
     private MutableLiveData<Boolean> enableShareScreen = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> videoLinkMicType = new MutableLiveData<>();
+    private MutableLiveData<PLVLinkMicDenoiseType> denoiseType = new MutableLiveData<>();
+    private MutableLiveData<Boolean> useExternalAudioInput = new MutableLiveData<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流状态">
@@ -177,6 +180,23 @@ public class PLVStreamerData {
     public  LiveData<Boolean> getIsStartShareScreen() {
         return enableShareScreen;
     }
+
+    public void postDenoiseType(PLVLinkMicDenoiseType denoiseType) {
+        this.denoiseType.postValue(denoiseType);
+    }
+
+    public LiveData<PLVLinkMicDenoiseType> getDenoiseType() {
+        return denoiseType;
+    }
+
+    public void postUseExternalAudioInput(boolean isUseExternalAudioInput) {
+        useExternalAudioInput.postValue(isUseExternalAudioInput);
+    }
+
+    public LiveData<Boolean> getUseExternalAudioInput() {
+        return useExternalAudioInput;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="连麦控制">

@@ -91,6 +91,13 @@ public interface IPLVSAStreamerLayout {
     PLVLinkMicConstant.NetworkQuality getNetworkQuality();
 
     /**
+     * 是否推流开始成功
+     *
+     * @return true：成功，false：未成功
+     */
+    boolean isStreamerStartSuccess();
+
+    /**
      * 添加因断网延迟20s断流的状态监听器
      *
      * @param listener 监听器
