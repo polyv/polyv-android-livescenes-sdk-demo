@@ -57,11 +57,19 @@ public class PLVCopyBoardPopupWindow {
         return showAndAnswer(anchor, isLeft, 0, onlyShowCopyItem, copyContent, R.drawable.plv_cp_ly_corner_bg, R.drawable.plv_inverted_triangle_layer_list, Color.parseColor("#F0F1F5"), clickListener);
     }
 
+    public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, boolean onlyShowCopyItem, @Nullable final String copyContent, final View.OnClickListener clickListener, boolean showPinMsgItem) {
+        return showAndAnswer(anchor, isLeft, 0, onlyShowCopyItem, copyContent, R.drawable.plv_cp_ly_corner_bg, R.drawable.plv_inverted_triangle_layer_list, Color.parseColor("#F0F1F5"), clickListener, showPinMsgItem);
+    }
+
     public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, int parentY, @Nullable final String copyContent, @DrawableRes int bgResId, @DrawableRes int triangleResId, @ColorInt int textColor, final View.OnClickListener clickListener) {
         return showAndAnswer(anchor, isLeft, parentY, false, copyContent, bgResId, triangleResId, textColor, clickListener);
     }
 
     public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, int parentY, boolean onlyShowCopyItem, @Nullable final String copyContent, @DrawableRes int bgResId, @DrawableRes int triangleResId, @ColorInt int textColor, final View.OnClickListener clickListener) {
+        return showAndAnswer(anchor, isLeft, parentY, onlyShowCopyItem, copyContent, bgResId, triangleResId, textColor, clickListener, false);
+    }
+
+    public static PopupWindow showAndAnswer(final View anchor, boolean isLeft, int parentY, boolean onlyShowCopyItem, @Nullable final String copyContent, @DrawableRes int bgResId, @DrawableRes int triangleResId, @ColorInt int textColor, final View.OnClickListener clickListener, boolean showPinMsgItem) {
         if (onlyShowCopyItem && copyContent == null) {
             return null;
         }
@@ -92,15 +100,32 @@ public class PLVCopyBoardPopupWindow {
                 }
             }
         });
+        View splitView2 = view.findViewById(R.id.split_view_2);
+        View pinTv = view.findViewById(R.id.long_press_pin_tv);
+        pinTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+                if (clickListener instanceof CopyBoardClickListener) {
+                    ((CopyBoardClickListener) clickListener).onClickPinButton();
+                }
+            }
+        });
         View invertedTriangleView = view.findViewById(R.id.inverted_triangle_view);
         invertedTriangleView.setBackgroundResource(triangleResId);
         if (copyContent == null) {
             copyTv.setVisibility(View.GONE);
             splitView.setVisibility(View.GONE);
+            pinTv.setVisibility(View.GONE);
+            splitView2.setVisibility(View.GONE);
         }
         if (onlyShowCopyItem) {
             answerTv.setVisibility(View.GONE);
             splitView.setVisibility(View.GONE);
+        }
+        if (!showPinMsgItem) {
+            pinTv.setVisibility(View.GONE);
+            splitView2.setVisibility(View.GONE);
         }
 
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -155,5 +180,7 @@ public class PLVCopyBoardPopupWindow {
         public abstract void onClickAnswerButton();
 
         public abstract boolean onClickCopyButton();
+
+        public abstract void onClickPinButton();
     }
 }

@@ -67,6 +67,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerRetryLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
@@ -140,6 +141,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     //横屏聊天区
     private PLVLCChatLandscapeLayout chatLandscapeLayout;
+    //评论上墙区
+    private PLVToTopView toTopView;
 
     //弹幕
     private IPLVLCDanmuController danmuController;
@@ -224,6 +227,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         volumeTipsView = findViewById(R.id.plvlc_playback_tipsview_volume);
         progressTipsView = findViewById(R.id.plvlc_playback_tipsview_progress);
         chatLandscapeLayout = findViewById(R.id.plvlc_chat_landscape_ly);
+        toTopView = findViewById(R.id.plvlc_chatroom_to_top_view);
 
         flPlayerSwitchViewParent = findViewById(R.id.plvlc_playback_fl_player_switch_view_parent);
         switchAnchorPlayer = findViewById(R.id.plvlc_playback_switch_anchor_player);
@@ -552,6 +556,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public PLVLCChatLandscapeLayout getChatLandscapeLayout() {
         return chatLandscapeLayout;
+    }
+
+    @Override
+    public PLVToTopView getToTopView() {
+        return toTopView;
     }
 
     @Override

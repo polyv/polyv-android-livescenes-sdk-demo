@@ -45,6 +45,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- 评论上墙布局 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
+        android:id="@+id/plvec_chatroom_to_top_view"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="82dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true" />
+
     <!--打赏布局-->
     <com.easefun.polyv.liveecommerce.modules.reward.widget.PLVECRewardGiftAnimView
         android:id="@+id/reward_ly"

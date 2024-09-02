@@ -37,12 +37,14 @@ import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengt
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgTipsWindow;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.IPLVManagerChatEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.history.PLVFileShareHistoryEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -88,6 +90,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private TextView chatMsgOverLengthMoreBtn;
 
     private boolean isOverLengthContentFolding = true;
+    private PolyvSendChatImageListener sendChatImageListener;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -116,6 +119,10 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         initView();
         addOnSendImgListener();
     }
+
+    public void recycle() {
+        PolyvChatroomManager.getInstance().removeSendChatImageListener(sendChatImageListener);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据、view">
@@ -135,12 +142,14 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     final boolean isProhibited = prohibitedWordVO != null;
                     // 严禁词、管理员私聊的信息不能回复
                     final boolean onlyShowCopyItem = isProhibited || isManagerChatMessage;
+                    // 是否允许评论上墙
+                    final boolean isPinMsgEnabled = adapter.callIsPinMsgEnabled() && !(messageData instanceof PLVFileShareHistoryEvent) && (messageData instanceof IPLVIdEvent);
                     getFullMessage(new PLVSugarUtil.Consumer<CharSequence>() {
                         @Override
                         public void accept(final CharSequence fullMessage) {
-                            PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, onlyShowCopyItem, fullMessage.toString(), new View.OnClickListener() {
+                            PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, onlyShowCopyItem, fullMessage.toString(), new PLVCopyBoardPopupWindow.CopyBoardClickListener() {
                                 @Override
-                                public void onClick(View v) {
+                                public void onClickAnswerButton() {
                                     PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
                                     chatQuoteVO.setUserId(userId);
                                     chatQuoteVO.setNick(nickName);
@@ -148,7 +157,31 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                                     chatQuoteVO.setObjects(PLVTextFaceLoader.messageToSpan(PLVChatroomPresenter.convertSpecialString(chatQuoteVO.getContent()), ConvertUtils.dp2px(12), Utils.getApp()));
                                     adapter.callOnShowAnswerWindow(chatQuoteVO, ((IPLVIdEvent) messageData).getId());
                                 }
-                            });
+
+                                @Override
+                                public boolean onClickCopyButton() {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onClickPinButton() {
+                                    if (messageData instanceof IPLVIdEvent) {
+                                        if (PLVSocketWrapper.getInstance().isOnlineStatus()) {
+                                            if (adapter.callIsStreamerStartSuccess()) {
+                                                PLVChatroomManager.getInstance().toTopMessage(((IPLVIdEvent) messageData).getId());
+                                            } else {
+                                                PLVToast.Builder.context(chatMsgTv.getContext())
+                                                        .setText(com.easefun.polyv.livecommon.R.string.plv_streamer_toast_call_streamer_start)
+                                                        .show();
+                                            }
+                                        } else {
+                                            PLVToast.Builder.context(chatMsgTv.getContext())
+                                                    .setText(com.easefun.polyv.livecommon.R.string.plv_common_toast_network_error)
+                                                    .show();
+                                        }
+                                    }
+                                }
+                            }, isPinMsgEnabled);
                         }
                     });
 
@@ -246,7 +279,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     }
 
     private void addOnSendImgListener() {
-        PolyvChatroomManager.getInstance().addSendChatImageListener(new PolyvSendChatImageListener() {
+        PolyvChatroomManager.getInstance().addSendChatImageListener(sendChatImageListener = new PolyvSendChatImageListener() {
             @Override
             public void onUploadFail(PolyvSendLocalImgEvent localImgEvent, Throwable t) {
                 localImgEvent.setSendStatus(PolyvSendLocalImgEvent.SENDSTATUS_FAIL);

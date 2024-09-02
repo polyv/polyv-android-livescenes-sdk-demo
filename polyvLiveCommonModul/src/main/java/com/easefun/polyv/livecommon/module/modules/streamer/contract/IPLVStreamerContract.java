@@ -18,6 +18,7 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
@@ -597,6 +598,16 @@ public interface IPLVStreamerContract {
          * @return 指定用户类型的连麦用户数量
          */
         int countLinkMicUser(@Nullable List<String> userTypes);
+
+        /**
+         * 设置降噪类型
+         */
+        void setDenoiseType(PLVLinkMicDenoiseType denoiseType);
+
+        /**
+         * 设置是否使用外部音频输入
+         */
+        void setIsUseExternalAudioInput(boolean isUseExternalAudioInput);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

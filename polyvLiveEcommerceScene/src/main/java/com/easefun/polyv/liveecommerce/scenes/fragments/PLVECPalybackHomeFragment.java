@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviou
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
@@ -139,6 +141,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     private PLVECRedpackView chatroomRedPackWidgetView;
 
+    //评论上墙布局
+    private PLVToTopView toTopView;
+
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
     private Runnable playbackTipsRunnable;
@@ -186,6 +191,10 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        RelativeLayout.LayoutParams toTopViewLayoutParams = null;
+        if (toTopView != null) {
+            toTopViewLayoutParams = (RelativeLayout.LayoutParams) toTopView.getLayoutParams();
+        }
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             backIv.setVisibility(View.VISIBLE);
@@ -194,6 +203,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             }
             if (commodityPopupLayout != null) {
                 commodityPopupLayout.setLandspace(true);
+            }
+            if (toTopViewLayoutParams != null) {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(16), 0, 0);
             }
         } else {
             view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
@@ -205,6 +217,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
             if (commodityPopupLayout != null) {
                 commodityPopupLayout.setLandspace(false);
+            }
+            if (toTopViewLayoutParams != null) {
+                toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(82), 0, 0);
             }
         }
     }
@@ -335,6 +350,12 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
 
+        //评论上墙
+        toTopView = findViewById(R.id.plvec_chatroom_to_top_view);
+        toTopView.setIsLiveType(false);
+        if (chatPlaybackManager != null && toTopView != null) {
+            chatPlaybackManager.addOnCallDataListener(toTopView.getChatPlaybackDataListener());
+        }
     }
 
     // </editor-fold>
@@ -417,6 +438,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                     }
                 });
                 chatPlaybackManager.addOnCallDataListener(chatPlaybackCallDataListener);
+            }
+            if (toTopView != null) {
+                chatPlaybackManager.addOnCallDataListener(toTopView.getChatPlaybackDataListener());
             }
             if (chatPlaybackTipsTv != null) {
                 chatPlaybackTipsTv.setVisibility(View.VISIBLE);
@@ -991,8 +1015,6 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          * 展示用于跳转微信复制的二维码
          */
         void onShowOpenLink();
-
-
     }
     // </editor-fold>
 }

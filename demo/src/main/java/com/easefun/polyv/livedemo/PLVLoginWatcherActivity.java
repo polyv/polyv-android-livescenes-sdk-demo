@@ -394,14 +394,14 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         break;
                     //进入直播带货场景
                     case ECOMMERCE:
-                        if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
+//                        if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchLive(PLVLoginWatcherActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar(), langType);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
-                        } else {
-                            ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
-                        }
+//                        } else {
+//                            ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
+//                        }
                         break;
                     default:
                         break;
@@ -467,16 +467,16 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         break;
                     //进入直播带货场景
                     case ECOMMERCE:
-                        if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
+//                        if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
                                     vid, getViewerId(), getViewerName(), getViewerAvatar(),
                                     plvPlaybackListType, langType);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
-                        } else {
-                            ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
-                        }
+//                        } else {
+//                            ToastUtils.showShort(R.string.plv_scene_login_toast_liveecommerce_no_support_type);
+//                        }
                         break;
                     default:
                         break;

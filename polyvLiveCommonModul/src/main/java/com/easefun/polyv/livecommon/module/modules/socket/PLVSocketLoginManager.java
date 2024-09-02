@@ -50,7 +50,6 @@ public class PLVSocketLoginManager implements IPLVSocketLoginManager {
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
-                PLVCommonLog.d(TAG, "socket receiveMessage: " + message + ", event: " + event + ", listenEvent: " + listenEvent);
                 if (getConfig().getChannelId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getChannelId())) {
                     acceptSocketMessage(new PLVSocketMessage(listenEvent, message, event));
                 }

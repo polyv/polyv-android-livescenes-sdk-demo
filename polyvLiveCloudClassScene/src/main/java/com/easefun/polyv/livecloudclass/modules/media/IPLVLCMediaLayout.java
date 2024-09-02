@@ -17,6 +17,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -108,6 +109,13 @@ public interface IPLVLCMediaLayout {
      * @return 横屏聊天布局
      */
     PLVLCChatLandscapeLayout getChatLandscapeLayout();
+
+    /**
+     * 获取评论上墙View
+     *
+     * @return 评论上墙View
+     */
+    PLVToTopView getToTopView();
 
     /**
      * 获取播放器自定义水印

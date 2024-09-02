@@ -100,6 +100,8 @@ public class PLVFaceManager {
         mFaceMap.put("[奶茶]", R.drawable.polyv_134);// no need i18n
         mFaceMap.put("[时钟]", R.drawable.polyv_135);// no need i18n
         mFaceMap.put("[晚安]", R.drawable.polyv_136);// no need i18n
+        mFaceMap.put("[拍手]", R.drawable.polyv_137);// no need i18n
+        mFaceMap.put("[鲜花]", R.drawable.polyv_138);// no need i18n
     }
 
     public void initEmotionList(@NotNull List<PLVEmotionImageVO.EmotionImage> emotionImages){

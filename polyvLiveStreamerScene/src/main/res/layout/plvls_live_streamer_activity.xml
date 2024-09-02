@@ -52,6 +52,17 @@
         app:layout_constraintBottom_toBottomOf="@+id/plvls_document_ly"
         app:layout_constraintLeft_toLeftOf="@+id/plvls_document_ly" />
 
+    <!-- 评论上墙布局 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
+        android:id="@+id/plvls_chatroom_to_top_view"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@+id/plvls_document_ly"
+        app:layout_constraintRight_toRightOf="@+id/plvls_document_ly"
+        app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
+
     <!--直播间弹层布局容器-->
     <FrameLayout
         android:id="@+id/plvls_live_room_popup_container"

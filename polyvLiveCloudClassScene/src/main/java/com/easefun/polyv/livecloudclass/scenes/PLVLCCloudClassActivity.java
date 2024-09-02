@@ -56,6 +56,7 @@ import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -118,6 +119,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private IPLVLCLinkMicLayout linkMicLayout;
     // 横屏聊天室布局
     private PLVLCChatLandscapeLayout chatLandscapeLayout;
+    // 评论上墙布局
+    private PLVToTopView toTopView;
 
     //弹窗布局
     private IPLVPopoverLayout popoverLayout;
@@ -527,6 +530,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         // 初始化横屏聊天室布局
         chatLandscapeLayout = mediaLayout.getChatLandscapeLayout();
         chatLandscapeLayout.init(livePageMenuLayout.getChatCommonMessageList());
+        // 初始化评论上墙View
+        toTopView = mediaLayout.getToTopView();
 
         // 注册 悬浮PPT布局 和 播放器布局 的切换器
         pptViewSwitcher.registerSwitchView(floatingPPTLayout.getPPTSwitchView(), mediaLayout.getPlayerSwitchView());
@@ -922,6 +927,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (mediaLayout != null) {
                     mediaLayout.setChatPlaybackEnabled(isChatPlaybackEnabled, liveRoomDataManager.getConfig().isLive());
                     mediaLayout.setChatIsDisplayEnabled(isDisplayEnabled);
+                }
+                if (toTopView != null) {
+                    toTopView.setIsChatPlaybackLayout(isChatPlaybackEnabled);
+                    toTopView.setIsLiveType(liveRoomDataManager.getConfig().isLive());
+                    livePageMenuLayout.getChatPlaybackManager().addOnCallDataListener(toTopView.getChatPlaybackDataListener());
+                    livePageMenuLayout.getChatroomPresenter().registerView(toTopView.getChatroomView());
                 }
             }
 

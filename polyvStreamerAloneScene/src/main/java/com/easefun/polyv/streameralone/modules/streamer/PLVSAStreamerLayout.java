@@ -405,6 +405,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
+    public boolean isStreamerStartSuccess() {
+        return streamerPresenter.getStreamerStatus() == PLVStreamerPresenter.STREAMER_STATUS_START_SUCCESS;
+    }
+
+    @Override
     public void addOnShowNetBrokenListener(IPLVOnDataChangedListener<Boolean> listener) {
         streamerPresenter.getData().getShowNetBroken().observe((LifecycleOwner) getContext(), listener);
     }

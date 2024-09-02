@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
@@ -55,7 +56,6 @@ public class GifSpanTextView extends GifTextView {
     }
 
     public void setTextInner(CharSequence text, boolean specialType) {
-        PLVCommonLog.d(TAG, "content :" + text);
         if (specialType) {
             setContentHttpPattern(text);
         } else {
@@ -66,11 +66,9 @@ public class GifSpanTextView extends GifTextView {
 
     @Override
     public void setText(CharSequence text, TextView.BufferType type) {
-        PLVCommonLog.d(TAG, "set text :" + text);
         type = TextView.BufferType.EDITABLE;
         CharSequence oldText = getText();
         if (!TextUtils.isEmpty(text) && text.length() >= 50) {
-            PLVCommonLog.d(TAG, "set text :" + text);
         }
         if (!TextUtils.isEmpty(oldText) && oldText instanceof Spannable) {
             Spannable sp = (Spannable) oldText;
@@ -116,8 +114,9 @@ public class GifSpanTextView extends GifTextView {
         if (getMeasuredWidth() > 0 && TextViewLinesUtils.getTextViewLines(this, getMeasuredWidth()) > getMaxLines()
                 && getEllipsize() == TextUtils.TruncateAt.END) {
             int lineEndIndex = getLayout().getLineEnd(getMaxLines() - 1);
-            String text = getText().subSequence(0, lineEndIndex - 1) + "...";
-            super.setText(text);
+            CharSequence text = getText().subSequence(0, lineEndIndex - 1);
+            SpannableStringBuilder span = new SpannableStringBuilder(text);
+            super.setText(span.append("..."));
         }
     }
 

@@ -113,7 +113,7 @@ public class PLVBeadWidget extends View {
         }
 
 
-        for (int i = 1; i < beadRadius; i++) {
+        for (int i = 1; i < beadCount; i++) {
             //半径+画笔宽度+偏移+画笔宽度+半径
             nextBeadCX += beadRadius + paintForUnSelected.getStrokeWidth() +
                     beadMargin + paintForUnSelected.getStrokeWidth() + beadRadius;

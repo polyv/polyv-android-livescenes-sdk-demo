@@ -1,6 +1,7 @@
 package com.easefun.polyv.livestreamer.modules.chatroom;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 
 /**
@@ -18,6 +19,13 @@ public interface IPLVLSChatroomLayout {
      * @param liveRoomDataManager 直播间数据管理器
      */
     void init(IPLVLiveRoomDataManager liveRoomDataManager);
+
+    /**
+     * 获取聊天室presenter
+     *
+     * @return 聊天室presenter
+     */
+    IPLVChatroomContract.IChatroomPresenter getChatroomPresenter();
 
     /**
      * 设置view交互事件监听器
@@ -111,6 +119,11 @@ public interface IPLVLSChatroomLayout {
          * 被踢出直播间
          */
         void onKickByServer();
+
+        /**
+         * 是否推流开始
+         */
+        boolean isStreamerStartSuccess();
     }
     // </editor-fold>
 }

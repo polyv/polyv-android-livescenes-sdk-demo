@@ -246,6 +246,19 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
                     chatOverLengthMessageLayout.show(chatMessageDataBean);
                 }
             }
+
+            @Override
+            public boolean isStreamerStartSuccess() {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.isStreamerStartSuccess();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isPinMsgEnabled() {
+                return PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.LIVE_PIN_MSG_ENABLED);
+            }
         });
         plvlsChatroomChatMsgRv.setAdapter(chatMessageAdapter);
         plvlsChatroomChatMsgRv.addUnreadView(plvlsChatroomUnreadMsgTv);
@@ -300,6 +313,11 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
         observeManagerChatEnableStatus();
         observeManagerChatNewMessageStatus();
         updateManagerChatVisibility();
+    }
+
+    @Override
+    public IPLVChatroomContract.IChatroomPresenter getChatroomPresenter() {
+        return chatroomPresenter;
     }
 
     @Override

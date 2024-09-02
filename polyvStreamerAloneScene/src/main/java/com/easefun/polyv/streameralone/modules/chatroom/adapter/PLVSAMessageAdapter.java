@@ -97,6 +97,13 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         }
     }
 
+    @Override
+    public void onViewRecycled(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVSAMessageAdapter> holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof PLVSAMessageViewHolder) {
+            ((PLVSAMessageViewHolder) holder).recycle();
+        }
+    }
 
     @Override
     public int getItemViewType(int position) {
@@ -298,12 +305,30 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         }
     }
 
+    public boolean callIsStreamerStartSuccess() {
+        if (onViewActionListener != null) {
+            return onViewActionListener.isStreamerStartSuccess();
+        }
+        return false;
+    }
+
+    public boolean callIsPinMsgEnabled() {
+        if (onViewActionListener != null) {
+            return onViewActionListener.isPinMsgEnabled();
+        }
+        return false;
+    }
+
     public interface OnViewActionListener {
         void onChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg);
 
         void onShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId);
 
         void onShowOverLengthMessage(PLVSAChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        boolean isStreamerStartSuccess();
+
+        boolean isPinMsgEnabled();
     }
     // </editor-fold>
 }

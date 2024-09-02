@@ -61,6 +61,7 @@ import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.IPLVLinkMicManager;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicEngineParam;
 import com.plv.livescenes.log.chat.PLVChatroomELog;
 import com.plv.livescenes.model.PLVListUsersVO;
@@ -207,6 +208,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Nullable
     private Boolean isNetworkConnect = null;
     private boolean isMyselfJoinRtc = false;
+    private PLVAutoSaveKV<PLVLinkMicDenoiseType> denoiseTypeKV = new PLVAutoSaveKV<PLVLinkMicDenoiseType>("plv_streamer_denoise_type") {};
+    private PLVAutoSaveKV<Boolean> isUseExternalAudioInputKV = new PLVAutoSaveKV<Boolean>("plv_streamer_is_use_external_audio_input") {};
 
     /**** 容器 ****/
     //推流和连麦列表
@@ -363,6 +366,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                                 .getOrDefault(PLVChannelFeature.STREAMER_PUSH_QUALITY_PREFERENCE, PLVPushDowngradePreference.PREFER_BETTER_QUALITY)
                 );
                 setMixLayoutType(mixLayoutType);
+                setDenoiseType(denoiseTypeKV.getOrDefault(PLVLinkMicDenoiseType.ADAPTIVE));
+                setIsUseExternalAudioInput(isUseExternalAudioInputKV.getOrDefault(false));
 
                 initStreamerListener();
 
@@ -708,12 +713,16 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     public void exitShareScreen() {
         if (streamerManager.isScreenSharing()) {
             streamerManager.exitScreenCapture();
+            if (curCameraFront) {
+                streamerManager.setLocalPushMirror(isFrontMirror);
+            }
         }
     }
 
     @Override
     public void requestShareScreen(Activity activity, PLVCustomScreenShareData customScreenShareData) {
         if (!streamerManager.isScreenSharing()) {
+            streamerManager.setLocalPushMirror(false);
             streamerManager.requestScreenCapture(activity, customScreenShareData);
         }
     }
@@ -1179,6 +1188,20 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     }
                 })
                 .toMutableList().size();
+    }
+
+    @Override
+    public void setDenoiseType(PLVLinkMicDenoiseType denoiseType) {
+        streamerData.postDenoiseType(denoiseType);
+        streamerManager.setDenoiseType(denoiseType);
+        denoiseTypeKV.set(denoiseType);
+    }
+
+    @Override
+    public void setIsUseExternalAudioInput(boolean isUseExternalAudioInput) {
+        streamerData.postUseExternalAudioInput(isUseExternalAudioInput);
+        streamerManager.setExternalAudioDeviceInput(isUseExternalAudioInput);
+        isUseExternalAudioInputKV.set(isUseExternalAudioInput);
     }
 
     @Override

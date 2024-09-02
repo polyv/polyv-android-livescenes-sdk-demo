@@ -121,6 +121,15 @@
         android:layout_height="match_parent"
         android:layout_marginTop="10dp" />
 
+    <!-- 评论上墙布局 -->
+    <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
+        android:id="@+id/plvlc_chatroom_to_top_view"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal" />
+
     <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
         android:id="@+id/commodity_push_ly"
         android:layout_width="308dp"

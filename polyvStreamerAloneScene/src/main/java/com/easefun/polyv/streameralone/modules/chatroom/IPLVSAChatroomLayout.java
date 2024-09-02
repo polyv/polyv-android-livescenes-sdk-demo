@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.socket.event.chat.PLVRewardEvent;
@@ -22,6 +23,13 @@ public interface IPLVSAChatroomLayout {
      * @param liveRoomDataManager 直播间数据管理器
      */
     void init(IPLVLiveRoomDataManager liveRoomDataManager);
+
+    /**
+     * 获取聊天室presenter
+     *
+     * @return 聊天室presenter
+     */
+    IPLVChatroomContract.IChatroomPresenter getChatroomPresenter();
 
     /**
      * 聊天室登录

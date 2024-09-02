@@ -76,6 +76,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
@@ -88,6 +89,7 @@ import com.plv.socket.event.chat.PLVRemoveHistoryEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
+import com.plv.socket.event.chat.PLVToTopEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -313,7 +315,6 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnMessageListener(new PLVSocketMessageObserver.OnMessageListener() {
             @Override
             public void onMessage(String listenEvent, String event, String message) {
-                PLVCommonLog.d(TAG, "chatroom receiveMessage: " + message + ", event: " + event + ", listenEvent: " + listenEvent);
                 if (getConfig().getChannelId().equals(PolyvSocketWrapper.getInstance().getLoginVO().getChannelId())) {
                     PLVRxBus.get().post(new PLVSocketMessage(listenEvent, message, event));
                 }
@@ -1298,7 +1299,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         break;
                     //onSliceId事件
                     case PLVEventConstant.Ppt.ON_SLICE_ID_EVENT:
-                        PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toMessageEventModel(message, PLVOnSliceIDEvent.class);
+                        final PLVOnSliceIDEvent onSliceIDEvent = PLVEventHelper.toMessageEventModel(message, PLVOnSliceIDEvent.class);
                         if (onSliceIDEvent != null && onSliceIDEvent.getData() != null) {
                             if (isFocusMode != onSliceIDEvent.getData().isFocusMode()) {
                                 isFocusMode = onSliceIDEvent.getData().isFocusMode();
@@ -1307,6 +1308,24 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                     @Override
                                     public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
                                         view.onFocusModeEvent(focusModeEvent);
+                                    }
+                                });
+                            }
+                            if (onSliceIDEvent.getData().getOnlineUserNumber() != 0) {
+                                PLVChatroomManager.getInstance().setOnlineCount(onSliceIDEvent.getData().getOnlineUserNumber());
+                            }
+                            if (onSliceIDEvent.getData().getSpeakTop() != null) {
+                                callbackToView(new ViewRunnable() {
+                                    @Override
+                                    public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                        view.onToTopEvent(onSliceIDEvent.getData().getSpeakTop());
+                                    }
+                                });
+                            } else {
+                                callbackToView(new ViewRunnable() {
+                                    @Override
+                                    public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                        view.onCancelTopEvent(new PLVCancelTopEvent());
                                     }
                                 });
                             }
@@ -1384,6 +1403,28 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             @Override
                             public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
                                 view.onFocusModeEvent(focusModeEvent);
+                            }
+                        });
+                    }
+                }
+            } else if (PLVEventConstant.Chatroom.MESSAGE_EVENT_SPEAK_LOWERCASE.equals(listenEvent)) {
+                if (PLVToTopEvent.EVENT.equals(event)) {
+                    final PLVToTopEvent toTopEvent = PLVGsonUtil.fromJson(PLVToTopEvent.class, message);
+                    if (toTopEvent != null) {
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onToTopEvent(toTopEvent);
+                            }
+                        });
+                    }
+                } else if (PLVCancelTopEvent.EVENT.equals(event)) {
+                    final PLVCancelTopEvent cancelTopEvent = PLVGsonUtil.fromJson(PLVCancelTopEvent.class, message);
+                    if (cancelTopEvent != null) {
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onCancelTopEvent(cancelTopEvent);
                             }
                         });
                     }

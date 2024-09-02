@@ -12,6 +12,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
@@ -20,6 +21,7 @@ import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
+import com.plv.socket.event.chat.PLVToTopEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
@@ -132,6 +134,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onRemoveMessageEvent(@Nullable String id, boolean isRemoveAll) {
+
+    }
+
+    @Override
+    public void onToTopEvent(@NonNull PLVToTopEvent toTopEvent) {
+
+    }
+
+    @Override
+    public void onCancelTopEvent(@NonNull PLVCancelTopEvent cancelTopEvent) {
 
     }
 

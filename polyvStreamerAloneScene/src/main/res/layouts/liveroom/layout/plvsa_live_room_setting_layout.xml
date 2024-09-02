@@ -25,12 +25,10 @@
         android:layout_marginRight="24dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/plvsa_setting_menu_ly_shape"
-        android:paddingLeft="24dp"
-        android:paddingTop="28dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="33dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:paddingTop="28dp"
+        android:paddingBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/plvsa_setting_btn_ll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -39,6 +37,7 @@
             android:id="@+id/plvsa_setting_live_title_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
             android:background="@null"
             android:focusable="false"
             android:textColor="#F0F1F5"
@@ -52,155 +51,258 @@
             android:id="@+id/plvsa_setting_live_title_split_view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginHorizontal="24dp"
             android:layout_marginTop="13dp"
             android:background="#1AFFFFFF"
-            app:layout_constraintTop_toBottomOf="@id/plvsa_setting_live_title_tv" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_tv" />
 
-        <ImageView
-            android:id="@+id/plvsa_setting_camera_orient_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="27dp"
-            android:padding="8dp"
-            android:src="@drawable/plvsa_setting_camera_orient_selector"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_mirror_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
-
-        <ImageView
-            android:id="@+id/plvsa_setting_mirror_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="27dp"
-            android:padding="8dp"
-            android:src="@drawable/plvsa_setting_mirror_selector"
-            app:layout_constraintLeft_toRightOf="@+id/plvsa_setting_camera_orient_iv"
-            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_bitrate_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
-
-        <ImageView
-            android:id="@+id/plvsa_setting_bitrate_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="27dp"
-            android:padding="8dp"
-            android:src="@drawable/plvsa_bitrate_icon_hd"
-            app:layout_constraintLeft_toRightOf="@+id/plvsa_setting_mirror_iv"
-            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_screen_orientation_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
-
-        <ImageView
-            android:id="@+id/plvsa_setting_screen_orientation_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="27dp"
-            android:padding="8dp"
-            android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon"
-            app:layout_constraintLeft_toRightOf="@+id/plvsa_setting_bitrate_iv"
-            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_push_resolution_ratio_ll"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
-
-        <ImageView
-            android:id="@+id/plvsa_setting_mix_layout_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="27dp"
-            android:padding="8dp"
-            android:src="@drawable/plvsa_live_room_setting_mix_layout_icon"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:layout_constraintLeft_toRightOf="@+id/plvsa_setting_push_resolution_ratio_ll"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view" />
-
-        <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
-            android:id="@+id/plvsa_setting_push_resolution_ratio_ll"
-            android:layout_width="wrap_content"
+        <HorizontalScrollView
+            android:id="@+id/plvsa_setting_action_scroll_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="27dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@id/plvsa_setting_screen_orientation_iv"
-            app:layout_constraintRight_toLeftOf="@+id/plvsa_setting_mix_layout_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view"
-            app:plv_show_on_landscape="true"
-            app:plv_show_on_portrait="false">
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_split_view">
 
-            <ImageView
-                android:id="@+id/plvsa_setting_push_resolution_ratio_iv"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center_horizontal"
-                android:padding="8dp"
-                android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon" />
-
-            <TextView
-                android:id="@+id/plvsa_setting_push_resolution_ratio_tv"
+            <LinearLayout
+                android:id="@+id/plvsa_setting_action_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/plv_streamer_push_resolution_ratio"
-                android:textColor="#ffffff"
-                android:textSize="12sp" />
+                android:orientation="horizontal">
 
-        </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="1dp" />
 
-        <TextView
-            android:id="@+id/plvsa_setting_camera_orient_tv"
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_camera_orient_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_camera_orient_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_setting_camera_orient_selector" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_camera_orient_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_camera_orient"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_mirror_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_mirror_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_setting_mirror_selector" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_mirror_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_mirror"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_bitrate_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_bitrate_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_bitrate_icon_hd" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_bitrate_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_bitrate_high"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_screen_orientation_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_screen_orientation_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon" />
+
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_screen_orientation_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_screen_orientation"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_mix_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_mix_layout_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_live_room_setting_mix_layout_icon"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_mix_layout_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_mix_layout"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
+                <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+                    android:id="@+id/plvsa_setting_push_resolution_ratio_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:plv_show_on_landscape="true"
+                    app:plv_show_on_portrait="false">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_push_resolution_ratio_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:src="@drawable/plvsa_live_room_setting_screen_orientation_switch_icon" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_push_resolution_ratio_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_push_resolution_ratio"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_denoise_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_denoise_layout_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="9dp"
+                        android:src="@drawable/plvsa_live_room_setting_denoise_layout_icon" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_denoise_layout_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_denoise_setting_title"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/plvsa_setting_external_audio_input_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/plvsa_setting_external_audio_input_layout_iv"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="9dp"
+                        android:src="@drawable/plvsa_live_room_setting_external_audio_input_layout_icon" />
+
+                    <TextView
+                        android:id="@+id/plvsa_setting_external_audio_input_layout_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plv_streamer_external_audio_input_title"
+                        android:textColor="#ffffff"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="1dp" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVBeadWidget
+            android:id="@+id/plvsa_setting_action_scroll_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/plv_streamer_camera_orient"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="@+id/plvsa_setting_camera_orient_iv"
-            app:layout_constraintRight_toRightOf="@+id/plvsa_setting_camera_orient_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_camera_orient_iv" />
-
-        <TextView
-            android:id="@+id/plvsa_setting_mirror_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/plv_streamer_mirror"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="@+id/plvsa_setting_mirror_iv"
-            app:layout_constraintRight_toRightOf="@+id/plvsa_setting_mirror_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_mirror_iv" />
-
-        <TextView
-            android:id="@+id/plvsa_setting_bitrate_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/plv_streamer_bitrate_high"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="@+id/plvsa_setting_bitrate_iv"
-            app:layout_constraintRight_toRightOf="@+id/plvsa_setting_bitrate_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_bitrate_iv" />
-
-        <TextView
-            android:id="@+id/plvsa_setting_screen_orientation_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/plv_streamer_screen_orientation"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="@+id/plvsa_setting_screen_orientation_iv"
-            app:layout_constraintRight_toRightOf="@+id/plvsa_setting_screen_orientation_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_screen_orientation_iv" />
-
-        <TextView
-            android:id="@+id/plvsa_setting_mix_layout_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/plv_streamer_mix_layout"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:layout_constraintLeft_toLeftOf="@+id/plvsa_setting_mix_layout_iv"
-            app:layout_constraintRight_toRightOf="@+id/plvsa_setting_mix_layout_iv"
-            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_mix_layout_iv" />
+            android:layout_marginTop="22dp"
+            app:bead_margin="4dp"
+            app:bead_radius="3dp"
+            app:layout_constraintEnd_toEndOf="@+id/plvsa_setting_action_scroll_container"
+            app:layout_constraintStart_toStartOf="@+id/plvsa_setting_action_scroll_container"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_action_scroll_container"
+            app:selected_bead_color="#2C96FF"
+            app:unselected_bead_color="#BEC2CA" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -252,9 +354,9 @@
             android:background="@drawable/plvsa_setting_start_live_bg_selector"
             android:gravity="center"
             android:text="@string/plv_streamer_start_live"
+            android:textAllCaps="false"
             android:textColor="#ffffff"
             android:textSize="16sp"
-            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </LinearLayout>

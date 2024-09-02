@@ -29,6 +29,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
+import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
@@ -495,6 +496,9 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
                     .show();
             return false;
         }
+
+        //追踪上报商品卡片点击事件
+        PLVTrackLogHelper.trackClickProductPush(liveRoomDataManager, productContentBean);
 
         //发送点击卡片事件
         PLVProductClickBean clickBean = new PLVProductClickBean();

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="320dp"
+    android:layout_height="60dp"
+    app:radius="8dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="#cc1D2129" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp">
+
+        <com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView
+            android:id="@+id/message_tv"
+            android:layout_width="245dp"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:gravity="center_vertical|left"
+            android:maxLines="2"
+            android:text="一行文本一行文本"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/close_tv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="  ×"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            tools:visibility="gone" />
+
+        <TextView
+            android:id="@+id/cancel_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/plv_to_top_cancel_tv_bg"
+            android:gravity="center"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="下墙"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectFrameLayout>

@@ -90,6 +90,14 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     }
 
     @Override
+    public void onViewRecycled(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVLSMessageAdapter> holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof PLVLSMessageViewHolder) {
+            ((PLVLSMessageViewHolder) holder).recycle();
+        }
+    }
+
+    @Override
     public int getItemViewType(int position) {
         return dataList.get(position).getItemType();
     }
@@ -280,6 +288,10 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         void onShowAnswerWindow(PLVChatQuoteVO chatQuoteVO, String quoteId);
 
         void onShowOverLengthMessage(PLVLSChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
+
+        boolean isStreamerStartSuccess();
+
+        boolean isPinMsgEnabled();
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
@@ -298,6 +310,20 @@ public class PLVLSMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         if (onViewActionListener != null) {
             onViewActionListener.onShowOverLengthMessage(chatMessageDataBean);
         }
+    }
+
+    public boolean callIsStreamerStartSuccess() {
+        if (onViewActionListener != null) {
+            return onViewActionListener.isStreamerStartSuccess();
+        }
+        return false;
+    }
+
+    public boolean callIsPinMsgEnabled() {
+        if (onViewActionListener != null) {
+            return onViewActionListener.isPinMsgEnabled();
+        }
+        return false;
     }
     // </editor-fold>
 }

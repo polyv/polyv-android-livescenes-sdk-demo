@@ -20,6 +20,7 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
@@ -28,6 +29,7 @@ import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
+import com.plv.socket.event.chat.PLVToTopEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
@@ -176,6 +178,18 @@ public interface IPLVChatroomContract {
          */
         @WorkerThread
         void onRemoveMessageEvent(@Nullable String id, boolean isRemoveAll);
+
+        /**
+         * 评论上墙事件
+         */
+        @WorkerThread
+        void onToTopEvent(@NonNull PLVToTopEvent toTopEvent);
+
+        /**
+         * 评论下墙事件
+         */
+        @WorkerThread
+        void onCancelTopEvent(@NonNull PLVCancelTopEvent cancelTopEvent);
 
         /**
          * 自定义事件中的送礼事件
