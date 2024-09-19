@@ -64,8 +64,12 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> playbackChannelDetailVO = new MutableLiveData<>();
     //直播场次Id
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
+    //聊天室token
+    private MutableLiveData<String> chatTokenLiveData = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
+    //聊天室token
+    private String chatToken;
     //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
     private boolean isSupportRTC;
     // </editor-fold>
@@ -148,6 +152,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     }
 
     @Override
+    public MutableLiveData<String> getChatTokenLiveData() {
+        return chatTokenLiveData;
+    }
+
+    @Override
     public MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData() {
         return interactStatusData;
     }
@@ -171,6 +180,17 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public String getSessionId() {
         return sessionId;
+    }
+
+    @Override
+    public void setChatToken(String chatToken) {
+        this.chatToken = chatToken;
+        chatTokenLiveData.postValue(chatToken);
+    }
+
+    @Override
+    public String getChatToken() {
+        return chatToken;
     }
 
     @Override

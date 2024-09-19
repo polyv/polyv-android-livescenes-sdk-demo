@@ -229,6 +229,11 @@ public interface IPLVLCLivePageMenuLayout {
          */
         void onShowOpenLink();
 
+        /**
+         * 截屏
+         */
+        void onScreenshot();
+
     }
     // </editor-fold>
 }

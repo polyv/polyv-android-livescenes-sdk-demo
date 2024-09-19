@@ -36,6 +36,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodit
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescOfflineFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.member.PLVLCMemberListPortFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackPreviousFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductLayout;
@@ -79,6 +80,8 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
@@ -178,6 +181,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCPlaybackPreviousFragment previousFragment;//往期视频tab页
     private PLVLCPlaybackChapterFragment chapterFragment;//章节tab页
     private PLVLCProductFragment productFragment;
+    private PLVLCMemberListPortFragment memberListFragment;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -310,6 +314,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             @Override
             public void onShowLanguageAction() {
                 languageSwitchPopupWindow.show(liveRoomDataManager.getConfig().getChannelId());
+            }
+
+            @Override
+            public void onScreenshot() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onScreenshot();
+                }
             }
 
             @Override
@@ -622,7 +633,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         qaDataBean.setUserPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar());
         qaDataBean.setUserNick(liveRoomDataManager.getConfig().getUser().getViewerName());
         qaDataBean.setSocketMsg();
-        questionsAndAnswersFragment.init(qaDataBean.getSocketMsg(), liveRoomDataManager);
+        questionsAndAnswersFragment.init(qaDataBean.getSocketMsg(), liveRoomDataManager, getContext());
         pageMenuTabFragmentList.add(questionsAndAnswersFragment);
     }
 
@@ -669,6 +680,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 @Override
                 public void onShowLanguageAction() {
                     languageSwitchPopupWindow.show(liveRoomDataManager.getConfig().getChannelId());
+                }
+
+                @Override
+                public void onScreenshot() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onScreenshot();
+                    }
                 }
 
                 @Override
@@ -814,6 +832,22 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             chapterFragment = new PLVLCPlaybackChapterFragment();
         }
         pageMenuTabFragmentList.add(chapterFragment);
+        refreshPageMenuTabAdapter();
+    }
+
+    private void addMemberListTab(String tabName) {
+        if (memberListFragment != null && pageMenuTabFragmentList.contains(memberListFragment)) {
+            return;
+        }
+        if (!liveRoomDataManager.getConfig().isLive()) {
+            return;
+        }
+        if (memberListFragment == null) {
+            memberListFragment = new PLVLCMemberListPortFragment();
+            memberListFragment.init(chatroomPresenter);
+        }
+        pageMenuTabTitleList.add(tabName);
+        pageMenuTabFragmentList.add(memberListFragment);
         refreshPageMenuTabAdapter();
     }
 
@@ -1219,7 +1253,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             } else if (PLVLiveClassDetailVO.MENUTYPE_BUY.equals(channelMenusBean.getMenuType())) {
                 commodityViewModel.notifyHasProductLayout(true);
                 addBuyProductTab(channelMenusBean.getName());
+            } else if (PLVLiveClassDetailVO.MENUTYPE_MEMBERS.equals(channelMenusBean.getMenuType())) {
+                addMemberListTab(channelMenusBean.getName());
             }
+        }
+        if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST)) {
+            addMemberListTab(getContext().getString(R.string.plv_sdk_live_menu_name_members));
         }
         checkAddPreviousTab();
         refreshPageMenuTabAdapter();

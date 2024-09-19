@@ -15,6 +15,8 @@ import com.plv.thirdpart.blankj.utilcode.util.Utils;
  * 直播频道相关信息配置类
  */
 public class PLVLiveChannelConfig {
+    private static String param4 = "";
+    private static String param5 = "";
     /**
      * 保利威账号信息
      */
@@ -71,6 +73,22 @@ public class PLVLiveChannelConfig {
      * （仅开播场景使用）
      */
     private boolean isLiveStreamingWhenLogin = false;
+
+    public static void setParam4(String param4) {
+        PLVLiveChannelConfig.param4 = param4;
+    }
+
+    public static String getParam4() {
+        return param4;
+    }
+
+    public static void setParam5(String param5) {
+        PLVLiveChannelConfig.param5 = param5;
+    }
+
+    public static String getParam5() {
+        return param5;
+    }
 
     public PLVLiveChannelConfig() {
         account = new Account();
@@ -129,7 +147,7 @@ public class PLVLiveChannelConfig {
      * @param actor        用户的头衔，一般观看场景不需填写，开播场景从登录接口获取
      */
     public void setupUser(String viewerId, String viewerName, String viewerAvatar, String viewerType, String actor) {
-        setupUser(viewerId, viewerName, viewerAvatar, viewerType, actor, "", "");
+        setupUser(viewerId, viewerName, viewerAvatar, viewerType, actor, param4, param5);
     }
 
     /**

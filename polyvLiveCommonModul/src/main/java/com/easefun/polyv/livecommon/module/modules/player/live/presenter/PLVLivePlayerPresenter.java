@@ -326,6 +326,13 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     }
 
     @Override
+    public void disableScreenCAP(Activity activity, boolean disableScreenCAP) {
+        if (videoView != null) {
+            videoView.disableScreenCAP(activity, disableScreenCAP);
+        }
+    }
+
+    @Override
     public PolyvLiveChannelVO getChannelVO() {
         return videoView == null ? null : videoView.getModleVO();
     }

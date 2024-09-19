@@ -237,7 +237,7 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
             fos = new FileOutputStream(new File(savePath, fileName));
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
             fos.flush();
-            ToastUtils.showShort(R.string.plv_live_save_img_success);
+            ToastUtils.showShort(R.string.plv_live_save_img_success, "");
         } catch (Exception e) {
             PLVCommonLog.exception(e);
             ToastUtils.showShort(R.string.plv_live_save_img_failed);

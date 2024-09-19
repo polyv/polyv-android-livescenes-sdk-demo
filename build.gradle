@@ -44,8 +44,8 @@ ext {
     compileSdkVersion = 31
     minSdkVersion = 21
     targetSdkVersion = 28
-    versionCode = 1190
-    versionName = "1.19.0"
+    versionCode = 1191
+    versionName = "1.19.1"
 }
 
 task clean(type: Delete) {

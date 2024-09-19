@@ -39,6 +39,7 @@ public class PLVLiveRoomDataMapper {
                 .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
                 .setAccountId(liveRoomDataManager.getConfig().getAccount().getUserId())
                 .setSessionId(liveRoomDataManager.getSessionId())
+                .setChatToken(liveRoomDataManager.getChatToken())
                 .setLiveScene(PLVLiveScene.ECOMMERCE == liveScene ? PLVInteractNativeAppParams.LIVE_SCENE_LIVE_ECOMMERCE : PLVInteractNativeAppParams.LIVE_SCENE_CLOUD_CLASS)
                 .setPromotionInfo(promotionDataBean)
                 .setChannelInfo(

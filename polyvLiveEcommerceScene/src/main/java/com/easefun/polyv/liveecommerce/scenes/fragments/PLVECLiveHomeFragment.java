@@ -41,6 +41,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoOverScrollViewPager;
+import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
@@ -56,6 +57,8 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
+import com.easefun.polyv.liveecommerce.modules.member.PLVECMemberListLayoutLand;
+import com.easefun.polyv.liveecommerce.modules.member.PLVECMemberListLayoutPort;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECBlackTabLayout;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
@@ -65,8 +68,12 @@ import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
+import com.plv.foundationsdk.component.exts.Lazy;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -88,6 +95,7 @@ import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
@@ -167,6 +175,24 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private PLVInteractEntranceLayout interactEntranceView;
     //评论上墙布局
     private PLVToTopView toTopView;
+    private PLVRoundRectGradientTextView liveWatchOnlineCountTv;
+    // 成员列表布局
+    private final Lazy<PLVECMemberListLayoutPort> memberListLayoutPort = new Lazy<PLVECMemberListLayoutPort>() {
+        @Override
+        public PLVECMemberListLayoutPort onLazyInit() {
+            PLVECMemberListLayoutPort res = new PLVECMemberListLayoutPort(getContext());
+            res.init(chatroomPresenter);
+            return res;
+        }
+    };
+    private final Lazy<PLVECMemberListLayoutLand> memberListLayoutLand = new Lazy<PLVECMemberListLayoutLand>() {
+        @Override
+        public PLVECMemberListLayoutLand onLazyInit() {
+            PLVECMemberListLayoutLand res = new PLVECMemberListLayoutLand(getContext());
+            res.init(chatroomPresenter);
+            return res;
+        }
+    };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -389,6 +415,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         toTopView = findViewById(R.id.plvec_chatroom_to_top_view);
         toTopView.setIsLiveType(true);
 
+        liveWatchOnlineCountTv = findViewById(R.id.plvec_live_watch_online_count_tv);
+        liveWatchOnlineCountTv.setOnClickListener(this);
+        final boolean showOnlineCount = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST);
+        liveWatchOnlineCountTv.setVisibility(showOnlineCount ? View.VISIBLE : View.GONE);
+
         //卡片推送
         cardPushManager.registerView((ImageView) findViewById(R.id.card_enter_view), (TextView) findViewById(R.id.card_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.card_enter_tips_view));
 
@@ -398,7 +430,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
 
-
+        updateOnlineCount(0);
         initNetworkTipsLayout();
         adjustInteractEntranceLyLocation(bulletinLy.getVisibility() == View.VISIBLE);
     }
@@ -468,12 +500,14 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     @Override
     protected void updateWatchCount(long watchCount) {
-//        watchInfoLy.updateWatchCount(watchCount);
+        watchInfoLy.updateWatchCount(watchCount);
     }
 
     @Override
-    protected void updateWatchInfo(long watchCount) {
-        watchInfoLy.updateWatchCount(watchCount);
+    protected void updateOnlineCount(long watchCount) {
+        String viewerCountText = StringUtils.toWString(watchCount);
+        String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
+        liveWatchOnlineCountTv.setText(text);
     }
 
     @Override
@@ -1051,6 +1085,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
+            public void onScreenshot() {
+                screenshotHelper.startScreenCaptureToFragment(PLVECLiveHomeFragment.this);
+            }
+
+            @Override
             public void onClickDynamicFunction(String event) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onClickDynamicFunction(event);
@@ -1131,6 +1170,15 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         } else if (id == R.id.plvec_controller_back_iv) {
             if(PLVScreenUtils.isLandscape(getContext())){
                 PLVOrientationManager.getInstance().setPortrait((Activity) getContext());
+            }
+        } else if (liveWatchOnlineCountTv != null && id == liveWatchOnlineCountTv.getId()) {
+            if (liveRoomDataManager != null && PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST)) {
+                if (ScreenUtils.isPortrait()) {
+                    memberListLayoutPort.get().show();
+                } else {
+                    memberListLayoutLand.get().show();
+                }
             }
         }
     }

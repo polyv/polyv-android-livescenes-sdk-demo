@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.player.live.contract;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -357,6 +358,13 @@ public interface IPLVLivePlayerContract {
          */
         @Nullable
         Bitmap screenshot();
+
+        /**
+         * 防录屏开关
+         * @param activity
+         * @param disableScreenCAP @code true}:开启<br/>{@code false}:关闭
+         */
+        void disableScreenCAP(Activity activity, boolean disableScreenCAP);
 
         /**
          * 获取视频信息

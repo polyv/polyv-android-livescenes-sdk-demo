@@ -4,6 +4,7 @@ import static com.plv.foundationsdk.component.livedata.PLVLiveDataExt.mutableLiv
 import static com.plv.foundationsdk.utils.PLVAppUtils.getString;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
 
@@ -71,6 +72,7 @@ import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.livescenes.model.PLVKickUsersVO;
+import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
@@ -114,6 +116,7 @@ import com.plv.socket.log.PLVELogSender;
 import com.plv.socket.socketio.PLVSocketIOClient;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
+import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -124,6 +127,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -131,11 +135,13 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.socket.client.Ack;
+import kotlin.jvm.functions.Function1;
 
 /**
  * mvp-聊天室presenter层实现，实现 IPLVChatroomContract.IChatroomPresenter 接口
@@ -212,6 +218,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Disposable getPageViewDisposable;
     //定时检查聊天消息最大数量disposable
     private Disposable observeChatMessageListMaxLengthDisposable;
+    // destroy时销毁
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     //聊天室功能开关数据观察者
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
@@ -324,10 +332,14 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         PolyvSocketWrapper.getInstance().getSocketObserver().addOnConnectStatusListener(new PLVSocketIOObservable.OnConnectStatusListener() {
             @Override
             public void onStatus(PLVSocketStatus status) {
-                if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS) {
+                if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS
+                    || status.getStatus() == PLVSocketStatus.STATUS_RECONNECTSUCCESS) {
                     if (hasRequestHistoryEvent) {//登录成功后可以获取到分房间id，如果之前存在请求历史的事件，则请求历史记录
                         requestChatHistory(requestHistoryViewIndex);
                     }
+                }
+                if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS) {
+                    liveRoomDataManager.setChatToken(PolyvSocketWrapper.getInstance().getChatToken());
                 }
             }
         });
@@ -522,13 +534,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     @Override
     public void requestChatHistory(final int viewIndex) {
-        if (PolyvSocketWrapper.getInstance().isAllowChildRoom()) {
-            if (!PolyvSocketWrapper.getInstance().canGetChildRoomIdStatus()) {
-                //如果允许分房间，但是还未获取到分房间id时，需等待获取成功后才能用分房间id请求历史记录
-                hasRequestHistoryEvent = true;
-                requestHistoryViewIndex = viewIndex;
-                return;
-            }
+        // socket登录成功之后才能获取历史记录(适配聊天室分组模式)
+        if (!PolyvSocketWrapper.getInstance().isOnlineStatus()) {
+            hasRequestHistoryEvent = true;
+            requestHistoryViewIndex = viewIndex;
+            return;
         }
         hasRequestHistoryEvent = false;
         isNoMoreChatHistory = false;
@@ -537,7 +547,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         final String userId = liveRoomDataManager.getConfig().getUser().getViewerId();
         final String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
-        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount)
+        final String groupId = liveRoomDataManager.getConfig().getUser().getParam4();
+        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, groupId, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount)
                 .map(new Function<String, JSONArray>() {
                     @Override
                     public JSONArray apply(String responseBody) throws Exception {
@@ -784,8 +795,121 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void requestUpdateLiveViewerList() {
+        String loginRoomId = PLVSocketWrapper.getInstance().getLoginRoomId();
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = getConfig().getChannelId();
+        }
+        final boolean isChatViewerGroup = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_CHAT_VIEWER_GROUP_ENABLE);
+        final String groupId;
+        if (isChatViewerGroup) {
+            groupId = liveRoomDataManager.getConfig().getUser().getParam4();
+        } else {
+            groupId = null;
+        }
+        final Disposable disposable = PLVChatApiRequestHelper.getLiveViewerList(loginRoomId, groupId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .map(new Function<PLVLiveViewerListVO, List<PLVLiveViewerListVO.Data.LiveViewer>>() {
+                    @Override
+                    public List<PLVLiveViewerListVO.Data.LiveViewer> apply(@NonNull PLVLiveViewerListVO liveViewerListVO) throws Exception {
+                        return liveViewerListVO.getSortedList(new Function1<PLVLiveViewerListVO.Data.LiveViewer, Integer>() {
+                            private final List<String> sortOrder = listOf(
+                                    "isMe-placeholder",
+                                    PLVSocketUserConstant.USERTYPE_TEACHER,
+                                    PLVSocketUserConstant.USERTYPE_GUEST,
+                                    PLVSocketUserConstant.USERTYPE_MANAGER,
+                                    PLVSocketUserConstant.USERTYPE_VIEWER,
+                                    PLVSocketUserConstant.USERTYPE_ASSISTANT
+                            );
+
+                            @Override
+                            public Integer invoke(PLVLiveViewerListVO.Data.LiveViewer liveViewer) {
+                                final boolean isMe = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(liveViewer.getUserId());
+                                if (isMe) {
+                                    return 0;
+                                }
+                                final int sortIndex = sortOrder.indexOf(liveViewer.getUserType());
+                                if (sortIndex != -1) {
+                                    return sortIndex;
+                                }
+                                return sortOrder.size();
+                            }
+                        });
+                    }
+                })
+                .onErrorReturn(new Function<Throwable, List<PLVLiveViewerListVO.Data.LiveViewer>>() {
+                    @Override
+                    public List<PLVLiveViewerListVO.Data.LiveViewer> apply(@NonNull Throwable throwable) throws Exception {
+                        PLVCommonLog.e(TAG, throwable.getMessage());
+                        PLVCommonLog.exception(throwable);
+                        return Collections.emptyList();
+                    }
+                })
+                .map(new Function<List<PLVLiveViewerListVO.Data.LiveViewer>, List<PLVLiveViewerListVO.Data.LiveViewer>>() {
+                    @Override
+                    public List<PLVLiveViewerListVO.Data.LiveViewer> apply(@NonNull List<PLVLiveViewerListVO.Data.LiveViewer> liveViewers) throws Exception {
+                        final PLVLiveViewerListVO.Data.LiveViewer first = liveViewers.isEmpty() ? null : liveViewers.get(0);
+                        final boolean firstIsMe = first != null && PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(first.getUserId());
+                        if (firstIsMe) {
+                            first.setMe(true);
+                            return liveViewers;
+                        }
+
+                        final PLVLiveViewerListVO.Data.LiveViewer liveViewerMe = new PLVLiveViewerListVO.Data.LiveViewer(
+                                true,
+                                PLVSocketWrapper.getInstance().getLoginVO().getActor(),
+                                false,
+                                PLVSocketWrapper.getInstance().getLoginVO().getChannelId(),
+                                null,
+                                null,
+                                null,
+                                PLVSocketWrapper.getInstance().getLoginVO().getNickName(),
+                                PLVSocketWrapper.getInstance().getLoginVO().getParam4(),
+                                PLVSocketWrapper.getInstance().getLoginVO().getParam5(),
+                                PLVSocketWrapper.getInstance().getLoginVO().getAvatarUrl(),
+                                PLVSocketWrapper.getInstance().getLoginRoomId(),
+                                null,
+                                null,
+                                null,
+                                PLVSocketWrapper.getInstance().getLoginVO().getUserId(),
+                                PLVSocketWrapper.getInstance().getLoginVO().getUserType()
+                        );
+                        final List<PLVLiveViewerListVO.Data.LiveViewer> result = new ArrayList<>();
+                        result.add(liveViewerMe);
+                        result.addAll(liveViewers);
+                        return result;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<List<PLVLiveViewerListVO.Data.LiveViewer>>() {
+                            @Override
+                            public void accept(final List<PLVLiveViewerListVO.Data.LiveViewer> liveViewers) throws Exception {
+                                callbackToView(new ViewRunnable() {
+                                    @Override
+                                    public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                        view.onLiveViewerListUpdate(liveViewers);
+                                    }
+                                });
+                            }
+                        },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                PLVCommonLog.e(TAG, throwable.getMessage());
+                                PLVCommonLog.exception(throwable);
+                            }
+                        }
+                );
+        compositeDisposable.add(disposable);
+    }
+
+    @Override
     public void destroy() {
         clearHistoryInfo();
+        compositeDisposable.dispose();
         if (iChatroomViews != null) {
             iChatroomViews.clear();
         }

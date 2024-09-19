@@ -1,11 +1,14 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.question;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,11 +21,17 @@ import android.widget.PopupWindow;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
+import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.PLVQAWebView2;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import net.plv.android.jsbridge.CallBackFunction;
 
 /**
  * 问答tab页
@@ -31,6 +40,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 public class PLVLCQAFragment extends PLVBaseFragment {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = "PLVLCQAFragment";
     private PLVQAWebView2 qaWebView;
     //webView的父控件
     private ViewGroup parentLy;
@@ -38,6 +48,7 @@ public class PLVLCQAFragment extends PLVBaseFragment {
     private String socketMsg;
     private PopupWindow popupWindow;
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private Context context;
 
     // </editor-fold>
 
@@ -64,9 +75,11 @@ public class PLVLCQAFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void init(String socketMsg, IPLVLiveRoomDataManager liveRoomDataManager) {
+    public void init(String socketMsg, IPLVLiveRoomDataManager liveRoomDataManager, Context context) {
         this.socketMsg = socketMsg;
         this.liveRoomDataManager = liveRoomDataManager;
+        this.context = context;
+        observeLiveData();
     }
     // </editor-fold>
 
@@ -127,4 +140,34 @@ public class PLVLCQAFragment extends PLVBaseFragment {
         }, 2000);
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="订阅更新">
+    private void observeLiveData() {
+        //更新sessionId
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) context, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken)) {
+                    if (liveRoomDataManager != null) {
+                        qaWebView.setAppParams(PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager));
+                    }
+                    qaWebView.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+            return PLVGsonUtil.toJsonSimple(nativeAppParams);
+        }
+        return "";
+    }
+    // </editor-fold >
 }

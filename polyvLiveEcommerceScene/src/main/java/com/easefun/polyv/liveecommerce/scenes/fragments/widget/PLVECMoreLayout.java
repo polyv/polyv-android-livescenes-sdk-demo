@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
@@ -54,6 +55,10 @@ public class PLVECMoreLayout extends FrameLayout {
      * 语言切换
      */
     public static final String MORE_FUNCTION_TYPE_LANGUAGE_SWITCH = "MORE_FUNCTION_TYPE_LANGUAGE_SWITCH";
+    /**
+     * 截屏
+     */
+    public static final String MORE_FUNCTION_TYPE_SCREENSHOT = "MORE_FUNCTION_TYPE_SCREENSHOT";
 
     /**
      * 抽奖挂件事件
@@ -72,7 +77,8 @@ public class PLVECMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LATENCY, R.drawable.plvec_live_more_latency, PLVAppUtils.getString(R.string.plv_player_mode), false),
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_FLOATING, R.drawable.plvec_live_more_floating_icon, PLVAppUtils.getString(R.string.plv_player_floating), false),
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_RATE, R.drawable.plvec_live_more_rate, PLVAppUtils.getString(R.string.plv_player_speed), false),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvec_live_more_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true)
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvec_live_more_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_SCREENSHOT, R.drawable.plvec_more_screenshot, PLVAppUtils.getString(R.string.plv_live_screenshot), PLVScreenshotHelper.SHOW_SCREENSHOT_VIEW)
     );
 
     //初始化不支持的事件

@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVAbsOnSocketEventListener;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketLoginManager;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.liveecommerce.R;
@@ -58,6 +60,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
     //抽奖挂件管理器
     protected PLVLotteryManager lotteryManager = new PLVLotteryManager();
+    //截屏帮助类
+    protected PLVScreenshotHelper screenshotHelper = new PLVScreenshotHelper();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -82,6 +86,12 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         observeClassDetailVO();
         observeInteractEntranceData();
         observeInteractStatusData();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        screenshotHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -121,7 +131,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     }
 
     //更新观看信息
-    protected void updateWatchInfo(long watchCount) {
+    protected void updateOnlineCount(long watchCount) {
     }
 
     //更新点赞数
@@ -420,7 +430,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable Integer integer) {
                 //在线人数
-                updateWatchInfo(integer.longValue());
+                updateOnlineCount(integer.longValue());
             }
         });
     }

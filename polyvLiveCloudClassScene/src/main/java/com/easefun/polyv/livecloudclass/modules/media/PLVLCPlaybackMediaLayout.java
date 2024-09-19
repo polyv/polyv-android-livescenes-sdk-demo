@@ -60,6 +60,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
@@ -267,6 +268,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         videoView.setMediaController(mediaController);
         videoView.setNoStreamIndicator(noStreamView);
         videoView.setPlayerBufferingIndicator(loadingLayout);
+        videoView.disableScreenCAP((Activity) getContext(), PLVScreenshotHelper.DISABLE_SCREEN_CAP); // 防录屏开关，true为开启
         //设置跑马灯
         marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
     }

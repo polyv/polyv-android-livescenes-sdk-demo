@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
@@ -152,6 +153,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         closeFloatingView = findViewById(R.id.close_floating_iv);
         closeFloatingView.setOnClickListener(this);
         videoView.setSubVideoView(subVideoView);
+        videoView.disableScreenCAP((Activity) getContext(), PLVScreenshotHelper.DISABLE_SCREEN_CAP); // 防录屏开关，true为开启
         fullScreenIv = findViewById(R.id.plvec_full_screen_iv);
         fullScreenIv.setOnClickListener(this);
 

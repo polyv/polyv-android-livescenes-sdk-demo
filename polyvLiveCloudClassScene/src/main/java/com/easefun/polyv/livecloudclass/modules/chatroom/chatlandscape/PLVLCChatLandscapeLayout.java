@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.member.PLVLCMemberListLandLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -56,6 +57,8 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
     private PLVLCChatCommonMessageList chatCommonMessageList;
     //未读信息提醒view
     private TextView unreadMsgTv;
+
+    private PLVLCMemberListLandLayout memberListLandLayout;
 
     //聊天室presenter
     private IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
@@ -517,6 +520,17 @@ public class PLVLCChatLandscapeLayout extends FrameLayout {
         toggle(toShow);
     }
     // </editor-fold>
+
+    public void showLandscapeMemberList() {
+        if (chatroomPresenter == null) {
+            return;
+        }
+        if (memberListLandLayout == null) {
+            memberListLandLayout = new PLVLCMemberListLandLayout(getContext());
+            memberListLandLayout.init(chatroomPresenter);
+        }
+        memberListLandLayout.show();
+    }
 
     // <editor-fold defaultstate="collapsed" desc="旋转处理">
     @Override

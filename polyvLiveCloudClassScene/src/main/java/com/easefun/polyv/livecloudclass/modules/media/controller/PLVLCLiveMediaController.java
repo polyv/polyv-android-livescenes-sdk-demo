@@ -130,6 +130,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView commodityView;
 
     private ImageView livePlayerControllerEnterPaintLandIv;
+    private TextView liveWatchOnlineCountLandTv;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
@@ -175,6 +176,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean hideRefreshButtonInRtcChannel;
     // 是否正在画笔模式
     private boolean isInPaintMode;
+    // 是否显示在线人数
+    private boolean isShowOnlineCount = false;
 
     //view动作监听器
     private OnViewActionListener onViewActionListener;
@@ -427,6 +430,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         commodityView = landscapeController.getCommodityView();
         pptTurnPageLandLayout = landscapeController.getPPTTurnPageLayout();
         livePlayerControllerEnterPaintLandIv = landscapeController.getEnterPaintView();
+        liveWatchOnlineCountLandTv = landscapeController.getLiveWatchOnlineCountTextView();
 
         backLandIv.setOnClickListener(this);
         videoPauseLandIv.setOnClickListener(this);
@@ -440,6 +444,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         rewardView.setOnClickListener(this);
         commodityView.setOnClickListener(this);
         livePlayerControllerEnterPaintLandIv.setOnClickListener(this);
+        liveWatchOnlineCountLandTv.setOnClickListener(this);
 
         pptTurnPageLandLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
@@ -565,14 +570,12 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void updateViewerOnlineCount(int onlineCount) {
-        videoViewerCountPortTv.setVisibility(View.VISIBLE);
-        videoViewerCountLandTv.setVisibility(View.VISIBLE);
-
+        if (liveWatchOnlineCountLandTv != null) {
+            liveWatchOnlineCountLandTv.setVisibility(isShowOnlineCount ? View.VISIBLE : View.GONE);
+        }
         String viewerCountText = StringUtils.toWString(onlineCount);
         String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
-
-        videoViewerCountPortTv.setText(text);
-        videoViewerCountLandTv.setText(text);
+        liveWatchOnlineCountLandTv.setText(text);
     }
 
     @Override
@@ -722,6 +725,14 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             hide();
         } else {
             show();
+        }
+    }
+
+    @Override
+    public void setShowOnlineCount(boolean showOnlineCount) {
+        this.isShowOnlineCount = showOnlineCount;
+        if (liveWatchOnlineCountLandTv != null) {
+            liveWatchOnlineCountLandTv.setVisibility(showOnlineCount ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -965,6 +976,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         } else if (id == livePlayerControllerEnterPaintIv.getId() || id == livePlayerControllerEnterPaintLandIv.getId()) {
             if (onViewActionListener != null) {
                 onViewActionListener.onEnterPaintMode();
+            }
+        } else if (liveWatchOnlineCountLandTv != null && id == liveWatchOnlineCountLandTv.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowLandscapeMemberList();
             }
         }
     }

@@ -7,6 +7,7 @@ import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreL
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_MODE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_RATE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_ROUTE;
+import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_SCREENSHOT;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -233,6 +234,12 @@ public class PLVECMorePopupView {
                             }
                             languageSwitchPopupWindow.show(channelId);
                             hideMoreWindow();
+                            break;
+                        case MORE_FUNCTION_TYPE_SCREENSHOT:
+                            if (clickListener != null) {
+                                clickListener.onScreenshot();
+                            }
+                            hideAll();
                             break;
                         default:
                             if (clickListener != null) {
@@ -512,6 +519,12 @@ public class PLVECMorePopupView {
                             }
                             languageSwitchPopupWindow.show(channelId);
                             hideMoreWindow();
+                            break;
+                        case MORE_FUNCTION_TYPE_SCREENSHOT:
+                            if (clickListener != null) {
+                                clickListener.onScreenshot();
+                            }
+                            hideAll();
                             break;
                         case MORE_FUNCTION_TYPE_FLOATING:
                             final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
@@ -807,6 +820,8 @@ public class PLVECMorePopupView {
 
         void switchLowLatencyMode(boolean isLowLatency);
 
+        void onScreenshot();
+
         /**
          * 点击了动态功能控件
          *
@@ -817,6 +832,8 @@ public class PLVECMorePopupView {
 
     public interface OnPlaybackMoreClickListener {
         void onChangeSpeedClick(View view, float speed);
+
+        void onScreenshot();
 
         /**
          * 点击了动态功能控件

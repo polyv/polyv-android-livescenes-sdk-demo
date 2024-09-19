@@ -195,6 +195,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      */
     void notifyPaintModeStatus(boolean isInPaintMode);
 
+    /**
+     * 设置显示在线人数
+     */
+    void setShowOnlineCount(boolean showOnlineCount);
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 控制栏布局中UI控件 触发的交互事件的回调方法">
@@ -268,6 +273,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * 进入画笔模式
          */
         void onEnterPaintMode();
+
+        /**
+         * 显示用户列表
+         */
+        void onShowLandscapeMemberList();
     }
     // </editor-fold>
 }

@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.player.playback.contract;
 
+import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.View;
@@ -283,6 +284,13 @@ public interface IPLVPlaybackPlayerContract {
          * @return
          */
         int getVideoCurrentPosition();
+
+        /**
+         * 防录屏开关
+         * @param activity
+         * @param disableScreenCAP @code true}:开启<br/>{@code false}:关闭
+         */
+        void disableScreenCAP(Activity activity, boolean disableScreenCAP);
 
         /**
          * 获取sessionId
