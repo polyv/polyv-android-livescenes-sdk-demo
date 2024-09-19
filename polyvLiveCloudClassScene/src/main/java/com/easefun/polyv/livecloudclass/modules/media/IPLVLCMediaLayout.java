@@ -531,6 +531,10 @@ public interface IPLVLCMediaLayout {
          */
         void onShowJobDetail(PLVShowJobDetailEvent param);
 
+        /**
+         * 显示用户列表
+         */
+        void onShowLandscapeMemberList();
     }
     // </editor-fold>
 

@@ -144,6 +144,8 @@ public interface IPLVLCLiveLandscapePlayerController {
      */
     ImageView getEnterPaintView();
 
+    TextView getLiveWatchOnlineCountTextView();
+
     /**
      * 显示
      */

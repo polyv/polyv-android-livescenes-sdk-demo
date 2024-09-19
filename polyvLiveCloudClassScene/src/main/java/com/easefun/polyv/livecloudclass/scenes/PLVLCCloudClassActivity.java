@@ -50,6 +50,7 @@ import com.easefun.polyv.livecommon.module.modules.popover.IPLVPopoverLayout;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.utils.PLVDialogFactory;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
@@ -65,6 +66,8 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -130,6 +133,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
 
     private PLVPlayerLogoView plvPlayerLogoView;
 
+    private PLVScreenshotHelper screenshotHelper = new PLVScreenshotHelper();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -330,6 +334,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (popoverLayout != null) {
             popoverLayout.onActivityResult(requestCode, resultCode, data);
+        }
+        if (screenshotHelper != null) {
+            screenshotHelper.onActivityResult(requestCode, resultCode, data);
         }
     }
     // </editor-fold>
@@ -731,6 +738,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     popoverLayout.getInteractLayout().onShowJobDetail(param);
                 }
             }
+
+            @Override
+            public void onShowLandscapeMemberList() {
+                if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST)) {
+                    if (chatLandscapeLayout != null) {
+                        chatLandscapeLayout.showLandscapeMemberList();
+                    }
+                }
+            }
         });
 
         //当前页面 监听 播放器数据中的PPT是否显示状态
@@ -991,6 +1008,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().onShowOpenLink();
                 }
+            }
+
+            @Override
+            public void onScreenshot() {
+                screenshotHelper.startScreenCapture(PLVLCCloudClassActivity.this);
             }
         });
         //当前页面 监听 聊天室数据中的观看热度变化

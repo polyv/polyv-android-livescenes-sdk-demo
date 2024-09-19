@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePl
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -210,6 +211,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         videoView.setPlayerBufferingIndicator(loadingView);
         videoView.setNoStreamIndicator(nostreamView);
         videoView.setMediaController(mediaController);
+        videoView.disableScreenCAP((Activity) getContext(), PLVScreenshotHelper.DISABLE_SCREEN_CAP); // 防录屏开关，true为开启
 
         videoView.setOnLowLatencyNetworkQualityListener(new IPLVLiveListenerEvent.OnLowLatencyNetworkQualityListener() {
             @Override

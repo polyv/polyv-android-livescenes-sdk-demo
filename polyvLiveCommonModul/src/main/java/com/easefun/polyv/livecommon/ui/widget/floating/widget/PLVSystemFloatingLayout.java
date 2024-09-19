@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -76,6 +77,10 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
                 | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+
+        if (PLVScreenshotHelper.DISABLE_SCREEN_CAP) {
+            wmLayoutParams.flags |= WindowManager.LayoutParams.FLAG_SECURE;
+        }
 
         wmLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
     }

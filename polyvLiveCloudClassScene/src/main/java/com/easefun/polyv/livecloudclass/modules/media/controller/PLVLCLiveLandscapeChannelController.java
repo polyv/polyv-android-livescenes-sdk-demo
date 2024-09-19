@@ -187,6 +187,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public TextView getLiveWatchOnlineCountTextView() {
+        return findViewById(R.id.plvlc_live_watch_online_count_tv);
+    }
+
+    @Override
     public void show() {
         setVisibility(VISIBLE);
     }

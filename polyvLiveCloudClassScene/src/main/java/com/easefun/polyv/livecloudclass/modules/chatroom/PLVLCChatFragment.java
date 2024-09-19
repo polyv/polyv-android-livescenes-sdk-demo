@@ -580,6 +580,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             onViewActionListener.onShowLanguageAction();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SCREENSHOT:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onScreenshot();
+                        }
+                        break;
                     default:
                         hideSoftInputAndPopupLayout();
                         if (onViewActionListener != null) {
@@ -1584,6 +1590,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 显示语言切换弹窗
          */
         void onShowLanguageAction();
+
+        /**
+         * 截屏
+         */
+        void onScreenshot();
 
         /**
          * 显示积分打赏弹窗

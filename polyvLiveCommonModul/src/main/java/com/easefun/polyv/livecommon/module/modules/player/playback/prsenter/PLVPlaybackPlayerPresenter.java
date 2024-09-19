@@ -211,6 +211,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     }
 
     @Override
+    public void disableScreenCAP(Activity activity, boolean disableScreenCAP) {
+        if (videoView != null) {
+            videoView.disableScreenCAP(activity, disableScreenCAP);
+        }
+    }
+
+    @Override
     public String getSessionId() {
         if (videoView != null && videoView.getPlaybackData() != null) {
             return videoView.getPlaybackData().getChannelSessionId();

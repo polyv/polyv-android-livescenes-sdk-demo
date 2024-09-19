@@ -79,6 +79,12 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                             onViewActionListener.onShowLanguageAction();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SCREENSHOT:
+                        popupWindow.dismiss();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onScreenshot();
+                        }
+                        break;
                     default:
                         popupWindow.dismiss();
                         if (onViewActionListener != null) {
@@ -145,6 +151,11 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
          * 显示语言切换弹窗
          */
         void onShowLanguageAction();
+
+        /**
+         * 截屏
+         */
+        void onScreenshot();
 
         /**
          * 点击了动态功能控件

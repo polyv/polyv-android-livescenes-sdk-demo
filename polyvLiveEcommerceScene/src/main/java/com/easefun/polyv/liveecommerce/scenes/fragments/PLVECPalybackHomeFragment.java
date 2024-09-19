@@ -925,6 +925,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }
 
                 @Override
+                public void onScreenshot() {
+                    screenshotHelper.startScreenCaptureToFragment(PLVECPalybackHomeFragment.this);
+                }
+
+                @Override
                 public void onClickDynamicFunction(String event) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onClickDynamicFunction(event);

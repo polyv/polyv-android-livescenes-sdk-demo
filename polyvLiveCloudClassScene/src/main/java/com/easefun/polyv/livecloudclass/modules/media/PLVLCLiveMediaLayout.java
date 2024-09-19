@@ -65,6 +65,7 @@ import com.easefun.polyv.livecommon.module.modules.player.live.view.PLVAbsLivePl
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
+import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
@@ -314,6 +315,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         videoView.setNoStreamIndicator(noStreamView);
         videoView.setStopStreamIndicator(stopStreamView);
         videoView.setMediaController(mediaController);
+        videoView.disableScreenCAP((Activity) getContext(), PLVScreenshotHelper.DISABLE_SCREEN_CAP); // 防录屏开关，true为开启
         //设置跑马灯
         marqueeView = ((Activity) getContext()).findViewById(R.id.polyv_marquee_view);
     }
@@ -517,6 +519,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     }
                 });
             }
+
+            @Override
+            public void onShowLandscapeMemberList() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowLandscapeMemberList();
+                }
+            }
         });
     }
 
@@ -705,6 +714,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         mediaController.setServerEnablePptTurnPage(
                 PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                         .isFeatureSupport(PLVChannelFeature.LIVE_PPT_ENABLE_TURN_PAGE)
+        );
+        mediaController.setShowOnlineCount(
+                PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST)
         );
     }
 
@@ -925,7 +938,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     @Override
     public void updateViewerCount(long viewerCount) {
-//        mediaController.updateViewerCount(viewerCount);
+        mediaController.updateViewerCount(viewerCount);
     }
 
     @Override

@@ -17,6 +17,24 @@
         android:layout_toRightOf="@+id/plvec_controller_back_iv"
         tools:visibility="visible" />
 
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvec_live_watch_online_count_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="64dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="3dp"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:plvGradientColors="#66000000"
+        app:plvRadius="18dp"
+        tools:text="1人在线"
+        tools:visibility="visible" />
+
     <ImageView
         android:id="@+id/plvec_controller_back_iv"
         android:layout_width="24dp"

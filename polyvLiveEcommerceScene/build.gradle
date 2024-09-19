@@ -27,6 +27,7 @@ android {
                     'src/main/res/layouts/player',
                     'src/main/res/layouts/commodity',
                     'src/main/res/layouts/linkmic',
+                    'src/main/res/layouts/member',
                     'src/main/res/layouts/reward',
                     'src/main/res/layouts/more',
                     'src/main/res/layouts/page',

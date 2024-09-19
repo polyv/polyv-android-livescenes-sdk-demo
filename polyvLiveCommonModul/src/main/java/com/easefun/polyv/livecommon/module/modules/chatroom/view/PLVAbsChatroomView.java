@@ -11,6 +11,7 @@ import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
@@ -224,6 +225,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onCheckMessageMaxLength(int maxLength) {
+
+    }
+
+    @Override
+    public void onLiveViewerListUpdate(List<PLVLiveViewerListVO.Data.LiveViewer> liveViewerList) {
 
     }
 }

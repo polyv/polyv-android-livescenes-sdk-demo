@@ -196,6 +196,17 @@
     <string name="plv_chat_input_tips_focus_2">In focus mode</string>
     <string name="plv_chat_input_tips_chat_6">Join the chat</string>
     <string name="plv_chat_input_tips_quiz">Initiate a question</string>
+
+    <string name="plv_member_list_title_viewers">Viewer Info</string>
+    <string name="plv_member_list_title_online_list">Online List</string>
+    <string name="plv_member_list_title_rule">Rules</string>
+    <string name="plv_member_list_rule_entry_text">Rules</string>
+    <string name="plv_member_list_footer">Up to 200 viewers</string>
+    <string name="plv_member_list_rules_title_1">1. Arrangement order</string>
+    <string name="plv_member_list_rules_desc_1">Sorted by special roles > audiences, with earlier entry time prioritized.</string>
+    <string name="plv_member_list_rules_title_2">2. Reminder</string>
+    <string name="plv_member_list_rules_desc_2">Short caching may cause delayed updates of entry/exit. Normal behavior.</string>
+
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">In-app purchases are not supported</string>
     <string name="plv_commodity_free">Free</string>
@@ -474,6 +485,7 @@
     <string name="plv_live_message_parse_error">Message parsing error</string>
     <string name="plv_live_loading_hint">Loading, please wait</string>
     <string name="plv_live_go_to_setting_page_error_hint">Failed to enter the settings page, please set it manually</string>
+    <string name="plv_live_screenshot">screenshot</string>
     <string name="plv_live_language_switch">Language</string>
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>

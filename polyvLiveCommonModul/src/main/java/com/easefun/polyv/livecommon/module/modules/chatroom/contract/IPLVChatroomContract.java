@@ -18,6 +18,7 @@ import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvBaseCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
+import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVCancelTopEvent;
@@ -303,6 +304,11 @@ public interface IPLVChatroomContract {
          * @param maxLength 最大长度
          */
         void onCheckMessageMaxLength(int maxLength);
+
+        /**
+         * 在线观众列表更新回调
+         */
+        void onLiveViewerListUpdate(List<PLVLiveViewerListVO.Data.LiveViewer> liveViewerList);
     }
     // </editor-fold>
 
@@ -471,6 +477,11 @@ public interface IPLVChatroomContract {
          * @param nickName 昵称
          */
         void setChatNickName(String nickName);
+
+        /**
+         * 请求更新在线观众列表
+         */
+        void requestUpdateLiveViewerList();
 
         /**
          * 销毁，包括销毁聊天室操作、解除view操作
