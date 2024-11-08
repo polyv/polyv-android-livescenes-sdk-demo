@@ -507,6 +507,20 @@
     <!--回放-章节-->
     <string name="tab_chapter">章节</string>
 
+    <!--分会场-->
+    <string name="plv_multi_venue_head_index">会场直播间</string>
+    <string name="plv_multi_venue_title">多会场</string>
+    <string name="plv_multi_venue_main_title">[主会场]</string>
+    <string name="plv_multi_venue_not_mord">没有更多了</string>
+    <string name="plv_multi_venue_select_status_playing">播放中</string>
+    <string name="plv_multi_venue_select_status_no_start">直播未开始</string>
+
+    <string name="plv_multi_venue_status_no_start">未开始</string>
+    <string name="plv_multi_venue_status_waitting">等待中</string>
+    <string name="plv_multi_venue_status_replaying">回放中</string>
+    <string name="plv_multi_venue_status_live">直播中</string>
+    <string name="plv_multi_venue_status_no_live">暂无直播</string>
+
     <!--打赏-->
     <string name="plv_reward_make_fail">打赏失败</string>
     <string name="plv_reward_gift">礼物</string>
@@ -541,6 +555,9 @@
     <string name="plv_lottery_will_start">抽奖即将开始</string>
     <string name="plv_lottery_no_start">抽奖暂未开始</string>
     <string name="plv_lottery_running">开奖中</string>
+
+    <!--条件抽奖 -->
+    <string name="plv_welfare_lottery_will_start">福利抽奖即将开始</string>
 
     <!--通用-->
     <string name="plv_common_dialog_click_wrong">按错了</string>

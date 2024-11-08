@@ -59,6 +59,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomV
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.viewmodel.PLVMultiRoomTransmitViewModel;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
@@ -128,6 +129,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     private final PLVMultiRoomTransmitViewModel multiRoomTransmitViewModel = PLVDependManager.getInstance().get(PLVMultiRoomTransmitViewModel.class);
     private final PLVRedpackViewModel redpackViewModel = PLVDependManager.getInstance().get(PLVRedpackViewModel.class);
+    private final PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
 
     //聊天信息列表
     private PLVLCChatCommonMessageList chatCommonMessageList;
@@ -201,6 +203,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private ImageView lotteryEnterView;
     private TextView lotteryEnterCdTv;
     private PLVTriangleIndicateTextView lotteryEnterTipsView;
+
+    //有条件抽奖挂件
+    private ImageView welfareLotteryEnterView;
+    private TextView welfareLotteryCdVTv;
+    private PLVTriangleIndicateTextView welfareLotteryEnterTipsView;
 
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
@@ -450,7 +457,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         likesView.setOnButtonClickListener(this);
         likesCountTv = findViewById(R.id.likes_count_tv);
         if (likesCount != 0) {
-            String likesString = StringUtils.toWString(likesCount);
+            String likesString = StringUtils.toKString(likesCount);
             likesCountTv.setText(likesString);
         }
 
@@ -500,6 +507,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         lotteryEnterTipsView = findViewById(R.id.plvlc_live_lottery_enter_tips_view);
         if (lotteryManager != null) {
             lotteryManager.registerView(lotteryEnterView, lotteryEnterCdTv, lotteryEnterTipsView);
+        }
+
+        // 有条件抽奖挂件
+        welfareLotteryEnterView = findViewById(R.id.plvlc_live_welfare_lotter_view);
+        welfareLotteryCdVTv = findViewById(R.id.plvlc_live_welfare_lottery_enter_cd_tv);
+        welfareLotteryEnterTipsView = findViewById(R.id.plvlc_live_welfare_lottery_enter_tips_view);
+        if (welfareLotteryManager != null) {
+            welfareLotteryManager.registerView(welfareLotteryEnterView, welfareLotteryCdVTv, welfareLotteryEnterTipsView);
         }
 
         //互动入口
@@ -1458,7 +1473,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     // <editor-fold defaultstate="collapsed" desc="点赞 - 数据设置、处理">
     public void setLikesCount(long likesCount) {
         this.likesCount = likesCount;
-        String likesString = StringUtils.toWString(likesCount);
+        String likesString = StringUtils.toKString(likesCount);
         if (likesCountTv != null) {
             likesCountTv.setText(likesString);
         }

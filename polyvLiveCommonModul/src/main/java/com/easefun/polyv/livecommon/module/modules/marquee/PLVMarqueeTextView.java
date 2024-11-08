@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeTextVO;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
  * 跑马灯view 的实现类
@@ -53,7 +55,8 @@ public class PLVMarqueeTextView extends PLVStrokeTextView {
     // <editor-fold desc="功能模块 - 设置样式">
     // 设置字体样式
     private void setFontStyle() {
-        setTextSize(textModel.getFontSize());
+        int textSize = Math.max(textModel.getFontSize() * 2, ConvertUtils.sp2px(textModel.getFontSize()));
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         setTextColor(Color.argb(textModel.getFontAlpha(),
                 Color.red(textModel.getFontColor()),
                 Color.green(textModel.getFontColor()),

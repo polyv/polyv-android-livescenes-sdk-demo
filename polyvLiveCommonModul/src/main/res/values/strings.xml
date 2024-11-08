@@ -507,6 +507,20 @@
     <!--回放-章节-->
     <string name="tab_chapter">Chapter</string>
 
+    <!--分会场-->
+    <string name="plv_multi_venue_head_index">Live Broadcast Room</string>
+    <string name="plv_multi_venue_title">MultiMeeting</string>
+    <string name="plv_multi_venue_main_title">[Main Meeting]</string>
+    <string name="plv_multi_venue_not_mord">No more updates</string>
+    <string name="plv_multi_venue_select_status_playing">Playing</string>
+    <string name="plv_multi_venue_select_status_no_start">Live Not Started</string>
+
+    <string name="plv_multi_venue_status_no_start">Not Started</string>
+    <string name="plv_multi_venue_status_waitting">Waiting</string>
+    <string name="plv_multi_venue_status_replaying">Replaying</string>
+    <string name="plv_multi_venue_status_live">Live</string>
+    <string name="plv_multi_venue_status_no_live">Not Live</string>
+
     <!--打赏-->
     <string name="plv_reward_make_fail">Reward failed</string>
     <string name="plv_reward_gift">Gift</string>
@@ -541,6 +555,9 @@
     <string name="plv_lottery_will_start">Lottery is about to begin</string>
     <string name="plv_lottery_no_start">Lottery has not yet started</string>
     <string name="plv_lottery_running">In lottery</string>
+
+    <!--条件抽奖 -->
+    <string name="plv_welfare_lottery_will_start">Lottery is about to begin</string>
 
     <!--通用-->
     <string name="plv_common_dialog_click_wrong">Cancel</string>

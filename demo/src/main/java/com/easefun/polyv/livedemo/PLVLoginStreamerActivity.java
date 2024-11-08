@@ -8,15 +8,20 @@ import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.core.os.ConfigurationCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -49,6 +54,7 @@ import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
@@ -76,6 +82,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
     private ImageView plvlsLoginInputChannelDeleteIv;
     private ImageView plvlsLoginInputNickDeleteIv;
     private ImageView plvlsLoginInputPwdDeleteIv;
+    private ImageView plvlsLoginInputPwdShowIv;
     private Button plvlsLoginEnterBtn;
     private CheckBox plvlsLoginRememberPasswordCb;
     private CheckBox plvlsLoginAgreeContractCb;
@@ -143,6 +150,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         plvlsLoginInputChannelDeleteIv = findViewById(R.id.plvls_login_input_channel_delete_iv);
         plvlsLoginInputNickDeleteIv = findViewById(R.id.plvls_login_input_nick_delete_iv);
         plvlsLoginInputPwdDeleteIv = findViewById(R.id.plvls_login_input_pwd_delete_iv);
+        plvlsLoginInputPwdShowIv = findViewById(R.id.plvls_login_input_pwd_show_iv);
         plvlsLoginEnterBtn = findViewById(R.id.plvls_login_enter_btn);
         plvlsLoginRememberPasswordCb = findViewById(R.id.plvls_login_remember_password_cb);
         plvlsLoginAgreeContractCb = findViewById(R.id.plvls_login_agree_contract_cb);
@@ -160,6 +168,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         plvlsLoginInputChannelDeleteIv.setOnClickListener(this);
         plvlsLoginInputNickDeleteIv.setOnClickListener(this);
         plvlsLoginInputPwdDeleteIv.setOnClickListener(this);
+        plvlsLoginInputPwdShowIv.setOnClickListener(this);
 
         plvlsLoginPrivatePolicyTv.setOnClickListener(this);
         plvlsLoginUsageContractTv.setOnClickListener(this);
@@ -167,6 +176,8 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         plvlsLoginEnterBtn.setOnClickListener(this);
 
         plvlsLoginRememberPasswordCb.setOnCheckedChangeListener(onRememberPwdCheckedChangeListener);
+
+        initViewForLanguage();
     }
 
     private void initViewForSavedData() {
@@ -190,6 +201,26 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
                     }
                 });
     }
+
+    private void initViewForLanguage() {
+        Locale locale = ConfigurationCompat.getLocales(Resources.getSystem().getConfiguration()).get(0);
+        if (locale != null && "zh".equals(locale.getLanguage())) {
+            ViewGroup vg = findViewById(R.id.plvls_login_read_protocol_ly);
+            ViewGroup vg1 = findViewById(R.id.plvls_login_remember_password_ll);
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View view = vg.getChildAt(i);
+                if (view instanceof TextView) {
+                    ((TextView) view).setTextSize(12);
+                }
+            }
+            for (int i = 0; i < vg1.getChildCount(); i++) {
+                View view = vg1.getChildAt(i);
+                if (view instanceof TextView) {
+                    ((TextView) view).setTextSize(12);
+                }
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="登录开播">
@@ -203,7 +234,7 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         }
         if (!plvlsLoginAgreeContractCb.isChecked()) {
             PLVToast.Builder.context(this)
-                    .setText("请勾选协议")
+                    .setText(R.string.plv_login_streamer_check_the_agreement)
                     .build()
                     .show();
             return;
@@ -568,6 +599,15 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
             plvlsLoginInputNickEt.setText("");
         } else if (id == R.id.plvls_login_input_pwd_delete_iv) {
             plvlsLoginInputPwdEt.setText("");
+        } else if (id == R.id.plvls_login_input_pwd_show_iv) {
+            plvlsLoginInputPwdShowIv.setSelected(!plvlsLoginInputPwdShowIv.isSelected());
+            int index = plvlsLoginInputPwdEt.getSelectionEnd();
+            if (plvlsLoginInputPwdShowIv.isSelected()) {
+                plvlsLoginInputPwdEt.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            } else {
+                plvlsLoginInputPwdEt.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            }
+            plvlsLoginInputPwdEt.setSelection(index);
         }
     }
     // </editor-fold>

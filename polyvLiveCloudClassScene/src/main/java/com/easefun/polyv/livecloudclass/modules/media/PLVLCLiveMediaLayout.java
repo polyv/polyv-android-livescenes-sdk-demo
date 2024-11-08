@@ -827,6 +827,21 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public ImageView getWelfareLotteryEnterView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterView();
+    }
+
+    @Override
+    public TextView getWelfareLotteryEnterCdView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterTipsView();
+    }
+
+    @Override
     public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
         mediaController.setChatIsDisplayEnabled(isDisplayEnabled);
     }

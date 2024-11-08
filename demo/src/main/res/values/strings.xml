@@ -12,4 +12,16 @@
     <string name="plv_login_waiting">正在登录中，请稍等…</string>
     <string name="plv_login_copyright">2013 – 2023 易方信息科技股份有限公司 版权所有</string>
 
+    <!--手机开播登录页多语言适配-->
+    <string name="plv_login_streamer_live_broadcast">Mobile Live Broadcast</string>
+    <string name="plv_login_streamer_enter_channel_number">Please enter the channel number</string>
+    <string name="plv_login_streamer_enter_password">Please enter the password</string>
+    <string name="plv_login_streamer_enter_nickname">Please enter your nickname</string>
+    <string name="plv_login_streamer_login">Login</string>
+    <string name="plv_login_streamer_remember_password">Remember password</string>
+    <string name="plv_login_streamer_read_and_agree">I have read and agree to&#160;</string>
+    <string name="plv_login_streamer_privacy_policy">Privacy Policy&#160;</string>
+    <string name="plv_login_streamer_and">and&#160;</string>
+    <string name="plv_login_streamer_user_agreement">User Agreement</string>
+    <string name="plv_login_streamer_check_the_agreement">Please check the agreement</string>
 </resources>

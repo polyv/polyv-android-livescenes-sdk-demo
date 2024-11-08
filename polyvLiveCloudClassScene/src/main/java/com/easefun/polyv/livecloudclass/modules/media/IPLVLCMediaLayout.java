@@ -156,6 +156,22 @@ public interface IPLVLCMediaLayout {
     PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
+     * 获取有条件抽奖入口按钮
+     * @return
+     */
+    ImageView getWelfareLotteryEnterView();
+
+    /**
+     * 获取有条件抽奖入口倒计时控件
+     */
+    TextView getWelfareLotteryEnterCdView();
+
+    /**
+     * 获取有条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView();
+
+    /**
      * 设置聊天tab是否显示
      *
      * @param isDisplayEnabled 聊天tab是否显示

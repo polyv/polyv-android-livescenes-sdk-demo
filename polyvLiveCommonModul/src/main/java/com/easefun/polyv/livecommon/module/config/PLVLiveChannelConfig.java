@@ -73,6 +73,7 @@ public class PLVLiveChannelConfig {
      * （仅开播场景使用）
      */
     private boolean isLiveStreamingWhenLogin = false;
+    private boolean isMaterialLibraryEnabled = false;
 
     public static void setParam4(String param4) {
         PLVLiveChannelConfig.param4 = param4;
@@ -108,6 +109,7 @@ public class PLVLiveChannelConfig {
         colinMicType = old.colinMicType;
         hiClassConfig = new HiClassConfig(old.hiClassConfig);
         isLiveStreamingWhenLogin = old.isLiveStreamingWhenLogin;
+        isMaterialLibraryEnabled = old.isMaterialLibraryEnabled;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">
@@ -252,6 +254,13 @@ public class PLVLiveChannelConfig {
         isSkipAutoLinkMic = skipAutoLinkMic;
     }
 
+    /**
+     * 设置是否素材库回放
+     * @param materialLibraryEnabled
+     */
+    public void setMaterialLibraryEnabled(boolean materialLibraryEnabled) {
+        isMaterialLibraryEnabled = materialLibraryEnabled;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="get">
@@ -312,6 +321,10 @@ public class PLVLiveChannelConfig {
      */
     public boolean isLiveStreamingWhenLogin() {
         return isLiveStreamingWhenLogin;
+    }
+
+    public boolean isMaterialLibraryEnabled() {
+        return isMaterialLibraryEnabled;
     }
     // </editor-fold>
 

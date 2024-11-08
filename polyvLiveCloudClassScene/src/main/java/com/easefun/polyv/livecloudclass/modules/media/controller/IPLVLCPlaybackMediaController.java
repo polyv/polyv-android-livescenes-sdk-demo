@@ -72,6 +72,22 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
+     * 获取有条件抽奖入口按钮
+     * @return
+     */
+    ImageView getWelfareLotteryEnterView();
+
+    /**
+     * 获取有条件抽奖入口倒计时控件
+     */
+    TextView getWelfareLotteryEnterCdView();
+
+    /**
+     * 获取有条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView();
+
+    /**
      * 设置点赞是否开启/关闭
      *
      * @param isSwitchEnabled

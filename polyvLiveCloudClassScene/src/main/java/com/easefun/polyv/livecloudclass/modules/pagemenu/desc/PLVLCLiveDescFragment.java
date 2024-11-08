@@ -180,7 +180,7 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
 
     private void updateLikesCount(long addCount) {
         likesCount = likesCount + addCount;
-        String likesString = StringUtils.toWString(likesCount);
+        String likesString = StringUtils.toKString(likesCount);
         if (likesTv != null) {
             likesTv.setText(likesString);
         }
@@ -196,7 +196,7 @@ public class PLVLCLiveDescFragment extends PLVBaseFragment {
     private void updateViewerCount(long addCount) {
         viewerCount = viewerCount + addCount;
         if (viewerCountTv != null) {
-            viewerCountTv.setText(StringUtils.toWString(viewerCount));
+            viewerCountTv.setText(StringUtils.toKString(viewerCount));
         }
     }
     // </editor-fold>

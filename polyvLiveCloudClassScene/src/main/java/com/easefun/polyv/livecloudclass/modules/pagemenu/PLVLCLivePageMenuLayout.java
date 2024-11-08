@@ -43,6 +43,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductLay
 import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.venue.PLVLCMultipleVenueFragment;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -182,6 +183,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCPlaybackChapterFragment chapterFragment;//章节tab页
     private PLVLCProductFragment productFragment;
     private PLVLCMemberListPortFragment memberListFragment;
+    private PLVLCMultipleVenueFragment venueFragment;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -851,6 +853,24 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         refreshPageMenuTabAdapter();
     }
 
+    /**
+     * 插入多会场Fragment
+     */
+    private void checkAddMultiVenueTab(PLVLiveClassDetailVO.DataBean.MultiMeetingSettingBean bean) {
+        if (bean == null || !bean.isMultiMeetingEnable()) {
+            return;
+        }
+        if (venueFragment != null && pageMenuTabFragmentList.contains(venueFragment)) {
+            return;
+        }
+        if (venueFragment == null) {
+            venueFragment = new PLVLCMultipleVenueFragment();
+            venueFragment.init(liveRoomDataManager.getConfig().getChannelId(), bean.getMainChannelId() + "");
+        }
+        pageMenuTabTitleList.add(getResources().getString(R.string.plv_multi_venue_title));
+        pageMenuTabFragmentList.add(venueFragment);
+    }
+
     private void tryAddOfflineDescTabForPlaybackCache() {
         if (liveRoomDataManager.getConfig().isLive()
                 || !pageMenuTabTitleList.isEmpty()
@@ -1228,6 +1248,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabFragmentList.clear();
         //直播详情中的直播菜单列表
         List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = liveClassDetail.getData().getChannelMenus();
+        PLVLiveClassDetailVO.DataBean.MultiMeetingSettingBean multiMeetBean = liveClassDetail.getData().getMultiMeetingSetting();
         for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
             if (channelMenusBean == null) {
                 continue;
@@ -1261,6 +1282,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 .isFeatureSupport(PLVChannelFeature.LIVE_SHOW_VIEWER_LIST)) {
             addMemberListTab(getContext().getString(R.string.plv_sdk_live_menu_name_members));
         }
+        checkAddMultiVenueTab(multiMeetBean);
         checkAddPreviousTab();
         refreshPageMenuTabAdapter();
     }

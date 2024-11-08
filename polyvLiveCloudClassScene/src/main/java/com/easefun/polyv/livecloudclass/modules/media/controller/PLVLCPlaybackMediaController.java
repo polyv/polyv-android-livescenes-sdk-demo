@@ -75,6 +75,11 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private PLVSimpleImageView lotteryEnterLandView;
     private TextView lotteryEnterCdLandTv;
     private PLVTriangleIndicateTextView lotteryEnterTipsLandView;
+
+    private PLVSimpleImageView welfareLotteryEnterLandView;
+    private TextView welfareLotteryEnterCdLandTv;
+    private PLVTriangleIndicateTextView welfareLotteryEnterTipsLandView;
+
     //观看热度
     private TextView videoViewerCountLandTv;
     /**** 竖屏View **/
@@ -170,6 +175,11 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         lotteryEnterLandView = findViewById(R.id.plvlc_playback_lottery_enter_land_view);
         lotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_lottery_enter_cd_land_tv);
         lotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_lottery_enter_tips_land_view);
+
+        welfareLotteryEnterLandView = findViewById(R.id.plvlc_playback_welfare_lottery_enter_land_view);
+        welfareLotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_welfare_lottery_enter_cd_land_tv);
+        welfareLotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_welfare_lottery_enter_tips_land_view);
+
         videoViewerCountLandTv = findViewById(R.id.plvlc_playback_count_land_tv);
 
         //port layout
@@ -361,6 +371,21 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public ImageView getWelfareLotteryEnterView() {
+        return welfareLotteryEnterLandView;
+    }
+
+    @Override
+    public TextView getWelfareLotteryEnterCdView() {
+        return welfareLotteryEnterCdLandTv;
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView() {
+        return welfareLotteryEnterTipsLandView;
+    }
+
+    @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
         this.isLikesSwitchEnabled = isSwitchEnabled;
         ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
@@ -463,7 +488,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
-        String viewerCountText = StringUtils.toWString(viewerCount);
+        String viewerCountText = StringUtils.toKString(viewerCount);
         String text = PLVAppUtils.formatString(R.string.plv_player_viewer_count, viewerCountText);
 
         videoViewerCountPortTv.setText(text);
@@ -475,7 +500,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
-        String viewerCountText = StringUtils.toWString(onlineCount);
+        String viewerCountText = StringUtils.toKString(onlineCount);
         String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
 
         videoViewerCountPortTv.setText(text);

@@ -40,6 +40,7 @@ import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
@@ -104,6 +105,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private static final String EXTRA_VID = "vid";//回放视频Id
     private static final String EXTRA_TEMP_STORE_FILE_ID = "temp_store_file_id";//暂存视频id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
+    private static final String EXTRA_MATERIAL_LIBRARY_ENABLED = "material_library_enabled";//素材库回放
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
     private static final String EXTRA_CHANNEL_TYPE = "channel_type";//频道类型
 
@@ -199,6 +201,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
      * @param langType      观看页语言
+     * @param materialLibraryEnabled 素材库回放
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -212,7 +215,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                                  @NonNull String viewerName,
                                                  @NonNull String viewerAvatar,
                                                  PLVPlaybackListType videoListType,
-                                                 String langType) {
+                                                 String langType,
+                                                 boolean materialLibraryEnabled) {
         if (activity == null) {
             return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvlc_login_playback_error_activity_is_null));
         }
@@ -239,6 +243,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VID, vid);
         intent.putExtra(EXTRA_TEMP_STORE_FILE_ID, tempStoreFileId);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
+        intent.putExtra(EXTRA_MATERIAL_LIBRARY_ENABLED, materialLibraryEnabled);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
         return PLVLaunchResult.success();
@@ -364,6 +369,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         final String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
         final String vid = firstNotEmpty(intent.getStringExtra(EXTRA_VID), intent.getStringExtra(EXTRA_TEMP_STORE_FILE_ID));
         final PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
+        final boolean materialLibraryEnabled = intent.getBooleanExtra(EXTRA_MATERIAL_LIBRARY_ENABLED, false);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
@@ -380,6 +386,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         } else { // 回放模式
             PLVLiveChannelConfigFiller.setupVid(vid != null ? vid : "");
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
+            PLVLiveChannelConfigFiller.setMaterialLibraryEnabled(materialLibraryEnabled);
 
             PLVFloatingPlayerManager.getInstance().setTag(channelId + "_" + (vid == null ? "playback" : vid));
         }
@@ -533,6 +540,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 popoverLayout.getInteractLayout().showLottery(event);
             }
         });
+
+        // 有条件抽奖挂件配置
+        PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
+        welfareLotteryManager.onCleared();
+        welfareLotteryManager.registerView(mediaLayout.getWelfareLotteryEnterView(), mediaLayout.getWelfareLotteryEnterCdView(), mediaLayout.getLotteryEnterTipsView());
 
         // 初始化横屏聊天室布局
         chatLandscapeLayout = mediaLayout.getChatLandscapeLayout();

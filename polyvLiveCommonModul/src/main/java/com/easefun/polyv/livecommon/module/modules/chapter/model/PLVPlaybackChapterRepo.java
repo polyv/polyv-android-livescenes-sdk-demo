@@ -32,7 +32,7 @@ public class PLVPlaybackChapterRepo {
     private Emitter<List<PLVChapterDataVO>> chapterListEmitter;
 
     public void updatePlaybackData(PLVPlaybackDataVO playbackDataVO) {
-        if (playbackDataVO.getPlaybackListType() == PLVPlaybackListType.TEMP_STORE) {
+        if (playbackDataVO.getPlaybackListType() == PLVPlaybackListType.TEMP_STORE || playbackDataVO.isMaterialLibraryEnabled()) {
             updateChapterListByRecord(playbackDataVO);
         } else {
             updateChapterListByPlayback(playbackDataVO);

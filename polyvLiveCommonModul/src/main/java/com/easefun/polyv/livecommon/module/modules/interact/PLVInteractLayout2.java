@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.modules.interact.info.PLVInteractInfo;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
@@ -43,7 +44,9 @@ import com.google.gson.GsonBuilder;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVJsonUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
@@ -51,13 +54,16 @@ import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickD
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.livescenes.model.interact.PLVWelfareLotteryVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
+import com.plv.socket.event.interact.PLVCheckLotteryCommentEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowOpenLinkEvent;
 import com.plv.socket.event.interact.PLVOpenOtherAppEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
+import com.plv.socket.event.interact.PLVShowWelfareLotteryEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
 import com.plv.socket.event.interact.PLVUpdateChannelSwitchEvent;
@@ -66,6 +72,8 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.lang.reflect.Modifier;
@@ -80,6 +88,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private static final String TAG = PLVInteractLayout2.class.getSimpleName();
 
     private final PLVRedpackViewModel redpackViewModel = PLVDependManager.getInstance().get(PLVRedpackViewModel.class);
+    private final PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
@@ -102,7 +111,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT,
             PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT,
             PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO,
-            PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON
+            PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON,
+            PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_COMMENT_SUCCESS,
+            PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_ENTRANCE_CHANGE
     );
     // </editor-fold >
 
@@ -185,6 +196,12 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON:
                 processClickProductEvent(param, callBackFunction);
                 break;
+            case PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_COMMENT_SUCCESS:
+                processWelfareLotteryComment(param);
+                break;
+            case PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_ENTRANCE_CHANGE:
+                processWelfareLottery(param);
+                break;
         }
     }
 
@@ -209,6 +226,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         plvlcInteractWeb.setWatchStatus(watchStatus);
         plvlcInteractWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVInteractWebView2.LANG_EN : PLVInteractWebView2.LANG_ZH);
         observeLiveData();
+        initListener();
     }
 
     @Override
@@ -304,6 +322,33 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
                 PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
             }
         });
+    }
+
+    public void showWelfareLottery(PLVShowWelfareLotteryEvent event) {
+        String data = PLVGsonUtil.toJsonSimple(event);
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    public void checkWelfareLotteryComment(final PLVCheckLotteryCommentEvent event) {
+
+        PLVAppUtils.postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                String data = PLVGsonUtil.toJsonSimple(event);
+                plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+                    @Override
+                    public void onCallBack(String s) {
+                        PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
@@ -451,6 +496,25 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
     // </editor-fold >
 
+    // <editor-fold defaultstate="collapsed" desc="监听注册">
+    void initListener() {
+        welfareLotteryManager.setOnWelfareLotteryEnterClickListener(new PLVWelfareLotteryManager.OnWelfareLotteryEnterClickListener() {
+            @Override
+            public void onClick(PLVShowWelfareLotteryEvent event) {
+                showWelfareLottery(event);
+            }
+        });
+
+        welfareLotteryManager.setOnWelfareLotteryCommendListener(new PLVWelfareLotteryManager.OnWelfareLotteryCommendListener() {
+            @Override
+            public void onCommendMessage(PLVCheckLotteryCommentEvent event) {
+                checkWelfareLotteryComment(event);
+            }
+        });
+
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="工具方法">
     private void processCallAppEvent(String param, CallBackFunction callBackFunction) {
         PLVCallAppEvent callAppEvent = PLVGsonUtil.fromJson(PLVCallAppEvent.class, param);
@@ -542,6 +606,23 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             onClickProductListener.onClickProduct(productLink);
 
         }
+    }
+
+    private void processWelfareLottery(String param) {
+        PLVWelfareLotteryVO welfareLotteryVO = PLVGsonUtil.fromJson(PLVWelfareLotteryVO.class, param);
+        welfareLotteryManager.acceptWelfareLotteryVO(welfareLotteryVO);
+    }
+
+    private void processWelfareLotteryComment(String param) {
+        String comment = "";
+        try {
+            JSONObject jsonObject = new JSONObject(param);
+            comment = PLVJsonUtils.getString(jsonObject, "comment", "");
+        } catch (Exception e) {
+
+        }
+        welfareLotteryManager.handleLotteryComment(comment);
+
     }
 
     private String updateChannelInfo(PLVLiveClassDetailVO.DataBean data) {

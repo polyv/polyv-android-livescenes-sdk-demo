@@ -12,6 +12,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,6 +29,8 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybac
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackCacheListViewModel;
+import com.easefun.polyv.livecommon.module.modules.venue.di.PLVMultiVenueModule;
+import com.easefun.polyv.livecommon.module.modules.venue.viewmodel.PLVMultiVenueViewModel;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.ui.widget.PLVSoftView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
@@ -117,6 +120,9 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     private PLVPlaybackCacheListViewModel playbackCacheListViewModel;
     private Observer<Event<PLVPlaybackCacheVideoVO>> playbackCacheLaunchObserver;
 
+    private PLVMultiVenueViewModel multiVenueViewModel;
+    private Observer<Event<Pair<String, Boolean>>> multiVenueLaunchObserver;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="生命周期">
@@ -132,6 +138,14 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         initView();
         //设置测试数据
         setTestData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (loginProgressDialog != null && loginProgressDialog.isShowing()) {
+            loginProgressDialog.dismiss();
+        }
     }
 
     @Override
@@ -153,7 +167,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     private void injectDependency() {
         PLVDependManager.getInstance()
                 .switchStore(this)
-                .addModule(PLVPlaybackCacheModule.instance);
+                .addModule(PLVPlaybackCacheModule.instance)
+                .addModule(PLVMultiVenueModule.instance);
     }
 
     // </editor-fold>
@@ -171,7 +186,9 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
         initPlaybackCacheConfig();
         initPlaybackCacheViewModel();
+        initMultiVenueViewModel();
         observePlaybackCacheLaunch();
+        observeMultiVenueLaunch();
     }
 
     private void findAllView() {
@@ -330,6 +347,32 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                     }
                 });
     }
+
+
+    private void initMultiVenueViewModel() {
+        multiVenueViewModel = PLVDependManager.getInstance().get(PLVMultiVenueViewModel.class);
+    }
+
+    private void observeMultiVenueLaunch() {
+        if (multiVenueViewModel != null) {
+            multiVenueViewModel.getOnRequestLaunchOtherVenueLiveData().removeObserver(multiVenueLaunchObserver);
+        }
+        multiVenueViewModel
+                .getOnRequestLaunchOtherVenueLiveData()
+                .observeForever(multiVenueLaunchObserver = new Observer<Event<Pair<String, Boolean>>>() {
+                    @Override
+                    public void onChanged(@Nullable Event<Pair<String, Boolean>> event) {
+                        final Intent clearTop = new Intent(PLVLoginWatcherActivity.this, PLVLoginWatcherActivity.class);
+                        clearTop.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        PLVLoginWatcherActivity.this.startActivity(clearTop);
+                        Pair<String, Boolean> pair = event.get();
+                        if (pair == null) {
+                            return;
+                        }
+                        loginOtherVenue(pair.first, pair.second);
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置测试数据">
@@ -435,11 +478,16 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
                 PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
                 String langType = plvPlaybackLoginResult.getLangType();
+                boolean materialLibraryEnabled = plvPlaybackLoginResult.isMaterialLibraryEnabled();
                 //1.SDK中未开启点播列表时——默认选择“读取直播后台回放设置”的参数
                 //2.SDK中开启“点播列表”/通过vid观看时——优先响应“点播列表”/vid观看开关配置
                 PLVPlaybackListType plvPlaybackListType = swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK;
                 if (TextUtils.isEmpty(vid) && plvPlaybackListType == PLVPlaybackListType.PLAYBACK && plvPlaybackLoginResult.isVodAndListType()) {
                     plvPlaybackListType = PLVPlaybackListType.VOD;
+                }
+                //3.开启素材库回放时——需使用回放列表
+                if (materialLibraryEnabled) {
+                    plvPlaybackListType = PLVPlaybackListType.PLAYBACK;
                 }
 
                 switch (curScene) {
@@ -456,7 +504,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                                     getViewerName(),
                                     getViewerAvatar(),
                                     plvPlaybackListType,
-                                    langType
+                                    langType,
+                                    materialLibraryEnabled
                             );
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -470,7 +519,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                         if (PLVLiveScene.isLiveEcommerceSceneSupportType(channelType)) {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
                                     vid, getViewerId(), getViewerName(), getViewerAvatar(),
-                                    plvPlaybackListType, langType);
+                                    plvPlaybackListType, langType, materialLibraryEnabled);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -504,6 +553,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
                 PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
                 String langType = plvPlaybackLoginResult.getLangType();
+                boolean materialLibraryEnabled = plvPlaybackLoginResult.isMaterialLibraryEnabled();
 
                 switch (curScene) {
                     //进入云课堂场景
@@ -519,7 +569,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                                     getViewerName(),
                                     getViewerAvatar(),
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK,
-                                    langType
+                                    langType,
+                                    materialLibraryEnabled
                             );
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
@@ -534,7 +585,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                             PLVLaunchResult launchResult = PLVECLiveEcommerceActivity.launchPlayback(PLVLoginWatcherActivity.this, channelId,
                                     vid, getViewerId(), getViewerName(),getViewerAvatar(),
                                     swtichPlaybackVodlistSw.isChecked() ? PLVPlaybackListType.VOD : PLVPlaybackListType.PLAYBACK,
-                                    langType);
+                                    langType, materialLibraryEnabled);
                             if (!launchResult.isSuccess()) {
                                 ToastUtils.showShort(launchResult.getErrorMessage());
                             }
@@ -554,6 +605,94 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 PLVCommonLog.e(TAG, "loginPlayback onLoginFailed:" + throwable.getMessage());
             }
         });
+    }
+
+
+    private void loginOtherVenue(String channelId, boolean isPlayback) {
+        // 多会场跳转到其他场景仅支持云课堂场景
+        final String playbackAppId = etPlaybackAppId.getText().toString().trim();
+        final String playbackAppSecret = etPlaybackAppSecret.getText().toString().trim();
+        final String playbackUserId = etPlaybackUserId.getText().toString().trim();
+
+        final String liveUserId= etLiveUserId.getText().toString().trim();
+        final String liveAppId = etLiveAppId.getText().toString().trim();
+        final String liveAppSecret = etLiveAppSecert.getText().toString().trim();
+
+        PLVFloatingPlayerManager.getInstance().clear();
+
+        if (!isFinishing()) {
+            loginProgressDialog.show();
+        }
+
+        if (!isPlayback) {
+            loginManager.loginLiveNew(liveAppId, liveAppSecret, liveUserId, channelId, new IPLVSceneLoginManager.OnLoginListener<PLVLiveLoginResult>() {
+                @Override
+                public void onLoginSuccess(PLVLiveLoginResult plvLiveLoginResult) {
+                    loginProgressDialog.dismiss();
+                    PLVLiveChannelConfigFiller.setupAccount(liveUserId, liveAppId, liveAppSecret);
+                    PLVLiveChannelType channelType = plvLiveLoginResult.getChannelTypeNew();
+                    String langType = plvLiveLoginResult.getLangType();
+
+                    if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
+                        PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchLive(PLVLoginWatcherActivity.this, channelId, channelType, getViewerId(), getViewerName(), getViewerAvatar(), langType);
+                        if (!launchResult.isSuccess()) {
+                            ToastUtils.showShort(launchResult.getErrorMessage());
+                        }
+                    } else {
+                        ToastUtils.showShort(R.string.plv_scene_login_toast_cloudclass_no_support_type);
+                    }
+                }
+
+                @Override
+                public void onLoginFailed(String msg, Throwable throwable) {
+                    loginProgressDialog.dismiss();
+                    ToastUtils.showShort(msg);
+                    PLVCommonLog.e(TAG, "loginLive onLoginFailed:" + throwable.getMessage());
+                }
+            });
+        } else {
+
+            loginManager.loginPlaybackNew(playbackAppId, playbackAppSecret, playbackUserId, channelId, "" ,new IPLVSceneLoginManager.OnLoginListener<PLVPlaybackLoginResult>() {
+                @Override
+                public void onLoginSuccess(PLVPlaybackLoginResult plvPlaybackLoginResult) {
+                    loginProgressDialog.dismiss();
+                    PLVLiveChannelConfigFiller.setupAccount(playbackUserId, playbackAppId, playbackAppSecret);
+                    PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
+                    String langType = plvPlaybackLoginResult.getLangType();
+                    PLVPlaybackListType plvPlaybackListType = PLVPlaybackListType.PLAYBACK;
+                    boolean materialLibraryEnabled = plvPlaybackLoginResult.isMaterialLibraryEnabled();
+
+                    if (PLVLiveScene.isCloudClassSceneSupportType(channelType)) {
+                        PLVLaunchResult launchResult = PLVLCCloudClassActivity.launchPlayback(
+                                PLVLoginWatcherActivity.this,
+                                channelId,
+                                channelType,
+                                "",
+                                null,
+                                getViewerId(),
+                                getViewerName(),
+                                getViewerAvatar(),
+                                plvPlaybackListType,
+                                langType,
+                                materialLibraryEnabled
+                        );
+                        if (!launchResult.isSuccess()) {
+                            ToastUtils.showShort(launchResult.getErrorMessage());
+                        }
+                    } else {
+                        ToastUtils.showShort(R.string.plv_scene_login_toast_cloudclass_no_support_type);
+                    }
+                }
+
+                @Override
+                public void onLoginFailed(String msg, Throwable throwable) {
+                    loginProgressDialog.dismiss();
+                    ToastUtils.showShort(msg);
+                    PLVCommonLog.e(TAG, "loginPlayback onLoginFailed:" + throwable.getMessage());
+                }
+            });
+        }
+
     }
     // </editor-fold>
 

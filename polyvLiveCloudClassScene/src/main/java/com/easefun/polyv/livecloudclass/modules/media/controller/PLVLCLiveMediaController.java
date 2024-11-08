@@ -561,7 +561,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
-        String viewerCountText = StringUtils.toWString(viewerCount);
+        String viewerCountText = StringUtils.toKString(viewerCount);
         String text = PLVAppUtils.formatString(R.string.plv_player_viewer_count, viewerCountText);
 
         videoViewerCountPortTv.setText(text);
@@ -573,7 +573,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         if (liveWatchOnlineCountLandTv != null) {
             liveWatchOnlineCountLandTv.setVisibility(isShowOnlineCount ? View.VISIBLE : View.GONE);
         }
-        String viewerCountText = StringUtils.toWString(onlineCount);
+        String viewerCountText = StringUtils.toKString(onlineCount);
         String text = PLVAppUtils.formatString(R.string.plv_player_viewer_online_count, viewerCountText);
         liveWatchOnlineCountLandTv.setText(text);
     }
