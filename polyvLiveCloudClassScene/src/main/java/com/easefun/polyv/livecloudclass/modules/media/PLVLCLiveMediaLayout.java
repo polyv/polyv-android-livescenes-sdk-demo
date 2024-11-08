@@ -54,6 +54,7 @@ import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControll
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
@@ -824,6 +825,21 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public PLVTriangleIndicateTextView getLotteryEnterTipsView() {
         return mediaController.getLandscapeController().getLotteryEnterTipsView();
+    }
+
+    @Override
+    public ImageView getWelfareLotteryEnterView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterView();
+    }
+
+    @Override
+    public TextView getWelfareLotteryEnterCdView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView() {
+        return mediaController.getLandscapeController().getWelfareLotteryEnterTipsView();
     }
 
     @Override

@@ -140,6 +140,23 @@ public interface IPLVLCLiveLandscapePlayerController {
     PLVTriangleIndicateTextView getLotteryEnterTipsView();
 
     /**
+     * 获取有条件抽奖入口倒计时控件
+     * @return
+     */
+    ImageView getWelfareLotteryEnterView();
+
+    /**
+     * 获取有条件抽奖入口提示控件
+     * @return
+     */
+    TextView getWelfareLotteryEnterCdView();
+
+    /**
+     * 获取有条件抽奖入口提示控件
+     */
+    PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView();
+
+    /**
      * 进入画笔模式控件
      */
     ImageView getEnterPaintView();

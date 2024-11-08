@@ -69,6 +69,8 @@ public class PLVInteractJSBridgeEventConst {
     public static final String V2_LOCK_TO_PORTRAIT = "lockToPortrait";
     public static final String V2_GET_INTERACT_INFO = "getInteractInfo";
     public static final String V2_CLICK_PRODUCT_BUTTON = "clickProductButton";
+    public static final String V2_WELFARE_LOTTERY_COMMENT_SUCCESS = "welfareLotteryCommentSuccess";
+    public static final String V2_WELFARE_LOTTERY_ENTRANCE_CHANGE = "welfareLotteryEntranceDataChange";
 
 
     //native2js

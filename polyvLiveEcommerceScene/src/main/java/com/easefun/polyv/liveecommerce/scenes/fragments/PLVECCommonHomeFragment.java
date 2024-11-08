@@ -19,6 +19,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroo
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
 import com.easefun.polyv.livecommon.module.modules.socket.IPLVSocketLoginManager;
@@ -60,6 +61,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected PLVCardPushManager cardPushManager = new PLVCardPushManager();
     //抽奖挂件管理器
     protected PLVLotteryManager lotteryManager = new PLVLotteryManager();
+    //有条件抽奖挂件管理器
+    PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
     //截屏帮助类
     protected PLVScreenshotHelper screenshotHelper = new PLVScreenshotHelper();
     // </editor-fold>
@@ -415,7 +418,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
             @Override
             public void onChanged(@Nullable Long l) {
                 //点赞数
-                String likesString = StringUtils.toWString(l);
+                String likesString = StringUtils.toKString(l);
                 updateLikesInfo(likesString);
             }
         });

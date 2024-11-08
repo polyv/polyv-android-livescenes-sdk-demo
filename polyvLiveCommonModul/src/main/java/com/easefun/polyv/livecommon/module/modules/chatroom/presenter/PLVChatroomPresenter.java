@@ -29,6 +29,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.model.enums.PLVRedPaperType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
+import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
 import com.easefun.polyv.livecommon.module.modules.redpack.model.PLVRedpackRepo;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
@@ -163,6 +164,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // model
     private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
     private final PLVRedpackRepo redpackRepo = PLVDependManager.getInstance().get(PLVRedpackRepo.class);
+    private final PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -341,6 +343,14 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 if (status.getStatus() == PLVSocketStatus.STATUS_LOGINSUCCESS) {
                     liveRoomDataManager.setChatToken(PolyvSocketWrapper.getInstance().getChatToken());
                 }
+            }
+        });
+        //监听互动应用评论信息
+        welfareLotteryManager.setJSLotteryCommentListener(new PLVWelfareLotteryManager.OnJSLotteryCommentListener() {
+            @Override
+            public void onJSLotteryComment(String comment) {
+                PolyvLocalMessage message = new PolyvLocalMessage(comment);
+                acceptLocalChatMessage(message, "");
             }
         });
     }
@@ -1630,6 +1640,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 view.onLocalSpeakMessage(textMessage);
             }
         });
+        welfareLotteryManager.sendCommentForLottery(textMessage.getSpeakMessage());
+
         chatroomData.postSpeakMessageData((CharSequence) textMessage.getObjects()[0], true);
     }
 

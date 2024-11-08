@@ -103,6 +103,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private static final String EXTRA_VIEWER_AVATAR = "viewerAvatar";//观看者头像地址
     private static final String EXTRA_VID = "vid";//视频Id
     private static final String EXTRA_VIDEO_LIST_TYPE = "video_list_type";//回放列表类型
+    private static final String EXTRA_MATERIAL_LIBRARY_ENABLED = "material_library_enabled";//素材库回放
     private static final String EXTRA_IS_LIVE = "is_live";//是否是直播
     private static final String EXTRA_CHANNEL_TYPE = "channel_type";//频道类型
 
@@ -205,6 +206,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
      * @param viewerName    观众昵称
      * @param videoListType 回放视频类型 {@link PLVPlaybackListType}
      * @param langType      观看页语言
+     * @param materialLibraryEnabled 素材库回放
      * @return PLVLaunchResult.isSuccess=true表示启动成功，PLVLaunchResult.isSuccess=false表示启动失败
      */
     @SuppressWarnings("ConstantConditions")
@@ -216,7 +218,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                                                  @NonNull String viewerName,
                                                  @NonNull String viewerAvatar,
                                                  PLVPlaybackListType videoListType,
-                                                 String langType) {
+                                                 String langType,
+                                                 boolean materialLibraryEnabled) {
         if (activity == null) {
             return PLVLaunchResult.error(PLVAppUtils.getString(R.string.plvec_login_playback_error_activity_is_null));
         }
@@ -240,6 +243,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         intent.putExtra(EXTRA_VIEWER_NAME, viewerName);
         intent.putExtra(EXTRA_VIEWER_AVATAR, viewerAvatar);
         intent.putExtra(EXTRA_VIDEO_LIST_TYPE, videoListType);
+        intent.putExtra(EXTRA_MATERIAL_LIBRARY_ENABLED, materialLibraryEnabled);
         intent.putExtra(EXTRA_IS_LIVE, false);
         activity.startActivity(intent);
         return PLVLaunchResult.success();
@@ -387,6 +391,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         final String viewerAvatar = intent.getStringExtra(EXTRA_VIEWER_AVATAR);
         final String vid = intent.getStringExtra(EXTRA_VID);
         final PLVPlaybackListType videoListType = (PLVPlaybackListType) intent.getSerializableExtra(EXTRA_VIDEO_LIST_TYPE);
+        final boolean materialLibraryEnabled = intent.getBooleanExtra(EXTRA_MATERIAL_LIBRARY_ENABLED, false);
 
         // 设置Config数据
         PLVLiveChannelConfigFiller.setIsLive(isLive);
@@ -403,6 +408,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         } else { // 回放模式
             PLVLiveChannelConfigFiller.setupVid(vid);
             PLVLiveChannelConfigFiller.setupVideoListType(videoListType != null ? videoListType : PLVPlaybackListType.PLAYBACK);
+            PLVLiveChannelConfigFiller.setMaterialLibraryEnabled(materialLibraryEnabled);
             PLVFloatingPlayerManager.getInstance().setTag(channelId + "_" + (vid == null ? "playback" : vid));
         }
 

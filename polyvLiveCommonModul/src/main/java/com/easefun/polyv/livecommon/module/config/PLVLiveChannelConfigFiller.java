@@ -163,6 +163,13 @@ public class PLVLiveChannelConfigFiller {
     }
 
     /**
+     * 设置是否素材库回放
+     */
+    public static void setMaterialLibraryEnabled(boolean materialLibraryEnabled){
+        channelConfig.setMaterialLibraryEnabled(materialLibraryEnabled);
+    }
+
+    /**
      * 生成新的config对象
      *
      * @return PLVLiveChannelConfig

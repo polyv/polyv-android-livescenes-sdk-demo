@@ -161,6 +161,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_ACCURATE_SEEK, true)
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_AUTO_PLAY_TEMP_STORE_VIDEO, true)
                 .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType())
+                .buildOptions(PLVPlaybackVideoParams.MATERIAL_LIBRARY_ENABLED, getConfig().isMaterialLibraryEnabled())
                 .buildOptions(PLVBaseVideoParams.LOAD_SLOW_TIME, 15);
         if (videoView != null) {
             videoView.playByMode(playbackVideoParams, PLVPlayOption.PLAYMODE_VOD);

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 /**
  * 直播信息view：推流logo，讲师名称，观看热度
@@ -43,7 +44,8 @@ public class PLVECWatchInfoView extends FrameLayout {
 
     @SuppressLint("SetTextI18n")
     public void updateWatchCount(final Long watchCount) {
-        watchCountTv.setText(watchCount + "");
+        String likesString = StringUtils.toKString(watchCount);
+        watchCountTv.setText(likesString);
     }
 
     @SuppressLint("SetTextI18n")
