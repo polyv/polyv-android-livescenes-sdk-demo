@@ -299,6 +299,9 @@ public class PLVSAHorizonBeautyLayout extends FrameLayout implements IPLVSABeaut
                 beautyOptionAdapter.setBeautyOptionList(PLVSABeautyOptionAdapter.ItemType.TYPE_DETAIL, beautyOptionsUiState.detailOptions);
                 beautyOptionAdapter.notifyDataSetChanged();
                 beautyOptionAdapter.updateCurrentSelectedOption();
+                if (beautySelectorFilterTv != null) {
+                    beautySelectorFilterTv.setVisibility((beautyOptionsUiState.filterOptions != null && beautyOptionsUiState.filterOptions.size() > 0) ? View.VISIBLE : View.GONE);
+                }
             }
         });
     }

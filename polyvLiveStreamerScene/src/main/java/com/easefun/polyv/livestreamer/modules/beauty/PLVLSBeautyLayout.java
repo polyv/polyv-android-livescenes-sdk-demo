@@ -353,6 +353,9 @@ public class PLVLSBeautyLayout extends FrameLayout implements IPLVLSBeautyLayout
                 beautyOptionAdapter.setBeautyOptionList(PLVLSBeautyOptionAdapter.ItemType.TYPE_DETAIL, beautyOptionsUiState.detailOptions);
                 beautyOptionAdapter.notifyDataSetChanged();
                 beautyOptionAdapter.updateCurrentSelectedOption();
+                if (beautySelectorFilterTv != null) {
+                    beautySelectorFilterTv.setVisibility((beautyOptionsUiState.filterOptions != null && beautyOptionsUiState.filterOptions.size() > 0) ? View.VISIBLE : View.GONE);
+                }
             }
         });
     }
