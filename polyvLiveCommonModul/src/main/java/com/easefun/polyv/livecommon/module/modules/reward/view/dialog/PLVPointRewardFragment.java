@@ -59,6 +59,9 @@ public class PLVPointRewardFragment extends PLVBaseFragment {
 
         adapter = new PLVRewardListAdapter();
         adapter.setOnCheckItemListener(onCheckItemListener);
+        if (dataList == null) {
+            return;
+        }
         adapter.setDataList(new ArrayList<PLVBaseViewData>(dataList));
         rvPointRewardList.setAdapter(adapter);
         adapter.notifyDataSetChanged();
