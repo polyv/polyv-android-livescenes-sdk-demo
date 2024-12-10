@@ -1,0 +1,32 @@
+<resources>
+    <string name="plvsa_streamer_alone_scene_name">POLYV 시작</string>
+
+    <string name="plvsa_setting_enter_live">생방송 방 입장</string>
+    <string name="plvsa_streamer_sharescreen_exit">退出共享</string>
+    <string name="plvsa_streamer_sharescreen_start">화면 공유</string>
+    <string name="plvsa_streamer_sharescreen_start_tip">이제 다른 사람들이 귀하의 화면을 볼 수 있습니다</string>
+    <string name="plvsa_streamer_sharescreen_already_stop">공유가 종료되었습니다</string>
+    <string name="plvsa_streamer_sharescreen_error">화면 공유 실패:</string>
+    <string name="plvsa_streamer_sharescreen_need_permission">화면 공유에는 강사 승인이 필요합니다</string>
+    <string name="plvsa_streamer_sharescreen_need_video_first">먼저 카메라를 켜주세요</string>
+    <string name="plvsa_streamer_remove_speaker_and_stop_screenshare">발언 권한이 제거되었으며 공유가 종료되었습니다</string>
+    <string name="plvsa_streamer_screenshare_start">开始共享</string>
+    <string name="plvsa_streamer_screenshare_stop">공유 종료</string>
+    <string name="plvsa_streamer_screenshare_ing">화면을 공유하고 계십니다</string>
+    <string name="plvsa_float_window_permission_need">백그라운드 작업을 보장하려면 플로팅 창 권한을 승인해야 합니다</string>
+    <string name="plvsa_float_window_permission_denied_and_not_show">권한이 제한되어 있어 플로팅 창이 열리지 않습니다</string>
+    <string name="plvsa_streamer_double_click_enter_fullscreen">창을 두 번 클릭하시면 확대됩니다</string>
+    <string name="plvsa_streamer_double_click_exit_fullscreen">전체 화면을 종료하려면 두 번 클릭하세요</string>
+    <string name="plvsa_streamer_allow_viewer_linkmic">뷰어 링크 마이크 활성화</string>
+
+    <!--登录-->
+    <string name="plvsa_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_channel_id_is_empty" translatable="false">channelId 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_avatar_url_is_empty" translatable="false">avatarUrl 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_actor_is_empty" translatable="false">actor 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_channel_name_is_empty" translatable="false">channelName 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_user_type_is_empty" translatable="false">usertype 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播纯视频页失败！</string>
+</resources>

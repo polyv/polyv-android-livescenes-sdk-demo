@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.ppt.contract;
 
+import com.easefun.polyv.livecommon.module.modules.ppt.enums.PLVPPTLayoutEnum;
+
 /**
  * date: 2020/9/16
  * author: HWilliamgo
@@ -64,6 +66,11 @@ public interface IPLVPPTContract {
          * 发送画笔消息
          */
         void sendPPTBrushMsg(String msg);
+
+        /**
+         * 设置当前PPT的布局状态
+         */
+        void notifyIsWatchLayout(PLVPPTLayoutEnum layout);
 
         /**
          * 销毁

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.easefun.polyv.businesssdk.model.ppt.PolyvPPTAuthentic;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
+import com.easefun.polyv.livecommon.module.modules.ppt.enums.PLVPPTLayoutEnum;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
@@ -49,6 +50,8 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
     private Disposable delaySendLoginEventDisposable;
 
     private int delayTime = MSG_DELAY_TIME;
+    // ppt观看页布局
+    private PLVPPTLayoutEnum watchLayout = PLVPPTLayoutEnum.FOLLOWTEACHER;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - presenter接口实现">
@@ -135,9 +138,15 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         // 非正在直播状态，不同步主副屏
                         return;
                     }
-                    // pptAndVideoPosition 0表示讲师端目前ppt在主屏 1表示讲师端目前播放器在主屏
                     if (view != null) {
-                        view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
+                        if (watchLayout == PLVPPTLayoutEnum.FOLLOWTEACHER) {
+                            // pptAndVideoPosition 0表示讲师端目前ppt在主屏 1表示讲师端目前播放器在主屏
+                            view.switchPPTViewLocation(eventVo.getPptAndVedioPosition() == 0);
+                        } else if (watchLayout == PLVPPTLayoutEnum.PPT) {
+                            view.switchPPTViewLocation(true);
+                        } else if (watchLayout == PLVPPTLayoutEnum.VIDEO) {
+                            view.switchPPTViewLocation(false);
+                        }
                     }
                 }
                 if (PLVEventConstant.Ppt.ON_SLICE_START_EVENT.equals(event)) {
@@ -146,7 +155,13 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                         return;
                     }
                     if (view != null) {
-                        view.switchPPTViewLocation(eventVo.isPptOnMainScreen());
+                        if (watchLayout == PLVPPTLayoutEnum.FOLLOWTEACHER) {
+                            view.switchPPTViewLocation(eventVo.isPptOnMainScreen());
+                        } else if (watchLayout == PLVPPTLayoutEnum.PPT) {
+                            view.switchPPTViewLocation(true);
+                        } else if (watchLayout == PLVPPTLayoutEnum.VIDEO) {
+                            view.switchPPTViewLocation(false);
+                        }
                     }
                 }
                 if (PLVEventConstant.Class.FINISH_CLASS.equals(event)) {
@@ -174,6 +189,11 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
         PolyvELogSender.send(PolyvPPTElog.class, PPT_RECEIVE_WEB_MESSAGE, "event " + SEND_SOCKET_EVENT + "receive web message :" + message);
         //发送画笔事件
         PLVSocketWrapper.getInstance().emit(PLVEventConstant.MESSAGE_EVENT, message);
+    }
+
+    @Override
+    public void notifyIsWatchLayout(PLVPPTLayoutEnum watchLayout) {
+        this.watchLayout = watchLayout;
     }
 
 

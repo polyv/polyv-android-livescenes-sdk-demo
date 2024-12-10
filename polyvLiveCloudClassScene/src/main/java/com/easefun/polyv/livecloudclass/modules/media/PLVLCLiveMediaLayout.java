@@ -17,7 +17,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +48,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsVie
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
+import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
@@ -81,6 +81,7 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.business.api.common.player.PLVPlayerConstant;
+import com.plv.business.api.common.ppt.IPLVPPTWebViewListener;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
@@ -219,10 +220,14 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private String coverImage = DEFAULT_COVER_IMAGE;
 
     private boolean isInPaintMode;
+    private boolean isPPTMode;
 
     //播放器presenter
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
     private PLVLCFloatingWindow floatingWindow;
+
+    // 漂浮窗内的pptView
+    private IPLVLCPPTView floatPPTView;
 
     //Listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
@@ -580,6 +585,28 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             }
 
             @Override
+            protected void onSwitchElsewhereAfter() {
+                View childOfAnchor;
+                try {
+                    childOfAnchor = playerSwitchAnchor.getSwitchView();
+                } catch (IllegalAccessException e) {
+                    PLVCommonLog.exception(e);
+                    return;
+                }
+
+
+                if (childOfAnchor == floatPPTView) {
+                    isPPTMode = true;
+                } else {
+                    isPPTMode = false;
+                }
+                livePlayerPresenter.setNeedGestureDetector(!isPPTMode);
+                if (floatPPTView != null) {
+                    floatPPTView.notifyPPTModeStatus(isPPTMode);
+                }
+            }
+
+            @Override
             protected void onSwitchBackAfter() {
                 View childOfAnchor;
                 try {
@@ -602,6 +629,17 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     videoView.addView(loadingView);
                     videoView.addView(noStreamView);
                     videoView.addView(stopStreamView);
+                }
+
+
+                if (childOfAnchor == floatPPTView) {
+                    isPPTMode = true;
+                } else {
+                    isPPTMode = false;
+                }
+                livePlayerPresenter.setNeedGestureDetector(!isPPTMode);
+                if (floatPPTView != null) {
+                    floatPPTView.notifyPPTModeStatus(isPPTMode);
                 }
             }
         });
@@ -1007,7 +1045,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             livePlayerPresenter.setPlayerVolume(0);
         }
         //禁用播放器手势
-        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode);
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode && !isPPTMode);
 
         mediaController.show();
 
@@ -1034,7 +1072,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             startPlay();
         }
         //恢复播放器手势
-        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode);
+        livePlayerPresenter.setNeedGestureDetector(!isJoinRTC && !isInPaintMode && !isPPTMode);
         //恢复播放器音量
         livePlayerPresenter.setPlayerVolume(100);
 
@@ -1172,6 +1210,23 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void setPPTView(IPolyvPPTView pptView) {
 
+    }
+
+    @Override
+    public void setFloatPPTView(IPLVLCPPTView floatPPTView) {
+        this.floatPPTView = floatPPTView;
+        floatPPTView.setLCPPTGestureListener(new IPLVPPTWebViewListener.OnPLVLCPPTGestureListener() {
+            @Override
+            public void onSingleTap() {
+                if (mediaController != null) {
+                    if (mediaController.isShowing()) {
+                        mediaController.hide();
+                    } else {
+                        mediaController.show();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -1319,7 +1374,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         @Override
         public void onLiveEnd() {
             super.onLiveEnd();
-            Log.i(TAG, "onLiveEnd: ");
+            PLVCommonLog.i(TAG, "onLiveEnd: ");
             startLiveTimeCountDown(liveStartTime);
             if (toTopView != null) {
                 toTopView.setShowEnabled(false);

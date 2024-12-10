@@ -45,6 +45,7 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsVi
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
+import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chapter.viewmodel.PLVPlaybackChapterViewModel;
@@ -74,6 +75,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
+import com.plv.business.api.common.ppt.IPLVPPTWebViewListener;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -169,6 +171,10 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     private final PLVPlaybackChapterViewModel playbackChapterViewModel = PLVDependManager.getInstance().get(PLVPlaybackChapterViewModel.class);
     //listener
     private IPLVLCMediaLayout.OnViewActionListener onViewActionListener;
+
+    // 漂浮窗内的pptView
+    private IPLVLCPPTView floatPPTView;
+    private boolean isPPTMode;
 
     private boolean pausingOnEnterBackground = false;
     // </editor-fold>
@@ -400,6 +406,27 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             }
 
             @Override
+            protected void onSwitchElsewhereAfter() {
+                View childOfAnchor;
+                try {
+                    childOfAnchor = switchAnchorPlayer.getSwitchView();
+                } catch (IllegalAccessException e) {
+                    PLVCommonLog.exception(e);
+                    return;
+                }
+
+                if (childOfAnchor == floatPPTView) {
+                    isPPTMode = true;
+                } else {
+                    isPPTMode = false;
+                }
+                playbackPlayerPresenter.setNeedGestureDetector(!isPPTMode);
+                if (floatPPTView != null) {
+                    floatPPTView.notifyPPTModeStatus(isPPTMode);
+                }
+            }
+
+            @Override
             protected void onSwitchBackAfter() {
                 super.onSwitchBackAfter();
                 View childOfAnchor = switchAnchorPlayer.getChildAt(0);
@@ -407,6 +434,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                     flPlayerSwitchViewParent.removeAllViews();
                     videoView.addView(playerView, 0);
                     videoView.addView(logoView);
+                }
+
+                if (childOfAnchor == floatPPTView) {
+                    isPPTMode = true;
+                } else {
+                    isPPTMode = false;
+                }
+                playbackPlayerPresenter.setNeedGestureDetector(!isPPTMode);
+                if (floatPPTView != null) {
+                    floatPPTView.notifyPPTModeStatus(isPPTMode);
                 }
             }
         });
@@ -836,6 +873,23 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public void setPPTView(IPolyvPPTView pptView) {
         playbackPlayerPresenter.bindPPTView(pptView);
+    }
+
+    @Override
+    public void setFloatPPTView(IPLVLCPPTView floatPPTView) {
+        this.floatPPTView = floatPPTView;
+        floatPPTView.setLCPPTGestureListener(new IPLVPPTWebViewListener.OnPLVLCPPTGestureListener() {
+            @Override
+            public void onSingleTap() {
+                if (mediaController != null) {
+                    if (mediaController.isShowing()) {
+                        mediaController.hide();
+                    } else {
+                        mediaController.show();
+                    }
+                }
+            }
+        });
     }
 
     @Override

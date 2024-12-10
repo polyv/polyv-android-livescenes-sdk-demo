@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.LocaleList;
 import androidx.annotation.RequiresApi;
 import androidx.core.os.ConfigurationCompat;
+
 import android.util.DisplayMetrics;
 import android.util.Pair;
 
@@ -35,11 +36,15 @@ public class PLVLanguageUtil {
     public static final int LANGUAGE_FOLLOW_SYSTEM = 0; // 跟随系统
     public static final int LANGUAGE_EN = 1; //英文
     public static final int LANGUAGE_CHINESE_SIMPLIFIED = 2; // 简体
+    public static final int LANGUAGE_CHINESE_TRADITIONAL = 3; // 繁体
+    public static final int LANGUAGE_JAPANESE = 4; // 日文
+    public static final int LANGUAGE_KOREAN = 5; // 韩文
     private static String lastSaveKeyOrType = "";
     private static Locale userLocale = null;
 
     private static final Map<String, Integer> LANG_MAP = new HashMap<String, Integer>() {
         {
+            // 目前后台还不支持添加 日文、韩文、繁体
             put(PLVLiveClassDetailVO.LangType.LANG_TYPE_FOLLOW_SYSTEM, LANGUAGE_FOLLOW_SYSTEM);
             put(PLVLiveClassDetailVO.LangType.LANG_TYPE_ZH_CN, LANGUAGE_CHINESE_SIMPLIFIED);
             put(PLVLiveClassDetailVO.LangType.LANG_TYPE_EN, LANGUAGE_EN);
@@ -127,9 +132,29 @@ public class PLVLanguageUtil {
     public static boolean isEqualsLanguage(int languageType) {
         int currentLanguageType = LANGUAGE_FOLLOW_SYSTEM;
         if (userLocale != null) {
-            currentLanguageType = isENLanguage() ? LANGUAGE_EN : LANGUAGE_CHINESE_SIMPLIFIED;
+            currentLanguageType = getCurrentLanguageCode();
         }
         return languageType == currentLanguageType;
+    }
+
+    private static int getCurrentLanguageCode() {
+        if (userLocale != null) {
+            String language = userLocale.getLanguage();
+            String country = userLocale.getCountry();
+            PLVCommonLog.d(TAG, "=== language: " + language +  " country: " + country);
+            PLVCommonLog.d(TAG, "=== CN language: " + Locale.CHINESE.getLanguage() +  " country: " + Locale.CHINESE.getCountry());
+            PLVCommonLog.d(TAG, "=== TW language: " + Locale.TRADITIONAL_CHINESE.getLanguage() +  " TW country: " + Locale.TRADITIONAL_CHINESE.getCountry());
+            if (Locale.CHINESE.getLanguage().equals(language)) {
+                return country.equals(Locale.TRADITIONAL_CHINESE.getLanguage()) ? LANGUAGE_CHINESE_TRADITIONAL : LANGUAGE_CHINESE_SIMPLIFIED;
+            } else if (Locale.ENGLISH.getLanguage().equals(language)) {
+                return LANGUAGE_EN;
+            } else if (Locale.JAPANESE.getLanguage().equals(language)) {
+                return LANGUAGE_JAPANESE;
+            } else if (Locale.KOREAN.getLanguage().equals(language)) {
+                return LANGUAGE_KOREAN;
+            }
+        }
+        return LANGUAGE_FOLLOW_SYSTEM;
     }
 
     private static Locale updateConfiguration(Context context) {
@@ -178,6 +203,12 @@ public class PLVLanguageUtil {
             locale = Locale.ENGLISH;
         } else if (languageType == LANGUAGE_CHINESE_SIMPLIFIED) {
             locale = Locale.SIMPLIFIED_CHINESE;
+        } else if (languageType == LANGUAGE_CHINESE_TRADITIONAL) {
+            locale = Locale.TRADITIONAL_CHINESE;
+        } else if (languageType == LANGUAGE_JAPANESE) {
+            locale = Locale.JAPAN;
+        } else if (languageType == LANGUAGE_KOREAN) {
+            locale = Locale.KOREA;
         }
         return locale;
     }

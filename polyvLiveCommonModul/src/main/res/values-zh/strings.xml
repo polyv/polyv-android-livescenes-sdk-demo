@@ -489,6 +489,9 @@
     <string name="plv_live_language_switch">语言切换</string>
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
+    <string name="plv_live_language_switch_tc" translatable="false">繁體中文-TC</string>
+    <string name="plv_live_language_switch_jp" translatable="false">日本語-JP</string>
+    <string name="plv_live_language_switch_ko" translatable="false">한국인-KO</string>
     <string name="plv_live_language_switch_hint">切换语言将为您重新进入直播间，请点击\"确定\"后切换</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">签到</string>

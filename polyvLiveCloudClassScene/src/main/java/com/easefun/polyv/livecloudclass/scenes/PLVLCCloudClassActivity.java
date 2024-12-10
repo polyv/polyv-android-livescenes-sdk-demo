@@ -455,6 +455,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout = (IPLVLCMediaLayout) videoLyViewStub.inflate();
             mediaLayout.init(liveRoomDataManager);
             mediaLayout.setLandscapeControllerView(liveLandscapeChannelController);
+            mediaLayout.setFloatPPTView(floatingPPTLayout.getPPTView());
             mediaLayout.startPlay();
 
             // 连麦控制条
@@ -472,6 +473,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout = (IPLVLCMediaLayout) videoLyViewStub.inflate();
             mediaLayout.init(liveRoomDataManager);
             mediaLayout.setPPTView(floatingPPTLayout.getPPTView().getPlaybackPPTViewToBindInPlayer());
+            mediaLayout.setFloatPPTView(floatingPPTLayout.getPPTView());
             mediaLayout.startPlay();
         }
 

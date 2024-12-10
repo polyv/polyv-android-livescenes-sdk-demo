@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.ppt;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.plv.business.api.common.ppt.IPLVPPTWebViewListener;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 
@@ -57,6 +58,12 @@ public interface IPLVLCPPTView {
     void notifyPaintModeStatus(boolean isInPaintMode);
 
     /**
+     * 更新在PPT状态
+     * @param isInPPTMode 当前是否处于ppt状态
+     */
+    void notifyPPTModeStatus(boolean isInPPTMode);
+
+    /**
      * 更新画笔工具
      */
     void notifyPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool);
@@ -75,6 +82,12 @@ public interface IPLVLCPPTView {
      * 更新文本画笔内容
      */
     void notifyPaintUpdateTextContent(String textContent);
+
+    /**
+     * 设置PPT内部的手势监听
+     * @param listener
+     */
+    void setLCPPTGestureListener(IPLVPPTWebViewListener.OnPLVLCPPTGestureListener listener);
 
 // </editor-fold>
 

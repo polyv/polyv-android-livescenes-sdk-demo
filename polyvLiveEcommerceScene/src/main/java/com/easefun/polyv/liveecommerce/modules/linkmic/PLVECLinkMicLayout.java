@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.modules.linkmic;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -7,12 +9,15 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -33,6 +39,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVNotchUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
@@ -56,6 +63,7 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
+import com.plv.thirdpart.blankj.utilcode.util.ImageUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -63,6 +71,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * date: 2020/7/16
@@ -89,6 +104,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private IPLVECLinkMicControlBar linkMicControlBar;
     private FrameLayout flMediaLinkMicRoot;
     private PLVNoInterceptTouchRecyclerView rvLinkMicList;
+    private ImageView linkMicBgIv;
     //连麦列表布局管理
     private GridLayoutManager gridLayoutManager;
     private final PLVECLinkMicInvitationLayout linkMicInvitationLayout = new PLVECLinkMicInvitationLayout(getContext());
@@ -139,6 +155,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         LayoutInflater.from(getContext()).inflate(R.layout.plvec_linkmic_media_layout, this, true);
         flMediaLinkMicRoot = findViewById(R.id.plvec_linkmic_fl_media_linkmic_root);
         rvLinkMicList = findViewById(R.id.plvec_link_mic_rv_linkmic_list);
+        linkMicBgIv = findViewById(R.id.plvec_linkmic_bg_iv);
 
         //init RecyclerView
         rvLinkMicList.addItemDecoration(landscapeItemDecoration);
@@ -292,6 +309,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         updatePushResolution(false);
         observeOnAudioState(liveRoomDataManager);
         observeLinkMicQueueOrder();
+        observeData();
     }
 
 
@@ -981,6 +999,61 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                     linkMicListAdapter.setCoverImage(coverImage);
                     linkMicListAdapter.updateTeacherCoverImage();
                 }
+            }
+        });
+    }
+    // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="监听数据">
+
+    private void observeData() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable final PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                String linkMicBg = nullable(new PLVSugarUtil.Supplier<String>() {
+                    @Override
+                    public String get() {
+                        return statefulData.getData().getData().getPortraitChatBgImg();
+                    }
+                });
+
+                final Integer linkMicBgOpacity = nullable(new PLVSugarUtil.Supplier<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return statefulData.getData().getData().getPortraitChatBgImgOpacity();
+                    }
+                });
+                if (TextUtils.isEmpty(linkMicBg)) {
+                    return;
+                }
+                if (linkMicBg.startsWith("//")) {
+                    linkMicBg = "https:" + linkMicBg;
+                }
+                final String finalLinkMicBg = linkMicBg;
+                Disposable loadBgDisposable = Observable.just(1).map(new Function<Integer, BitmapDrawable>() {
+                            @Override
+                            public BitmapDrawable apply(Integer integer) throws Exception {
+                                return (BitmapDrawable) PLVImageLoader.getInstance().getImageAsDrawable(PLVECLinkMicLayout.this.getContext(), finalLinkMicBg);
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<BitmapDrawable>() {
+                            @Override
+                            public void accept(BitmapDrawable bitmapDrawable) throws Exception {
+                                if (bitmapDrawable == null) {
+                                    return;
+                                }
+                                Bitmap bitmapBg = bitmapDrawable.getBitmap();
+                                if (linkMicBgOpacity != null && linkMicBgOpacity > 0) {
+                                    Bitmap blurBitmap= ImageUtils.fastBlur(bitmapBg, 0.8f, (float) linkMicBgOpacity / 2);
+                                    linkMicBgIv.setImageBitmap(blurBitmap);
+
+                                } else {
+                                    linkMicBgIv.setImageBitmap(bitmapDrawable.getBitmap());
+                                }
+                            }
+                        });
             }
         });
     }

@@ -12,6 +12,13 @@
         android:background="@drawable/plvec_player_bg"
         android:visibility="gone"
         tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/plvec_linkmic_bg_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
         <!-- 连麦列表-->
         <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView
             android:id="@+id/plvec_link_mic_rv_linkmic_list"

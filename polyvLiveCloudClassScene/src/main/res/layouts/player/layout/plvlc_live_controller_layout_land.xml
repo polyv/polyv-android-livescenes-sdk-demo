@@ -388,7 +388,7 @@
             android:layout_marginEnd="16dp"
             android:src="@drawable/plvlc_controller_paint_mode_icon"
             android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/plvlc_live_lottery_enter_view"
+            app:layout_constraintEnd_toStartOf="@+id/plvlc_live_welfare_lottery_enter_view"
             app:layout_constraintTop_toTopOf="@+id/start_send_message_land_tv"
             tools:visibility="visible" />
 
