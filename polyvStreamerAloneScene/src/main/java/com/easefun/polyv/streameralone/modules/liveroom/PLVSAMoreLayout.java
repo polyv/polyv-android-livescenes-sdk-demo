@@ -653,6 +653,18 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 }
             });
+            presenter.getData().getLinkMicCount().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Integer>() {
+                @Override
+                public void onChanged(@Nullable Integer integer) {
+                    if (integer > 1) {
+                        moreHangUpViewerLinkmicLayout.setEnabled(true);
+                        moreHangUpViewerLinkmicIv.setAlpha(1f);
+                    } else {
+                        moreHangUpViewerLinkmicLayout.setEnabled(false);
+                        moreHangUpViewerLinkmicIv.setAlpha(0.5f);
+                    }
+                }
+            });
         }
     };
     // </editor-fold>

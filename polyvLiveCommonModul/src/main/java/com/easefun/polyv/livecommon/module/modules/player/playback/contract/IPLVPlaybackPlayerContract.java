@@ -406,6 +406,13 @@ public interface IPLVPlaybackPlayerContract {
         String getVideoName();
 
         /**
+         * 是否需要手势
+         *
+         * @param need true：需要，false：不需要
+         */
+        void setNeedGestureDetector(boolean need);
+
+        /**
          * 销毁，包括销毁播放器、解除view
          */
         void destroy();

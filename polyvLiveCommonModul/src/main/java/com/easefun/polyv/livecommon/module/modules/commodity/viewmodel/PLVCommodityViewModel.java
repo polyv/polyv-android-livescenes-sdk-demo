@@ -146,6 +146,11 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                 commodityUiState.productContentBeanPushToShow = null;
             }
             commodityUiStateLiveData.postValue(commodityUiState.copy());
+        } else if (productEvent.isProductCancelPushEvent()) {
+            if (commodityUiState.productContentBeanPushToShow != null) {
+                commodityUiState.productContentBeanPushToShow = null;
+                commodityUiStateLiveData.postValue(commodityUiState.copy());
+            }
         }
     }
 

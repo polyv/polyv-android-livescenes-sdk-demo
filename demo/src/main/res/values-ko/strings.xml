@@ -1,0 +1,27 @@
+<resources>
+
+    <string name="plv_app_name">POLYV多场景</string>
+
+    <string name="plv_login">登录</string>
+    <string name="plv_login_head_info">POLYV&#160;&#160;云课堂</string>
+    <string name="plv_login_userId">用户ID</string>
+    <string name="plv_login_vid">视频ID</string>
+    <string name="plv_login_channelId">频道ID</string>
+    <string name="plv_login_appId">APP ID</string>
+    <string name="plv_login_appSecret">APP Secret</string>
+    <string name="plv_login_waiting">正在登录中，请稍等…</string>
+    <string name="plv_login_copyright">2013 – 2023 易方信息科技股份有限公司 版权所有</string>
+
+    <!--手机开播登录页多语言适配-->
+    <string name="plv_login_streamer_live_broadcast">휴대폰 방송 시작</string>
+    <string name="plv_login_streamer_enter_channel_number">채널 번호를 입력하십시오</string>
+    <string name="plv_login_streamer_enter_password">암호를 입력하십시오</string>
+    <string name="plv_login_streamer_enter_nickname">닉네임을 입력하십시오</string>
+    <string name="plv_login_streamer_login">로그인</string>
+    <string name="plv_login_streamer_remember_password">비밀번호 기억하기</string>
+    <string name="plv_login_streamer_read_and_agree">읽기 및 동의</string>
+    <string name="plv_login_streamer_privacy_policy">《프라이버시 정책》</string>
+    <string name="plv_login_streamer_and">및</string>
+    <string name="plv_login_streamer_user_agreement">《사용 계약》</string>
+    <string name="plv_login_streamer_check_the_agreement">프로토콜을 선택하십시오</string>
+</resources>

@@ -590,7 +590,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             }
             llLandscapeRoot.setVisibility(GONE);
         } else {
-            floatingViewPortraitRoot.setVisibility(GONE);
+            floatingViewPortraitRoot.setVisibility(INVISIBLE);
             llLandscapeRoot.setVisibility(VISIBLE);
         }
     }

@@ -10,12 +10,15 @@ import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -23,10 +26,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -35,18 +40,21 @@ import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVMultiModeRecyclerViewLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAdapter;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -65,12 +73,19 @@ import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ImageUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.socket.client.Ack;
 
 /**
@@ -78,6 +93,7 @@ import io.socket.client.Ack;
  */
 public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = "PLVSAStreamerLayout";
 
     // 本地麦克风音量大小达到该阈值时，提示当前正处于静音状态
     private static final int VOLUME_THRESHOLD_TO_NOTIFY_AUDIO_MUTED = 40;
@@ -110,6 +126,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     //返回home时的悬浮窗
     public PLVSAStreamerFloatWindow floatWindow;
 
+    // 连麦时显示的背景图
+    private ImageView linkMicBgIv;
+
     private boolean isLocalAudioMuted = false;
     private long lastNotifyLocalAudioMutedTimestamp;
     //是否显示悬浮窗请求弹窗
@@ -141,6 +160,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         setClickable(false);
 
         plvsaStreamerRvLayout = findViewById(R.id.plvsa_streamer_rv_layout);
+        linkMicBgIv = findViewById(R.id.plvsa_streamer_bg_iv);
 
         //init RecyclerView
         PLVNoInterceptTouchRecyclerView plvsaStreamerRv = plvsaStreamerRvLayout.getRecyclerView();
@@ -337,6 +357,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         linkMicInvitationLayout.setIsOnlyAudio(liveRoomDataManager.isOnlyAudio());
 
         observePushResolutionRatio();
+
+        observeData();
 
         updateOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
     }
@@ -555,6 +577,10 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         @Override
         public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
             super.onUsersJoin(dataBeanList);
+            // 仅竖屏才展示背景图
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                linkMicBgIv.setVisibility(View.VISIBLE);
+            }
             streamerAdapter.updateAllItem();
             updateLinkMicLayoutListOnChange();
         }
@@ -562,6 +588,10 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         @Override
         public void onUsersLeave(List<PLVLinkMicItemDataBean> dataBeanList) {
             super.onUsersLeave(dataBeanList);
+            if (plvsaStreamerRvLayout.getCurrentMode() != PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER) {
+                // 嘉宾布局一直有背景画面
+                linkMicBgIv.setVisibility(View.GONE);
+            }
             streamerAdapter.updateAllItem();
             updateLinkMicLayoutListOnChange();
         }
@@ -747,6 +777,66 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                 });
     }
     // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="监听数据">
+
+    private void observeData() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable final PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                String linkMicBg = nullable(new PLVSugarUtil.Supplier<String>() {
+                    @Override
+                    public String get() {
+                        return statefulData.getData().getData().getPortraitChatBgImg();
+                    }
+                });
+
+                final Integer linkMicBgOpacity = nullable(new PLVSugarUtil.Supplier<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return statefulData.getData().getData().getPortraitChatBgImgOpacity();
+                    }
+                });
+                if (TextUtils.isEmpty(linkMicBg)) {
+                    return;
+                }
+                if (linkMicBg.startsWith("//")) {
+                    linkMicBg = "https:" + linkMicBg;
+                }
+                final String finalLinkMicBg = linkMicBg;
+                Disposable loadBgDisposable = Observable.just(1).map(new Function<Integer, BitmapDrawable>() {
+                            @Override
+                            public BitmapDrawable apply(Integer integer) throws Exception {
+                                return (BitmapDrawable) PLVImageLoader.getInstance().getImageAsDrawable(getContext(), finalLinkMicBg);
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<BitmapDrawable>() {
+                            @Override
+                            public void accept(BitmapDrawable bitmapDrawable) throws Exception {
+                                if (bitmapDrawable == null) {
+                                    return;
+                                }
+                                Bitmap bitmapBg = bitmapDrawable.getBitmap();
+                                if (linkMicBgOpacity != null && linkMicBgOpacity > 0) {
+                                    Bitmap blurBitmap = ImageUtils.fastBlur(bitmapBg, 0.8f, (float) linkMicBgOpacity / 2);
+                                    linkMicBgIv.setImageBitmap(blurBitmap);
+
+                                } else {
+                                    linkMicBgIv.setImageBitmap(bitmapDrawable.getBitmap());
+                                }
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                PLVCommonLog.e(TAG, "load link mic bg fail");
+                            }
+                        });
+            }
+        });
+    }
+    // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="更新连麦布局">
 
@@ -1018,6 +1108,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         plvsaStreamerRvLayout.setMainViewVisibility(View.VISIBLE);
         streamerAdapter.setItemType(PLVSAStreamerAdapter.ITEM_TYPE_ONE_TO_MORE);
         streamerAdapter.setItemHide(-1);//不隐藏
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            linkMicBgIv.setVisibility(View.VISIBLE);
+        }
     }
 
     // </editor-fold >
@@ -1046,6 +1139,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_LANDSCAPE);
         } else {
             streamerPresenter.setPushPictureResolutionType(PLVLinkMicConstant.PushPictureResolution.RESOLUTION_PORTRAIT);
+        }
+        if (!isLandscape && plvsaStreamerRvLayout.getCurrentMode() == PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER) {
+            linkMicBgIv.setVisibility(View.VISIBLE);
         }
     }
     // </editor-fold>

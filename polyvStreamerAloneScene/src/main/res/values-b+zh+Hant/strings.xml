@@ -1,0 +1,32 @@
+<resources>
+    <string name="plvsa_streamer_alone_scene_name">POLYV開播</string>
+
+    <string name="plvsa_setting_enter_live">進入直播間</string>
+    <string name="plvsa_streamer_sharescreen_exit">退出共享</string>
+    <string name="plvsa_streamer_sharescreen_start">螢幕共享</string>
+    <string name="plvsa_streamer_sharescreen_start_tip">其他人現在可以看到你的螢幕</string>
+    <string name="plvsa_streamer_sharescreen_already_stop">共享已結束</string>
+    <string name="plvsa_streamer_sharescreen_error">螢幕分享失敗：</string>
+    <string name="plvsa_streamer_sharescreen_need_permission">螢幕共享需講師授權</string>
+    <string name="plvsa_streamer_sharescreen_need_video_first">請先開啟攝影機</string>
+    <string name="plvsa_streamer_remove_speaker_and_stop_screenshare">您已被移除主講權限，共享已結束</string>
+    <string name="plvsa_streamer_screenshare_start">開始共享</string>
+    <string name="plvsa_streamer_screenshare_stop">結束共享</string>
+    <string name="plvsa_streamer_screenshare_ing">您正在分享畫面</string>
+    <string name="plvsa_float_window_permission_need">為保證後台運行，需要您授權浮窗權限</string>
+    <string name="plvsa_float_window_permission_denied_and_not_show">權限受限，將不開啟懸浮窗</string>
+    <string name="plvsa_streamer_double_click_enter_fullscreen">雙擊視窗放大</string>
+    <string name="plvsa_streamer_double_click_exit_fullscreen">雙擊退出全螢幕</string>
+    <string name="plvsa_streamer_allow_viewer_linkmic">開啟觀眾連麥</string>
+
+    <!--登录-->
+    <string name="plvsa_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_channel_id_is_empty" translatable="false">channelId 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_avatar_url_is_empty" translatable="false">avatarUrl 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_actor_is_empty" translatable="false">actor 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_channel_name_is_empty" translatable="false">channelName 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_user_type_is_empty" translatable="false">usertype 为空，启动手机开播纯视频页失败！</string>
+    <string name="plvsa_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播纯视频页失败！</string>
+</resources>

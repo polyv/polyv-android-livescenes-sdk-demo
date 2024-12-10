@@ -1,0 +1,66 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="plvls_app_name">POLYV ライブ</string>
+
+    <string name="plvls_document_upload_tips">
+        1. 18:00 ～ 19:00 はアップロードのピーク時間帯であり、待ち時間が長くなります。オフピーク時間帯にアップロードしてください。
+        \n2. ドキュメントの最大サイズは 500M、1000 ページ以下です。
+        \n3. 音声とビデオを含まない、暗号化されていない ppt、pptx、pdf、doc、docx、xls、xlsx、wps、jpg、jpeg、png 形式のみをサポートします。
+        \n4. 特殊なフォントや有料フォントを含む WPS またはドキュメントの場合は、まず PDF に変換してからアップロードしてください。
+    </string>
+    <string name="plvls_document_upload_choose_convert_type">トランスコーディング方法を選択してください</string>
+    <string name="plvls_document_upload_choose_convert_type_hint">
+        高速トランスコーディング: PPT アニメーション効果は含まれていないため、より高速です。
+        \nアニメーションのトランスコーディング: PPT アニメーション効果が含まれますが、速度は遅くなります。Microsoft Office で保存された PPT のみをサポートします。
+    </string>
+    <string name="plvls_document_no_live_please_wait">ライブブロードキャストはまだ開始されていません。しばらくお待ちください</string>
+
+    <string name="plvls_document_usage_not_permeitted">レッスン機能は承認された後にのみ使用できます</string>
+    <string name="plvls_document_fast_transcoding">高速トランスコーディング</string>
+    <string name="plvls_document_animation_transcoding">アニメーションのトランスコーディング (低速)</string>
+    <string name="plvls_document_upload_continue_hint">ローカル ドキュメントの最後のアップロードが中断されました。再アップロードしますか?</string>
+    <string name="plvls_document_convert_fail_hint">暗号化されたドキュメントはまだサポートされていません。ドキュメントが復号化されているか、PDF ファイルに変換されていることを確認して、再試行してください。解決できない場合は、カスタマーサービスまでご連絡ください。 </string>
+    <string name="plvls_document_reupload">再アップロード</string>
+    <string name="plvls_document_all">すべてのドキュメント<xliff:g>&#160;</xliff:g></string>
+    <string name="plvls_document_number">合計 %s</string>
+    <string name="plvls_document_page">合計 %s ページ</string>
+    <string name="plvls_document_add_whiteboard_success_hint">ホワイトボードが正常に追加されました</string>
+    <string name="plvls_document_upload_status_failed">アップロードに失敗しました</string>
+    <string name="plvls_document_upload_status_success">アップロードに成功しました。トランスコーディングを待機しています</string>
+    <string name="plvls_document_upload_status_converting">変換中...</string>
+    <string name="plvls_document_upload_status_convert_fail">デコードできません</string>
+    <string name="plvls_document_upload_status_convert_animate_loss">アニメーション効果は失われますが、使用には影響しません</string>
+    <string name="plvls_document_upload_retry">再試行</string>
+    <string name="plvls_document_upload_help">ヘルプ</string>
+    <string name="plvls_document_upload_hint">アップロード手順</string>
+    <string name="plvls_document_go_back_view_all_hint">戻ってすべてのドキュメントを表示します</string>
+
+    <string name="plvls_manager_chatroom_title_tv_name">マネージャーのプライベート チャット</string>
+    <string name="plvls_manager_chatroom_more_message_scroll_to_bottom">一番下に戻る</string>
+    <string name="plvls_manager_chatroom_more_message_has_unread_message">{}新しいメッセージ</string>
+    <string name="plvls_manager_chatroom_unread_message_notify">現在、プライベート チャット メッセージが {} 件あります。時間内に確認してください</string>
+    <string name="plvls_manager_chatroom_input_tv_hint_network_disconnect">現在ネットワークがありません。インタラクションに参加する前にネットワークを設定してください</string>
+    <string name="plvls_manager_chatroom_input_hint_check_network">ネットワーク設定を確認してください</string>
+    <string name="plvls_manager_chatroom_private_chat_hint">プライベート チャット</string>
+
+    <!--登录-->
+    <string name="plvls_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_channel_id_is_empty" translatable="false">channelId 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_avatar_url_is_empty" translatable="false">avatarUrl 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_actor_is_empty" translatable="false">actor 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_user_type_is_empty" translatable="false">userType 为空，启动手机开播三分屏页失败！</string>
+    <string name="plvls_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播三分屏页失败！</string>
+
+    <string name="plvls_live_channel_info_copy_sip_phone_number_success_toast">電話番号が正常にコピーされました</string>
+    <string name="plvls_live_channel_info_sip_phone_number_text">電話番号{}</string>
+
+    <string name="plvls_live_member_count_hint_text">メンバー</string>
+    <string name="plvls_live_member_sip_text">電話接続</string>
+    <string name="plvls_live_member_sip_calling_in_count_text">接続予定 ({})</string>
+    <string name="plvls_live_member_sip_calling_out_count_text">通話中 ({})</string>
+    <string name="plvls_live_member_sip_connected_count_text">接続済み({})</string>
+
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_title">「Lian Mic」機能が更新されました</string>
+    <string name="plvls_live_room_new_link_mic_first_intro_hint_content">この機能ボタンをクリックして視聴者接続マイクを有効にします</string>
+</resources>

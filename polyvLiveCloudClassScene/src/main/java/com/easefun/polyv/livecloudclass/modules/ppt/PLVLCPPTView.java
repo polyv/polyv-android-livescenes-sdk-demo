@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.ppt;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,12 +21,16 @@ import com.easefun.polyv.businesssdk.web.IPolyvWebMessageProcessor;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.ppt.contract.IPLVPPTContract;
+import com.easefun.polyv.livecommon.module.modules.ppt.enums.PLVPPTLayoutEnum;
 import com.easefun.polyv.livecommon.module.modules.ppt.presenter.PLVPPTPresenter;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlaceHolderView;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.business.api.common.ppt.IPLVPPTWebViewListener;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.business.api.common.ppt.PLVPPTWebView;
 import com.plv.business.api.common.ppt.vo.PLVPPTLocalCacheVO;
@@ -68,6 +74,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     private boolean isRtcWatch = PLVLinkMicConfig.getInstance().isLowLatencyPureRtcWatch() || PLVLinkMicConfig.getInstance().isLowLatencyMixRtcWatch();
 
     private boolean isPPTChannelType;
+
+    // 当前是ppt模式
+    private boolean isInPPTMode;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -154,7 +163,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
         presenter = new PLVPPTPresenter();
         presenter.init(this);
-
+        observer(liveRoomDataManager);
         loadWeb();
     }
 
@@ -250,6 +259,13 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     }
 
     @Override
+    public void notifyPPTModeStatus(boolean isInPPTMode) {
+        this.isInPPTMode = isInPPTMode;
+        pptWebView.setIsInPPTMode(isInPPTMode);
+    }
+
+
+    @Override
     public void notifyPaintMarkToolChanged(PLVLCMarkToolEnums.MarkTool markTool) {
         if (PLVLCMarkToolEnums.MarkTool.CLEAR.equals(markTool)) {
             sendWebMessage(PLVLivePPTProcessor.DELETE_ALL_PAINT, "");
@@ -277,6 +293,11 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     @Override
     public void notifyPaintUpdateTextContent(String textContent) {
         sendWebMessage(PLVLivePPTProcessor.CHANGE_TEXT_CONTENT, textContent);
+    }
+
+    @Override
+    public void setLCPPTGestureListener(IPLVPPTWebViewListener.OnPLVLCPPTGestureListener listener) {
+        pptWebView.setPPTWebViewGestureListener(listener);
     }
 
     // </editor-fold>
@@ -384,6 +405,29 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     private void updateMsgDelayTime() {
         presenter.notifyIsWatchLowLatency(isRtcWatch || isLowLatencyWatch);
+    }
+
+    private void observer(IPLVLiveRoomDataManager liveRoomDataManager) {
+
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> data) {
+                if (data == null || data.getData() == null || data.getData().getData() == null || data.getData().getData().getWatchThemeModel() == null) {
+                    return;
+                }
+                String watchLayout = data.getData().getData().getWatchThemeModel().getWatchLayout();
+                if (watchLayout == null) {
+                    return;
+                }
+                PLVPPTLayoutEnum layoutEnum = PLVPPTLayoutEnum.FOLLOWTEACHER;
+                if (PLVPPTLayoutEnum.PPT.getValue().equals(watchLayout)) {
+                    layoutEnum = PLVPPTLayoutEnum.PPT;
+                } else if (PLVPPTLayoutEnum.VIDEO.getValue().equals(watchLayout)) {
+                    layoutEnum = PLVPPTLayoutEnum.VIDEO;
+                }
+                presenter.notifyIsWatchLayout(layoutEnum);
+            }
+        });
     }
 
     // </editor-fold>

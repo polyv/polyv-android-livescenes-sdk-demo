@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.easefun.polyv.businesssdk.api.common.ppt.IPolyvPPTView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout;
 import com.easefun.polyv.livecloudclass.modules.media.controller.IPLVLCLiveLandscapePlayerController;
+import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -241,6 +242,7 @@ public interface IPLVLCMediaLayout {
      */
     IPLVLCLiveLandscapePlayerController getLandscapeControllerView();
 
+
     /**
      * 更新观看热度
      *
@@ -398,6 +400,12 @@ public interface IPLVLCMediaLayout {
      * @param pptView pptView
      */
     void setPPTView(IPolyvPPTView pptView);
+
+    /**
+     * 设置悬浮窗PPTView
+     * @param floatPPTView
+     */
+    void setFloatPPTView(IPLVLCPPTView floatPPTView);
 
     /**
      * 添加播放信息的监听器

@@ -30,7 +30,7 @@ android {
             pickFirst 'META-INF/proguard/coroutines.pro'
         }
 
-        resConfigs 'en', 'zh-rCN'
+        resConfigs 'en', 'zh', 'ja', 'ko', 'b+zh+Hant'//繁体
     }
     signingConfigs {
         release {

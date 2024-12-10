@@ -2,7 +2,10 @@ package com.easefun.polyv.livecommon.ui.widget;
 
 
 import static com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil.LANGUAGE_CHINESE_SIMPLIFIED;
+import static com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil.LANGUAGE_CHINESE_TRADITIONAL;
 import static com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil.LANGUAGE_EN;
+import static com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil.LANGUAGE_JAPANESE;
+import static com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil.LANGUAGE_KOREAN;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -34,11 +37,33 @@ public class PLVLanguageSwitchPopupWindow {
         });
         TextView switchZhTv = this.view.findViewById(R.id.plv_language_switch_zh_tv);
         TextView switchEnTv = this.view.findViewById(R.id.plv_language_switch_en_tv);
+        TextView switchTCTv = this.view.findViewById(R.id.plv_language_switch_tc_tv);
+        TextView switchJPTv = this.view.findViewById(R.id.plv_language_switch_jp_tv);
+        TextView switchKOTv = this.view.findViewById(R.id.plv_language_switch_ko_tv);
         TextView cancelTv = this.view.findViewById(R.id.plv_language_switch_cancel_tv);
         switchZhTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleSwitch(LANGUAGE_CHINESE_SIMPLIFIED);
+            }
+        });
+        switchTCTv.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                handleSwitch(LANGUAGE_CHINESE_TRADITIONAL);
+            }
+        });
+        switchJPTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleSwitch(LANGUAGE_JAPANESE);
+            }
+        });
+        switchKOTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleSwitch(LANGUAGE_KOREAN);
             }
         });
         switchEnTv.setOnClickListener(new View.OnClickListener() {

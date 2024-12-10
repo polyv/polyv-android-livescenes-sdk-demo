@@ -323,7 +323,7 @@
 
                             <TextView
                                 android:id="@+id/plvsa_more_close_room_tv"
-                                android:layout_width="wrap_content"
+                                android:layout_width="52dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="center|top"
                                 android:letterSpacing="-0.18"

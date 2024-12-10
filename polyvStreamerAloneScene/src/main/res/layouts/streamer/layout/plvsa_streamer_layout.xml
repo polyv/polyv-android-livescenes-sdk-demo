@@ -3,6 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <ImageView
+        android:id="@+id/plvsa_streamer_bg_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
     <!--推流和连麦列表-->
     <com.easefun.polyv.livecommon.ui.widget.PLVMultiModeRecyclerViewLayout
         android:id="@+id/plvsa_streamer_rv_layout"

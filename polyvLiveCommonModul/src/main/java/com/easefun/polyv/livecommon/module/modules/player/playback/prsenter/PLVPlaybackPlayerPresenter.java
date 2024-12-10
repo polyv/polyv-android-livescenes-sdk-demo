@@ -361,6 +361,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     }
 
     @Override
+    public void setNeedGestureDetector(boolean need) {
+        if (videoView != null) {
+            videoView.setNeedGestureDetector(need);
+        }
+    }
+
+    @Override
     public void destroy() {
         stopMarqueeView();
         removeWatermark();
