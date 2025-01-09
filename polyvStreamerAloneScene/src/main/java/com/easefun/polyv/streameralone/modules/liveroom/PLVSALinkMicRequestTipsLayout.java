@@ -1,14 +1,8 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
+
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
@@ -20,12 +14,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
-import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
-import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
+import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout;
 import com.easefun.polyv.streameralone.R;
-import com.plv.foundationsdk.component.di.PLVDependManager;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 
 /**
@@ -37,55 +28,11 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
 
-    private PLVRoundRectLayout plvsaEmptyLinkmicTipsGroupLayout;
+    private PLVTriangleIndicateLayout plvsaEmptyLinkmicTipsGroupLayout;
     private LinearLayout plvsaEmptyLinkmicTipsLl;
     private ImageView plvsaEmptyLinkmicTipsIconIv;
     private TextView plvsaEmptyLinkmicTipsTv;
     private Button plvsaEmptyLinkmicNavBtn;
-
-    // 有人申请连麦提示条的宽度+右边距
-    private int linkmicTipsGroupWidthWithMargin;
-
-    // 连麦提示条动画
-    private ObjectAnimator linkmicTipsMoveInAnimator = new ObjectAnimator();
-    private ObjectAnimator linkmicTipsMoveOutAnimator = new ObjectAnimator();
-    private boolean isLinkmicTipsAnimating = false;
-    private boolean isLinkmicTipsShowing = false;
-
-    // 连麦提示条动画 消息处理Handler
-    private static final int MSG_CANCEL = 0;
-    private static final int MSG_MOVE_IN = 1;
-    private static final int MSG_MOVE_OUT = 2;
-    private final Handler animatorHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_CANCEL:
-                    animatorHandler.removeMessages(MSG_MOVE_IN);
-                    animatorHandler.removeMessages(MSG_MOVE_OUT);
-                    linkmicTipsMoveInAnimator.cancel();
-                    linkmicTipsMoveOutAnimator.cancel();
-                    plvsaEmptyLinkmicTipsGroupLayout.setAlpha(1);
-                    plvsaEmptyLinkmicTipsGroupLayout.setTranslationX(linkmicTipsGroupWidthWithMargin);
-                    isLinkmicTipsShowing = false;
-                    isLinkmicTipsAnimating = false;
-                    break;
-                case MSG_MOVE_IN:
-                    if (!isLinkmicTipsShowing && !isLinkmicTipsAnimating) {
-                        linkmicTipsMoveInAnimator.start();
-                    }
-                    break;
-                case MSG_MOVE_OUT:
-                    if (isLinkmicTipsShowing && !isLinkmicTipsAnimating) {
-                        linkmicTipsMoveOutAnimator.start();
-                    }
-                    break;
-                default:
-            }
-        }
-    };
-
-    private boolean isBeautyLayoutShowing = false;
 
     private OnTipsClickListener onTipsClickListener;
 
@@ -114,68 +61,15 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_linkmic_request_tips_layout, this);
         findView();
 
-        initLinkmicTipsAnimator();
         initLinkmicTipsOnClickListener();
-
-        observeBeautyLayoutStatus();
     }
 
     private void findView() {
-        plvsaEmptyLinkmicTipsGroupLayout = (PLVRoundRectLayout) findViewById(R.id.plvsa_empty_linkmic_tips_group_layout);
-        plvsaEmptyLinkmicTipsLl = (LinearLayout) findViewById(R.id.plvsa_empty_linkmic_tips_ll);
-        plvsaEmptyLinkmicTipsIconIv = (ImageView) findViewById(R.id.plvsa_empty_linkmic_tips_icon_iv);
-        plvsaEmptyLinkmicTipsTv = (TextView) findViewById(R.id.plvsa_empty_linkmic_tips_tv);
-        plvsaEmptyLinkmicNavBtn = (Button) findViewById(R.id.plvsa_empty_linkmic_nav_btn);
-    }
-
-    private void initLinkmicTipsAnimator() {
-        plvsaEmptyLinkmicTipsGroupLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                final int tipsWidth = plvsaEmptyLinkmicTipsGroupLayout.getWidth();
-                final int tipsWidthWithMargin = tipsWidth + ConvertUtils.dp2px(8);
-                linkmicTipsGroupWidthWithMargin = tipsWidthWithMargin;
-
-                plvsaEmptyLinkmicTipsGroupLayout.setTranslationX(tipsWidthWithMargin);
-
-                // 移入：从屏幕右侧移入
-                linkmicTipsMoveInAnimator = ObjectAnimator.ofFloat(plvsaEmptyLinkmicTipsGroupLayout, "translationX", tipsWidthWithMargin, 0);
-                linkmicTipsMoveInAnimator.setDuration(500);
-
-                // 移出：渐隐
-                linkmicTipsMoveOutAnimator = ObjectAnimator.ofFloat(plvsaEmptyLinkmicTipsGroupLayout, "alpha", 1, 0);
-                linkmicTipsMoveOutAnimator.setDuration(1000);
-
-                linkmicTipsMoveInAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animation, boolean isReverse) {
-                        isLinkmicTipsShowing = true;
-                        isLinkmicTipsAnimating = true;
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        isLinkmicTipsAnimating = false;
-                        animatorHandler.sendMessageDelayed(Message.obtain(animatorHandler, MSG_MOVE_OUT), 10 * 1000);
-                    }
-                });
-
-                linkmicTipsMoveOutAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        isLinkmicTipsAnimating = true;
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation, boolean isReverse) {
-                        isLinkmicTipsShowing = false;
-                        isLinkmicTipsAnimating = false;
-                        plvsaEmptyLinkmicTipsGroupLayout.setAlpha(1);
-                        plvsaEmptyLinkmicTipsGroupLayout.setTranslationX(tipsWidthWithMargin);
-                    }
-                });
-            }
-        });
+        plvsaEmptyLinkmicTipsGroupLayout = findViewById(R.id.plvsa_empty_linkmic_tips_group_layout);
+        plvsaEmptyLinkmicTipsLl = findViewById(R.id.plvsa_empty_linkmic_tips_ll);
+        plvsaEmptyLinkmicTipsIconIv = findViewById(R.id.plvsa_empty_linkmic_tips_icon_iv);
+        plvsaEmptyLinkmicTipsTv = findViewById(R.id.plvsa_empty_linkmic_tips_tv);
+        plvsaEmptyLinkmicNavBtn = findViewById(R.id.plvsa_empty_linkmic_nav_btn);
     }
 
     private void initLinkmicTipsOnClickListener() {
@@ -197,49 +91,20 @@ public class PLVSALinkMicRequestTipsLayout extends FrameLayout {
         });
     }
 
-    private void observeBeautyLayoutStatus() {
-        PLVDependManager.getInstance().get(PLVBeautyViewModel.class)
-                .getUiState()
-                .observe((LifecycleOwner) getContext(), new Observer<PLVBeautyUiState>() {
-                    @Override
-                    public void onChanged(@Nullable PLVBeautyUiState beautyUiState) {
-                        PLVSALinkMicRequestTipsLayout.this.isBeautyLayoutShowing = beautyUiState != null && beautyUiState.isBeautyMenuShowing;
-                        updateVisibility();
-                    }
-                });
-    }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 外部调用的方法">
 
     public void show() {
-        animatorHandler.sendMessage(Message.obtain(animatorHandler, MSG_MOVE_IN));
+        PLVViewUtil.showViewForDuration(this, seconds(10).toMillis());
     }
 
     public void hide() {
-        animatorHandler.sendMessage(Message.obtain(animatorHandler, MSG_MOVE_OUT));
-    }
-
-    public void cancel() {
-        animatorHandler.sendMessage(Message.obtain(animatorHandler, MSG_CANCEL));
+        setVisibility(View.GONE);
     }
 
     public void setOnTipsClickListener(OnTipsClickListener onTipsClickListener) {
         this.onTipsClickListener = onTipsClickListener;
-    }
-
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="内部处理">
-
-    private void updateVisibility() {
-        // 美颜布局显示时，不显示连麦提示条
-        if (isBeautyLayoutShowing) {
-            setVisibility(View.GONE);
-            return;
-        }
-        setVisibility(View.VISIBLE);
     }
 
     // </editor-fold>

@@ -321,6 +321,7 @@
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">Selecting "End class" will disconnect the live lesson. End class now\?</string>
     <string name="plv_streamer_dialog_no_network">Lost connection. Live class ended. Please restore network and retry streaming</string>
+    <string name="plv_streamer_network_disconnect_mask_hint">Network down, live stream paused</string>
     <string name="plv_streamer_toast_can_not_linkmic_before_the_class">Unable to start call before class begins</string>
     <string name="plv_streamer_toast_please_click_class_first">Please start the class first</string>
     <string name="plv_push_downgrade_preference_title">Weak net</string>
@@ -501,6 +502,7 @@
 
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">Confirm to exit playback</string>
+    <string name="plv_playback_title">Live Replay</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">No more data</string>
     <string name="plv_previous_load_error">Loading failed, please tap retry</string>
@@ -539,6 +541,9 @@
     <string name="plv_reward_select_num_hint">Please select the reward amount</string>
     <string name="plv_reward_select_cash_hint">Please select a reward gift</string>
     <string name="plv_reward_text_3">Reward</string>
+    <string name="plv_reward_gift_reward">Gifts Reward</string>
+    <string name="plv_reward_gift_effect">Gifts Effects</string>
+    <string name="plv_reward_gift_reward_switch_tips">After toggling the switch, viewers need to refresh or reload the page for the changes to take effect</string>
     <!--红包-->
     <string name="plv_red_paper_send_msg">%s sent a %s,<xliff:g>&#160;</xliff:g></string>
     <string name="plv_red_paper_get">Click to receive</string>

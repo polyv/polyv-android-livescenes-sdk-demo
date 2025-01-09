@@ -480,4 +480,9 @@
 
     </declare-styleable>
 
+    <declare-styleable name="PLVClipOutMaskView">
+        <attr name="plv_mask_color" format="color" />
+        <attr name="plv_mask_consume_click" format="boolean" />
+    </declare-styleable>
+
 </resources>

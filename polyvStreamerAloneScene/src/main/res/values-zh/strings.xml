@@ -17,7 +17,7 @@
     <string name="plvsa_float_window_permission_denied_and_not_show">权限受限，将不开启悬浮窗</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">双击窗口放大</string>
     <string name="plvsa_streamer_double_click_exit_fullscreen">双击退出全屏</string>
-    <string name="plvsa_streamer_allow_viewer_linkmic">开启观众连麦</string>
+    <string name="plvsa_streamer_allow_viewer_linkmic">申请连麦</string>
 
     <!--登录-->
     <string name="plvsa_login_streamer_error_activity_is_null" translatable="false">activity 为空，启动手机开播纯视频页失败！</string>

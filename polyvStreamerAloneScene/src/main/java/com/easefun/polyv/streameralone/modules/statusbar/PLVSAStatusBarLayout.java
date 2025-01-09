@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.statusbar;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
+
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
@@ -24,11 +26,14 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberLayout;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -41,13 +46,12 @@ import java.util.Locale;
 /**
  * 状态栏布局
  */
-public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBarLayout {
+public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBarLayout, View.OnClickListener {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
 
     private View rootView;
     private ImageView plvsaStatusBarCloseIv;
-    private LinearLayout plvsaStatusBarInfoLl;
     private PLVRoundRectLayout plvsaStatusBarChannelInfoRl;
     private ImageView plvsaStatusBarChannelInfoIv;
     private TextView plvsaStatusBarChannelInfoTv;
@@ -55,6 +59,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private PLVRoundRectLayout plvsaStatusBarMemberCountRl;
     private ImageView plvsaStatusBarMemberCountIv;
     private TextView plvsaStatusBarMemberCountTv;
+    private View plvsaMemberLinkmicRequestTipsView;
     private PLVRoundRectLayout plvsaStatusBarStreamerTimeRl;
     private PLVRoundImageView plvsaStatusBarStreamerStatusIv;
     private TextView plvsaStatusBarStreamerTimeTv;
@@ -67,9 +72,11 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private PLVRoundRectLayout plvsaStatusBarNotificationLayout;
     private TextView plvsaStatusBarNotificationLabel;
     private TextView plvsaStatusBarNotificationTv;
-
+    // 有人申请连麦时 连麦提示条布局
+    private PLVSALinkMicRequestTipsLayout linkMicRequestTipsLayout;
     private PLVSAChannelInfoLayout channelInfoLayout;
-
+    //成员列表布局
+    private PLVSAMemberLayout memberLayout;
     // 停止直播确认对话框
     private PLVConfirmDialog stopLiveConfirmDialog;
 
@@ -81,7 +88,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private boolean isOpenAudio = true;
     private boolean isOpenVideo = true;
 
-    private OnStopLiveListener stopLiveListener;
+    private OnViewActionListener onViewActionListener;
 
     //关闭直播提示的文案
     private String closeContentString;
@@ -108,13 +115,12 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private void initView() {
         rootView = LayoutInflater.from(getContext()).inflate(R.layout.plvsa_status_bar_layout, this);
         findView();
-        initChannelInfoOnClickListener();
-        initCloseIconOnClickListener();
+        initOnClickListener();
+        observeLinkmicRequestLayout();
     }
 
     private void findView() {
         plvsaStatusBarCloseIv = (ImageView) findViewById(R.id.plvsa_status_bar_close_iv);
-        plvsaStatusBarInfoLl = (LinearLayout) findViewById(R.id.plvsa_status_bar_info_ll);
         plvsaStatusBarChannelInfoRl = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_channel_info_rl);
         plvsaStatusBarChannelInfoIv = (ImageView) findViewById(R.id.plvsa_status_bar_channel_info_iv);
         plvsaStatusBarChannelInfoTv = (TextView) findViewById(R.id.plvsa_status_bar_channel_info_tv);
@@ -122,6 +128,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         plvsaStatusBarMemberCountRl = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_member_count_rl);
         plvsaStatusBarMemberCountIv = (ImageView) findViewById(R.id.plvsa_status_bar_member_count_iv);
         plvsaStatusBarMemberCountTv = (TextView) findViewById(R.id.plvsa_status_bar_member_count_tv);
+        plvsaMemberLinkmicRequestTipsView = findViewById(R.id.plvsa_member_linkmic_request_tips_view);
         plvsaStatusBarStreamerTimeRl = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_streamer_time_rl);
         plvsaStatusBarStreamerStatusIv = (PLVRoundImageView) findViewById(R.id.plvsa_status_bar_streamer_status_iv);
         plvsaStatusBarStreamerTimeTv = (TextView) findViewById(R.id.plvsa_status_bar_streamer_time_tv);
@@ -134,24 +141,28 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         plvsaStatusBarNotificationLayout = (PLVRoundRectLayout) findViewById(R.id.plvsa_status_bar_notification_layout);
         plvsaStatusBarNotificationLabel = (TextView) findViewById(R.id.plvsa_status_bar_notification_label);
         plvsaStatusBarNotificationTv = (TextView) findViewById(R.id.plvsa_status_bar_notification_tv);
+        linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
+
+        memberLayout = new PLVSAMemberLayout(getContext());
     }
 
-    private void initChannelInfoOnClickListener() {
-        plvsaStatusBarChannelInfoRl.setOnClickListener(new OnClickListener() {
+    private void initOnClickListener() {
+        plvsaStatusBarChannelInfoRl.setOnClickListener(this);
+        plvsaStatusBarCloseIv.setOnClickListener(this);
+        plvsaStatusBarMemberCountRl.setOnClickListener(this);
+    }
+
+    private void observeLinkmicRequestLayout() {
+        linkMicRequestTipsLayout.setOnTipsClickListener(new PLVSALinkMicRequestTipsLayout.OnTipsClickListener() {
             @Override
-            public void onClick(View v) {
-                if (channelInfoLayout != null) {
-                    channelInfoLayout.open();
-                }
+            public void onClickBar() {
+                linkMicRequestTipsLayout.hide();
             }
-        });
-    }
 
-    private void initCloseIconOnClickListener() {
-        plvsaStatusBarCloseIv.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                showStopLiveConfirmLayout();
+            public void onClickNavBtn() {
+                linkMicRequestTipsLayout.hide();
+                openMemberLayoutAndHideUserRequestTips();
             }
         });
     }
@@ -165,8 +176,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                     .setRightBtnListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (stopLiveListener != null) {
-                                stopLiveListener.onStopLive();
+                            if (onViewActionListener != null) {
+                                onViewActionListener.onStopLive();
                             }
                             stopLiveConfirmDialog.hide();
                         }
@@ -203,6 +214,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     @Override
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        //初始化成员布局
+        memberLayout.init(liveRoomDataManager);
 
         initTeacherName(liveRoomDataManager);
         initChannelInfoLayout(liveRoomDataManager);
@@ -212,6 +225,9 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     @Override
     public void setOnlineCount(int onlineCount) {
         plvsaStatusBarMemberCountTv.setText(StringUtils.toWString(onlineCount).toUpperCase());
+        if (memberLayout != null) {
+            memberLayout.updateOnlineCount(onlineCount);
+        }
     }
 
     @Override
@@ -222,14 +238,54 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     }
 
     @Override
-    public void setOnStopLiveListener(OnStopLiveListener stopLiveListener) {
-        this.stopLiveListener = stopLiveListener;
+    public void setOnViewActionListener(OnViewActionListener onViewActionListener) {
+        this.onViewActionListener = onViewActionListener;
+    }
+
+    @Override
+    public void notifyLinkMicTypeChange(boolean isVideoLinkMic, boolean isOpenLinkMic) {
+        if (memberLayout != null) {
+            memberLayout.notifyLinkMicTypeChange(isVideoLinkMic, isOpenLinkMic);
+        }
+    }
+
+    @Override
+    public void openMemberLayoutAndHideUserRequestTips() {
+        if (memberLayout != null) {
+            memberLayout.open();
+        }
+        hideUserRequestTips();
+    }
+
+    @Override
+    public void closeMemberLayout() {
+        if (memberLayout != null) {
+            memberLayout.closeAndHideWindow();
+        }
+    }
+
+    @Override
+    public void showUserRequestTips() {
+        if (memberLayout != null && memberLayout.isOpen()) {
+            return;
+        }
+        plvsaMemberLinkmicRequestTipsView.setVisibility(View.VISIBLE);
+        linkMicRequestTipsLayout.show();
+    }
+
+    @Override
+    public void hideUserRequestTips() {
+        plvsaMemberLinkmicRequestTipsView.setVisibility(View.INVISIBLE);
+        linkMicRequestTipsLayout.hide();
     }
 
     @Override
     public boolean onBackPressed() {
         if (channelInfoLayout != null) {
             return channelInfoLayout.onBackPressed();
+        }
+        if (memberLayout != null) {
+            return memberLayout.onBackPressed();
         }
         return false;
     }
@@ -245,7 +301,16 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
     public IPLVStreamerContract.IStreamerView getStreamerView() {
         return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
-                .proxyAll(streamerView, statusBarPushDowngradeAlertLayout.streamerView);
+                .proxyAll(
+                        streamerView,
+                        statusBarPushDowngradeAlertLayout.streamerView,
+                        nullable(new PLVSugarUtil.Supplier<IPLVStreamerContract.IStreamerView>() {
+                            @Override
+                            public IPLVStreamerContract.IStreamerView get() {
+                                return memberLayout.getStreamerView();
+                            }
+                        })
+                );
     }
 
     private IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
@@ -484,6 +549,25 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="点击回调">
+
+    @Override
+    public void onClick(View v) {
+        final int id = v.getId();
+        if (id == plvsaStatusBarChannelInfoRl.getId()) {
+            if (channelInfoLayout != null) {
+                channelInfoLayout.open();
+            }
+        } else if (id == plvsaStatusBarCloseIv.getId()) {
+            showStopLiveConfirmLayout();
+        } else if (id == plvsaStatusBarMemberCountRl.getId()) {
+            openMemberLayoutAndHideUserRequestTips();
+            linkMicRequestTipsLayout.hide();
+        }
+    }
+
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="内部方法">
 
     private static String trimStringLength(String oriString, int specLength) {
@@ -504,10 +588,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
     // <editor-fold defaultstate="collapsed" desc="接口定义">
 
-    /**
-     * 停止直播回调，由上层停止直播
-     */
-    public interface OnStopLiveListener {
+    public interface OnViewActionListener {
         void onStopLive();
     }
 

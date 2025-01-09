@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.easefun.polyv.livecommon.module.modules.chatroom.PLVCustomGiftEvent;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -24,6 +25,7 @@ import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVProhibitedWordVO;
+import com.plv.socket.event.chat.PLVRewardEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +36,15 @@ import java.util.List;
 public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBaseViewHolder<PLVBaseViewData, PLVSAMessageAdapter>> {
     // <editor-fold defaultstate="collapsed" desc="变量">
     public static final String PAYLOAD_PROHIBITED_CHANGED = "prohibitedChanged";
+    public static final int DISPLAY_DATA_TYPE_FULL = 1;
+    public static final int DISPLAY_DATA_TYPE_SPECIAL = 2;
+    public static final int DISPLAY_DATA_TYPE_REMOVE_REWARD = 3;//仅适配全部消息的数据列表
     private List<PLVBaseViewData> dataList;//adapter使用的数据列表
     private List<PLVBaseViewData> fullDataList;//全部信息的数据列表
     private List<PLVBaseViewData> specialDataList;//只看讲师信息的数据列表(包括我、讲师类型、嘉宾类型、助教类型、管理员类型的信息)
+    private List<PLVBaseViewData> excludeRewardDataList;//移除了打赏信息的数据列表
 
-    private boolean isDisplaySpecialType;//是否只看讲师
+    private int displayDataType = DISPLAY_DATA_TYPE_FULL;//显示数据类型
 
     private int msgIndex;
     // </editor-fold>
@@ -51,7 +57,14 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     public PLVSAMessageAdapter() {
         fullDataList = new ArrayList<>();
         specialDataList = new ArrayList<>();
-        dataList = isDisplaySpecialType ? specialDataList : fullDataList;
+        excludeRewardDataList = new ArrayList<>();
+        if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
+            dataList = fullDataList;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+            dataList = specialDataList;
+        } else {
+            dataList = excludeRewardDataList;
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现PLVBaseAdapter定义的方法">
@@ -127,18 +140,19 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     }
     // </editor-fold>
 
-    public void changeDisplayType(boolean isDisplaySpecialType) {
-        if (this.isDisplaySpecialType == isDisplaySpecialType) {
+    public void changeDisplayType(int displayDataType) {
+        if (this.displayDataType == displayDataType) {
             return;
         }
-        this.isDisplaySpecialType = isDisplaySpecialType;
-        if (isDisplaySpecialType) {
-            dataList = specialDataList;
-            notifyDataSetChanged();
-        } else {
+        this.displayDataType = displayDataType;
+        if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
             dataList = fullDataList;
-            notifyDataSetChanged();
+        } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+            dataList = specialDataList;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_REMOVE_REWARD) {
+            dataList = excludeRewardDataList;
         }
+        notifyDataSetChanged();
     }
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 列表数据更新">
@@ -147,6 +161,10 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         fullDataList.add(baseViewData);
         if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
             specialDataList.add(baseViewData);
+        }
+        if (!(baseViewData.getData() instanceof PLVCustomGiftEvent)
+                && !(baseViewData.getData() instanceof PLVRewardEvent)) {
+            excludeRewardDataList.add(baseViewData);
         }
         if (dataList.size() != oldSize) {
             notifyItemInserted(dataList.size() - 1);
@@ -163,6 +181,12 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 specialDataList.add(baseViewData);
             }
         }
+        for (PLVBaseViewData baseViewData : list) {
+            if (!(baseViewData.getData() instanceof PLVCustomGiftEvent)
+                    && !(baseViewData.getData() instanceof PLVRewardEvent)) {
+                excludeRewardDataList.add(baseViewData);
+            }
+        }
         if (dataList.size() != oldSize) {
             notifyItemRangeInserted(oldSize, dataList.size() - oldSize);
             return true;
@@ -177,6 +201,13 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             PLVBaseViewData baseViewData = list.get(i);
             if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(0, baseViewData);
+            }
+        }
+        for (int i = list.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = list.get(i);
+            if (!(baseViewData.getData() instanceof PLVCustomGiftEvent)
+                    && !(baseViewData.getData() instanceof PLVRewardEvent)) {
+                excludeRewardDataList.add(0, baseViewData);
             }
         }
         if (dataList.size() != oldSize) {
@@ -213,7 +244,30 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 }
             }
         }
-        notifyItemChanged(isDisplaySpecialType ? changedSpecialDataPosition : changedFullDataPosition, PAYLOAD_PROHIBITED_CHANGED);
+        int changedExcludeRewardDataPosition = -1;
+        for (int i = excludeRewardDataList.size() - 1; i >= 0; i--) {
+            PLVBaseViewData baseViewData = excludeRewardDataList.get(i);
+            if (baseViewData.getData() instanceof PolyvLocalMessage) {
+                String speakMsg = ((PolyvLocalMessage) baseViewData.getData()).getSpeakMessage();
+                if (prohibitedMessage != null && speakMsg != null && speakMsg.contains(prohibitedMessage)) {
+                    PLVProhibitedWordVO prohibitedWordVO = new PLVProhibitedWordVO(prohibitedMessage, hintMsg, status);
+                    ((PolyvLocalMessage) baseViewData.getData()).setProhibitedWord(prohibitedWordVO);
+                    changedExcludeRewardDataPosition = i;
+                    break;
+                }
+            }
+        }
+        int changedPosition = -1;
+        if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
+            changedPosition = changedFullDataPosition;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+            changedPosition = changedSpecialDataPosition;
+        } else if (displayDataType == DISPLAY_DATA_TYPE_REMOVE_REWARD) {
+            changedPosition = changedExcludeRewardDataPosition;
+        }
+        if (changedPosition != -1) {
+            notifyItemChanged(changedPosition);
+        }
     }
 
     public boolean removeDataChanged(String id) {
@@ -243,9 +297,30 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 break;
             }
         }
+        int removeExcludeRewardDataPosition = -1;
+        for (PLVBaseViewData baseViewData : excludeRewardDataList) {
+            removeExcludeRewardDataPosition++;
+            if (baseViewData.getData() instanceof IPLVIdEvent
+                    && id.equals(((IPLVIdEvent) baseViewData.getData()).getId())
+                    || (baseViewData.getData() instanceof IPLVMessageIdEvent
+                    && id.equals(((IPLVMessageIdEvent) baseViewData.getData()).getMessageId()))) {
+                excludeRewardDataList.remove(baseViewData);
+                break;
+            }
+        }
         if (dataList.size() != oldSize) {
-            notifyItemRemoved(isDisplaySpecialType ? removeSpecialDataPosition : removeFullDataPosition);
-            return true;
+            int changedPosition = -1;
+            if (displayDataType == DISPLAY_DATA_TYPE_FULL) {
+                changedPosition = removeFullDataPosition;
+            } else if (displayDataType == DISPLAY_DATA_TYPE_SPECIAL) {
+                changedPosition = removeSpecialDataPosition;
+            } else if (displayDataType == DISPLAY_DATA_TYPE_REMOVE_REWARD) {
+                changedPosition = removeExcludeRewardDataPosition;
+            }
+            if (changedPosition != -1) {
+                notifyItemChanged(changedPosition);
+                return true;
+            }
         }
         return false;
     }
@@ -265,6 +340,12 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             specialDataList.clear();
             specialDataList.addAll(retainList);
         }
+        if (excludeRewardDataList.size() > maxLength) {
+//            excludeRewardDataList.removeAll(excludeRewardDataList.subList(0, excludeRewardDataList.size() - maxLength));
+            List<PLVBaseViewData> retainList = new ArrayList<>(excludeRewardDataList.subList(excludeRewardDataList.size() - maxLength, excludeRewardDataList.size()));
+            excludeRewardDataList.clear();
+            excludeRewardDataList.addAll(retainList);
+        }
         if (dataList.size() != oldSize) {
             notifyDataSetChanged();
             return true;
@@ -276,6 +357,7 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         int oldSize = dataList.size();
         fullDataList.clear();
         specialDataList.clear();
+        excludeRewardDataList.clear();
         if (dataList.size() != oldSize) {//if dataList=fullDataList or dataList=specialDataList
             notifyDataSetChanged();
             return true;

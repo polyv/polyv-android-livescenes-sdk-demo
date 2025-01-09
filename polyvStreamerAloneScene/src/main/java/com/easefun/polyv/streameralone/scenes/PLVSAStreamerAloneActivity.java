@@ -47,8 +47,8 @@ import com.easefun.polyv.streameralone.modules.beauty.IPLVSABeautyLayout;
 import com.easefun.polyv.streameralone.modules.beauty.PLVSABeautyLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.IPLVSASettingLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSACleanUpLayout;
-import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMoreLayout;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSANetworkDisconnectMaskLayout;
 import com.easefun.polyv.streameralone.modules.streamer.IPLVSAStreamerLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFinishLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerFullscreenLayout;
@@ -113,8 +113,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private PLVSAStreamerFinishLayout streamerFinishLayout;
     // 摄像头上层的viewpager布局
     private PLVNoInterceptTouchViewPager topLayerViewPager;
-    // 有人申请连麦时 连麦提示条布局
-    private PLVSALinkMicRequestTipsLayout linkMicRequestTipsLayout;
     // 美颜布局
     private IPLVSABeautyLayout beautyLayout;
     // 主页fragment
@@ -126,6 +124,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     // 互动布局
     private IPLVStreamerInteractLayout interactLayout;
+    private PLVSANetworkDisconnectMaskLayout networkDisconnectMaskLayout;
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -222,9 +222,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         observeViewPagerLayout();
         observeStreamerLayout();
         observeCleanUpLayout();
-        observeLinkmicRequestLayout();
         observeFullscreenLayout();
         observeBeautyLayoutStatus();
+        observeNetworkDisconnectLayout();
     }
 
     private void setStatusBarColor() {
@@ -360,6 +360,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
         // 进行网络请求，获取直播详情数据
         liveRoomDataManager.requestChannelDetail();
+        // 进行网络请求，请求打赏配置
+        liveRoomDataManager.requestRewardSetting();
     }
     // </editor-fold>
 
@@ -371,10 +373,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         cleanUpLayout = findViewById(R.id.plvsa_clean_up_layout);
         streamerFinishLayout = findViewById(R.id.plvsa_streamer_finish_layout);
         topLayerViewPager = findViewById(R.id.plvsa_top_layer_view_pager);
-        linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
         fullscreenLayout = findViewById(R.id.plvsa_fullscreen_view);
         maskGroup = findViewById(R.id.plvsa_mask_group);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
+        networkDisconnectMaskLayout = findViewById(R.id.plvsa_network_disconnect_mask_layout);
+
         interactLayout.init(liveRoomDataManager);
 
         //初始化推流和连麦布局
@@ -419,6 +422,13 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 public void onShowSignInAction() {
                     if (interactLayout != null) {
                         interactLayout.showSignIn();
+                    }
+                }
+
+                @Override
+                public void onGiftEffectSwitch(boolean isOpen) {
+                    if (homeFragment != null) {
+                        homeFragment.changeGiftEffectSwitch(isOpen);
                     }
                 }
             });
@@ -646,11 +656,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onClickToOpenMemberLayout() {
-                linkMicRequestTipsLayout.cancel();
-            }
-
-            @Override
             public boolean showCleanUpLayout() {
                 boolean success = false;
                 if (cleanUpLayout != null) {
@@ -699,17 +704,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         emptyFragment.setOnViewActionListener(new PLVSAEmptyFragment.OnViewActionListener() {
             @Override
             public void onViewCreated() {
-                streamerLayout.addOnUserRequestListener(new IPLVOnDataChangedListener<String>() {
-                    @Override
-                    public void onChanged(@Nullable String s) {
-                        if (s == null) {
-                            return;
-                        }
-                        if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
-                            linkMicRequestTipsLayout.show();
-                        }
-                    }
-                });
+
             }
 
             @Override
@@ -718,27 +713,6 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
         });
     }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 连麦提示条布局">
-
-    private void observeLinkmicRequestLayout() {
-        linkMicRequestTipsLayout.setOnTipsClickListener(new PLVSALinkMicRequestTipsLayout.OnTipsClickListener() {
-            @Override
-            public void onClickBar() {
-                linkMicRequestTipsLayout.cancel();
-            }
-
-            @Override
-            public void onClickNavBtn() {
-                linkMicRequestTipsLayout.cancel();
-                // homeFragment index=1
-                topLayerViewPager.setCurrentItem(1);
-                homeFragment.openMemberLayoutAndHideUserRequestTips();
-            }
-        });
-    }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 全屏布局">
@@ -759,6 +733,14 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         }
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 网络断开遮罩">
+
+    private void observeNetworkDisconnectLayout() {
+        streamerLayout.getStreamerPresenter().registerView(networkDisconnectMaskLayout.streamerView);
+    }
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置直播恢复">
 

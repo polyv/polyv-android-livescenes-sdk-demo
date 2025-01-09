@@ -321,6 +321,7 @@
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">退室を終了するためにクリックすると、ライブ ブロードキャストが終了します。本当に退室を終了しますか? </string>
     <string name="plv_streamer_dialog_no_network">ネットワークが切断されたため、ライブ ブロードキャストが停止しました。ネットワークを変更してもう一度お試しください。</string>
+    <string name="plv_streamer_network_disconnect_mask_hint">ネットオフ、生中継一時停止</string>
     <string name="plv_streamer_toast_can_not_linkmic_before_the_class">授業の前に linkmic を開始できません</string>
     <string name="plv_streamer_toast_please_click_class_first">最初にクリックして授業を行ってください</string>
     <string name="plv_push_downgrade_preference_title">弱いネットワーク処理</string>
@@ -500,6 +501,7 @@
 
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">再生の終了を確認する</string>
+    <string name="plv_playback_title">ライブ再生</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">データがありません</string>
     <string name="plv_previous_load_error">読み込みに失敗しました。クリックして再試行してください。</string>
@@ -538,6 +540,9 @@
     <string name="plv_reward_select_num_hint">報酬額を選択してください</string>
     <string name="plv_reward_select_cash_hint">特典アイテムを選択してください</string>
     <string name="plv_reward_text_3">報酬</string>
+    <string name="plv_reward_gift_reward">プレゼント</string>
+    <string name="plv_reward_gift_effect">プレゼント効果</string>
+    <string name="plv_reward_gift_reward_switch_tips">打賞設定をオン/オフにすると、視聴者はページを更新するか、ライブルームに再入力する必要があります</string>
     <!--红包-->
     <string name="plv_red_paper_send_msg">%s が %s にメッセージを送信しました。</string>
     <string name="plv_red_paper_get">クリックして受け取る</string>

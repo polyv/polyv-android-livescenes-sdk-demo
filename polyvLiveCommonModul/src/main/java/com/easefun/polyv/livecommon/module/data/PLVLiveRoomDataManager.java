@@ -12,6 +12,7 @@ import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
@@ -62,6 +63,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<Boolean> isOnlyAudio = new MutableLiveData<>();
     //回放频道的详细信息
     private MutableLiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> playbackChannelDetailVO = new MutableLiveData<>();
+    //打赏配置
+    private MutableLiveData<PLVStatefulData<PLVRewardSettingVO>> rewardSettingVO = new MutableLiveData<>();
     //直播场次Id
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
     //聊天室token
@@ -144,6 +147,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public LiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> getPlaybackChannelData() {
         return playbackChannelDetailVO;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<PLVRewardSettingVO>> getRewardSettingData() {
+        return rewardSettingVO;
     }
 
     @Override
@@ -378,6 +386,21 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             @Override
             public void onFailed(String msg, Throwable throwable) {
                 playbackChannelDetailVO.postValue(PLVStatefulData.<PLVPlaybackChannelDetailVO>error(msg,throwable));
+            }
+        });
+    }
+
+    @Override
+    public void requestRewardSetting() {
+        liveRoomDataRequester.requestRewardSetting(new PLVLiveRoomDataRequester.IPLVNetRequestListener<PLVRewardSettingVO>() {
+            @Override
+            public void onSuccess(PLVRewardSettingVO plvRewardSettingVO) {
+                rewardSettingVO.postValue(PLVStatefulData.success(plvRewardSettingVO));
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                rewardSettingVO.postValue(PLVStatefulData.<PLVRewardSettingVO>error(msg, throwable));
             }
         });
     }
