@@ -45,12 +45,6 @@
         android:overScrollMode="never"
         android:visibility="invisible" />
 
-    <!--有人申请连麦时 连麦提示条布局-->
-    <com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout
-        android:id="@+id/plvsa_linkmic_request_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <!--直播设置布局-->
     <com.easefun.polyv.streameralone.modules.liveroom.PLVSASettingLayout
         android:id="@+id/plvsa_setting_layout"
@@ -77,6 +71,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"/>
+
+    <!-- 网络断开遮罩布局 -->
+    <com.easefun.polyv.streameralone.modules.liveroom.PLVSANetworkDisconnectMaskLayout
+        android:id="@+id/plvsa_network_disconnect_mask_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <!--直播间弹层布局容器底层蒙层遮罩-->
     <View

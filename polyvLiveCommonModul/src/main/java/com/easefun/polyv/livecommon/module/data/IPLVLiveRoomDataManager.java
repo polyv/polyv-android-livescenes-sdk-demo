@@ -11,6 +11,7 @@ import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
@@ -112,6 +113,12 @@ public interface IPLVLiveRoomDataManager {
      * @return
      */
     LiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> getPlaybackChannelData();
+
+    /**
+     * 获取打赏设置LiveData
+     * @return
+     */
+    LiveData<PLVStatefulData<PLVRewardSettingVO>> getRewardSettingData();
 
     /**
      * 获取请求商品接口的rank
@@ -223,6 +230,11 @@ public interface IPLVLiveRoomDataManager {
      * 请求回放频道的详细信息
      */
     void requestPlaybackChannelStatus();
+
+    /**
+     * 请求打赏设置
+     */
+    void requestRewardSetting();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

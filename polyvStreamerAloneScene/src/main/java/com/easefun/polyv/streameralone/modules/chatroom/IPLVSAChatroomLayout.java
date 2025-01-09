@@ -47,6 +47,11 @@ public interface IPLVSAChatroomLayout {
     void callInputWindow();
 
     /**
+     * 改变聊天列表显示类型
+     */
+    void changeDisplayType(int displayDataType);
+
+    /**
      * 添加信息到聊天列表中
      *
      * @param chatMessageDataList 信息

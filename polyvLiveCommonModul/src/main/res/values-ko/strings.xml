@@ -321,6 +321,7 @@
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">퇴실을 종료하려면 라이브 방송이 종료됩니다. 수업을 종료하시겠습니까? </string>
     <string name="plv_streamer_dialog_no_network">네트워크 연결이 끊어져 라이브 방송이 중단되었습니다. 네트워크를 변경하고 다시 시도해 주세요.</string>
+    <string name="plv_streamer_network_disconnect_mask_hint">네트워크 끊김, 실시간 중단</string>
     <string name="plv_streamer_toast_can_not_linkmic_before_the_class">수업 전에 링크마이크를 시작할 수 없습니다</string>
     <string name="plv_streamer_toast_please_click_class_first">먼저 수업을 클릭해 주세요</string>
     <string name="plv_push_downgrade_preference_title">약한 네트워크 처리</string>
@@ -501,6 +502,7 @@
 
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">재생 종료 확인</string>
+    <string name="plv_playback_title">생방송 재생</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">데이터 없음</string>
     <string name="plv_previous_load_error">로드에 실패했습니다. 다시 시도하려면 클릭하세요</string>
@@ -539,6 +541,9 @@
     <string name="plv_reward_select_num_hint">보상 금액을 선택해주세요</string>
     <string name="plv_reward_select_cash_hint">보상 아이템을 선택해주세요</string>
     <string name="plv_reward_text_3">보상</string>
+    <string name="plv_reward_gift_reward">선물 타상</string>
+    <string name="plv_reward_gift_effect">선물 효과</string>
+    <string name="plv_reward_gift_reward_switch_tips">포상 설정을 켜거나 끈 후, 시청자는 페이지를 새로 고치거나 생방송으로 다시 들어가야 한다</string>
     <!--红包-->
     <string name="plv_red_paper_send_msg">%s님이 %s님에게 메시지를 보냈습니다,</string>
     <string name="plv_red_paper_get">수신하려면 클릭하세요</string>

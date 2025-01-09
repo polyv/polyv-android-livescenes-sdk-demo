@@ -2,6 +2,7 @@
 
 <com.easefun.polyv.livecommon.ui.widget.PLVSoftView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/plv_login_soft_listener_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -212,6 +213,6 @@
         android:layout_marginTop="@dimen/dm_10"
         android:layout_marginBottom="@dimen/dm_30"
         android:gravity="bottom"
-        android:text="@string/plv_login_copyright" />
+        tools:text="Copyright" />
 
 </com.easefun.polyv.livecommon.ui.widget.PLVSoftView>

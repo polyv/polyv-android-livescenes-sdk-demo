@@ -1,9 +1,9 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getOrDefault;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.scaleToRange;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -22,12 +21,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
@@ -35,15 +34,15 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
-import com.easefun.polyv.livecommon.ui.widget.PLVBeadWidget;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
-import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
@@ -54,31 +53,24 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.functions.Consumer;
+import okhttp3.ResponseBody;
+
 /**
  * 开播设置布局
  */
 public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
-
-    // 设置配置布局左右间距
-    private final static int SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT = ConvertUtils.dp2px(24);
-    private final static int SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND = ConvertUtils.dp2px(132);
-    // 开始直播按钮左右间距
-    private final static int START_LIVE_BUTTON_HORIZON_MARGIN_PORT = ConvertUtils.dp2px(24);
-    private final static int START_LIVE_BUTTON_HORIZON_MARGIN_LAND = ConvertUtils.dp2px(144);
-    // 标题框最大显示行数
-    private final static int LIVE_TITLE_MAX_LINES_PORT = Integer.MAX_VALUE;
-    private final static int LIVE_TITLE_MAX_LINES_LAND = 2;
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -108,27 +100,24 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ConstraintLayout plvsaSettingConfigLy;
     private TextView plvsaSettingLiveTitleTv;
     private View plvsaSettingLiveTitleSplitView;
-    private HorizontalScrollView settingActionScrollContainer;
+    private View settingActionScrollContainer;
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
-    private ImageView plvsaSettingMixIv;
-    private ImageView plvsaSettingScreenOrientationIv;
     private TextView plvsaSettingCameraOrientTv;
     private TextView plvsaSettingMirrorTv;
     private TextView plvsaSettingBitrateTv;
-    private TextView plvsaSettingMixTv;
-    private TextView plvsaSettingScreenOrientationTv;
+    private LinearLayout settingMixLayout;
+    private LinearLayout settingScreenOrientationLayout;
     private LinearLayout plvsaSettingBtnLl;
-    private PLVRoundRectLayout plvsaSettingBeautyLayout;
-    private ImageView plvsaSettingBeautyIv;
+    private LinearLayout plvsaSettingBeautyLayout;
     private Button plvsaSettingStartLiveBtn;
     private PLVOrientationSensibleLinearLayout settingPushResolutionRatioLl;
     private ImageView settingPushResolutionRatioIv;
     private TextView settingPushResolutionRatioTv;
     private LinearLayout settingDenoiseLayout;
     private LinearLayout settingExternalAudioInputLayout;
-    private PLVBeadWidget settingActionScrollIndicator;
+    private LinearLayout settingLiveReplaySwitchLayout;
 
     private String liveTitle;
 
@@ -180,23 +169,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
         plvsaSettingBitrateIv = findViewById(R.id.plvsa_setting_bitrate_iv);
-        plvsaSettingMixIv = findViewById(R.id.plvsa_setting_mix_layout_iv);
-        plvsaSettingScreenOrientationIv = findViewById(R.id.plvsa_setting_screen_orientation_iv);
         plvsaSettingCameraOrientTv = findViewById(R.id.plvsa_setting_camera_orient_tv);
         plvsaSettingMirrorTv = findViewById(R.id.plvsa_setting_mirror_tv);
         plvsaSettingBitrateTv = findViewById(R.id.plvsa_setting_bitrate_tv);
-        plvsaSettingMixTv = findViewById(R.id.plvsa_setting_mix_layout_tv);
-        plvsaSettingScreenOrientationTv = findViewById(R.id.plvsa_setting_screen_orientation_tv);
+        settingMixLayout = findViewById(R.id.plvsa_setting_mix_layout);
+        settingScreenOrientationLayout = findViewById(R.id.plvsa_setting_screen_orientation_layout);
         plvsaSettingBtnLl = findViewById(R.id.plvsa_setting_btn_ll);
         plvsaSettingBeautyLayout = findViewById(R.id.plvsa_setting_beauty_layout);
-        plvsaSettingBeautyIv = findViewById(R.id.plvsa_setting_beauty_iv);
         plvsaSettingStartLiveBtn = findViewById(R.id.plvsa_setting_start_live_btn);
         settingPushResolutionRatioLl = findViewById(R.id.plvsa_setting_push_resolution_ratio_ll);
         settingPushResolutionRatioIv = findViewById(R.id.plvsa_setting_push_resolution_ratio_iv);
         settingPushResolutionRatioTv = findViewById(R.id.plvsa_setting_push_resolution_ratio_tv);
         settingDenoiseLayout = findViewById(R.id.plvsa_setting_denoise_layout);
         settingExternalAudioInputLayout = findViewById(R.id.plvsa_setting_external_audio_input_layout);
-        settingActionScrollIndicator = findViewById(R.id.plvsa_setting_action_scroll_indicator);
+        settingLiveReplaySwitchLayout = findViewById(R.id.plvsa_setting_live_replay_switch_layout);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
         plvsaSettingBeautyLayout.setOnClickListener(this);
@@ -207,36 +193,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingMirrorTv.setOnClickListener(this);
         plvsaSettingBitrateIv.setOnClickListener(this);
         plvsaSettingBitrateTv.setOnClickListener(this);
-        plvsaSettingMixIv.setOnClickListener(this);
-        plvsaSettingMixTv.setOnClickListener(this);
-        plvsaSettingScreenOrientationIv.setOnClickListener(this);
-        plvsaSettingScreenOrientationTv.setOnClickListener(this);
+        settingMixLayout.setOnClickListener(this);
+        settingScreenOrientationLayout.setOnClickListener(this);
         settingPushResolutionRatioLl.setOnClickListener(this);
         settingDenoiseLayout.setOnClickListener(this);
         settingExternalAudioInputLayout.setOnClickListener(this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            settingActionScrollContainer.setOnScrollChangeListener(new OnScrollChangeListener() {
-                @Override
-                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    updateScrollContainerIndicator();
-                }
-            });
-        }
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updateScrollContainerIndicator();
-            }
-        });
-
-        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
-            plvsaSettingMixIv.setVisibility(VISIBLE);
-            plvsaSettingMixTv.setVisibility(VISIBLE);
-        } else {
-            plvsaSettingMixIv.setVisibility(GONE);
-            plvsaSettingMixTv.setVisibility(GONE);
-        }
+        settingLiveReplaySwitchLayout.setOnClickListener(this);
 
         initTitleInputLayout();
         initBitrateLayout();
@@ -468,16 +430,31 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plv_streamer_start_live));
     }
 
-    private void initPushResolutionRatioLayout() {
+    private void initButtonVisibility(IPLVLiveRoomDataManager liveRoomDataManager) {
         final boolean userAllowChangeRatio = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RATIO);
         final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
         settingPushResolutionRatioLl.setShowOnLandscape(userAllowChangeRatio && channelAllowChangeRatio);
+
+        final boolean userAllowChangeLiveReplay = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_REPLAY_OPEN);
+        settingLiveReplaySwitchLayout.setVisibility(userAllowChangeLiveReplay ? View.VISIBLE : View.GONE);
+
+        final boolean showOrientationButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_SETTING_SHOW_ORIENTATION_BUTTON, true);
+        settingScreenOrientationLayout.setVisibility(showOrientationButton ? View.VISIBLE : View.GONE);
+
+        final boolean showMixLayoutButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_SETTING_SHOW_MIX_LAYOUT_BUTTON, true);
+        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT) && showMixLayoutButton) {
+            settingMixLayout.setVisibility(View.VISIBLE);
+        } else {
+            settingMixLayout.setVisibility(View.GONE);
+        }
     }
 
-    private void setupDefaultPushResolution(IPLVLiveRoomDataManager liveRoomDataManager) {
+    private void initOrientation(IPLVLiveRoomDataManager liveRoomDataManager) {
         final boolean isDefaultLandscape = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .getOrDefault(PLVChannelFeature.STREAMER_ALONE_DEFAULT_LANDSCAPE_RESOLUTION, false);
-        if (PLVScreenUtils.isLandscape(getContext()) ^ isDefaultLandscape) {
+        if (PLVScreenUtils.isLandscape(getContext()) != isDefaultLandscape) {
             changeScreenOrientation();
         }
     }
@@ -526,12 +503,13 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         titleInputLayout.initTitle(liveTitle);
         bitrateLayout.init(liveRoomDataManager);
         mixLayout.init(liveRoomDataManager);
+        initButtonVisibility(liveRoomDataManager);
         initBitrateMapIcon();
         initStartLiveBtnText();
-        initPushResolutionRatioLayout();
 
-        updateOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
-        setupDefaultPushResolution(liveRoomDataManager);
+        updatePushResolutionRatioOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
+        initOrientation(liveRoomDataManager);
+        observeLiveRoomData();
     }
 
     @Override
@@ -693,39 +671,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
-        updateOnOrientationChanged(isLandscape);
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updateScrollContainerIndicator();
-            }
-        });
-    }
-
-    private void updateOnOrientationChanged(boolean isLandscape) {
         updatePushResolutionRatioOnOrientationChanged(isLandscape);
-
-        MarginLayoutParams settingConfigLayoutParam = (MarginLayoutParams) plvsaSettingConfigLy.getLayoutParams();
-        MarginLayoutParams settingButtonLayoutParam = (MarginLayoutParams) plvsaSettingBtnLl.getLayoutParams();
-        int liveTitleMaxLines;
-
-        if (isLandscape) {
-            settingConfigLayoutParam.width = ConvertUtils.dp2px(450);
-            settingButtonLayoutParam.width = ConvertUtils.dp2px(450);
-            settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_LAND;
-            settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_LAND;
-            liveTitleMaxLines = LIVE_TITLE_MAX_LINES_LAND;
-        } else {
-            settingConfigLayoutParam.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            settingButtonLayoutParam.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            settingConfigLayoutParam.leftMargin = settingConfigLayoutParam.rightMargin = SETTING_CONFIG_LAYOUT_HORIZON_MARGIN_PORT;
-            settingButtonLayoutParam.leftMargin = settingButtonLayoutParam.rightMargin = START_LIVE_BUTTON_HORIZON_MARGIN_PORT;
-            liveTitleMaxLines = LIVE_TITLE_MAX_LINES_PORT;
-        }
-
-        plvsaSettingConfigLy.setLayoutParams(settingConfigLayoutParam);
-        plvsaSettingBtnLl.setLayoutParams(settingButtonLayoutParam);
-        plvsaSettingLiveTitleTv.setMaxLines(liveTitleMaxLines);
     }
 
     private void updatePushResolutionRatioOnOrientationChanged(boolean isLandscape) {
@@ -755,6 +701,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
+    @SuppressLint("CheckResult")
     @Override
     public void onClick(View v) {
         if (!PLVDebounceClicker.tryClick(this)) {
@@ -783,11 +730,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == R.id.plvsa_setting_bitrate_iv
                 || id == R.id.plvsa_setting_bitrate_tv) {
             bitrateLayout.open();
-        } else if (id == R.id.plvsa_setting_mix_layout_iv
-                || id == R.id.plvsa_setting_mix_layout_tv) {
+        } else if (id == settingMixLayout.getId()) {
             mixLayout.open();
-        } else if (id == plvsaSettingScreenOrientationIv.getId()
-                || id == plvsaSettingScreenOrientationTv.getId()) {
+        } else if (id == settingScreenOrientationLayout.getId()) {
             changeScreenOrientation();
         } else if (id == plvsaSettingBeautyLayout.getId()) {
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
@@ -797,9 +742,40 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             denoisePreferenceLayout.open();
         } else if (id == settingExternalAudioInputLayout.getId()) {
             externalAudioInputPreferenceLayout.open();
+        } else if (id == settingLiveReplaySwitchLayout.getId()) {
+            settingLiveReplaySwitchLayout.setSelected(!settingLiveReplaySwitchLayout.isSelected());
+            settingLiveReplaySwitchLayout.setEnabled(false);
+            PLVChatApiRequestHelper.getInstance().updatePlaybackSetting(liveRoomDataManager.getConfig().getChannelId(), !settingLiveReplaySwitchLayout.isSelected())
+                    .subscribe(new Consumer<ResponseBody>() {
+                        @Override
+                        public void accept(ResponseBody responseBody) throws Exception {
+                            settingLiveReplaySwitchLayout.setEnabled(true);
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            settingLiveReplaySwitchLayout.setEnabled(true);
+                            PLVCommonLog.exception(throwable);
+                        }
+                    });
         }
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="数据监听">
+    private void observeLiveRoomData() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (statefulData != null && statefulData.getData() != null && statefulData.getData().getData() != null){
+                    boolean playbackEnabled = statefulData.getData().getData().isPlaybackEnabled();
+                    settingLiveReplaySwitchLayout.setSelected(!playbackEnabled);
+                }
+            }
+        });
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="内部处理逻辑">
 
@@ -873,20 +849,6 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (iconId != null) {
             plvsaSettingBitrateIv.setImageResource(iconId);
         }
-    }
-
-    private void updateScrollContainerIndicator() {
-        int maxSize = settingActionScrollContainer.getChildAt(0).getWidth();
-        if (maxSize <= 0) {
-            maxSize = 1;
-        }
-        int pageSize = settingActionScrollContainer.getWidth();
-        if (pageSize <= 0) {
-            pageSize = 1;
-        }
-        int currentOffset = settingActionScrollContainer.getScrollX();
-        settingActionScrollIndicator.setBeadCount(maxSize / pageSize + 1);
-        settingActionScrollIndicator.setCurrentSelectedIndex((int) (scaleToRange(currentOffset, 0F, maxSize - pageSize, 0F, maxSize / pageSize) + 0.5));
     }
 
     private void changeScreenOrientation() {

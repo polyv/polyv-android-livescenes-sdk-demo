@@ -321,6 +321,7 @@
     <!--推流-->
     <string name="plv_streamer_dialog_stop_class_ask">點擊下課將結束直播，確認下課嗎？ </string>
     <string name="plv_streamer_dialog_no_network">網路斷開，已停止直播，請更換網路後重試</string>
+    <string name="plv_streamer_network_disconnect_mask_hint">網絡斷開，直播已暫停</string>
     <string name="plv_streamer_toast_can_not_linkmic_before_the_class">上課前無法發起連麥</string>
     <string name="plv_streamer_toast_please_click_class_first">請先點選上課</string>
     <string name="plv_push_downgrade_preference_title">弱網處理</string>
@@ -501,6 +502,7 @@
 
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">確認退出回放</string>
+    <string name="plv_playback_title">直播重播</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">沒有資料</string>
     <string name="plv_previous_load_error">載入失敗，請點選重試</string>
@@ -539,6 +541,9 @@
     <string name="plv_reward_select_num_hint">請選擇打賞數</string>
     <string name="plv_reward_select_cash_hint">請選擇打賞道具</string>
     <string name="plv_reward_text_3">打賞</string>
+    <string name="plv_reward_gift_reward">禮物打賞</string>
+    <string name="plv_reward_gift_effect">禮物特效</string>
+    <string name="plv_reward_gift_reward_switch_tips">開啟/關閉打賞設定後，觀眾需刷新頁面或重進直播間</string>
     <!--红包-->
     <string name="plv_red_paper_send_msg">%s 發了一個%s，</string>
     <string name="plv_red_paper_get">點選領取</string>

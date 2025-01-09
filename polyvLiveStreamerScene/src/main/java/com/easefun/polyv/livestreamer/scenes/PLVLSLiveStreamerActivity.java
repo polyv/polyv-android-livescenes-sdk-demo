@@ -37,6 +37,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.IPLVLSChatroomLayout;
 import com.easefun.polyv.livestreamer.modules.document.IPLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.PLVLSDocumentLayout;
 import com.easefun.polyv.livestreamer.modules.document.widget.PLVLSDocumentControllerExpandMenu;
+import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSNetworkDisconnectMaskLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSPushDowngradeAlertToastLayout;
 import com.easefun.polyv.livestreamer.modules.statusbar.IPLVLSStatusBarLayout;
 import com.easefun.polyv.livestreamer.modules.streamer.IPLVLSStreamerLayout;
@@ -100,6 +101,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private PLVLSPushDowngradeAlertToastLayout pushDowngradeAlertToastLy;
     // 互动布局
     private IPLVStreamerInteractLayout interactLayout;
+    private PLVLSNetworkDisconnectMaskLayout networkDisconnectMaskLayout;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -196,6 +198,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         observeStreamerLayout();
         observeChatroomLayout();
         observeDocumentLayout();
+        observeNetworkDisconnectLayout();
     }
 
     @Override
@@ -318,6 +321,8 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         toTopView = findViewById(R.id.plvls_chatroom_to_top_view);
         pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
+        networkDisconnectMaskLayout = findViewById(R.id.plvls_network_disconnect_mask_layout);
+
         interactLayout.init(liveRoomDataManager);
 
         // 初始化推流和连麦布局
@@ -684,6 +689,14 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
         });
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 网络断开遮罩">
+
+    private void observeNetworkDisconnectLayout() {
+        plvlsStreamerLy.getStreamerPresenter().registerView(networkDisconnectMaskLayout.streamerView);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="设置直播恢复">

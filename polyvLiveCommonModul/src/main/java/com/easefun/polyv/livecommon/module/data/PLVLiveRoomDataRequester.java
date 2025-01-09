@@ -13,6 +13,8 @@ import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.feature.pointreward.IPLVPointRewardDataSource;
+import com.plv.livescenes.feature.pointreward.PLVRewardDataSource;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.hiclass.api.PLVHCApiManager;
 import com.plv.livescenes.hiclass.vo.PLVHCLessonDetailVO;
@@ -20,6 +22,7 @@ import com.plv.livescenes.model.PLVIncreasePageViewerVO;
 import com.plv.livescenes.model.PLVLiveStatusVO2;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
+import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.livescenes.net.PLVApiManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -43,6 +46,7 @@ public class PLVLiveRoomDataRequester {
     //请求商品的rank
     private int commodityRank = -1;
 
+    private PLVRewardDataSource rewardDataSource = new PLVRewardDataSource();
     //直播频道配置参数
     private PLVLiveChannelConfig liveChannelConfig;
 
@@ -420,6 +424,32 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-fold>
 
+    // <editor-folder defaultstate="collapsed" desc="打赏配置 - 请求、取消">
+    void requestRewardSetting(final IPLVNetRequestListener<PLVRewardSettingVO> listener) {
+        rewardDataSource.getRewardSetting(getConfig().getChannelId(), new IPLVPointRewardDataSource.IPointRewardListener<PLVRewardSettingVO>() {
+            @Override
+            public void onSuccess(PLVRewardSettingVO plvRewardSettingVO) {
+                if (listener != null) {
+                    listener.onSuccess(plvRewardSettingVO);
+                }
+            }
+
+            @Override
+            public void onFailed(Throwable throwable) {
+                if (listener != null) {
+                    listener.onFailed(getErrorMessage(throwable), throwable);
+                }
+            }
+        });
+    }
+
+    void disposeRewardSetting() {
+        if (rewardDataSource != null) {
+            rewardDataSource.destroy();
+        }
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -430,6 +460,7 @@ public class PLVLiveRoomDataRequester {
         disposeUpdateChannelName();
         disposeLessonDetail();
         disposePlayBackChannelDetail();
+        disposeRewardSetting();
     }
     // </editor-fold>
 

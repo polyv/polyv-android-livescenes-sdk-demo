@@ -1,6 +1,5 @@
 package com.easefun.polyv.livedemo;
 
-import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 
 import android.app.ProgressDialog;
@@ -50,6 +49,7 @@ import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.io.File;
+import java.util.Calendar;
 
 /**
  * date: 2020-04-29
@@ -185,6 +185,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         //默认选择直播
         rlLiveGroupLayout.performClick();
 
+        initCopyright();
         initPlaybackCacheConfig();
         initPlaybackCacheViewModel();
         initMultiVenueViewModel();
@@ -310,6 +311,11 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 loginManager.destroy();
             }
         });
+    }
+
+    private void initCopyright() {
+        final int year = Calendar.getInstance().get(Calendar.YEAR);
+        tvCopyright.setText("");
     }
 
     private void initPlaybackCacheConfig() {

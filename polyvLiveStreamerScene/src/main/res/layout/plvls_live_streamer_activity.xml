@@ -63,6 +63,13 @@
         app:layout_constraintRight_toRightOf="@+id/plvls_document_ly"
         app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
 
+    <!-- 网络断开遮罩布局 -->
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSNetworkDisconnectMaskLayout
+        android:id="@+id/plvls_network_disconnect_mask_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <!--直播间弹层布局容器-->
     <FrameLayout
         android:id="@+id/plvls_live_room_popup_container"

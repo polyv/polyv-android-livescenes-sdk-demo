@@ -294,6 +294,13 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
     }
 
     @Override
+    public void changeDisplayType(int displayDataType) {
+        if (chatMessageAdapter != null) {
+            chatMessageAdapter.changeDisplayType(displayDataType);
+        }
+    }
+
+    @Override
     public void addChatMessageToChatList(final List<PLVBaseViewData> chatMessageDataList, final boolean isScrollEnd) {
         addChatMessageToList(chatMessageDataList, isScrollEnd);
     }

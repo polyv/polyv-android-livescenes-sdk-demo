@@ -1,5 +1,7 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
+
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -7,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -55,15 +56,18 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.IPLVChatroomManager;
+import com.plv.livescenes.feature.pointreward.IPLVPointRewardDataSource;
+import com.plv.livescenes.feature.pointreward.PLVRewardDataSource;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
+import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.socket.client.Ack;
+import okhttp3.ResponseBody;
 
 /**
  * 更多布局
@@ -93,7 +97,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     //view
     private ConstraintLayout plvsaMoreLayout;
-    private TextView plvsaMoreTextTv;
     private ViewGroup plvsaMoreSettingsSv;
     private FlexboxLayout plvsaMoreSettingsLayout;
     private ImageView plvsaMoreCameraIv;
@@ -130,6 +133,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ImageView moreHangUpViewerLinkmicIv;
     private TextView moreHangUpViewerLinkmicTv;
     private LinearLayout moreInteractSigninLl;
+    private LinearLayout moreGiftRewardLayout;
+    private ImageView moreGiftRewardIv;
+    private TextView moreGiftRewardTv;
+    private LinearLayout moreGiftEffectLayout;
+    private ImageView moreGiftEffectIv;
+    private TextView moreGiftEffectTv;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -162,6 +171,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private long lastClickCameraSwitchViewTime;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVRewardDataSource rewardDataSource = new PLVRewardDataSource();
     private String channelId;
 
     /**
@@ -198,7 +208,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_more_layout, this);
 
         plvsaMoreLayout = (ConstraintLayout) findViewById(R.id.plvsa_more_layout);
-        plvsaMoreTextTv = (TextView) findViewById(R.id.plvsa_more_text_tv);
         plvsaMoreSettingsSv = findViewById(R.id.plvsa_more_settings_sv);
         plvsaMoreSettingsLayout = (FlexboxLayout) findViewById(R.id.plvsa_more_settings_layout);
         plvsaMoreCameraIv = (ImageView) findViewById(R.id.plvsa_more_camera_iv);
@@ -235,6 +244,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreHangUpViewerLinkmicIv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_iv);
         moreHangUpViewerLinkmicTv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_tv);
         moreInteractSigninLl = findViewById(R.id.plvsa_more_interact_signin_layout);
+        moreGiftRewardLayout = findViewById(R.id.plvsa_more_gift_reward_layout);
+        moreGiftRewardIv = findViewById(R.id.plvsa_more_gift_reward_iv);
+        moreGiftRewardTv = findViewById(R.id.plvsa_more_gift_reward_tv);
+        moreGiftEffectLayout = findViewById(R.id.plvsa_more_gift_effect_layout);
+        moreGiftEffectIv = findViewById(R.id.plvsa_more_gift_effect_iv);
+        moreGiftEffectTv = findViewById(R.id.plvsa_more_gift_effect_tv);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -260,15 +275,17 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreLinkmicSettingLayout.setOnClickListener(this);
         moreHangUpViewerLinkmicLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
+        moreGiftRewardLayout.setOnClickListener(this);
+        moreGiftEffectLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
         if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
-            plvsaMoreSettingsLayout.removeView(plvsaMoreShareScreenLl);
+            plvsaMoreShareScreenLl.setVisibility(View.GONE);
         }
-        if (!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT)) {
-            plvsaMoreSettingsLayout.removeView(plvsaMoreMixLayout);
+        if (!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_GIFT_REWARD_OPEN)) {
+            moreGiftRewardLayout.setVisibility(View.GONE);
         }
 
         //init bitrateLayout
@@ -359,6 +376,17 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 }
             });
+            liveRoomDataManager.getRewardSettingData().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PLVRewardSettingVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PLVRewardSettingVO> statefulData) {
+                    liveRoomDataManager.getRewardSettingData().removeObserver(this);
+                    if (statefulData == null || !statefulData.isSuccess() || statefulData.getData() == null) {
+                        return;
+                    }
+                    boolean isOpen = statefulData.getData().getDonateGiftEnabled();
+                    moreGiftRewardLayout.setSelected(isOpen ? false : true);
+                }
+            });
         }
     }
 
@@ -428,6 +456,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         initBitrateMapIcon();
         observeLiveRoomStatus();
         updateLinkMicStrategy(liveRoomDataManager);
+        initMixLayoutButton();
     }
 
     private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -435,8 +464,19 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
         if (!canControlLinkMic || !isNewLinkMicStrategy) {
-            plvsaMoreSettingsLayout.removeView(moreAllowViewerLinkmicLayout);
-            plvsaMoreSettingsLayout.removeView(moreLinkmicSettingLayout);
+            moreAllowViewerLinkmicLayout.setVisibility(View.GONE);
+            moreLinkmicSettingLayout.setVisibility(View.GONE);
+            moreHangUpViewerLinkmicLayout.setVisibility(View.GONE);
+        }
+    }
+
+    private void initMixLayoutButton() {
+        final boolean showMixLayoutButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_SETTING_SHOW_MIX_LAYOUT_BUTTON, true);
+        if (PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_MIX_LAYOUT) && showMixLayoutButton) {
+            plvsaMoreMixLayout.setVisibility(View.VISIBLE);
+        } else {
+            plvsaMoreMixLayout.setVisibility(View.GONE);
         }
     }
     // </editor-folder>
@@ -794,6 +834,29 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             if (onViewActionListener != null) {
                 onViewActionListener.onShowSignInAction();
             }
+        } else if (id == moreGiftRewardLayout.getId()) {
+            moreGiftRewardLayout.setSelected(!moreGiftRewardLayout.isSelected());
+            moreGiftRewardLayout.setEnabled(false);
+            PLVToast.Builder.context(getContext())
+                    .setText(getContext().getString(R.string.plv_reward_gift_reward_switch_tips))
+                    .show();
+            rewardDataSource.updateGiftReward(channelId, !moreGiftRewardLayout.isSelected(), new IPLVPointRewardDataSource.IPointRewardListener<ResponseBody>() {
+                @Override
+                public void onSuccess(ResponseBody responseBody) {
+                    moreGiftRewardLayout.setEnabled(true);
+                }
+
+                @Override
+                public void onFailed(Throwable throwable) {
+                    moreGiftRewardLayout.setEnabled(true);
+                    PLVCommonLog.exception(throwable);
+                }
+            });
+        } else if (id == moreGiftEffectLayout.getId()) {
+            moreGiftEffectLayout.setSelected(!moreGiftEffectLayout.isSelected());
+            if (onViewActionListener != null) {
+                onViewActionListener.onGiftEffectSwitch(!moreGiftEffectLayout.isSelected());
+            }
         }
     }
 
@@ -900,7 +963,6 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             moreLayoutParam.height = MORE_LAYOUT_HEIGHT_LAND;
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_LAND;
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_LAND);
-            settingLayoutParam.topToBottom = R.id.plvsa_more_text_tv;
             settingLayoutParam.topMargin = ConvertUtils.dp2px(plvsaMoreSettingsLayout.getChildCount() > 9 ? 48 : 0);
         }
 
@@ -919,6 +981,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
          * 显示签到
          */
         void onShowSignInAction();
+
+        /**
+         * 礼物特效开关切换
+         */
+        void onGiftEffectSwitch(boolean isOpen);
     }
     // </editor-fold>
 }

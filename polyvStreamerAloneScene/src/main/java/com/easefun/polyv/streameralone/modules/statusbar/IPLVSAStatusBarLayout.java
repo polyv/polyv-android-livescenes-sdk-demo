@@ -30,12 +30,17 @@ public interface IPLVSAStatusBarLayout {
      */
     void updateChannelName(String channelName);
 
-    /**
-     * 设置停止直播回调监听
-     *
-     * @param onStopLiveListener
-     */
-    void setOnStopLiveListener(PLVSAStatusBarLayout.OnStopLiveListener onStopLiveListener);
+    void setOnViewActionListener(PLVSAStatusBarLayout.OnViewActionListener onViewActionListener);
+
+    void notifyLinkMicTypeChange(boolean isVideoLinkMic, boolean isOpenLinkMic);
+
+    void openMemberLayoutAndHideUserRequestTips();
+
+    void closeMemberLayout();
+
+    void showUserRequestTips();
+
+    void hideUserRequestTips();
 
     /**
      * 是否拦截返回事件

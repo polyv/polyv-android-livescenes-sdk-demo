@@ -14,139 +14,142 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/plvsa_status_bar_info_ll"
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvsa_status_bar_channel_info_rl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/plvsa_status_bar_close_iv"
+        android:background="#33000000"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/plvsa_status_bar_close_iv">
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="18dp">
 
-        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
-            android:id="@+id/plvsa_status_bar_channel_info_rl"
+        <ImageView
+            android:id="@+id/plvsa_status_bar_channel_info_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/plvsa_status_bar_channel_info_icon" />
+
+        <TextView
+            android:id="@+id/plvsa_status_bar_channel_info_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#33000000"
-            android:paddingLeft="10dp"
-            android:paddingTop="8dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="8dp"
-            app:radius="18dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_toEndOf="@id/plvsa_status_bar_channel_info_iv"
+            android:layout_toRightOf="@id/plvsa_status_bar_channel_info_iv"
+            android:text="@string/plv_live_channel_info"
+            android:textColor="#FFF"
+            android:textSize="14sp" />
 
-            <ImageView
-                android:id="@+id/plvsa_status_bar_channel_info_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/plvsa_status_bar_channel_info_icon" />
+        <ImageView
+            android:id="@+id/plvsa_status_bar_channel_info_nav_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/plvsa_status_bar_channel_info_tv"
+            android:layout_toRightOf="@id/plvsa_status_bar_channel_info_tv"
+            android:src="@drawable/plvsa_status_bar_channel_info_nav_icon" />
 
-            <TextView
-                android:id="@+id/plvsa_status_bar_channel_info_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_toEndOf="@id/plvsa_status_bar_channel_info_iv"
-                android:layout_toRightOf="@id/plvsa_status_bar_channel_info_iv"
-                android:text="@string/plv_live_channel_info"
-                android:textColor="#FFF"
-                android:textSize="14sp" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
-            <ImageView
-                android:id="@+id/plvsa_status_bar_channel_info_nav_iv"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/plvsa_status_bar_channel_info_tv"
-                android:layout_toRightOf="@id/plvsa_status_bar_channel_info_tv"
-                android:src="@drawable/plvsa_status_bar_channel_info_nav_icon" />
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvsa_status_bar_member_count_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:background="#33000000"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintStart_toEndOf="@+id/plvsa_status_bar_channel_info_rl"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="18dp">
 
-        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+        <ImageView
+            android:id="@+id/plvsa_status_bar_member_count_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/plvsa_status_bar_member_count_icon" />
 
-        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
-            android:id="@+id/plvsa_status_bar_member_count_rl"
+        <TextView
+            android:id="@+id/plvsa_status_bar_member_count_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:background="#33000000"
-            android:paddingLeft="10dp"
-            android:paddingTop="8dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="8dp"
-            app:radius="18dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_toEndOf="@id/plvsa_status_bar_member_count_iv"
+            android:layout_toRightOf="@id/plvsa_status_bar_member_count_iv"
+            android:text="0"
+            android:textColor="#FFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="222" />
 
-            <ImageView
-                android:id="@+id/plvsa_status_bar_member_count_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/plvsa_status_bar_member_count_icon" />
+        <!--成员列表中有用户申请连麦时的提示-->
+        <View
+            android:id="@+id/plvsa_member_linkmic_request_tips_view"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="-2dp"
+            android:layout_toEndOf="@+id/plvsa_status_bar_member_count_tv"
+            android:background="@drawable/plvsa_tool_bar_member_view_bg_shape"
+            android:visibility="invisible" />
 
-            <TextView
-                android:id="@+id/plvsa_status_bar_member_count_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_toEndOf="@id/plvsa_status_bar_member_count_iv"
-                android:layout_toRightOf="@id/plvsa_status_bar_member_count_iv"
-                android:text="0"
-                android:textColor="#FFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:text="222" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
-        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plvsa_status_bar_streamer_time_rl"
+        android:layout_width="91dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="11dp"
+        android:layout_marginLeft="11dp"
+        android:background="#33000000"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintStart_toEndOf="@+id/plvsa_status_bar_member_count_rl"
+        app:layout_constraintTop_toTopOf="parent"
+        app:radius="18dp">
 
-        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
-            android:id="@+id/plvsa_status_bar_streamer_time_rl"
-            android:layout_width="91dp"
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/plvsa_status_bar_streamer_status_iv"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_centerVertical="true"
+            android:background="#FF3B30"
+            app:radius_iv="8dp" />
+
+        <TextView
+            android:id="@+id/plvsa_status_bar_streamer_time_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="11dp"
-            android:layout_marginLeft="11dp"
-            android:background="#33000000"
-            android:paddingStart="8dp"
-            android:paddingLeft="8dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="0dp"
-            android:paddingRight="0dp"
-            android:paddingBottom="8dp"
-            app:radius="18dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_toEndOf="@id/plvsa_status_bar_streamer_status_iv"
+            android:layout_toRightOf="@id/plvsa_status_bar_streamer_status_iv"
+            android:ellipsize="none"
+            android:singleLine="true"
+            android:text="00:00:00"
+            android:textColor="#FFF"
+            android:textSize="14dp"
+            android:textStyle="bold" />
 
-            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
-                android:id="@+id/plvsa_status_bar_streamer_status_iv"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_centerVertical="true"
-                android:background="#FF3B30"
-                app:radius_iv="8dp" />
-
-            <TextView
-                android:id="@+id/plvsa_status_bar_streamer_time_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="6dp"
-                android:layout_marginLeft="6dp"
-                android:layout_toEndOf="@id/plvsa_status_bar_streamer_status_iv"
-                android:layout_toRightOf="@id/plvsa_status_bar_streamer_status_iv"
-                android:ellipsize="none"
-                android:singleLine="true"
-                android:text="00:00:00"
-                android:textColor="#FFF"
-                android:textSize="14dp"
-                android:textStyle="bold" />
-
-        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
-
-    </LinearLayout>
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
         android:id="@+id/plvsa_status_bar_streamer_teacher_layout"
@@ -160,7 +163,7 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/plvsa_status_bar_info_ll"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_status_bar_channel_info_rl"
         app:layout_constraintWidth_default="wrap"
         app:radius="10dp">
 
@@ -260,5 +263,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plvsa_status_bar_notification_layout" />
+
+    <!--有人申请连麦时 连麦提示条布局-->
+    <com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout
+        android:id="@+id/plvsa_linkmic_request_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/plvsa_status_bar_member_count_rl"
+        app:layout_constraintStart_toStartOf="@+id/plvsa_status_bar_member_count_rl"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_status_bar_member_count_rl"
+        tools:visibility="visible" />
 
 </android.support.constraint.ConstraintLayout>
