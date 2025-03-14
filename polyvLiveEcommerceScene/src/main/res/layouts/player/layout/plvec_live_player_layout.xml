@@ -119,6 +119,7 @@
         android:text="@string/plv_player_floating_playing"
         android:textColor="#E4E4E4"
         android:textSize="14sp"
+        android:gravity="center"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

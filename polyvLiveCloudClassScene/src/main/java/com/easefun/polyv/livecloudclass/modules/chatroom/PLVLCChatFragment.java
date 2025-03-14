@@ -52,6 +52,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLay
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -79,6 +80,7 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -86,6 +88,7 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
@@ -595,6 +598,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             onViewActionListener.onShowLanguageAction();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowPlaySettingAction();
+                        }
+                        break;
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SCREENSHOT:
                         hideSoftInputAndPopupLayout();
                         if (onViewActionListener != null) {
@@ -631,6 +640,23 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 }
             }
         });
+
+        if (liveRoomDataManager != null && getContext() != null) {
+            liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                    liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                    if (plvLiveClassDetailVOPLVStatefulData == null || !plvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                        return;
+                    }
+                    PLVLiveClassDetailVO liveClassDetail = plvLiveClassDetailVOPLVStatefulData.getData();
+                    if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                        return;
+                    }
+                    chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
+                }
+            });
+        }
     }
 
     private void observeTransmitChangedEvent() {
@@ -1605,6 +1631,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 显示语言切换弹窗
          */
         void onShowLanguageAction();
+
+        /**
+         * 显示播放设置弹窗
+         */
+        void onShowPlaySettingAction();
 
         /**
          * 截屏

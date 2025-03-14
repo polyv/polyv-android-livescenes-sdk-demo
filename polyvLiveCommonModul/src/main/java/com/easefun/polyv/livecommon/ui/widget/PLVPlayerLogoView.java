@@ -1,8 +1,10 @@
 package com.easefun.polyv.livecommon.ui.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -14,12 +16,15 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.ViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSimpleUrlWebViewActivity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 播放器logo布局
@@ -27,7 +32,8 @@ import java.util.List;
 public class PLVPlayerLogoView extends FrameLayout {
 
     private final List<LogoParam> logoParams = new ArrayList<>();
-
+    private final Map<String, int[]> bitmapSizeCache = new HashMap<>();
+    private final Map<LogoParam, ImageView> imageViewMap = new HashMap<>();
     private OnClickLogoListener onClickLogoListener = new OnClickLogoListener();
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -75,7 +81,12 @@ public class PLVPlayerLogoView extends FrameLayout {
             }
         }
 
-        final ImageView imageView = new ImageView(getContext());
+        final ImageView imageView;
+        if (imageViewMap.containsKey(logoParam)) {
+            imageView = imageViewMap.get(logoParam);
+        } else {
+            imageView = new ImageView(getContext());
+        }
 
         //获取Bitmap的尺寸
         getBitmapSize(logoParam, new OnGetBitmapSizeCallback() {
@@ -134,10 +145,21 @@ public class PLVPlayerLogoView extends FrameLayout {
 
                 //加载图片
                 if (logoParam.resId != 0) {
-                    PLVImageLoader.getInstance().loadImage(getContext(), logoParam.resId, imageView);
+                    PLVImageLoader.getInstance().loadImage(getContext(), logoParam.resId, new ViewTarget<ImageView, Drawable>(imageView) {
+                        @Override
+                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                            imageView.setImageDrawable(resource);
+                        }
+                    });
                 } else {
-                    PLVImageLoader.getInstance().loadImage(getContext(), logoParam.resUrl, imageView);
+                    PLVImageLoader.getInstance().loadImage(getContext(), logoParam.resUrl, new ViewTarget<ImageView, Drawable>(imageView) {
+                        @Override
+                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                            imageView.setImageDrawable(resource);
+                        }
+                    });
                 }
+                imageViewMap.put(logoParam, imageView);
 
                 if (!logoParams.contains(logoParam)) {
                     logoParams.add(logoParam);
@@ -157,10 +179,20 @@ public class PLVPlayerLogoView extends FrameLayout {
             cb.onGetBitmapSize(options.outWidth, options.outHeight);
         } else {
             //此处用glide获取图片的尺寸方式可以优化，见issue:https://github.com/bumptech/glide/issues/781
-
+            if (bitmapSizeCache.containsKey(logoParam.resUrl)) {
+                int[] bitmapSize = bitmapSizeCache.get(logoParam.resUrl);
+                if (bitmapSize != null) {
+                    cb.onGetBitmapSize(bitmapSize[0], bitmapSize[1]);
+                    return;
+                }
+            }
+            if (getContext() instanceof Activity && ((Activity) getContext()).isFinishing()) {
+                return;
+            }
             Glide.with(getContext()).asBitmap().load(logoParam.resUrl).into(new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    bitmapSizeCache.put(logoParam.resUrl, new int[]{resource.getWidth(), resource.getHeight()});
                     cb.onGetBitmapSize(resource.getWidth(), resource.getHeight());
                 }
             });

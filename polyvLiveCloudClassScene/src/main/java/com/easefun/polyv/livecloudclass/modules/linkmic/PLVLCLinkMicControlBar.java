@@ -1,8 +1,10 @@
 package com.easefun.polyv.livecloudclass.modules.linkmic;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.arch.lifecycle.GenericLifecycleObserver;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
@@ -15,6 +17,7 @@ import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -27,6 +30,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.linkmic.widget.PLVLCLinkMicRingButton;
@@ -39,6 +43,8 @@ import com.easefun.polyv.livecommon.ui.widget.PLVNoConsumeTouchEventButton;
 import com.easefun.polyv.livecommon.ui.widget.PLVTouchFloatingView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
@@ -47,7 +53,11 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.log.IPLVLinkMicTraceLogSender;
 import com.plv.linkmic.log.PLVLinkMicTraceLogSender;
 import com.plv.livescenes.log.linkmic.PLVLinkMicELog;
+import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -609,32 +619,37 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                 if (toastWhenFloatingPlayerShowing()) {
                     return;
                 }
-                btnRingActionPortrait.setRingOffState();
-                tvRequestTip.setText(R.string.plv_linkmic_tip_requesting_link_mic);
+                requireLinkMicPermission(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnRingActionPortrait.setRingOffState();
+                        tvRequestTip.setText(R.string.plv_linkmic_tip_requesting_link_mic);
 
-                btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_off);
-                tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_requesting_link_mic);
-                switch (state) {
-                    case STATE_TEACHER_LINK_MIC_OPEN:
-                        PLVCommonLog.d(TAG, "btnSetting.onClickRingUp->STATE_TEACHER_LINK_MIC_OPEN");
-                        break;
-                    case STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE:
-                        //悬浮窗横向移动动画
-                        animateMoveToShowMiddleWidth();
-                        tipGradientShowOrHide(true, DURATION_MS_LINK_MIC_OPEN_OFF);
-                        PLVCommonLog.d(TAG, "btnSetting.onClickRingUp->STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE");
-                        break;
-                    default:
-                        break;
-                }
-                state = PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC;
+                        btnRingActionLandscape.setBackgroundResource(R.drawable.plvlc_linkmic_iv_ring_off);
+                        tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_requesting_link_mic);
+                        switch (state) {
+                            case STATE_TEACHER_LINK_MIC_OPEN:
+                                PLVCommonLog.d(TAG, "btnSetting.onClickRingUp->STATE_TEACHER_LINK_MIC_OPEN");
+                                break;
+                            case STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE:
+                                //悬浮窗横向移动动画
+                                animateMoveToShowMiddleWidth();
+                                tipGradientShowOrHide(true, DURATION_MS_LINK_MIC_OPEN_OFF);
+                                PLVCommonLog.d(TAG, "btnSetting.onClickRingUp->STATE_TEACHER_LINK_MIC_OPEN_COLLAPSE");
+                                break;
+                            default:
+                                break;
+                        }
+                        state = PLVLCLinkMicControllerState.STATE_REQUESTING_JOIN_LINK_MIC;
 
-                // 连麦时不允许小窗播放
-                PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
+                        // 连麦时不允许小窗播放
+                        PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
 
-                if (onPLCLinkMicControlBarListener != null) {
-                    onPLCLinkMicControlBarListener.onClickRingUpLinkMic();
-                }
+                        if (onPLCLinkMicControlBarListener != null) {
+                            onPLCLinkMicControlBarListener.onClickRingUpLinkMic();
+                        }
+                    }
+                });
             }
 
             @Override
@@ -789,6 +804,41 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             return true;
         }
         return false;
+    }
+
+    private void requireLinkMicPermission(final Runnable onSuccess) {
+        ArrayList<String> permissions = new ArrayList<>(Arrays.asList(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+        ));
+        PLVFastPermission.getInstance()
+                .start((Activity) getContext(), permissions, new PLVOnPermissionCallback() {
+                    @Override
+                    public void onAllGranted() {
+                        onSuccess.run();
+                    }
+
+                    @Override
+                    public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+                        new AlertDialog.Builder(getContext())
+                                .setTitle(com.easefun.polyv.livecommon.R.string.plv_common_dialog_tip)
+                                .setMessage(com.easefun.polyv.livecommon.R.string.plv_linkmic_error_tip_permission_denied)
+                                .setPositiveButton(com.easefun.polyv.livecommon.R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PLVFastPermission.getInstance().jump2Settings(ActivityUtils.getTopActivity());
+                                    }
+                                })
+                                .setNegativeButton(com.easefun.polyv.livecommon.R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(ActivityUtils.getTopActivity(), com.easefun.polyv.livecommon.R.string.plv_linkmic_error_tip_permission_cancel, Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .setCancelable(false)
+                                .show();
+                    }
+                });
     }
     // </editor-fold>
 

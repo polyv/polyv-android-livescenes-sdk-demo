@@ -1,9 +1,12 @@
 package com.easefun.polyv.liveecommerce.modules.player.floating;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -11,13 +14,16 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.player.floating.IPLVFloatingWindow;
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerConfig;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
 import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.plv.business.api.common.player.PLVBaseVideoView;
 import com.plv.business.api.common.player.listener.IPLVVideoViewListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -25,6 +31,7 @@ import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVLiveLoginResult;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -36,7 +43,14 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     private static final String TAG = PLVECFloatingWindow.class.getSimpleName();
+    private static final int IS_JOIN_LINK_MIC = 1 << 1;
+    private static final int IS_JOIN_REQUEST_LINK_MIC = 1 << 2;
+    private static final int IS_PLAYER_PREPARED = 1 << 3;
+    private static final int IS_OPEN_FLOAT_ENABLE = 1 << 4;
 
+    private int canShowFloatingWindowStatus = IS_OPEN_FLOAT_ENABLE;
+    private boolean requestShowByGoHome = false;
+    private boolean requestShowByExitPage = false;
     private boolean requestShowByCommodityPage = false;
     private boolean requestShowByUser = false;
     private boolean isLanderScreen = false;
@@ -49,19 +63,128 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
     @Nullable
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
+    private AlertDialog alertDialog;
+
     private PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_FOREGROUND;
     private PLVFloatingEnums.Orientation orientation = PLVFloatingEnums.Orientation.AUTO;
 
     private ViewGroup.LayoutParams originContentLayoutParam;
 
+    public void updateWhenJoinLinkMic(boolean isJoinLinkMic) {
+        updateWhenJoinRequestLinkMic(false);
+        if (isJoinLinkMic) {
+            canShowFloatingWindowStatus |= IS_JOIN_LINK_MIC;
+        } else {
+            canShowFloatingWindowStatus &= ~IS_JOIN_LINK_MIC;
+        }
+    }
+
+    public void updateWhenJoinRequestLinkMic(boolean isRequestLinkMic) {
+        if (isRequestLinkMic) {
+            canShowFloatingWindowStatus |= IS_JOIN_REQUEST_LINK_MIC;
+        } else {
+            canShowFloatingWindowStatus &= ~IS_JOIN_REQUEST_LINK_MIC;
+        }
+    }
+
+    public void updateWhenPlayerPrepared(boolean prepared) {
+        if (prepared) {
+            canShowFloatingWindowStatus |= IS_PLAYER_PREPARED;
+        } else {
+            canShowFloatingWindowStatus &= ~IS_PLAYER_PREPARED;
+        }
+    }
+
+    public void updateWhenOpenFloat(boolean isOpenFloatEnable) {
+        if (isOpenFloatEnable) {
+            canShowFloatingWindowStatus |= IS_OPEN_FLOAT_ENABLE;
+        } else {
+            canShowFloatingWindowStatus &= ~IS_OPEN_FLOAT_ENABLE;
+        }
+    }
+
+    public boolean canShowFloatingWindowStatus() {
+        return (canShowFloatingWindowStatus & IS_PLAYER_PREPARED) != 0
+                && (canShowFloatingWindowStatus & IS_OPEN_FLOAT_ENABLE) != 0
+                && (canShowFloatingWindowStatus & IS_JOIN_LINK_MIC) == 0
+                && (canShowFloatingWindowStatus & IS_JOIN_REQUEST_LINK_MIC) == 0;
+    }
+
+    public void hideWhenOnlyShowByGoHome() {
+        // 1.前后台切换触发小窗 – 切回后自动全屏
+        // 2.客户手动触发小窗 – 切回后不自动全屏
+        if (requestShowByGoHome && !requestShowByUser && !requestShowByCommodityPage && !requestShowByExitPage) {
+            close();
+        }
+    }
+
+    public void showByGoHomeWhenEnabled() {
+        if (!PLVFloatingPlayerConfig.isAutoFloatingWhenGoHome()) {
+            return;
+        }
+        PLVAppUtils.postToMainThread(200, new Runnable() { // 小米悬浮窗兼容
+            @Override
+            public void run() {
+                if (AppUtils.isAppForeground()) {
+                    return;
+                }
+                showByGoHome(true);
+            }
+        });
+    }
+
+    public void showByExitPageWhenEnabled(@NonNull Callback onBackPressedRunnable) {
+        if (!PLVFloatingPlayerConfig.isAutoFloatingWhenExitPage()) {
+            onBackPressedRunnable.run(null);
+            return;
+        }
+        showByExitPage(true, onBackPressedRunnable);
+    }
+
+    public void showByExitPage(boolean toShow, @NonNull Callback onBackPressedRunnable) {
+        if (!canShowFloatingWindowStatus()) {
+            onBackPressedRunnable.run(null);
+            return;
+        }
+        requestShowByExitPage = toShow;
+        onRequestShowChanged(onBackPressedRunnable);
+    }
+
+    public void showByGoHome(boolean toShow) {
+        // 避免 跳到权限设置页面申请权限时 再次触发悬浮窗申请权限
+        if (isNeedShow()
+                && contentAnchorLayout != null
+                && !PLVFloatPermissionUtils.checkPermission((Activity) contentAnchorLayout.getContext())) {
+            return;
+        }
+        if (!canShowFloatingWindowStatus()) {
+            return;
+        }
+        requestShowByGoHome = toShow;
+        onRequestShowChanged();
+    }
+
     public void showByCommodityPage(boolean toShow) {
+        if (!canShowFloatingWindowStatus()) {
+            return;
+        }
         requestShowByCommodityPage = toShow;
         onRequestShowChanged();
     }
 
     public void showByUser(boolean toShow) {
+        showByUser(toShow, null);
+    }
+
+    public void showByUser(boolean toShow, @Nullable Callback onBackPressedRunnable) {
+        if (!canShowFloatingWindowStatus()) {
+            if (onBackPressedRunnable != null) {
+                onBackPressedRunnable.run(null);
+            }
+            return;
+        }
         requestShowByUser = toShow;
-        onRequestShowChanged();
+        onRequestShowChanged(onBackPressedRunnable);
     }
 
     public void setRequestShowByUser(boolean requestShowByUser) {
@@ -82,6 +205,27 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
 
     public void setLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        observerDataToFloatingWindow();
+    }
+
+    private void observerDataToFloatingWindow() {
+        if (liveRoomDataManager == null || contentAnchorLayout == null) {
+            return;
+        }
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) contentAnchorLayout.getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (plvLiveClassDetailVOPLVStatefulData == null || !plvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                    return;
+                }
+                PLVLiveClassDetailVO liveClassDetail = plvLiveClassDetailVOPLVStatefulData.getData();
+                if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                    return;
+                }
+                updateWhenOpenFloat(liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
+            }
+        });
     }
 
     public void setLanderScreen(boolean isLanderScreen){
@@ -131,10 +275,16 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
      */
     @Override
     public void close() {
-        requestShowByCommodityPage = false;
-        requestShowByUser = false;
+        resetStatus();
         restoreContentLayoutParam();
         PLVFloatingPlayerManager.getInstance().clear();
+    }
+
+    private void resetStatus() {
+        requestShowByGoHome = false;
+        requestShowByExitPage = false;
+        requestShowByCommodityPage = false;
+        requestShowByUser = false;
     }
 
     // 根据视频宽高适配悬浮窗宽高
@@ -171,9 +321,13 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
     }
 
     private void onRequestShowChanged() {
-        if (requestShowByUser) {
+        onRequestShowChanged(null);
+    }
+
+    private void onRequestShowChanged(@Nullable Callback onBackPressedRunnable) {
+        if (PLVFloatingPlayerConfig.isAutoFloatingWhenGoHome()) {
             showType = PLVFloatingEnums.ShowType.SHOW_ALWAYS;
-        } else if (requestShowByCommodityPage) {
+        } else {
             showType = PLVFloatingEnums.ShowType.SHOW_ONLY_FOREGROUND;
         }
         PLVFloatingPlayerManager.getInstance().updateShowType(showType);
@@ -181,15 +335,22 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
         final boolean needShow = isNeedShow();
         final boolean isShowing = PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
         if (needShow && !isShowing) {
-            playOnFloatingWindow();
+            playOnFloatingWindow(onBackPressedRunnable);
         } else if (!needShow && isShowing) {
             restoreContentLayoutParam();
             PLVFloatingPlayerManager.getInstance().hide();
+        } else {
+            if (onBackPressedRunnable != null) {
+                onBackPressedRunnable.run(null);
+            }
         }
     }
 
-    private void playOnFloatingWindow() {
+    private void playOnFloatingWindow(@Nullable Callback onBackPressedRunnable) {
         if (contentAnchorLayout == null) {
+            if (onBackPressedRunnable != null) {
+                onBackPressedRunnable.run(null);
+            }
             return;
         }
         final Runnable runnable = new Runnable() {
@@ -215,8 +376,7 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                                 if (savedIntent == null) {
                                     return;
                                 }
-                                requestShowByCommodityPage = false;
-                                requestShowByUser = false;
+                                resetStatus();
                                 restoreContentLayoutParam();
                                 PLVFloatingPlayerManager.getInstance().clear();
                                 boolean result = AppUtils.bring2Front(contentAnchorLayout.getContext());
@@ -229,17 +389,7 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                                     });
                                 }
                                 savedIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                final boolean needReLogin = ((Activity) contentAnchorLayout.getContext()).isFinishing();
-                                if (needReLogin) {
-                                    reLoginWatchThenRun(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            contentAnchorLayout.getContext().startActivity(savedIntent);
-                                        }
-                                    });
-                                } else {
-                                    contentAnchorLayout.getContext().startActivity(savedIntent);
-                                }
+                                contentAnchorLayout.getContext().startActivity(savedIntent);
                             }
                         })
                         .setOnCloseFloatingWindowListener(new PLVFloatingPlayerManager.OnCloseFloatingWindowListener() {
@@ -254,7 +404,7 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                 setContentMatchParent();
             }
         };
-        checkFloatingWindowPermissionThenRun(contentAnchorLayout.getContext(), runnable);
+        checkFloatingWindowPermissionThenRun(contentAnchorLayout.getContext(), runnable, onBackPressedRunnable);
     }
 
     private void reLoginWatchThenRun(final Runnable onLoginSuccess) {
@@ -280,27 +430,74 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
         );
     }
 
-    private void checkFloatingWindowPermissionThenRun(final Context context, final Runnable runnable) {
+    private void checkFloatingWindowPermissionThenRun(final Context context, final Runnable runnable, @Nullable final Callback onBackPressedRunnable) {
         if (PLVFloatPermissionUtils.checkPermission((Activity) context)) {
-            runnable.run();
+            if (onBackPressedRunnable != null) {
+                onBackPressedRunnable.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        runnable.run();
+                    }
+                });
+            } else {
+                runnable.run();
+            }
         } else {
             final Activity topActivity = ActivityUtils.getTopActivity();
-            new AlertDialog.Builder(topActivity == null ? context : topActivity)
+            alertDialog = new AlertDialog.Builder(topActivity == null ? context : topActivity)
                     .setMessage(PLVAppUtils.getString(R.string.plv_player_floating_permission_apply_tips))
                     .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_3), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             PLVFloatPermissionUtils.requestPermission((Activity) context, new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
                                 @Override
-                                public void onResult(boolean isGrant) {
-                                    if (isGrant) {
-                                        runnable.run();
+                                public void onResult(final boolean isGrant) {
+                                    if (onBackPressedRunnable != null) {
+                                        onBackPressedRunnable.run(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (isGrant) {
+                                                    runnable.run();
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        if (isGrant) {
+                                            runnable.run();
+                                        }
                                     }
+                                    if (!isGrant) {
+                                        resetStatus();
+                                    }
+                                    // 由后台小窗的权限申请跳到权限页时，会再触发一次后台小窗的权限申请，因此这里需隐藏
+                                    if (alertDialog != null && alertDialog.isShowing()) {
+                                        alertDialog.dismiss();
+                                    }
+                                    alertDialog = null;
                                 }
                             });
                         }
                     })
-                    .setNegativeButton(PLVAppUtils.getString(R.string.plv_common_dialog_cancel_2), null)
+                    .setNegativeButton(PLVAppUtils.getString(R.string.plv_common_dialog_cancel_2), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (onBackPressedRunnable != null) {
+                                onBackPressedRunnable.run(null);
+                            }
+                            resetStatus();
+                            alertDialog = null;
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            if (onBackPressedRunnable != null) {
+                                onBackPressedRunnable.run(null);
+                            }
+                            resetStatus();
+                            alertDialog = null;
+                        }
+                    })
                     .show();
 
         }
@@ -323,7 +520,11 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
     }
 
     private boolean isNeedShow() {
-        return requestShowByUser || requestShowByCommodityPage;
+        return requestShowByUser || requestShowByCommodityPage || requestShowByGoHome || requestShowByExitPage;
     }
 
+    public interface Callback {
+        // callback 不为null表示可进入小窗状态
+        void run(@Nullable Runnable callback);
+    }
 }

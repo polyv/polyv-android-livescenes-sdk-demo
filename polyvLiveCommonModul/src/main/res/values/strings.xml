@@ -69,6 +69,11 @@
     <string name="plv_player_error">playback error\n</string>
     <string name="plv_player_retry_fail">Retry failed</string>
     <string name="plv_player_retry">Retry</string>
+    <string name="plv_player_exit_fullscreen">Exit fullscreen</string>
+    <string name="plv_player_enter_fullscreen">Entered fullscreen</string>
+    <string name="plv_player_layout_adjusted">Layout adjusted</string>
+    <string name="plv_player_open_barrage">Barrage enabled</string>
+    <string name="plv_player_close_barrage">Barrage disabled</string>
     <!--下载-->
     <string name="plv_download_downloading">Downloading</string>
     <string name="plv_download_downloaded">Downloaded</string>
@@ -488,6 +493,9 @@
     <string name="plv_live_go_to_setting_page_error_hint">Failed to enter the settings page, please set it manually</string>
     <string name="plv_live_screenshot">screenshot</string>
     <string name="plv_live_language_switch">Language</string>
+    <string name="plv_live_play_setting">Playback Settings</string>
+    <string name="plv_live_auto_floating_exit_page">Enable picture-in-picture on live room exit</string>
+    <string name="plv_live_auto_floating_go_home">Enable picture-in-picture on app exit</string>
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_tc" translatable="false">繁體中文-TC</string>
@@ -619,4 +627,6 @@
     <string name="plv_beauty_filter_cherry">Sakura</string>
     <string name="plv_beauty_filter_film">Film</string>
     <string name="plv_beauty_filter_night">Night</string>
+
+    <string name="plv_interact_sign_in_timeout_toast">You do not sign in on time, automatically quit the live room</string>
 </resources>

@@ -71,6 +71,7 @@ public class PLVInteractJSBridgeEventConst {
     public static final String V2_CLICK_PRODUCT_BUTTON = "clickProductButton";
     public static final String V2_WELFARE_LOTTERY_COMMENT_SUCCESS = "welfareLotteryCommentSuccess";
     public static final String V2_WELFARE_LOTTERY_ENTRANCE_CHANGE = "welfareLotteryEntranceDataChange";
+    public static final String V2_SIGN_IN_TIMEOUT_RECV = "notCheckIn";
 
 
     //native2js

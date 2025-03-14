@@ -66,6 +66,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
@@ -510,7 +511,15 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             @Override
             public void onClickFloating() {
                 if (floatingWindow != null) {
-                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser(), new PLVLCFloatingWindow.Callback() {
+                        @Override
+                        public void run(@Nullable Runnable callback) {
+                            if (callback != null) {
+                                callback.run();
+                                ((Activity) getContext()).finish();
+                            }
+                        }
+                    });
                 }
             }
 
@@ -972,6 +981,9 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     final boolean showChatLayout = !danmuSwitchView.isSelected();
                     chatLandscapeLayout.toggle(showChatLayout);
                 }
+                PLVToast.Builder.context(getContext())
+                        .setText(!danmuSwitchView.isSelected() ? R.string.plv_player_open_barrage : R.string.plv_player_close_barrage)
+                        .show();
             }
         });
 
@@ -1637,6 +1649,10 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 //更新封面图
                 coverImage = liveClassDetail.getData().getSplashImg();
                 updateCoverImage(isOnlyAudio, coverImage);
+
+                // 是否允许使用小窗功能
+                boolean isOpen = liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled();
+                mediaController.updateFloatWindowView(isOpen);
             }
         });
 

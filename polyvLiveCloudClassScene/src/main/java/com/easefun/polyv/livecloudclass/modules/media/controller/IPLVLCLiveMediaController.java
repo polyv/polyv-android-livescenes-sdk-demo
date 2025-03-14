@@ -200,6 +200,12 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      */
     void setShowOnlineCount(boolean showOnlineCount);
 
+    /**
+     * 更新是否显示小窗
+     * @param isOpenFloatWindowEnable
+     */
+    void updateFloatWindowView(boolean isOpenFloatWindowEnable);
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2、需要外部响应的事件监听器 - 定义 控制栏布局中UI控件 触发的交互事件的回调方法">

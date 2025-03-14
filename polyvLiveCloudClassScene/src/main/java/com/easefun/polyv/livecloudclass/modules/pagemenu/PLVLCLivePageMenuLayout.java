@@ -65,6 +65,7 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.glide.progress.PLVM
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVLanguageSwitchPopupWindow;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaySettingPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVViewPagerAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVViewPagerHelper;
@@ -140,6 +141,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCChatMoreFloatingView chatMoreFloatingView;
     //语言切换弹窗
     private PLVLanguageSwitchPopupWindow languageSwitchPopupWindow;
+    //播放设置弹窗
+    private PLVPlaySettingPopupWindow playSettingPopupWindow;
 
     //聊天回放管理器
     private IPLVChatPlaybackManager chatPlaybackManager;
@@ -319,6 +322,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             }
 
             @Override
+            public void onShowPlaySettingAction() {
+                playSettingPopupWindow.show();
+            }
+
+            @Override
             public void onScreenshot() {
                 if (onViewActionListener != null) {
                     onViewActionListener.onScreenshot();
@@ -336,6 +344,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
 
     private void initLanguageSwitchPopupWindow() {
         languageSwitchPopupWindow = new PLVLanguageSwitchPopupWindow(this);
+    }
+
+    private void initPlaySettingPopupWindow() {
+        playSettingPopupWindow = new PLVPlaySettingPopupWindow(this);
     }
     // </editor-fold>
 
@@ -432,6 +444,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         initChatPlaybackManager();
         initChatMoreFloatingView();
         initLanguageSwitchPopupWindow();
+        initPlaySettingPopupWindow();
 
         chatCommonMessageList.init(liveRoomDataManager);
 
@@ -643,7 +656,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         pageMenuTabTitleList.add(channelMenusBean.getName());
         tuWenFragment = new PLVLCTuWenFragment();
         PLVInteractNativeAppParams appParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
-        tuWenFragment.init(liveRoomDataManager.getConfig().getChannelId(),appParams);
+        tuWenFragment.init(liveRoomDataManager, appParams, getContext());
         pageMenuTabFragmentList.add(tuWenFragment);
     }
 
@@ -682,6 +695,11 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 @Override
                 public void onShowLanguageAction() {
                     languageSwitchPopupWindow.show(liveRoomDataManager.getConfig().getChannelId());
+                }
+
+                @Override
+                public void onShowPlaySettingAction() {
+                    playSettingPopupWindow.show();
                 }
 
                 @Override

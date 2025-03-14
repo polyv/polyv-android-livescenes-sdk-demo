@@ -1,36 +1,51 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
+import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.PLVTuWenWebView2;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
+import net.plv.android.jsbridge.CallBackFunction;
+
 /**
  * 图文直播tab页
  */
 public class PLVLCTuWenFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = PLVLCTuWenFragment.class.getSimpleName();
     //图文webView
     private PLVTuWenWebView2 tuWenWebView;
     //webView的父控件
     private ViewGroup parentLy;
     //频道号
     private String channelId;
+    private IPLVLiveRoomDataManager liveRoomDataManager;
+    private Context context;
+    private Boolean isLive;
     //互动应用app需要的属性
     private PLVInteractNativeAppParams appParams;
     private PLVSocketIOObservable.OnConnectStatusListener onConnectStatusListener;
@@ -62,9 +77,12 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
-    public void init(String channelId, PLVInteractNativeAppParams appParams) {
-        this.channelId = channelId;
+    public void init(IPLVLiveRoomDataManager liveRoomDataManager, PLVInteractNativeAppParams appParams, Context context) {
+        this.channelId = liveRoomDataManager.getConfig().getChannelId();
+        this.liveRoomDataManager = liveRoomDataManager;
+        this.context = context;
         this.appParams = appParams;
+        observeLiveData();
     }
     // </editor-fold>
 
@@ -112,9 +130,11 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听当前直播状态变化">
     public void updateLiveStatus(PLVLiveStateEnum liveStateEnum) {
         if (liveStateEnum.getStatus().equals(PLVLiveStateEnum.LIVE.getStatus())) {
+            this.isLive = true;
             appParams.setIsLive(true);
         } else {
             appParams.setIsLive(false);
+            this.isLive = false;
         }
         if (tuWenWebView != null) {
             tuWenWebView.setAppParams(appParams);
@@ -122,4 +142,30 @@ public class PLVLCTuWenFragment extends PLVBaseFragment {
         }
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="数据监听 - 监听直播数据">
+    private void observeLiveData() {
+        //更新sessionId
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) context, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && tuWenWebView != null) {
+                    if (liveRoomDataManager != null) {
+                        appParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+                        if (isLive != null) {
+                            appParams.setIsLive(isLive);
+                        }
+                        tuWenWebView.setAppParams(appParams);
+                    }
+                    tuWenWebView.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, PLVGsonUtil.toJsonSimple(appParams), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    // </editor-folder>
 }

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
+import com.bumptech.glide.request.target.ViewTarget;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVGlideImageLoadEngine;
 
 import java.io.File;
@@ -59,11 +60,19 @@ public class PLVImageLoader {
         loadEngine.loadImage(context, url, imageView);
     }
 
+    public void loadImage(Context context, String url, ViewTarget<ImageView, Drawable> viewTarget) {
+        loadEngine.loadImage(context, url, viewTarget);
+    }
+
     /**
      * 加载图片，使用resource id
      */
     public void loadImage(Context context, @DrawableRes int resId, ImageView imageView) {
         loadEngine.loadImage(context, resId, imageView);
+    }
+
+    public void loadImage(Context context, @DrawableRes int resId, ViewTarget<ImageView, Drawable> viewTarget) {
+        loadEngine.loadImage(context, resId, viewTarget);
     }
 
     /**

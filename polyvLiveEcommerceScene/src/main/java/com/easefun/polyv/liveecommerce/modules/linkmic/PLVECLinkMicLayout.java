@@ -23,7 +23,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -134,6 +133,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     //横屏时的宽度
     private int landscapeWidth = 0;
+
+    private PLVECFloatingWindow floatingWindow;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -218,6 +219,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 linkMicPresenter.getJoinAnswerTimeLeft(callback);
             }
         });
+
+        floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
     }
 
     private void setupMixStreamHandler() {
@@ -718,7 +721,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_success));
         }
         // 连麦时不允许小窗播放
-        PLVDependManager.getInstance().get(PLVECFloatingWindow.class).showByUser(false);
+        floatingWindow.showByUser(false);
         // 连麦成功不再暂停rtc观看
         resume();
         //更新连麦控制器

@@ -47,6 +47,10 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      */
     public static final String CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH = "CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH";
     /**
+     * 播放设置
+     */
+    public static final String CHAT_FUNCTION_TYPE_PLAY_SETTING = "CHAT_FUNCTION_TYPE_PLAY_SETTING";
+    /**
      * 截屏
      */
     public static final String CHAT_FUNCTION_TYPE_SCREENSHOT = "CHAT_FUNCTION_TYPE_SCREENSHOT";
@@ -75,6 +79,7 @@ public class PLVLCChatMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_OPEN_CAMERA, R.drawable.plvlc_chatroom_btn_camera, PLVAppUtils.getString(R.string.plv_live_open_camera), false),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_BULLETIN, R.drawable.plvlc_chatroom_btn_bulletin_show, PLVAppUtils.getString(R.string.plv_live_bulletin), true),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvlc_chatroom_btn_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_PLAY_SETTING, R.drawable.plvlc_chatroom_more_play_setting, PLVAppUtils.getString(R.string.plv_live_play_setting), true),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_SCREENSHOT, R.drawable.plvlc_chatroom_btn_screenshot, PLVAppUtils.getString(R.string.plv_live_screenshot), PLVScreenshotHelper.SHOW_SCREENSHOT_VIEW),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, PLVAppUtils.getString(R.string.plv_live_message), false)
 //            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, PLVAppUtils.getString(R.string.plv_chat_view_close_effect), false)

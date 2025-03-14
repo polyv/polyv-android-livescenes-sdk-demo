@@ -25,6 +25,7 @@ import com.easefun.polyv.livecloudclass.modules.linkmic.IPLVLCLinkMicLayout;
 import com.easefun.polyv.livecloudclass.modules.linkmic.PLVLCLinkMicControlBar;
 import com.easefun.polyv.livecloudclass.modules.media.IPLVLCMediaLayout;
 import com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCLiveLandscapeChannelController;
+import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindowModule;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityDetailActivity;
@@ -136,6 +137,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     private PLVPlayerLogoView plvPlayerLogoView;
 
     private PLVScreenshotHelper screenshotHelper = new PLVScreenshotHelper();
+
+    private PLVLCFloatingWindow floatingWindow;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="启动Activity的方法">
@@ -273,6 +276,18 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        floatingWindow.hideWhenOnlyShowByGoHome();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        floatingWindow.showByGoHomeWhenEnabled();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
@@ -314,24 +329,31 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         } else if (livePageMenuLayout != null && livePageMenuLayout.onBackPressed()) {
             return;
         }
-
-        //弹出退出直播间的确认框
-        PLVDialogFactory.createConfirmDialog(
-                this,
-                getResources().getString(
-                        liveRoomDataManager.getConfig().isLive()
-                                ? R.string.plv_live_room_dialog_exit_confirm_ask
-                                : R.string.plv_playback_room_dialog_exit_confirm_ask
-                ),
-                getResources().getString(R.string.plv_common_dialog_exit),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        PLVLCCloudClassActivity.super.onBackPressed();
-                    }
-                }
-        ).show();
+        floatingWindow.showByExitPageWhenEnabled(new PLVLCFloatingWindow.Callback() {
+            @Override
+            public void run(@Nullable final Runnable callback) {
+                //弹出退出直播间的确认框
+                PLVDialogFactory.createConfirmDialog(
+                        PLVLCCloudClassActivity.this,
+                        getResources().getString(
+                                liveRoomDataManager.getConfig().isLive()
+                                        ? R.string.plv_live_room_dialog_exit_confirm_ask
+                                        : R.string.plv_playback_room_dialog_exit_confirm_ask
+                        ),
+                        getResources().getString(R.string.plv_common_dialog_exit),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (callback != null) {
+                                    callback.run();
+                                }
+                                dialog.dismiss();
+                                PLVLCCloudClassActivity.super.onBackPressed();
+                            }
+                        }
+                ).show();
+            }
+        });
     }
 
     @Override
@@ -564,6 +586,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             PLVScreenUtils.enterLandscape(this);
         }
         plvPlayerLogoView = mediaLayout.getLogoView();
+        floatingWindow = PLVDependManager.getInstance().get(PLVLCFloatingWindow.class);
     }
 
     private void startPlaybackOnHasRecordFile() {
@@ -790,6 +813,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                             if (linkMicLayout != null) {
                                 linkMicLayout.showAll();
                             }
+                            floatingWindow.updateWhenPlayerPrepared(true);
                             break;
                         case LIVE_STOP:
                             if (liveRoomDataManager.getConfig().isPPTChannelType()) {
@@ -819,6 +843,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                                 linkMicLayout.setLiveEnd();
                                 linkMicLayout.hideAll();
                             }
+                            floatingWindow.updateWhenPlayerPrepared(false);
                             break;
                         default:
                             break;
@@ -829,6 +854,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         case PREPARED:
                             floatingPPTLayout.show();
                             livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), mediaLayout.getFileId());
+                            floatingWindow.updateWhenPlayerPrepared(true);
                             break;
                         case IDLE:
                             floatingPPTLayout.hide();
@@ -851,6 +877,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                     }
                     boolean isLinkMicOpen = linkMicState.first;
                     boolean isAudio = linkMicState.second;
+                    if (!isLinkMicOpen) {
+                        floatingWindow.updateWhenJoinRequestLinkMic(false);
+                    }
                     if (linkMicLayout == null) {
                         return;
                     }
@@ -1219,26 +1248,33 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             @Override
             public void onChannelLinkMicOpenStatusChanged(boolean isOpen) {
                 mediaLayout.updateWhenLinkMicOpenStatusChanged(isOpen);
+                if (!isOpen) {
+                    floatingWindow.updateWhenJoinRequestLinkMic(false);
+                }
             }
 
             @Override
             public void onRequestJoinLinkMic() {
                 mediaLayout.updateWhenRequestJoinLinkMic(true);
+                floatingWindow.updateWhenJoinRequestLinkMic(true);
             }
 
             @Override
             public void onCancelRequestJoinLinkMic() {
                 mediaLayout.updateWhenRequestJoinLinkMic(false);
+                floatingWindow.updateWhenJoinRequestLinkMic(false);
             }
 
             @Override
             public void onJoinLinkMic() {
                 mediaLayout.updateWhenJoinLinkMic();
+                floatingWindow.updateWhenJoinLinkMic(true);
             }
 
             @Override
             public void onLeaveLinkMic() {
                 mediaLayout.updateWhenLeaveLinkMic();
+                floatingWindow.updateWhenJoinLinkMic(false);
             }
 
             @Override

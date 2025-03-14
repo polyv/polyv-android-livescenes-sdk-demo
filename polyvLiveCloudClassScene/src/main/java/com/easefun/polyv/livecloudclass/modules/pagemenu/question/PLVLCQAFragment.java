@@ -143,11 +143,11 @@ public class PLVLCQAFragment extends PLVBaseFragment {
 
     // <editor-fold defaultstate="collapsed" desc="订阅更新">
     private void observeLiveData() {
-        //更新sessionId
+        //更新chatToken
         liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) context, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String chatToken) {
-                if (!TextUtils.isEmpty(chatToken)) {
+                if (!TextUtils.isEmpty(chatToken) && qaWebView != null) {
                     if (liveRoomDataManager != null) {
                         qaWebView.setAppParams(PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager));
                     }

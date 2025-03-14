@@ -141,6 +141,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private boolean curIsLandscape = false;
     //横屏时的宽度
     private int landscapeWidth = 0;
+
+    private PLVLCFloatingWindow floatingWindow;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -250,6 +252,8 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         //init方向
         curIsLandscape = PLVScreenUtils.isLandscape(getContext());
+
+        floatingWindow = PLVDependManager.getInstance().get(PLVLCFloatingWindow.class);
     }
 
     private void setupMixStreamHandler() {
@@ -751,7 +755,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         PLVCommonLog.d(TAG, "onJoinLinkMic");
         ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_linkmic_join_channel_success));
         // 连麦时不允许小窗播放
-        PLVDependManager.getInstance().get(PLVLCFloatingWindow.class).showByUser(false);
+        floatingWindow.showByUser(false);
         // 连麦成功不再暂停rtc观看
         resume();
         //更新连麦控制器

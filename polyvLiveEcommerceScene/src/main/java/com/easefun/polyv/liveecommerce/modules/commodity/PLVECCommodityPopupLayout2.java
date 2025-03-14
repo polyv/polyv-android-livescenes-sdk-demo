@@ -3,6 +3,7 @@ package com.easefun.polyv.liveecommerce.modules.commodity;
 import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -16,12 +17,14 @@ import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
@@ -37,7 +40,7 @@ import net.plv.android.jsbridge.CallBackFunction;
  * @author Hoshiiro
  */
 public class PLVECCommodityPopupLayout2 extends FrameLayout {
-
+    private static final String TAG = PLVECCommodityPopupLayout2.class.getSimpleName();
     private PLVProductWebView commodityPopupWebView;
     private boolean isLandspace = false;
     private OnViewActionListener listener;
@@ -222,6 +225,20 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                 updateNativeAppParamToWebView();
             }
         });
+        //更新chatToken
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && commodityPopupWebView != null) {
+                    commodityPopupWebView.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void updateNativeAppParamToWebView() {
@@ -239,6 +256,14 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
             return null;
         }
         return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+    }
+
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+            return PLVGsonUtil.toJsonSimple(nativeAppParams);
+        }
+        return "";
     }
 
     public void setLandspace(boolean isLandspace){

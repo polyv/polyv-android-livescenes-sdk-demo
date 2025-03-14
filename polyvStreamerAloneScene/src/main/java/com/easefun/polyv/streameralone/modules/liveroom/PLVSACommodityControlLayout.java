@@ -3,9 +3,12 @@ package com.easefun.polyv.streameralone.modules.liveroom;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +16,16 @@ import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.easefun.polyv.streameralone.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.commodity.PLVCommodityControlWebView;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -32,7 +38,7 @@ import net.plv.android.jsbridge.CallBackFunction;
 public class PLVSACommodityControlLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
-
+    private static final String TAG = PLVSACommodityControlLayout.class.getSimpleName();
     // 弹层位置
     private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
     private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
@@ -82,6 +88,7 @@ public class PLVSACommodityControlLayout extends FrameLayout {
 
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        observeLiveData();
     }
 
     // </editor-fold>
@@ -166,6 +173,33 @@ public class PLVSACommodityControlLayout extends FrameLayout {
                 .loadWeb();
     }
 
+    private void observeLiveData() {
+        //更新chatToken
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && commodityControlWebView != null) {
+                    commodityControlWebView.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager)
+                    .setAppId(PolyvLiveSDKClient.getInstance().getAppId())
+                    .setAppSecret(PolyvLiveSDKClient.getInstance().getAppSecret())
+                    .setAccountId(PolyvLiveSDKClient.getInstance().getUserId());
+            return PLVGsonUtil.toJsonSimple(nativeAppParams);
+        }
+        return "";
+    }
     // </editor-fold>
 
 }

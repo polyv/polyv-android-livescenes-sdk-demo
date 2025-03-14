@@ -161,6 +161,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void acceptChatPlaybackEnable(boolean isChatPlaybackEnable) {
     }
 
+    protected void acceptOpenFloatWindow(boolean isFloatEnable) {
+    }
+
     protected void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
     }
 
@@ -199,6 +202,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //设置加入连麦状态
     public void setJoinLinkMic(boolean isJoinLinkMic) {
+    }
+
+    public void setJoinRequestLinkMic(boolean isJoinRequestLinkMic) {
     }
 
     //设置回放播放信息
@@ -367,6 +373,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                             PLVDependManager.getInstance().get(PLVCommodityViewModel.class).notifyHasProductLayout(true);
                             acceptOpenCommodity();
                         }
+                        // 小窗功能开光
+                        acceptOpenFloatWindow(dataBean.getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
                         //聊天回放开关
                         boolean isChatPlaybackEnable = classDetailVO.getData().isChatPlaybackEnabled();
                         acceptChatPlaybackEnable(isChatPlaybackEnable);
