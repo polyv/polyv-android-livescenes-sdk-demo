@@ -69,6 +69,11 @@
     <string name="plv_player_error">再生例外\n</string>
     <string name="plv_player_retry_fail">再試行に失敗しました</string>
     <string name="plv_player_retry">再試行</string>
+    <string name="plv_player_exit_fullscreen">フルスクリーンを終了しました</string>
+    <string name="plv_player_enter_fullscreen">フルスクリーンになりました</string>
+    <string name="plv_player_layout_adjusted">レイアウトが調整されました</string>
+    <string name="plv_player_open_barrage">弾幕が有効になりました</string>
+    <string name="plv_player_close_barrage">弾幕が無効になりました</string>
     <!--下载-->
     <string name="plv_download_downloading">ダウンロード中</string>
     <string name="plv_download_downloaded">ダウンロード済み</string>
@@ -486,7 +491,11 @@
     <string name="plv_live_message_parse_error">メッセージ解析エラー</string>
     <string name="plv_live_loading_hint">読み込み中です。しばらくお待ちください</string>
     <string name="plv_live_go_to_setting_page_error_hint">設定ページに入ることができませんでした。手動で設定してください。</string>
+    <string name="plv_live_screenshot">キャプチャ</string>
     <string name="plv_live_language_switch">言語切り替え</string>
+    <string name="plv_live_play_setting">再生設定</string>
+    <string name="plv_live_auto_floating_exit_page">退出時に小窓を有効に</string>
+    <string name="plv_live_auto_floating_go_home">バックグラウンドで小窓を有効に</string>
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_tc" translatable="false">繁體中文-TC</string>
@@ -617,4 +626,6 @@
     <string name="plv_beauty_filter_cherry">さくら</string>
     <string name="plv_beauty_filter_film">映画</string>
     <string name="plv_beauty_filter_night">夜</string>
+
+    <string name="plv_interact_sign_in_timeout_toast">チェックインがおくれ遅れたばあい場合,じどう自動てき的にスタジオをたいしつ退室されます</string>
 </resources>

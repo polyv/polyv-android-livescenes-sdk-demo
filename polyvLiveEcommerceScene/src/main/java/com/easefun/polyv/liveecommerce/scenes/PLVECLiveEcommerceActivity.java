@@ -278,6 +278,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             videoLayout.setPlayerVolume(100);
         }
         isUserCloseFloatingWindow = false;
+        floatingWindow.hideWhenOnlyShowByGoHome();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        floatingWindow.showByGoHomeWhenEnabled();
     }
 
     @Override
@@ -313,7 +320,15 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             PLVOrientationManager.getInstance().setPortrait(this);
             return;
         }
-        super.onBackPressed();
+        floatingWindow.showByExitPageWhenEnabled(new PLVECFloatingWindow.Callback() {
+            @Override
+            public void run(@Nullable final Runnable callback) {
+                if (callback != null) {
+                    callback.run();
+                }
+                PLVECLiveEcommerceActivity.super.onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -525,7 +540,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         closeIm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                PLVECLiveEcommerceActivity.this.onBackPressed();
             }
         });
     }
@@ -806,6 +821,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             public void onChanged(@Nullable PLVPlayerState state) {
                 commonHomeFragment.setPlayerState(state);
                 if (PLVPlayerState.PREPARED.equals(state)) {
+                    floatingWindow.updateWhenPlayerPrepared(true);
                     commonHomeFragment.onPlaybackVideoPrepared(videoLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), videoLayout.getFileId());
                 }
             }
@@ -907,6 +923,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                                 linkMicLayout.showAll();
                             }
                             isLive = true;
+                            floatingWindow.updateWhenPlayerPrepared(true);
                             break;
                         case LIVE_STOP:
                             if (linkMicLayout != null) {
@@ -932,6 +949,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                                 PLVOrientationManager.getInstance().lockOrientation();
                             }
                             isLive = false;
+                            floatingWindow.updateWhenPlayerPrepared(false);
                             break;
                         default:
                             break;
@@ -951,6 +969,10 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                     }
                     boolean isLinkMicOpen = linkMicState.first;
                     boolean isAudio = linkMicState.second;
+                    if (!isLinkMicOpen && commonHomeFragment != null) {
+                        commonHomeFragment.setJoinRequestLinkMic(false);
+                        floatingWindow.updateWhenJoinRequestLinkMic(false);
+                    }
                     if (linkMicLayout == null) {
                         return;
                     }
@@ -1018,14 +1040,26 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
             @Override
             public void onChannelLinkMicOpenStatusChanged(boolean isOpen) {
+                if (!isOpen && commonHomeFragment != null) {
+                    commonHomeFragment.setJoinRequestLinkMic(false);
+                    floatingWindow.updateWhenJoinRequestLinkMic(false);
+                }
             }
 
             @Override
             public void onRequestJoinLinkMic() {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.setJoinRequestLinkMic(true);
+                    floatingWindow.updateWhenJoinRequestLinkMic(true);
+                }
             }
 
             @Override
             public void onCancelRequestJoinLinkMic() {
+                if (commonHomeFragment != null) {
+                    commonHomeFragment.setJoinRequestLinkMic(false);
+                    floatingWindow.updateWhenJoinRequestLinkMic(false);
+                }
             }
 
             @Override
@@ -1037,6 +1071,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 videoLayout.updateWhenJoinLinkMic();
                 if (commonHomeFragment != null) {
                     commonHomeFragment.setJoinLinkMic(true);
+                    floatingWindow.updateWhenJoinLinkMic(true);
                 }
             }
 
@@ -1048,6 +1083,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 videoLayout.updateWhenLeaveLinkMic();
                 if (commonHomeFragment != null) {
                     commonHomeFragment.setJoinLinkMic(false);
+                    floatingWindow.updateWhenJoinLinkMic(false);
                 }
             }
 

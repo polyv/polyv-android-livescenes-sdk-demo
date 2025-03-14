@@ -56,7 +56,7 @@
     <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
         android:id="@+id/plvls_chatroom_to_top_view"
         android:layout_width="320dp"
-        android:layout_height="60dp"
+        android:layout_height="74dp"
         android:layout_marginTop="6dp"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="@+id/plvls_document_ly"

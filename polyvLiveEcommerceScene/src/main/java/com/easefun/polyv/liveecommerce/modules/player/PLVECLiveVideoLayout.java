@@ -145,6 +145,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     // 是否无延迟观看模式
     private boolean isLowLatency = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     private boolean isLiveStart = false;
+
+    private Observer<Boolean> floatingStatusObserver;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -281,7 +283,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
     private void observeFloatingPlayer() {
         PLVFloatingPlayerManager.getInstance().getFloatingViewShowState()
-                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+                .observeForever(floatingStatusObserver = new Observer<Boolean>() {
                     @Override
                     public void onChanged(@Nullable Boolean isShowingBoolean) {
                         final boolean isShowing = isShowingBoolean != null && isShowingBoolean;
@@ -291,6 +293,15 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                         livePlayerFloatingPlayingPlaceholderTv.setVisibility(isShowing ? VISIBLE : GONE);
 
                         updateVideoViewSize();
+                        postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                if (ScreenUtils.isLandscape()) {
+                                    updateVideoViewSize();
+                                }
+                            }
+                        }, !isShowing ? 600 : 0); // 小米后台横屏回来时不会触发onConfigurationChanged，需要延迟执行，不然获取的方向不对
                     }
                 });
     }
@@ -391,6 +402,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         if (livePlayerPresenter != null) {
             livePlayerPresenter.destroy();
         }
+        PLVFloatingPlayerManager.getInstance().getFloatingViewShowState().removeObserver(floatingStatusObserver);
     }
     // </editor-fold>
 
@@ -805,7 +817,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     private void onVideoSizeChanged(int width, int height) {
-        final boolean isLandscape = PLVScreenUtils.isLandscape(getContext());
+        final boolean isLandscape = ScreenUtils.isLandscape();
         final boolean videoLandscape = width > height;
         MarginLayoutParams layoutParams = (MarginLayoutParams) liveVideoContainerLayout.getLayoutParams();
         if (isLandscape || !videoLandscape || isVideoViewPlayingInFloatWindow) {

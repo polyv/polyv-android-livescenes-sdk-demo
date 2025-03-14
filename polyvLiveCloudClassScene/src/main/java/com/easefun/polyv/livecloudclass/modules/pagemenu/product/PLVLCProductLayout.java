@@ -2,6 +2,7 @@ package com.easefun.polyv.livecloudclass.modules.pagemenu.product;
 
 import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -15,9 +16,11 @@ import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityDetailActivity;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
@@ -31,7 +34,7 @@ import net.plv.android.jsbridge.CallBackFunction;
  * @author Hoshiiro
  */
 public class PLVLCProductLayout extends FrameLayout {
-
+    private static final String TAG = PLVLCProductLayout.class.getSimpleName();
     private PLVProductWebView productWebView;
 
     @Nullable
@@ -144,6 +147,20 @@ public class PLVLCProductLayout extends FrameLayout {
                 updateNativeAppParamToWebView();
             }
         });
+        //更新chatToken
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && productWebView != null) {
+                    productWebView.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void updateNativeAppParamToWebView() {
@@ -161,6 +178,14 @@ public class PLVLCProductLayout extends FrameLayout {
             return null;
         }
         return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+    }
+
+    private String getNativeAppPramsInfo() {
+        if (liveRoomDataManager != null) {
+            PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
+            return PLVGsonUtil.toJsonSimple(nativeAppParams);
+        }
+        return "";
     }
 
     public interface OnViewActionListener {

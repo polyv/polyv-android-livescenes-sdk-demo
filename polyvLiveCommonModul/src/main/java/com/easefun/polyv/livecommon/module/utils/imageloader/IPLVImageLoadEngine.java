@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import android.widget.ImageView;
 
+import com.bumptech.glide.request.target.ViewTarget;
+
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
@@ -19,7 +21,11 @@ import java.util.concurrent.ExecutionException;
 public interface IPLVImageLoadEngine {
     void loadImage(Context context, String url, ImageView imageView);
 
+    void loadImage(Context context, String url, ViewTarget<ImageView, Drawable> viewTarget);
+
     void loadImage(Context context, @DrawableRes int resId, ImageView imageView);
+
+    void loadImage(Context context, @DrawableRes int resId, ViewTarget<ImageView, Drawable> viewTarget);
 
     @WorkerThread
     File saveImageAsFile(Context context, String url) throws ExecutionException, InterruptedException;

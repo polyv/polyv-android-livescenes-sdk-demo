@@ -40,7 +40,7 @@ public class PLVLCRewardViewHolder extends PLVChatMessageBaseViewHolder<PLVBaseV
             }
 
             if(ScreenUtils.isLandscape()){
-                itemView.setVisibility(View.GONE);
+                itemView.getLayoutParams().height = 1;
             }
 
             /* 全屏模式暂不显示打赏

@@ -261,7 +261,9 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     @Override
     public void notifyPPTModeStatus(boolean isInPPTMode) {
         this.isInPPTMode = isInPPTMode;
-        pptWebView.setIsInPPTMode(isInPPTMode);
+        if (pptWebView != null) {
+            pptWebView.setIsInPPTMode(isInPPTMode);
+        }
     }
 
 

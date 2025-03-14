@@ -176,6 +176,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean hideRefreshButtonInRtcChannel;
     // 是否正在画笔模式
     private boolean isInPaintMode;
+    // 是否允许开启小窗模式
+    private boolean isFloatWindowEnable = true;
     // 是否显示在线人数
     private boolean isShowOnlineCount = false;
 
@@ -616,6 +618,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         hideRefreshButtonInRtcChannel = isHideRefreshButton;
         getLiveMediaDispatcher().updateViewProperties();
         updatePaintModeEntrance();
+        notifyPPTSwitchViewChanged(VISIBLE_FORCE_VISIBLE, true);
     }
 
     @Override
@@ -624,6 +627,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         isRequestingJoinLinkMic = false;
         getLiveMediaDispatcher().updateViewProperties();
         updatePaintModeEntrance();
+        notifyPPTSwitchViewChanged(VISIBLE_FOR_SERVER, false);
     }
 
     @Override
@@ -726,6 +730,18 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         } else {
             show();
         }
+    }
+
+    @Override
+    public void updateFloatWindowView(boolean isOpenFloatWindowEnable) {
+        this.isFloatWindowEnable = isOpenFloatWindowEnable;
+        if (liveControlFloatingLandIv != null && !isFloatWindowEnable) {
+            liveControlFloatingLandIv.setVisibility(GONE);
+        }
+        if (liveControlFloatingIv != null && !isFloatWindowEnable) {
+            liveControlFloatingIv.setVisibility(GONE);
+        }
+
     }
 
     @Override
@@ -850,6 +866,32 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
     // </editor-fold>
 
+    // <editor-folder defaultstate="collapsed" desc="控制流 - PPT切换按钮控制">
+    private static final int VISIBLE_FOR_SERVER = 1;
+    private static final int VISIBLE_FORCE_VISIBLE = 2;
+    private void notifyPPTSwitchViewChanged(int visibleType, boolean useFullScreenStyle) {
+        // 纯视频频道才使用全屏样式
+        useFullScreenStyle = useFullScreenStyle && !isServerEnablePPT;
+        if (visibleType == VISIBLE_FOR_SERVER) {
+            setServerEnablePPT(isServerEnablePPT);
+        } else {
+            videoPptSwitchPortIv.setVisibility(View.VISIBLE);
+            videoPptSwitchLandIv.setVisibility(View.VISIBLE);
+        }
+        // 全屏按钮resource
+        int fullScreenResource = R.drawable.plvlc_controller_linkmic_sub_selector;
+        // imageResource can‘t update state
+        videoPptSwitchPortIv.setImageDrawable(useFullScreenStyle ? getResources().getDrawable(fullScreenResource) : getResources().getDrawable(R.drawable.plvlc_controller_ppt_sub_selector));
+        videoPptSwitchLandIv.setImageDrawable(useFullScreenStyle ? getResources().getDrawable(fullScreenResource) : getResources().getDrawable(R.drawable.plvlc_controller_ppt_sub_selector));
+        videoPptSwitchPortIv.setSelected(false);
+        videoPptSwitchLandIv.setSelected(false);
+        // 纯视频频道使用全屏样式的情况下，竖屏的按钮不显示
+        if (useFullScreenStyle) {
+            videoPptSwitchPortIv.setVisibility(View.GONE);
+        }
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="旋转处理">
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
@@ -946,6 +988,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             if (onViewActionListener != null) {
                 onViewActionListener.onClickShowOrHideSubTab(isNotShowState);
             }
+            if (isLinkMic) {
+                PLVToast.Builder.context(getContext())
+                        .setText(R.string.plv_player_layout_adjusted)
+                        .show();
+            }
         } else if (id == R.id.bulletin_land_iv) {
             if (onViewActionListener != null) {
                 onViewActionListener.onShowBulletinAction();
@@ -1020,8 +1067,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             videoPauseLandIv.setVisibility(VISIBLE);
             videoRefreshPortIv.setVisibility(VISIBLE);
             videoRefreshLandIv.setVisibility(VISIBLE);
-            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
-            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
+            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
             morePortIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
             moreLandIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
@@ -1069,8 +1116,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 videoRefreshPortIv.setVisibility(GONE);
                 videoRefreshLandIv.setVisibility(GONE);
             }
-            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
-            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic ? View.GONE : View.VISIBLE);
+            liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
+            liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
             morePortIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);
             moreLandIv.setVisibility(showMoreButton ? View.VISIBLE : View.GONE);

@@ -544,6 +544,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     @Override
+    protected void acceptOpenFloatWindow(boolean isFloatEnable) {
+        morePopupView.updateOpenFloat(isFloatEnable);
+    }
+
+    @Override
     protected void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
         if (interactEntranceView != null) {
             interactEntranceView.acceptInteractEntranceData(dataBeans);
@@ -592,6 +597,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     @Override
     public void setJoinLinkMic(boolean isJoinLinkMic) {
         morePopupView.updateJoinLinkMic(isJoinLinkMic);
+    }
+
+    @Override
+    public void setJoinRequestLinkMic(boolean isJoinRequestLinkMic) {
+        morePopupView.updateJoinLinkMicRequest(isJoinRequestLinkMic);
     }
 
     @Override

@@ -13,7 +13,10 @@ import android.widget.PopupWindow;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -79,6 +82,12 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                             onViewActionListener.onShowLanguageAction();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING:
+                        popupWindow.dismiss();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowPlaySettingAction();
+                        }
+                        break;
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SCREENSHOT:
                         popupWindow.dismiss();
                         if (onViewActionListener != null) {
@@ -107,7 +116,7 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
     // </editor-folder>
 
     // <editor-folder defaultstate="collapsed" desc="对外API">
-    public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
+    public void init(final IPLVLiveRoomDataManager liveRoomDataManager) {
         if (!liveRoomDataManager.getConfig().isLive()) {
             updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_BULLETIN, false);
         }
@@ -117,6 +126,20 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                 if (plvWebviewUpdateAppStatusVO != null) {
                     updateChatMoreFunction(plvWebviewUpdateAppStatusVO);
                 }
+            }
+        });
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (plvLiveClassDetailVOPLVStatefulData == null || !plvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                    return;
+                }
+                PLVLiveClassDetailVO liveClassDetail = plvLiveClassDetailVOPLVStatefulData.getData();
+                if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                    return;
+                }
+                updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
             }
         });
     }
@@ -151,6 +174,11 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
          * 显示语言切换弹窗
          */
         void onShowLanguageAction();
+
+        /**
+         * 显示播放设置弹窗
+         */
+        void onShowPlaySettingAction();
 
         /**
          * 截屏

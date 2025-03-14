@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
+        android:id="@+id/plv_play_setting_orient_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include
+        layout="@layout/plv_widget_blur_top_radius_layout"
+        android:layout_width="match_parent"
+        android:layout_height="266dp"
+        android:layout_gravity="bottom"
+        android:visibility="invisible" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plv_play_setting_content_ly"
+        android:layout_width="match_parent"
+        android:layout_height="266dp"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:clickable="true"
+        app:mode="leftTop|rightTop"
+        app:radius="10dp">
+
+        <TextView
+            android:id="@+id/plv_play_setting_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingVertical="16dp"
+            android:text="@string/plv_live_play_setting"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/plv_line_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/plv_play_setting_tv"
+            android:background="#f2f2f2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plv_play_setting_tv"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp">
+
+                <TextView
+                    android:id="@+id/plv_play_setting_exit_page_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/plv_play_setting_exit_page_sw"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:maxLines="1"
+                    android:paddingVertical="16dp"
+                    android:text="@string/plv_live_auto_floating_exit_page"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:id="@+id/plv_play_setting_exit_page_sw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:thumb="@drawable/plv_switch_thumb"
+                    android:track="@drawable/plv_switch_track" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp">
+
+                <TextView
+                    android:id="@+id/plv_play_setting_go_home_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/plv_play_setting_go_home_sw"
+                    android:ellipsize="end"
+                    android:gravity="center|left"
+                    android:maxLines="1"
+                    android:paddingVertical="16dp"
+                    android:text="@string/plv_live_auto_floating_go_home"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:id="@+id/plv_play_setting_go_home_sw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:thumb="@drawable/plv_switch_thumb"
+                    android:track="@drawable/plv_switch_track" />
+            </RelativeLayout>
+        </LinearLayout>
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

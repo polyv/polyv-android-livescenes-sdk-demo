@@ -119,12 +119,12 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
         @Override
         public void onActivityStarted(Activity activity) {
-            updateContentViewAttach();
         }
 
         @Override
         public void onActivityResumed(Activity activity) {
-
+            // in onActivityStarted, isAppForeground can false
+            updateContentViewAttach();
         }
 
         @Override

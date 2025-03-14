@@ -69,6 +69,11 @@
     <string name="plv_player_error">재생 예외\n</string>
     <string name="plv_player_retry_fail">재시도 실패</string>
     <string name="plv_player_retry">다시 시도</string>
+    <string name="plv_player_exit_fullscreen">전체 화면 해제됨</string>
+    <string name="plv_player_enter_fullscreen">전체 화면으로 전환됨</string>
+    <string name="plv_player_layout_adjusted">레이아웃이 조정되었습니다</string>
+    <string name="plv_player_open_barrage">자막이 활성화되었습니다</string>
+    <string name="plv_player_close_barrage">자막이 비활성화되었습니다</string>
     <!--下载-->
     <string name="plv_download_downloading">다운로드 중</string>
     <string name="plv_download_downloaded">다운로드됨</string>
@@ -488,6 +493,9 @@
     <string name="plv_live_go_to_setting_page_error_hint">설정 페이지에 진입하지 못했습니다. 수동으로 설정해 주세요</string>
     <string name="plv_live_screenshot">스크린샷</string>
     <string name="plv_live_language_switch">언어 전환</string>
+    <string name="plv_live_play_setting">재생 설정</string>
+    <string name="plv_live_auto_floating_exit_page">종료 시 작은 창 활성화</string>
+    <string name="plv_live_auto_floating_go_home">백그라운드에서 작은 창 활성화</string>
     <string name="plv_live_language_switch_zh" translatable="false">简体中文-ZH</string>
     <string name="plv_live_language_switch_en" translatable="false">English-EN</string>
     <string name="plv_live_language_switch_tc" translatable="false">繁體中文-TC</string>
@@ -619,4 +627,6 @@
     <string name="plv_beauty_filter_cherry">사쿠라</string>
     <string name="plv_beauty_filter_film">영화</string>
     <string name="plv_beauty_filter_night">밤</string>
+
+    <string name="plv_interact_sign_in_timeout_toast">시간에 맞춰 체크인하지 않으면, 자동으로 스튜디오를 종료합니다</string>
 </resources>

@@ -5,10 +5,12 @@ import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreL
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_LANGUAGE_SWITCH;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_LATENCY;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_MODE;
+import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_SETTING;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_RATE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_ROUTE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_SCREENSHOT;
 
+import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
@@ -30,6 +32,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVLanguageSwitchPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlaySettingPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
@@ -61,6 +64,8 @@ public class PLVECMorePopupView {
     private ViewGroup changeDefinitionLy;
     //语言切换弹窗
     private PLVLanguageSwitchPopupWindow languageSwitchPopupWindow;
+    //播放设置弹窗
+    private PLVPlaySettingPopupWindow playSettingPopupWindow;
     //播放速度弹窗
     private PLVSpeedPopupView speedPopupView;
 
@@ -80,7 +85,9 @@ public class PLVECMorePopupView {
 
     private boolean isJoinRtcChannel = false;
     private boolean isJoinLinkMic = false;
+    private boolean isRequestJoinLinkMic = false;
     private boolean isVideoMode = true;
+    private boolean isOpenFloatEnable = true;
     private boolean isLowLatencyWatching = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
     //是否有清晰度信息
     private boolean isHasDefinitionVO;
@@ -225,7 +232,15 @@ public class PLVECMorePopupView {
                             break;
                         case MORE_FUNCTION_TYPE_FLOATING:
                             final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
-                            floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                            floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser(), new PLVECFloatingWindow.Callback() {
+                                @Override
+                                public void run(@Nullable Runnable callback) {
+                                    if (callback != null) {
+                                        callback.run();
+                                        ((Activity) v.getContext()).finish();
+                                    }
+                                }
+                            });
                             hideAll();
                             break;
                         case MORE_FUNCTION_TYPE_LANGUAGE_SWITCH:
@@ -233,6 +248,14 @@ public class PLVECMorePopupView {
                                 languageSwitchPopupWindow = new PLVLanguageSwitchPopupWindow(v);
                             }
                             languageSwitchPopupWindow.show(channelId);
+                            hideMoreWindow();
+                            break;
+                        case MORE_FUNCTION_TYPE_PLAY_SETTING:
+                            if (playSettingPopupWindow == null) {
+                                playSettingPopupWindow = new PLVPlaySettingPopupWindow(v);
+                                playSettingPopupWindow.setUseBlackStyle();
+                            }
+                            playSettingPopupWindow.show();
                             hideMoreWindow();
                             break;
                         case MORE_FUNCTION_TYPE_SCREENSHOT:
@@ -480,7 +503,18 @@ public class PLVECMorePopupView {
 
     public void updateJoinLinkMic(boolean isJoinLinkMic) {
         this.isJoinLinkMic = isJoinLinkMic;
+        this.isRequestJoinLinkMic = false;
         updateSubViewVisibility();
+    }
+
+    public void updateOpenFloat(boolean isOpenFloatEnable) {
+        this.isOpenFloatEnable = isOpenFloatEnable;
+        updateSubViewVisibility();
+    }
+
+    public void updateJoinLinkMicRequest(boolean isRequestJoinLinkmic) {
+        this.isRequestJoinLinkMic = isRequestJoinLinkmic;
+        updateFloatingControlVisibility();
     }
 
     public void acceptInteractStatusData(PLVWebviewUpdateAppStatusVO webviewUpdateAppStatusVO) {
@@ -520,6 +554,14 @@ public class PLVECMorePopupView {
                             languageSwitchPopupWindow.show(channelId);
                             hideMoreWindow();
                             break;
+                        case MORE_FUNCTION_TYPE_PLAY_SETTING:
+                            if (playSettingPopupWindow == null) {
+                                playSettingPopupWindow = new PLVPlaySettingPopupWindow(v);
+                                playSettingPopupWindow.setUseBlackStyle();
+                            }
+                            playSettingPopupWindow.show();
+                            hideMoreWindow();
+                            break;
                         case MORE_FUNCTION_TYPE_SCREENSHOT:
                             if (clickListener != null) {
                                 clickListener.onScreenshot();
@@ -528,7 +570,15 @@ public class PLVECMorePopupView {
                             break;
                         case MORE_FUNCTION_TYPE_FLOATING:
                             final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
-                            floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                            floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser(), new PLVECFloatingWindow.Callback() {
+                                @Override
+                                public void run(@Nullable Runnable callback) {
+                                    if (callback != null) {
+                                        callback.run();
+                                        ((Activity) v.getContext()).finish();
+                                    }
+                                }
+                            });
                             hideAll();
                             break;
                         default:
@@ -626,6 +676,7 @@ public class PLVECMorePopupView {
         updateDefinitionViewVisibility();
         updateLatencyLayoutVisibility();
         updateFloatingControlVisibility();
+        updatePlaySettingVisibility();
     }
 
     private void updateSpeedControlVisibility() {
@@ -679,10 +730,16 @@ public class PLVECMorePopupView {
         if (moreLayout == null) {
             return;
         }
-        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE && !isJoinLinkMic;
+        final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE && !isJoinLinkMic && isOpenFloatEnable && !isRequestJoinLinkMic;
         moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_FLOATING, mediaPlaying);
     }
 
+    private void updatePlaySettingVisibility() {
+        if (moreLayout == null) {
+            return;
+        }
+        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_PLAY_SETTING, isOpenFloatEnable);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - 子布局">

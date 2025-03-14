@@ -62,6 +62,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPl
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
 import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
@@ -307,6 +308,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                     final boolean showChatLayout = !danmuSwitchView.isSelected();
                     chatLandscapeLayout.toggle(showChatLayout);
                 }
+                PLVToast.Builder.context(getContext())
+                        .setText(!danmuSwitchView.isSelected() ? R.string.plv_player_open_barrage : R.string.plv_player_close_barrage)
+                        .show();
             }
         });
         danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);
@@ -369,7 +373,15 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
             @Override
             public void onClickFloating() {
                 if (floatingWindow != null) {
-                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser());
+                    floatingWindow.showByUser(!floatingWindow.isRequestingShowByUser(), new PLVLCFloatingWindow.Callback() {
+                        @Override
+                        public void run(@Nullable Runnable callback) {
+                            if (callback != null) {
+                                callback.run();
+                                ((Activity) getContext()).finish();
+                            }
+                        }
+                    });
                 }
             }
         });

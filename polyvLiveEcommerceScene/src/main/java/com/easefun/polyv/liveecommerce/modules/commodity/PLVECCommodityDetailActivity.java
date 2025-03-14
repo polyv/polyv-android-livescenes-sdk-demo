@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 
+import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerConfig;
 import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewActivity;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -17,6 +18,8 @@ public class PLVECCommodityDetailActivity extends PLVSimpleWebViewActivity {
     private String commodityDetailUrl;
 
     private PLVECFloatingWindow floatingWindow;
+
+    private boolean showFlag = false;
 
     public static void start(Context context, String commodityDetailUrl) {
         Intent intent = new Intent(context, PLVECCommodityDetailActivity.class);
@@ -34,13 +37,18 @@ public class PLVECCommodityDetailActivity extends PLVSimpleWebViewActivity {
     @Override
     public void onResume() {
         super.onResume();
-        floatingWindow.showByCommodityPage(true);
+        if (!PLVFloatingPlayerConfig.isAutoFloatingWhenGoHome() || !showFlag) {
+            showFlag = true;
+            floatingWindow.showByCommodityPage(true);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        floatingWindow.showByCommodityPage(false);
+        if (!PLVFloatingPlayerConfig.isAutoFloatingWhenGoHome()) {
+            floatingWindow.showByCommodityPage(false);
+        }
     }
 
     private void initData() {
