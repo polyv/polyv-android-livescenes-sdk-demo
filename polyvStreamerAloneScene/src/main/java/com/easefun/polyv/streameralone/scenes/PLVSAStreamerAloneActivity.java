@@ -237,6 +237,14 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (settingLayout != null) {
+            settingLayout.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         PLVLanguageUtil.detachLanguageActivity();
@@ -554,6 +562,12 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                     fullscreenLayout.changeViewToFullscreen(switchItemView, itemDataBean);
                     homeFragment.closeMemberLayout();
                 }
+            }
+        });
+        homeFragment.runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                homeFragment.getChatroomPresenter().registerView(streamerLayout.getChatroomView());
             }
         });
         //监听因断网延迟20s断流的状态

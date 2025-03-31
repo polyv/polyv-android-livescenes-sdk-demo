@@ -36,20 +36,24 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="plvsa_mask_top_view,plvsa_mask_bottom_view" />
 
-    <!--上层的viewpager布局-->
-    <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager
-        android:id="@+id/plvsa_top_layer_view_pager"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="none"
-        android:overScrollMode="never"
-        android:visibility="invisible" />
+        android:layout_height="match_parent">
+        <!--上层的viewpager布局-->
+        <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager
+            android:id="@+id/plvsa_top_layer_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadingEdge="none"
+            android:overScrollMode="never"
+            android:visibility="invisible" />
 
-    <!--直播设置布局-->
-    <com.easefun.polyv.streameralone.modules.liveroom.PLVSASettingLayout
-        android:id="@+id/plvsa_setting_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <!--直播设置布局-->
+        <com.easefun.polyv.streameralone.modules.liveroom.PLVSASettingLayout
+            android:id="@+id/plvsa_setting_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
     <!--成员管理引导弹层布局容器-->
     <FrameLayout

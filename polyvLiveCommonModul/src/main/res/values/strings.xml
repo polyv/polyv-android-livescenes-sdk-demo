@@ -201,6 +201,8 @@
     <string name="plv_chat_input_tips_focus_2">In focus mode</string>
     <string name="plv_chat_input_tips_chat_6">Join the chat</string>
     <string name="plv_chat_input_tips_quiz">Initiate a question</string>
+    <string name="plv_chat_no_message">No chat messages at the moment</string>
+    <string name="plv_chat_image_alt_text">[Image]</string>
 
     <string name="plv_member_list_title_viewers">Viewer Info</string>
     <string name="plv_member_list_title_online_list">Online List</string>
@@ -211,6 +213,8 @@
     <string name="plv_member_list_rules_desc_1">Sorted by special roles > audiences, with earlier entry time prioritized.</string>
     <string name="plv_member_list_rules_title_2">2. Reminder</string>
     <string name="plv_member_list_rules_desc_2">Short caching may cause delayed updates of entry/exit. Normal behavior.</string>
+    <string name="plv_member_enter_live_room">Enter the live streaming room</string>
+    <string name="plv_member_leave_live_room">Leave the live broadcast room</string>
 
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">In-app purchases are not supported</string>
@@ -403,6 +407,7 @@
     <string name="plv_streamer_network_bad_3">Network bad</string>
     <string name="plv_streamer_network_very_bad">Network very bad</string>
     <string name="plv_streamer_network_disconnect">Network disconnected</string>
+    <string name="plv_streamer_network_unknown">Unknown network</string>
     <string name="plv_streamer_network_cannot_connect">Network unavailable</string>
     <string name="plv_streamer_bitrate_desc">Bitrate: %skbps, Frame Rate: %sfps</string>
     <string name="plv_streamer_open_audio_linkmic_toast">Audio call has been enabled</string>
@@ -413,6 +418,7 @@
     <string name="plv_streamer_switch_linkmic_type_confirm_text">Switch and hang up viewers</string>
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">Weak network signal, activation failed. Check your connection!</string>
     <string name="plv_streamer_toast_call_streamer_start">Please start the live stream first</string>
+    <string name="plv_streamer_sticker">Sticker</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>

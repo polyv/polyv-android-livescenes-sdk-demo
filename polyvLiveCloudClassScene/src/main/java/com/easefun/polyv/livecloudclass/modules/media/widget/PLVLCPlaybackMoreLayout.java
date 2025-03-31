@@ -86,6 +86,7 @@ public class PLVLCPlaybackMoreLayout {
         speedVO.add(1.25f);
         speedVO.add(1.5f);
         speedVO.add(2.0f);
+        speedVO.add(3.0f);
 
         if (popupWindow == null) {
             popupWindow = new PopupWindow(anchor.getContext());

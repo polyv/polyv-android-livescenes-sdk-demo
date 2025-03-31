@@ -318,7 +318,7 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 changedPosition = removeExcludeRewardDataPosition;
             }
             if (changedPosition != -1) {
-                notifyItemChanged(changedPosition);
+                notifyItemRemoved(changedPosition);
                 return true;
             }
         }

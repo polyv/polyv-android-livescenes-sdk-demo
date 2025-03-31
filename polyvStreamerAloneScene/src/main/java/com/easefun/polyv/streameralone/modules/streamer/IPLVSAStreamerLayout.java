@@ -4,6 +4,7 @@ import android.util.Pair;
 import android.view.MotionEvent;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
@@ -30,6 +31,11 @@ public interface IPLVSAStreamerLayout {
      * @param listener 监听器
      */
     void setOnViewActionListener(OnViewActionListener listener);
+
+    /**
+     * 聊天模块view
+     */
+    IPLVChatroomContract.IChatroomView getChatroomView();
 
     /**
      * 设置相机方向

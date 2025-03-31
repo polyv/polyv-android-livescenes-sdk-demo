@@ -2,6 +2,7 @@ package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.SurfaceView;
@@ -224,6 +225,12 @@ public interface IPLVStreamerContract {
          * @param extra    附加信息，如错误码
          */
         void onScreenShareChange(int position, boolean isShare, int extra, String userId, boolean isMyself);
+
+        /**
+         * 有其他连麦用户
+         * @param hasHasLinkMicUser
+         */
+        void onHasLinkMicUser(boolean hasHasLinkMicUser);
 
         /**
          * 讲师邀请上麦
@@ -608,6 +615,15 @@ public interface IPLVStreamerContract {
          * 设置是否使用外部音频输入
          */
         void setIsUseExternalAudioInput(boolean isUseExternalAudioInput);
+
+        /**
+         * 设置水印
+         * @param var1 图片
+         * @param var3 水印的x位置占比
+         * @param var4 水印的y位置占比
+         * @param var5 水印的宽占比
+         */
+        void setWatermark(Bitmap var1, float var3, float var4, float var5);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

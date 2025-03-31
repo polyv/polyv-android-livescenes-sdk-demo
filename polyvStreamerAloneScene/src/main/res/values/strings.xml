@@ -5,6 +5,8 @@
     <string name="plvsa_setting_enter_live">Enter the live room</string>
     <string name="plvsa_streamer_sharescreen_exit">Stop Sharing</string>
     <string name="plvsa_streamer_sharescreen_start">Screen Sharing</string>
+    <string name="plvsa_streamer_sharescreen_float_message">Desktop message</string>
+    <string name="plvsa_streamer_sharescreen_float_message_condition_hint">Valid only during screen sharing period, system \'Display on Other Applications\' permission needs to be enabled</string>
     <string name="plvsa_streamer_sharescreen_start_tip">Others can now see your screen</string>
     <string name="plvsa_streamer_sharescreen_already_stop">Sharing ended</string>
     <string name="plvsa_streamer_sharescreen_error">Screen sharing failed:&#160;</string>

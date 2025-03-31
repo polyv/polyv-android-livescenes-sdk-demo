@@ -1,5 +1,6 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import android.content.Intent;
 import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -61,6 +62,8 @@ public interface IPLVSASettingLayout {
      * 开始直播
      */
     void liveStart();
+
+    void onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
      * view交互事件监听器

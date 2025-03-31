@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
@@ -120,6 +121,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private View plvsaMoreShareScreenLl;
     private ImageView plvsaMoreShareScreenIv;
     private TextView plvsaMoreShareScreenTv;
+    private LinearLayout moreShareScreenFloatMessageLl;
+    private ImageView moreShareScreenFloatMessageIv;
+    private TextView moreShareScreenFloatMessageTv;
     private LinearLayout moreBeautyLl;
     private LinearLayout moreShareLl;
     private LinearLayout morePushDowngradePreferenceLl;
@@ -139,6 +143,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private LinearLayout moreGiftEffectLayout;
     private ImageView moreGiftEffectIv;
     private TextView moreGiftEffectTv;
+    private ViewGroup moreWaterLayout;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -153,6 +158,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private final PLVSAPushDowngradePreferenceLayout pushDowngradePreferenceLayout = new PLVSAPushDowngradePreferenceLayout(getContext());
     // 连麦设置布局
     private final PLVSAMoreLinkMicSettingLayout linkMicSettingLayout = new PLVSAMoreLinkMicSettingLayout(getContext());
+    // 屏幕分享桌面消息
+    private final PLVSAMoreScreenShareFloatMessageLayout screenShareFloatMessageLayout = new PLVSAMoreScreenShareFloatMessageLayout(getContext());
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -231,6 +238,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreShareScreenLl = findViewById(R.id.plvsa_more_share_screen_ll);
         plvsaMoreShareScreenIv = findViewById(R.id.plvsa_more_share_screen_iv);
         plvsaMoreShareScreenTv = findViewById(R.id.plvsa_more_share_screen_tv);
+        moreShareScreenFloatMessageLl = findViewById(R.id.plvsa_more_share_screen_float_message_ll);
+        moreShareScreenFloatMessageIv = findViewById(R.id.plvsa_more_share_screen_float_message_iv);
+        moreShareScreenFloatMessageTv = findViewById(R.id.plvsa_more_share_screen_float_message_tv);
         moreBeautyLl = findViewById(R.id.plvsa_more_beauty_ll);
         moreShareLl = findViewById(R.id.plvsa_more_share_layout);
         morePushDowngradePreferenceLl = findViewById(R.id.plvsa_more_push_downgrade_preference_ll);
@@ -250,6 +260,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftEffectLayout = findViewById(R.id.plvsa_more_gift_effect_layout);
         moreGiftEffectIv = findViewById(R.id.plvsa_more_gift_effect_iv);
         moreGiftEffectTv = findViewById(R.id.plvsa_more_gift_effect_tv);
+        moreWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -268,6 +279,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         plvsaMoreCloseRoomIv.setOnClickListener(this);
         plvsaMoreCloseRoomTv.setOnClickListener(this);
         plvsaMoreShareScreenLl.setOnClickListener(this);
+        moreShareScreenFloatMessageLl.setOnClickListener(this);
         moreBeautyLl.setOnClickListener(this);
         moreShareLl.setOnClickListener(this);
         morePushDowngradePreferenceLl.setOnClickListener(this);
@@ -277,12 +289,14 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreInteractSigninLl.setOnClickListener(this);
         moreGiftRewardLayout.setOnClickListener(this);
         moreGiftEffectLayout.setOnClickListener(this);
+        moreWaterLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
 
         if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
             plvsaMoreShareScreenLl.setVisibility(View.GONE);
+            moreShareScreenFloatMessageLl.setVisibility(View.GONE);
         }
         if (!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_GIFT_REWARD_OPEN)) {
             moreGiftRewardLayout.setVisibility(View.GONE);
@@ -453,6 +467,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         if (mixLayout != null) {
             mixLayout.init(liveRoomDataManager);
         }
+        boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+        if (moreWaterLayout != null) {
+            moreWaterLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
+        }
+        screenShareFloatMessageLayout.init(liveRoomDataManager);
         initBitrateMapIcon();
         observeLiveRoomStatus();
         updateLinkMicStrategy(liveRoomDataManager);
@@ -577,6 +597,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
     // <editor-fold defaultstate="collapsed" desc="推流和连麦 - MVP模式的view层实现">
     private PLVAbsStreamerView streamerView = new PLVAbsStreamerView() {
+        private boolean isShare;
+        private boolean hasLinkMicUser;
 
         @Override
         public void setPresenter(@NonNull final IPLVStreamerContract.IStreamerPresenter presenter) {
@@ -672,6 +694,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     if (isStartShare == null) {
                         return;
                     }
+                    isShare = isStartShare;
                     plvsaMoreShareScreenIv.setSelected(isStartShare);
                     plvsaMoreShareScreenTv.setText(isStartShare ? getContext().getString(R.string.plvsa_streamer_sharescreen_exit) : getContext().getString(R.string.plvsa_streamer_sharescreen_start));
                     //去掉摄像头可选项
@@ -691,6 +714,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                         plvsaMoreCameraSwitchIv.clearColorFilter();
                         plvsaMoreMirrorIv.clearColorFilter();
                     }
+                    boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                            .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+                    if (moreWaterLayout != null) {
+                        moreWaterLayout.setVisibility((showWatermarkButton && !isShare && !hasLinkMicUser) ? View.VISIBLE : View.GONE);
+                    }
                 }
             });
             presenter.getData().getLinkMicCount().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Integer>() {
@@ -705,6 +733,16 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 }
             });
+        }
+
+        @Override
+        public void onHasLinkMicUser(boolean hasHasLinkMicUser) {
+            this.hasLinkMicUser = hasHasLinkMicUser;
+            boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+            if (moreWaterLayout != null) {
+                moreWaterLayout.setVisibility((showWatermarkButton && !isShare && !hasHasLinkMicUser) ? View.VISIBLE : View.GONE);
+            }
         }
     };
     // </editor-fold>
@@ -828,6 +866,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == moreLinkmicSettingLayout.getId()) {
             close();
             linkMicSettingLayout.open();
+        } else if (id == moreShareScreenFloatMessageLl.getId()) {
+            close();
+            screenShareFloatMessageLayout.open();
         } else if (id == moreHangUpViewerLinkmicLayout.getId()) {
             closeAllViewerLinkMic();
         } else if (id == moreInteractSigninLl.getId()) {
@@ -857,6 +898,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             if (onViewActionListener != null) {
                 onViewActionListener.onGiftEffectSwitch(!moreGiftEffectLayout.isSelected());
             }
+        } else if (id == moreWaterLayout.getId()) {
+            close();
+            PLVImagePickerUtil.openGallery((Activity) getContext());
         }
     }
 

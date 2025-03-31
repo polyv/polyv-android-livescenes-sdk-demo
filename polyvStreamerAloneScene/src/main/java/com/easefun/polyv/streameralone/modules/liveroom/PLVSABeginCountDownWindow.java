@@ -88,14 +88,16 @@ public class PLVSABeginCountDownWindow implements IPLVSACountDownWindow {
 
         final AtomicInteger countDownTimes = new AtomicInteger(COUNT_DOWN_TIMES);
         final int oneCountDownDurationInMillis = (int) (ONE_COUNT_DURATION * 1000);
-        final Disposable[] disposables = new Disposable[1];
-        disposables[0] = PLVRxTimer.timer(oneCountDownDurationInMillis, oneCountDownDurationInMillis, new Consumer<Long>() {
+        if (countDownDisposable != null) {
+            countDownDisposable.dispose();
+        }
+        countDownDisposable = PLVRxTimer.timer(oneCountDownDurationInMillis, oneCountDownDurationInMillis, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 int countDown = countDownTimes.decrementAndGet();
                 if (countDown <= 0) {
                     dismissWindowByFinishCountDown = true;
-                    disposables[0].dispose();
+                    countDownDisposable.dispose();
                     hide();
 
                     //回调开始上课倒计时完成

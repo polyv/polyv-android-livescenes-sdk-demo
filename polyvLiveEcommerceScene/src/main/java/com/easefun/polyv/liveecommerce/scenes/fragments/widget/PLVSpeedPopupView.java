@@ -33,6 +33,7 @@ public class PLVSpeedPopupView {
         speedArray.put(2, 1.25f);
         speedArray.put(3, 1.5f);
         speedArray.put(4, 2.0f);
+        speedArray.put(5, 3.0f);
         popupWindow = new PopupWindow(anchor.getContext());
         view = PLVViewInitUtils.initPopupWindow(anchor, R.layout.plvec_playback_more_speed_change_layout, popupWindow, new View.OnClickListener() {
             @Override

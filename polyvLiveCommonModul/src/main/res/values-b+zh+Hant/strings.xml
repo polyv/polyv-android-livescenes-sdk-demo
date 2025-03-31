@@ -201,6 +201,8 @@
     <string name="plv_chat_input_tips_focus_2">目前為專注模式..</string>
     <string name="plv_chat_input_tips_chat_6">聊聊什麼~</string>
     <string name="plv_chat_input_tips_quiz">發起提問</string>
+    <string name="plv_chat_no_message">暫無聊天消息</string>
+    <string name="plv_chat_image_alt_text">[圖片]</string>
 
     <string name="plv_member_list_title_viewers">觀眾資訊</string>
     <string name="plv_member_list_title_online_list">線上成員</string>
@@ -211,6 +213,8 @@
     <string name="plv_member_list_rules_desc_1">線上列表順序將根據特殊角色>觀眾的優先順序進行排序；觀眾順序將根據進入直播間的先後時間進行排序，先進入直播間的觀眾將展示在前排</string >
     <string name="plv_member_list_rules_title_2">二、特別提醒</string>
     <string name="plv_member_list_rules_desc_2">線上清單將會有短時間的緩存，可能會出現觀眾重新離開/進入直播間，清單未更新及時的現象，屬於正常。 </string>
+    <string name="plv_member_enter_live_room">進入直播間</string>
+    <string name="plv_member_leave_live_room">離開直播間</string>
 
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">APP內不支援購買</string>
@@ -403,6 +407,7 @@
     <string name="plv_streamer_network_bad_3">網路較差</string>
     <string name="plv_streamer_network_very_bad">網路很差</string>
     <string name="plv_streamer_network_disconnect">網路斷開</string>
+    <string name="plv_streamer_network_unknown">未知網絡</string>
     <string name="plv_streamer_network_cannot_connect">無法連線</string>
     <string name="plv_streamer_bitrate_desc">碼率：%skbps，幀率：%sfps</string>
     <string name="plv_streamer_open_audio_linkmic_toast">已開啟音訊連麥</string>
@@ -413,6 +418,7 @@
     <string name="plv_streamer_switch_linkmic_type_confirm_text">切換並下麥所有使用者</string>
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">目前網路訊號較弱，開啟失敗，請檢查網路！</string>
     <string name="plv_streamer_toast_call_streamer_start">請先發起直播</string>
+    <string name="plv_streamer_sticker">貼圖</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暫無相關文件</string>

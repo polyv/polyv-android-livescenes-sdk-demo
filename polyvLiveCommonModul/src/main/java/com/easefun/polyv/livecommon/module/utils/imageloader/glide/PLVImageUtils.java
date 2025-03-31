@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.chatroom.send.img.PLVSendChatImageHelper;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Random;
-
-import okio.Okio;
 
 public class PLVImageUtils {
 
@@ -39,14 +38,21 @@ public class PLVImageUtils {
                     + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
 
             InputStream input = null;
+            OutputStream output = null;
             try {
                 input = contentResolver.openInputStream(uri);
                 File outFile = new File(context.getCacheDir(), fileName);
+                output = new BufferedOutputStream(new FileOutputStream(outFile));
                 if (outFile.getParentFile() != null && !outFile.getParentFile().exists()) {
                     outFile.getParentFile().mkdirs();
                 }
                 outFile.createNewFile();
-                Okio.buffer(Okio.sink(outFile)).writeAll(Okio.source(input));
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                }
+                output.flush();
                 return outFile.getAbsolutePath();
             } catch (IOException e) {
                 PLVCommonLog.exception(e);
@@ -54,6 +60,9 @@ public class PLVImageUtils {
                 try {
                     if (input != null) {
                         input.close();
+                    }
+                    if (output != null) {
+                        output.close();
                     }
                 } catch (Exception e) {
                     PLVCommonLog.exception(e);

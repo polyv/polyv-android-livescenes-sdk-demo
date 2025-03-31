@@ -4,6 +4,8 @@
     <string name="plvsa_setting_enter_live">進入直播間</string>
     <string name="plvsa_streamer_sharescreen_exit">退出共享</string>
     <string name="plvsa_streamer_sharescreen_start">螢幕共享</string>
+    <string name="plvsa_streamer_sharescreen_float_message">案頭消息</string>
+    <string name="plvsa_streamer_sharescreen_float_message_condition_hint">僅限荧幕共亯期間有效，需開啟系統「在其他應用上層顯示」許可權</string>
     <string name="plvsa_streamer_sharescreen_start_tip">其他人現在可以看到你的螢幕</string>
     <string name="plvsa_streamer_sharescreen_already_stop">共享已結束</string>
     <string name="plvsa_streamer_sharescreen_error">螢幕分享失敗：</string>

@@ -679,6 +679,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     // <editor-fold defaultstate="collapsed" desc="列表item绑定">
     private void bindVideoMute(@NonNull LinkMicItemViewHolder holder, boolean isMuteVideo, String linkMicId) {
+        final boolean holderIsMuted = holder.flRenderViewContainer.getVisibility() != View.VISIBLE;
+        if (holderIsMuted == isMuteVideo) {
+            return;
+        }
         //是否关闭摄像头
         if (isMuteVideo) {
             holder.flRenderViewContainer.setVisibility(View.INVISIBLE);

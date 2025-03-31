@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/plv_widget_blur_top_radius_layout"
+        android:layout_width="match_parent"
+        android:layout_height="202dp"
+        android:layout_gravity="bottom" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plv_setting_more_ly"
+        android:layout_width="match_parent"
+        android:layout_height="202dp"
+        android:layout_gravity="bottom"
+        android:clickable="true"
+        android:padding="24dp"
+        app:mode="leftTop|rightTop"
+        app:radius="10dp">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/plvsa_setting_action_scroll_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="24dp"
+            app:flexWrap="wrap" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

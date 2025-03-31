@@ -187,7 +187,6 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
         menuDrawerPortrait.setMenuSize(ConvertUtils.dp2px(519));
         menuDrawerPortrait.setDrawOverlay(false);
         menuDrawerPortrait.setDropShadowEnabled(false);
-        menuDrawerPortrait.setAdjustKeyBoard(true);
 
         menuDrawerPortrait.setOnDrawerStateChangeListener(new PLVMenuDrawer.OnDrawerStateChangeListener() {
             @Override

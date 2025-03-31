@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
@@ -51,6 +52,9 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAdapter;
+import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.IPLVSAStreamerScreenShareFloatWindow;
+import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.PLVSAStreamerScreenShareFloatWindowV1;
+import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.PLVSAStreamerScreenShareFloatWindowV2;
 import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
@@ -124,7 +128,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     //退出直播间弹窗
     private PLVConfirmDialog leaveLiveConfirmDialog;
     //返回home时的悬浮窗
-    public PLVSAStreamerFloatWindow floatWindow;
+    public final PLVSAStreamerScreenShareFloatWindowV1 floatWindow = new PLVSAStreamerScreenShareFloatWindowV1(getContext());
+    public final PLVSAStreamerScreenShareFloatWindowV2 floatWindowV2 = new PLVSAStreamerScreenShareFloatWindowV2(getContext());
 
     // 连麦时显示的背景图
     private ImageView linkMicBgIv;
@@ -200,9 +205,6 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         PLVForegroundService.startForegroundService(PLVSAStreamerAloneActivity.class, PLVAppUtils.getString(R.string.plvsa_streamer_alone_scene_name), R.drawable.plvsa_ic_launcher);
         //防止自动息屏、锁屏
         setKeepScreenOn(true);
-
-        //悬浮窗
-        floatWindow = new PLVSAStreamerFloatWindow(getContext());
 
         initLinkMicInvitationLayout();
         observeSpeakerPermissionChange();
@@ -353,6 +355,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
         //初始化悬浮窗
         streamerPresenter.registerView(floatWindow.getStreamerView());
+        streamerPresenter.registerView(floatWindowV2.streamerView);
 
         linkMicInvitationLayout.setIsOnlyAudio(liveRoomDataManager.isOnlyAudio());
 
@@ -366,6 +369,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     public void setOnViewActionListener(OnViewActionListener listener) {
         this.onViewActionListener = listener;
+    }
+
+    @Override
+    public IPLVChatroomContract.IChatroomView getChatroomView() {
+        return floatWindowV2.chatroomView;
     }
 
     @Override
@@ -526,6 +534,8 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     public void destroy() {
         floatWindow.close();
         floatWindow.destroy();
+        floatWindowV2.close();
+        floatWindowV2.destroy();
         linkMicInvitationLayout.destroy();
         streamerPresenter.destroy();
         PLVForegroundService.stopForegroundService();
@@ -1173,9 +1183,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
     private void showFloatWindow() {
         if(PLVFloatPermissionUtils.checkPermission((Activity) getContext())){
-            if (floatWindow != null) {
-                floatWindow.show();
-            }
+            getCurrentScreenShareFloatWindow().show();
         } else {
             if(isShowWindowPermissionDialog) {
                 new PLVSAConfirmDialog(getContext())
@@ -1198,9 +1206,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                                     @Override
                                     public void onResult(boolean isGrant) {
                                         if(isGrant){
-                                            if (floatWindow != null) {
-                                                floatWindow.show();
-                                            }
+                                            getCurrentScreenShareFloatWindow().show();
                                         } else {
                                             Toast.makeText(getContext(), getContext().getString(R.string.plvsa_float_window_permission_denied_and_not_show), Toast.LENGTH_SHORT).show();
                                         }
@@ -1216,9 +1222,14 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     private void hideFloatWindow(){
-        if(floatWindow != null){
-            floatWindow.close();
-        }
+        getCurrentScreenShareFloatWindow().close();
+    }
+
+    @NonNull
+    private IPLVSAStreamerScreenShareFloatWindow getCurrentScreenShareFloatWindow() {
+        boolean isFloatWindowV2 = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SCREEN_SHARE_FLOAT_WINDOW_V2);
+        return isFloatWindowV2 ? floatWindowV2 : floatWindow;
     }
 
     // </editor-fold >
