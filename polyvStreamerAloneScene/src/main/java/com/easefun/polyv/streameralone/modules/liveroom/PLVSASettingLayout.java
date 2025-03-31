@@ -9,6 +9,7 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -34,12 +35,15 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
+import com.easefun.polyv.livecommon.module.utils.water.PLVPhotoContainer;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.google.android.flexbox.FlexboxLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -61,6 +65,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.functions.Consumer;
@@ -100,7 +105,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private ConstraintLayout plvsaSettingConfigLy;
     private TextView plvsaSettingLiveTitleTv;
     private View plvsaSettingLiveTitleSplitView;
-    private View settingActionScrollContainer;
+    private FlexboxLayout settingActionScrollContainer;
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
     private ImageView plvsaSettingBitrateIv;
@@ -118,10 +123,17 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private LinearLayout settingDenoiseLayout;
     private LinearLayout settingExternalAudioInputLayout;
     private LinearLayout settingLiveReplaySwitchLayout;
+    private LinearLayout settingMoreLayout;
+    private LinearLayout settingWaterLayout;
+    private ViewGroup settingLayout;
+
+    private PLVSASettingMoreLayout settingMorePopupLayout;
+    private PLVPhotoContainer waterLayout;
 
     private String liveTitle;
 
-    private PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>> landscapeChannelPushRatioMapKV = new PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>>("plvsa_setting_push_resolution_ratio_land_key") {};
+    private PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>> landscapeChannelPushRatioMapKV = new PLVAutoSaveKV<Map<String, PLVLinkMicConstant.PushResolutionRatio>>("plvsa_setting_push_resolution_ratio_land_key") {
+    };
 
     // 标记位 当用户手动切换清晰度时为true 避免进入设置页时内部初始化清晰度弹出toast提示
     private boolean switchBitrateByUser = false;
@@ -183,6 +195,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingDenoiseLayout = findViewById(R.id.plvsa_setting_denoise_layout);
         settingExternalAudioInputLayout = findViewById(R.id.plvsa_setting_external_audio_input_layout);
         settingLiveReplaySwitchLayout = findViewById(R.id.plvsa_setting_live_replay_switch_layout);
+        settingMoreLayout = findViewById(R.id.plvsa_setting_more_layout);
+        settingMorePopupLayout = new PLVSASettingMoreLayout(this);
+        settingWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
+        settingLayout = findViewById(R.id.plvsa_setting_ly);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
         plvsaSettingBeautyLayout.setOnClickListener(this);
@@ -199,7 +215,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingDenoiseLayout.setOnClickListener(this);
         settingExternalAudioInputLayout.setOnClickListener(this);
         settingLiveReplaySwitchLayout.setOnClickListener(this);
+        settingMoreLayout.setOnClickListener(this);
+        settingWaterLayout.setOnClickListener(this);
 
+        initWaterLayout();
         initTitleInputLayout();
         initBitrateLayout();
         initMixLayout();
@@ -210,6 +229,32 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
         observeBeautyModuleInitResult();
         observeBeautyLayoutStatus();
+    }
+
+    private void initWaterLayout() {
+        waterLayout = findViewById(R.id.plvsa_water_layout);
+        waterLayout.setOnViewActionListener(new PLVPhotoContainer.OnViewActionListener() {
+            @Override
+            public void onEditMode(boolean isEditMode) {
+                if (isEditMode) {
+                    waterLayout.bringToFront();
+                    settingLayout.setAlpha(0.5f);
+                    bringToFront();
+                } else {
+                    settingLayout.bringToFront();
+                    settingLayout.setAlpha(1f);
+                    for (int i = 0; i < ((ViewGroup) getParent()).getChildCount(); i++) {
+                        View child = ((ViewGroup) getParent()).getChildAt(i);
+                        if (child != null && !child.equals(PLVSASettingLayout.this)) {
+                            child.bringToFront();
+                        }
+                    }
+                    if (isSettingFinished && streamerPresenter != null) {
+                        streamerPresenter.setWatermark(waterLayout.captureView(), 0, 0, 1);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -331,6 +376,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 // 倒计时结束，隐藏设置布局，更新直播标题，开始直播
                 isSettingFinished = true;
                 updateVisibility();
+                // 进入直播间时再设置水印
+                if (streamerPresenter != null) {
+                    streamerPresenter.setWatermark(waterLayout.captureView(), 0, 0, 1);
+                }
                 liveRoomDataManager.getConfig().setupChannelName(liveTitle);
                 liveRoomDataManager.requestUpdateChannelName(new IPLVLiveRoomDataManager.IUpdateChannelNameListener() {
                     @Override
@@ -426,6 +475,66 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 });
     }
 
+    private void observeScrollContainer() {
+        checkShowMoreAction();
+        settingActionScrollContainer.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkShowMoreAction();
+                    }
+                }, 500); // 需要加一定的延迟，必现view移除后留下空位/添加时重叠在一起
+            }
+        });
+    }
+
+    private void checkShowMoreAction() {
+        // 1、确保定义时其他可动态调整状态的item默认为隐藏，2、确保可能放到更多里的item的状态在初始化之后不可再调整
+        int showMoreMaxItemCount = 10;
+        int childVisibleCount = 0;
+        for (int i = 0; i < settingActionScrollContainer.getChildCount(); i++) {
+            View child = settingActionScrollContainer.getChildAt(i);
+            if (child.getVisibility() == View.VISIBLE && child != settingMoreLayout) {
+                childVisibleCount++;
+            }
+        }
+        // 大于等于10个，移除最后的item添加到更多弹窗布局中
+        if (childVisibleCount >= showMoreMaxItemCount) {
+            settingMoreLayout.setVisibility(View.VISIBLE);
+            List<View> addItemViews = new ArrayList<>();
+            int index = settingActionScrollContainer.getChildCount() - 2; // 跳过更多按钮
+            while (childVisibleCount >= showMoreMaxItemCount) {
+                View child = settingActionScrollContainer.getChildAt(index);
+                if (child.getVisibility() != View.VISIBLE) {
+                    index--;
+                    continue;
+                }
+                settingActionScrollContainer.removeView(child);
+                addItemViews.add(0, child);
+                index--;
+                childVisibleCount--;
+            }
+            for (View addItemView : addItemViews) {
+                settingMorePopupLayout.addItem(addItemView);
+            }
+        } else if (settingMorePopupLayout.hasItem() && childVisibleCount < showMoreMaxItemCount - 1) { // 小于9个时，检查是否要从更多弹窗布局中移除item回来
+            while (childVisibleCount < showMoreMaxItemCount - 1) {
+                View child = settingMorePopupLayout.removePreviousItem();
+                if (child != null) {
+                    settingActionScrollContainer.addView(child, settingActionScrollContainer.getChildCount() - 1);
+                    childVisibleCount++;
+                } else {
+                    break;
+                }
+            }
+            if (!settingMorePopupLayout.hasItem()) {
+                settingMoreLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
     private void initStartLiveBtnText() {
         plvsaSettingStartLiveBtn.setText(isGuest() ? getContext().getString(R.string.plvsa_setting_enter_live) : getContext().getString(R.string.plv_streamer_start_live));
     }
@@ -449,6 +558,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else {
             settingMixLayout.setVisibility(View.GONE);
         }
+
+        boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+        settingWaterLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
     }
 
     private void initOrientation(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -480,7 +593,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private int getQualityIcon(String qualityLevel) {
-       if (PLVLinkMicConstant.QualityLevel.isHSD(qualityLevel)) {
+        if (PLVLinkMicConstant.QualityLevel.isHSD(qualityLevel)) {
             return R.drawable.plvsa_bitrate_icon_hd;
         } else if (PLVLinkMicConstant.QualityLevel.isSHD(qualityLevel)) {
             return R.drawable.plvsa_bitrate_icon_fhd;
@@ -510,6 +623,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         updatePushResolutionRatioOnOrientationChanged(PLVScreenUtils.isLandscape(getContext()));
         initOrientation(liveRoomDataManager);
         observeLiveRoomData();
+        observeScrollContainer();
     }
 
     @Override
@@ -584,6 +698,19 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         checkPermissionToStartCountDown();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        PLVImagePickerUtil.handleActivityResult(getContext(), requestCode, resultCode, data, new PLVImagePickerUtil.ImagePickerCallback() {
+
+            @Override
+            public void onImagesSelected(ArrayList<String> imagePaths) {
+                for (String imagePath : imagePaths) {
+                    waterLayout.addImage(imagePath);
+                }
+            }
+        });
+    }
+
 // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 MVP - View">
@@ -612,6 +739,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     }
 
     private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
+        private boolean isShare;
+        private boolean hasLinkMicUser;
+
         @Override
         public void onStreamerError(int errorCode, Throwable throwable) {
             plvsaSettingCameraOrientIv.setEnabled(false);
@@ -632,6 +762,26 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 plvsaSettingMirrorIv.setEnabled(false);
                 plvsaSettingMirrorTv.setEnabled(false);
                 plvsaSettingMirrorTv.setAlpha(0.6F);
+            }
+        }
+
+        @Override
+        public void onScreenShareChange(int position, boolean isShare, int extra, String userId, boolean isMyself) {
+            this.isShare = isShare;
+            boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+            if (waterLayout != null) {
+                waterLayout.setVisibility((showWatermarkButton && !isShare && !hasLinkMicUser) ? View.VISIBLE : View.GONE);
+            }
+        }
+
+        @Override
+        public void onHasLinkMicUser(boolean hasHasLinkMicUser) {
+            this.hasLinkMicUser = hasHasLinkMicUser;
+            boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+            if (waterLayout != null) {
+                waterLayout.setVisibility((showWatermarkButton && !isShare && !hasHasLinkMicUser) ? View.VISIBLE : View.GONE);
             }
         }
     };
@@ -707,6 +857,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (!PLVDebounceClicker.tryClick(this)) {
             return;
         }
+        settingMorePopupLayout.dismiss();
         int id = v.getId();
         if (id == R.id.plvsa_setting_close_page_iv) {
             ((Activity) getContext()).onBackPressed();
@@ -758,6 +909,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                             PLVCommonLog.exception(throwable);
                         }
                     });
+        } else if (id == settingMoreLayout.getId()) {
+            settingMorePopupLayout.show();
+        } else if (id == settingWaterLayout.getId()) {
+            PLVImagePickerUtil.openGallery((Activity) getContext());
         }
     }
     // </editor-fold>
@@ -768,7 +923,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> statefulData) {
                 liveRoomDataManager.getClassDetailVO().removeObserver(this);
-                if (statefulData != null && statefulData.getData() != null && statefulData.getData().getData() != null){
+                if (statefulData != null && statefulData.getData() != null && statefulData.getData().getData() != null) {
                     boolean playbackEnabled = statefulData.getData().getData().isPlaybackEnabled();
                     settingLiveReplaySwitchLayout.setSelected(!playbackEnabled);
                 }
@@ -901,15 +1056,15 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private void updateVisibility() {
         // 美颜布局显示时，不显示设置布局
         if (isBeautyLayoutShowing) {
-            setVisibility(View.GONE);
+            settingLayout.setVisibility(View.GONE);
             return;
         }
         // 设置结束后隐藏
         if (isSettingFinished) {
-            setVisibility(View.GONE);
+            settingLayout.setVisibility(View.GONE);
             return;
         }
-        setVisibility(View.VISIBLE);
+        settingLayout.setVisibility(View.VISIBLE);
     }
 
     // </editor-fold>

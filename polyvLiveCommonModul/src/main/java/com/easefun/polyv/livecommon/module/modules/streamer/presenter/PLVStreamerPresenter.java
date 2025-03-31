@@ -8,6 +8,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -17,6 +18,8 @@ import android.util.Pair;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -210,6 +213,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean isMyselfJoinRtc = false;
     private PLVAutoSaveKV<PLVLinkMicDenoiseType> denoiseTypeKV = new PLVAutoSaveKV<PLVLinkMicDenoiseType>("plv_streamer_denoise_type") {};
     private PLVAutoSaveKV<Boolean> isUseExternalAudioInputKV = new PLVAutoSaveKV<Boolean>("plv_streamer_is_use_external_audio_input") {};
+    private Bitmap watermarkBitmap;
+    private View myRenderView;
+    private ViewGroup myRenderViewParent;
 
     /**** 容器 ****/
     //推流和连麦列表
@@ -428,6 +434,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     }
                 });
                 updateMixLayoutWhenScreenShare(isShare, streamerItem.second.getLinkMicId());
+                // 屏幕共享不需要水印
+                streamerManager.setWatermark(isShare ? null : watermarkBitmap, 0, 0, 1);
             }
 
             @Override
@@ -636,6 +644,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void releaseRenderView(View renderView) {
         streamerManager.releaseRenderView(renderView);
+        if (myRenderView == renderView) {
+            tryDetachWaterFromRenderParent(true);
+            myRenderView = null;
+        }
     }
 
     @Override
@@ -646,6 +658,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 return;
             }
             streamerManager.setupLocalVideo(renderView);
+            myRenderView = renderView;
+            tryAttachWaterToRenderParent();
         } else {
             streamerManager.setupRemoteVideo(renderView, linkMicId);
         }
@@ -1205,6 +1219,13 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void setWatermark(Bitmap var1, float var3, float var4, float var5) {
+        streamerManager.setWatermark(var1, var3, var4, var5);
+        watermarkBitmap = var1;
+        tryAttachWaterToRenderParent();
+    }
+
+    @Override
     public void destroy() {
         if (currentSocketUserBean != null && currentSocketUserBean.getUserId() != null && !currentSocketUserBean.isTeacher()) {
             setUserPermissionSpeaker(currentSocketUserBean.getUserId(), false, null);
@@ -1667,13 +1688,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     }
                     updateMixLayoutUsers();
                     updateLinkMicCount();
-                    callbackToView(new ViewRunnable() {
-                        @Override
-                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                            //更新推流和连麦列表
-                            view.onUsersJoin(Collections.singletonList(linkMicItemDataBean));
-                        }
-                    });
+                    callOnUsersJoin(Collections.singletonList(linkMicItemDataBean));
                 }
                 break;
             }
@@ -1714,13 +1729,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(linkMicUid);
         if (linkMicItem != null) {
             streamerList.remove(linkMicItem.second);
-            callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                    //更新推流和连麦列表
-                    view.onUsersLeave(Collections.singletonList(linkMicItem.second));
-                }
-            });
+            callOnUsersLeave(Collections.singletonList(linkMicItem.second));
             updateMixLayoutUsers();
             updateLinkMicCount();
         }
@@ -1854,12 +1863,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         if (!willRemoveStreamerList.isEmpty()) {
             updateMixLayoutUsers();
             updateLinkMicCount();
-            callbackToView(new ViewRunnable() {
-                @Override
-                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                    view.onUsersLeave(willRemoveStreamerList);
-                }
-            });
+            callOnUsersLeave(willRemoveStreamerList);
         }
     }
 
@@ -1933,12 +1937,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                         streamerList.add(guestDataBean);
                     }
                     updateLinkMicCount();
-                    callbackToView(new ViewRunnable() {
-                        @Override
-                        public void run(@NonNull @NotNull IPLVStreamerContract.IStreamerView view) {
-                            view.onUsersLeave(streamerList);
-                        }
-                    });
+                    callOnUsersLeave(streamerList);
                     callUpdateGuestStatus(false);
                 }
                 streamerData.postStreamerStatus(isLive);
@@ -2059,6 +2058,83 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     private boolean isMyLinkMicId(String linkMicId) {
         return linkMicId != null && linkMicId.equals(streamerManager.getLinkMicUid());
+    }
+
+    private void callOnUsersJoin(final List<PLVLinkMicItemDataBean> dataBeanList) {
+        callbackToView(new ViewRunnable() {
+
+            @Override
+            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                view.onUsersJoin(dataBeanList);
+            }
+        });
+        tryCallHasLinkMicUser();
+    }
+
+    private void callOnUsersLeave(final List<PLVLinkMicItemDataBean> dataBeanList) {
+        callbackToView(new ViewRunnable() {
+
+            @Override
+            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                view.onUsersLeave(dataBeanList);
+            }
+        });
+        tryCallHasLinkMicUser();
+    }
+
+    private void tryCallHasLinkMicUser() {
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                view.onHasLinkMicUser(streamerList.size() > 1);
+            }
+        });
+        if (streamerList.size() > 1) {
+            tryAttachWaterToRenderParent();
+        } else {
+            tryDetachWaterFromRenderParent(false);
+        }
+    }
+
+    private void tryAttachWaterToRenderParent() {
+        if (watermarkBitmap != null && myRenderView != null && streamerList.size() > 1) {
+            ViewGroup parent = (ViewGroup) myRenderView.getParent();
+            if (parent != null) {
+                boolean hasWaterMark = false;
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    View child = parent.getChildAt(i);
+                    if (child instanceof ImageView && child.getTag() != null && child.getTag().equals(watermarkBitmap)) {
+                        hasWaterMark = true;
+                        break;
+                    }
+                }
+                if (!hasWaterMark) {
+                    ImageView imageView = new ImageView(myRenderView.getContext());
+                    imageView.setImageBitmap(watermarkBitmap);
+                    imageView.setTag(watermarkBitmap);
+                    parent.addView(imageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    myRenderViewParent = parent;
+                }
+            }
+        }
+    }
+
+    private void tryDetachWaterFromRenderParent(boolean force) {
+        if (watermarkBitmap != null && myRenderView != null && (force || streamerList.size() <= 1)) {
+            ViewGroup parent = (ViewGroup) myRenderView.getParent(); // always null
+            if (parent == null) {
+                parent = myRenderViewParent;
+            }
+            if (parent != null) {
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    View child = parent.getChildAt(i);
+                    if (child instanceof ImageView && child.getTag() != null && child.getTag().equals(watermarkBitmap)) {
+                        parent.removeView(child);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Nullable

@@ -201,6 +201,8 @@
     <string name="plv_chat_input_tips_focus_2">現在フォーカス モードです。</string>
     <string name="plv_chat_input_tips_chat_6">何かについて話しましょう~</string>
     <string name="plv_chat_input_tips_quiz">質問する</string>
+    <string name="plv_chat_no_message">チャットメッセージはありません</string>
+    <string name="plv_chat_image_alt_text">[画像]</string>
 
     <string name="plv_member_list_title_viewers">視聴者情報</string>
     <string name="plv_member_list_title_online_list">オンライン メンバー</string>
@@ -211,6 +213,8 @@
     <string name="plv_member_list_rules_desc_1">オンライン リストの順序は、特別な役割>視聴者の優先順位に従って並べ替えられます。視聴者の順序は、ライブ ブロードキャスト ルームへの入場時間とライブに入場した視聴者に従って並べ替えられます。放送室の最初は最前列に表示されます</string>
     <string name="plv_member_list_rules_title_2">2. 特別な注意事項</string>
     <string name="plv_member_list_rules_desc_2">オンライン リストは短期間キャッシュされますが、視聴者が再びライブ ブロードキャスト ルームに入室し、リストが時間内に更新されない場合があります。これは正常です。 </string>
+    <string name="plv_member_enter_live_room">生中継室に入る</string>
+    <string name="plv_member_leave_live_room">生中継室を出る</string>
 
     <!--商品-->
     <string name="plv_commodity_toast_empty_link">アプリでは購入がサポートされていません</string>
@@ -403,6 +407,7 @@
     <string name="plv_streamer_network_bad_3">ネットワークが不良です</string>
     <string name="plv_streamer_network_very_bad">ネットワークが非常に悪い</string>
     <string name="plv_streamer_network_disconnect">ネットワーク切断</string>
+    <string name="plv_streamer_network_unknown">不明なネットワーク</string>
     <string name="plv_streamer_network_cannot_connect">接続できません</string>
     <string name="plv_streamer_bitrate_desc">ビット レート: %skbps、フレーム レート: %sfps</string>
     <string name="plv_streamer_open_audio_linkmic_toast">オーディオリンクマイクがオンになりました</string>
@@ -413,6 +418,7 @@
     <string name="plv_streamer_switch_linkmic_type_confirm_text">すべてのユーザーを切り替えて切断します</string>
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">現在のネットワーク信号が弱く、起動に失敗しました。ネットワークを確認してください！</string>
     <string name="plv_streamer_toast_call_streamer_start">最初にライブ ブロードキャストを開始してください</string>
+    <string name="plv_streamer_sticker">ステッカー</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">関連するドキュメントはありません</string>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvsa_more_screen_share_float_message_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    android:background="@drawable/plvsa_more_ly_shape"
+    tools:layout_height="216dp">
+
+    <TextView
+        android:id="@+id/plvsa_more_screen_share_float_message_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="35dp"
+        android:text="@string/plvsa_streamer_sharescreen_float_message"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/plvsa_more_screen_share_float_message_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:thumb="@drawable/plvsa_more_screen_share_float_message_switch_thumb"
+        android:track="@drawable/plvsa_more_screen_share_float_message_switch_track"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_more_screen_share_float_message_tv"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_more_screen_share_float_message_tv"
+        app:layout_constraintStart_toEndOf="@+id/plvsa_more_screen_share_float_message_tv"
+        tools:checked="true" />
+
+    <TextView
+        android:id="@+id/plvsa_more_screen_share_float_message_hint_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="27dp"
+        android:gravity="start"
+        android:text="@string/plvsa_streamer_sharescreen_float_message_condition_hint"
+        android:textColor="#CCF0F1F5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_more_screen_share_float_message_tv" />
+
+</android.support.constraint.ConstraintLayout>

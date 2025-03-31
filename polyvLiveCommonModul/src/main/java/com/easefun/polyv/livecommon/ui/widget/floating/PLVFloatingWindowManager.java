@@ -122,6 +122,20 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
     }
 
     @Override
+    public void setEnableDragX(boolean enableDrag) {
+        if (floatingLayout != null) {
+            floatingLayout.setEnableDragX(enableDrag);
+        }
+    }
+
+    @Override
+    public void setEnableDragY(boolean enableDrag) {
+        if (floatingLayout != null) {
+            floatingLayout.setEnableDragY(enableDrag);
+        }
+    }
+
+    @Override
     public void setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove) {
         if (floatingLayout != null) {
             floatingLayout.setConsumeTouchEventOnMove(consumeTouchEventOnMove);
@@ -192,6 +206,16 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
             return this;
         }
 
+        public WindowBuilder setEnableDragX(boolean enableDrag) {
+            buildParam.enableDragX = enableDrag;
+            return this;
+        }
+
+        public WindowBuilder setEnableDragY(boolean enableDrag) {
+            buildParam.enableDragY = enableDrag;
+            return this;
+        }
+
         public WindowBuilder setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove) {
             buildParam.consumeTouchEventOnMove = consumeTouchEventOnMove;
             return this;
@@ -213,6 +237,8 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
             private PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND;
             private PLVFloatingEnums.AutoEdgeType autoEdgeType = PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT;
             private boolean enableDrag = true;
+            private boolean enableDragX = true;
+            private boolean enableDragY = true;
             private boolean consumeTouchEventOnMove = true;
 
             private PLVAbsFloatingLayout create() {
@@ -235,6 +261,8 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
                 floatingLayout.setShowType(showType);
                 floatingLayout.setAutoMoveToEdge(autoEdgeType);
                 floatingLayout.setEnableDrag(enableDrag);
+                floatingLayout.setEnableDragX(enableDragX);
+                floatingLayout.setEnableDragY(enableDragY);
                 floatingLayout.setConsumeTouchEventOnMove(consumeTouchEventOnMove);
 
                 return floatingLayout;

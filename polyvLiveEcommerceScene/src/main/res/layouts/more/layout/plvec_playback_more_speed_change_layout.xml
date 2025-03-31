@@ -40,78 +40,86 @@
                     android:textColor="#ffffff"
                     android:textSize="18sp" />
 
-                <android.support.constraint.ConstraintLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/change_speed_ly"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="26dp">
+                    android:layout_marginTop="16dp"
+                    android:paddingBottom="8dp"
+                    app:flexWrap="wrap">
 
                     <TextView
                         android:id="@+id/change_speed_0_5"
                         android:layout_width="0dp"
                         android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
                         android:text="0.5x"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp"
-                        app:layout_constraintHorizontal_chainStyle="spread_inside"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toLeftOf="@+id/change_speed_1"
-                        app:layout_constraintWidth_percent="0.18" />
+                        app:layout_flexBasisPercent="19%" />
 
                     <TextView
                         android:id="@+id/change_speed_1"
                         android:layout_width="0dp"
                         android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
                         android:text="1.0x"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp"
-                        app:layout_constraintLeft_toRightOf="@+id/change_speed_0_5"
-                        app:layout_constraintRight_toLeftOf="@id/change_speed_1_2_5"
-                        app:layout_constraintWidth_percent="0.18" />
+                        app:layout_flexBasisPercent="19%" />
 
                     <TextView
                         android:id="@+id/change_speed_1_2_5"
                         android:layout_width="0dp"
                         android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
                         android:text="1.25x"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp"
-                        app:layout_constraintLeft_toRightOf="@+id/change_speed_1"
-                        app:layout_constraintRight_toLeftOf="@id/change_speed_1_5"
-                        app:layout_constraintWidth_percent="0.18" />
+                        app:layout_flexBasisPercent="19%" />
 
                     <TextView
                         android:id="@+id/change_speed_1_5"
                         android:layout_width="0dp"
                         android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
                         android:text="1.5x"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp"
-                        app:layout_constraintLeft_toRightOf="@+id/change_speed_1_2_5"
-                        app:layout_constraintRight_toLeftOf="@id/change_speed_2"
-                        app:layout_constraintWidth_percent="0.18" />
+                        app:layout_flexBasisPercent="19%" />
 
                     <TextView
                         android:id="@+id/change_speed_2"
                         android:layout_width="0dp"
                         android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
                         android:background="@drawable/plvec_route_corner_bg_sel"
                         android:gravity="center"
                         android:text="2.0x"
                         android:textColor="@color/plvec_route_fg"
                         android:textSize="14sp"
-                        app:layout_constraintLeft_toRightOf="@+id/change_speed_1_5"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintWidth_percent="0.18" />
-                </android.support.constraint.ConstraintLayout>
+                        app:layout_flexBasisPercent="19%" />
+
+                    <TextView
+                        android:id="@+id/change_speed_3"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/plvec_route_corner_bg_sel"
+                        android:gravity="center"
+                        android:text="3.0x"
+                        android:textColor="@color/plvec_route_fg"
+                        android:textSize="14sp"
+                        app:layout_flexBasisPercent="19%" />
+                </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
 
         </RelativeLayout>

@@ -36,6 +36,8 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
     protected int floatWindowHeight;
 
     protected boolean enableDrag = true;
+    protected boolean enableDragX = true;
+    protected boolean enableDragY = true;
     protected boolean consumeTouchEventOnMove = true;
     protected PLVFloatingEnums.ShowType showType = PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND;
     protected PLVFloatingEnums.AutoEdgeType autoEdgeType = PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT;
@@ -127,6 +129,16 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
     }
 
     @Override
+    public void setEnableDragX(boolean enableDrag) {
+        this.enableDragX = enableDrag;
+    }
+
+    @Override
+    public void setEnableDragY(boolean enableDrag) {
+        this.enableDragY = enableDrag;
+    }
+
+    @Override
     public void setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove) {
         this.consumeTouchEventOnMove = consumeTouchEventOnMove;
     }
@@ -151,7 +163,9 @@ public abstract class PLVAbsFloatingLayout extends FrameLayout implements IPLVFl
                 x = nowX;
                 y = nowY;
                 if (enableDrag) {
-                    updateFloatLocation(fitInsideScreenX(floatingLocationX + movedX), fitInsideScreenY(floatingLocationY + movedY));
+                    int newX = enableDragX ? fitInsideScreenX(floatingLocationX + movedX) : floatingLocationX;
+                    int newY = enableDragY ? fitInsideScreenY(floatingLocationY + movedY) : floatingLocationY;
+                    updateFloatLocation(newX, newY);
                 }
                 if (Math.abs(movedX) >= 5 || Math.abs(movedY) >= 5) {
                     isMove = true;

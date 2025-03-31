@@ -41,8 +41,8 @@ public class PLVWebViewHelper {
     private static boolean databaseEnabled = true;
     private static boolean appCacheEnabled = true;
     private static boolean allowFileAccess = true;
-    private static boolean allowFileAccessFromFileURLs = true;
-    private static boolean allowUniversalAccessFromFileURLs = true;
+    private static boolean allowFileAccessFromFileURLs = false;
+    private static boolean allowUniversalAccessFromFileURLs = false;
 
     private static void initWebSettings(Context context, WebView webView) {
         WebSettings webSettings = webView.getSettings();
@@ -125,7 +125,7 @@ public class PLVWebViewHelper {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (!isUseActionView) {
                 try {
-                    if (url.startsWith("weixin://")) {
+                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         ActivityUtils.startActivity(intent);
                         return true;
@@ -133,7 +133,7 @@ public class PLVWebViewHelper {
                 } catch (Exception e) {
                     return true;//如果没有安装对应的应用就拦截不展示错误画面
                 }
-                view.loadUrl(url);
+                return false;
             } else {
                 if (url.startsWith("yy://")) {
                     view.loadUrl(url);

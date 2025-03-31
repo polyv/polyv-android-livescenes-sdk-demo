@@ -148,6 +148,11 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
+    public void onHasLinkMicUser(boolean hasHasLinkMicUser) {
+
+    }
+
+    @Override
     public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
 
     }

@@ -1,4 +1,4 @@
-package com.easefun.polyv.streameralone.modules.streamer;
+package com.easefun.polyv.streameralone.modules.streamer.widget.screenshare;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -35,7 +35,7 @@ import java.lang.ref.WeakReference;
  * 纯视频开播悬浮窗，系统级别悬浮窗，需要申请悬浮窗权限。
  * 用于显示屏幕共享状态，仅在后台时显示
  */
-public class PLVSAStreamerFloatWindow implements View.OnClickListener {
+public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScreenShareFloatWindow, View.OnClickListener {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
     private Context context;
@@ -48,7 +48,7 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
 
     private HomeKeyEventBroadCastReceiver receiver;
 
-    View view;
+    private View view;
 
     private boolean isNoNetWork = false;
 
@@ -63,20 +63,11 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="构造方法/初始化">
-    public PLVSAStreamerFloatWindow(Context context) {
+    public PLVSAStreamerScreenShareFloatWindowV1(Context context) {
         this.context = context;
         handler = new Handler(context.getMainLooper());
 
         view = LayoutInflater.from(context).inflate(R.layout.plvsa_widget_floating_screen_share, null, false);
-
-        PLVFloatingWindowManager.getInstance().createNewWindow((Activity) context)
-                .setIsSystemWindow(true)
-                .setContentView(view)
-                .setSize(ViewGroup.LayoutParams.WRAP_CONTENT, ConvertUtils.dp2px(72))
-                .setFloatLocation(ScreenUtils.getScreenWidth() - ConvertUtils.dp2px(98), (int) (ScreenUtils.getScreenHeight() / 2.5))
-                .setShowType(PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND)
-                .setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT)
-                .build();
 
         plvsaStreamerWindowRoot = view.findViewById(R.id.plvsa_streamer_window_root);
         plvsaStreamerWindowFold = view.findViewById(R.id.plvsa_streamer_window_fold);
@@ -93,24 +84,40 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         plvsaStreamerWindowStatusTv.setOnClickListener(this);
 
         receiver = new HomeKeyEventBroadCastReceiver(new WeakReference<>(this));
-        IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-
-        context.registerReceiver(receiver, homeFilter);
-
-
     }
 
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
+    @Override
     public void show() {
+        PLVFloatingWindowManager.getInstance().createNewWindow((Activity) context)
+                .setIsSystemWindow(true)
+                .setContentView(view)
+                .setSize(ViewGroup.LayoutParams.WRAP_CONTENT, ConvertUtils.dp2px(72))
+                .setFloatLocation(ScreenUtils.getScreenWidth() - ConvertUtils.dp2px(98), (int) (ScreenUtils.getScreenHeight() / 2.5))
+                .setShowType(PLVFloatingEnums.ShowType.SHOW_ONLY_BACKGROUND)
+                .setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_RIGHT)
+                .build();
         PLVFloatingWindowManager.getInstance().show((Activity) context);
+        try {
+            context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+        }
     }
 
+    @Override
     public void close() {
         PLVFloatingWindowManager.getInstance().hide();
+        try {
+            context.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            PLVCommonLog.exception(e);
+        }
     }
 
+    @Override
     public void destroy() {
         PLVFloatingWindowManager.getInstance().destroy();
         try {
@@ -186,8 +193,6 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
 
     // <editor-fold defaultstate="collapsed" desc="功能方法">
     private void exitScreencast() {
-
-
         Intent intent = new Intent(context, PLVSAStreamerAloneActivity.class);
         //service context 6.0↓(test 7.0~9.0 no error) only use Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, report： Calling startActivity() from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -198,10 +203,9 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
             @Override
             public void run() {
                 streamerPresenter.exitShareScreen();
-                PLVFloatingWindowManager.getInstance().hide();
+                close();
             }
         }, 300);
-
     }
 
 
@@ -291,9 +295,9 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
         static final String SYSTEM_HOME_KEY_LONG = "recentapps";
         static final String SYSTEM_HOME__MIUI_GESTURE = "fs_gesture";//小米全面屏返回桌面触发事件
 
-        private WeakReference<PLVSAStreamerFloatWindow> window;
+        private WeakReference<PLVSAStreamerScreenShareFloatWindowV1> window;
 
-        public HomeKeyEventBroadCastReceiver(WeakReference<PLVSAStreamerFloatWindow> window) {
+        public HomeKeyEventBroadCastReceiver(WeakReference<PLVSAStreamerScreenShareFloatWindowV1> window) {
             this.window = window;
         }
 
@@ -302,7 +306,7 @@ public class PLVSAStreamerFloatWindow implements View.OnClickListener {
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
                 String reason = intent.getStringExtra(SYSTEM_REASON);
-                final PLVSAStreamerFloatWindow floatWindow = window.get();
+                final PLVSAStreamerScreenShareFloatWindowV1 floatWindow = window.get();
                 if (floatWindow == null) {
                     return;
                 }

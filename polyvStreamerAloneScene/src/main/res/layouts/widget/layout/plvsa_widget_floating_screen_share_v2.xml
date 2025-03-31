@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvsa_streamer_screen_share_float_window_root"
+    android:layout_width="match_parent"
+    android:layout_height="58dp">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+        android:id="@+id/plvsa_streamer_screen_share_float_window_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="12dp"
+        android:background="@drawable/plvsa_streamer_screen_share_float_window_bg"
+        android:clickable="true"
+        app:mode="all"
+        app:radius="12dp">
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_close_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/plv_close_ic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_network_iv"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/plv_streamer_network_status_good_icon"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_streamer_screen_share_float_window_close_iv"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_network_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_screen_share_float_window_network_iv"
+            app:layout_constraintStart_toEndOf="@+id/plvsa_streamer_screen_share_float_window_network_iv"
+            app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_screen_share_float_window_network_iv"
+            tools:text="@string/plv_streamer_network_good" />
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_back_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/plvsa_streamer_screen_share_back_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_text_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#99FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_screen_share_float_window_close_iv"
+            tools:text="暂无聊天消息暂无聊天消息暂无聊天消息暂无聊天消息暂无聊天消息暂无聊天消息" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvsa_streamer_screen_share_float_window_collapsed_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_collapsed_left_iv"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:rotation="180"
+            android:src="@drawable/plvsa_streamer_screen_share_float_window_collapsed_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:alpha="1" />
+
+        <ImageView
+            android:id="@+id/plvsa_streamer_screen_share_float_window_collapsed_right_iv"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:src="@drawable/plvsa_streamer_screen_share_float_window_collapsed_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:alpha="1" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -49,6 +49,10 @@ public interface IPLVFloatingLayout {
 
     void setEnableDrag(boolean enableDrag);
 
+    void setEnableDragX(boolean enableDrag);
+
+    void setEnableDragY(boolean enableDrag);
+
     void setConsumeTouchEventOnMove(boolean consumeTouchEventOnMove);
 
     /**

@@ -4,6 +4,8 @@
     <string name="plvsa_setting_enter_live">ライブ ブロードキャスト ルームに入る</string>
     <string name="plvsa_streamer_sharescreen_exit">共有を終了</string>
     <string name="plvsa_streamer_sharescreen_start">画面共有</string>
+    <string name="plvsa_streamer_sharescreen_float_message">デスクトップメッセージ</string>
+    <string name="plvsa_streamer_sharescreen_float_message_condition_hint">画面共有期間のみ有効で、システムの「他のアプリケーションの上位に表示」権限をオンにする必要があります</string>
     <string name="plvsa_streamer_sharescreen_start_tip">他の人があなたの画面を見ることができるようになりました</string>
     <string name="plvsa_streamer_sharescreen_already_stop">共有が終了しました</string>
     <string name="plvsa_streamer_sharescreen_error">画面共有に失敗しました:</string>
