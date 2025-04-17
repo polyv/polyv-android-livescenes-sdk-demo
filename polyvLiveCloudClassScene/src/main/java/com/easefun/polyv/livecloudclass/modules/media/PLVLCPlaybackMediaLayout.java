@@ -58,6 +58,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVAbsPlaybackPlayerView;
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
@@ -287,6 +288,9 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
                     final boolean showChatLayout = !danmuSwitchView.isSelected();
                     chatLandscapeLayout.toggle(showChatLayout);
                 }
+                PLVToast.Builder.context(getContext())
+                        .setText(!danmuSwitchView.isSelected() ? R.string.plv_player_open_barrage : R.string.plv_player_close_barrage)
+                        .show();
             }
         });
         danmuWrapper.setDanmuSwitchLandView(danmuSwitchView);

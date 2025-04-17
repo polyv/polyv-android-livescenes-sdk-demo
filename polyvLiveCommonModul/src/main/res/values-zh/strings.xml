@@ -68,6 +68,11 @@
     <string name="plv_player_error">播放异常\n</string>
     <string name="plv_player_retry_fail">重试失败</string>
     <string name="plv_player_retry">重试</string>
+    <string name="plv_player_exit_fullscreen">已取消全屏</string>
+    <string name="plv_player_enter_fullscreen">画面已全屏</string>
+    <string name="plv_player_layout_adjusted">已调整布局</string>
+    <string name="plv_player_open_barrage">已开启弹幕</string>
+    <string name="plv_player_close_barrage">已关闭弹幕</string>
     <!--下载-->
     <string name="plv_download_downloading">下载中</string>
     <string name="plv_download_downloaded">已下载</string>

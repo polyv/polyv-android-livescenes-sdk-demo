@@ -44,6 +44,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
@@ -109,6 +110,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     // View
+    private ImageView chatroomBgIv;
     // 播放器布局
     private IPLVECVideoLayout videoLayout;
     // 连麦布局
@@ -266,6 +268,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
         observeVideoLayout();
         observeLinkMicLayout();
+        observeLiveRoomData();
     }
 
     @Override
@@ -511,6 +514,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         initGesture();
 
         videoLayout.startPlay();
+
+        //聊天室背景图
+        chatroomBgIv = findViewById(R.id.plvec_chat_room_bg_iv);
 
         final String vid = liveRoomDataManager.getConfig().getVid();
         final boolean isPlayback = !liveRoomDataManager.getConfig().isLive();
@@ -821,6 +827,28 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
                 }
             });
         }
+    }
+
+    private void observeLiveRoomData() {
+        liveRoomDataManager.getClassDetailVO().observe(this, new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> liveClassDetailVO) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (liveClassDetailVO != null && liveClassDetailVO.isSuccess()) {
+                    PLVLiveClassDetailVO liveClassDetail = liveClassDetailVO.getData();
+                    if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                        return;
+                    }
+                    // 聊天室背景图
+                    String chatBackgroundUrl = liveClassDetail.getData().getPortraitChatBgImg();
+                    if (!TextUtils.isEmpty(chatBackgroundUrl)) {
+                        PLVImageLoader.getInstance()
+                                .loadImage(PLVECLiveEcommerceActivity.this, chatBackgroundUrl, chatroomBgIv, liveClassDetail.getData().getPortraitChatBgImgOpacity());
+                    }
+                }
+            }
+        });
     }
     // </editor-fold>
 

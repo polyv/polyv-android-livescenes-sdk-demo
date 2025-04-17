@@ -28,6 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Pair;
 import android.view.Gravity;
@@ -52,6 +53,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLay
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
@@ -67,6 +69,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRe
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
@@ -78,6 +81,7 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageHelper;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -85,6 +89,7 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
@@ -135,6 +140,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //未读信息提醒view
     private TextView unreadMsgTv;
+    //聊天背景
+    private ImageView chatroomBgIv;
 
     @Nullable
     private PLVLCChatOverLengthMessageLayout chatOverLengthMessageLayout;
@@ -364,6 +371,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 }
             });
         }
+        //聊天室背景
+        chatroomBgIv = findViewById(R.id.plv_chat_room_bg_iv);
 
         //信息输入框
         inputEt = findViewById(R.id.input_et);
@@ -610,6 +619,28 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 }
             }
         });
+
+        if (liveRoomDataManager != null && getContext() != null) {
+            liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+                @Override
+                public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> plvLiveClassDetailVOPLVStatefulData) {
+                    liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                    if (plvLiveClassDetailVOPLVStatefulData == null || !plvLiveClassDetailVOPLVStatefulData.isSuccess()) {
+                        return;
+                    }
+                    PLVLiveClassDetailVO liveClassDetail = plvLiveClassDetailVOPLVStatefulData.getData();
+                    if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                        return;
+                    }
+                    // 聊天室背景图
+                    String chatBackgroundUrl = liveClassDetail.getData().getChatBackgroundImage();
+                    if (!TextUtils.isEmpty(chatBackgroundUrl)) {
+                        PLVImageLoader.getInstance()
+                                .loadImage(getContext(), chatBackgroundUrl, chatroomBgIv, liveClassDetail.getData().getChatBackgroundImageOpacity());
+                    }
+                }
+            });
+        }
     }
 
     private void observeTransmitChangedEvent() {

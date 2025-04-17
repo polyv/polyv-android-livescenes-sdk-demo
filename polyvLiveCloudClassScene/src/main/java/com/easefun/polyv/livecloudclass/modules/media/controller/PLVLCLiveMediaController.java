@@ -156,7 +156,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     // 服务端的点赞开关
     private boolean isLikesSwitchEnabled = true;
     // 服务端的打赏开关
-    private boolean isRewardSwitchEnabled = true;
+    private boolean isRewardSwitchEnabled = false;
     // 聊天室tab是否可见
     private boolean isChatDisplayEnabled = true;
     // 主播放器是否正在播放
@@ -601,6 +601,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         hideRefreshButtonInRtcChannel = isHideRefreshButton;
         getLiveMediaDispatcher().updateViewProperties();
         updatePaintModeEntrance();
+        notifyPPTSwitchViewChanged(VISIBLE_FORCE_VISIBLE, true);
     }
 
     @Override
@@ -609,6 +610,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         isRequestingJoinLinkMic = false;
         getLiveMediaDispatcher().updateViewProperties();
         updatePaintModeEntrance();
+        notifyPPTSwitchViewChanged(VISIBLE_FOR_SERVER, false);
     }
 
     @Override
@@ -827,6 +829,30 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
     // </editor-fold>
 
+    // <editor-folder defaultstate="collapsed" desc="控制流 - PPT切换按钮控制">
+    private static final int VISIBLE_FOR_SERVER = 1;
+    private static final int VISIBLE_FORCE_VISIBLE = 2;
+    private void notifyPPTSwitchViewChanged(int visibleType, boolean useFullScreenStyle) {
+        if (visibleType == VISIBLE_FOR_SERVER) {
+            setServerEnablePPT(isServerEnablePPT);
+        } else {
+            videoPptSwitchPortIv.setVisibility(View.VISIBLE);
+            videoPptSwitchLandIv.setVisibility(View.VISIBLE);
+        }
+        // 全屏按钮resource
+        int fullScreenResource = R.drawable.plvlc_controller_linkmic_sub_selector;
+        // imageResource can‘t update state
+        videoPptSwitchPortIv.setImageDrawable(useFullScreenStyle ? getResources().getDrawable(fullScreenResource) : getResources().getDrawable(R.drawable.plvlc_controller_ppt_sub_selector));
+        videoPptSwitchLandIv.setImageDrawable(useFullScreenStyle ? getResources().getDrawable(fullScreenResource) : getResources().getDrawable(R.drawable.plvlc_controller_ppt_sub_selector));
+        videoPptSwitchPortIv.setSelected(false);
+        videoPptSwitchLandIv.setSelected(false);
+        // 纯视频频道使用全屏样式的情况下，竖屏的按钮不显示
+        if (useFullScreenStyle) {
+            videoPptSwitchPortIv.setVisibility(View.GONE);
+        }
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="旋转处理">
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
@@ -922,6 +948,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             videoPptSwitchLandIv.setSelected(isShowState);
             if (onViewActionListener != null) {
                 onViewActionListener.onClickShowOrHideSubTab(isNotShowState);
+            }
+            if (isLinkMic) {
+                PLVToast.Builder.context(getContext())
+                        .setText(R.string.plv_player_layout_adjusted)
+                        .show();
             }
         } else if (id == R.id.bulletin_land_iv) {
             if (onViewActionListener != null) {

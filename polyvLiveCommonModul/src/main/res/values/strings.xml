@@ -68,6 +68,11 @@
     <string name="plv_player_error">playback error\n</string>
     <string name="plv_player_retry_fail">Retry failed</string>
     <string name="plv_player_retry">Retry</string>
+    <string name="plv_player_exit_fullscreen">Exit fullscreen</string>
+    <string name="plv_player_enter_fullscreen">Entered fullscreen</string>
+    <string name="plv_player_layout_adjusted">Layout adjusted</string>
+    <string name="plv_player_open_barrage">Barrage enabled</string>
+    <string name="plv_player_close_barrage">Barrage disabled</string>
     <!--下载-->
     <string name="plv_download_downloading">Downloading</string>
     <string name="plv_download_downloaded">Downloaded</string>
