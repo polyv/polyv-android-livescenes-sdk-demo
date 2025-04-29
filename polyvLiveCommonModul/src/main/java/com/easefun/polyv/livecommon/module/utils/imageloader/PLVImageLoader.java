@@ -53,6 +53,10 @@ public class PLVImageLoader {
         loadEngine.loadImage(imageView.getContext(), url, imageView);
     }
 
+    public void loadImage(Context context, String url, ImageView imageView, int radius) {
+        loadEngine.loadImage(context, url, imageView, radius);
+    }
+
     /**
      * 加载图片
      */

@@ -41,6 +41,7 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -268,6 +269,32 @@ public class PLVSAStreamerScreenShareFloatWindowV2 extends FrameLayout implement
                                         .append(loginEvent.getUser().getNick())
                                         .append(" ")
                                         .appendExclude(getContext().getString(R.string.plv_member_enter_live_room), new ForegroundColorSpan(Color.WHITE));
+                                streamerScreenShareFloatWindowTextTv.setText(span);
+                            } catch (Exception e) {
+                                PLVCommonLog.exception(e);
+                            }
+                        }
+                    };
+                    showMessageTask.keepShowingDuration = 2000;
+                    tryShowMessage(showMessageTask);
+                }
+            });
+        }
+
+        @Override
+        public void onLogoutEvent(@NonNull final PLVLogoutEvent logoutEvent) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    final ShowMessageTask showMessageTask = new ShowMessageTask();
+                    showMessageTask.onShowMessage = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                final Spannable span = new PLVSpannableStringBuilder()
+                                        .append(logoutEvent.getNick())
+                                        .append(" ")
+                                        .appendExclude(getContext().getString(R.string.plv_member_leave_live_room), new ForegroundColorSpan(Color.WHITE));
                                 streamerScreenShareFloatWindowTextTv.setText(span);
                             } catch (Exception e) {
                                 PLVCommonLog.exception(e);

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,11 +31,14 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
 import com.easefun.polyv.livecommon.module.utils.water.PLVPhotoContainer;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
@@ -51,6 +55,9 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.image.segmenter.api.IPLVImageSegmenterManager;
+import com.plv.image.segmenter.api.PLVImageSegmenterManager;
+import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
 import com.plv.livescenes.access.PLVChannelFeature;
@@ -63,6 +70,7 @@ import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +84,7 @@ import okhttp3.ResponseBody;
  */
 public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayout, View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private static final String TAG = PLVSASettingLayout.class.getSimpleName();
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -126,9 +135,11 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private LinearLayout settingMoreLayout;
     private LinearLayout settingWaterLayout;
     private ViewGroup settingLayout;
+    private LinearLayout settingVirtualBgLayout;
 
     private PLVSASettingMoreLayout settingMorePopupLayout;
     private PLVPhotoContainer waterLayout;
+    private PLVVirtualBackgroundLayout virtualBackgroundLayout;
 
     private String liveTitle;
 
@@ -140,6 +151,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
     //listener
     private OnViewActionListener onViewActionListener;
+    private IPLVImageSegmenterManager.InitCallback imageSegmenterInitCallback = null;
 
     private boolean isSettingFinished = false;
     private boolean isBeautyLayoutShowing = false;
@@ -166,6 +178,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     public PLVSASettingLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        PLVVirtualBackgroundLayout.destroy();
     }
     // </editor-fold>
 
@@ -199,6 +217,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingMorePopupLayout = new PLVSASettingMoreLayout(this);
         settingWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
         settingLayout = findViewById(R.id.plvsa_setting_ly);
+        settingVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_background_layout);
 
         plvsaSettingClosePageIv.setOnClickListener(this);
         plvsaSettingBeautyLayout.setOnClickListener(this);
@@ -217,6 +236,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingLiveReplaySwitchLayout.setOnClickListener(this);
         settingMoreLayout.setOnClickListener(this);
         settingWaterLayout.setOnClickListener(this);
+        settingVirtualBgLayout.setOnClickListener(this);
 
         initWaterLayout();
         initTitleInputLayout();
@@ -252,6 +272,53 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                     if (isSettingFinished && streamerPresenter != null) {
                         streamerPresenter.setWatermark(waterLayout.captureView(), 0, 0, 1);
                     }
+                }
+                if (onViewActionListener != null) {
+                    onViewActionListener.onEditMode(isEditMode);
+                }
+            }
+        });
+    }
+
+    private void initVirtualBgLayout() {
+        virtualBackgroundLayout = PLVVirtualBackgroundLayout.init(this, new PLVVirtualBackgroundLayout.OnViewActionListener() {
+            @Override
+            public void onConfirmDeleteBg(final int position) {
+                new PLVSAConfirmDialog(getContext())
+                        .setTitleVisibility(View.GONE)
+                        .setContent(R.string.plv_streamer_bg_delete_confirm)
+                        .setIsNeedLeftBtn(true)
+                        .setCancelable(true)
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                virtualBackgroundLayout.confirmDeleteBg(position);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+
+            @Override
+            public void onSelectedBg(Bitmap bitmap) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(bitmap, false);
+                }
+            }
+
+            @Override
+            public void onCancelBgAndBlur() {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(null, false);
+                }
+            }
+
+            @Override
+            public void onSelectedBlur() {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(null, true);
                 }
             }
         });
@@ -562,6 +629,17 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
         settingWaterLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
+
+        // 监听图片分割初始化回调
+        PLVImageSegmenterManager.getInstance().addInitCallback(new WeakReference<>(imageSegmenterInitCallback = new IPLVImageSegmenterManager.InitCallback() {
+            @Override
+            public void onFinishInit(PLVImageSegmenterInitCode code) {
+                PLVCommonLog.i(TAG, "onImageSegmenterFinishInit, code: " + code);
+                if (code == PLVImageSegmenterInitCode.SUCCESS) {
+                    settingVirtualBgLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        }));
     }
 
     private void initOrientation(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -709,6 +787,17 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 }
             }
         });
+        PLVImageSelectorUtil.handleActivityResult(getContext(), requestCode, resultCode, data, new PLVImageSelectorUtil.ImagePickerCallback() {
+
+            @Override
+            public void onImagesSelected(ArrayList<String> imagePaths) {
+                for (String imagePath : imagePaths) {
+                    if (virtualBackgroundLayout != null) {
+                        virtualBackgroundLayout.addImage(imagePath);
+                    }
+                }
+            }
+        });
     }
 
 // </editor-fold>
@@ -741,6 +830,11 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
         private boolean isShare;
         private boolean hasLinkMicUser;
+
+        @Override
+        public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
+            initVirtualBgLayout();
+        }
 
         @Override
         public void onStreamerError(int errorCode, Throwable throwable) {
@@ -822,6 +916,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         super.onConfigurationChanged(newConfig);
         final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
         updatePushResolutionRatioOnOrientationChanged(isLandscape);
+        if (virtualBackgroundLayout != null) {
+            virtualBackgroundLayout.onOrientationChanged(!isLandscape);
+        }
     }
 
     private void updatePushResolutionRatioOnOrientationChanged(boolean isLandscape) {
@@ -913,6 +1010,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             settingMorePopupLayout.show();
         } else if (id == settingWaterLayout.getId()) {
             PLVImagePickerUtil.openGallery((Activity) getContext());
+        } else if (id == settingVirtualBgLayout.getId()) {
+            if (virtualBackgroundLayout != null) {
+                virtualBackgroundLayout.show();
+            }
         }
     }
     // </editor-fold>

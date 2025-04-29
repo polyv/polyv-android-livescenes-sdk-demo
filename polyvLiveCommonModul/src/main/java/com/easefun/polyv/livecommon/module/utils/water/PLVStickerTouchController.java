@@ -27,6 +27,10 @@ public class PLVStickerTouchController implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        boolean isEditMode = ((PLVStickerImageView) v).isEditMode();
+        if (!isEditMode) {
+            return false;
+        }
         this.mView = v;
         mScaleDetector.onTouchEvent(event);
         int pointerCount = event.getPointerCount();

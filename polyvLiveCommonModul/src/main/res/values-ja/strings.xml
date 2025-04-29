@@ -419,6 +419,11 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">現在のネットワーク信号が弱く、起動に失敗しました。ネットワークを確認してください！</string>
     <string name="plv_streamer_toast_call_streamer_start">最初にライブ ブロードキャストを開始してください</string>
     <string name="plv_streamer_sticker">ステッカー</string>
+    <string name="plv_streamer_virtual_background">バーチャル背景</string>
+    <string name="plv_streamer_upload">カスタム</string>
+    <string name="plv_streamer_blur_bg">背景をぼかす</string>
+    <string name="plv_streamer_bg_delete_confirm">この背景画像を削除してもよろしいですか？</string>
+    <string name="plv_streamer_camera_occupy_tips">カメラは他のアプリによって使用されています。他のカメラを使用している可能性のあるアプリを終了してください！</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">関連するドキュメントはありません</string>

@@ -28,6 +28,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Pair;
 import android.view.Gravity;
@@ -69,6 +70,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRe
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
 import com.easefun.polyv.livecommon.ui.widget.PLVImagePreviewPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
@@ -140,6 +142,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //未读信息提醒view
     private TextView unreadMsgTv;
+    //聊天背景
+    private ImageView chatroomBgIv;
 
     @Nullable
     private PLVLCChatOverLengthMessageLayout chatOverLengthMessageLayout;
@@ -180,6 +184,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private PLVLCLikeIconView likesView;
     private TextView likesCountTv;
     private long likesCount;
+
 
     //打赏按钮
     @Nullable
@@ -374,6 +379,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 }
             });
         }
+        //聊天室背景
+        chatroomBgIv = findViewById(R.id.plv_chat_room_bg_iv);
 
         //信息输入框
         inputEt = findViewById(R.id.input_et);
@@ -654,6 +661,12 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         return;
                     }
                     chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
+                    // 聊天室背景图
+                    String chatBackgroundUrl = liveClassDetail.getData().getChatBackgroundImage();
+                    if (!TextUtils.isEmpty(chatBackgroundUrl)) {
+                        PLVImageLoader.getInstance()
+                                .loadImage(getContext(), chatBackgroundUrl, chatroomBgIv, liveClassDetail.getData().getChatBackgroundImageOpacity());
+                    }
                 }
             });
         }

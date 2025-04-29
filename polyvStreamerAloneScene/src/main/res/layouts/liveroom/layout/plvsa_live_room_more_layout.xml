@@ -347,7 +347,6 @@
                                 android:layout_width="52dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="center|top"
-                                android:letterSpacing="-0.18"
                                 android:text="@string/plv_chat_confirm_close_room"                                android:translationX="-0dp"
                                 android:textColor="#99F0F1F5"
                                 android:textSize="12sp" />
@@ -475,6 +474,39 @@
                             android:layout_height="wrap_content"
                             android:gravity="center|top"
                             android:text="@string/plv_streamer_sticker"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvsa_setting_virtual_bg_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/plvsa_setting_virtual_bg_layout_iv"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="12dp"
+                            android:src="@drawable/plvsa_live_room_setting_live_vbg" />
+
+                        <TextView
+                            android:id="@+id/plvsa_setting_virtual_bg_layout_tv"
+                            android:layout_width="52dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plv_streamer_virtual_background"
                             android:textColor="#99F0F1F5"
                             android:textSize="12sp" />
 

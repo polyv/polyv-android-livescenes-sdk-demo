@@ -234,6 +234,9 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 plvlsDocumentLy.onSelectUploadDocument(data);
             }
         }
+        if (plvlsStatusBarLy != null) {
+            plvlsStatusBarLy.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

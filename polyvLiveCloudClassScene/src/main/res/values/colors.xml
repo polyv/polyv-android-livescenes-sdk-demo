@@ -34,6 +34,17 @@
     <color name="colorSoftDodgerBlue">#e53082FE</color>
     <color name="colorMalibu">#5C9DFF</color>
 
-
-
+    <color name="plvlc_product_push_card_layout_background_with_image">#FFFFFF</color>
+    <color name="plvlc_product_push_card_layout_background_outer_no_image">#FF5252</color>
+    <color name="plvlc_product_push_card_layout_background_inner_no_image">#FFFFFF</color>
+    <color name="plvlc_product_push_card_index_background">#99000000</color>
+    <color name="plvlc_product_push_card_index_text">#FFFFFF</color>
+    <color name="plvlc_product_push_card_tag_background_with_image">#FF5252</color>
+    <color name="plvlc_product_push_card_tag_background_stroke_no_image">#99FF5252</color>
+    <color name="plvlc_product_push_card_tag_text_with_image">#FFFFFF</color>
+    <color name="plvlc_product_push_card_tag_text_no_image">#FF5252</color>
+    <color name="plvlc_product_push_card_name">#3D3D3D</color>
+    <color name="plvlc_product_push_card_price">#FF5252</color>
+    <color name="plvlc_product_push_card_buy_action_background">#FF5252</color>
+    <color name="plvlc_product_push_card_buy_action_text">#FFFFFF</color>
 </resources>

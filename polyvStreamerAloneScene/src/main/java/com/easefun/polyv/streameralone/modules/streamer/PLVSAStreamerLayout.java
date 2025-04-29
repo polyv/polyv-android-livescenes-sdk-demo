@@ -67,6 +67,7 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.screenshare.IPLVScreenShareListener;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVLocalFeature;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -1227,9 +1228,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
     @NonNull
     private IPLVSAStreamerScreenShareFloatWindow getCurrentScreenShareFloatWindow() {
-        boolean isFloatWindowV2 = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
-                .isFeatureSupport(PLVChannelFeature.STREAMER_SCREEN_SHARE_FLOAT_WINDOW_V2);
-        return isFloatWindowV2 ? floatWindowV2 : floatWindow;
+        return PLVLocalFeature.isStreamerScreenShareFloatWindowV2() ? floatWindowV2 : floatWindow;
     }
 
     // </editor-fold >

@@ -210,7 +210,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                 });
     }
 
-    private void observeCommodityControlSwitch(@NonNull IPLVLiveRoomDataManager liveRoomDataManager) {
+    private void observeCommodityControlSwitch(@NonNull final IPLVLiveRoomDataManager liveRoomDataManager) {
         final Context context = getContext();
         if (context == null) {
             return;
@@ -222,7 +222,8 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
                         if (data != null && data.isSuccess() && data.getData() != null && data.getData().getData() != null) {
                             final boolean isCommodityControlSwitchOn = data.getData().getData().isMobileAnchorProductEnabled();
                             final boolean hasControlPermission = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_COMMODITY_ALLOW_CONTROL);
-                            toolBarCommodityControlIv.setVisibility(isCommodityControlSwitchOn && hasControlPermission ? View.VISIBLE : View.GONE);
+                            final boolean show = isCommodityControlSwitchOn && hasControlPermission;
+                            toolBarCommodityControlIv.setVisibility(show ? View.VISIBLE : View.GONE);
                         }
                     }
                 });
@@ -270,7 +271,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         observeStatusBarLayout();
         observeCommodityControlSwitch(liveRoomDataManager);
         updateGuestLayout();
-        updateLinkMicStrategy(liveRoomDataManager);
+        updateLinkMicButton(liveRoomDataManager);
     }
 
     public void changeGiftEffectSwitch(boolean isOpen) {
@@ -433,7 +434,7 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         homeFragmentLayout.setVisibility(View.VISIBLE);
     }
 
-    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+    private void updateLinkMicButton(IPLVLiveRoomDataManager liveRoomDataManager) {
         final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
         if (!canControlLinkMic) {
             return;

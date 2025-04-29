@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="104dp"
+    android:layout_height="wrap_content">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+        android:id="@+id/plvec_product_push_hot_effect_layout"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mode="all"
+        app:radius="20dp">
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVGradientView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:plvGradientColors="#ffFFAF0F,#ffFFAF0F,#ffFFAF0F,#ccFFAF0F,#00FFAF0F"
+            app:plvGradientOrientation="leftRight" />
+
+        <ImageView
+            android:id="@+id/plvec_product_push_hot_effect_iv"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/plvec_product_push_hot_effect_icon_normal" />
+
+        <TextView
+            android:id="@+id/plvec_product_push_hot_effect_type_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/plvec_product_push_hot_effect_iv"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="热卖中" />
+
+        <TextView
+            android:id="@+id/plvec_product_push_hot_effect_multiply_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="x"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBaseline_toBaselineOf="@+id/plvec_product_push_hot_effect_type_tv"
+            app:layout_constraintStart_toEndOf="@+id/plvec_product_push_hot_effect_type_tv"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvec_product_push_hot_effect_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/plvec_product_push_hot_effect_multiply_tv"
+            app:layout_constraintStart_toEndOf="@+id/plvec_product_push_hot_effect_multiply_tv"
+            tools:text="9999+" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+        android:id="@+id/plvec_product_push_card"
+        android:layout_width="104dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/plvec_product_push_card_layout_background_with_image"
+        android:paddingBottom="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_hot_effect_layout"
+        app:mode="all"
+        app:radius="6dp">
+
+        <ImageView
+            android:layout_width="52dp"
+            android:layout_height="51dp"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/plvec_product_push_card_background_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+            android:id="@+id/plvec_product_push_image_layout"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="2dp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mode="all"
+            app:radius="4dp">
+
+            <ImageView
+                android:id="@+id/plvec_product_push_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:background="#ffa39e"
+                tools:src="@drawable/plvec_gift_flower" />
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+                android:id="@+id/plvec_product_push_index_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:textColor="@color/plvec_product_push_card_index_text"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:plvBottomRightRadius="6dp"
+                app:plvGradientMiddleColor="@color/plvec_product_push_card_index_background"
+                app:plvTopLeftRadius="4dp"
+                tools:text="1" />
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+                android:id="@+id/plvec_product_push_tag_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginBottom="3dp"
+                android:maxLength="6"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="1dp"
+                android:textColor="@color/plvec_product_push_card_tag_text_with_image"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:plvGradientMiddleColor="@color/plvec_product_push_card_tag_background_with_image"
+                app:plvRadius="2dp"
+                tools:text="商品标签" />
+
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+        <TextView
+            android:id="@+id/plvec_product_push_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/plvec_product_push_card_name"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_image_layout"
+            tools:text="商品名称商品名称" />
+
+        <TextView
+            android:id="@+id/plvec_product_push_price_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/plvec_product_push_card_price"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_name_tv"
+            tools:text="¥10" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvec_product_push_buy_action_tv"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/plv_commodity_buy"
+            android:textColor="@color/plvec_product_push_card_buy_action_text"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_price_tv"
+            app:plvGradientMiddleColor="@color/plvec_product_push_card_buy_action_background"
+            app:plvRadius="4dp" />
+
+        <ImageView
+            android:id="@+id/plvec_product_push_close_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="2dp"
+            android:src="@drawable/plvec_product_push_close_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.easefun.polyv.livestreamer.modules.statusbar;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -91,6 +92,11 @@ public interface IPLVLSStatusBarLayout {
      * @param onlineCount 在线人数
      */
     void setOnlineCount(int onlineCount);
+
+    /**
+     * Activity跳转结果
+     */
+    void onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
      * 是否拦截返回事件

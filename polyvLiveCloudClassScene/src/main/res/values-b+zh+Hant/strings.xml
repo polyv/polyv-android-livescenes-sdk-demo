@@ -15,4 +15,8 @@
     <string name="plvlc_login_playback_error_channel_type_is_null" translatable="false">channelType 为空，启动云课堂回放页失败！</string>
     <string name="plvlc_login_playback_error_viewer_id_is_empty" translatable="false">viewerId 为空，启动云课堂回放页失败</string>
     <string name="plvlc_login_playback_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动云课堂回放页失败</string>
+
+    <string name="plvlc_product_push_hot_effect_text_normal">熱賣中</string>
+    <string name="plvlc_product_push_hot_effect_text_finance">選購中</string>
+    <string name="plvlc_product_push_hot_effect_text_job">投遞中</string>
 </resources>

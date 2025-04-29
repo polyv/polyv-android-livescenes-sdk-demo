@@ -47,14 +47,13 @@ import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeV
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
-import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCProductPushCardLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControllerLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
-import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -97,8 +96,6 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
-import com.plv.socket.event.commodity.PLVProductContentBean;
-import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.TimeUtils;
@@ -195,7 +192,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private String liveStartTime;
 
     //商品卡片
-    private PLVLCCommodityPushLayout commodityPushLayout;
+    private PLVLCProductPushCardLayout productPushCardLayout;
 
     //横屏时为连麦预留的右偏移量
     private int landscapeMarginRightForLinkMicLayout;
@@ -276,7 +273,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         chatLandscapeLayout = findViewById(R.id.chat_landscape_ly);
         toTopView = findViewById(R.id.plvlc_chatroom_to_top_view);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
-        commodityPushLayout = findViewById(R.id.commodity_push_ly);
+        productPushCardLayout = findViewById(R.id.plvlc_product_push_card_layout);
 
         //初始化
         svgaParser = new SVGAParser(getContext());
@@ -741,20 +738,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
         }
 
-        commodityPushLayout.init(liveRoomDataManager);
-        commodityPushLayout.setCommodityPushListener(new PLVLCCommodityPushLayout.ICommodityPushListener() {
-            @Override
-            public void showJobDetail(PLVProductContentBean bean) {
-                if (onViewActionListener != null) {
-                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
-                    event.setData(bean);
-                    onViewActionListener.onShowJobDetail(event);
-                }
-            }
-        });
-
-        // 追踪商品卡片曝光事件
-        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
+        productPushCardLayout.init(liveRoomDataManager);
     }
 
     private void initWithLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {

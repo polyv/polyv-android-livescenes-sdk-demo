@@ -1,11 +1,15 @@
 package com.easefun.polyv.livestreamer.modules.liveroom;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.children;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.foreach;
 
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,27 +23,45 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
+import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
+import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
+import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
+import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
+import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
+import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.image.segmenter.api.IPLVImageSegmenterManager;
+import com.plv.image.segmenter.api.PLVImageSegmenterManager;
+import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -47,13 +69,14 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import kotlin.jvm.functions.Function1;
 
 /**
  * 设置布局
  */
 public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
-
+    private static final String TAG = PLVLSMoreSettingLayout.class.getSimpleName();
     private PLVBlurView blurLy;
     private ConstraintLayout moreSettingSelectLayout;
     private TextView moreSettingTitleTv;
@@ -64,12 +87,15 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private LinearLayout moreSettingShareItemLayout;
     private LinearLayout morePushDowngradeItemLayout;
     private LinearLayout moreInteractSigninLl;
+    private LinearLayout moreVirtualBgItemLayout;
     private PLVLSBitrateLayout moreSettingBitrateLayout;
     private PLVLSMixLayout moreSettingMixLayout;
     private PLVLSPushDowngradePreferenceLayout morePushDowngradePreferenceLayout;
     private View moreSettingExitSeparator;
     private TextView moreSettingExitTv;
     private Group moreSettingExitGroup;
+    private TextView moreSettingsInteractTv;
+    private GridLayout moreSettingsInteractLayout;
 
     // 分享布局
     private PLVLSShareLayout shareLayout;
@@ -78,7 +104,12 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private PLVMenuDrawer menuDrawer;
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
 
+    private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
+
+    private PLVVirtualBackgroundLayout virtualBackgroundLayout;
+
     private OnViewActionListener onViewActionListener;
+    private IPLVImageSegmenterManager.InitCallback imageSegmenterInitCallback = null;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private Disposable updateBlurViewDisposable;
@@ -110,6 +141,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         initMixLayout();
         initPushDowngradeLayout();
         initShareLayout();
+        initVirtualBackgroundItemLayout();
         observeBeautyModuleInitResult();
 
         PLVBlurUtils.initBlurView(blurLy);
@@ -132,6 +164,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingExitTv = findViewById(R.id.plvls_more_setting_exit_tv);
         moreSettingExitGroup = findViewById(R.id.plvls_more_setting_exit_group);
         moreInteractSigninLl = findViewById(R.id.plvls_more_interact_signin_layout);
+        moreVirtualBgItemLayout = findViewById(R.id.plvls_more_setting_virtual_bg_layout);
+        moreSettingsInteractTv = findViewById(R.id.plvls_more_settings_interact_tv);
+        moreSettingsInteractLayout = findViewById(R.id.plvls_more_settings_interact_layout);
 
         moreSettingExitTv.setOnClickListener(this);
         moreSettingBeautyItemLayout.setOnClickListener(this);
@@ -140,6 +175,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         morePushDowngradeItemLayout.setOnClickListener(this);
         moreSettingShareItemLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
+        moreVirtualBgItemLayout.setOnClickListener(this);
     }
 
     private void initBitrateLayout() {
@@ -236,6 +272,105 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             });
         }
     }
+
+    private void updateActionVisibility() {
+        final PLVChannelFeatureManager channelFeatures = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId());
+        final boolean showMixLayout = channelFeatures.isFeatureSupport(PLVChannelFeature.STREAMER_SETTING_SHOW_MIX_LAYOUT_BUTTON);
+        final boolean showSignInLayout = channelFeatures.isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_INTERACT_SIGN_IN);
+        if (!showMixLayout) {
+            PLVViewUtil.setGridLayoutItemVisible(moreSettingMixItemLayout, false);
+        }
+        if (!showSignInLayout) {
+            PLVViewUtil.setGridLayoutItemVisible(moreInteractSigninLl, false);
+        }
+        updateInteractMenuVisibility();
+    }
+
+    private void updateInteractMenuVisibility() {
+        final boolean show = PLVSequenceWrapper.wrap(children(moreSettingsInteractLayout))
+                .filter(new Function1<View, Boolean>() {
+                    @Override
+                    public Boolean invoke(View view) {
+                        return !(view instanceof Space);
+                    }
+                })
+                .any(new Function1<View, Boolean>() {
+                    @Override
+                    public Boolean invoke(View view) {
+                        return view.getVisibility() == View.VISIBLE;
+                    }
+                });
+        moreSettingsInteractTv.setVisibility(show ? View.VISIBLE : View.GONE);
+        moreSettingsInteractLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    private void initVirtualBackgroundLayout() {
+        virtualBackgroundLayout = new PLVVirtualBackgroundLayout(this, new PLVVirtualBackgroundLayout.OnViewActionListener() {
+            @Override
+            public void onConfirmDeleteBg(final int position) {
+                PLVLSConfirmDialog.Builder.context(getContext())
+                        .setTitleVisibility(View.GONE)
+                        .setContent(R.string.plv_streamer_bg_delete_confirm)
+                        .setIsNeedLeftBtn(true)
+                        .setCancelable(true)
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                virtualBackgroundLayout.confirmDeleteBg(position);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+            }
+
+            @Override
+            public void onSelectedBg(Bitmap bitmap) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(bitmap, false);
+                }
+            }
+
+            @Override
+            public void onCancelBgAndBlur() {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(null, false);
+                }
+            }
+
+            @Override
+            public void onSelectedBlur() {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setVirtualBackground(null, true);
+                }
+            }
+        });
+        virtualBackgroundLayout.setUseBlackStyle();
+    }
+
+    private void initVirtualBackgroundItemLayout() {
+        initVirtualBackgroundItemLayout(false);
+        // 监听图片分割初始化回调
+        PLVImageSegmenterManager.getInstance().addInitCallback(new WeakReference<>(imageSegmenterInitCallback = new IPLVImageSegmenterManager.InitCallback() {
+            @Override
+            public void onFinishInit(PLVImageSegmenterInitCode code) {
+                PLVCommonLog.i(TAG, "onImageSegmenterFinishInit, code: " + code);
+                boolean isVisible = code == PLVImageSegmenterInitCode.SUCCESS;
+                initVirtualBackgroundItemLayout(isVisible);
+            }
+        }));
+    }
+
+    private void initVirtualBackgroundItemLayout(boolean isVisible) {
+        moreVirtualBgItemLayout.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) moreVirtualBgItemLayout.getLayoutParams();
+            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, isVisible ? 1 : 0, 1F);
+            moreVirtualBgItemLayout.setLayoutParams(lp);
+        }
+    }
     // </editor-fold>
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
@@ -251,6 +386,21 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             moreSettingMixLayout.init(liveRoomDataManager);
         }
         observeLiveRoomStatus();
+        updateActionVisibility();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        PLVImageSelectorUtil.handleActivityResult(getContext(), requestCode, resultCode, data, new PLVImageSelectorUtil.ImagePickerCallback() {
+
+            @Override
+            public void onImagesSelected(ArrayList<String> imagePaths) {
+                for (String imagePath : imagePaths) {
+                    if (virtualBackgroundLayout != null) {
+                        virtualBackgroundLayout.addImage(imagePath);
+                    }
+                }
+            }
+        });
     }
     // </editor-folder>
 
@@ -342,6 +492,24 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     }
     // </editor-fold>
 
+    // <editor-folder defaultstate="collapsed" desc="streamerView">
+    public IPLVStreamerContract.IStreamerView getStreamerView() {
+        return streamerView;
+    }
+
+    private final IPLVStreamerContract.IStreamerView streamerView = new PLVAbsStreamerView() {
+        @Override
+        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+            streamerPresenter = presenter;
+        }
+
+        @Override
+        public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
+            initVirtualBackgroundLayout();
+        }
+    };
+    // </editor-folder>
+
     private void showLayout(final View viewToShow) {
         final List<View> views = PLVSugarUtil.<View>listOf(
                 moreSettingSelectLayout,
@@ -404,9 +572,14 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         } else if (id == moreSettingShareItemLayout.getId()) {
             close();
             shareLayout.open();
-        }else if (id == moreInteractSigninLl.getId()) {
+        } else if (id == moreInteractSigninLl.getId()) {
             if (onViewActionListener != null) {
                 onViewActionListener.onShowSignInAction();
+            }
+        } else if (id == moreVirtualBgItemLayout.getId()) {
+            if (virtualBackgroundLayout != null) {
+                close();
+                virtualBackgroundLayout.show();
             }
         }
     }

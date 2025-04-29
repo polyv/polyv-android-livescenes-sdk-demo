@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     android:background="#202127">
 
+    <ImageView
+        android:id="@+id/plv_chat_room_bg_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
     <com.easefun.polyv.livecommon.ui.widget.PLVSimpleSwipeRefreshLayout
         android:id="@+id/swipe_load_view"
         android:layout_width="match_parent"

@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
@@ -154,6 +155,7 @@ public class PLVSACommodityControlLayout extends FrameLayout {
         commodityControlWebView = new PLVCommodityControlWebView(getContext());
         addView(commodityControlWebView, MATCH_PARENT, MATCH_PARENT);
         commodityControlWebView
+                .setLang(PLVLanguageUtil.isENLanguage() ? PLVCommodityControlWebView.LANG_EN : PLVCommodityControlWebView.LANG_ZH_CN)
                 .setOnNeedUpdateNativeAppParamsInfoHandler(new BridgeHandler() {
                     @Override
                     public void handler(String data, CallBackFunction callBackFunction) {

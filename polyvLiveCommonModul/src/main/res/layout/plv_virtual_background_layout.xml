@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:blurOverlayColor="#BF1B202D" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plv_setting_virtual_bg_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#2c2c2c"
+        android:clickable="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        app:mode="all"
+        app:radius="10dp">
+
+        <TextView
+            android:id="@+id/plv_setting_virtual_bg_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:text="@string/plv_streamer_virtual_background"
+            android:textColor="#F0F1F5"
+            android:textSize="18sp" />
+
+        <View
+            android:id="@+id/plv_setting_title_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1AF0F1F5"
+            android:translationY="-15dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_below="@+id/plv_setting_virtual_bg_tv" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plv_setting_virtual_bg_tv"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/plv_setting_virtual_bg_top_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    tools:itemCount="2" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/plv_setting_virtual_bg_bottom_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    tools:itemCount="2" />
+            </LinearLayout>
+        </ScrollView>
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

@@ -332,12 +332,14 @@
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>
 
-    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2
-            android:id="@+id/plvec_commodity_push_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/playback_commodity_iv"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="52dp"
-            android:layout_marginBottom="4dp" />
+    <com.easefun.polyv.liveecommerce.modules.commodity.PLVECProductPushCardLayout
+        android:id="@+id/plvec_product_push_card_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/more_iv"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        android:layout_marginBottom="72dp"
+        android:layout_marginEnd="12dp" />
+
 </RelativeLayout>

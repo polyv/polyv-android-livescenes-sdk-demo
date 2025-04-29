@@ -536,6 +536,13 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onEditMode(boolean isEditMode) {
+                if (topLayerViewPager != null) {
+                    topLayerViewPager.setAlpha(isEditMode ? 0.5f : 1);
+                }
+            }
+
+            @Override
             public IPLVStreamerContract.IStreamerPresenter getStreamerPresenter() {
                 if (streamerLayout == null) {
                     return null;
