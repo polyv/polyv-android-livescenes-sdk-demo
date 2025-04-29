@@ -21,6 +21,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVJoinRequestSEvent;
 import com.plv.linkmic.model.PLVLinkMicMedia;
 import com.plv.livescenes.document.model.PLVPPTStatus;
@@ -43,6 +44,7 @@ import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -666,6 +668,13 @@ public class PLVStreamerMsgHandler {
                 PLVCommonLog.d(TAG, "onForceHangUp: isGuest=" + isGuest + ", isJoinChannelSuccess=" + isJoinChannelSuccess);
                 if (isGuest && isJoinChannelSuccess) {
                     handleGuestForceHangUp();
+                }
+            }
+
+            @Override
+            public void onWarn(PLVLinkMicConstant.WarnCode warn) {
+                if (PLVLinkMicConstant.WarnCode.WARN_CAMERA_OCCUPY == warn || PLVLinkMicConstant.WarnCode.WARN_CAMERA_IS_OCCUPIED == warn) {
+                    ToastUtils.showLong(R.string.plv_streamer_camera_occupy_tips);
                 }
             }
 

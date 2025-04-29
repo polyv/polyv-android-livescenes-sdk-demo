@@ -32,7 +32,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommon
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreFloatingView;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.PLVLCPlaybackChapterFragment;
-import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCProductPushCardLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescOfflineFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.iframe.PLVLCIFrameFragment;
@@ -53,7 +53,6 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomV
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
-import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.modules.previous.presenter.PLVPreviousPlaybackPresenter;
@@ -97,7 +96,6 @@ import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
-import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
@@ -168,8 +166,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //直播页面菜单tab标题列表
     private List<String> pageMenuTabTitleList;
 
-    //商品卡片
-    private PLVLCCommodityPushLayout commodityPushLayout;
     //空布局
     private ViewGroup emptyLy;
 
@@ -187,6 +183,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCProductFragment productFragment;
     private PLVLCMemberListPortFragment memberListFragment;
     private PLVLCMultipleVenueFragment venueFragment;
+
+    private PLVLCProductPushCardLayout productPushCardLayout;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -264,8 +262,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         chatCommonMessageList = new PLVLCChatCommonMessageList(getContext());
         restoreChatTabForMessageList(chatCommonMessageList);
 
-        commodityPushLayout = findViewById(R.id.plvlc_commodity_push_layout);
         emptyLy = findViewById(R.id.plvlc_chatroom_empty_ly);
+        productPushCardLayout = findViewById(R.id.plvlc_product_push_card_layout);
     }
 
     private void initChatroomMvpView(IPLVChatroomContract.IChatroomPresenter presenter) {
@@ -447,6 +445,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         initPlaySettingPopupWindow();
 
         chatCommonMessageList.init(liveRoomDataManager);
+        productPushCardLayout.init(liveRoomDataManager);
 
         this.chatroomPresenter = new PLVChatroomPresenter(liveRoomDataManager);
         this.chatroomPresenter.init();
@@ -459,19 +458,6 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (!NetworkUtils.isConnected()) {
             tryAddOfflineDescTabForPlaybackCache();
         }
-        commodityPushLayout.init(liveRoomDataManager);
-        commodityPushLayout.setCommodityPushListener(new PLVLCCommodityPushLayout.ICommodityPushListener() {
-            @Override
-            public void showJobDetail(PLVProductContentBean bean) {
-                if (onViewActionListener != null) {
-                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
-                    event.setData(bean);
-                    onViewActionListener.onShowJobDetail(event);
-                }
-            }
-        });
-        // 追踪商品卡片曝光事件
-        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, false, liveRoomDataManager);
 
         initSocketLoginManager();
         observeClassDetailVO();

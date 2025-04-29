@@ -3,4 +3,17 @@
     <color name="plvec_playback_more_video_text_color">#FFFFD16B</color>
     <color name="plvec_playback_indicator_select_coloc">#FFFFA611</color>
     <color name="plvec_playback_item_title_color">#CCFFFFFF</color>
+    <color name="plvec_product_push_card_layout_background_with_image">#FFFFFF</color>
+    <color name="plvec_product_push_card_layout_background_outer_no_image">#FF5252</color>
+    <color name="plvec_product_push_card_layout_background_inner_no_image">#FFFFFF</color>
+    <color name="plvec_product_push_card_index_background">#99000000</color>
+    <color name="plvec_product_push_card_index_text">#FFFFFF</color>
+    <color name="plvec_product_push_card_tag_background_with_image">#FF5252</color>
+    <color name="plvec_product_push_card_tag_background_stroke_no_image">#99FF5252</color>
+    <color name="plvec_product_push_card_tag_text_with_image">#FFFFFF</color>
+    <color name="plvec_product_push_card_tag_text_no_image">#FF5252</color>
+    <color name="plvec_product_push_card_name">#3D3D3D</color>
+    <color name="plvec_product_push_card_price">#FF5252</color>
+    <color name="plvec_product_push_card_buy_action_background">#FF5252</color>
+    <color name="plvec_product_push_card_buy_action_text">#FFFFFF</color>
 </resources>

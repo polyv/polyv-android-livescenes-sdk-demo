@@ -419,6 +419,11 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">Weak network signal, activation failed. Check your connection!</string>
     <string name="plv_streamer_toast_call_streamer_start">Please start the live stream first</string>
     <string name="plv_streamer_sticker">Sticker</string>
+    <string name="plv_streamer_virtual_background">Virtual Background</string>
+    <string name="plv_streamer_upload">Custom</string>
+    <string name="plv_streamer_blur_bg">Background Blur</string>
+    <string name="plv_streamer_bg_delete_confirm">Are you sure you want to delete this background image?</string>
+    <string name="plv_streamer_camera_occupy_tips">The camera is being used by another app. Please close any other apps that might be using the camera!</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>

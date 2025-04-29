@@ -31,7 +31,6 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
-import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointRewardEventProducer;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
@@ -56,7 +55,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
+import com.easefun.polyv.liveecommerce.modules.commodity.PLVECProductPushCardLayout;
 import com.easefun.polyv.liveecommerce.modules.member.PLVECMemberListLayoutLand;
 import com.easefun.polyv.liveecommerce.modules.member.PLVECMemberListLayoutPort;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsView;
@@ -84,7 +83,6 @@ import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
-import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
@@ -134,7 +132,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     //商品
     private ImageView commodityIv;
     private PLVECCommodityPopupLayout2 commodityPopupLayout;
-    private PLVECCommodityPushLayout2 commodityPushLayout;
+    private PLVECProductPushCardLayout productPushCardLayout;
     //打赏
     private ImageView rewardIv;
 
@@ -383,22 +381,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         networkTipsView = findViewById(R.id.plvec_live_network_tips_layout);
 
-        commodityPushLayout = findViewById(R.id.plvec_commodity_push_layout);
-        commodityPushLayout.setAnchor(commodityIv);
-        commodityPushLayout.init(liveRoomDataManager);
-        commodityPushLayout.setCommodityPushListener(new PLVECCommodityPushLayout2.ICommodityPushListener() {
-            @Override
-            public void showJobDetail(PLVProductContentBean bean) {
-                if (onViewActionListener != null) {
-                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
-                    event.setData(bean);
-                    onViewActionListener.onShowJobDetail(event);
-                }
-            }
-        });
-
-        // 追踪商品卡片曝光事件
-        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout, true, liveRoomDataManager);
+        productPushCardLayout = findViewById(R.id.plvec_product_push_card_layout);
+        productPushCardLayout.init(liveRoomDataManager);
 
         interactEntranceView = findViewById(R.id.plvec_interact_entrance_ly);
         interactEntranceView.changeLayoutStyle(false);

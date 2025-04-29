@@ -18,5 +18,7 @@
     <string name="plvec_login_playback_error_viewer_name_is_empty" translatable="false">viewerName 为空，启动直播带货回放页失败</string>
 
     <string name="plvec_live_detail_bulletin_image_alt_text">[图片]</string>
-
+    <string name="plvec_product_push_hot_effect_text_normal">热卖中</string>
+    <string name="plvec_product_push_hot_effect_text_finance">选购中</string>
+    <string name="plvec_product_push_hot_effect_text_job">投递中</string>
 </resources>

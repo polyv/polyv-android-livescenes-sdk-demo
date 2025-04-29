@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
@@ -520,7 +521,8 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 .proxyAll(
                         streamerView,
                         memberLayout.getStreamerView(),
-                        plvlsStatusBarLinkmicIv.streamerView
+                        plvlsStatusBarLinkmicIv.streamerView,
+                        moreSettingLayout.getStreamerView()
                 );
     }
 
@@ -591,6 +593,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     @Override
     public void setOnlineCount(int onlineCount) {
         memberLayout.setOnlineCount(onlineCount);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (moreSettingLayout != null) {
+            moreSettingLayout.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

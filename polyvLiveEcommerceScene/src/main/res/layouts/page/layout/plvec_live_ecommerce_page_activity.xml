@@ -3,6 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/plvec_player_bg">
+
+    <!-- 聊天室背景图 -->
+    <ImageView
+        android:id="@+id/plvec_chat_room_bg_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
     <!-- 底层的播放器layout -->
     <FrameLayout
         android:id="@+id/plvec_fl_video_container"

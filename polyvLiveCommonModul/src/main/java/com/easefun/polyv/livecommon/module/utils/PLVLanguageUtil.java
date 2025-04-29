@@ -142,10 +142,8 @@ public class PLVLanguageUtil {
             String language = userLocale.getLanguage();
             String country = userLocale.getCountry();
             PLVCommonLog.d(TAG, "=== language: " + language +  " country: " + country);
-            PLVCommonLog.d(TAG, "=== CN language: " + Locale.CHINESE.getLanguage() +  " country: " + Locale.CHINESE.getCountry());
-            PLVCommonLog.d(TAG, "=== TW language: " + Locale.TRADITIONAL_CHINESE.getLanguage() +  " TW country: " + Locale.TRADITIONAL_CHINESE.getCountry());
             if (Locale.CHINESE.getLanguage().equals(language)) {
-                return country.equals(Locale.TRADITIONAL_CHINESE.getLanguage()) ? LANGUAGE_CHINESE_TRADITIONAL : LANGUAGE_CHINESE_SIMPLIFIED;
+                return country.equals(Locale.TRADITIONAL_CHINESE.getCountry()) ? LANGUAGE_CHINESE_TRADITIONAL : LANGUAGE_CHINESE_SIMPLIFIED;
             } else if (Locale.ENGLISH.getLanguage().equals(language)) {
                 return LANGUAGE_EN;
             } else if (Locale.JAPANESE.getLanguage().equals(language)) {

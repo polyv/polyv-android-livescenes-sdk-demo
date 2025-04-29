@@ -626,6 +626,14 @@ public interface IPLVStreamerContract {
         void setWatermark(Bitmap var1, float var3, float var4, float var5);
 
         /**
+         * 设置虚拟背景
+         *
+         * @param bitmap             背景图片
+         * @param onlyBlurBackground 是否仅模糊背景，为true时，不会使用背景图片，而是使用周围原始背景的模糊效果
+         */
+        void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground);
+
+        /**
          * 销毁，包括销毁推流和连麦操作、解除view操作
          */
         void destroy();

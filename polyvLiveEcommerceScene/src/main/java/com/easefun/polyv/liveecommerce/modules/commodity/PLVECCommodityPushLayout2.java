@@ -56,7 +56,9 @@ import java.util.List;
 
 /**
  * 商品推送布局
+ * @deprecated use {@link PLVECProductPushCardLayout}
  */
+@Deprecated
 public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
 

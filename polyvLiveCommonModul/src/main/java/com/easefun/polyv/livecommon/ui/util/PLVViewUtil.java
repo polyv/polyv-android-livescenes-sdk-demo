@@ -5,7 +5,9 @@ import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
+import android.widget.GridLayout;
 
 import com.easefun.polyv.livecommon.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -58,4 +60,14 @@ public class PLVViewUtil {
         }
         return false;
     }
+
+    public static void setGridLayoutItemVisible(View view, final boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final GridLayout.LayoutParams lp = (GridLayout.LayoutParams) view.getLayoutParams();
+            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, visible ? 1 : 0, 1F);
+            view.setLayoutParams(lp);
+        }
+    }
+
 }

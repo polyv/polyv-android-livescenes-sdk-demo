@@ -419,6 +419,11 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">현재 네트워크 신호가 약해서 시작에 실패했습니다. 네트워크를 확인해주세요! </string>
     <string name="plv_streamer_toast_call_streamer_start">먼저 라이브 방송을 시작해주세요</string>
     <string name="plv_streamer_sticker">스티커</string>
+    <string name="plv_streamer_virtual_background">가상 배경</string>
+    <string name="plv_streamer_upload">사용자 정의</string>
+    <string name="plv_streamer_blur_bg">배경 흐리게</string>
+    <string name="plv_streamer_bg_delete_confirm">이 배경 이미지를 삭제하시겠습니까?</string>
+    <string name="plv_streamer_camera_occupy_tips">카메라가 다른 앱에서 사용 중입니다. 카메라를 사용할 수 있는 다른 앱을 종료하세요!</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">해당 문서 없음</string>

@@ -127,6 +127,32 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/plvsa_setting_virtual_background_layout"
+                android:layout_width="62dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="9dp"
+                    android:src="@drawable/plvsa_live_room_setting_live_vbg" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/plv_streamer_virtual_background"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/plvsa_setting_mirror_layout"
                 android:layout_width="62dp"
                 android:layout_height="wrap_content"

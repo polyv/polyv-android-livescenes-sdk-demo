@@ -204,6 +204,31 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/plvls_more_setting_virtual_bg_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plvls_live_room_setting_live_vbg" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/plv_streamer_virtual_background"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
                     <!--  placeholder  -->
                     <Space
                         android:layout_width="0dp"
@@ -225,7 +250,6 @@
                     android:text="@string/plv_live_more_interact"
                     app:layout_constraintTop_toBottomOf="@+id/plvls_more_settings_layout"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    android:visibility="gone"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="21dp"
                     android:textSize="14sp"
@@ -234,10 +258,9 @@
                     android:layout_height="wrap_content"/>
 
                 <GridLayout
-                    android:id="@+id/plvsa_more_settings_interact_layout"
+                    android:id="@+id/plvls_more_settings_interact_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:columnCount="4"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="14dp"
@@ -259,13 +282,13 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:id="@+id/plvsa_more_interact_signin_iv"
+                            android:id="@+id/plvls_more_interact_signin_iv"
                             android:layout_width="28dp"
                             android:layout_height="28dp"
                             android:src="@drawable/plvls_more_interact_signin" />
 
                         <TextView
-                            android:id="@+id/plvsa_more_interact_signin_tv"
+                            android:id="@+id/plvls_more_interact_signin_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"

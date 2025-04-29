@@ -47,7 +47,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanP
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
-import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPushLayout2;
+import com.easefun.polyv.liveecommerce.modules.commodity.PLVECProductPushCardLayout;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.PLVECPreviousDialogFragment;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.previous.PLVECPreviousAdapter;
@@ -71,7 +71,6 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
-import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
@@ -122,7 +121,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     //商品
     private ImageView commodityIv;
     private PLVECCommodityPopupLayout2 commodityPopupLayout;
-    private PLVECCommodityPushLayout2 commodityPushLayout2;
+    private PLVECProductPushCardLayout productPushCardLayout;
 
     //更多回放视频
     private ImageView moreVideoListIv;
@@ -246,22 +245,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         moreVideoListIv.setVisibility(View.GONE);
         morePopupView = new PLVECMorePopupView();
         morePopupView.initPlaybackMoreLayout(moreIv);
-        commodityPushLayout2 = findViewById(R.id.plvec_commodity_push_layout);
-        commodityPushLayout2.setAnchor(commodityIv);
-        commodityPushLayout2.init(liveRoomDataManager);
-        commodityPushLayout2.setCommodityPushListener(new PLVECCommodityPushLayout2.ICommodityPushListener() {
-            @Override
-            public void showJobDetail(PLVProductContentBean bean) {
-                if (onViewActionListener != null) {
-                    PLVShowJobDetailEvent event = new PLVShowJobDetailEvent();
-                    event.setData(bean);
-                    onViewActionListener.onShowJobDetail(event);
-                }
-            }
-        });
 
-        // 追踪商品卡片曝光事件
-        PLVTrackLogHelper.trackReadProductPush(commodityPushLayout2, true, liveRoomDataManager);
+        productPushCardLayout = findViewById(R.id.plvec_product_push_card_layout);
+        productPushCardLayout.init(liveRoomDataManager);
 
         previousPresenter = new PLVPreviousPlaybackPresenter(liveRoomDataManager);
         previousPopupView = new PLVECPreviousDialogFragment();

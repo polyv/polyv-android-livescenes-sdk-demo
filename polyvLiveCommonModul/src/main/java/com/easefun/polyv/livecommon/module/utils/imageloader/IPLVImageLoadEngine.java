@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutionException;
 public interface IPLVImageLoadEngine {
     void loadImage(Context context, String url, ImageView imageView);
 
+    void loadImage(Context context, String url, ImageView imageView, int radius);
+
     void loadImage(Context context, String url, ViewTarget<ImageView, Drawable> viewTarget);
 
     void loadImage(Context context, @DrawableRes int resId, ImageView imageView);

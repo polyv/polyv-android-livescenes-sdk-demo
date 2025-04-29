@@ -1226,6 +1226,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground) {
+        streamerManager.setVirtualBackground(bitmap, onlyBlurBackground);
+    }
+
+    @Override
     public void destroy() {
         if (currentSocketUserBean != null && currentSocketUserBean.getUserId() != null && !currentSocketUserBean.isTeacher()) {
             setUserPermissionSpeaker(currentSocketUserBean.getUserId(), false, null);

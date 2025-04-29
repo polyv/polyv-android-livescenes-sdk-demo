@@ -130,14 +130,13 @@
         android:visibility="gone"
         android:layout_gravity="center_horizontal" />
 
-    <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityPushLayout
-        android:id="@+id/commodity_push_ly"
-        android:layout_width="308dp"
+    <com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCProductPushCardLayout
+        android:id="@+id/plvlc_product_push_card_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|bottom"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        app:plv_show_on_landscape="true"
+        android:layout_marginBottom="72dp"
+        android:layout_marginEnd="12dp"
+        android:layout_gravity="bottom|end"
         app:plv_show_on_portrait="false" />
 
     <!-- 亮度手势提示 -->

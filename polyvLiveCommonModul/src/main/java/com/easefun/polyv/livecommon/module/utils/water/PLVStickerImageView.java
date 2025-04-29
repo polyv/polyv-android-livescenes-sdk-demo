@@ -149,6 +149,10 @@ public class PLVStickerImageView extends ImageView {
         }
     }
 
+    public boolean isEditMode() {
+        return mOnToggleBorderListener != null && mOnToggleBorderListener.isEditMode();
+    }
+
     public void setOnToggleBorderListener(OnToggleBorderListener onToggleBorderListener) {
         mOnToggleBorderListener = onToggleBorderListener;
     }
@@ -157,5 +161,7 @@ public class PLVStickerImageView extends ImageView {
         void onToggleBorder(boolean show, View view);
 
         void onRemoveFromParent();
+
+        boolean isEditMode();
     }
 }

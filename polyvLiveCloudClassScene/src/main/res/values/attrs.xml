@@ -9,6 +9,11 @@
         <attr name="plv_show_on_landscape" />
     </declare-styleable>
 
+    <declare-styleable name="PLVLCProductPushCardLayout">
+        <attr name="plv_show_on_portrait" />
+        <attr name="plv_show_on_landscape" />
+    </declare-styleable>
+
     <declare-styleable name="PLVLCRedpackView">
         <attr name="plvlc_red_pack_hint_position" format="enum">
             <enum name="left" value="1" />

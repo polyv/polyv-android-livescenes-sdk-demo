@@ -37,6 +37,8 @@ import com.easefun.polyv.streameralone.modules.liveroom.adapter.PLVSAMemberAdapt
 import com.plv.business.model.ppt.PLVPPTAuthentic;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -184,6 +186,12 @@ public class PLVSAMemberLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="API">
     public void open() {
+        if (liveRoomDataManager == null) {
+            return;
+        }
+        if (!PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER)) {
+            return;
+        }
         if (menuDrawer == null) {
             menuDrawer = PLVMenuDrawer.attach(
                     (Activity) getContext(),

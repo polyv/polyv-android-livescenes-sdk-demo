@@ -1,5 +1,6 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.children;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 import android.app.Activity;
@@ -32,6 +33,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -42,12 +44,16 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.google.android.flexbox.FlexboxLayout;
+import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.image.segmenter.api.IPLVImageSegmenterManager;
+import com.plv.image.segmenter.api.PLVImageSegmenterManager;
+import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
@@ -64,10 +70,12 @@ import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.socket.client.Ack;
+import kotlin.jvm.functions.Function1;
 import okhttp3.ResponseBody;
 
 /**
@@ -144,6 +152,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ImageView moreGiftEffectIv;
     private TextView moreGiftEffectTv;
     private ViewGroup moreWaterLayout;
+    private ViewGroup moreVirtualBgLayout;
+    private TextView moreSettingsInteractTv;
+    private FlexboxLayout moreSettingsInteractLayout;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -180,6 +191,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private PLVRewardDataSource rewardDataSource = new PLVRewardDataSource();
     private String channelId;
+
+    private IPLVImageSegmenterManager.InitCallback imageSegmenterInitCallback = null;
 
     /**
      * 限制每800ms点击一次
@@ -261,6 +274,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftEffectIv = findViewById(R.id.plvsa_more_gift_effect_iv);
         moreGiftEffectTv = findViewById(R.id.plvsa_more_gift_effect_tv);
         moreWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
+        moreVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_bg_layout);
+        moreSettingsInteractTv = findViewById(R.id.plvsa_more_settings_interact_tv);
+        moreSettingsInteractLayout = findViewById(R.id.plvsa_more_settings_interact_layout);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -290,6 +306,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftRewardLayout.setOnClickListener(this);
         moreGiftEffectLayout.setOnClickListener(this);
         moreWaterLayout.setOnClickListener(this);
+        moreVirtualBgLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
@@ -339,6 +356,17 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
         //init shareLayout
         shareLayout = new PLVSAShareLayout(getContext());
+
+        //init virtualBgLayout
+        PLVImageSegmenterManager.getInstance().addInitCallback(new WeakReference<>(imageSegmenterInitCallback = new IPLVImageSegmenterManager.InitCallback() {
+            @Override
+            public void onFinishInit(PLVImageSegmenterInitCode code) {
+                PLVCommonLog.i(TAG, "onImageSegmenterFinishInit, code: " + code);
+                if (code == PLVImageSegmenterInitCode.SUCCESS) {
+                    moreVirtualBgLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        }));
 
         setupPushDowngradeLayout();
         observeBeautyModuleInitResult();
@@ -475,11 +503,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         screenShareFloatMessageLayout.init(liveRoomDataManager);
         initBitrateMapIcon();
         observeLiveRoomStatus();
-        updateLinkMicStrategy(liveRoomDataManager);
+        updateLinkMicButton(liveRoomDataManager);
+        updateInteractLayout(liveRoomDataManager);
         initMixLayoutButton();
     }
 
-    private void updateLinkMicStrategy(IPLVLiveRoomDataManager liveRoomDataManager) {
+    private void updateLinkMicButton(IPLVLiveRoomDataManager liveRoomDataManager) {
         final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
         final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
@@ -488,6 +517,36 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             moreLinkmicSettingLayout.setVisibility(View.GONE);
             moreHangUpViewerLinkmicLayout.setVisibility(View.GONE);
         }
+        updateInteractMenuVisibility();
+    }
+
+    private void updateInteractLayout(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final PLVChannelFeatureManager channelFeatures = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId());
+        final boolean serverShowSignIn = channelFeatures.isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_INTERACT_SIGN_IN);
+        final boolean serverShowReward = channelFeatures.isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_INTERACT_GIFT_REWARD);
+        final boolean serverShowGiftEffect = channelFeatures.isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_INTERACT_GIFT_EFFECT);
+        if (!serverShowSignIn) {
+            moreInteractSigninLl.setVisibility(View.GONE);
+        }
+        if (!serverShowReward) {
+            moreGiftRewardLayout.setVisibility(View.GONE);
+        }
+        if (!serverShowGiftEffect) {
+            moreGiftEffectLayout.setVisibility(View.GONE);
+        }
+        updateInteractMenuVisibility();
+    }
+
+    private void updateInteractMenuVisibility() {
+        final boolean show = PLVSequenceWrapper.wrap(children(moreSettingsInteractLayout))
+                .any(new Function1<View, Boolean>() {
+                    @Override
+                    public Boolean invoke(View view) {
+                        return view.getVisibility() == View.VISIBLE;
+                    }
+                });
+        moreSettingsInteractTv.setVisibility(show ? View.VISIBLE : View.GONE);
+        moreSettingsInteractLayout.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void initMixLayoutButton() {
@@ -901,6 +960,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         } else if (id == moreWaterLayout.getId()) {
             close();
             PLVImagePickerUtil.openGallery((Activity) getContext());
+        } else if (id == moreVirtualBgLayout.getId()) {
+            PLVVirtualBackgroundLayout.tryShow();
         }
     }
 

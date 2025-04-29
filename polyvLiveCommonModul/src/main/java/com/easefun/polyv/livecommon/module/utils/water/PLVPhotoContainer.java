@@ -25,6 +25,7 @@ public class PLVPhotoContainer extends RelativeLayout {
     private View mMaskView;
     private FrameLayout mImageContainer;
     private TextView mDeleteTextView;
+    private boolean isEditMode = false;
     private OnViewActionListener mOnViewActionListener;
 
     public PLVPhotoContainer(Context context) {
@@ -105,7 +106,18 @@ public class PLVPhotoContainer extends RelativeLayout {
             ToastUtils.showShort("最多添加10张图片"); // no need i18n
             return;
         }
-        PLVStickerImageView imageView = new PLVStickerImageView(getContext(), 160);
+        final PLVStickerImageView imageView = new PLVStickerImageView(getContext(), 160);
+        imageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.bringToFront();
+                imageView.toggleBorder(true);
+                if (mOnViewActionListener != null) {
+                    mOnViewActionListener.onEditMode(true);
+                }
+                isEditMode = true;
+            }
+        });
         imageView.setImageWithBorder(path);
         imageView.setOnToggleBorderListener(new PLVStickerImageView.OnToggleBorderListener() {
             @Override
@@ -115,6 +127,7 @@ public class PLVPhotoContainer extends RelativeLayout {
                     if (mOnViewActionListener != null) {
                         mOnViewActionListener.onEditMode(true);
                     }
+                    isEditMode = true;
                     hideOtherBorders(view);
                 }
             }
@@ -126,7 +139,13 @@ public class PLVPhotoContainer extends RelativeLayout {
                     if (mOnViewActionListener != null) {
                         mOnViewActionListener.onEditMode(false);
                     }
+                    isEditMode = false;
                 }
+            }
+
+            @Override
+            public boolean isEditMode() {
+                return isEditMode;
             }
         });
 
@@ -144,6 +163,7 @@ public class PLVPhotoContainer extends RelativeLayout {
         if (mOnViewActionListener != null) {
             mOnViewActionListener.onEditMode(true);
         }
+        isEditMode = true;
     }
 
     public boolean hasImage() {
@@ -173,6 +193,7 @@ public class PLVPhotoContainer extends RelativeLayout {
         if (mOnViewActionListener != null) {
             mOnViewActionListener.onEditMode(false);
         }
+        isEditMode = false;
     }
 
     private void hideOtherBorders(View view) {

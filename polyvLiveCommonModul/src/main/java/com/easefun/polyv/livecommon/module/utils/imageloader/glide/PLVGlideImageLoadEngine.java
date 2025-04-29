@@ -46,6 +46,14 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
     }
 
     @Override
+    public void loadImage(Context context, String url, ImageView imageView, int radius) {
+        Glide.with(context)
+                .load(url)
+                .apply(new RequestOptions().transform(new PLVBlurTransformation(context, radius)))
+                .into(imageView);
+    }
+
+    @Override
     public void loadImage(Context context, String url, ViewTarget<ImageView, Drawable> viewTarget) {
         Glide.with(context)
                 .load(url)

@@ -129,6 +129,12 @@ public interface IPLVSASettingLayout {
         void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
 
         /**
+         * 是否进入贴图编辑模式
+         * @param isEditMode
+         */
+        void onEditMode(boolean isEditMode);
+
+        /**
          * 获取推流Presenter
          *
          * @return

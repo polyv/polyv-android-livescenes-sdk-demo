@@ -19,8 +19,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
-import com.plv.livescenes.access.PLVChannelFeature;
-import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVLocalFeature;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
@@ -72,16 +71,14 @@ public class PLVSAMoreScreenShareFloatMessageLayout extends FrameLayout {
         moreScreenShareFloatMessageSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
-                        .set(PLVChannelFeature.STREAMER_SCREEN_SHARE_FLOAT_WINDOW_V2, isChecked);
+                PLVLocalFeature.setStreamerScreenShareFloatWindowV2(isChecked);
             }
         });
     }
 
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
-        moreScreenShareFloatMessageSwitch.setChecked(PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
-                .isFeatureSupport(PLVChannelFeature.STREAMER_SCREEN_SHARE_FLOAT_WINDOW_V2));
+        moreScreenShareFloatMessageSwitch.setChecked(PLVLocalFeature.isStreamerScreenShareFloatWindowV2());
     }
 
     public void open() {
