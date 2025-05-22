@@ -19,4 +19,7 @@
     <string name="plvlc_product_push_hot_effect_text_normal">On Sale</string>
     <string name="plvlc_product_push_hot_effect_text_finance">Purchasing</string>
     <string name="plvlc_product_push_hot_effect_text_job">In Transit</string>
+    <string name="plvlc_playback_subtitle_translate">Translate subtitles</string>
+    <string name="plvlc_playback_subtitle_original">Original subtitles</string>
+    <string name="plvlc_playback_subtitle_title">Replay subtitles</string>
 </resources>

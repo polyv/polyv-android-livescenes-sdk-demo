@@ -19,4 +19,7 @@
     <string name="plvlc_product_push_hot_effect_text_normal">大ヒット中</string>
     <string name="plvlc_product_push_hot_effect_text_finance">選択購入中</string>
     <string name="plvlc_product_push_hot_effect_text_job">配達中</string>
+    <string name="plvlc_playback_subtitle_translate">翻訳字幕</string>
+    <string name="plvlc_playback_subtitle_original">オリジナル字幕</string>
+    <string name="plvlc_playback_subtitle_title">再生タイトル</string>
 </resources>

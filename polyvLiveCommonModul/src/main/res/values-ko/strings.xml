@@ -640,4 +640,26 @@
     <string name="plv_beauty_filter_night">밤</string>
 
     <string name="plv_interact_sign_in_timeout_toast">시간에 맞춰 체크인하지 않으면, 자동으로 스튜디오를 종료합니다</string>
+    <string name="plv_subtitle_language_chinese">중국어</string>
+    <string name="plv_subtitle_language_english">영어</string>
+    <string name="plv_subtitle_language_cantonese">광둥어</string>
+    <string name="plv_subtitle_language_uyghur">위구르어</string>
+    <string name="plv_subtitle_language_tagalog">필리핀어</string>
+    <string name="plv_subtitle_language_thai">태국어</string>
+    <string name="plv_subtitle_language_malay">말레이어</string>
+    <string name="plv_subtitle_language_indonesian">인도네시아어</string>
+    <string name="plv_subtitle_language_lao">라오어</string>
+    <string name="plv_subtitle_language_burmese">미얀마어</string>
+    <string name="plv_subtitle_language_vietnamese">베트남어</string>
+    <string name="plv_subtitle_language_french">프랑스어</string>
+    <string name="plv_subtitle_language_japanese">일본어</string>
+    <string name="plv_subtitle_language_german">독일어</string>
+    <string name="plv_subtitle_language_korean">한국어</string>
+    <string name="plv_subtitle_language_russian">러시아어</string>
+    <string name="plv_subtitle_language_portuguese">포르투갈어</string>
+    <string name="plv_subtitle_language_turkish">터키어</string>
+    <string name="plv_subtitle_language_arabic">아랍어</string>
+    <string name="plv_subtitle_language_spanish">스페인어</string>
+    <string name="plv_subtitle_language_khmer">크메르어(캄보디아)</string>
+    <string name="plv_subtitle_language_tamil">타밀어(싱가포르)</string>
 </resources>

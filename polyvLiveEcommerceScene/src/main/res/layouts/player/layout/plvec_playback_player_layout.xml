@@ -57,6 +57,12 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp" />
 
+    <!-- 字幕 -->
+    <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECPlaybackSubtitleLayout
+        android:id="@+id/plvec_playback_subtitle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <ImageView
         android:id="@+id/plvec_full_screen_iv"
         android:layout_width="22dp"

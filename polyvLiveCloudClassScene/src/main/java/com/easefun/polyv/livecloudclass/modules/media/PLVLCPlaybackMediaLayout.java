@@ -41,6 +41,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCDanmuWrapper;
 import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessageSendPanel;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackSubtitleLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCProgressTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
@@ -156,7 +157,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     //商品卡片
     private PLVLCProductPushCardLayout productPushCardLayout;
-
+    private PLVLCPlaybackSubtitleLayout playbackSubtitleLayout;
     //跑马灯
     private PLVMarqueeView marqueeView = null;
 
@@ -233,18 +234,18 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         progressTipsView = findViewById(R.id.plvlc_playback_tipsview_progress);
         chatLandscapeLayout = findViewById(R.id.plvlc_chat_landscape_ly);
         toTopView = findViewById(R.id.plvlc_chatroom_to_top_view);
-
         flPlayerSwitchViewParent = findViewById(R.id.plvlc_playback_fl_player_switch_view_parent);
         switchAnchorPlayer = findViewById(R.id.plvlc_playback_switch_anchor_player);
-
         tvCountDown = findViewById(R.id.auxiliary_tv_count_down);
         playbackPlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvlc_playback_player_floating_playing_placeholder_tv);
         llAuxiliaryCountDown = findViewById(R.id.polyv_auxiliary_controller_ll_tips);
-        llAuxiliaryCountDown.setVisibility(GONE);
         watermarkView = findViewById(R.id.polyv_watermark_view);
         playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvlc_playback_auto_continue_seek_time_hint_layout);
         playbackAutoContinueSeekTimeTv = findViewById(R.id.plvlc_playback_auto_continue_seek_time_tv);
         productPushCardLayout = findViewById(R.id.plvlc_product_push_card_layout);
+        playbackSubtitleLayout = findViewById(R.id.plvlc_playback_subtitle_layout);
+
+        llAuxiliaryCountDown.setVisibility(GONE);
 
         initVideoView();
         initPlayErrorView();
@@ -531,6 +532,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         }
 
         productPushCardLayout.init(liveRoomDataManager);
+        playbackSubtitleLayout.initData(playbackPlayerPresenter);
     }
 
     @Override

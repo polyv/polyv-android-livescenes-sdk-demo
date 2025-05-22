@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.player.playback.prsenter;
 
+import static com.plv.foundationsdk.component.exts.LangsKt.isLiteralTrue;
 import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.Activity;
@@ -58,6 +59,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
 import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
 import com.plv.livescenes.playback.vo.PLVPlaybackLocalCacheVO;
@@ -101,6 +103,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Nullable
     private PLVPlaybackDataVO playbackDataVO;
+    private Long serverAutoContinueProgress;
 
     private IPolyvVideoViewListenerEvent.OnGestureClickListener onSubGestureClickListener;
     // </editor-fold>
@@ -364,6 +367,30 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     public void setNeedGestureDetector(boolean need) {
         if (videoView != null) {
             videoView.setNeedGestureDetector(need);
+        }
+    }
+
+    @Override
+    public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+        if (videoView != null) {
+            return videoView.getAllSubtitleSettings();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+        if (videoView != null) {
+            return videoView.getShowSubtitles();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+        if (videoView != null) {
+            videoView.setShowSubtitles(subtitles);
+            updatePlayInfo();
         }
     }
 
@@ -880,6 +907,32 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                     playbackChapterViewModel.updatePlaybackData(playbackDataVO);
                 }
             });
+            videoView.setOnServerAutoContinueProgressListener(new IPLVPlaybackListenerEvent.OnServerAutoContinueProgressListener() {
+                @Override
+                public void onProgress(Long progress) {
+                    // 跨端续播进度
+                    serverAutoContinueProgress = progress;
+                }
+            });
+            videoView.setOnSubtitleSettingListener(new IPLVPlaybackListenerEvent.OnSubtitleSettingListener() {
+                @Override
+                public void onSubtitleUpdated(List<PLVPlaybackSubtitleVO> allSubtitles) {
+                    PLVPlaybackSubtitleVO firstOriginSubtitle = null;
+                    PLVPlaybackSubtitleVO firstTranslateSubtitle = null;
+                    List<PLVPlaybackSubtitleVO> showSubtitles = new ArrayList<>();
+                    for (PLVPlaybackSubtitleVO subtitle : allSubtitles) {
+                        if (firstOriginSubtitle == null && isLiteralTrue(subtitle.isOriginal())) {
+                            firstOriginSubtitle = subtitle;
+                            showSubtitles.add(subtitle);
+                        }
+                        if (firstTranslateSubtitle == null && subtitle.isOriginal() != null && !isLiteralTrue(subtitle.isOriginal())) {
+                            firstTranslateSubtitle = subtitle;
+                            showSubtitles.add(subtitle);
+                        }
+                    }
+                    videoView.setShowSubtitles(showSubtitles);
+                }
+            });
         }
     }
 
@@ -909,17 +962,23 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (!AUTO_CONTINUE_PLAY || videoView == null || playbackDataVO == null) {
             return;
         }
-        final PLVPlayInfoVO playInfoVO = playbackPlayerRepo.getPlaybackProgress(playbackDataVO);
-        if (playInfoVO == null || playInfoVO.getTotalTime() <= 0 || playInfoVO.getPosition() <= 0) {
+        int autoContinuePlaySeekTo;
+        if (serverAutoContinueProgress != null) {
+            // 跨端续播进度优先
+            autoContinuePlaySeekTo = serverAutoContinueProgress.intValue() * 1000;
+        } else {
+            final PLVPlayInfoVO playInfoVO = playbackPlayerRepo.getPlaybackProgress(playbackDataVO);
+            if (playInfoVO == null || playInfoVO.getTotalTime() <= 0 || playInfoVO.getPosition() <= 0) {
+                return;
+            }
+            autoContinuePlaySeekTo = playInfoVO.getPosition();
+        }
+        if (autoContinuePlaySeekTo < seconds(10).toMillis()
+                || autoContinuePlaySeekTo > videoView.getDuration() / 1000 * 1000 - seconds(10).toMillis()) {
+            // 视频播放开头10秒不自动续播
+            // 离播放结束还有10秒视为播放完毕，不自动续播
             return;
         }
-        if (playInfoVO.getPosition() < seconds(2).toMillis()
-                || playInfoVO.getPosition() > playInfoVO.getTotalTime() - seconds(2).toMillis()) {
-            // 视频播放开头2秒不自动续播
-            // 离播放结束还有2秒视为播放完毕，不自动续播
-            return;
-        }
-        final int autoContinuePlaySeekTo = playInfoVO.getPosition();
         PLVCommonLog.i(TAG, "Auto continue play, seek to: " + autoContinuePlaySeekTo);
         videoView.seekTo(autoContinuePlaySeekTo);
         if (getView() != null) {
@@ -966,13 +1025,15 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             position = totalTime;
         }
         int bufPercent = videoView.getBufferPercentage();
+        boolean subVideoPlaying = subVideoView != null && subVideoView.isPlaying();
 
         final PLVPlayInfoVO playInfoVO = new PLVPlayInfoVO.Builder()
                 .position(position)
                 .totalTime(totalTime)
                 .bufPercent(bufPercent)
                 .isPlaying(videoView.isPlaying())
-                .isSubViewPlaying(subVideoView != null && subVideoView.isPlaying())
+                .isSubViewPlaying(subVideoPlaying)
+                .setSubtitles(subVideoPlaying ? Collections.<String>emptyList() : videoView.getSubtitleTextAtTime(position))
                 .build();
 
         playbackPlayerData.postPlayInfoVO(playInfoVO);

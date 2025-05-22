@@ -14,6 +14,9 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data
 import com.easefun.polyv.livecommon.module.modules.watermark.IPLVWatermarkView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
+
+import java.util.List;
 
 /**
  * mvp-回放播放器契约接口
@@ -411,6 +414,21 @@ public interface IPLVPlaybackPlayerContract {
          * @param need true：需要，false：不需要
          */
         void setNeedGestureDetector(boolean need);
+
+        /**
+         * 获取所有支持的字幕设置
+         */
+        List<PLVPlaybackSubtitleVO> getAllSubtitleSettings();
+
+        /**
+         * 获取当前显示的字幕设置
+         */
+        List<PLVPlaybackSubtitleVO> getShowSubtitles();
+
+        /**
+         * 设置需要显示的字幕
+         */
+        void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
 
         /**
          * 销毁，包括销毁播放器、解除view

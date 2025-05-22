@@ -25,7 +25,6 @@ import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommod
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
-import com.easefun.polyv.livecommon.module.utils.PLVScreenshotHelper;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
@@ -38,8 +37,11 @@ import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
+
+import java.util.List;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -236,6 +238,22 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             @Override
             public void onSpeedSelected(Float speed, int pos) {
                 playerPresenter.setSpeed(speed);
+            }
+        });
+        moreLayout.setOnSubtitleActionListener(new PLVLCPlaybackMoreLayout.OnSubtitleActionListener() {
+            @Override
+            public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+                return playerPresenter.getAllSubtitleSettings();
+            }
+
+            @Override
+            public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+                return playerPresenter.getShowSubtitles();
+            }
+
+            @Override
+            public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+                playerPresenter.setShowSubtitles(subtitles);
             }
         });
     }

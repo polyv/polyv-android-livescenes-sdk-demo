@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
+        android:id="@+id/plvlc_playback_subtitle_translate_popup_root"
+        android:layout_width="match_parent"
+        android:layout_height="375dp"
+        android:layout_gravity="bottom"
+        android:background="#2C2C35"
+        app:radius="0dp">
+
+        <TextView
+            android:id="@+id/plvlc_playback_subtitle_translate_select_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/plvlc_playback_subtitle_translate"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/plvlc_playback_subtitle_translate_option_rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginVertical="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/plvlc_playback_subtitle_translate_select_title"
+            app:layout_constraintBottom_toTopOf="@+id/plvlc_playback_subtitle_translate_select_cancel_tv" />
+
+        <TextView
+            android:id="@+id/plvlc_playback_subtitle_translate_select_cancel_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/plv_sdk_common_cancel"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp" />
+
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
+</FrameLayout>
