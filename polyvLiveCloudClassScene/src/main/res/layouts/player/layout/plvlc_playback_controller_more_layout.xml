@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/plvlc_danmu_container_ly"
@@ -88,6 +89,63 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp" />
             </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/plvlc_playback_subtitle_setting_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/plvlc_playback_subtitle_setting_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plvlc_playback_subtitle_title"
+                    android:textColor="#C2C2C2"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <CheckBox
+                    android:id="@+id/plvlc_playback_subtitle_setting_original_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plvlc_playback_subtitle_original"
+                    android:textColor="#C2C2C2"
+                    android:buttonTint="#6DA7FF"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintTop_toTopOf="@+id/plvlc_playback_subtitle_setting_title"
+                    app:layout_constraintBottom_toBottomOf="@+id/plvlc_playback_subtitle_setting_title"
+                    app:layout_constraintStart_toEndOf="@+id/plvlc_playback_subtitle_setting_title" />
+
+                <CheckBox
+                    android:id="@+id/plvlc_playback_subtitle_setting_translate_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plvlc_playback_subtitle_translate"
+                    android:textColor="#C2C2C2"
+                    android:textSize="12sp"
+                    android:buttonTint="#6DA7FF"
+                    app:layout_constraintStart_toStartOf="@+id/plvlc_playback_subtitle_setting_original_checkbox"
+                    app:layout_constraintTop_toBottomOf="@+id/plvlc_playback_subtitle_setting_original_checkbox" />
+
+                <TextView
+                    android:id="@+id/plvlc_playback_subtitle_setting_translate_option_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:layout_marginStart="12dp"
+                    tools:text="英语"
+                    android:textColor="#C2C2C2"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toEndOf="@+id/plvlc_playback_subtitle_setting_translate_checkbox"
+                    app:layout_constraintTop_toTopOf="@+id/plvlc_playback_subtitle_setting_translate_checkbox"
+                    app:layout_constraintBottom_toBottomOf="@+id/plvlc_playback_subtitle_setting_translate_checkbox"
+                    android:background="@drawable/plvlc_playback_subtitle_translate_option_background" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout>
     </FrameLayout>
 </FrameLayout>

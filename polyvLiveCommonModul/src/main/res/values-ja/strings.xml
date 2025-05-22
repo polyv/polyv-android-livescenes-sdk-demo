@@ -639,4 +639,26 @@
     <string name="plv_beauty_filter_night">夜</string>
 
     <string name="plv_interact_sign_in_timeout_toast">チェックインがおくれ遅れたばあい場合,じどう自動てき的にスタジオをたいしつ退室されます</string>
+    <string name="plv_subtitle_language_chinese">中国語</string>
+    <string name="plv_subtitle_language_english">英語</string>
+    <string name="plv_subtitle_language_cantonese">広東語</string>
+    <string name="plv_subtitle_language_uyghur">ウイグル語</string>
+    <string name="plv_subtitle_language_tagalog">フィリピン語</string>
+    <string name="plv_subtitle_language_thai">タイ語</string>
+    <string name="plv_subtitle_language_malay">マレー語</string>
+    <string name="plv_subtitle_language_indonesian">インドネシア語</string>
+    <string name="plv_subtitle_language_lao">ラオス語</string>
+    <string name="plv_subtitle_language_burmese">ミャンマー語</string>
+    <string name="plv_subtitle_language_vietnamese">ベトナム語</string>
+    <string name="plv_subtitle_language_french">フランス語</string>
+    <string name="plv_subtitle_language_japanese">日本語</string>
+    <string name="plv_subtitle_language_german">ドイツ語</string>
+    <string name="plv_subtitle_language_korean">韓国語</string>
+    <string name="plv_subtitle_language_russian">ロシア語</string>
+    <string name="plv_subtitle_language_portuguese">ポルトガル語</string>
+    <string name="plv_subtitle_language_turkish">トルコ語</string>
+    <string name="plv_subtitle_language_arabic">アラビア語</string>
+    <string name="plv_subtitle_language_spanish">スペイン語</string>
+    <string name="plv_subtitle_language_khmer">クメール語（カンボジア）</string>
+    <string name="plv_subtitle_language_tamil">タミル語(シンガポール)</string>
 </resources>

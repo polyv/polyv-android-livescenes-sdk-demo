@@ -19,4 +19,7 @@
     <string name="plvlc_product_push_hot_effect_text_normal">잘 팔리고 있다</string>
     <string name="plvlc_product_push_hot_effect_text_finance">선택 구매 중</string>
     <string name="plvlc_product_push_hot_effect_text_job">배달 중</string>
+    <string name="plvlc_playback_subtitle_translate">자막 번역</string>
+    <string name="plvlc_playback_subtitle_original">어쿠스틱 자막</string>
+    <string name="plvlc_playback_subtitle_title">자막 재생</string>
 </resources>

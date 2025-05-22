@@ -640,4 +640,26 @@
     <string name="plv_beauty_filter_night">夜色</string>
 
     <string name="plv_interact_sign_in_timeout_toast">您未按时签到，自动退出直播间</string>
+    <string name="plv_subtitle_language_chinese">中文</string>
+    <string name="plv_subtitle_language_english">英文</string>
+    <string name="plv_subtitle_language_cantonese">粤语</string>
+    <string name="plv_subtitle_language_uyghur">维吾尔族语</string>
+    <string name="plv_subtitle_language_tagalog">菲律宾语</string>
+    <string name="plv_subtitle_language_thai">泰语</string>
+    <string name="plv_subtitle_language_malay">马来语</string>
+    <string name="plv_subtitle_language_indonesian">印尼语</string>
+    <string name="plv_subtitle_language_lao">老挝语</string>
+    <string name="plv_subtitle_language_burmese">缅甸语</string>
+    <string name="plv_subtitle_language_vietnamese">越南语</string>
+    <string name="plv_subtitle_language_french">法语</string>
+    <string name="plv_subtitle_language_japanese">日语</string>
+    <string name="plv_subtitle_language_german">德语</string>
+    <string name="plv_subtitle_language_korean">韩语</string>
+    <string name="plv_subtitle_language_russian">俄语</string>
+    <string name="plv_subtitle_language_portuguese">葡萄牙语</string>
+    <string name="plv_subtitle_language_turkish">土耳其</string>
+    <string name="plv_subtitle_language_arabic">阿拉伯语</string>
+    <string name="plv_subtitle_language_spanish">西班牙语</string>
+    <string name="plv_subtitle_language_khmer">高棉语（柬埔寨）</string>
+    <string name="plv_subtitle_language_tamil">泰米尔(新加坡)</string>
 </resources>

@@ -50,6 +50,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
+import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECPlaybackSubtitleLayout;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -113,6 +114,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private TextView playbackPlayerFloatingPlayingPlaceholderTv;
     private PLVRoundRectLayout playbackAutoContinueSeekTimeHintLayout;
     private TextView playbackAutoContinueSeekTimeTv;
+    private PLVECPlaybackSubtitleLayout playbackSubtitleLayout;
 
     //播放器是否小窗播放状态
     private boolean isVideoViewPlayingInFloatWindow;
@@ -170,6 +172,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         playbackPlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_playback_player_floating_playing_placeholder_tv);
         playbackAutoContinueSeekTimeHintLayout = findViewById(R.id.plvec_playback_auto_continue_seek_time_hint_layout);
         playbackAutoContinueSeekTimeTv = findViewById(R.id.plvec_playback_auto_continue_seek_time_tv);
+        playbackSubtitleLayout = findViewById(R.id.plvec_playback_subtitle_layout);
 
         initPlayErrorView();
         initSubVideoViewChangeListener();
@@ -251,6 +254,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         playbackPlayerPresenter.setAllowOpenAdHead(isAllowOpenAdhead);
+
+        playbackSubtitleLayout.initData(playbackPlayerPresenter);
     }
 
     @Override
