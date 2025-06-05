@@ -225,6 +225,7 @@
     <string name="plv_commodity_knowledge">行って学んでください</string>
     <string name="plv_commodity_now_knowledge">今すぐ学習</string>
     <string name="plv_commodity_position_details">ポジションの詳細</string>
+    <string name="plv_commodity_price_not_opened">待開価格</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">リンクマイク エラー</string>
@@ -586,6 +587,7 @@
     <string name="plv_welfare_lottery_will_start">福祉宝くじがまもなく始まります</string>
 
     <!--通用-->
+    <string name="plv_common_storage_permission_apply_tips">ファイルの読み書き機能を利用するには、アプリ設定でファイルアクセス権限を有効にする必要があります。設定に移動して権限を有効にしますか？</string>
     <string name="plv_common_dialog_click_wrong">間違ったクリック</string>
     <string name="plv_common_dialog_exit">終了</string>
     <string name="plv_common_dialog_tip">ヒント</string>

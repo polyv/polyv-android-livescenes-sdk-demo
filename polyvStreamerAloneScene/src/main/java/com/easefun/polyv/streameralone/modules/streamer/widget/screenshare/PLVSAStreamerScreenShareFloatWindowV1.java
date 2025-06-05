@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
@@ -101,9 +102,11 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
                 .build();
         PLVFloatingWindowManager.getInstance().show((Activity) context);
         try {
-            context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+            if (Build.VERSION.SDK_INT < 31) {
+                context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+            }
         } catch (Exception e) {
-            PLVCommonLog.exception(e);
+            PLVCommonLog.warn(e);
         }
     }
 
@@ -113,7 +116,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
         try {
             context.unregisterReceiver(receiver);
         } catch (Exception e) {
-            PLVCommonLog.exception(e);
+            PLVCommonLog.warn(e);
         }
     }
 
@@ -123,7 +126,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
         try {
             context.unregisterReceiver(receiver);
         } catch (Exception e) {
-            PLVCommonLog.exception(e);
+            PLVCommonLog.warn(e);
         }
     }
     // </editor-fold >

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
@@ -225,6 +226,13 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         //更新屏幕共享占位图显示状态
         if (isMe) {
             holder.plvsaScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
+            holder.streamerScreenShareStopTv.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    adapterCallback.onClickCloseScreenShare();
+                    return false;
+                }
+            });
         }
 
         final boolean showLinkMicDuration = SHOW_MEMBER_LINKMIC_DURATION_FOR_TEACHER
@@ -760,6 +768,13 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
 
         //更新屏幕共享占位图显示状态
         holder.plvsaScreenSharePlaceholderView.setVisibility(isMe && isScreenShare ? View.VISIBLE : View.INVISIBLE);
+        holder.streamerScreenShareStopTv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                adapterCallback.onClickCloseScreenShare();
+                return false;
+            }
+        });
 
         final boolean showLinkMicDuration = SHOW_MEMBER_LINKMIC_DURATION_FOR_TEACHER
                 && PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)
@@ -837,6 +852,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         private View plvsaPlaceholderView;
         //屏幕分享时的占位图
         private View plvsaScreenSharePlaceholderView;
+        private PLVRoundRectGradientTextView streamerScreenShareStopTv;
         @Nullable
         private ImageView plvsaStreamerGrantSpeakerIv;
         @Nullable
@@ -856,6 +872,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
             plvsaStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvsa_streamer_guest_link_status_tv);
             plvsaPlaceholderView = itemView.findViewById(R.id.plvsa_no_streamer_placeholder);
             plvsaScreenSharePlaceholderView = itemView.findViewById(R.id.plvsa_streamer_screen_share_placeholder);
+            streamerScreenShareStopTv = itemView.findViewById(R.id.plvsa_streamer_screen_share_stop_tv);
             plvsaStreamerGrantSpeakerIv = itemView.findViewById(R.id.plvsa_streamer_grant_speaker_iv);
             streamerLinkmicDurationLayout = itemView.findViewById(R.id.plvsa_streamer_linkmic_duration_layout);
 
@@ -945,6 +962,11 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
          * 推流画面缩放
          */
         void onStreamerViewScale(PLVLinkMicItemDataBean itemDataBean, float scaleFactor);
+
+        /**
+         * 停止屏幕共享
+         */
+        void onClickCloseScreenShare();
     }
     // </editor-fold>
 }

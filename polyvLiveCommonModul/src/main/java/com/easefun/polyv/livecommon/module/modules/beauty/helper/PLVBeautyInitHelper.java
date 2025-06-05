@@ -2,7 +2,6 @@ package com.easefun.polyv.livecommon.module.modules.beauty.helper;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.Manifest;
 import android.app.Activity;
 import androidx.lifecycle.GenericLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
@@ -10,13 +9,13 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
 
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.plv.beauty.api.IPLVBeautyManager;
 import com.plv.beauty.api.PLVBeautyManager;
 import com.plv.beauty.api.enums.PLVBeautyErrorCode;
 import com.plv.beauty.api.resource.RemoteResource;
 import com.plv.beauty.api.vo.PLVBeautyInitParam;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.feature.beauty.PLVBeautyApiManager;
@@ -98,14 +97,8 @@ public class PLVBeautyInitHelper {
     }
 
     private void requirePermissionThenRun(final Context context, final Runnable onGrantedPermission) {
-        if (PLVFastPermission.hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            onGrantedPermission.run();
-            return;
-        }
-
-        PLVFastPermission.getInstance().start(
+        PLVStoragePermissionCompat.start(
                 (Activity) context,
-                listOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 new PLVOnPermissionCallback() {
                     @Override
                     public void onAllGranted() {

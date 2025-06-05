@@ -16,6 +16,7 @@
     <string name="plvsa_streamer_screenshare_start">Screen Sharing</string>
     <string name="plvsa_streamer_screenshare_stop">Stop Sharing</string>
     <string name="plvsa_streamer_screenshare_ing">You are sharing your screen</string>
+    <string name="plvsa_streamer_screenshare_stop_confirm">Are you sure to end screen sharing?</string>
     <string name="plvsa_float_window_permission_need">To ensure that it runs in the background, you need to authorize the floating window permissions</string>
     <string name="plvsa_float_window_permission_denied_and_not_show">Permissions are limited and the floating window will not be opened</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">Double click the window to enlarge</string>

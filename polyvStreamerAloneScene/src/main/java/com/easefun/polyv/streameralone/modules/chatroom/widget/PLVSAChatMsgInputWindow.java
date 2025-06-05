@@ -1,6 +1,5 @@
 package com.easefun.polyv.streameralone.modules.chatroom.widget;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
@@ -37,7 +37,6 @@ import com.easefun.polyv.livescenes.model.PLVEmotionImageVO;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAEmotionPersonalListAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.utils.PLVSAChatroomUtils;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -242,10 +241,8 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 选择图片发送">
     private void requestSelectImg() {
-        ArrayList<String> permissions = new ArrayList<>(1);
-        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        PLVFastPermission.getInstance()
-                .start(this, permissions, new PLVOnPermissionCallback() {
+        PLVStoragePermissionCompat
+                .start(this, new PLVOnPermissionCallback() {
                     @Override
                     public void onAllGranted() {
                         selectImg();
@@ -280,7 +277,7 @@ public class PLVSAChatMsgInputWindow extends PLVInputWindow implements View.OnCl
                 .setPositiveButton(R.string.plv_common_dialog_confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        PLVFastPermission.getInstance().jump2Settings(PLVSAChatMsgInputWindow.this);
+                        PLVStoragePermissionCompat.jump2Settings(PLVSAChatMsgInputWindow.this);
                     }
                 })
                 .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {

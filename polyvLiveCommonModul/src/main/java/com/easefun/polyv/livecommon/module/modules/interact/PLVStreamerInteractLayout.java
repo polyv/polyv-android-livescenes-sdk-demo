@@ -2,7 +2,6 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,8 +21,8 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
@@ -214,10 +213,8 @@ public class PLVStreamerInteractLayout extends FrameLayout implements IPLVStream
                 ToastUtils.showShort(R.string.plv_live_save_sign_in_failed, " url is empty");
                 return;
             }
-            ArrayList<String> permissions = new ArrayList<>(1);
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            PLVFastPermission.getInstance()
-                    .start((Activity) getContext(), permissions, new PLVOnPermissionCallback() {
+            PLVStoragePermissionCompat
+                    .start((Activity) getContext(), new PLVOnPermissionCallback() {
                         @Override
                         public void onAllGranted() {
                             downloadSignRecord(url);
@@ -233,7 +230,7 @@ public class PLVStreamerInteractLayout extends FrameLayout implements IPLVStream
                                         .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                PLVFastPermission.getInstance().jump2Settings(getContext());
+                                                PLVStoragePermissionCompat.jump2Settings(getContext());
                                             }
                                         })
                                         .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {

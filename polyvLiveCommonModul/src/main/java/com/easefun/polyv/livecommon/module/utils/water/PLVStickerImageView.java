@@ -13,6 +13,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -88,7 +89,15 @@ public class PLVStickerImageView extends ImageView {
                 .into(new SimpleTarget<Drawable>(mMaxSize, mMaxSize) {
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
-                        Bitmap bitmap = ((BitmapDrawable) resource).getBitmap();
+                        Bitmap bitmap = null;
+                        if (resource instanceof BitmapDrawable) {
+                            bitmap = ((BitmapDrawable) resource).getBitmap();
+                        } else if (resource instanceof GifDrawable) {
+                            bitmap = ((GifDrawable) resource).getFirstFrame();
+                        }
+                        if (bitmap == null) {
+                            return;
+                        }
                         adjustImageSize(bitmap);
                         mBorderDrawable = new PLVRoundedBorderDrawable(
                                 bitmap,

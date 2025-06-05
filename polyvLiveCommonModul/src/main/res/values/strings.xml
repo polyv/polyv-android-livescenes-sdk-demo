@@ -225,6 +225,7 @@
     <string name="plv_commodity_knowledge">Knowledge</string>
     <string name="plv_commodity_now_knowledge">Knowledge</string>
     <string name="plv_commodity_position_details">Position Details</string>
+    <string name="plv_commodity_price_not_opened">To Be Revealed</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">Call failed</string>
@@ -587,6 +588,7 @@
     <string name="plv_welfare_lottery_will_start">Lottery is about to begin</string>
 
     <!--通用-->
+    <string name="plv_common_storage_permission_apply_tips">File read/write functionality requires file access permission to be enabled in app settings. Go to settings to enable it?</string>
     <string name="plv_common_dialog_click_wrong">Cancel</string>
     <string name="plv_common_dialog_exit">Exit</string>
     <string name="plv_common_dialog_tip">Hint</string>

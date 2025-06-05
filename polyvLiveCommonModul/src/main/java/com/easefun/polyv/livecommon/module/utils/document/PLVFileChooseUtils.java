@@ -1,17 +1,14 @@
 package com.easefun.polyv.livecommon.module.utils.document;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Environment;
 import android.webkit.MimeTypeMap;
 
-import com.plv.foundationsdk.permission.PLVFastPermission;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PLVFileChooseUtils {
 
@@ -20,13 +17,6 @@ public class PLVFileChooseUtils {
 
     public static void openDirChooseFile(Activity activity, int requestCode, String[] mimeTypes) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                intent = new Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                activity.startActivity(intent);
-                return;
-            }
-        }
         if (mimeTypes != null) {
             if (Build.VERSION.SDK_INT >= 19) {
                 intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -39,11 +29,7 @@ public class PLVFileChooseUtils {
     }
 
     public static void chooseFile(final Activity activity, final int requestCode) {
-        List<String> permissions = new ArrayList<>();
-        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        PLVFastPermission.getInstance().start(activity, permissions,
+        PLVStoragePermissionCompat.start(activity,
                 new PLVOnPermissionCallback() {
                     @Override
                     public void onAllGranted() {

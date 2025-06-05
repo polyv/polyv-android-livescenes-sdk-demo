@@ -69,6 +69,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointR
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.imageloader.glide.PLVImageUtils;
@@ -86,6 +87,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
@@ -285,10 +287,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 ToastUtils.showShort("cannot retrieve selected image");
             }
         } else if (requestCode == REQUEST_OPEN_CAMERA && resultCode == Activity.RESULT_OK) {//data->null
-            if (Build.VERSION.SDK_INT >= 29) {
-                sendImg(PLVImageUtils.transformUriToFilePath(getContext(), takePictureUri));
-            } else {
-                sendImg(takePictureFilePath.getAbsolutePath());
+            try {
+                if (Build.VERSION.SDK_INT >= 29) {
+                    sendImg(PLVImageUtils.transformUriToFilePath(getContext(), takePictureUri));
+                } else {
+                    sendImg(takePictureFilePath.getAbsolutePath());
+                }
+            } catch (Exception e) {
+                PLVCommonLog.exception(e);
             }
         }
     }
@@ -1284,10 +1290,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         if (!checkCanSendImg()) {
             return;
         }
-        ArrayList<String> permissions = new ArrayList<>(1);
-        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        PLVFastPermission.getInstance()
-                .start((Activity) getContext(), permissions, new PLVOnPermissionCallback() {
+        PLVStoragePermissionCompat
+                .start((Activity) getContext(), new PLVOnPermissionCallback() {
                     @Override
                     public void onAllGranted() {
                         selectImg();
@@ -1296,7 +1300,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
                         if (!deniedForeverP.isEmpty()) {
-                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_send_img_error_tip_permission_denied));
+                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_send_img_error_tip_permission_denied), true);
                         } else {
                             ToastUtils.showShort(R.string.plv_chat_send_img_error_tip_permission_cancel);
                         }
@@ -1316,8 +1320,26 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         if (!checkCanSendImg()) {
             return;
         }
-        ArrayList<String> permissions = new ArrayList<>(2);
-        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        PLVStoragePermissionCompat
+                .start((Activity) getContext(), new PLVOnPermissionCallback() {
+                    @Override
+                    public void onAllGranted() {
+                        requestCameraPermission();
+                    }
+
+                    @Override
+                    public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
+                        if (!deniedForeverP.isEmpty()) {
+                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_denied), true);
+                        } else {
+                            ToastUtils.showShort(R.string.plv_chat_open_camera_error_tip_permission_cancel);
+                        }
+                    }
+                });
+    }
+
+    private void requestCameraPermission() {
+        ArrayList<String> permissions = new ArrayList<>(1);
         permissions.add(Manifest.permission.CAMERA);
         PLVFastPermission.getInstance()
                 .start((Activity) getContext(), permissions, new PLVOnPermissionCallback() {
@@ -1329,7 +1351,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     @Override
                     public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
                         if (!deniedForeverP.isEmpty()) {
-                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_denied));
+                            showRequestPermissionDialog(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_denied), false);
                         } else {
                             ToastUtils.showShort(PLVAppUtils.getString(R.string.plv_chat_open_camera_error_tip_permission_cancel));
                         }
@@ -1363,13 +1385,17 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         startActivityForResult(intent, REQUEST_OPEN_CAMERA);
     }
 
-    private void showRequestPermissionDialog(String message) {
+    private void showRequestPermissionDialog(String message, final boolean isOnyStoragePermission) {
         new AlertDialog.Builder(getContext()).setTitle(PLVAppUtils.getString(R.string.plv_common_dialog_tip))
                 .setMessage(message)
                 .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_2), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        PLVFastPermission.getInstance().jump2Settings(getContext());
+                        if (isOnyStoragePermission) {
+                            PLVStoragePermissionCompat.jump2Settings(getContext());
+                        } else {
+                            PLVFastPermission.getInstance().jump2Settings(getContext());
+                        }
                     }
                 })
                 .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {

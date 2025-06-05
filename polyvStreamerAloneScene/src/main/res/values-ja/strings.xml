@@ -15,6 +15,7 @@
     <string name="plvsa_streamer_screenshare_start">共有を開始</string>
     <string name="plvsa_streamer_screenshare_stop">共有を終了</string>
     <string name="plvsa_streamer_screenshare_ing">画面を共有しています</string>
+    <string name="plvsa_streamer_screenshare_stop_confirm">画面共有を終了しますか？</string>
     <string name="plvsa_float_window_permission_need">バックグラウンド操作を確実にするには、フローティング ウィンドウの権限を承認する必要があります</string>
     <string name="plvsa_float_window_permission_denied_and_not_show">権限が制限されているため、フローティング ウィンドウは開きません</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">ウィンドウをダブルクリックして拡大します</string>

@@ -343,6 +343,26 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             public void onStreamerViewScale(PLVLinkMicItemDataBean itemDataBean, float scaleFactor) {
                 scaleStreamerView(itemDataBean, scaleFactor);
             }
+
+            @Override
+            public void onClickCloseScreenShare() {
+                if (streamerPresenter == null) {
+                    return;
+                }
+                PLVSAConfirmDialog.Builder.context(getContext())
+                        .setTitle(R.string.plvsa_streamer_screenshare_stop_confirm)
+                        .setContentVisibility(View.GONE)
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setRightButtonText(R.string.plv_common_dialog_confirm)
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                streamerPresenter.exitShareScreen();
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
         });
 
         final boolean isDefaultBackCamera = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())

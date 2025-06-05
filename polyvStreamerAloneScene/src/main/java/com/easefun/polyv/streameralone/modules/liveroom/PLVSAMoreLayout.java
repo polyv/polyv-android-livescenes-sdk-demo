@@ -869,7 +869,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                         @Override
                         public void run() {
                             plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
-                            String toastText = PLVAppUtils.getString(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
+                            String toastText = PLVAppUtils.getString(!plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_confirm_close_room_2 : R.string.plv_chat_cancel_close_room_2);
                             PLVToast.Builder.context(getContext())
                                     .setText(toastText)
                                     .build().show();

@@ -1,6 +1,5 @@
 package com.easefun.polyv.livecommon.ui.window;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -21,11 +20,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSafeWebView;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.CloseUtils;
@@ -152,10 +151,8 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
             return;
         }
         final boolean isSaveToMediaStore = true;
-        ArrayList<String> permissions = new ArrayList<>(1);
-        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        PLVFastPermission.getInstance()
-                .start((Activity) webView.getContext(), permissions, new PLVOnPermissionCallback() {
+        PLVStoragePermissionCompat
+                .start((Activity) webView.getContext(), new PLVOnPermissionCallback() {
                     @Override
                     public void onAllGranted() {
                         Bitmap bitmap = captureWebView();
@@ -176,7 +173,7 @@ public abstract class PLVSimpleWebViewFragment extends PLVBaseFragment {
                                     .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            PLVFastPermission.getInstance().jump2Settings(webView.getContext());
+                                            PLVStoragePermissionCompat.jump2Settings(webView.getContext());
                                         }
                                     })
                                     .setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {

@@ -1,9 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.download.layout;
 
 import static com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO.bytesToFitSizeString;
-import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.Manifest;
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -26,15 +24,14 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasou
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.PLVPlaybackCacheVideoViewModel;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
+import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.plv.foundationsdk.component.di.PLVDependManager;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Hoshiiro
@@ -166,8 +163,7 @@ public class PLVLCPlaybackCachePopupLayout extends FrameLayout implements View.O
     }
 
     private void requirePermissionThenRun(final Runnable runnable) {
-        final List<String> requestPermissions = listOf(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        PLVFastPermission.getInstance().start((Activity) getContext(), requestPermissions, new PLVOnPermissionCallback() {
+        PLVStoragePermissionCompat.start((Activity) getContext(), new PLVOnPermissionCallback() {
             @Override
             public void onAllGranted() {
                 runnable.run();
