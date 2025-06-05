@@ -15,6 +15,7 @@
     <string name="plvsa_streamer_screenshare_start">开始共享</string>
     <string name="plvsa_streamer_screenshare_stop">공유 종료</string>
     <string name="plvsa_streamer_screenshare_ing">화면을 공유하고 계십니다</string>
+    <string name="plvsa_streamer_screenshare_stop_confirm">화면 공유를 종료하시겠습니까?</string>
     <string name="plvsa_float_window_permission_need">백그라운드 작업을 보장하려면 플로팅 창 권한을 승인해야 합니다</string>
     <string name="plvsa_float_window_permission_denied_and_not_show">권한이 제한되어 있어 플로팅 창이 열리지 않습니다</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">창을 두 번 클릭하시면 확대됩니다</string>

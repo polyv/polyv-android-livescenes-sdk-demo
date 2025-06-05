@@ -1752,6 +1752,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             PLVRTCMixUser mixUser = new PLVRTCMixUser();
             mixUser.setScreenShare(plvLinkMicItemDataBean.isScreenShareInScreenStream());
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
+            mixUser.setNickname(plvLinkMicItemDataBean.getNick());
             //屏幕共享时，当前用户的混流摄像头不能为mute，否则CDN混流无画面
             if (plvLinkMicItemDataBean.isScreenShare()) {
                 mixUser.setMuteVideo(false);
@@ -1779,6 +1780,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 mixUser.setMuteVideo(plvLinkMicItemDataBean.isMuteVideo());
             }
             mixUser.setUserId(plvLinkMicItemDataBean.getLinkMicId());
+            mixUser.setNickname(plvLinkMicItemDataBean.getNick());
             mixUserList.add(mixUser);
         }
         streamerManager.updateMixLayoutUsers(mixUserList);

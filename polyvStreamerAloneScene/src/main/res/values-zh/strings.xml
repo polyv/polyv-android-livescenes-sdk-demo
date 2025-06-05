@@ -15,6 +15,7 @@
     <string name="plvsa_streamer_screenshare_start">开始共享</string>
     <string name="plvsa_streamer_screenshare_stop">结束共享</string>
     <string name="plvsa_streamer_screenshare_ing">您正在共享屏幕</string>
+    <string name="plvsa_streamer_screenshare_stop_confirm">确定结束屏幕共享吗？</string>
     <string name="plvsa_float_window_permission_need">为保证后台运行，需要您授权浮窗权限</string>
     <string name="plvsa_float_window_permission_denied_and_not_show">权限受限，将不开启悬浮窗</string>
     <string name="plvsa_streamer_double_click_enter_fullscreen">双击窗口放大</string>

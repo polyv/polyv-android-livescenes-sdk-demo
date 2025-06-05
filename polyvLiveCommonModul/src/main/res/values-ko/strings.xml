@@ -225,6 +225,7 @@
     <string name="plv_commodity_knowledge">가서 배우세요</string>
     <string name="plv_commodity_now_knowledge">지금 알아보기</string>
     <string name="plv_commodity_position_details">직위 세부정보</string>
+    <string name="plv_commodity_price_not_opened">대기 가격</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">링크믹 오류</string>
@@ -587,6 +588,7 @@
     <string name="plv_welfare_lottery_will_start">복지 복권이 곧 시작됩니다</string>
 
     <!--通用-->
+    <string name="plv_common_storage_permission_apply_tips">파일 읽기/쓰기 기능을 사용하려면 앱 설정에서 파일 액세스 권한을 활성화해야 합니다. 설정으로 이동하여 권한을 활성화하시겠습니까?</string>
     <string name="plv_common_dialog_click_wrong">잘못 클릭</string>
     <string name="plv_common_dialog_exit">종료</string>
     <string name="plv_common_dialog_tip">팁</string>

@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 
 import com.easefun.polyv.livecommon.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
 import com.plv.foundationsdk.utils.PLVScreenshotUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -43,7 +42,7 @@ public class PLVScreenshotHelper {
     }
 
     public PLVScreenshotHelper() {
-        screenshotUtil = new PLVScreenshotUtil();
+        screenshotUtil = new PLVScreenshotUtil(true);
         screenshotUtil.setListener(new PLVScreenshotUtil.PLVScreenshotListener() {
             @Override
             public void onPermissionDenied(boolean needJump2SettingsRecover) {
@@ -51,7 +50,7 @@ public class PLVScreenshotHelper {
                     new AlertDialog.Builder(screenshotUtil.activity).setTitle(R.string.plv_common_dialog_tip).setMessage(R.string.plv_live_no_save_img_permission_hint).setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            PLVFastPermission.getInstance().jump2Settings(screenshotUtil.activity);
+                            PLVStoragePermissionCompat.jump2Settings(screenshotUtil.activity);
                         }
                     }).setNegativeButton(R.string.plv_common_dialog_cancel, new DialogInterface.OnClickListener() {
                         @Override

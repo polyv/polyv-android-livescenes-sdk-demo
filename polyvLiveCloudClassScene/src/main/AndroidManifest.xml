@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.easefun.polyv.livecloudclass">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -31,6 +32,9 @@
             android:name=".modules.download.PLVPlaybackCacheActivity"
             android:screenOrientation="portrait" />
 
-        <service android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService" />
+        <service
+            android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService"
+            android:foregroundServiceType="camera"
+            tools:ignore="ForegroundServicePermission" />
     </application>
 </manifest>

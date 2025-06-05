@@ -3,6 +3,7 @@ package com.easefun.polyv.liveecommerce.modules.commodity
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.content.Context
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommod
 import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper
 import com.easefun.polyv.livecommon.module.utils.PLVToast
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
 import com.easefun.polyv.liveecommerce.R
@@ -56,6 +58,9 @@ class PLVECProductPushCardLayout @JvmOverloads constructor(
                         }
 
                         override fun onClickBuyAction(product: PLVProductContentBean) {
+                            if (product.isNormalProduct && !product.isOpenPrice) {
+                                return
+                            }
                             if (enterCommodity(product)) {
                                 viewModel.onCloseProductPush()
                             }
@@ -201,6 +206,7 @@ private sealed class AbsCardLayout(
     protected fun bindPrice(textView: TextView, product: PLVProductContentBean) {
         val priceText = when {
             product.isNormalProduct -> when {
+                !product.isOpenPrice -> "¥??"
                 !product.customPrice.isNullOrBlank() -> product.customPrice
                 product.isFreeForPay -> context.getString(R.string.plv_commodity_free)
                 else -> "¥${product.realPrice}"
@@ -209,10 +215,25 @@ private sealed class AbsCardLayout(
             product.isPositionProduct -> product.treatment
             else -> ""
         }
-        textView.text = priceText
+        val priceNotOpenedText = when {
+            product.isNormalProduct && !product.isOpenPrice -> context.getString(R.string.plv_commodity_price_not_opened)
+            else -> null
+        }
+
+        textView.text = PLVSpannableStringBuilder(priceText).apply {
+            if (priceNotOpenedText != null) {
+                append(" ")
+                appendExclude(priceNotOpenedText, ForegroundColorSpan(0xFF999999.toInt()))
+            }
+        }
     }
 
     protected fun bindBuyText(textView: TextView, product: PLVProductContentBean) {
+        if (product.isNormalProduct && !product.isOpenPrice) {
+            textView.alpha = 0.6F
+        } else {
+            textView.alpha = 1F
+        }
         textView.text = product.btnShow
     }
 

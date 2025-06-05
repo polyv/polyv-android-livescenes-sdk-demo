@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -42,6 +43,7 @@
             android:src="@drawable/plvsa_streamer_screen_sharing_placeholder" />
 
         <TextView
+            android:id="@+id/plvsa_streamer_screen_share_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/plvsa_streamer_screen_share_iv"
@@ -50,6 +52,22 @@
             android:text="@string/plvsa_streamer_screenshare_ing"
             android:textColor="#F0F1F5"
             android:textSize="12sp" />
+
+        <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+            android:id="@+id/plvsa_streamer_screen_share_stop_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/plvsa_streamer_screen_share_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="9dp"
+            android:text="@string/plvsa_streamer_screenshare_stop"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            app:plvGradientMiddleColor="#FF6363"
+            app:plvRadius="18dp" />
+
     </RelativeLayout>
 
 </FrameLayout>

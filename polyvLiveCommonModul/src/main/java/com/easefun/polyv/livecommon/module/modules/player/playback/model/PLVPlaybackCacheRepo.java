@@ -1,6 +1,5 @@
 package com.easefun.polyv.livecommon.module.modules.player.playback.model;
 
-import android.Manifest;
 import android.support.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.PLVPlaybackCacheDatabaseDataSource;
@@ -261,7 +260,7 @@ public class PLVPlaybackCacheRepo {
     }
 
     private boolean hasPermission() {
-        return PLVFastPermission.hasPermission(PLVAppUtils.getApp(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return PLVFastPermission.hasStoragePermissionCompat13(PLVAppUtils.getApp());
     }
 
     // </editor-fold>

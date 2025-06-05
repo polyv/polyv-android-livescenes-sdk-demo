@@ -62,11 +62,11 @@ public class PLVWebViewHelper {
         // 设置 WebView 的缓存模式
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         // 支持启用缓存模式
-        webSettings.setAppCacheEnabled(appCacheEnabled);
+//        webSettings.setAppCacheEnabled(appCacheEnabled);
         // 设置 AppCache 最大缓存值(现在官方已经不提倡使用，已废弃)
-        webSettings.setAppCacheMaxSize(8 * 1024 * 1024);
+//        webSettings.setAppCacheMaxSize(8 * 1024 * 1024);
         // Android 私有缓存存储，如果你不调用setAppCachePath方法，WebView将不会产生这个目录
-        webSettings.setAppCachePath(context.getCacheDir().getAbsolutePath());
+//        webSettings.setAppCachePath(context.getCacheDir().getAbsolutePath());
         // 数据库路径
         if (!hasKitkat()) {
             webSettings.setDatabasePath(context.getDatabasePath("html").getPath());

@@ -14,6 +14,6 @@
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.Translucent" />
         <service android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService"
-            android:foregroundServiceType="mediaProjection"/>
+            android:foregroundServiceType="camera"/>
     </application>
 </manifest>
