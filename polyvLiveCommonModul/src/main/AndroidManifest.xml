@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
 
     <!-- 目前仅有纯视频开播用到 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>

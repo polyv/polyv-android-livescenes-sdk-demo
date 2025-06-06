@@ -25,5 +25,8 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
+        <service
+            android:name="com.easefun.polyv.livecommon.module.utils.PLVForegroundService"
+            android:foregroundServiceType="camera|microphone" />
     </application>
 </manifest>

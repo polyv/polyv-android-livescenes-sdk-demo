@@ -49,8 +49,8 @@ public class PLVForegroundService extends Service {
      * @param activityToJump 当点击前台服务的通知，要跳转的activity
      */
     public static void startForegroundService(Class<? extends Activity> activityToJump, String title, int icon) {
-        // 检查摄像头权限
-        if (!PLVFastPermission.hasPermission(Utils.getApp(), Manifest.permission.CAMERA)) {
+        // 检查摄像头、麦克风权限
+        if (!PLVFastPermission.hasPermission(Utils.getApp(), Manifest.permission.CAMERA) || !PLVFastPermission.hasPermission(Utils.getApp(), Manifest.permission.RECORD_AUDIO)) {
             PLVCommonLog.e(TAG, "no camera permission");
             return;
         }
@@ -104,7 +104,7 @@ public class PLVForegroundService extends Service {
                 .setContentIntent(pendingIntent)
                 .build();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA);
+            startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA | ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
         } else {
             startForeground(1, notification);
         }
