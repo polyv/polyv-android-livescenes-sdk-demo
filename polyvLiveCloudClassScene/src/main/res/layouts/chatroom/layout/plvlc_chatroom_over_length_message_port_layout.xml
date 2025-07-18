@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    app:mode="top"
-    app:radius="4dp">
+    app:plv_mode="top"
+    app:plv_radius="4dp">
 
     <TextView
         android:id="@+id/plvlc_chatroom_over_length_message_title"

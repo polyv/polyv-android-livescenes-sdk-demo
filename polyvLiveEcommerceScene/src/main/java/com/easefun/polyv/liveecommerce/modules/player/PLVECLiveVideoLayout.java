@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -119,6 +120,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     private PLVWatermarkView watermarkView;
     //播放器是否小窗播放状态
     private boolean isVideoViewPlayingInFloatWindow;
+    //截图，用于刷新直播的时候防止黑屏
+    private ImageView screenshotIV;
 
     private ViewTreeObserver.OnGlobalLayoutListener onSubVideoViewLayoutListener;
 
@@ -195,6 +198,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
 
         watermarkView = findViewById(R.id.plvec_watermark_view);
         marqueeView = ((Activity) getContext()).findViewById(R.id.plvec_marquee_view);
+        screenshotIV = findViewById(R.id.plvec_screenshot_iv);
 
         livePlayerFloatingPlayingPlaceholderTv = findViewById(R.id.plvec_live_player_floating_playing_placeholder_tv);
 
@@ -407,6 +411,11 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的live方法">
+    @Override
+    public void restartPlay() {
+        livePlayerPresenter.restartPlay();
+    }
+
     @Override
     public int getLinesPos() {
         return livePlayerPresenter.getLinesPos();
@@ -737,6 +746,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         @Override
         public void onPrepared(int mediaPlayMode) {
             super.onPrepared(mediaPlayMode);
+            hideScreenShotView();
             isLiveStart = true;
             updateVideoViewSize();
 
@@ -758,6 +768,12 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         }
 
         @Override
+        public void onRestartPlay() {
+            super.onRestartPlay();
+            showScreenShotView();
+        }
+
+        @Override
         public void onLinesChanged(int linesPos) {
             super.onLinesChanged(linesPos);
         }
@@ -767,6 +783,18 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
             updatePlayCenterView();
         }
     };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="播放器 - 截图view显示、隐藏">
+    private void hideScreenShotView() {
+        screenshotIV.setVisibility(GONE);
+    }
+
+    private void showScreenShotView() {
+        Bitmap screenshot = livePlayerPresenter.screenshot();
+        screenshotIV.setImageBitmap(screenshot);
+        screenshotIV.setVisibility(VISIBLE);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 播放暂停按钮的显示、隐藏">
@@ -846,7 +874,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                 onViewActionListener.onCloseFloatingAction();
             }
         } else if (v.getId() == R.id.play_center) {
-            resume();
+            restartPlay();
         } else if (v.getId() == R.id.plvec_full_screen_iv){
             if(PLVScreenUtils.isPortrait(getContext())){
                 PLVOrientationManager.getInstance().setLandscape((Activity) getContext());

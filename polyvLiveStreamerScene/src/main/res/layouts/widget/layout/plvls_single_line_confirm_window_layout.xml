@@ -7,8 +7,8 @@
     android:layout_gravity="center"
     android:alpha="0.75"
     android:background="@android:color/black"
-    app:mode="all"
-    app:radius="8dp">
+    app:plv_mode="all"
+    app:plv_radius="8dp">
 
     <TextView
         android:id="@+id/plv_confirm_content"

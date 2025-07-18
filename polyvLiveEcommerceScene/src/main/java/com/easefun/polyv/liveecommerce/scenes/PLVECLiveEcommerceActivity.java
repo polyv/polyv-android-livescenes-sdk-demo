@@ -1153,7 +1153,11 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="匿名内部类 - view交互事件监听器">
     private void videoResume() {
-        videoLayout.resume();
+        if (liveRoomDataManager.getConfig().isLive()) {
+            videoLayout.restartPlay();
+        } else {
+            videoLayout.resume();
+        }
     }
 
     private void videoPause() {

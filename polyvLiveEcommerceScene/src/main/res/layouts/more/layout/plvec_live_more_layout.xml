@@ -8,7 +8,7 @@
     android:padding="10dp"
     android:numColumns="5"
     android:layout_height="wrap_content"
-    tools:background="@color/colorEbonyClay"
+    tools:background="@color/plv_colorEbonyClay"
     tools:ignore="MissingDefaultResource">
 
 </android.support.v7.widget.RecyclerView>

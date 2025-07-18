@@ -52,8 +52,8 @@ public class PLVRoundRectConstraintLayout extends ConstraintLayout {
         setWillNotDraw(false);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVRoundRectConstraintLayout, defStyleAttr, 0);
-        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectConstraintLayout_radius, 10);
-        int mode = a.getInt(R.styleable.PLVRoundRectConstraintLayout_mode, MODE_ALL);
+        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectConstraintLayout_plv_radius, 10);
+        int mode = a.getInt(R.styleable.PLVRoundRectConstraintLayout_plv_mode, MODE_ALL);
         a.recycle();
 
         mRoundMode = mode;

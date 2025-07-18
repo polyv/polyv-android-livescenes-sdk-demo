@@ -21,7 +21,7 @@
             android:layout_marginBottom="16dp"
             android:background="#80464646"
             android:orientation="horizontal"
-            app:radius="8dp" />
+            app:plv_radius="8dp" />
     </FrameLayout>
 
     <android.support.constraint.ConstraintLayout
@@ -33,7 +33,7 @@
             android:id="@+id/blur_ly"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:blurOverlayColor="#DF1B202D" />
+            app:plv_blurOverlayColor="#DF1B202D" />
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"

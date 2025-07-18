@@ -280,16 +280,10 @@ public class PLVStreamerMsgHandler {
 
     private boolean sortMemberListAndCallback(boolean hasUpdateMemberList, final Runnable runnable) {
         if (hasUpdateMemberList) {
-            PLVStreamerPresenter.SortMemberListUtils.sort(streamerPresenter.memberList);
+            streamerPresenter.callUpdateSortMemberList();
             streamerPresenter.handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
-                        @Override
-                        public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                            view.onUpdateMemberListData(streamerPresenter.memberList);
-                        }
-                    });
                     if (runnable != null) {
                         runnable.run();
                     }

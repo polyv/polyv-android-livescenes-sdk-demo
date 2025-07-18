@@ -10,7 +10,7 @@
         android:id="@+id/blur_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#BF1B202D" />
+        app:plv_blurOverlayColor="#BF1B202D" />
 
     <TextView
         android:id="@+id/plvls_chatroom_over_length_message_title"

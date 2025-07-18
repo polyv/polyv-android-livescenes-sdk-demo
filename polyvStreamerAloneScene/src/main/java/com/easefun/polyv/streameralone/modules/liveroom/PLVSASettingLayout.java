@@ -847,7 +847,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
 
         @Override
-        public void onCameraDirection(boolean front, int pos) {
+        public void onCameraDirection(boolean front, int pos, String uid) {
             if (front) {
                 plvsaSettingMirrorIv.setEnabled(true);
                 plvsaSettingMirrorTv.setEnabled(true);

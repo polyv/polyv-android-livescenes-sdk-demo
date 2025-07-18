@@ -50,6 +50,15 @@ public class PLVMemberItemDataBean {
         }
     }
 
+    public void syncMemberItemBean(PLVMemberItemDataBean memberItemDataBean) {
+        if (memberItemDataBean.getSocketUserBean() != null) {
+            this.socketUserBean = memberItemDataBean.getSocketUserBean();
+        }
+        if (memberItemDataBean.getLinkMicItemDataBean() != null) {
+            this.linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
+        }
+    }
+
     public PLVLinkMicItemDataBean.LinkMicStatus getLinkMicStatus() {
         if (linkMicItemDataBean != null) {
             return linkMicItemDataBean.getStatus();

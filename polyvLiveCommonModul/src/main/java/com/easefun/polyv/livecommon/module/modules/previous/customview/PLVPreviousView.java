@@ -83,7 +83,7 @@ public class PLVPreviousView extends FrameLayout {
         refreshLayout.setDisableLoadMoreWhenContentNotFull(false);//数据没满时关闭footer
         refreshLayout.setFooterView(footView);
         header = new MaterialHeader<>(getContext());
-        header.setColorSchemeColors(new int[]{getContext().getResources().getColor(R.color.dodgerBlue)});
+        header.setColorSchemeColors(new int[]{getContext().getResources().getColor(R.color.plv_dodgerBlue)});
         refreshLayout.setHeaderView(header);
         refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
             @Override

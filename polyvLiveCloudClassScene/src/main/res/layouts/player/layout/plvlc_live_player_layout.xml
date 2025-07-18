@@ -160,7 +160,7 @@
         android:layout_height="32dp"
         android:background="@color/colorCornflowerBlue"
         android:gravity="center"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         android:textSize="14sp"
         android:visibility="gone"
         tools:text="倒计时：06天22小时07分31秒"

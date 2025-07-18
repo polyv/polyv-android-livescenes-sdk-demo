@@ -3,5 +3,5 @@
 
     <corners android:radius="3dp" />
 
-    <solid android:color="@color/dodgerBlue" />
+    <solid android:color="@color/plv_dodgerBlue" />
 </shape>

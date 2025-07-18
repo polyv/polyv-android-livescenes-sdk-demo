@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -1161,7 +1162,13 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (((Activity) getContext()).isInMultiWindowMode() && streamerPresenter.isScreenSharing()) {
+                View rootView = ((Activity) getContext()).getWindow().getDecorView();
+                isLandscape = rootView.getWidth() > rootView.getHeight();
+            }
+        }
         updateOnOrientationChanged(isLandscape);
     }
 

@@ -173,7 +173,7 @@
         android:paddingRight="8dp"
         android:paddingBottom="4dp"
         android:text="@string/plv_player_controller_reopen_floating_view"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         android:textSize="12sp"
         android:visibility="gone"
         tools:visibility="visible" />

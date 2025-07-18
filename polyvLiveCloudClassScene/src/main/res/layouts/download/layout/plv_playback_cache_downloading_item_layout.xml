@@ -70,7 +70,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/plv_playback_cache_downloading_start_or_pause_iv"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius_iv="16dp" />
+        app:plv_radius_iv="16dp" />
 
     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
         android:id="@+id/plv_playback_cache_downloading_start_or_pause_iv"
@@ -82,7 +82,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius_iv="16dp" />
+        app:plv_radius_iv="16dp" />
 
     <View
         android:layout_width="match_parent"

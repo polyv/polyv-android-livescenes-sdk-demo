@@ -33,6 +33,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
+                    <!-- 截图view -->
+                    <ImageView
+                        android:id="@+id/plvec_screenshot_iv"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+
                     <!--音频模式显示的view-->
                     <com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveAudioModeView
                         android:id="@+id/audio_mode_ly"

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="horizontal"
-    tools:background="@color/colorEbonyClay">
+    tools:background="@color/plv_colorEbonyClay">
 
     <ImageView
         android:layout_width="10dp"
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         android:textSize="12sp"
         tools:text="00:00:00" />
 

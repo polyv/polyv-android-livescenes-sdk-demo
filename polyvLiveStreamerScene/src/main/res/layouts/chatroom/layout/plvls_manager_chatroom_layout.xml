@@ -10,7 +10,7 @@
         android:id="@+id/plvls_manager_chatroom_blur_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#BF1B202D" />
+        app:plv_blurOverlayColor="#BF1B202D" />
 
     <TextView
         android:id="@+id/plvls_manager_chatroom_title_tv"
@@ -63,7 +63,7 @@
         android:background="#474B57"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_goneMarginBottom="36dp"
-        app:radius="16dp">
+        app:plv_radius="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,7 +106,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/plvls_manager_chatroom_input_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:radius="14dp"
+        app:plv_radius="14dp"
         tools:visibility="visible">
 
         <LinearLayout

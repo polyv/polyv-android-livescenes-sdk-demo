@@ -54,7 +54,7 @@
         android:id="@+id/plvls_beauty_blur_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:blurOverlayColor="#BF1B202D"
+        app:plv_blurOverlayColor="#BF1B202D"
         app:layout_constraintBottom_toBottomOf="@+id/plvls_beauty_item_layout"
         app:layout_constraintEnd_toEndOf="@+id/plvls_beauty_item_layout"
         app:layout_constraintStart_toStartOf="@+id/plvls_beauty_item_layout"

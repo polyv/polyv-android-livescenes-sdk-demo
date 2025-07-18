@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    app:mode="left"
-    app:radius="16dp">
+    app:plv_mode="left"
+    app:plv_radius="16dp">
 
     <TextView
         android:id="@+id/plvec_member_list_title_tv"

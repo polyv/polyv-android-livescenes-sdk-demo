@@ -6,15 +6,26 @@ import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,10 +55,12 @@ import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import io.socket.client.Ack;
 
 /**
@@ -72,16 +85,23 @@ public class PLVSAMemberLayout extends FrameLayout {
     private LinearLayout plvsaMemberLayout;
     private TextView plvsaMemberOnlineCountTv;
     private RecyclerView plvsaMemberListRv;
+    private RecyclerView plvsaMemberSearchListRv;
+    private EditText plvsaMemberSearchEt;
     //adapter
     private PLVSAMemberAdapter memberAdapter;
+    private PLVSAMemberAdapter memberSearchAdapter;
 
     //推流和连麦presenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable lastRunnable;
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
+    //dispose
+    private Disposable searchUserDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -106,6 +126,62 @@ public class PLVSAMemberLayout extends FrameLayout {
         plvsaMemberLayout = findViewById(R.id.plvsa_member_layout);
         plvsaMemberOnlineCountTv = findViewById(R.id.plvsa_member_online_count_tv);
         plvsaMemberListRv = findViewById(R.id.plvsa_member_list_rv);
+        plvsaMemberSearchListRv = findViewById(R.id.plvsa_member_search_list_rv);
+        plvsaMemberSearchEt = findViewById(R.id.plvsa_member_search_et);
+
+        plvsaMemberSearchEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    KeyboardUtils.hideSoftInput(plvsaMemberSearchEt);
+                    return true;
+                }
+                return false;
+            }
+        });
+        plvsaMemberSearchEt.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(final Editable editable) {
+                if (editable.length() <= 0) {
+                    cancelPost();
+                    plvsaMemberSearchListRv.setVisibility(View.INVISIBLE);
+                    plvsaMemberListRv.setVisibility(View.VISIBLE);
+                } else {
+                    searchUser(editable);
+                }
+            }
+        });
+        final View rootView = ((Activity) getContext()).getWindow().getDecorView();
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int oldHeight = 0;
+
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = rootView.getRootView().getHeight();
+                int heightDiff = screenHeight - r.height();
+                if (oldHeight == 0) {
+                    oldHeight = heightDiff;
+                    return;
+                }
+                if (heightDiff != oldHeight) {
+                    memberAdapter.hideControlWindow();
+                    memberSearchAdapter.hideControlWindow();
+                }
+                oldHeight = heightDiff;
+            }
+        });
     }
     // </editor-fold>
 
@@ -117,7 +193,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         plvsaMemberListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         memberAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
         memberAdapter.setTeacherPermission(!isGuest());//嘉宾默认无权限，需要隐藏控制相关按钮
-        memberAdapter.setOnViewActionListener(new PLVSAMemberAdapter.OnViewActionListener() {
+        PLVSAMemberAdapter.OnViewActionListener listener = new PLVSAMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
                 if (streamerPresenter != null) {
@@ -164,8 +240,25 @@ public class PLVSAMemberLayout extends FrameLayout {
                     }
                 });
             }
-        });
+
+            @Override
+            public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
+                if (streamerPresenter != null) {
+                    return streamerPresenter.getPositionByMemberItem(memberItemDataBean);
+                }
+                return -1;
+            }
+        };
+        memberAdapter.setOnViewActionListener(listener);
         plvsaMemberListRv.setAdapter(memberAdapter);
+
+        //init memberSearchListRv
+        plvsaMemberSearchListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        memberSearchAdapter = new PLVSAMemberAdapter(liveRoomDataManager.getConfig().isAutoLinkToGuest());
+        memberSearchAdapter.setMemberListShow(false);
+        memberSearchAdapter.setTeacherPermission(!isGuest());//嘉宾默认无权限，需要隐藏控制相关按钮
+        memberSearchAdapter.setOnViewActionListener(listener);
+        plvsaMemberSearchListRv.setAdapter(memberSearchAdapter);
 
         observeClassDetail();
     }
@@ -179,6 +272,7 @@ public class PLVSAMemberLayout extends FrameLayout {
                             return;
                         }
                         memberAdapter.setChannelAllowInviteLinkMic(data.getData().getData().isInviteAudioEnabled());
+                        memberSearchAdapter.setChannelAllowInviteLinkMic(data.getData().getData().isInviteAudioEnabled());
                     }
                 });
     }
@@ -211,6 +305,8 @@ public class PLVSAMemberLayout extends FrameLayout {
                         onDrawerStateChangeListener.onDrawerStateChange(oldState, newState);
                     }
                     if (newState == PLVMenuDrawer.STATE_CLOSED) {
+                        plvsaMemberSearchEt.setText("");
+                        KeyboardUtils.hideSoftInput(plvsaMemberSearchEt);
                         menuDrawer.detachToContainer();
                     } else if (newState == PLVMenuDrawer.STATE_OPEN) {
                     }
@@ -245,9 +341,12 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
     }
 
-    public void closeAndHideWindow(){
-        if(memberAdapter != null){
+    public void closeAndHideWindow() {
+        if (memberAdapter != null) {
             memberAdapter.hideControlWindow();
+        }
+        if (memberSearchAdapter != null) {
+            memberSearchAdapter.hideControlWindow();
         }
         if (menuDrawer != null) {
             menuDrawer.closeMenu();
@@ -269,6 +368,9 @@ public class PLVSAMemberLayout extends FrameLayout {
     public void notifyLinkMicTypeChange(boolean isVideoLinkMic, boolean isOpenLinkMic) {
         if (memberAdapter != null) {
             memberAdapter.setOpenLinkMic(isOpenLinkMic);
+        }
+        if (memberSearchAdapter != null) {
+            memberSearchAdapter.setOpenLinkMic(isOpenLinkMic);
         }
     }
 
@@ -305,6 +407,7 @@ public class PLVSAMemberLayout extends FrameLayout {
                         return;
                     }
                     memberAdapter.setStreamerStatus(isStartedStatus);
+                    memberSearchAdapter.setStreamerStatus(isStartedStatus);
                 }
             });
         }
@@ -313,12 +416,14 @@ public class PLVSAMemberLayout extends FrameLayout {
         public void onUserMuteVideo(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteVideo(uid, mute, streamerListPos, memberListPos);
             memberAdapter.updateUserMuteVideo(memberListPos);
+            memberSearchAdapter.updateUserMuteVideo(uid);
         }
 
         @Override
         public void onUserMuteAudio(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteAudio(uid, mute, streamerListPos, memberListPos);
             memberAdapter.updateUserMuteAudio(memberListPos);
+            memberSearchAdapter.updateUserMuteAudio(uid);
         }
 
         @Override
@@ -336,6 +441,7 @@ public class PLVSAMemberLayout extends FrameLayout {
         public void onUsersJoin(List<PLVLinkMicItemDataBean> dataBeanList) {
             super.onUsersJoin(dataBeanList);
             memberAdapter.updateUserJoin(dataBeanList);
+            memberSearchAdapter.updateUserJoin(dataBeanList);
             toastUserLinkMicMsg(dataBeanList, true);
         }
 
@@ -351,6 +457,7 @@ public class PLVSAMemberLayout extends FrameLayout {
             }
 
             memberAdapter.updateUserLeave(dataBeanList);
+            memberSearchAdapter.updateUserLeave(dataBeanList);
             toastUserLinkMicMsg(dataBeanList, false);
         }
 
@@ -361,8 +468,17 @@ public class PLVSAMemberLayout extends FrameLayout {
         }
 
         @Override
-        public void onCameraDirection(boolean front, int pos) {
-            super.onCameraDirection(front, pos);
+        public void onUpdateMemberSearchListData(List<PLVMemberItemDataBean> dataBeanList) {
+            if (TextUtils.isEmpty(plvsaMemberSearchEt.getText().toString())) {
+                return;
+            }
+            plvsaMemberSearchListRv.setVisibility(View.VISIBLE);
+            plvsaMemberListRv.setVisibility(View.INVISIBLE);
+            memberSearchAdapter.update(dataBeanList);
+        }
+
+        @Override
+        public void onCameraDirection(boolean front, int pos, String uid) {
             memberAdapter.updateCameraDirection(pos);
         }
 
@@ -404,9 +520,10 @@ public class PLVSAMemberLayout extends FrameLayout {
         @Override
         public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
             super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
-            if(PLVPPTAuthentic.PermissionType.TEACHER.equals(type)){
-                if(user != null && !user.isTeacher()){
+            if (PLVPPTAuthentic.PermissionType.TEACHER.equals(type)) {
+                if (user != null && !user.isTeacher()) {
                     memberAdapter.setHasSpeakerUser(isGranted ? user : null);
+                    memberSearchAdapter.setHasSpeakerUser(isGranted ? user : null);
                 }
             }
         }
@@ -483,11 +600,43 @@ public class PLVSAMemberLayout extends FrameLayout {
                 .show();
     }
 
-    private boolean isGuest(){
-        if(liveRoomDataManager != null){
+    private boolean isGuest() {
+        if (liveRoomDataManager != null) {
             return PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType());
         }
         return false;
+    }
+
+    private void debounce(Runnable action, long delayMillis) {
+        cancelPost();
+        lastRunnable = action;
+        handler.postDelayed(action, delayMillis);
+    }
+
+    private void cancelPost() {
+        if (lastRunnable != null) {
+            handler.removeCallbacks(lastRunnable);
+        }
+        if (searchUserDisposable != null) {
+            searchUserDisposable.dispose();
+        }
+    }
+
+    private void searchUser(final Editable editable) {
+        debounce(new Runnable() {
+            @Override
+            public void run() {
+                if (searchUserDisposable != null) {
+                    searchUserDisposable.dispose();
+                }
+                if (TextUtils.isEmpty(editable.toString())) {
+                    return;
+                }
+                if (streamerPresenter != null) {
+                    searchUserDisposable = streamerPresenter.searchMemberList(editable.toString());
+                }
+            }
+        }, 1000);
     }
     // </editor-fold>
 }

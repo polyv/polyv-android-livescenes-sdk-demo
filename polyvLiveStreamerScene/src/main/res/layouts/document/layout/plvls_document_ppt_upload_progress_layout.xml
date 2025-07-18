@@ -13,10 +13,10 @@
         android:layout_height="32dp"
         android:max="100"
         tools:progress="25"
-        app:cpv_progressTextVisible="false"
-        app:cpv_reachCapRound="false"
-        app:cpv_progressNormalColor="@color/white"
-        app:cpv_progressReachColor="#366BEE"
+        app:plv_cpv_progressTextVisible="false"
+        app:plv_cpv_reachCapRound="false"
+        app:plv_cpv_progressNormalColor="@color/plv_white"
+        app:plv_cpv_progressReachColor="#366BEE"
         android:visibility="visible" />
 
     <LinearLayout
@@ -58,7 +58,7 @@
             android:layout_width="66dp"
             android:layout_height="24dp"
             tools:text="知道了"
-            android:textColor="@color/white"
+            android:textColor="@color/plv_white"
             android:gravity="center"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/plvls_document_ppt_upload_progress_round_border_bg"

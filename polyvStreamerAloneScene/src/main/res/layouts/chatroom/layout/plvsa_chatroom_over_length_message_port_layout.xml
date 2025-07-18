@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:background="#2C2C2C"
-    app:mode="top"
-    app:radius="16dp">
+    app:plv_mode="top"
+    app:plv_radius="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"

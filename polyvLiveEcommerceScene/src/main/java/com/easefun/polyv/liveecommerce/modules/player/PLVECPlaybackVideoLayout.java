@@ -355,6 +355,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVECVideoLayout定义的live方法，空实现">
     @Override
+    public void restartPlay() {
+    }
+
+    @Override
     public int getLinesPos() {
         return 0;
     }

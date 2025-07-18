@@ -37,6 +37,9 @@ public class PLVBeautyOptionListInitUseCase {
 
     public List<PLVFilterOption> initFilterOptionList() {
         final List<PLVFilterOption> repoFilterOptionList = beautyRepo.getFilterOptionList();
+        if (repoFilterOptionList.size() > 0 && "0".equals(repoFilterOptionList.get(0).getKey())) {
+            return repoFilterOptionList;
+        }
         final List<String> defaultFilterKeyList = PLVBeautyOptionDefaultConfig.getDefaultFilterKeyOrder();
         Collections.sort(repoFilterOptionList, new Comparator<PLVFilterOption>() {
             @Override

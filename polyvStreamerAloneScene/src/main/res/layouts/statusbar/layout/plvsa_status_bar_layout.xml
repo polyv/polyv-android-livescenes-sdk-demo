@@ -25,7 +25,7 @@
         android:paddingBottom="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="18dp">
+        app:plv_radius="18dp">
 
         <ImageView
             android:id="@+id/plvsa_status_bar_channel_info_iv"
@@ -71,7 +71,7 @@
         android:paddingBottom="8dp"
         app:layout_constraintStart_toEndOf="@+id/plvsa_status_bar_channel_info_rl"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="18dp">
+        app:plv_radius="18dp">
 
         <ImageView
             android:id="@+id/plvsa_status_bar_member_count_iv"
@@ -123,7 +123,7 @@
         android:paddingBottom="8dp"
         app:layout_constraintStart_toEndOf="@+id/plvsa_status_bar_member_count_rl"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="18dp">
+        app:plv_radius="18dp">
 
         <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
             android:id="@+id/plvsa_status_bar_streamer_status_iv"
@@ -131,7 +131,7 @@
             android:layout_height="8dp"
             android:layout_centerVertical="true"
             android:background="#FF3B30"
-            app:radius_iv="8dp" />
+            app:plv_radius_iv="8dp" />
 
         <TextView
             android:id="@+id/plvsa_status_bar_streamer_time_tv"
@@ -165,7 +165,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plvsa_status_bar_channel_info_rl"
         app:layout_constraintWidth_default="wrap"
-        app:radius="10dp">
+        app:plv_radius="10dp">
 
         <LinearLayout
             android:id="@+id/plvsa_status_bar_streamer_teacher_ll"
@@ -224,7 +224,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/plvsa_status_bar_streamer_teacher_layout"
-        app:radius="18dp">
+        app:plv_radius="18dp">
 
         <TextView
             android:id="@+id/plvsa_status_bar_notification_label"

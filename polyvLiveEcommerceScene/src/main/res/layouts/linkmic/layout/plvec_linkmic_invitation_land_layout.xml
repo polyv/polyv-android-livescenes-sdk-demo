@@ -11,8 +11,8 @@
         android:layout_height="match_parent"
         android:background="#262523"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mode="left"
-        app:radius="6dp">
+        app:plv_mode="left"
+        app:plv_radius="6dp">
 
         <TextView
             android:id="@+id/plvlc_linkmic_invitation_title_tv"

@@ -442,7 +442,7 @@ public class PLVECMorePopupView {
 
         View morely = view.findViewById(R.id.more_ly);
         RelativeLayout.LayoutParams morelyParams = (RelativeLayout.LayoutParams) morely.getLayoutParams();
-        morelyParams.height = ConvertUtils.dp2px(130);
+        morelyParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         morelyParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         morelyParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         morelyParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);

@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        app:radius="4dp">
+        app:plv_radius="4dp">
 
         <ImageView
             android:id="@+id/plvls_document_ppt_item_iv"

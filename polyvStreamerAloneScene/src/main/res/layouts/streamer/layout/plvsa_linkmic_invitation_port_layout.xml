@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:background="#232323"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:mode="top"
-        app:radius="6dp">
+        app:plv_mode="top"
+        app:plv_radius="6dp">
 
         <TextView
             android:id="@+id/plvsa_linkmic_invitation_title_tv"
@@ -37,8 +37,8 @@
             app:layout_constraintBottom_toTopOf="@+id/plvsa_linkmic_invitation_camera_iv"
             app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintTop_toBottomOf="@+id/plvsa_linkmic_invitation_title_tv"
-            app:mode="all"
-            app:radius="4dp">
+            app:plv_mode="all"
+            app:plv_radius="4dp">
 
             <TextureView
                 android:id="@+id/plvsa_linkmic_invitation_camera_preview_view"

@@ -16,8 +16,8 @@
         android:paddingVertical="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="all"
-        app:radius="4dp">
+        app:plv_mode="all"
+        app:plv_radius="4dp">
 
         <ImageView
             android:id="@+id/plvlc_ppt_exit_mark_tool_iv"
@@ -49,7 +49,7 @@
         android:paddingBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/plvlc_ppt_mark_tool_state_ll"
         app:layout_constraintEnd_toEndOf="parent"
-        app:radius="22dp">
+        app:plv_radius="22dp">
 
         <LinearLayout
             android:id="@+id/plvlc_ppt_mark_tool_group"
@@ -214,7 +214,7 @@
             android:layout_height="36dp"
             android:background="#99000000"
             android:src="@drawable/plvlc_ppt_mark_tool_undo_icon"
-            app:radius_iv="18dp" />
+            app:plv_radius_iv="18dp" />
 
         <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundColorView
             android:id="@+id/plvlc_ppt_mark_tool_current_color_view"
@@ -236,7 +236,7 @@
                 android:layout_height="36dp"
                 android:background="#99000000"
                 android:src="@drawable/plvlc_ppt_pen_icon"
-                app:radius_iv="18dp" />
+                app:plv_radius_iv="18dp" />
 
             <ImageView
                 android:layout_width="6dp"

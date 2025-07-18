@@ -341,11 +341,13 @@
     <string name="plv_push_downgrade_fluency_desc">네트워크 상태가 좋지 않을 경우 영상의 유창함을 최우선으로 생각하지만 선명도는 떨어집니다.</string>
     <string name="plv_push_downgrade_alert_toast_text">현재 네트워크 상태가 좋지 않습니다. 원활한 모드로 전환하는 것이 좋습니다</string>
     <string name="plv_push_downgrade_alert_toast_confirm">지금 전환</string>
-    <string name="plv_streamer_denoise_setting_title">소음 감소</string>
-    <string name="plv_streamer_denoise_adaptive_title">적응형 소음 감소</string>
-    <string name="plv_streamer_denoise_adaptive_desc">컨퍼런스, 교육, 훈련 등 대부분의 생방송 시나리오에 적합한 음원에 대한 지능형 식별 및 소음 감소 기능을 제공합니다</string>
-    <string name="plv_streamer_denoise_balance_title">균형잡힌 소음 감소</string>
-    <string name="plv_streamer_denoise_balance_desc">주로 배경의 환경 소음을 줄이는 통합 소음 감소 효과를 제공하며 사람의 목소리와 주요 소리에 대한 우수한 유지 효과가 있어 대기 중 라이브 방송 시나리오에 적합합니다</string>
+    <string name="plv_streamer_denoise_setting_title">음성 음질</string>
+    <string name="plv_streamer_denoise_adaptive_title">보컬 모드</string>
+    <string name="plv_streamer_denoise_adaptive_desc">주로 음성 통화에 적합한 장면, 예를 들어 온라인 회의, 음성 통화 등</string>
+    <string name="plv_streamer_denoise_balance_title">음악 모드</string>
+    <string name="plv_streamer_denoise_balance_desc">고음질 음악 전송이 필요한 장면에 적합합니다. 예: 노래방, 음악 라이브 등</string>
+    <string name="plv_streamer_denoise_default_title">기본 모드</string>
+    <string name="plv_streamer_denoise_default_desc">기본 음성 음질로, 특별한 요구가 없으면 이 옵션을 선택하는 것이 좋습니다</string>
     <string name="plv_streamer_external_audio_input_title">외부 장치</string>
     <string name="plv_streamer_external_audio_input_desc">생방송 중에 외부 마이크를 통해 볼륨을 수집하는 시나리오에 적합합니다. 이 기능을 켜면 정상적인 사운드 수집을 위해 미디어 볼륨으로 전환됩니다. </string>
     <string name="plv_streamer_external_audio_input_enable_text">활성화</string>
@@ -425,6 +427,7 @@
     <string name="plv_streamer_blur_bg">배경 흐리게</string>
     <string name="plv_streamer_bg_delete_confirm">이 배경 이미지를 삭제하시겠습니까?</string>
     <string name="plv_streamer_camera_occupy_tips">카메라가 다른 앱에서 사용 중입니다. 카메라를 사용할 수 있는 다른 앱을 종료하세요!</string>
+    <string name="plv_streamer_member_search">멤버 검색</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">해당 문서 없음</string>
@@ -640,6 +643,15 @@
     <string name="plv_beauty_filter_cherry">사쿠라</string>
     <string name="plv_beauty_filter_film">영화</string>
     <string name="plv_beauty_filter_night">밤</string>
+    <string name="plv_beauty_filter_cool_white">쿨화이트</string>
+    <string name="plv_beauty_filter_milk">밀크</string>
+    <string name="plv_beauty_filter_blue_tone">블루톤</string>
+    <string name="plv_beauty_filter_vitality">활력</string>
+    <string name="plv_beauty_filter_fresh">상쾌함</string>
+    <string name="plv_beauty_filter_texture">질감</string>
+    <string name="plv_beauty_filter_porcelain">도자기</string>
+    <string name="plv_beauty_filter_cherry_red">체리레드</string>
+    <string name="plv_beauty_filter_aesthetic">미학</string>
 
     <string name="plv_interact_sign_in_timeout_toast">시간에 맞춰 체크인하지 않으면, 자동으로 스튜디오를 종료합니다</string>
     <string name="plv_subtitle_language_chinese">중국어</string>

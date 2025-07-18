@@ -30,7 +30,7 @@
         android:text="@string/plv_previous_request_error"
         android:layout_marginTop="36dp"
         android:layout_marginLeft="102dp"
-        android:textColor="@color/dodgerBlue"
+        android:textColor="@color/plv_dodgerBlue"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"/>

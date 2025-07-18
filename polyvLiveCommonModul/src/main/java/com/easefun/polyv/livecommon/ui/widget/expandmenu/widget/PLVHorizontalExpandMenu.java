@@ -97,20 +97,20 @@ public class PLVHorizontalExpandMenu extends RelativeLayout {
         defaultWidth = DpOrPxUtils.dip2px(mContext, 200);
         defaultHeight = DpOrPxUtils.dip2px(mContext, 40);
 
-        menuBackColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_back_color, Color.WHITE);
-        menuStrokeSize = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_stroke_size, 1);
-        menuStrokeColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_stroke_color, Color.GRAY);
-        menuCornerRadius = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_corner_radius, DpOrPxUtils.dip2px(mContext, 20));
+        menuBackColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_plv_back_color, Color.WHITE);
+        menuStrokeSize = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_plv_stroke_size, 1);
+        menuStrokeColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_plv_stroke_color, Color.GRAY);
+        menuCornerRadius = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_plv_corner_radius, DpOrPxUtils.dip2px(mContext, 20));
 
-        buttonStyle = typedArray.getInteger(R.styleable.PLVHorizontalExpandMenu_button_style, Right);
+        buttonStyle = typedArray.getInteger(R.styleable.PLVHorizontalExpandMenu_plv_button_style, Right);
         buttonIconDegrees = 90;
-        buttonIconSize = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_button_icon_size, DpOrPxUtils.dip2px(mContext, 8));
-        buttonIconStrokeWidth = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_button_icon_stroke_width, 8);
-        buttonIconColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_button_icon_color, Color.GRAY);
+        buttonIconSize = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_plv_button_icon_size, DpOrPxUtils.dip2px(mContext, 8));
+        buttonIconStrokeWidth = typedArray.getDimension(R.styleable.PLVHorizontalExpandMenu_plv_button_icon_stroke_width, 8);
+        buttonIconColor = typedArray.getColor(R.styleable.PLVHorizontalExpandMenu_plv_button_icon_color, Color.GRAY);
 
-        expandAnimTime = typedArray.getInteger(R.styleable.PLVHorizontalExpandMenu_expand_time, 200);
+        expandAnimTime = typedArray.getInteger(R.styleable.PLVHorizontalExpandMenu_plv_expand_time, 200);
 
-        leftIconId = typedArray.getResourceId(R.styleable.PLVHorizontalExpandMenu_left_icon_id, 0);
+        leftIconId = typedArray.getResourceId(R.styleable.PLVHorizontalExpandMenu_plv_left_icon_id, 0);
 
         typedArray.recycle();
 

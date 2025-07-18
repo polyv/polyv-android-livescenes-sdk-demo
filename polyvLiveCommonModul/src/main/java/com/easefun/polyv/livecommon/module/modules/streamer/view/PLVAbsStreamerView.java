@@ -98,7 +98,12 @@ public abstract class PLVAbsStreamerView implements IPLVStreamerContract.IStream
     }
 
     @Override
-    public void onCameraDirection(boolean front, int pos) {
+    public void onUpdateMemberSearchListData(List<PLVMemberItemDataBean> dataBeanList) {
+
+    }
+
+    @Override
+    public void onCameraDirection(boolean front, int pos, String uid) {
 
     }
 

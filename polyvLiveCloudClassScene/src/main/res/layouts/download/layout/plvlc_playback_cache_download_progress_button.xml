@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:mode="all"
-    app:radius="25dp"
-    tools:background="@color/white"
+    app:plv_mode="all"
+    app:plv_radius="25dp"
+    tools:background="@color/plv_white"
     tools:layout_height="48dp"
     tools:paddingHorizontal="24dp">
 

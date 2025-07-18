@@ -45,7 +45,7 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginRight="16dp"
                 android:text="@string/plv_linkmic_tip_try_scroll_left"
-                android:textColor="@color/white" />
+                android:textColor="@color/plv_white" />
         </LinearLayout>
 
     </FrameLayout>
@@ -71,7 +71,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="4dp"
             android:maxLines="1"
-            android:textColor="@color/white"
+            android:textColor="@color/plv_white"
             tools:text="小黑同学名字很长很长..." />
 
         <TextView

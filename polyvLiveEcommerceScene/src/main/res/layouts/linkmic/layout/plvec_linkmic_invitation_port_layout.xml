@@ -10,8 +10,8 @@
         android:layout_height="wrap_content"
         android:background="#262523"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:mode="top"
-        app:radius="6dp">
+        app:plv_mode="top"
+        app:plv_radius="6dp">
 
         <TextView
             android:id="@+id/plvec_linkmic_invitation_title_tv"

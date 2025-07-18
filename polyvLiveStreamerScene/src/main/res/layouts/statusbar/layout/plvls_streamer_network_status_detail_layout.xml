@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="196dp"
     android:layout_height="wrap_content"
-    app:indicateColor="#BF1B202D"
-    app:rectRadius="8dp"
-    app:triangleMargin="34dp"
-    app:triangleMarginType="right"
-    app:trianglePosition="top">
+    app:plv_indicateColor="#BF1B202D"
+    app:plv_rectRadius="8dp"
+    app:plv_triangleMargin="34dp"
+    app:plv_triangleMarginType="right"
+    app:plv_trianglePosition="top">
 
     <LinearLayout
         android:layout_width="wrap_content"

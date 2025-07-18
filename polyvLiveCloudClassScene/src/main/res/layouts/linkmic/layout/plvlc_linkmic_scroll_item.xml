@@ -14,8 +14,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="all"
-        app:radius="0dp">
+        app:plv_mode="all"
+        app:plv_radius="0dp">
 
         <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
             android:id="@+id/plvlc_linkmic_switch_anchor_item"
@@ -25,7 +25,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/colorEbonyClay">
+                android:background="@color/plv_colorEbonyClay">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -105,7 +105,7 @@
                         android:maxLines="1"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/plv_white"
                         android:textSize="12sp"
                         tools:text="你好你好你好你好你好你好你好你好你好你好" />
                 </LinearLayout>

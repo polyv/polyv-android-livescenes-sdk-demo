@@ -19,6 +19,7 @@ import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
@@ -502,6 +503,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                                 .show();
                     }
                 });
+            }
+
+            @Override
+            public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
+                return plvlsStreamerLy.getPositionByMemberItem(memberItemDataBean);
             }
 
             @Override

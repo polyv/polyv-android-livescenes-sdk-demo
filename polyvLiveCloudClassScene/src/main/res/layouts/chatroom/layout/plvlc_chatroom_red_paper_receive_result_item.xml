@@ -18,8 +18,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="all"
-        app:radius="4dp">
+        app:plv_mode="all"
+        app:plv_radius="4dp">
 
         <TextView
             android:id="@+id/plvlc_chatroom_red_paper_result_tv"

@@ -29,7 +29,7 @@
         android:textColor="#ffffff"
         android:textSize="12sp"
         android:visibility="invisible"
-        app:scroll_first_delay="0"
-        app:scroll_interval="4000"
-        app:scroll_mode="mode_once" />
+        app:plv_scroll_first_delay="0"
+        app:plv_scroll_interval="4000"
+        app:plv_scroll_mode="mode_once" />
 </LinearLayout>

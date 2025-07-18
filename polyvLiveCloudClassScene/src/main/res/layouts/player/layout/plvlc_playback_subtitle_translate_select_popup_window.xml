@@ -10,7 +10,7 @@
         android:layout_height="375dp"
         android:layout_gravity="bottom"
         android:background="#2C2C35"
-        app:radius="0dp">
+        app:plv_radius="0dp">
 
         <TextView
             android:id="@+id/plvlc_playback_subtitle_translate_select_title"

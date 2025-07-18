@@ -8,13 +8,13 @@
         android:id="@+id/plv_triangle_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:triangleWidth="12dp"
-        app:triangleHeight="8dp"
-        app:trianglePosition="bottom"
-        app:triangleMarginType="left"
-        app:triangleMargin="42dp"
-        app:rectRadius="4dp"
-        app:indicateColor="#e51A1B1F"
+        app:plv_triangleWidth="12dp"
+        app:plv_triangleHeight="8dp"
+        app:plv_trianglePosition="bottom"
+        app:plv_triangleMarginType="left"
+        app:plv_triangleMargin="42dp"
+        app:plv_rectRadius="4dp"
+        app:plv_indicateColor="#e51A1B1F"
         >
 
         <pl.droidsonroids.gif.GifImageView

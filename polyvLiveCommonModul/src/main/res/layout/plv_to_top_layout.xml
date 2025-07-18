@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="320dp"
     android:layout_height="74dp"
-    app:radius="8dp">
+    app:plv_radius="8dp">
 
     <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
         android:id="@+id/blur_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#cc1D2129" />
+        app:plv_blurOverlayColor="#cc1D2129" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/message_vp"

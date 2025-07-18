@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="24dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="all"
-        app:radius="20dp">
+        app:plv_mode="all"
+        app:plv_radius="20dp">
 
         <com.easefun.polyv.livecommon.ui.widget.PLVGradientView
             android:layout_width="match_parent"
@@ -77,8 +77,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_hot_effect_layout"
-        app:mode="all"
-        app:radius="6dp">
+        app:plv_mode="all"
+        app:plv_radius="6dp">
 
         <TextView
             android:id="@+id/plvec_product_push_index_tv"
@@ -101,8 +101,8 @@
             android:background="@color/plvec_product_push_card_layout_background_inner_no_image"
             android:paddingBottom="4dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:mode="top"
-            app:radius="6dp">
+            app:plv_mode="top"
+            app:plv_radius="6dp">
 
             <ImageView
                 android:layout_width="52dp"

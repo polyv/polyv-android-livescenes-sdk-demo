@@ -31,7 +31,7 @@
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:src="@drawable/plv_setting_cancel"
-                app:radius_iv="8dp" />
+                app:plv_radius_iv="8dp" />
 
             <ImageView
                 android:id="@+id/plv_virtual_bg_cancel_iv"

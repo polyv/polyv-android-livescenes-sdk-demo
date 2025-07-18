@@ -10,15 +10,15 @@
         android:layout_height="wrap_content"
         android:paddingStart="12dp"
         android:paddingEnd="5dp"
-        app:indicateColor="#80232323"
+        app:plv_indicateColor="#80232323"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:rectRadius="16dp"
-        app:triangleHeight="6dp"
-        app:triangleWidth="11dp"
-        app:trianglePosition="top"
-        app:triangleMarginType="center">
+        app:plv_rectRadius="16dp"
+        app:plv_triangleHeight="6dp"
+        app:plv_triangleWidth="11dp"
+        app:plv_trianglePosition="top"
+        app:plv_triangleMarginType="center">
 
         <LinearLayout
             android:id="@+id/plvsa_empty_linkmic_tips_ll"

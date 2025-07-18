@@ -5,23 +5,71 @@
     android:layout_height="match_parent"
     android:background="@drawable/plvsa_more_ly_shape"
     android:orientation="vertical"
-    android:paddingLeft="32dp"
-    android:paddingTop="32dp"
-    android:paddingRight="32dp">
+    android:paddingTop="32dp">
 
     <TextView
         android:id="@+id/plvsa_member_online_count_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
         android:text="@string/plv_chat_online_count_2"
         android:textColor="#FFF0F1F5"
         android:textSize="18sp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/plvsa_member_list_rv"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp">
+
+        <EditText
+            android:id="@+id/plvsa_member_search_et"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/plvsa_member_search_et_bg_shape"
+            android:gravity="center|left"
+            android:hint="@string/plv_streamer_member_search"
+            android:textColorHint="#969BA5"
+            android:paddingLeft="32dp"
+            android:paddingRight="16dp"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
+            android:textColor="#FFF0F1F5"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_search_iv"
+            android:layout_width="12dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="12dp"
+            android:clickable="false"
+            android:scaleType="fitCenter"
+            android:src="@drawable/plvsa_member_search_ic" />
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/plvsa_member_online_count_tv"
-        android:layout_marginTop="16dp"
-        android:overScrollMode="never" />
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/plvsa_member_list_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/plvsa_member_online_count_tv"
+            android:layout_marginTop="8dp"
+            android:overScrollMode="never" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/plvsa_member_search_list_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/plvsa_member_online_count_tv"
+            android:layout_marginTop="8dp"
+            android:overScrollMode="never"
+            android:visibility="invisible" />
+    </FrameLayout>
 </LinearLayout>

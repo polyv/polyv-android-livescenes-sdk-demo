@@ -18,10 +18,10 @@
         android:max="100"
         android:progress="0"
         android:visibility="gone"
-        app:cpv_innerPadding="2dp"
-        app:cpv_outerColor="#E5ffffff"
-        app:cpv_outerSize="1dp"
-        app:cpv_progressNormalColor="#00000000"
-        app:cpv_progressReachColor="#E5ffffff"
-        app:cpv_progressStyle="FillInnerArc" />
+        app:plv_cpv_innerPadding="2dp"
+        app:plv_cpv_outerColor="#E5ffffff"
+        app:plv_cpv_outerSize="1dp"
+        app:plv_cpv_progressNormalColor="#00000000"
+        app:plv_cpv_progressReachColor="#E5ffffff"
+        app:plv_cpv_progressStyle="FillInnerArc" />
 </FrameLayout>

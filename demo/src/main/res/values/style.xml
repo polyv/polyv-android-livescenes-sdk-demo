@@ -5,7 +5,7 @@
         <item name="android:layout_width">244dp</item>
         <item name="android:layout_height">140dp</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/plv_white</item>
         <item name="android:paddingTop">36dp</item>
         <item name="android:paddingLeft">36dp</item>
         <item name="android:paddingStart">36dp</item>
@@ -13,7 +13,7 @@
     </style>
 
     <style name="plv_login_edit_text_style">
-        <item name="backgroundTint">@color/dodgerBlue</item>
+        <item name="backgroundTint">@color/plv_dodgerBlue</item>
         <item name="android:textSize">16sp</item>
         <item name="android:singleLine">true</item>
         <item name="android:textCursorDrawable">@null</item>

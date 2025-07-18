@@ -75,7 +75,7 @@
                 android:paddingRight="16dp"
                 android:paddingBottom="6dp"
                 android:singleLine="true"
-                android:textColor="@color/white"
+                android:textColor="@color/plv_white"
                 android:textSize="14sp"
                 tools:text="好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好" />
 

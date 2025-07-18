@@ -127,6 +127,7 @@ public class PLVSADenoisePreferenceLayout extends FrameLayout {
 
         protected PLVStreamerPreferenceCardView denoiseAdaptiveCardView;
         protected PLVStreamerPreferenceCardView denoiseBalanceCardView;
+        protected PLVStreamerPreferenceCardView denoiseDefaultCardView;
 
         public AbsDenoiseLayout(@NonNull Context context) {
             super(context);
@@ -153,6 +154,16 @@ public class PLVSADenoisePreferenceLayout extends FrameLayout {
                     }
                 }
             });
+            denoiseDefaultCardView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onDenoiseChanged(PLVLinkMicDenoiseType.DEFAULT);
+                        updateCurrentDenoiseType(PLVLinkMicDenoiseType.DEFAULT);
+                        close();
+                    }
+                }
+            });
         }
 
         protected final void updateCurrentDenoiseType(@Nullable PLVLinkMicDenoiseType denoiseType) {
@@ -166,6 +177,7 @@ public class PLVSADenoisePreferenceLayout extends FrameLayout {
             }
             denoiseAdaptiveCardView.setSelected(denoiseType == PLVLinkMicDenoiseType.ADAPTIVE);
             denoiseBalanceCardView.setSelected(denoiseType == PLVLinkMicDenoiseType.BALANCE);
+            denoiseDefaultCardView.setSelected(denoiseType == PLVLinkMicDenoiseType.DEFAULT);
         }
 
     }
@@ -180,6 +192,7 @@ public class PLVSADenoisePreferenceLayout extends FrameLayout {
             LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_denoise_preference_layout_port, this);
             denoiseAdaptiveCardView = findViewById(R.id.plvsa_denoise_adaptive_card_view);
             denoiseBalanceCardView = findViewById(R.id.plvsa_denoise_balance_card_view);
+            denoiseDefaultCardView = findViewById(R.id.plvsa_denoise_default_card_view);
             setOnClickListener();
         }
 
@@ -195,6 +208,7 @@ public class PLVSADenoisePreferenceLayout extends FrameLayout {
             LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_denoise_preference_layout_land, this);
             denoiseAdaptiveCardView = findViewById(R.id.plvsa_denoise_adaptive_card_view);
             denoiseBalanceCardView = findViewById(R.id.plvsa_denoise_balance_card_view);
+            denoiseDefaultCardView = findViewById(R.id.plvsa_denoise_default_card_view);
             setOnClickListener();
         }
 

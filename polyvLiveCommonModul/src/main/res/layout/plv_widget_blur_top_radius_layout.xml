@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     android:layout_gravity="bottom|right"
     android:background="#00000000"
-    app:mode="all"
-    app:radius="10dp">
+    app:plv_mode="all"
+    app:plv_radius="10dp">
 
     <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
         android:id="@+id/blur_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#cc000000" />
+        app:plv_blurOverlayColor="#cc000000" />
 </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

@@ -2,27 +2,23 @@ package com.easefun.polyv.livecommon.module.modules.beauty.helper;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.app.Activity;
 import android.arch.lifecycle.GenericLifecycleObserver;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 
-import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.plv.beauty.api.IPLVBeautyManager;
 import com.plv.beauty.api.PLVBeautyManager;
 import com.plv.beauty.api.enums.PLVBeautyErrorCode;
 import com.plv.beauty.api.resource.RemoteResource;
 import com.plv.beauty.api.vo.PLVBeautyInitParam;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.feature.beauty.PLVBeautyApiManager;
 import com.plv.livescenes.feature.beauty.vo.PLVBeautySettingVO;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -80,12 +76,7 @@ public class PLVBeautyInitHelper {
             return;
         }
 
-        requirePermissionThenRun(context, new Runnable() {
-            @Override
-            public void run() {
-                startBeautyInit(context, onInitFinishCallback);
-            }
-        });
+        startBeautyInit(context, onInitFinishCallback);
     }
 
     public void destroy() {
@@ -94,22 +85,6 @@ public class PLVBeautyInitHelper {
             getBeautySettingDisposable = null;
         }
         PLVBeautyManager.getInstance().destroy();
-    }
-
-    private void requirePermissionThenRun(final Context context, final Runnable onGrantedPermission) {
-        PLVStoragePermissionCompat.start(
-                (Activity) context,
-                new PLVOnPermissionCallback() {
-                    @Override
-                    public void onAllGranted() {
-                        onGrantedPermission.run();
-                    }
-
-                    @Override
-                    public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
-
-                    }
-                });
     }
 
     private void startBeautyInit(final Context context, final PLVSugarUtil.Consumer<Boolean> onInitFinishCallback) {

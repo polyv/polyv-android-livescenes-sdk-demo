@@ -8,7 +8,7 @@
         android:id="@+id/plvec_previous_item_im"
         android:layout_width="match_parent"
         android:layout_height="92dp"
-        app:radius_iv="10dp"
+        app:plv_radius_iv="10dp"
         android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         android:text="00:00:00"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"

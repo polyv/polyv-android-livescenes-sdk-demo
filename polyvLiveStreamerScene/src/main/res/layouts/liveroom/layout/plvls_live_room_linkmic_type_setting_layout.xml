@@ -10,7 +10,7 @@
         android:id="@+id/blur_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#BF1B202D" />
+        app:plv_blurOverlayColor="#BF1B202D" />
 
     <ImageView
         android:id="@+id/plvls_linkmic_type_setting_back_iv"

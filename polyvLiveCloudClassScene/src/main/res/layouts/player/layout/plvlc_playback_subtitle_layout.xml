@@ -17,7 +17,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:radius="4dp">
+        app:plv_radius="4dp">
 
         <TextView
             android:id="@+id/plvlc_playback_subtitle_tv"

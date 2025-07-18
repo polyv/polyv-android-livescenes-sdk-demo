@@ -7,7 +7,7 @@
     android:background="#FFFFFF"
     android:paddingStart="12dp"
     android:paddingEnd="0dp"
-    app:radius="4dp">
+    app:plv_radius="4dp">
 
     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
         android:id="@+id/plvlc_commodity_cover_ly"
@@ -18,7 +18,7 @@
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="4dp">
+        app:plv_radius="4dp">
 
         <ImageView
             android:id="@+id/plvlc_commodity_cover_iv"
@@ -123,8 +123,8 @@
         android:visibility="gone"
         android:paddingLeft="3dp"
         android:layout_marginTop="4dp"
-        app:mode="all"
-        app:radius="8dp">
+        app:plv_mode="all"
+        app:plv_radius="8dp">
 
         <TextView
             android:id="@+id/plvlc_product_title_effect_tv"

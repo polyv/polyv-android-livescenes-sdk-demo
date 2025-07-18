@@ -52,8 +52,8 @@ public class PLVRoundRectFrameLayout extends FrameLayout {
         setWillNotDraw(false);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVRoundRectLayout, defStyleAttr, 0);
-        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectLayout_radius, 10);
-        int mode = a.getInt(R.styleable.PLVRoundRectLayout_mode, MODE_ALL);
+        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundRectLayout_plv_radius, 10);
+        int mode = a.getInt(R.styleable.PLVRoundRectLayout_plv_mode, MODE_ALL);
         a.recycle();
 
         mRoundMode = mode;

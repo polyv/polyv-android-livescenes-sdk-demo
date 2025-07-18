@@ -21,10 +21,10 @@
         android:layout_width="match_parent"
         android:layout_height="266dp"
         android:layout_gravity="bottom"
-        android:background="@color/white"
+        android:background="@color/plv_white"
         android:clickable="true"
-        app:mode="leftTop|rightTop"
-        app:radius="10dp">
+        app:plv_mode="leftTop|rightTop"
+        app:plv_radius="10dp">
 
         <TextView
             android:id="@+id/plv_play_setting_tv"

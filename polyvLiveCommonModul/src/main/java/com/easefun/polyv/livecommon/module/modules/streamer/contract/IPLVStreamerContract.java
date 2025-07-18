@@ -27,6 +27,7 @@ import com.plv.socket.user.PLVSocketUserBean;
 
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import io.socket.client.Ack;
 
 /**
@@ -147,12 +148,17 @@ public interface IPLVStreamerContract {
         void onUpdateMemberListData(List<PLVMemberItemDataBean> dataBeanList);
 
         /**
+         * 更新成员搜索列表数据
+         */
+        void onUpdateMemberSearchListData(List<PLVMemberItemDataBean> dataBeanList);
+
+        /**
          * 相机方向改变
          *
          * @param front true：前置，false：后置
          * @param pos   成员列表中的位置
          */
-        void onCameraDirection(boolean front, int pos);
+        void onCameraDirection(boolean front, int pos, String uid);
 
         /**
          * 更新成员列表中的socket用户信息
@@ -535,6 +541,16 @@ public interface IPLVStreamerContract {
          * 请求成员列表数据
          */
         void requestMemberList();
+
+        /**
+         * 根据昵称搜索成员列表用户
+         */
+        Disposable searchMemberList(String nick);
+
+        /**
+         * 根据memberItem获取成员列表中的位置，如果不在成员列表中，则会尝试放入成员列表并返回该位置
+         */
+        int getPositionByMemberItem(PLVMemberItemDataBean memberItem);
 
         /**
          * 获取推流状态

@@ -90,10 +90,10 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            app:bead_margin="8dp"
-            app:bead_radius="3dp"
-            app:selected_bead_color="#ADADC0"
-            app:unselected_bead_color="#1A1B1F" />
+            app:plv_bead_margin="8dp"
+            app:plv_bead_radius="3dp"
+            app:plv_selected_bead_color="#ADADC0"
+            app:plv_unselected_bead_color="#1A1B1F" />
 
         <LinearLayout
             android:id="@+id/plv_ll_reward_bottom"

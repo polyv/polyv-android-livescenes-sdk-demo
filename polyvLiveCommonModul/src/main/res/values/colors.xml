@@ -1,10 +1,10 @@
 <resources>
 
     <!-- The default background of the menu. -->
-    <color name="md__defaultBackground">#FF555555</color>
-    <color name="white">#FFF</color>
-    <color name="item_checkCircle_backgroundColor">#1E8AE8</color>
-    <color name="colorEbonyClay">#2B3045</color>
-    <color name="dodgerBlue">#3082FE</color>
+    <color name="plv_md__defaultBackground">#FF555555</color>
+    <color name="plv_white">#FFF</color>
+    <color name="plv_item_checkCircle_backgroundColor">#1E8AE8</color>
+    <color name="plv_colorEbonyClay">#2B3045</color>
+    <color name="plv_dodgerBlue">#3082FE</color>
 
 </resources>

@@ -341,11 +341,13 @@
     <string name="plv_push_downgrade_fluency_desc">當網路狀態差時，優先保證畫面流暢度，但清晰度會下降</string>
     <string name="plv_push_downgrade_alert_toast_text">目前網路較差，建議切換為流暢模式</string>
     <string name="plv_push_downgrade_alert_toast_confirm">馬上切換</string>
-    <string name="plv_streamer_denoise_setting_title">降噪</string>
-    <string name="plv_streamer_denoise_adaptive_title">自適應降噪</string>
-    <string name="plv_streamer_denoise_adaptive_desc">提供聲源智慧辨識與降噪的能力，適用於會議、教育訓練等大多數直播場景</string>
-    <string name="plv_streamer_denoise_balance_title">均衡降噪</string>
-    <string name="plv_streamer_denoise_balance_desc">提供統一的降噪效果，主要減少背景中的環境噪音，對人聲和主要聲音有較好的保留效果，適用於氛圍型直播場景</string>
+    <string name="plv_streamer_denoise_setting_title">聲音音質</string>
+    <string name="plv_streamer_denoise_adaptive_title">人聲模式</string>
+    <string name="plv_streamer_denoise_adaptive_desc">適合以語音通話為主的場景，例如線上會議、語音通話</string>
+    <string name="plv_streamer_denoise_balance_title">音樂模式</string>
+    <string name="plv_streamer_denoise_balance_desc">適合需要高保真傳輸音樂的場景，例如K歌、音樂直播等</string>
+    <string name="plv_streamer_denoise_default_title">預設模式</string>
+    <string name="plv_streamer_denoise_default_desc">預設的聲音音質，如無特殊需求建議選擇此項</string>
     <string name="plv_streamer_external_audio_input_title">外接裝置</string>
     <string name="plv_streamer_external_audio_input_desc">適用於直播過程中透過外接麥克風收集音量的場景，開啟此功能後將切換至媒體音量，確保正常收音。 </string>
     <string name="plv_streamer_external_audio_input_enable_text">開啟</string>
@@ -425,6 +427,7 @@
     <string name="plv_streamer_blur_bg">背景模糊</string>
     <string name="plv_streamer_bg_delete_confirm">確認要刪除該背景圖片嗎？</string>
     <string name="plv_streamer_camera_occupy_tips">攝影機正在被其他應用程式使用，建議關閉其他可能使用攝影機的應用程式！</string>
+    <string name="plv_streamer_member_search">搜尋成員</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">暫無相關文件</string>
@@ -640,6 +643,15 @@
     <string name="plv_beauty_filter_cherry">櫻花</string>
     <string name="plv_beauty_filter_film">膠片</string>
     <string name="plv_beauty_filter_night">夜色</string>
+    <string name="plv_beauty_filter_cool_white">冷白</string>
+    <string name="plv_beauty_filter_milk">牛奶</string>
+    <string name="plv_beauty_filter_blue_tone">藍調</string>
+    <string name="plv_beauty_filter_vitality">元氣</string>
+    <string name="plv_beauty_filter_fresh">清新</string>
+    <string name="plv_beauty_filter_texture">質感</string>
+    <string name="plv_beauty_filter_porcelain">粉瓷</string>
+    <string name="plv_beauty_filter_cherry_red">櫻紅</string>
+    <string name="plv_beauty_filter_aesthetic">唯美</string>
 
     <string name="plv_interact_sign_in_timeout_toast">您未按時簽到，自動退出直播間</string>
     <string name="plv_subtitle_language_chinese">中文</string>

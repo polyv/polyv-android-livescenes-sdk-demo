@@ -109,8 +109,8 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="7dp"
         android:visibility="gone"
-        app:mode="all"
-        app:radius="14dp"
+        app:plv_mode="all"
+        app:plv_radius="14dp"
         tools:visibility="visible">
 
         <LinearLayout

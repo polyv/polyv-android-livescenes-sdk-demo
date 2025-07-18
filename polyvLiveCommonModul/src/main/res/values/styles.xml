@@ -40,9 +40,9 @@
 
     <!-- Base theme for the menu drawer. -->
     <style name="Widget.MenuDrawer">
-        <item name="mdMenuBackground">@color/md__defaultBackground</item>
-        <item name="mdContentBackground">?android:attr/windowBackground</item>
-        <item name="mdDrawerOpenUpContentDescription">Close drawer</item>
-        <item name="mdDrawerClosedUpContentDescription">Open drawer</item>
+        <item name="plv_mdMenuBackground">@color/plv_md__defaultBackground</item>
+        <item name="plv_mdContentBackground">?android:attr/windowBackground</item>
+        <item name="plv_mdDrawerOpenUpContentDescription">Close drawer</item>
+        <item name="plv_mdDrawerClosedUpContentDescription">Open drawer</item>
     </style>
 </resources>
