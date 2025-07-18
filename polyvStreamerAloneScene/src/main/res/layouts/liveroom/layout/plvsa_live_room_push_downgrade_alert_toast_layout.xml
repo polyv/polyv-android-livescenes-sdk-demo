@@ -4,8 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="#991B202D"
-    app:mode="all"
-    app:radius="40dp">
+    app:plv_mode="all"
+    app:plv_radius="40dp">
 
     <TextView
         android:id="@+id/plvsa_live_room_push_downgrade_alert_desc"

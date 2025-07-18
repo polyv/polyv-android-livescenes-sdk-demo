@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -21,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -92,41 +94,130 @@ public class PLVUriPathHelper {
 
     //文件太大会阻塞主线程(2g左右)
     private static String getFilePathForN(Uri uri, Context context) {
-        Uri returnUri = uri;
-        Cursor returnCursor = context.getContentResolver().query(returnUri, null, null, null, null);
-        /*
-         * Get the column indexes of the data in the Cursor,
-         *     * move to the first row in the Cursor, get the data,
-         *     * and display it.
-         * */
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-        returnCursor.moveToFirst();
-        String name = (returnCursor.getString(nameIndex));
-        String size = (Long.toString(returnCursor.getLong(sizeIndex)));
-        File file = new File(context.getFilesDir(), name);
-        InputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        try {
-            inputStream = context.getContentResolver().openInputStream(uri);
-            outputStream = new FileOutputStream(file);
-            int read = 0;
-            int maxBufferSize = 1 * 1024 * 1024;
-            int bytesAvailable = inputStream.available();
-
-            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-
-            final byte[] buffers = new byte[bufferSize];
-            while ((read = inputStream.read(buffers)) != -1) {
-                outputStream.write(buffers, 0, read);
-            }
-
-        } catch (Exception e) {
-            Log.e("Exception", e.getMessage());
-        } finally {
-           CloseUtils.closeIO(inputStream,outputStream);
+        if (uri == null || context == null) {
+            PLVCommonLog.w(TAG, "Invalid parameters: uri or context is null.");
+            return null;
         }
-        return file.getPath();
+        String displayName = null;
+        Cursor returnCursor = null;
+        ParcelFileDescriptor pfd = null; // 引入 ParcelFileDescriptor
+        File outputFile = null; // 声明 outputFile
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            returnCursor = context.getContentResolver().query(uri, null, null, null, null);
+            if (returnCursor != null && returnCursor.moveToFirst()) {
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIndex != -1) {
+                    displayName = returnCursor.getString(nameIndex);
+                } else {
+                    PLVCommonLog.w(TAG, "Display name column not found for URI: " + uri);
+                }
+            } else {
+                PLVCommonLog.w(TAG, "Cursor is null or empty for URI: " + uri);
+            }
+            // --- 步骤 1: 安全地确定目标文件名和路径 ---
+            String safeFileName;
+            if (!TextUtils.isEmpty(displayName)) {
+                // 从 display name 中提取安全的文件名部分
+                safeFileName = new File(displayName).getName();
+                // 可选：进一步验证 safeFileName 只包含允许的字符
+                if (!isValidFileName(safeFileName)) {
+                    PLVCommonLog.w(TAG, "Sanitized filename is invalid: " + safeFileName);
+                    return null;
+                }
+            } else {
+                // 如果没有 display name，生成一个唯一的临时文件名
+                safeFileName = "temp_file_" + System.currentTimeMillis();
+                PLVCommonLog.i(TAG, "Using generated temp filename: " + safeFileName + " for URI: " + uri);
+            }
+            // 在应用的私有文件目录下构建目标文件对象
+            File targetDir = context.getFilesDir();
+            File candidateFile = new File(targetDir, safeFileName);
+            // --- 步骤 2: 验证目标路径是否安全 (模拟 saferOpenFile 的核心逻辑) ---
+            // 获取私有目录的规范路径
+            String canonicalTargetDirPath = targetDir.getCanonicalPath();
+            // 获取候选文件路径的规范路径
+            String canonicalCandidateFilePath = candidateFile.getCanonicalPath();
+            // 检查候选文件的规范路径是否以私有目录的规范路径开头，并且不是私有目录本身
+            // 这是一个防止路径遍历的关键步骤
+            if (!canonicalCandidateFilePath.startsWith(canonicalTargetDirPath + File.separator)) {
+                // 如果路径没有在私有目录内部，或者就是私有目录本身 (这通常是错误的)
+                PLVCommonLog.e(TAG, "Path traversal attempt detected: " + canonicalCandidateFilePath);
+                return null; // 拒绝不安全的文件路径
+            }
+            // 如果验证通过，将候选文件对象赋值给 outputFile
+            outputFile = candidateFile;
+            // --- 步骤 3: 通过文件描述符打开输入流 ---
+            pfd = context.getContentResolver().openFileDescriptor(uri, "r");
+            if (pfd == null) {
+                PLVCommonLog.w(TAG, "Failed to open ParcelFileDescriptor for URI: " + uri);
+                return null;
+            }
+            // 从 ParcelFileDescriptor 获取 FileInputStream
+            inputStream = new FileInputStream(pfd.getFileDescriptor());
+            outputStream = new FileOutputStream(outputFile);
+            // --- 步骤 4: 复制文件内容 ---
+            byte[] buffer = new byte[4096]; // 常用缓冲区大小
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            outputStream.flush();
+            PLVCommonLog.i(TAG, "Successfully copied file to: " + outputFile.getPath() + ", Size: " + outputFile.length());
+        } catch (IOException e) {
+            // 捕获 IOException，而不是通用的 Exception
+            PLVCommonLog.e(TAG, "IOException during file copy from URI: " + uri + e.getMessage());
+            outputFile = null; // 复制失败，不返回文件路径
+        } catch (Exception e) {
+            // 捕获其他潜在的异常 (如 Cursor 相关的)
+            PLVCommonLog.e(TAG, "General error during file processing for URI: " + uri + e.getMessage());
+            outputFile = null;
+        } finally {
+            // --- 步骤 6: 在 finally 块中关闭所有资源 ---
+            if (returnCursor != null) {
+                try {
+                    returnCursor.close();
+                } catch (Exception e) {
+                    PLVCommonLog.e(TAG, "Error closing cursor" + e.getMessage());
+                }
+            }
+            if (pfd != null) {
+                try {
+                    // ParcelFileDescriptor 也有 close 方法
+                    pfd.close();
+                } catch (Exception e) {
+                    PLVCommonLog.e(TAG, "Error closing ParcelFileDescriptor" + e.getMessage());
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                    PLVCommonLog.e(TAG, "Error closing input stream" + e.getMessage());
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Exception e) {
+                    PLVCommonLog.e(TAG, "Error closing output stream" + e.getMessage());
+                }
+            }
+        }
+        return (outputFile != null && outputFile.exists()) ? outputFile.getPath() : null;
+    }
+
+    private static boolean isValidFileName(String fileName) {
+        if (TextUtils.isEmpty(fileName)) {
+            return false;
+        }
+        // 检查是否包含不允许的字符，例如 / \ : * ? " < > |
+        // 一个简单的检查：不允许包含路径分隔符
+        if (fileName.contains("/") || fileName.contains("\\")) {
+            return false;
+        }
+        return true;
     }
 
     /**

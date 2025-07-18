@@ -293,6 +293,11 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
+    public int getPositionByMemberItem(PLVMemberItemDataBean memberItem) {
+        return streamerPresenter.getPositionByMemberItem(memberItem);
+    }
+
+    @Override
     public void controlUserLinkMic(int position, PLVStreamerControlLinkMicAction action) {
         streamerPresenter.controlUserLinkMic(position, action);
     }

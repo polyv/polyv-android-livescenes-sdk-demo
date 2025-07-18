@@ -57,6 +57,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -88,9 +89,15 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private LinearLayout morePushDowngradeItemLayout;
     private LinearLayout moreInteractSigninLl;
     private LinearLayout moreVirtualBgItemLayout;
+    private LinearLayout moreDenoiseItemLayout;
+    private LinearLayout moreExternalAudioInputItemLayout;
     private PLVLSBitrateLayout moreSettingBitrateLayout;
     private PLVLSMixLayout moreSettingMixLayout;
     private PLVLSPushDowngradePreferenceLayout morePushDowngradePreferenceLayout;
+    // 降噪配置布局
+    private PLVLSDenoisePreferenceLayout moreDenoisePreferenceLayout;
+    // 外接设备布局
+    private PLVLSExternalAudioInputPreferenceLayout moreExternalAudioInputPreferenceLayout;
     private View moreSettingExitSeparator;
     private TextView moreSettingExitTv;
     private Group moreSettingExitGroup;
@@ -142,6 +149,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         initPushDowngradeLayout();
         initShareLayout();
         initVirtualBackgroundItemLayout();
+        initDenoiseLayout();
+        initExternalAudioInputLayout();
         observeBeautyModuleInitResult();
 
         PLVBlurUtils.initBlurView(blurLy);
@@ -165,6 +174,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingExitGroup = findViewById(R.id.plvls_more_setting_exit_group);
         moreInteractSigninLl = findViewById(R.id.plvls_more_interact_signin_layout);
         moreVirtualBgItemLayout = findViewById(R.id.plvls_more_setting_virtual_bg_layout);
+        moreDenoiseItemLayout = findViewById(R.id.plvls_more_setting_denoise_layout);
+        moreDenoisePreferenceLayout = findViewById(R.id.plvls_more_setting_denoise_preference_layout);
+        moreExternalAudioInputItemLayout = findViewById(R.id.plvls_more_setting_external_audio_input_layout);
+        moreExternalAudioInputPreferenceLayout = findViewById(R.id.plvls_more_setting_external_audio_input_preference_layout);
         moreSettingsInteractTv = findViewById(R.id.plvls_more_settings_interact_tv);
         moreSettingsInteractLayout = findViewById(R.id.plvls_more_settings_interact_layout);
 
@@ -176,6 +189,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingShareItemLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
         moreVirtualBgItemLayout.setOnClickListener(this);
+        moreDenoiseItemLayout.setOnClickListener(this);
+        moreExternalAudioInputItemLayout.setOnClickListener(this);
     }
 
     private void initBitrateLayout() {
@@ -371,6 +386,47 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             moreVirtualBgItemLayout.setLayoutParams(lp);
         }
     }
+
+    private void initDenoiseLayout() {
+        moreDenoisePreferenceLayout.setOnViewActionListener(new PLVLSDenoisePreferenceLayout.OnViewActionListener() {
+            @Nullable
+            @Override
+            public PLVLinkMicDenoiseType getCurrentDenoiseType() {
+                if (streamerPresenter != null) {
+                    return streamerPresenter.getData().getDenoiseType().getValue();
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public void onDenoiseChanged(@NonNull PLVLinkMicDenoiseType denoiseType) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setDenoiseType(denoiseType);
+                }
+            }
+        });
+    }
+
+    private void initExternalAudioInputLayout() {
+        moreExternalAudioInputPreferenceLayout.setOnViewActionListener(new PLVLSExternalAudioInputPreferenceLayout.OnViewActionListener() {
+            @Override
+            public boolean currentIsEnableExternalAudioInput() {
+                if (streamerPresenter != null) {
+                    return streamerPresenter.getData().getUseExternalAudioInput().getValue();
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public void onEnableExternalAudioInputChanged(boolean enable) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setIsUseExternalAudioInput(enable);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-folder defaultstate="collapsed" desc="初始化数据">
@@ -515,7 +571,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 moreSettingSelectLayout,
                 moreSettingBitrateLayout,
                 moreSettingMixLayout,
-                morePushDowngradePreferenceLayout
+                morePushDowngradePreferenceLayout,
+                moreDenoisePreferenceLayout,
+                moreExternalAudioInputPreferenceLayout
         );
         foreach(views, new PLVSugarUtil.Consumer<View>() {
             @Override
@@ -581,6 +639,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 close();
                 virtualBackgroundLayout.show();
             }
+        } else if (id == moreDenoiseItemLayout.getId()) {
+            showLayout(moreDenoisePreferenceLayout);
+        } else if (id == moreExternalAudioInputItemLayout.getId()) {
+            showLayout(moreExternalAudioInputPreferenceLayout);
         }
     }
     // </editor-fold>

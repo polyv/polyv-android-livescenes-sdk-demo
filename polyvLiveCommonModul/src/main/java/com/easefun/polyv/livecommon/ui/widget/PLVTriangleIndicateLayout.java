@@ -119,13 +119,13 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
     private void init() {
         TypedArray typedArray = getContext().obtainStyledAttributes(mAttrs, R.styleable.PLVTriangleIndicateLayout);
 
-        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
-        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
-        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
-        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_trianglePosition, DEFAULT_TRIANGLE_POSITION);
-        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
-        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateLayout_indicateColor, DEFAULT_TRIANGLE_COLOR);
-        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_rectRadius, 0);
+        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_plv_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
+        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_plv_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
+        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_plv_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
+        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_plv_trianglePosition, DEFAULT_TRIANGLE_POSITION);
+        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateLayout_plv_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
+        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateLayout_plv_indicateColor, DEFAULT_TRIANGLE_COLOR);
+        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateLayout_plv_rectRadius, 0);
 
         if (typedArray.hasValue(R.styleable.PLVTriangleIndicateLayout_plvGradientColors)) {
             orientation = typedArray.getInt(R.styleable.PLVTriangleIndicateLayout_plvGradientOrientation, orientation);

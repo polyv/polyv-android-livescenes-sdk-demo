@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/colorEbonyClay"
+    tools:background="@color/plv_colorEbonyClay"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
@@ -28,7 +28,7 @@
         android:background="@drawable/plvlc_bg_player_audio_mode_play_video_btn"
         android:gravity="center"
         android:text="@string/plv_player_video_play_mode"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         app:layout_constraintBottom_toBottomOf="@id/plvlc_iv_audio_mode_img"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">

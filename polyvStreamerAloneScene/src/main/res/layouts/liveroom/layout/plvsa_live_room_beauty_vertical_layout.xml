@@ -85,8 +85,8 @@
         android:layout_height="wrap_content"
         android:background="#CC464646"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:mode="top"
-        app:radius="16dp">
+        app:plv_mode="top"
+        app:plv_radius="16dp">
 
         <LinearLayout
             android:id="@+id/plvsa_beauty_item_selector_layout"

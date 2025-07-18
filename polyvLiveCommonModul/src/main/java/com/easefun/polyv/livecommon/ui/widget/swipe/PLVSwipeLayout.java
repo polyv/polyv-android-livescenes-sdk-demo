@@ -90,12 +90,12 @@ public class PLVSwipeLayout extends FrameLayout {
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PLVSwipeLayout);
-        int dragEdgeChoices = a.getInt(R.styleable.PLVSwipeLayout_drag_edge, DRAG_RIGHT);
-        mEdgeSwipesOffset[DragEdge.Left.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_leftEdgeSwipeOffset, 0);
-        mEdgeSwipesOffset[DragEdge.Right.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_rightEdgeSwipeOffset, 0);
-        mEdgeSwipesOffset[DragEdge.Top.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_topEdgeSwipeOffset, 0);
-        mEdgeSwipesOffset[DragEdge.Bottom.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_bottomEdgeSwipeOffset, 0);
-        setClickToClose(a.getBoolean(R.styleable.PLVSwipeLayout_clickToClose, mClickToClose));
+        int dragEdgeChoices = a.getInt(R.styleable.PLVSwipeLayout_plv_drag_edge, DRAG_RIGHT);
+        mEdgeSwipesOffset[DragEdge.Left.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_plv_leftEdgeSwipeOffset, 0);
+        mEdgeSwipesOffset[DragEdge.Right.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_plv_rightEdgeSwipeOffset, 0);
+        mEdgeSwipesOffset[DragEdge.Top.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_plv_topEdgeSwipeOffset, 0);
+        mEdgeSwipesOffset[DragEdge.Bottom.ordinal()] = a.getDimension(R.styleable.PLVSwipeLayout_plv_bottomEdgeSwipeOffset, 0);
+        setClickToClose(a.getBoolean(R.styleable.PLVSwipeLayout_plv_clickToClose, mClickToClose));
 
         if ((dragEdgeChoices & DRAG_LEFT) == DRAG_LEFT) {
             mDragEdges.put(DragEdge.Left, null);
@@ -109,7 +109,7 @@ public class PLVSwipeLayout extends FrameLayout {
         if ((dragEdgeChoices & DRAG_BOTTOM) == DRAG_BOTTOM) {
             mDragEdges.put(DragEdge.Bottom, null);
         }
-        int ordinal = a.getInt(R.styleable.PLVSwipeLayout_show_mode, ShowMode.PullOut.ordinal());
+        int ordinal = a.getInt(R.styleable.PLVSwipeLayout_plv_show_mode, ShowMode.PullOut.ordinal());
         mShowMode = ShowMode.values()[ordinal];
         a.recycle();
 

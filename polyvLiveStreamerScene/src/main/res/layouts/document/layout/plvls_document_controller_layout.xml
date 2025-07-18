@@ -99,61 +99,61 @@
                         android:id="@+id/plvls_document_paint_color_red_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#FF6363"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#FF6363"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView
                         android:id="@+id/plvls_document_paint_color_blue_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#4399FF"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#4399FF"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView
                         android:id="@+id/plvls_document_paint_color_green_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#5AE59C"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#5AE59C"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView
                         android:id="@+id/plvls_document_paint_color_yellow_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#FFE45B"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#FFE45B"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView
                         android:id="@+id/plvls_document_paint_color_grey_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#4A5060"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#4A5060"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundBorderColorView
                         android:id="@+id/plvls_document_paint_color_white_iv"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:innerBorderColor="#313542"
-                        app:innerBorderWidth="1dp"
-                        app:mainColor="#F0F1F5"
-                        app:outerBorderColor="#F0F1F5"
-                        app:outerBorderWidth="3dp" />
+                        app:plv_innerBorderColor="#313542"
+                        app:plv_innerBorderWidth="1dp"
+                        app:plv_mainColor="#F0F1F5"
+                        app:plv_outerBorderColor="#F0F1F5"
+                        app:plv_outerBorderWidth="3dp" />
 
                     <View
                         android:id="@+id/plvls_document_paint_separator"

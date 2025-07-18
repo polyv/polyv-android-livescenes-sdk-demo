@@ -140,6 +140,10 @@ public interface IPLVECVideoLayout {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - live部分，定义 直播播放器布局 独有的方法">
+    /**
+     * 重新开始播放
+     */
+    void restartPlay();
 
     /**
      * 获取线路索引

@@ -110,27 +110,27 @@ public class PLVCircleProgressView extends ProgressBar {
     }
 
     private void obtainAttributes(AttributeSet attrs) {
-        TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.CircleProgressView);
-        mProgressStyle = ta.getInt(R.styleable.CircleProgressView_cpv_progressStyle, ProgressStyle.NORMAL);
+        TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.PLVCircleProgressView);
+        mProgressStyle = ta.getInt(R.styleable.PLVCircleProgressView_plv_cpv_progressStyle, ProgressStyle.NORMAL);
         // 获取三种风格通用的属性
-        mNormalBarSize = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_progressNormalSize, mNormalBarSize);
-        mNormalBarColor = ta.getColor(R.styleable.CircleProgressView_cpv_progressNormalColor, mNormalBarColor);
+        mNormalBarSize = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_progressNormalSize, mNormalBarSize);
+        mNormalBarColor = ta.getColor(R.styleable.PLVCircleProgressView_plv_cpv_progressNormalColor, mNormalBarColor);
 
-        mReachBarSize = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_progressReachSize, mReachBarSize);
-        mReachBarColor = ta.getColor(R.styleable.CircleProgressView_cpv_progressReachColor, mReachBarColor);
+        mReachBarSize = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_progressReachSize, mReachBarSize);
+        mReachBarColor = ta.getColor(R.styleable.PLVCircleProgressView_plv_cpv_progressReachColor, mReachBarColor);
 
-        mTextSize = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_progressTextSize, mTextSize);
-        mTextColor = ta.getColor(R.styleable.CircleProgressView_cpv_progressTextColor, mTextColor);
-        mTextSkewX = ta.getDimension(R.styleable.CircleProgressView_cpv_progressTextSkewX, 0);
-        if (ta.hasValue(R.styleable.CircleProgressView_cpv_progressTextSuffix)) {
-            mTextSuffix = ta.getString(R.styleable.CircleProgressView_cpv_progressTextSuffix);
+        mTextSize = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_progressTextSize, mTextSize);
+        mTextColor = ta.getColor(R.styleable.PLVCircleProgressView_plv_cpv_progressTextColor, mTextColor);
+        mTextSkewX = ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_progressTextSkewX, 0);
+        if (ta.hasValue(R.styleable.PLVCircleProgressView_plv_cpv_progressTextSuffix)) {
+            mTextSuffix = ta.getString(R.styleable.PLVCircleProgressView_plv_cpv_progressTextSuffix);
         }
-        if (ta.hasValue(R.styleable.CircleProgressView_cpv_progressTextPrefix)) {
-            mTextPrefix = ta.getString(R.styleable.CircleProgressView_cpv_progressTextPrefix);
+        if (ta.hasValue(R.styleable.PLVCircleProgressView_plv_cpv_progressTextPrefix)) {
+            mTextPrefix = ta.getString(R.styleable.PLVCircleProgressView_plv_cpv_progressTextPrefix);
         }
-        mTextVisible = ta.getBoolean(R.styleable.CircleProgressView_cpv_progressTextVisible, mTextVisible);
+        mTextVisible = ta.getBoolean(R.styleable.PLVCircleProgressView_plv_cpv_progressTextVisible, mTextVisible);
 
-        mRadius = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_radius, mRadius);
+        mRadius = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_radius, mRadius);
         rectF = new RectF(-mRadius, -mRadius, mRadius, mRadius);
 
         switch (mProgressStyle) {
@@ -140,13 +140,13 @@ public class PLVCircleProgressView extends ProgressBar {
                 mOuterSize = 0;
                 break;
             case ProgressStyle.FILL_IN_ARC:
-                mStartArc = ta.getInt(R.styleable.CircleProgressView_cpv_progressStartArc, 0) + 270;
-                mInnerPadding = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_innerPadding, mInnerPadding);
-                mOuterColor = ta.getColor(R.styleable.CircleProgressView_cpv_outerColor, mReachBarColor);
-                mOuterSize = (int) ta.getDimension(R.styleable.CircleProgressView_cpv_outerSize, mOuterSize);
+                mStartArc = ta.getInt(R.styleable.PLVCircleProgressView_plv_cpv_progressStartArc, 0) + 270;
+                mInnerPadding = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_innerPadding, mInnerPadding);
+                mOuterColor = ta.getColor(R.styleable.PLVCircleProgressView_plv_cpv_outerColor, mReachBarColor);
+                mOuterSize = (int) ta.getDimension(R.styleable.PLVCircleProgressView_plv_cpv_outerSize, mOuterSize);
                 mReachBarSize = 0;// 将画笔大小重置为0
                 mNormalBarSize = 0;
-                if (!ta.hasValue(R.styleable.CircleProgressView_cpv_progressNormalColor)) {
+                if (!ta.hasValue(R.styleable.PLVCircleProgressView_plv_cpv_progressNormalColor)) {
                     mNormalBarColor = Color.TRANSPARENT;
                 }
                 int mInnerRadius = mRadius - mOuterSize / 2 - mInnerPadding;
@@ -154,10 +154,10 @@ public class PLVCircleProgressView extends ProgressBar {
 
                 break;
             case ProgressStyle.NORMAL:
-                mReachCapRound = ta.getBoolean(R.styleable.CircleProgressView_cpv_reachCapRound, true);
-                mStartArc = ta.getInt(R.styleable.CircleProgressView_cpv_progressStartArc, 0) + 270;
-                if (ta.hasValue(R.styleable.CircleProgressView_cpv_innerBackgroundColor)) {
-                    mInnerBackgroundColor = ta.getColor(R.styleable.CircleProgressView_cpv_innerBackgroundColor, Color.argb(0, 0, 0, 0));
+                mReachCapRound = ta.getBoolean(R.styleable.PLVCircleProgressView_plv_cpv_reachCapRound, true);
+                mStartArc = ta.getInt(R.styleable.PLVCircleProgressView_plv_cpv_progressStartArc, 0) + 270;
+                if (ta.hasValue(R.styleable.PLVCircleProgressView_plv_cpv_innerBackgroundColor)) {
+                    mInnerBackgroundColor = ta.getColor(R.styleable.PLVCircleProgressView_plv_cpv_innerBackgroundColor, Color.argb(0, 0, 0, 0));
                     needDrawInnerBackground = true;
                 }
                 break;

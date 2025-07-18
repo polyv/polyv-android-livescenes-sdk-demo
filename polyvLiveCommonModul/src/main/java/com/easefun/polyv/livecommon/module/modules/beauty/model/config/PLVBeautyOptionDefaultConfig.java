@@ -23,9 +23,9 @@ public class PLVBeautyOptionDefaultConfig {
     // 美颜默认强度
     public static final Map<PLVBeautyOption, Float> DEFAULT_BEAUTY_OPTION_VALUE = mapOf(
             // 磨皮
-            pair(PLVBeautyOption.BEAUTY_SMOOTH, 0.85F),
+            pair(PLVBeautyOption.BEAUTY_SMOOTH, 0.5F),
             // 美白
-            pair(PLVBeautyOption.BEAUTY_WHITEN, 0.7F),
+            pair(PLVBeautyOption.BEAUTY_WHITEN, 0.25F),
             // 锐化
             pair(PLVBeautyOption.BEAUTY_SHARP, 0.25F),
             // 瘦脸
@@ -63,6 +63,16 @@ public class PLVBeautyOptionDefaultConfig {
                 put("樱花", PLVAppUtils.getString(R.string.plv_beauty_filter_cherry));
                 put("胶片", PLVAppUtils.getString(R.string.plv_beauty_filter_film));
                 put("夜色", PLVAppUtils.getString(R.string.plv_beauty_filter_night));
+
+                put("冷白", PLVAppUtils.getString(R.string.plv_beauty_filter_cool_white));
+                put("牛奶", PLVAppUtils.getString(R.string.plv_beauty_filter_milk));
+                put("蓝调", PLVAppUtils.getString(R.string.plv_beauty_filter_blue_tone));
+                put("元气", PLVAppUtils.getString(R.string.plv_beauty_filter_vitality));
+                put("清新", PLVAppUtils.getString(R.string.plv_beauty_filter_fresh));
+                put("质感", PLVAppUtils.getString(R.string.plv_beauty_filter_texture));
+                put("粉瓷", PLVAppUtils.getString(R.string.plv_beauty_filter_porcelain));
+                put("樱红", PLVAppUtils.getString(R.string.plv_beauty_filter_cherry_red));
+                put("唯美", PLVAppUtils.getString(R.string.plv_beauty_filter_aesthetic));
             }
         };
     }

@@ -102,25 +102,25 @@ public class PLVSeekBar {
         if (t == null){
             return;
         }
-        indicatorMargin = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_margin, 0);
-        indicatorDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_rsb_indicator_drawable, 0);
-        indicatorShowMode = t.getInt(R.styleable.PLVRangeSeekBar_rsb_indicator_show_mode, INDICATOR_ALWAYS_HIDE);
-        indicatorHeight = t.getLayoutDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_height, WRAP_CONTENT);
-        indicatorWidth = t.getLayoutDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_width, WRAP_CONTENT);
-        indicatorTextSize = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_text_size, PLVSeekbarUtils.dp2px(14));
-        indicatorTextColor = t.getColor(R.styleable.PLVRangeSeekBar_rsb_indicator_text_color, Color.WHITE);
-        indicatorBackgroundColor = t.getColor(R.styleable.PLVRangeSeekBar_rsb_indicator_background_color, ContextCompat.getColor(getContext(), R.color.colorAccent));
-        indicatorPaddingLeft = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_padding_left, 0);
-        indicatorPaddingRight = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_padding_right, 0);
-        indicatorPaddingTop = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_padding_top, 0);
-        indicatorPaddingBottom = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_padding_bottom, 0);
-        indicatorArrowSize = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_arrow_size, 0);
-        thumbDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_rsb_thumb_drawable, R.drawable.plv_beauty_seek_bar_thumb);
-        thumbInactivatedDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_rsb_thumb_inactivated_drawable, 0);
-        thumbWidth = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_thumb_width, PLVSeekbarUtils.dp2px(26));
-        thumbHeight = (int) t.getDimension(R.styleable.PLVRangeSeekBar_rsb_thumb_height, PLVSeekbarUtils.dp2px(26));
-        thumbScaleRatio = t.getFloat(R.styleable.PLVRangeSeekBar_rsb_thumb_scale_ratio, 1f);
-        indicatorRadius = t.getDimension(R.styleable.PLVRangeSeekBar_rsb_indicator_radius, 0f);
+        indicatorMargin = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_margin, 0);
+        indicatorDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_drawable, 0);
+        indicatorShowMode = t.getInt(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_show_mode, INDICATOR_ALWAYS_HIDE);
+        indicatorHeight = t.getLayoutDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_height, WRAP_CONTENT);
+        indicatorWidth = t.getLayoutDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_width, WRAP_CONTENT);
+        indicatorTextSize = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_text_size, PLVSeekbarUtils.dp2px(14));
+        indicatorTextColor = t.getColor(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_text_color, Color.WHITE);
+        indicatorBackgroundColor = t.getColor(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_background_color, ContextCompat.getColor(getContext(), R.color.colorAccent));
+        indicatorPaddingLeft = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_padding_left, 0);
+        indicatorPaddingRight = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_padding_right, 0);
+        indicatorPaddingTop = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_padding_top, 0);
+        indicatorPaddingBottom = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_padding_bottom, 0);
+        indicatorArrowSize = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_arrow_size, 0);
+        thumbDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_plv_rsb_thumb_drawable, R.drawable.plv_beauty_seek_bar_thumb);
+        thumbInactivatedDrawableId = t.getResourceId(R.styleable.PLVRangeSeekBar_plv_rsb_thumb_inactivated_drawable, 0);
+        thumbWidth = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_thumb_width, PLVSeekbarUtils.dp2px(26));
+        thumbHeight = (int) t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_thumb_height, PLVSeekbarUtils.dp2px(26));
+        thumbScaleRatio = t.getFloat(R.styleable.PLVRangeSeekBar_plv_rsb_thumb_scale_ratio, 1f);
+        indicatorRadius = t.getDimension(R.styleable.PLVRangeSeekBar_plv_rsb_indicator_radius, 0f);
         t.recycle();
     }
 

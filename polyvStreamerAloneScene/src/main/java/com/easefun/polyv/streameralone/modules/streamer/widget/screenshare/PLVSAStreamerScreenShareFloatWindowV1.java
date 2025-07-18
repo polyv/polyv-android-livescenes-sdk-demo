@@ -102,7 +102,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
                 .build();
         PLVFloatingWindowManager.getInstance().show((Activity) context);
         try {
-            if (Build.VERSION.SDK_INT < 31) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
             }
         } catch (Exception e) {

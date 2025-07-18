@@ -11,7 +11,7 @@
     android:orientation="vertical"
     android:visibility="visible"
     tools:visibility="visible"
-    tools:background="@color/colorEbonyClay">
+    tools:background="@color/plv_colorEbonyClay">
 
     <ImageView
         android:id="@+id/plvec_live_more_iv"

@@ -78,7 +78,7 @@ public class PLVLCLiveAudioModeView extends ConstraintLayout implements IPolyvLi
 
     // <editor-fold defaultstate="collapsed" desc="初始化View">
     private void initView() {
-        setBackgroundColor(getResources().getColor(R.color.colorEbonyClay));
+        setBackgroundColor(getResources().getColor(R.color.plv_colorEbonyClay));
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_player_audio_mode_view, this);
         ivAudioModeImg = findViewById(R.id.plvlc_iv_audio_mode_img);
         tvPlaceholderAudioModePlayVideo = findViewById(R.id.plvlc_tv_placeholder_audio_mode_play_video);

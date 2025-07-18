@@ -12,7 +12,7 @@
         android:background="@drawable/plvls_document_del"
         android:gravity="center"
         android:text="@string/plv_ppt_delete_hint"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

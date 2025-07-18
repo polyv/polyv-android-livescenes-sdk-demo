@@ -4,20 +4,20 @@
     <attr name="plv_show_on_landscape" format="boolean" />
     <attr name="plv_max_height" format="dimension" />
     <declare-styleable name="PLVMarqueeTextView">
-        <attr name="scroll_interval" format="integer" />
-        <attr name="scroll_first_delay" format="integer" />
-        <attr name="scroll_mode">
+        <attr name="plv_scroll_interval" format="integer" />
+        <attr name="plv_scroll_first_delay" format="integer" />
+        <attr name="plv_scroll_mode">
             <enum name="mode_forever" value="100" />
             <enum name="mode_once" value="101" />
         </attr>
     </declare-styleable>
 
     <declare-styleable name="PLVBlurView">
-        <attr name="blurOverlayColor" format="color" />
+        <attr name="plv_blurOverlayColor" format="color" />
     </declare-styleable>
 
-    <attr name="radius" format="dimension" />
-    <attr name="mode" format="flags">
+    <attr name="plv_radius" format="dimension" />
+    <attr name="plv_mode" format="flags">
         <flag name="none" value="0" />
         <flag name="leftTop" value="1" />
         <flag name="leftBottom" value="2" />
@@ -30,17 +30,17 @@
         <flag name="all" value="15" />
     </attr>
     <declare-styleable name="PLVRoundRectLayout">
-        <attr name="radius" />
-        <attr name="mode" />
+        <attr name="plv_radius" />
+        <attr name="plv_mode" />
     </declare-styleable>
     <declare-styleable name="PLVRoundRectConstraintLayout">
-        <attr name="radius" />
-        <attr name="mode" />
+        <attr name="plv_radius" />
+        <attr name="plv_mode" />
     </declare-styleable>
 
     <declare-styleable name="PLVRoundImageView">
-        <attr name="radius_iv" format="dimension" />
-        <attr name="mode_iv">
+        <attr name="plv_radius_iv" format="dimension" />
+        <attr name="plv_mode_iv">
             <enum name="all" value="1" />
             <enum name="top" value="3" />
         </attr>
@@ -48,94 +48,94 @@
 
     <declare-styleable name="PLVRoundBorderColorView">
 
-        <attr name="placeholder" format="reference|color" />
-        <attr name="mainColor" format="color" />
-        <attr name="innerBorderColor" format="color" />
-        <attr name="innerBorderWidth" format="dimension" />
-        <attr name="outerBorderColor" format="color" />
-        <attr name="outerBorderWidth" format="dimension" />
+        <attr name="plv_placeholder" format="reference|color" />
+        <attr name="plv_mainColor" format="color" />
+        <attr name="plv_innerBorderColor" format="color" />
+        <attr name="plv_innerBorderWidth" format="dimension" />
+        <attr name="plv_outerBorderColor" format="color" />
+        <attr name="plv_outerBorderWidth" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="CircleProgressView">
-        <attr name="cpv_progressNormalColor" format="color" />
-        <attr name="cpv_progressReachColor" format="color" />
-        <attr name="cpv_progressTextColor" format="color" />
-        <attr name="cpv_progressTextSize" format="dimension" />
-        <attr name="cpv_progressTextOffset" format="dimension" />
-        <attr name="cpv_progressNormalSize" format="dimension" />
-        <attr name="cpv_progressReachSize" format="dimension" />
-        <attr name="cpv_radius" format="dimension" />
-        <attr name="cpv_progressTextVisible" format="boolean" />
-        <attr name="cpv_progressStartArc" format="integer" />
-        <attr name="cpv_progressTextSkewX" format="dimension" />
-        <attr name="cpv_progressTextPrefix" format="string" />
-        <attr name="cpv_progressTextSuffix" format="string" />
-        <attr name="cpv_innerBackgroundColor" format="color" />
-        <attr name="cpv_progressStyle" format="enum">
+    <declare-styleable name="PLVCircleProgressView">
+        <attr name="plv_cpv_progressNormalColor" format="color" />
+        <attr name="plv_cpv_progressReachColor" format="color" />
+        <attr name="plv_cpv_progressTextColor" format="color" />
+        <attr name="plv_cpv_progressTextSize" format="dimension" />
+        <attr name="plv_cpv_progressTextOffset" format="dimension" />
+        <attr name="plv_cpv_progressNormalSize" format="dimension" />
+        <attr name="plv_cpv_progressReachSize" format="dimension" />
+        <attr name="plv_cpv_radius" format="dimension" />
+        <attr name="plv_cpv_progressTextVisible" format="boolean" />
+        <attr name="plv_cpv_progressStartArc" format="integer" />
+        <attr name="plv_cpv_progressTextSkewX" format="dimension" />
+        <attr name="plv_cpv_progressTextPrefix" format="string" />
+        <attr name="plv_cpv_progressTextSuffix" format="string" />
+        <attr name="plv_cpv_innerBackgroundColor" format="color" />
+        <attr name="plv_cpv_progressStyle" format="enum">
             <enum name="Normal" value="0" />
             <enum name="FillInner" value="1" />
             <enum name="FillInnerArc" value="2" />
         </attr>
-        <attr name="cpv_innerProgressColor" format="color" />
-        <attr name="cpv_innerPadding" format="dimension" />
-        <attr name="cpv_outerColor" format="color" />
-        <attr name="cpv_outerSize" format="dimension" />
-        <attr name="cpv_reachCapRound" format="boolean" />
+        <attr name="plv_cpv_innerProgressColor" format="color" />
+        <attr name="plv_cpv_innerPadding" format="dimension" />
+        <attr name="plv_cpv_outerColor" format="color" />
+        <attr name="plv_cpv_outerSize" format="dimension" />
+        <attr name="plv_cpv_reachCapRound" format="boolean" />
     </declare-styleable>
 
     <!-- Reference to a style for the menu drawer. -->
-    <attr name="menuDrawerStyle" format="reference" />
+    <attr name="plv_menuDrawerStyle" format="reference" />
 
     <!-- Styleables used for styling the menu drawer. -->
     <declare-styleable name="PLVMenuDrawer">
 
         <!-- Drawable to use for the background of the content. -->
-        <attr name="mdContentBackground" format="reference" />
+        <attr name="plv_mdContentBackground" format="reference" />
 
         <!-- Drawable to use for the background of the menu. -->
-        <attr name="mdMenuBackground" format="reference" />
+        <attr name="plv_mdMenuBackground" format="reference" />
 
         <!-- The size of the menu. -->
-        <attr name="mdMenuSize" format="dimension" />
+        <attr name="plv_mdMenuSize" format="dimension" />
 
         <!-- Drawable used as indicator for the active view. -->
-        <attr name="mdActiveIndicator" format="reference" />
+        <attr name="plv_mdActiveIndicator" format="reference" />
 
         <!-- Defines whether the content will have a dropshadow onto the menu. Default is true. -->
-        <attr name="mdDropShadowEnabled" format="boolean" />
+        <attr name="plv_mdDropShadowEnabled" format="boolean" />
 
         <!-- The size of the drop shadow. Default is 6dp -->
-        <attr name="mdDropShadowSize" format="dimension" />
+        <attr name="plv_mdDropShadowSize" format="dimension" />
 
         <!-- The color of the drop shadow. Default is #FF000000. -->
-        <attr name="mdDropShadowColor" format="color" />
+        <attr name="plv_mdDropShadowColor" format="color" />
 
         <!-- Drawable used for the drop shadow. -->
-        <attr name="mdDropShadow" format="reference" />
+        <attr name="plv_mdDropShadow" format="reference" />
 
         <!-- The touch bezel size. -->
-        <attr name="mdTouchBezelSize" format="dimension" />
+        <attr name="plv_mdTouchBezelSize" format="dimension" />
 
         <!-- Whether the indicator should be animated between active views. -->
-        <attr name="mdAllowIndicatorAnimation" format="boolean" />
+        <attr name="plv_mdAllowIndicatorAnimation" format="boolean" />
 
         <!-- The maximum animation duration -->
-        <attr name="mdMaxAnimationDuration" format="integer" />
+        <attr name="plv_mdMaxAnimationDuration" format="integer" />
 
         <!-- Drawable that replaces the up indicator -->
-        <attr name="mdSlideDrawable" format="reference" />
+        <attr name="plv_mdSlideDrawable" format="reference" />
 
         <!-- String to use as the up indicators content description when the drawer is open -->
-        <attr name="mdDrawerOpenUpContentDescription" format="string" />
+        <attr name="plv_mdDrawerOpenUpContentDescription" format="string" />
 
         <!-- String to use as the up indicators content description when the drawer is closed -->
-        <attr name="mdDrawerClosedUpContentDescription" format="string" />
+        <attr name="plv_mdDrawerClosedUpContentDescription" format="string" />
 
         <!-- Whether an overlay should be drawn as the drawer is opened and closed -->
-        <attr name="mdDrawOverlay" format="boolean" />
+        <attr name="plv_mdDrawOverlay" format="boolean" />
 
         <!-- The position of the drawer -->
-        <attr name="mdPosition" format="enum">
+        <attr name="plv_mdPosition" format="enum">
             <enum name="left" value="0" />
             <enum name="top" value="1" />
             <enum name="right" value="2" />
@@ -147,49 +147,49 @@
 
     <!--注意这里的name要和自定义View的名称一致，不然在xml布局中无法引用-->
     <declare-styleable name="PLVHorizontalExpandMenu">
-        <attr name="back_color" format="color"></attr>
-        <attr name="stroke_size" format="dimension"></attr>
-        <attr name="stroke_color" format="color"></attr>
-        <attr name="corner_radius" format="dimension"></attr>
-        <attr name="button_style">
+        <attr name="plv_back_color" format="color"></attr>
+        <attr name="plv_stroke_size" format="dimension"></attr>
+        <attr name="plv_stroke_color" format="color"></attr>
+        <attr name="plv_corner_radius" format="dimension"></attr>
+        <attr name="plv_button_style">
             <enum name="right" value="0" />
             <enum name="left" value="1" />
         </attr>
-        <attr name="button_icon_size" format="dimension"></attr>
-        <attr name="button_icon_stroke_width" format="dimension"></attr>
-        <attr name="button_icon_color" format="color"></attr>
-        <attr name="expand_time" format="integer"></attr>
-        <attr name="left_icon_id" format="reference"></attr>
+        <attr name="plv_button_icon_size" format="dimension"></attr>
+        <attr name="plv_button_icon_stroke_width" format="dimension"></attr>
+        <attr name="plv_button_icon_color" format="color"></attr>
+        <attr name="plv_expand_time" format="integer"></attr>
+        <attr name="plv_left_icon_id" format="reference"></attr>
     </declare-styleable>
 
     <declare-styleable name="PLVSwipeLayout">
-        <attr name="drag_edge">
+        <attr name="plv_drag_edge">
             <flag name="left" value="1" />
             <flag name="right" value="2" />
             <flag name="top" value="4" />
             <flag name="bottom" value="8" />
         </attr>
-        <attr name="leftEdgeSwipeOffset" format="dimension" />
-        <attr name="rightEdgeSwipeOffset" format="dimension" />
-        <attr name="topEdgeSwipeOffset" format="dimension" />
-        <attr name="bottomEdgeSwipeOffset" format="dimension" />
-        <attr name="show_mode" format="enum">
+        <attr name="plv_leftEdgeSwipeOffset" format="dimension" />
+        <attr name="plv_rightEdgeSwipeOffset" format="dimension" />
+        <attr name="plv_topEdgeSwipeOffset" format="dimension" />
+        <attr name="plv_bottomEdgeSwipeOffset" format="dimension" />
+        <attr name="plv_show_mode" format="enum">
             <enum name="lay_down" value="0" />
             <enum name="pull_out" value="1" />
         </attr>
-        <attr name="clickToClose" format="boolean" />
+        <attr name="plv_clickToClose" format="boolean" />
     </declare-styleable>
 
-    <attr name="triangleWidth" format="dimension" />
-    <attr name="triangleHeight" format="dimension" />
-    <attr name="triangleMargin" format="dimension" />
-    <attr name="trianglePosition" format="enum">
+    <attr name="plv_triangleWidth" format="dimension" />
+    <attr name="plv_triangleHeight" format="dimension" />
+    <attr name="plv_triangleMargin" format="dimension" />
+    <attr name="plv_trianglePosition" format="enum">
         <enum name="top" value="0" />
         <enum name="bottom" value="1" />
         <enum name="left" value="2" />
         <enum name="right" value="3" />
     </attr>
-    <attr name="triangleMarginType" format="enum">
+    <attr name="plv_triangleMarginType" format="enum">
         <enum name="left" value="0" />
         <enum name="right" value="1" />
         <enum name="top" value="2" />
@@ -197,10 +197,10 @@
         <enum name="center" value="4" />
         <enum name="anchor" value="5" />
     </attr>
-    <attr name="triangleCenter" format="boolean" />
-    <attr name="indicateColor" format="color" />
-    <attr name="indicateEndColor" format="color" />
-    <attr name="rectRadius" format="dimension" />
+    <attr name="plv_triangleCenter" format="boolean" />
+    <attr name="plv_indicateColor" format="color" />
+    <attr name="plv_indicateEndColor" format="color" />
+    <attr name="plv_rectRadius" format="dimension" />
     <attr name="plvGradientOrientation" format="enum">
         <enum name="leftRight" value="0" />
         <enum name="bottomLeftTopRight" value="1" />
@@ -217,34 +217,34 @@
     <attr name="plvGradientColors" format="string" />
 
     <declare-styleable name="PLVTriangleIndicateTextView">
-        <attr name="triangleWidth" />
-        <attr name="triangleHeight" />
-        <attr name="triangleMargin" />
-        <attr name="trianglePosition" />
-        <attr name="triangleMarginType" />
-        <attr name="triangleCenter" />
-        <attr name="indicateColor" />
-        <attr name="indicateEndColor" />
-        <attr name="rectRadius" />
+        <attr name="plv_triangleWidth" />
+        <attr name="plv_triangleHeight" />
+        <attr name="plv_triangleMargin" />
+        <attr name="plv_trianglePosition" />
+        <attr name="plv_triangleMarginType" />
+        <attr name="plv_triangleCenter" />
+        <attr name="plv_indicateColor" />
+        <attr name="plv_indicateEndColor" />
+        <attr name="plv_rectRadius" />
     </declare-styleable>
 
     <declare-styleable name="PolyvBeadWidget">
-        <attr name="bead_margin" format="dimension" />
-        <attr name="bead_radius" format="dimension" />
-        <attr name="selected_bead_color" format="color" />
-        <attr name="unselected_bead_color" format="color" />
+        <attr name="plv_bead_margin" format="dimension" />
+        <attr name="plv_bead_radius" format="dimension" />
+        <attr name="plv_selected_bead_color" format="color" />
+        <attr name="plv_unselected_bead_color" format="color" />
     </declare-styleable>
 
     <declare-styleable name="PLVTriangleIndicateLayout">
-        <attr name="triangleWidth" />
-        <attr name="triangleHeight" />
-        <attr name="triangleMargin" />
-        <attr name="trianglePosition" />
-        <attr name="triangleMarginType" />
-        <attr name="indicateColor" />
+        <attr name="plv_triangleWidth" />
+        <attr name="plv_triangleHeight" />
+        <attr name="plv_triangleMargin" />
+        <attr name="plv_trianglePosition" />
+        <attr name="plv_triangleMarginType" />
+        <attr name="plv_indicateColor" />
         <attr name="plvGradientColors" />
         <attr name="plvGradientOrientation" />
-        <attr name="rectRadius" />
+        <attr name="plv_rectRadius" />
     </declare-styleable>
 
     <declare-styleable name="PLVGradientView">
@@ -361,122 +361,122 @@
         <!--PLVRangeSeekBar common attrs-->
 
         <!--The maximum-->
-        <attr name="rsb_max" format="float"/>
+        <attr name="plv_rsb_max" format="float"/>
 
         <!--The minimum-->
-        <attr name="rsb_min" format="float"/>
+        <attr name="plv_rsb_min" format="float"/>
 
         <!--PLVRangeSeekBar mode, single is normal seekBar, range is PLVRangeSeekBar-->
-        <attr name="rsb_mode" format="enum">
+        <attr name="plv_rsb_mode" format="enum">
             <enum name="single" value="1"/>
             <enum name="range" value="2"/>
         </attr>
 
         <!--PLVRangeSeekBar gravity-->
-        <attr name="rsb_gravity" format="enum">
+        <attr name="plv_rsb_gravity" format="enum">
             <enum name="top" value="0"/>
             <enum name="bottom" value="1"/>
             <enum name="center" value="2"/>
         </attr>
 
         <!--The min interval of the thumbs -->
-        <attr name="rsb_min_interval" format="float"/>
+        <attr name="plv_rsb_min_interval" format="float"/>
 
         <!-- 0 for the normal mode, greater than 1 to switch to scale mode-->
-        <attr name="rsb_tick_mark_number" format="integer"/>
+        <attr name="plv_rsb_tick_mark_number" format="integer"/>
 
         <!--Scale mode
         Number according to the scale of the actual proportion of the distribution of the location (markTextArray must be a number)
         Other bisects the current layout (markTextArray can be any character)
         -->
-        <attr name="rsb_tick_mark_mode" format="enum">
+        <attr name="plv_rsb_tick_mark_mode" format="enum">
             <enum name="number" value="0"/>
             <enum name="other" value="1"/>
         </attr>
 
         <!--The tick mark text gravity -->
-        <attr name="rsb_tick_mark_gravity" format="enum">
+        <attr name="plv_rsb_tick_mark_gravity" format="enum">
             <enum name="left" value="0"/>
             <enum name="center" value="1"/>
             <enum name="right" value="2"/>
         </attr>
 
         <!--The tick mark text layout gravity -->
-        <attr name="rsb_tick_mark_layout_gravity" format="enum">
+        <attr name="plv_rsb_tick_mark_layout_gravity" format="enum">
             <enum name="top" value="0"/>
             <enum name="bottom" value="1"/>
         </attr>
 
         <!--The tick mark text array -->
-        <attr name="rsb_tick_mark_text_array" format="reference"/>
+        <attr name="plv_rsb_tick_mark_text_array" format="reference"/>
 
         <!--The tick mark text margin bottom to progress -->
-        <attr name="rsb_tick_mark_text_margin" format="dimension" />
+        <attr name="plv_rsb_tick_mark_text_margin" format="dimension" />
 
-        <attr name="rsb_tick_mark_text_size" format="dimension" />
+        <attr name="plv_rsb_tick_mark_text_size" format="dimension" />
 
-        <attr name="rsb_tick_mark_text_color" format="color" />
+        <attr name="plv_rsb_tick_mark_text_color" format="color" />
 
         <!--it just work in range && number mode now-->
-        <attr name="rsb_tick_mark_in_range_text_color" format="color" />
+        <attr name="plv_rsb_tick_mark_in_range_text_color" format="color" />
 
-        <attr name="rsb_progress_height" format="dimension"/>
+        <attr name="plv_rsb_progress_height" format="dimension"/>
 
-        <attr name="rsb_progress_radius" format="dimension"/>
+        <attr name="plv_rsb_progress_radius" format="dimension"/>
 
         <!--the color of progress bar when in progress-->
-        <attr name="rsb_progress_color" format="color"/>
+        <attr name="plv_rsb_progress_color" format="color"/>
         <!--the default color of the progress bar-->
-        <attr name="rsb_progress_default_color" format="color"/>
+        <attr name="plv_rsb_progress_default_color" format="color"/>
 
-        <attr name="rsb_progress_drawable" format="reference"/>
+        <attr name="plv_rsb_progress_drawable" format="reference"/>
 
-        <attr name="rsb_progress_drawable_default" format="reference"/>
+        <attr name="plv_rsb_progress_drawable_default" format="reference"/>
 
-        <attr name="rsb_mid_side_drawable_mode" format="boolean"/>
+        <attr name="plv_rsb_mid_side_drawable_mode" format="boolean"/>
 
         <!--SeekBar attrs-->
-        <attr name="rsb_indicator_show_mode" format="enum">
+        <attr name="plv_rsb_indicator_show_mode" format="enum">
             <enum name="showWhenTouch" value="0"/>
             <enum name="alwaysHide" value="1"/>
             <enum name="alwaysShowAfterTouch" value="2"/>
             <enum name="alwaysShow" value="3"/>
         </attr>
-        <attr name="rsb_indicator_height" format="dimension" >
+        <attr name="plv_rsb_indicator_height" format="dimension" >
             <enum name="wrap_content" value="-1" />
         </attr>
-        <attr name="rsb_indicator_width" format="dimension" >
+        <attr name="plv_rsb_indicator_width" format="dimension" >
             <enum name="wrap_content" value="-1" />
         </attr>
         <!--indicator margin bottom to progress bar-->
-        <attr name="rsb_indicator_margin" format="dimension" />
-        <attr name="rsb_indicator_text_size" format="dimension" />
-        <attr name="rsb_indicator_text_color" format="color" />
+        <attr name="plv_rsb_indicator_margin" format="dimension" />
+        <attr name="plv_rsb_indicator_text_size" format="dimension" />
+        <attr name="plv_rsb_indicator_text_color" format="color" />
         <!--indicator arrow size, it just work when you not use rsb_indicator_drawable -->
-        <attr name="rsb_indicator_arrow_size" format="dimension" />
+        <attr name="plv_rsb_indicator_arrow_size" format="dimension" />
         <!-- must use 9 path ！！！-->
-        <attr name="rsb_indicator_drawable" format="reference"/>
-        <attr name="rsb_indicator_background_color" format="color" />
-        <attr name="rsb_indicator_padding_left" format="dimension" />
-        <attr name="rsb_indicator_padding_right" format="dimension" />
-        <attr name="rsb_indicator_padding_top" format="dimension" />
-        <attr name="rsb_indicator_padding_bottom" format="dimension" />
-        <attr name="rsb_indicator_radius" format="dimension" />
-        <attr name="rsb_thumb_drawable" format="reference"/>
+        <attr name="plv_rsb_indicator_drawable" format="reference"/>
+        <attr name="plv_rsb_indicator_background_color" format="color" />
+        <attr name="plv_rsb_indicator_padding_left" format="dimension" />
+        <attr name="plv_rsb_indicator_padding_right" format="dimension" />
+        <attr name="plv_rsb_indicator_padding_top" format="dimension" />
+        <attr name="plv_rsb_indicator_padding_bottom" format="dimension" />
+        <attr name="plv_rsb_indicator_radius" format="dimension" />
+        <attr name="plv_rsb_thumb_drawable" format="reference"/>
         <!--the thumb inactivated is when you don't touch the thumb button-->
-        <attr name="rsb_thumb_inactivated_drawable" format="reference"/>
-        <attr name="rsb_thumb_width" format="dimension"/>
-        <attr name="rsb_thumb_height" format="dimension"/>
-        <attr name="rsb_thumb_scale_ratio" format="float"/>
+        <attr name="plv_rsb_thumb_inactivated_drawable" format="reference"/>
+        <attr name="plv_rsb_thumb_width" format="dimension"/>
+        <attr name="plv_rsb_thumb_height" format="dimension"/>
+        <attr name="plv_rsb_thumb_scale_ratio" format="float"/>
 
         <!--steps PLVSeekBar-->
-        <attr name="rsb_steps" format="integer"/>
-        <attr name="rsb_step_color" format="color"/>
-        <attr name="rsb_step_width" format="dimension"/>
-        <attr name="rsb_step_height" format="dimension"/>
-        <attr name="rsb_step_radius" format="dimension"/>
-        <attr name="rsb_step_auto_bonding" format="boolean"/>
-        <attr name="rsb_step_drawable" format="reference"/>
+        <attr name="plv_rsb_steps" format="integer"/>
+        <attr name="plv_rsb_step_color" format="color"/>
+        <attr name="plv_rsb_step_width" format="dimension"/>
+        <attr name="plv_rsb_step_height" format="dimension"/>
+        <attr name="plv_rsb_step_radius" format="dimension"/>
+        <attr name="plv_rsb_step_auto_bonding" format="boolean"/>
+        <attr name="plv_rsb_step_drawable" format="reference"/>
 
     </declare-styleable>
 

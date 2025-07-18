@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/colorEbonyClay">
+    tools:background="@color/plv_colorEbonyClay">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout
         android:id="@+id/plvec_more_pop_vertical_ly"

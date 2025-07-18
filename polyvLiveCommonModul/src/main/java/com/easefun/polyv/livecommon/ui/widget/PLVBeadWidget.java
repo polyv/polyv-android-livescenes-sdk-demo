@@ -44,10 +44,10 @@ public class PLVBeadWidget extends View {
 
     private void init(AttributeSet attrs) {
         TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.PolyvBeadWidget);
-        beadMargin = (int) ta.getDimension(R.styleable.PolyvBeadWidget_bead_margin, 30);
-        beadRadius = (int) ta.getDimension(R.styleable.PolyvBeadWidget_bead_radius, 10);
-        int colorForSelectedBead = ta.getColor(R.styleable.PolyvBeadWidget_selected_bead_color, Color.BLACK);
-        int colorForUnselectedBead = ta.getColor(R.styleable.PolyvBeadWidget_unselected_bead_color, Color.BLUE);
+        beadMargin = (int) ta.getDimension(R.styleable.PolyvBeadWidget_plv_bead_margin, 30);
+        beadRadius = (int) ta.getDimension(R.styleable.PolyvBeadWidget_plv_bead_radius, 10);
+        int colorForSelectedBead = ta.getColor(R.styleable.PolyvBeadWidget_plv_selected_bead_color, Color.BLACK);
+        int colorForUnselectedBead = ta.getColor(R.styleable.PolyvBeadWidget_plv_unselected_bead_color, Color.BLUE);
         ta.recycle();
 
 

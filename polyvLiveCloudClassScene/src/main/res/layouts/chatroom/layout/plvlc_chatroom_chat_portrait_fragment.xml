@@ -38,9 +38,9 @@
             android:textColor="#ffffff"
             android:textSize="14sp"
             android:visibility="invisible"
-            app:scroll_first_delay="100"
-            app:scroll_interval="6000"
-            app:scroll_mode="mode_forever" />
+            app:plv_scroll_first_delay="100"
+            app:plv_scroll_interval="6000"
+            app:plv_scroll_mode="mode_forever" />
     </FrameLayout>
 
     <RelativeLayout
@@ -70,9 +70,9 @@
             android:textColor="#ffffff"
             android:textSize="12sp"
             android:visibility="invisible"
-            app:scroll_first_delay="100"
-            app:scroll_interval="6000"
-            app:scroll_mode="mode_once" />
+            app:plv_scroll_first_delay="100"
+            app:plv_scroll_interval="6000"
+            app:plv_scroll_mode="mode_once" />
 
         <ImageView
             android:id="@+id/greeting_start_left"
@@ -190,16 +190,16 @@
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:visibility="gone"
-                        app:indicateColor="#FF9D4D"
-                        app:indicateEndColor="#F65F49"
+                        app:plv_indicateColor="#FF9D4D"
+                        app:plv_indicateEndColor="#F65F49"
                         app:layout_constraintBottom_toBottomOf="@+id/card_enter_view"
                         app:layout_constraintEnd_toStartOf="@+id/card_enter_view"
                         app:layout_constraintTop_toTopOf="@+id/card_enter_view"
-                        app:rectRadius="4dp"
-                        app:triangleCenter="true"
-                        app:triangleHeight="6dp"
-                        app:trianglePosition="right"
-                        app:triangleWidth="10dp"
+                        app:plv_rectRadius="4dp"
+                        app:plv_triangleCenter="true"
+                        app:plv_triangleHeight="6dp"
+                        app:plv_trianglePosition="right"
+                        app:plv_triangleWidth="10dp"
                         tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -250,16 +250,16 @@
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:visibility="gone"
-                        app:indicateColor="#FF9D4D"
-                        app:indicateEndColor="#F65F49"
+                        app:plv_indicateColor="#FF9D4D"
+                        app:plv_indicateEndColor="#F65F49"
                         app:layout_constraintBottom_toBottomOf="@+id/plvlc_live_lottery_enter_view"
                         app:layout_constraintEnd_toStartOf="@+id/plvlc_live_lottery_enter_view"
                         app:layout_constraintTop_toTopOf="@+id/plvlc_live_lottery_enter_view"
-                        app:rectRadius="4dp"
-                        app:triangleCenter="true"
-                        app:triangleHeight="6dp"
-                        app:trianglePosition="right"
-                        app:triangleWidth="10dp"
+                        app:plv_rectRadius="4dp"
+                        app:plv_triangleCenter="true"
+                        app:plv_triangleHeight="6dp"
+                        app:plv_trianglePosition="right"
+                        app:plv_triangleWidth="10dp"
                         tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -310,16 +310,16 @@
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:visibility="gone"
-                        app:indicateColor="#FF9D4D"
-                        app:indicateEndColor="#F65F49"
+                        app:plv_indicateColor="#FF9D4D"
+                        app:plv_indicateEndColor="#F65F49"
                         app:layout_constraintBottom_toBottomOf="@+id/plvlc_live_welfare_lotter_view"
                         app:layout_constraintEnd_toStartOf="@+id/plvlc_live_welfare_lotter_view"
                         app:layout_constraintTop_toTopOf="@+id/plvlc_live_welfare_lotter_view"
-                        app:rectRadius="4dp"
-                        app:triangleCenter="true"
-                        app:triangleHeight="6dp"
-                        app:trianglePosition="right"
-                        app:triangleWidth="10dp"
+                        app:plv_rectRadius="4dp"
+                        app:plv_triangleCenter="true"
+                        app:plv_triangleHeight="6dp"
+                        app:plv_trianglePosition="right"
+                        app:plv_triangleWidth="10dp"
                         tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

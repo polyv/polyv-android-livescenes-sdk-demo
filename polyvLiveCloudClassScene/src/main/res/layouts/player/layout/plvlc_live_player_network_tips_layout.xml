@@ -14,7 +14,7 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="7dp"
         android:text="@string/plv_player_network_bad_2"
-        android:textColor="@color/white"
+        android:textColor="@color/plv_white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -33,7 +33,7 @@
         android:paddingVertical="7dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="14sp">
+        app:plv_radius="14sp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/plv_player_network_bad_3"
-                android:textColor="@color/white"
+                android:textColor="@color/plv_white"
                 android:textSize="12sp" />
 
             <TextView

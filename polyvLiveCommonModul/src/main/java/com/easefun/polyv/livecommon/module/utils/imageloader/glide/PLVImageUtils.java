@@ -12,11 +12,9 @@ import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.livescenes.chatroom.send.img.PLVSendChatImageHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,25 +75,8 @@ public class PLVImageUtils {
         if (!sourceFile.canRead()) {
             return sourcePath;
         }
-        if (sourceFile.length() < PLVSendChatImageHelper.ALLOW_LENGTH) {
-            try {
-                final String imageType = PLVSendChatImageHelper.getImageType(sourceFile);
-                if ("jpeg".equalsIgnoreCase(imageType) || "jpg".equalsIgnoreCase(imageType)) {
-                    return sourcePath;
-                }
-            } catch (FileNotFoundException e) {
-                // ignore
-            }
-        }
 
-        String compressOutput = compressOnce(context, sourcePath, 100);
-        if (compressOutput == null) {
-            return sourcePath;
-        }
-        if (new File(compressOutput).length() < PLVSendChatImageHelper.ALLOW_LENGTH) {
-            return compressOutput;
-        }
-        compressOutput = compressOnce(context, sourcePath, calculateNextQuality(new File(compressOutput).length()));
+        String compressOutput = compressOnce(context, sourcePath, 80);
         if (compressOutput == null) {
             return sourcePath;
         }

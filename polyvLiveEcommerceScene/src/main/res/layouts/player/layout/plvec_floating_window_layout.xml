@@ -4,7 +4,7 @@
     android:id="@+id/floating_ly"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:mode="all"
-    app:radius="10dp">
+    app:plv_mode="all"
+    app:plv_radius="10dp">
 
 </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

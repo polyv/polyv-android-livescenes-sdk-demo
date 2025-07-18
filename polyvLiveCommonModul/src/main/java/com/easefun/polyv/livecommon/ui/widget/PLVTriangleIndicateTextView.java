@@ -72,15 +72,15 @@ public class PLVTriangleIndicateTextView extends AppCompatTextView {
     private void init() {
         TypedArray typedArray = getContext().obtainStyledAttributes(mAttrs, R.styleable.PLVTriangleIndicateTextView);
 
-        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
-        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
-        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
-        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_trianglePosition, DEFAULT_TRIANGLE_POSITION);
-        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
-        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_indicateColor, DEFAULT_TRIANGLE_COLOR);
-        indicateEndColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_indicateEndColor, -1);
-        triangleCenter = typedArray.getBoolean(R.styleable.PLVTriangleIndicateTextView_triangleCenter, false);
-        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_rectRadius, 0);
+        triangleWidth = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_plv_triangleWidth, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_WIDTH));
+        triangleHeight = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_plv_triangleHeight, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_HEIGHT));
+        triangleMargin = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_plv_triangleMargin, DpOrPxUtils.dip2px(getContext(), DEFAULT_TRIANGLE_MARGIN));
+        trianglePosition = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_plv_trianglePosition, DEFAULT_TRIANGLE_POSITION);
+        triangleMarginType = typedArray.getInteger(R.styleable.PLVTriangleIndicateTextView_plv_triangleMarginType, DEFAULT_TRIANGLE_MARGIN_TYPE);
+        indicateColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_plv_indicateColor, DEFAULT_TRIANGLE_COLOR);
+        indicateEndColor = typedArray.getColor(R.styleable.PLVTriangleIndicateTextView_plv_indicateEndColor, -1);
+        triangleCenter = typedArray.getBoolean(R.styleable.PLVTriangleIndicateTextView_plv_triangleCenter, false);
+        radius = typedArray.getDimension(R.styleable.PLVTriangleIndicateTextView_plv_rectRadius, 0);
 
         typedArray.recycle();
     }

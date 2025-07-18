@@ -23,8 +23,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:mode="all"
-                app:radius="8dp">
+                app:plv_mode="all"
+                app:plv_radius="8dp">
 
                 <com.easefun.polyv.livescenes.document.PLVSDocumentWebView
                     android:id="@+id/plvls_document_web_view"

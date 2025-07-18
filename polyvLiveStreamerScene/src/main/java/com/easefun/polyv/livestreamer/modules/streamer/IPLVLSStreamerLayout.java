@@ -5,6 +5,7 @@ import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
@@ -83,6 +84,11 @@ public interface IPLVLSStreamerLayout {
      * @param front true：前置，false：后置
      */
     boolean setCameraDirection(boolean front);
+
+    /**
+     * 获取成员列表中的用户在成员列表中的位置
+     */
+    int getPositionByMemberItem(PLVMemberItemDataBean memberItem);
 
     /**
      * 控制成员列表中的用户加入或离开连麦

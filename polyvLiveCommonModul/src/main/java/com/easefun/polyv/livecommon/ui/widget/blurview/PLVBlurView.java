@@ -44,7 +44,7 @@ public class PLVBlurView extends FrameLayout {
 
     private void init(AttributeSet attrs, int defStyleAttr) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVBlurView, defStyleAttr, 0);
-        overlayColor = a.getColor(R.styleable.PLVBlurView_blurOverlayColor, Color.TRANSPARENT);
+        overlayColor = a.getColor(R.styleable.PLVBlurView_plv_blurOverlayColor, Color.TRANSPARENT);
         a.recycle();
     }
 

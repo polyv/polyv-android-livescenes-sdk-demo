@@ -1,26 +1,26 @@
 <resources>
 
     <!-- ID used when defining the content layout in XML. -->
-    <item name="mdContent" type="id" />
+    <item name="plv_mdContent" type="id" />
 
     <!-- ID used when defining the menu layout in XML. -->
-    <item name="mdMenu" type="id" />
+    <item name="plv_mdMenu" type="id" />
 
     <!-- The ID of the content container. -->
-    <item name="md__content" type="id" />
+    <item name="plv_md__content" type="id" />
 
     <!-- The ID of the menu container. -->
-    <item name="md__menu" type="id" />
+    <item name="plv_md__menu" type="id" />
 
     <!-- The ID of the drawer. -->
-    <item name="md__drawer" type="id" />
+    <item name="plv_md__drawer" type="id" />
 
     <!-- Used with View#setTag(int) to specify a position for the active view. -->
-    <item name="mdActiveViewPosition" type="id" />
+    <item name="plv_mdActiveViewPosition" type="id" />
 
-    <item name="md__translationX" type="id" />
+    <item name="plv_md__translationX" type="id" />
 
-    <item name="md__translationY" type="id" />
+    <item name="plv_md__translationY" type="id" />
 
     <item name="plv_view_util_show_view_for_duration_tag" type="id" />
     <item name="plv_view_util_popup_window_obj_tag" type="id" />

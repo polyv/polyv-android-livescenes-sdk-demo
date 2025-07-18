@@ -171,8 +171,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:mode="all"
-        app:radius="14dp"
+        app:plv_mode="all"
+        app:plv_radius="14dp"
         tools:visibility="visible">
 
         <LinearLayout

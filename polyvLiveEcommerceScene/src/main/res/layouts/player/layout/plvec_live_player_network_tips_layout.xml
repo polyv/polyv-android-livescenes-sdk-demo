@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/colorEbonyClay">
+    tools:background="@color/plv_colorEbonyClay">
 
     <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
         android:id="@+id/plvec_live_player_network_not_good_tips_tv"
@@ -33,12 +33,12 @@
         android:paddingVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:rectRadius="8dp"
-        app:triangleHeight="4dp"
-        app:triangleMargin="20dp"
-        app:triangleMarginType="right"
-        app:trianglePosition="bottom"
-        app:triangleWidth="8dp"
+        app:plv_rectRadius="8dp"
+        app:plv_triangleHeight="4dp"
+        app:plv_triangleMargin="20dp"
+        app:plv_triangleMarginType="right"
+        app:plv_trianglePosition="bottom"
+        app:plv_triangleWidth="8dp"
         tools:layout_marginBottom="120dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout

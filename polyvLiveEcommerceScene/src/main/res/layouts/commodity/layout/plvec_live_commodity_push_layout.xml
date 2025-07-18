@@ -17,7 +17,7 @@
             android:layout_height="56dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="12dp"
-            app:radius="10dp">
+            app:plv_radius="10dp">
 
             <ImageView
                 android:id="@+id/commodity_cover_iv"

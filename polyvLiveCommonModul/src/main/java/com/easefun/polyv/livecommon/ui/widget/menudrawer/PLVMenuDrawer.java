@@ -462,7 +462,7 @@ public abstract class PLVMenuDrawer extends ViewGroup {
      */
     public static PLVMenuDrawer attach(Activity activity, Type type, Position position, int dragMode, ViewGroup container) {
         PLVMenuDrawer menuDrawer = createMenuDrawer(activity, dragMode, position, type);
-        menuDrawer.setId(R.id.md__drawer);
+        menuDrawer.setId(R.id.plv_md__drawer);
 
         switch (dragMode) {
             case PLVMenuDrawer.MENU_DRAG_CONTENT:
@@ -573,7 +573,7 @@ public abstract class PLVMenuDrawer extends ViewGroup {
     }
 
     public PLVMenuDrawer(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.menuDrawerStyle);
+        this(context, attrs, R.attr.plv_menuDrawerStyle);
     }
 
     public PLVMenuDrawer(Context context, AttributeSet attrs, int defStyle) {
@@ -585,60 +585,60 @@ public abstract class PLVMenuDrawer extends ViewGroup {
         setWillNotDraw(false);
         setFocusable(false);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PLVMenuDrawer, R.attr.menuDrawerStyle,
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PLVMenuDrawer, R.attr.plv_menuDrawerStyle,
                 R.style.Widget_MenuDrawer);
 
-        final Drawable contentBackground = a.getDrawable(R.styleable.PLVMenuDrawer_mdContentBackground);
-        final Drawable menuBackground = a.getDrawable(R.styleable.PLVMenuDrawer_mdMenuBackground);
+        final Drawable contentBackground = a.getDrawable(R.styleable.PLVMenuDrawer_plv_mdContentBackground);
+        final Drawable menuBackground = a.getDrawable(R.styleable.PLVMenuDrawer_plv_mdMenuBackground);
 
-        mMenuSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_mdMenuSize, dpToPx(240));
+        mMenuSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_plv_mdMenuSize, dpToPx(240));
 
-        final int indicatorResId = a.getResourceId(R.styleable.PLVMenuDrawer_mdActiveIndicator, 0);
+        final int indicatorResId = a.getResourceId(R.styleable.PLVMenuDrawer_plv_mdActiveIndicator, 0);
         if (indicatorResId != 0) {
             mActiveIndicator = BitmapFactory.decodeResource(getResources(), indicatorResId);
         }
 
-        mDropShadowEnabled = a.getBoolean(R.styleable.PLVMenuDrawer_mdDropShadowEnabled, true);
+        mDropShadowEnabled = a.getBoolean(R.styleable.PLVMenuDrawer_plv_mdDropShadowEnabled, true);
 
-        mDropShadowDrawable = a.getDrawable(R.styleable.PLVMenuDrawer_mdDropShadow);
+        mDropShadowDrawable = a.getDrawable(R.styleable.PLVMenuDrawer_plv_mdDropShadow);
 
         if (mDropShadowDrawable == null) {
-            mDropShadowColor = a.getColor(R.styleable.PLVMenuDrawer_mdDropShadowColor, 0xFF000000);
+            mDropShadowColor = a.getColor(R.styleable.PLVMenuDrawer_plv_mdDropShadowColor, 0xFF000000);
         } else {
             mCustomDropShadow = true;
         }
 
-        mDropShadowSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_mdDropShadowSize,
+        mDropShadowSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_plv_mdDropShadowSize,
                 dpToPx(DEFAULT_DROP_SHADOW_DP));
 
-        mTouchBezelSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_mdTouchBezelSize,
+        mTouchBezelSize = a.getDimensionPixelSize(R.styleable.PLVMenuDrawer_plv_mdTouchBezelSize,
                 dpToPx(DEFAULT_DRAG_BEZEL_DP));
 
-        mAllowIndicatorAnimation = a.getBoolean(R.styleable.PLVMenuDrawer_mdAllowIndicatorAnimation, false);
+        mAllowIndicatorAnimation = a.getBoolean(R.styleable.PLVMenuDrawer_plv_mdAllowIndicatorAnimation, false);
 
-        mMaxAnimationDuration = a.getInt(R.styleable.PLVMenuDrawer_mdMaxAnimationDuration, DEFAULT_ANIMATION_DURATION);
+        mMaxAnimationDuration = a.getInt(R.styleable.PLVMenuDrawer_plv_mdMaxAnimationDuration, DEFAULT_ANIMATION_DURATION);
 
-        final int slideDrawableResId = a.getResourceId(R.styleable.PLVMenuDrawer_mdSlideDrawable, -1);
+        final int slideDrawableResId = a.getResourceId(R.styleable.PLVMenuDrawer_plv_mdSlideDrawable, -1);
         if (slideDrawableResId != -1) {
             setSlideDrawable(slideDrawableResId);
         }
 
-        mDrawerOpenContentDesc = a.getResourceId(R.styleable.PLVMenuDrawer_mdDrawerOpenUpContentDescription, 0);
-        mDrawerClosedContentDesc = a.getResourceId(R.styleable.PLVMenuDrawer_mdDrawerClosedUpContentDescription, 0);
+        mDrawerOpenContentDesc = a.getResourceId(R.styleable.PLVMenuDrawer_plv_mdDrawerOpenUpContentDescription, 0);
+        mDrawerClosedContentDesc = a.getResourceId(R.styleable.PLVMenuDrawer_plv_mdDrawerClosedUpContentDescription, 0);
 
-        mDrawOverlay = a.getBoolean(R.styleable.PLVMenuDrawer_mdDrawOverlay, true);
+        mDrawOverlay = a.getBoolean(R.styleable.PLVMenuDrawer_plv_mdDrawOverlay, true);
 
-        final int position = a.getInt(R.styleable.PLVMenuDrawer_mdPosition, 0);
+        final int position = a.getInt(R.styleable.PLVMenuDrawer_plv_mdPosition, 0);
         setPosition(Position.fromValue(position));
 
         a.recycle();
 
         mMenuContainer = new NoClickThroughFrameLayout(context);
-        mMenuContainer.setId(R.id.md__menu);
+        mMenuContainer.setId(R.id.plv_md__menu);
 //        mMenuContainer.setBackgroundDrawable(menuBackground);//polyv
 
         mContentContainer = new NoClickThroughFrameLayout(context);
-        mContentContainer.setId(R.id.md__content);
+        mContentContainer.setId(R.id.plv_md__content);
         mContentContainer.setBackgroundDrawable(contentBackground);
 
         mMenuOverlay = new ColorDrawable(0xFF000000);
@@ -649,13 +649,13 @@ public abstract class PLVMenuDrawer extends ViewGroup {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        View menu = findViewById(R.id.mdMenu);
+        View menu = findViewById(R.id.plv_mdMenu);
         if (menu != null) {
             removeView(menu);
             setMenuView(menu);
         }
 
-        View content = findViewById(R.id.mdContent);
+        View content = findViewById(R.id.plv_mdContent);
         if (content != null) {
             removeView(content);
             setContentView(content);
@@ -764,7 +764,7 @@ public abstract class PLVMenuDrawer extends ViewGroup {
     }
 
     private void drawIndicator(Canvas canvas) {
-        Integer position = (Integer) mActiveView.getTag(R.id.mdActiveViewPosition);
+        Integer position = (Integer) mActiveView.getTag(R.id.plv_mdActiveViewPosition);
         final int pos = position == null ? 0 : position;
         if (pos == mActivePosition) {
             updateIndicatorClipRect();

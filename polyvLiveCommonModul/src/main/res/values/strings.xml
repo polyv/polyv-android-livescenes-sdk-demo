@@ -341,11 +341,13 @@
     <string name="plv_push_downgrade_fluency_desc">When network condition is poor, video fluency is prioritized but may cause lower clarity</string>
     <string name="plv_push_downgrade_alert_toast_text">The network condition is currently poor. It\'s recommended to switch to fluency mode</string>
     <string name="plv_push_downgrade_alert_toast_confirm">Switch now</string>
-    <string name="plv_streamer_denoise_setting_title">Noise Reduction</string>
-    <string name="plv_streamer_denoise_adaptive_title">Adaptive</string>
-    <string name="plv_streamer_denoise_adaptive_desc">Smartly refines audio for meetings and education</string>
-    <string name="plv_streamer_denoise_balance_title">Balanced</string>
-    <string name="plv_streamer_denoise_balance_desc">Delivers targeted noise cancellation to minimize environmental sounds, preserving speech and key audio for atmospheric live broadcasts.</string>
+    <string name="plv_streamer_denoise_setting_title">Audio Quality</string>
+    <string name="plv_streamer_denoise_adaptive_title">Vocal Mode</string>
+    <string name="plv_streamer_denoise_adaptive_desc">Suitable for scenarios mainly focused on voice calls, such as online meetings and voice calls</string>
+    <string name="plv_streamer_denoise_balance_title">Music Mode</string>
+    <string name="plv_streamer_denoise_balance_desc">Suitable for scenarios requiring high-fidelity music transmission, such as karaoke and music live streaming</string>
+    <string name="plv_streamer_denoise_default_title">Default Mode</string>
+    <string name="plv_streamer_denoise_default_desc">Default audio quality. Recommended if there are no special requirements</string>
     <string name="plv_streamer_external_audio_input_title">External Device</string>
     <string name="plv_streamer_external_audio_input_desc">For live streaming with an external mic, enable this feature to switch to media volume for clear audio capture.</string>
     <string name="plv_streamer_external_audio_input_enable_text">Enable</string>
@@ -425,6 +427,7 @@
     <string name="plv_streamer_blur_bg">Background Blur</string>
     <string name="plv_streamer_bg_delete_confirm">Are you sure you want to delete this background image?</string>
     <string name="plv_streamer_camera_occupy_tips">The camera is being used by another app. Please close any other apps that might be using the camera!</string>
+    <string name="plv_streamer_member_search">Search Members</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">No related documents</string>
@@ -640,6 +643,15 @@
     <string name="plv_beauty_filter_cherry">Sakura</string>
     <string name="plv_beauty_filter_film">Film</string>
     <string name="plv_beauty_filter_night">Night</string>
+    <string name="plv_beauty_filter_cool_white">Cool White</string>
+    <string name="plv_beauty_filter_milk">Milk</string>
+    <string name="plv_beauty_filter_blue_tone">Blue Tone</string>
+    <string name="plv_beauty_filter_vitality">Vitality</string>
+    <string name="plv_beauty_filter_fresh">Fresh</string>
+    <string name="plv_beauty_filter_texture">Texture</string>
+    <string name="plv_beauty_filter_porcelain">Porcelain</string>
+    <string name="plv_beauty_filter_cherry_red">Cherry Red</string>
+    <string name="plv_beauty_filter_aesthetic">Aesthetic</string>
 
     <string name="plv_interact_sign_in_timeout_toast">You do not sign in on time, automatically quit the live room</string>
     <string name="plv_subtitle_language_chinese">Chinese</string>

@@ -9,13 +9,13 @@
     <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
         android:layout_centerHorizontal="true"
         android:id="@+id/plvlc_ppt_turn_page_tip_tv"
-        app:indicateColor="@color/white"
-        app:rectRadius="5dp"
-        app:triangleHeight="6dp"
-        app:trianglePosition="bottom"
-        app:triangleMarginType="left"
-        app:triangleMargin="55dp"
-        app:triangleWidth="10dp"
+        app:plv_indicateColor="@color/plv_white"
+        app:plv_rectRadius="5dp"
+        app:plv_triangleHeight="6dp"
+        app:plv_trianglePosition="bottom"
+        app:plv_triangleMarginType="left"
+        app:plv_triangleMargin="55dp"
+        app:plv_triangleWidth="10dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:paddingTop="5dp"
@@ -59,7 +59,7 @@
             android:text="0/0"
             android:clickable="true"
             android:focusable="true"
-            android:textColor="@color/white"
+            android:textColor="@color/plv_white"
             android:textSize="12sp" />
 
         <ImageView

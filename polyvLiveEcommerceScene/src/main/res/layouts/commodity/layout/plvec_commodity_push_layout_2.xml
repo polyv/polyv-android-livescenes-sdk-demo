@@ -5,12 +5,12 @@
     android:id="@+id/plvec_commodity_push_layout_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:indicateColor="#FFFFFF"
-    app:rectRadius="8dp"
-    app:triangleHeight="8dp"
-    app:triangleMarginType="anchor"
-    app:trianglePosition="bottom"
-    app:triangleWidth="16dp">
+    app:plv_indicateColor="#FFFFFF"
+    app:plv_rectRadius="8dp"
+    app:plv_triangleHeight="8dp"
+    app:plv_triangleMarginType="anchor"
+    app:plv_trianglePosition="bottom"
+    app:plv_triangleWidth="16dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:radius="4dp">
+            app:plv_radius="4dp">
 
             <ImageView
                 android:id="@+id/plvec_commodity_cover_iv"
@@ -97,8 +97,8 @@
             android:visibility="gone"
             android:paddingLeft="3dp"
             android:layout_marginTop="4dp"
-            app:mode="all"
-            app:radius="8dp">
+            app:plv_mode="all"
+            app:plv_radius="8dp">
 
             <TextView
                 android:id="@+id/plvec_product_title_effect_tv"

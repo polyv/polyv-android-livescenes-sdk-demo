@@ -24,7 +24,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="none">
+        app:plv_mode="none">
 
         <com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout
             android:id="@+id/plvec_linkmic_switch_anchor_item_parent"

@@ -13,8 +13,8 @@
         android:layout_height="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mode="all"
-        app:radius="4dp"
+        app:plv_mode="all"
+        app:plv_radius="4dp"
         tools:layout_marginStart="150dp"
         tools:layout_marginTop="150dp">
 
@@ -42,15 +42,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="7dp"
-        app:indicateColor="#FFFFFF"
+        app:plv_indicateColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
         app:layout_constraintStart_toStartOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
         app:layout_constraintTop_toBottomOf="@+id/plvls_live_room_new_link_mic_first_intro_mic_icon"
-        app:rectRadius="16dp"
-        app:triangleHeight="8dp"
-        app:triangleMarginType="center"
-        app:trianglePosition="top"
-        app:triangleWidth="16dp">
+        app:plv_rectRadius="16dp"
+        app:plv_triangleHeight="8dp"
+        app:plv_triangleMarginType="center"
+        app:plv_trianglePosition="top"
+        app:plv_triangleWidth="16dp">
 
         <LinearLayout
             android:layout_width="wrap_content"

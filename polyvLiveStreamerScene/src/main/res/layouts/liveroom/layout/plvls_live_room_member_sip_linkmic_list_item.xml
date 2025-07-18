@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/colorEbonyClay">
+    tools:background="@color/plv_colorEbonyClay">
 
     <TextView
         android:id="@+id/plvls_member_sip_linkmic_item_avatar_tv"

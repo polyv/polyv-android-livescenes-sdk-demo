@@ -19,87 +19,133 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
+        android:layout_height="0dp"
+        android:scrollbars="none"
+        android:fillViewport="true"
         android:layout_marginTop="30dp"
-        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_title_tv">
 
-        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
-            android:id="@+id/plvsa_denoise_adaptive_card_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="12dp">
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="24dp"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/plvsa_denoise_adaptive_title_tv"
-                android:layout_width="0dp"
+            <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+                android:id="@+id/plvsa_denoise_default_card_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:text="@string/plv_streamer_denoise_adaptive_title"
-                android:textColor="#F0F1F5"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:paddingVertical="12dp">
 
-            <TextView
-                android:id="@+id/plvsa_denoise_adaptive_desc_tv"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/plvsa_denoise_default_title_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:text="@string/plv_streamer_denoise_default_title"
+                    android:textColor="#F0F1F5"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/plvsa_denoise_default_desc_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/plv_streamer_denoise_default_desc"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_default_title_tv" />
+
+            </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+                android:id="@+id/plvsa_denoise_adaptive_card_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/plv_streamer_denoise_adaptive_desc"
-                android:textColor="#99F0F1F5"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_adaptive_title_tv" />
+                android:paddingVertical="12dp">
 
-        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+                <TextView
+                    android:id="@+id/plvsa_denoise_adaptive_title_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:text="@string/plv_streamer_denoise_adaptive_title"
+                    android:textColor="#F0F1F5"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp" />
+                <TextView
+                    android:id="@+id/plvsa_denoise_adaptive_desc_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/plv_streamer_denoise_adaptive_desc"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_adaptive_title_tv" />
 
-        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
-            android:id="@+id/plvsa_denoise_balance_card_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="12dp">
+            </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
 
-            <TextView
-                android:id="@+id/plvsa_denoise_balance_title_tv"
-                android:layout_width="0dp"
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+                android:id="@+id/plvsa_denoise_balance_card_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:text="@string/plv_streamer_denoise_balance_title"
-                android:textColor="#F0F1F5"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:paddingVertical="12dp">
 
-            <TextView
-                android:id="@+id/plvsa_denoise_balance_desc_tv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/plv_streamer_denoise_balance_desc"
-                android:textColor="#99F0F1F5"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_balance_title_tv" />
+                <TextView
+                    android:id="@+id/plvsa_denoise_balance_title_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:text="@string/plv_streamer_denoise_balance_title"
+                    android:textColor="#F0F1F5"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+                <TextView
+                    android:id="@+id/plvsa_denoise_balance_desc_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/plv_streamer_denoise_balance_desc"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_balance_title_tv" />
 
-    </LinearLayout>
+            </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

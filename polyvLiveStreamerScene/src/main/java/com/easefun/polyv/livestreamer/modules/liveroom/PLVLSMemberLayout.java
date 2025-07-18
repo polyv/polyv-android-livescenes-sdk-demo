@@ -7,15 +7,23 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -55,6 +63,7 @@ import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +88,9 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
+    //推流和连麦presenter
+    private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
+
     //布局弹层
     private PLVMenuDrawer menuDrawer;
 
@@ -94,6 +106,8 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     private View memberSplitView;
     private FrameLayout memberListLayout;
     private RecyclerView memberListRv;
+    private RecyclerView memberSearchListRv;
+    private EditText memberSearchEt;
     private PLVLSSipLinkMicMemberLayout memberSipLinkmicLayout;
     private TextView memberListLinkmicConfigTv;
 
@@ -103,9 +117,14 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
 
     //adapter
     private PLVLSMemberAdapter memberAdapter;
+    private PLVLSMemberAdapter memberSearchAdapter;
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable lastRunnable;
 
     //disposable
     private Disposable updateBlurViewDisposable;
+    private Disposable searchUserDisposable;
 
     //推流状态
     private boolean isStartedStatus;
@@ -133,10 +152,10 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
     public void init(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
+        // init memberListRv
         memberAdapter = new PLVLSMemberAdapter(liveRoomDataManager);
         memberListRv.setAdapter(memberAdapter);
-
-        memberAdapter.setOnViewActionListener(new PLVLSMemberAdapter.OnViewActionListener() {
+        PLVLSMemberAdapter.OnViewActionListener listener = new PLVLSMemberAdapter.OnViewActionListener() {
             @Override
             public void onMicControl(int position, boolean isMute) {
                 if (onViewActionListener != null) {
@@ -171,7 +190,22 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
                     onViewActionListener.onGrantSpeakerPermission(position, userId, isGrant);
                 }
             }
-        });
+
+            @Override
+            public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.getPosition(memberItemDataBean);
+                }
+                return -1;
+            }
+        };
+        memberAdapter.setOnViewActionListener(listener);
+
+        //init memberSearchListRv
+        memberSearchAdapter = new PLVLSMemberAdapter(liveRoomDataManager);
+        memberSearchAdapter.setMemberListShow(false);
+        memberSearchListRv.setAdapter(memberSearchAdapter);
+        memberSearchAdapter.setOnViewActionListener(listener);
 
         if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
             memberListLinkMicDownAllTv.setVisibility(INVISIBLE);
@@ -202,6 +236,18 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         });
         memberListRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(0, ConvertUtils.dp2px(8)));
 
+        memberSearchListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false) {
+            @Override
+            public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                try {
+                    super.onLayoutChildren(recycler, state);
+                } catch (IndexOutOfBoundsException e) {
+                    // ignore IndexOutOfBoundsException: Inconsistency detected. Invalid view holder adapter positionViewHolder
+                }
+            }
+        });
+        memberSearchListRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(0, ConvertUtils.dp2px(8)));
+
         PLVBlurUtils.initBlurView(blurLy);
 
         observeSipLinkMicListUpdate();
@@ -222,12 +268,47 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         memberListRv = findViewById(R.id.plvls_member_list_rv);
         memberSipLinkmicLayout = findViewById(R.id.plvls_member_sip_linkmic_layout);
         memberListLinkmicConfigTv = findViewById(R.id.plvls_member_list_linkmic_config_tv);
+        memberSearchListRv = findViewById(R.id.plvls_member_search_list_rv);
+        memberSearchEt = findViewById(R.id.plvls_member_search_et);
 
         memberListLinkMicDownAllTv.setOnClickListener(this);
         memberListLinkMicMuteAllAudioTv.setOnClickListener(this);
         memberListTv.setOnClickListener(this);
         memberSipLinkmicListLayout.setOnClickListener(this);
         memberListLinkmicConfigTv.setOnClickListener(this);
+
+        memberSearchEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    KeyboardUtils.hideSoftInput(memberSearchEt);
+                    return true;
+                }
+                return false;
+            }
+        });
+        memberSearchEt.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(final Editable editable) {
+                if (editable.length() <= 0) {
+                    cancelPost();
+                    memberSearchListRv.setVisibility(View.INVISIBLE);
+                    memberListRv.setVisibility(View.VISIBLE);
+                } else {
+                    searchUser(editable);
+                }
+            }
+        });
     }
 
     private void initTabLayout() {
@@ -296,6 +377,8 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
                         onDrawerStateChangeListener.onDrawerStateChange(oldState, newState);
                     }
                     if (newState == PLVMenuDrawer.STATE_CLOSED) {
+                        memberSearchEt.setText("");
+                        KeyboardUtils.hideSoftInput(memberSearchEt);
                         menuDrawer.detachToContainer();
                         stopUpdateBlurViewTimer();
                     } else if (newState == PLVMenuDrawer.STATE_OPEN) {
@@ -358,10 +441,12 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     public void setStreamerStatus(boolean isStartedStatus) {
         this.isStartedStatus = isStartedStatus;
         memberAdapter.setStreamerStatus(isStartedStatus);
+        memberSearchAdapter.setStreamerStatus(isStartedStatus);
     }
 
     public void updateLinkMicMediaType(boolean isVideoLinkMicType, boolean isOpenLinkMic) {
         memberAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
+        memberSearchAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
     }
 
     public boolean onBackPressed() {
@@ -382,6 +467,12 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
 
     // <editor-fold defaultstate="collapsed" desc="成员列表 - MVP模式的view层实现">
     private PLVAbsStreamerView streamerView = new PLVAbsStreamerView() {
+
+        @Override
+        public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
+            streamerPresenter = presenter;
+        }
+
         @Override
         public void onUsersLeave(List<PLVLinkMicItemDataBean> leaveUsers) {
             // 用户退出时，收回主讲权限
@@ -396,23 +487,27 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         public void onUserMuteVideo(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteVideo(uid, mute, streamerListPos, memberListPos);
             memberAdapter.updateUserMuteVideo(memberListPos);
+            memberSearchAdapter.updateUserMuteVideo(uid);
         }
 
         @Override
         public void onUserMuteAudio(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteAudio(uid, mute, streamerListPos, memberListPos);
             memberAdapter.updateVolumeChanged();
+            memberSearchAdapter.updateVolumeChanged();
         }
 
         @Override
         public void onLocalUserMicVolumeChanged(int volume) {
             memberAdapter.updateVolumeChanged();
+            memberSearchAdapter.updateVolumeChanged();
         }
 
         @Override
         public void onRemoteUserVolumeChanged(List<PLVMemberItemDataBean> linkMicList) {
             super.onRemoteUserVolumeChanged(linkMicList);
             memberAdapter.updateVolumeChanged();
+            memberSearchAdapter.updateVolumeChanged();
         }
 
         @Override
@@ -422,9 +517,19 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         }
 
         @Override
-        public void onCameraDirection(boolean front, int pos) {
-            super.onCameraDirection(front, pos);
+        public void onUpdateMemberSearchListData(List<PLVMemberItemDataBean> dataBeanList) {
+            if (TextUtils.isEmpty(memberSearchEt.getText().toString())) {
+                return;
+            }
+            memberSearchListRv.setVisibility(View.VISIBLE);
+            memberListRv.setVisibility(View.INVISIBLE);
+            memberSearchAdapter.update(dataBeanList);
+        }
+
+        @Override
+        public void onCameraDirection(boolean front, int pos, String uid) {
             memberAdapter.updateCameraDirection(pos);
+            memberSearchAdapter.updateCameraDirection(uid);
         }
 
         @Override
@@ -467,6 +572,7 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
             super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
             if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER)) {
                 memberAdapter.updatePermissionChange();
+                memberSearchAdapter.updatePermissionChange();
             }
         }
     };
@@ -481,6 +587,9 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     private void updateMemberListLinkMicShowType(boolean isOnlyAudio){
         if(memberAdapter != null){
             memberAdapter.setOnlyShowAudioUI(isOnlyAudio);
+        }
+        if (memberSearchAdapter != null) {
+            memberSearchAdapter.setOnlyShowAudioUI(isOnlyAudio);
         }
     }
 
@@ -511,6 +620,40 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         }
     }
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="工具方法">
+    private void debounce(Runnable action, long delayMillis) {
+        cancelPost();
+        lastRunnable = action;
+        handler.postDelayed(action, delayMillis);
+    }
+
+    private void cancelPost() {
+        if (lastRunnable != null) {
+            handler.removeCallbacks(lastRunnable);
+        }
+        if (searchUserDisposable != null) {
+            searchUserDisposable.dispose();
+        }
+    }
+
+    private void searchUser(final Editable editable) {
+        debounce(new Runnable() {
+            @Override
+            public void run() {
+                if (searchUserDisposable != null) {
+                    searchUserDisposable.dispose();
+                }
+                if (TextUtils.isEmpty(editable.toString())) {
+                    return;
+                }
+                if (streamerPresenter != null) {
+                    searchUserDisposable = streamerPresenter.searchMemberList(editable.toString());
+                }
+            }
+        }, 1000);
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">
 

@@ -144,7 +144,7 @@ public class PLVPlaceHolderView extends ConstraintLayout implements IPLVPlayErro
 
     // <editor-fold defaultstate="collapsed" desc="初始化View">
     private void initView() {
-        setBackgroundColor(getResources().getColor(R.color.colorEbonyClay));
+        setBackgroundColor(getResources().getColor(R.color.plv_colorEbonyClay));
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_player_nostream_view, this, true);
 
         ivPlaceholderImg = findViewById(R.id.plvlc_iv_placeholder_img);

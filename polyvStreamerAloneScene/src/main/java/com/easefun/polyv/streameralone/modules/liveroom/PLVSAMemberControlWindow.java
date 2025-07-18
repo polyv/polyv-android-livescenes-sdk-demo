@@ -48,6 +48,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     //data
     private int position;
     private String userId;
+    private String linkmicId;
     //listener
     private OnViewActionListener onViewActionListener;
 
@@ -61,8 +62,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     public PLVSAMemberControlWindow(View anchor) {
         View contentView = View.inflate(anchor.getContext(), R.layout.plvsa_live_room_member_control_layout, null);
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup
-                .LayoutParams.WRAP_CONTENT, true);
-        popupWindow.setFocusable(true);//这里必须设置为true才能点击区域外或者消失
+                .LayoutParams.WRAP_CONTENT, false);
+        popupWindow.setFocusable(false);//这里必须设置为true才能点击区域外或者消失
         popupWindow.setTouchable(true);//这个控制PopupWindow内部控件的点击事件
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popupWindow.setOutsideTouchable(true);
@@ -94,9 +95,10 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
-    public void bindData(String userId, int pos) {
+    public void bindData(String userId, String linkmicId, int pos) {
         this.position = pos;
         this.userId = userId;
+        this.linkmicId = linkmicId;
     }
 
     public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType, boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
@@ -198,6 +200,10 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getLinkmicId() {
+        return linkmicId;
     }
 
     public void setOnViewActionListener(OnViewActionListener listener) {

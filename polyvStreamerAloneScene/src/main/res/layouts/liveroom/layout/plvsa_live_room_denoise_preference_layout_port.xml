@@ -30,6 +30,44 @@
         app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_title_tv">
 
         <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
+            android:id="@+id/plvsa_denoise_default_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="20dp">
+
+            <TextView
+                android:id="@+id/plvsa_denoise_default_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:text="@string/plv_streamer_denoise_default_title"
+                android:textColor="#F0F1F5"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plvsa_denoise_default_desc_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/plv_streamer_denoise_default_desc"
+                android:textColor="#99F0F1F5"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/plvsa_denoise_default_title_tv" />
+
+        </com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView
             android:id="@+id/plvsa_denoise_adaptive_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

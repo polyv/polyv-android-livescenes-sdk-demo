@@ -35,8 +35,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/plvls_linkmic_invitation_title_tv"
-            app:mode="all"
-            app:radius="4dp">
+            app:plv_mode="all"
+            app:plv_radius="4dp">
 
             <TextureView
                 android:id="@+id/plvls_linkmic_invitation_camera_preview_view"

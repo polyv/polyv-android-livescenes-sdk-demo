@@ -73,10 +73,10 @@ public class PLVRoundBorderColorView extends View {
     private void init(Context context, AttributeSet attrs) {
         mDensity = context.getResources().getDisplayMetrics().density;
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.PLVRoundBorderColorView);
-        final int innerStrokeColor = ta.getColor(R.styleable.PLVRoundBorderColorView_innerBorderColor, Color.WHITE);
-        final float innerStrokeWidth = ta.getDimension(R.styleable.PLVRoundBorderColorView_innerBorderWidth, 0);
-        final int outerStrokeColor = ta.getColor(R.styleable.PLVRoundBorderColorView_outerBorderColor, Color.WHITE);
-        final float outerStrokeWidth = ta.getDimension(R.styleable.PLVRoundBorderColorView_outerBorderWidth, 0);
+        final int innerStrokeColor = ta.getColor(R.styleable.PLVRoundBorderColorView_plv_innerBorderColor, Color.WHITE);
+        final float innerStrokeWidth = ta.getDimension(R.styleable.PLVRoundBorderColorView_plv_innerBorderWidth, 0);
+        final int outerStrokeColor = ta.getColor(R.styleable.PLVRoundBorderColorView_plv_outerBorderColor, Color.WHITE);
+        final float outerStrokeWidth = ta.getDimension(R.styleable.PLVRoundBorderColorView_plv_outerBorderWidth, 0);
 
         mInnerStrokePaint = new Paint();
         mInnerStrokePaint.setAntiAlias(true);
@@ -98,9 +98,9 @@ public class PLVRoundBorderColorView extends View {
             mBackgroundPaint.setAntiAlias(true);
             mBackgroundPaint.setStyle(Paint.Style.FILL);
             int defaultColorPaint = ResourcesCompat.getColor(
-                    getResources(), R.color.item_checkCircle_backgroundColor,
+                    getResources(), R.color.plv_item_checkCircle_backgroundColor,
                     getContext().getTheme());
-            int colorPaint = ta.getColor(R.styleable.PLVRoundBorderColorView_mainColor, defaultColorPaint);
+            int colorPaint = ta.getColor(R.styleable.PLVRoundBorderColorView_plv_mainColor, defaultColorPaint);
             mBackgroundPaint.setColor(colorPaint);
         }
 

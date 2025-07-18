@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    app:mode="top"
-    app:radius="16dp">
+    app:plv_mode="top"
+    app:plv_radius="16dp">
 
     <ImageView
         android:id="@+id/plvlc_member_list_rule_desc_back_iv"

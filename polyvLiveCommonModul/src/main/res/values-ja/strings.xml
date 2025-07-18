@@ -341,11 +341,13 @@
     <string name="plv_push_downgrade_fluency_desc">ネットワークの状態が悪い場合、画像の流暢性の確保が優先されますが、鮮明さが低下します</string>
     <string name="plv_push_downgrade_alert_toast_text">現在のネットワークは貧弱です。スムーズ モードに切り替えることをお勧めします</string>
     <string name="plv_push_downgrade_alert_toast_confirm">今すぐ切り替える</string>
-    <string name="plv_streamer_denoise_setting_title">ノイズリダクション</string>
-    <string name="plv_streamer_denoise_adaptive_title">適応型ノイズ リダクション</string>
-    <string name="plv_streamer_denoise_adaptive_desc">会議、教育、トレーニングなどのほとんどのライブ ブロードキャスト シナリオに適した、音源のインテリジェントな識別機能とノイズ低減機能を提供します</string>
-    <string name="plv_streamer_denoise_balance_title">バランスのとれたノイズリダクション</string>
-    <string name="plv_streamer_denoise_balance_desc">統合されたノイズ低減効果を提供し、主に背景の環境ノイズを低減します。また、人の声や主要な音に対して優れた保持効果があり、大気中のライブ ブロードキャスト シナリオに適しています。</string>
+    <string name="plv_streamer_denoise_setting_title">音声品質</string>
+    <string name="plv_streamer_denoise_adaptive_title">ボーカルモード</string>
+    <string name="plv_streamer_denoise_adaptive_desc">主に音声通話に適したシーン、例えばオンライン会議や音声通話など</string>
+    <string name="plv_streamer_denoise_balance_title">音楽モード</string>
+    <string name="plv_streamer_denoise_balance_desc">高音質で音楽を伝送する必要があるシーンに適しています。例えばカラオケや音楽ライブなど</string>
+    <string name="plv_streamer_denoise_default_title">デフォルトモード</string>
+    <string name="plv_streamer_denoise_default_desc">デフォルトの音声品質で、特別な要件がなければこちらをおすすめします</string>
     <string name="plv_streamer_external_audio_input_title">外部デバイス</string>
     <string name="plv_streamer_external_audio_input_desc">ライブ ブロードキャスト中に外部マイクを通じて音量を収集するシナリオに適しています。この機能をオンにすると、メディアの音量に切り替わり、通常の音声収集が行われます。 </string>
     <string name="plv_streamer_external_audio_input_enable_text">有効にする</string>
@@ -425,6 +427,7 @@
     <string name="plv_streamer_blur_bg">背景をぼかす</string>
     <string name="plv_streamer_bg_delete_confirm">この背景画像を削除してもよろしいですか？</string>
     <string name="plv_streamer_camera_occupy_tips">カメラは他のアプリによって使用されています。他のカメラを使用している可能性のあるアプリを終了してください！</string>
+    <string name="plv_streamer_member_search">メンバー検索</string>
 
     <!--PPT-->
     <string name="plv_ppt_no_document">関連するドキュメントはありません</string>
@@ -639,6 +642,15 @@
     <string name="plv_beauty_filter_cherry">さくら</string>
     <string name="plv_beauty_filter_film">映画</string>
     <string name="plv_beauty_filter_night">夜</string>
+    <string name="plv_beauty_filter_cool_white">クールホワイト</string>
+    <string name="plv_beauty_filter_milk">ミルク</string>
+    <string name="plv_beauty_filter_blue_tone">ブルートーン</string>
+    <string name="plv_beauty_filter_vitality">バイタリティ</string>
+    <string name="plv_beauty_filter_fresh">フレッシュ</string>
+    <string name="plv_beauty_filter_texture">テクスチャー</string>
+    <string name="plv_beauty_filter_porcelain">ポーセリン</string>
+    <string name="plv_beauty_filter_cherry_red">チェリーレッド</string>
+    <string name="plv_beauty_filter_aesthetic">美的</string>
 
     <string name="plv_interact_sign_in_timeout_toast">チェックインがおくれ遅れたばあい場合,じどう自動てき的にスタジオをたいしつ退室されます</string>
     <string name="plv_subtitle_language_chinese">中国語</string>

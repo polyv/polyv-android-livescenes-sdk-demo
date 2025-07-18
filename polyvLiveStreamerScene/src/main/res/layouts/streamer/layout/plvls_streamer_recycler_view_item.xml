@@ -20,8 +20,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:mode="all"
-            app:radius="8dp">
+            app:plv_mode="all"
+            app:plv_radius="8dp">
 
             <FrameLayout
                 android:id="@+id/plvls_streamer_render_view_container"

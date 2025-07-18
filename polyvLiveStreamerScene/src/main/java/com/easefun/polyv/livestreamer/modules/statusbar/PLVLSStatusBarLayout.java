@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocum
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingInListState;
@@ -370,6 +371,14 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 if (onViewActionListener != null) {
                     onViewActionListener.onGrantSpeakerPermission(position, userId, isGrant);
                 }
+            }
+
+            @Override
+            public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
+                if (onViewActionListener != null) {
+                    return onViewActionListener.getPosition(memberItemDataBean);
+                }
+                return -1;
             }
 
             @Override

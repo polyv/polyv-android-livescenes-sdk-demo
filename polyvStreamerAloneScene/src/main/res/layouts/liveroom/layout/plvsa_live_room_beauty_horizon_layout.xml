@@ -14,8 +14,8 @@
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mode="left"
-        app:radius="16dp">
+        app:plv_mode="left"
+        app:plv_radius="16dp">
 
         <LinearLayout
             android:id="@+id/plvsa_beauty_switch_ll"

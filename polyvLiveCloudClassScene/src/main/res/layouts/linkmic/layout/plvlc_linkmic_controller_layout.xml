@@ -40,7 +40,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="16dp"
                 android:text="@string/plv_linkmic_tip_request_video_link_mic"
-                android:textColor="@color/white"
+                android:textColor="@color/plv_white"
                 android:textSize="16sp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -153,7 +153,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@string/plv_linkmic_tip_request_video_link_mic"
-            android:textColor="@color/white"
+            android:textColor="@color/plv_white"
             android:textSize="10sp" />
     </LinearLayout>
 </merge>

@@ -7,11 +7,11 @@
     android:paddingVertical="4dp"
     app:plvGradientColors="#FF9D4D,#F65F49"
     app:plvGradientOrientation="leftRight"
-    app:rectRadius="4dp"
-    app:triangleHeight="6dp"
-    app:triangleMarginType="center"
-    app:trianglePosition="right"
-    app:triangleWidth="10dp">
+    app:plv_rectRadius="4dp"
+    app:plv_triangleHeight="6dp"
+    app:plv_triangleMarginType="center"
+    app:plv_trianglePosition="right"
+    app:plv_triangleWidth="10dp">
 
     <TextView
         android:layout_width="wrap_content"

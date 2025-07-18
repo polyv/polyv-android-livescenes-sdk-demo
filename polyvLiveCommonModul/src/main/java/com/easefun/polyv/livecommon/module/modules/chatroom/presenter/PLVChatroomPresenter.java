@@ -1205,7 +1205,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     //图片类型发言
                     case PLVEventConstant.Chatroom.MESSAGE_EVENT_CHAT_IMG:
                         final PLVChatImgEvent chatImgEvent = PLVEventHelper.toMessageEventModel(message, PLVChatImgEvent.class);
-                        if (chatImgEvent != null &&
+                        if (chatImgEvent != null && chatImgEvent.getUser() != null &&
                                 !PolyvSocketWrapper.getInstance().getLoginVO().getUserId().
                                         equals(chatImgEvent.getUser().getUserId())) {
                             chatMessage = chatImgEvent;

@@ -10,7 +10,7 @@
         android:id="@+id/blur_ly"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="#BF1B202D" />
+        app:plv_blurOverlayColor="#BF1B202D" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/plvls_more_setting_select_layout"
@@ -229,6 +229,56 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/plvls_more_setting_denoise_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plvls_live_room_setting_denoise_layout_icon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/plv_streamer_denoise_setting_title"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvls_more_setting_external_audio_input_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plvls_live_room_setting_external_audio_input_layout_icon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/plv_streamer_external_audio_input_title"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
                     <!--  placeholder  -->
                     <Space
                         android:layout_width="0dp"
@@ -343,6 +393,22 @@
 
     <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSPushDowngradePreferenceLayout
         android:id="@+id/plvls_more_push_downgrade_preference_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_separator"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSDenoisePreferenceLayout
+        android:id="@+id/plvls_more_setting_denoise_preference_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/plvls_more_setting_exit_separator"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSExternalAudioInputPreferenceLayout
+        android:id="@+id/plvls_more_setting_external_audio_input_preference_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"

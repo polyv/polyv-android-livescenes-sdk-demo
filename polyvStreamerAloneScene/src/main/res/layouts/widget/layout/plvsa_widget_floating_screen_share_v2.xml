@@ -13,8 +13,8 @@
         android:layout_marginHorizontal="12dp"
         android:background="@drawable/plvsa_streamer_screen_share_float_window_bg"
         android:clickable="true"
-        app:mode="all"
-        app:radius="12dp">
+        app:plv_mode="all"
+        app:plv_radius="12dp">
 
         <ImageView
             android:id="@+id/plvsa_streamer_screen_share_float_window_close_iv"

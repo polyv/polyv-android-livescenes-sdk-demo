@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,8 +58,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private static final String LINK_MIC_INVITATION_DRAWABLE_FILE_NAME = "plvsa_linkmic_guest_requesting.svga";
 
+    //是否是成员列表显示，true：成员列表，false：搜索列表
+    private boolean isMemberListShow = true;
     //dataList
     private List<PLVMemberItemDataBean> dataBeanList;
+    private List<PLVMemberItemDataBean> srcDataList;
     //streamerStatus
     private boolean isStartedStatus;
     private boolean isGuestAutoLinkMic;
@@ -116,9 +120,14 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     // <editor-fold defaultstate="collapsed" desc="对外API">
     //更新所有数据
     public void update(List<PLVMemberItemDataBean> dataList) {
+        this.srcDataList = dataList;
         this.dataBeanList = new ArrayList<>(dataList);
         notifyDataSetChanged();
         checkHideControlWindow();
+    }
+
+    public void setMemberListShow(boolean isMemberListShow) {
+        this.isMemberListShow = isMemberListShow;
     }
 
     //获取数据列表
@@ -136,6 +145,16 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void updateUserMuteAudio(int pos) {
         updateVolumeChanged();
         checkUpdateControlWindow(pos);
+    }
+
+    //更新关闭视频
+    public void updateUserMuteVideo(String uid) {
+        checkUpdateControlWindow(uid);
+    }
+
+    //更新关闭音频
+    public void updateUserMuteAudio(String uid) {
+        checkUpdateControlWindow(uid);
     }
 
     //更新用户加入连麦
@@ -275,6 +294,49 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
+    private void checkUpdateControlWindow(String linkmicId) {
+        if (lastShowControlWindow != null && lastShowControlWindow.isShowing()) {
+            if (linkmicId != null && linkmicId.equals(lastShowControlWindow.getLinkmicId())) {
+                Pair<Integer, PLVMemberItemDataBean> dataBeanPair = getMemberItemByOnlyLinkMicId(linkmicId);
+                if (dataBeanPair == null || dataBeanPair.second == null || dataBeanPair.second.getLinkMicItemDataBean() == null) {
+                    return;
+                }
+                PLVSocketUserBean socketUserBean = dataBeanPair.second.getSocketUserBean();
+                @Nullable
+                PLVLinkMicItemDataBean linkMicItemDataBean = dataBeanPair.second.getLinkMicItemDataBean();
+                boolean isRTCJoin = linkMicItemDataBean != null && linkMicItemDataBean.isRtcJoinStatus();
+                boolean isOpenCamera = linkMicItemDataBean == null || !linkMicItemDataBean.isMuteVideo();
+                boolean isOpenMic = linkMicItemDataBean == null || !linkMicItemDataBean.isMuteAudio();
+                boolean isBan = socketUserBean.isBanned();
+                boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
+                boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
+                boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
+                if (isSpecialType && !isRTCJoin) {
+                    lastShowControlWindow.dismiss();
+                } else {
+                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
+                }
+            }
+        }
+    }
+
+    private Pair<Integer, PLVMemberItemDataBean> getMemberItemByOnlyLinkMicId(String linkMicId) {
+        if (dataBeanList == null) {
+            return null;
+        }
+        for (int i = 0; i < dataBeanList.size(); i++) {
+            PLVMemberItemDataBean memberItemDataBean = dataBeanList.get(i);
+            PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
+            if (linkMicItemDataBean != null) {
+                String linkMicIdForIndex = linkMicItemDataBean.getLinkMicId();
+                if (linkMicId != null && linkMicId.equals(linkMicIdForIndex)) {
+                    return new Pair<>(i, memberItemDataBean);
+                }
+            }
+        }
+        return null;
+    }
+
     private void checkUpdateControlWindow(List<PLVLinkMicItemDataBean> dataBeans) {
         if (lastShowControlWindow != null && lastShowControlWindow.isShowing()) {
             for (PLVLinkMicItemDataBean itemDataBean : dataBeans) {
@@ -306,6 +368,22 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private boolean isViewerUserType(String userType) {
         return PLVSocketUserConstant.USERTYPE_VIEWER.equals(userType);
+    }
+
+    private PLVMemberItemDataBean getMemberItemByPosition(int pos) {
+        if (pos < 0 || pos >= dataBeanList.size()) {
+            return null;
+        }
+        return dataBeanList.get(pos);
+    }
+
+    private int getPositionFromMemberList(int pos) {
+        if (!isMemberListShow) {
+            if (onViewActionListener != null) {
+                pos = onViewActionListener.getPosition(getMemberItemByPosition(pos));
+            }
+        }
+        return pos;
     }
     // </editor-fold>
 
@@ -350,7 +428,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View v) {
                     final int pos = getAdapterPosition();
-                    if (pos < 0 || currentMemberItemDataBean == null || currentMemberItemDataBean.getSocketUserBean() == null) {
+                    int memberListPos = getPositionFromMemberList(pos);
+                    if (pos < 0 || memberListPos < 0 || currentMemberItemDataBean == null || currentMemberItemDataBean.getSocketUserBean() == null) {
                         return;
                     }
                     final boolean isGuest = currentMemberItemDataBean.getSocketUserBean().isGuest();
@@ -368,15 +447,15 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     final boolean notNeedAnswer = !isChannelAllowInviteLinkMic && (isGuest || isViewer);
                     switch (currentMemberItemDataBean.getLinkMicStatus()) {
                         case WAIT_ACCEPT_HAND_UP:
-                            processAcceptHandUp(pos);
+                            processAcceptHandUp(memberListPos);
                             break;
                         case JOIN:
                         case RTC_JOIN:
-                            processHangUpLinkMic(pos);
+                            processHangUpLinkMic(memberListPos);
                             break;
                         default:
                             if (canInviteLinkMic) {
-                                processInviteLinkMic(pos, !notNeedAnswer);
+                                processInviteLinkMic(memberListPos, !notNeedAnswer);
                             }
                             break;
                     }
@@ -392,23 +471,23 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 @Override
                 public void onClickCamera(boolean isWillOpen) {
-                    final int pos = getAdapterPosition();
-                    if (pos < 0) {
+                    int memberListPos = getPositionFromMemberList(getAdapterPosition());
+                    if (memberListPos < 0) {
                         return;
                     }
                     if (onViewActionListener != null) {
-                        onViewActionListener.onCameraControl(pos, !isWillOpen);
+                        onViewActionListener.onCameraControl(memberListPos, !isWillOpen);
                     }
                 }
 
                 @Override
                 public void onClickMic(boolean isWillOpen) {
-                    final int pos = getAdapterPosition();
-                    if (pos < 0) {
+                    final int memberListPos = getPositionFromMemberList(getAdapterPosition());
+                    if (memberListPos < 0) {
                         return;
                     }
                     if (onViewActionListener != null) {
-                        onViewActionListener.onMicControl(pos, !isWillOpen);
+                        onViewActionListener.onMicControl(memberListPos, !isWillOpen);
                     }
                 }
 
@@ -425,6 +504,7 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     if (sendResult > 0) {
                         toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_success);
                         dataBeanList.remove(getAdapterPosition());
+                        srcDataList.remove(getAdapterPosition());
                         notifyItemRemoved(getAdapterPosition());
                     } else {
                         toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_fail) + "(" + sendResult + ")";
@@ -468,12 +548,13 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClickGrantSpeaker(boolean isGrant) {
                     final int pos = getAdapterPosition();
-                    if (pos < 0) {
+                    int memberListPos = getPositionFromMemberList(pos);
+                    if (pos < 0 || memberListPos < 0) {
                         return ;
                     }
 
                     if(onViewActionListener != null){
-                        onViewActionListener.onGrantUserSpeakerPermission(pos, dataBeanList.get(pos).getSocketUserBean(), isGrant);
+                        onViewActionListener.onGrantUserSpeakerPermission(memberListPos, dataBeanList.get(pos).getSocketUserBean(), isGrant);
                     }
                 }
 
@@ -506,7 +587,8 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
             boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
             String userId = socketUserBean.getUserId();
-            memberControlWindow.bindData(userId, pos);
+            String linkMicId = linkMicItemDataBean != null ? linkMicItemDataBean.getLinkMicId() : "";
+            memberControlWindow.bindData(userId, linkMicId, pos);
             memberControlWindow.show(plvsaMemberMoreIv, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
             lastShowControlWindow = memberControlWindow;
         }
@@ -766,6 +848,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
          * 授予用户主讲权限
          */
         void onGrantUserSpeakerPermission(int position, PLVSocketUserBean user, boolean isGrant);
+
+        /**
+         * 获取成员列表中的索引
+         */
+        int getPosition(PLVMemberItemDataBean memberItemDataBean);
     }
     // </editor-fold>
 }

@@ -81,9 +81,9 @@ public class PLVMarqueeTextView extends AppCompatTextView {
 
     private void initView(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PLVMarqueeTextView);
-        mRollingInterval = typedArray.getInt(R.styleable.PLVMarqueeTextView_scroll_interval, ROLLING_INTERVAL_DEFAULT);
-        mScrollMode = typedArray.getInt(R.styleable.PLVMarqueeTextView_scroll_mode, SCROLL_FOREVER);
-        mFirstScrollDelay = typedArray.getInt(R.styleable.PLVMarqueeTextView_scroll_first_delay, FIRST_SCROLL_DELAY_DEFAULT);
+        mRollingInterval = typedArray.getInt(R.styleable.PLVMarqueeTextView_plv_scroll_interval, ROLLING_INTERVAL_DEFAULT);
+        mScrollMode = typedArray.getInt(R.styleable.PLVMarqueeTextView_plv_scroll_mode, SCROLL_FOREVER);
+        mFirstScrollDelay = typedArray.getInt(R.styleable.PLVMarqueeTextView_plv_scroll_first_delay, FIRST_SCROLL_DELAY_DEFAULT);
         typedArray.recycle();
         setSingleLine();
         setEllipsize(null);

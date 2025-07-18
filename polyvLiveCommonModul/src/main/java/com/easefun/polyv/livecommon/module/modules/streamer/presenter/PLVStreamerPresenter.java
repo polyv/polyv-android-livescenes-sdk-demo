@@ -211,7 +211,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Nullable
     private Boolean isNetworkConnect = null;
     private boolean isMyselfJoinRtc = false;
-    private PLVAutoSaveKV<PLVLinkMicDenoiseType> denoiseTypeKV = new PLVAutoSaveKV<PLVLinkMicDenoiseType>("plv_streamer_denoise_type") {};
+    private PLVAutoSaveKV<PLVLinkMicDenoiseType> denoiseTypeKV = new PLVAutoSaveKV<PLVLinkMicDenoiseType>("plv_streamer_denoise_type_new") {};
     private PLVAutoSaveKV<Boolean> isUseExternalAudioInputKV = new PLVAutoSaveKV<Boolean>("plv_streamer_is_use_external_audio_input") {};
     private Bitmap watermarkBitmap;
     private View myRenderView;
@@ -222,6 +222,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private final List<PLVLinkMicItemDataBean> streamerList = new LinkedList<>();
     //成员列表
     final List<PLVMemberItemDataBean> memberList = Collections.synchronizedList(new LinkedList<PLVMemberItemDataBean>());
+    //成员搜索列表
+    final List<PLVMemberItemDataBean> memberSearchList = new LinkedList<>();
     //rtc回调在连麦中的列表
     final Map<String, PLVLinkMicItemDataBean> rtcJoinMap = new HashMap<>();
 
@@ -372,7 +374,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                                 .getOrDefault(PLVChannelFeature.STREAMER_PUSH_QUALITY_PREFERENCE, PLVPushDowngradePreference.PREFER_BETTER_QUALITY)
                 );
                 setMixLayoutType(mixLayoutType);
-                setDenoiseType(denoiseTypeKV.getOrDefault(PLVLinkMicDenoiseType.ADAPTIVE));
+                setDenoiseType(denoiseTypeKV.getOrDefault(PLVLinkMicDenoiseType.DEFAULT));
                 setIsUseExternalAudioInput(isUseExternalAudioInputKV.getOrDefault(false));
 
                 initStreamerListener();
@@ -558,7 +560,16 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     return;
                 }
                 item.second.setFrontCamera(front);
-                view.onCameraDirection(front, item.first);
+                // 同步状态到搜索列表
+                for (PLVMemberItemDataBean memberItemDataBean : memberSearchList) {
+                    if (memberItemDataBean.getLinkMicItemDataBean() != null && memberItemDataBean.getLinkMicItemDataBean().getLinkMicId() != null) {
+                        if (memberItemDataBean.getLinkMicItemDataBean().getLinkMicId().equals(streamerManager.getLinkMicUid())) {
+                            memberItemDataBean.setFrontCamera(front);
+                            break;
+                        }
+                    }
+                }
+                view.onCameraDirection(front, item.first, streamerManager.getLinkMicUid());
             }
         });
         return true;
@@ -1003,6 +1014,61 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void requestMemberList() {
         requestListUsersApi();
+    }
+
+    @Override
+    public Disposable searchMemberList(String nick) {
+        return PLVChatApiRequestHelper.searchUsers(liveRoomDataManager.getConfig().getChannelId(), nick)
+                .subscribe(new Consumer<List<PLVSocketUserBean>>() {
+
+                    @Override
+                    public void accept(List<PLVSocketUserBean> plvSocketUserBeans) throws Exception {
+                        memberSearchList.clear();
+                        for (PLVSocketUserBean plvSocketUserBean : plvSocketUserBeans) {
+                            PLVMemberItemDataBean memberItemDataBean;
+                            Pair<Integer, PLVMemberItemDataBean> dataBeanPair = getMemberItemWithUserId(plvSocketUserBean.getUserId());
+                            if (dataBeanPair != null) {
+                                memberItemDataBean = dataBeanPair.second;
+                            } else {
+                                memberItemDataBean = new PLVMemberItemDataBean();
+                                memberItemDataBean.setSocketUserBean(plvSocketUserBean);
+                            }
+                            memberSearchList.add(memberItemDataBean);
+                        }
+                        SortMemberListUtils.sort(memberSearchList);
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                                view.onUpdateMemberSearchListData(memberSearchList);
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                });
+    }
+
+    @Override
+    public int getPositionByMemberItem(PLVMemberItemDataBean memberItem) {
+        if (memberItem == null || memberItem.getSocketUserBean() == null) {
+            return -1;
+        }
+        Pair<Integer, PLVMemberItemDataBean> dataBeanPair = getMemberItemWithUserId(memberItem.getSocketUserBean().getUserId());
+        if (dataBeanPair != null) {
+            return dataBeanPair.first;
+        } else {
+            memberList.add(memberItem);
+            callbackToView(new ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onUpdateMemberListData(memberList);
+                }
+            });
+            return memberList.size() - 1;
+        }
     }
 
     @Override
@@ -1525,18 +1591,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         };
         addTeacherTask.run();
 
-        SortMemberListUtils.sort(memberList);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                callbackToView(new ViewRunnable() {
-                    @Override
-                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                        view.onUpdateMemberListData(memberList);
-                    }
-                });
-            }
-        });
+        callUpdateSortMemberList();
     }
 
     private void requestLinkMicListApiTimer() {
@@ -2215,12 +2270,36 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     void callUpdateSortMemberList() {
-        callbackToView(new ViewRunnable() {
-            @Override
-            public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
-                view.onUpdateMemberListData(SortMemberListUtils.sort(memberList));
+        SortMemberListUtils.sort(memberList);
+        for (PLVMemberItemDataBean memberItemDataBean : memberSearchList) {
+            Pair<Integer, PLVMemberItemDataBean> dataBeanPair = getMemberItemWithUserId(memberItemDataBean.getSocketUserBean().getUserId());
+            if (dataBeanPair != null) {
+                memberItemDataBean.syncMemberItemBean(dataBeanPair.second);
             }
-        });
+        }
+        SortMemberListUtils.sort(memberSearchList);
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                callbackToView(new ViewRunnable() {
+                    @Override
+                    public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                        view.onUpdateMemberListData(memberList);
+                        view.onUpdateMemberSearchListData(memberSearchList);
+                    }
+                });
+            }
+        };
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            runnable.run();
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            });
+        }
     }
 
     void callUserMuteAudio(final String linkMicId, final boolean isMute) {

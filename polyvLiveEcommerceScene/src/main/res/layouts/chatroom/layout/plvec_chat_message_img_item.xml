@@ -31,6 +31,6 @@
         android:layout_gravity="center"
         android:background="#00000000"
         android:scaleType="centerCrop"
-        app:radius_iv="6dp"
+        app:plv_radius_iv="6dp"
         android:src="@drawable/plvec_img_site" />
 </LinearLayout>

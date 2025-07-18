@@ -10,7 +10,7 @@
     <color name="gray">#e0e0e0</color>
     <color name="gray_alpha">#aa848e99</color>
     <color name="gray_deep">#8B8989</color>
-    <color name="white">#ffffff</color>
+    <color name="plv_white">#ffffff</color>
     <color name="blue">#14a2f4</color>
     <color name="blue_alpha">#a214a2f4</color>
     <color name="video_back">#D6F2FF</color>
@@ -21,9 +21,9 @@
     <color name="text_gray">#666666</color>
     <color name="text_red">#F1453D</color>
     <color name="text_green">#8BC34A</color>
-    <color name="item_checkCircle_backgroundColor">#1E8AE8</color>
+    <color name="plv_item_checkCircle_backgroundColor">#1E8AE8</color>
     <color name="colorTuna">#CC333344</color>
-    <color name="dodgerBlue">#3082FE</color>
+    <color name="plv_dodgerBlue">#3082FE</color>
     <color name="colorVulcan">#0E141E</color>
     <color name="colorGunPowder">#3E3E4E</color>
     <color name="colorCornflowerBlue">#FF6DA7FF</color>

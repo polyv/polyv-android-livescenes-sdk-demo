@@ -44,8 +44,8 @@ public class PLVRoundImageView extends AppCompatImageView {
         super(context, attrs, defStyleAttr);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLVRoundImageView, defStyleAttr, 0);
-        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundImageView_radius_iv, 10);
-        int mode = a.getInt(R.styleable.PLVRoundImageView_mode_iv, MODE_ALL);
+        int radius = a.getDimensionPixelSize(R.styleable.PLVRoundImageView_plv_radius_iv, 10);
+        int mode = a.getInt(R.styleable.PLVRoundImageView_plv_mode_iv, MODE_ALL);
         a.recycle();
 
         mRoundMode = mode;
