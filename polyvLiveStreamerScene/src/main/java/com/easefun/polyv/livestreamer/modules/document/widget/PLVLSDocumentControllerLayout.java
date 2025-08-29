@@ -394,7 +394,6 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
                 updatePageIndicator(currentAutoId, currentPageIndex);
 
                 // 更新画笔和添加白板按钮状态
-                updateAddWhiteboardVisibility();
                 boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
                 if (isWhiteBoard) {
                     plvlsDocumentMarkMenu.setRightIconResId(R.drawable.plvls_document_mark_active);
@@ -407,8 +406,8 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
             @Override
             public void onUserPermissionChange() {
                 updatePageSelectorVisibility();
-                updateAddWhiteboardVisibility();
-                updateMarkToolVisibility();
+                updateWhiteBoardAddVisibility();
+                updateMarkToolMenuVisibility();
             }
 
             @Override
@@ -607,17 +606,6 @@ public class PLVLSDocumentControllerLayout extends FrameLayout {
 
     private int getCurrentDocumentPageCount() {
         return getDocumentPageCount(currentAutoId);
-    }
-
-    private void updateAddWhiteboardVisibility() {
-        final boolean isWhiteBoard = currentAutoId == AUTO_ID_WHITE_BOARD;
-        final boolean show = isWhiteBoard && PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_WHITE_BOARD_ADD);
-        plvlsDocumentWhiteboardAddIv.setVisibility(show ? VISIBLE : GONE);
-    }
-
-    private void updateMarkToolVisibility() {
-        final boolean show = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_DOCUMENT_ALLOW_USE_PAINT);
-        plvlsDocumentMarkMenu.setVisibility(show ? VISIBLE : GONE);
     }
 
     private void updateVisibility() {

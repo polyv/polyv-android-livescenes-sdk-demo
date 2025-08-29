@@ -432,8 +432,9 @@ public interface IPLVLCMediaLayout {
      * 更换回放视频vid并且立即播放
      *
      * @param vid 回放视频的vid
+     * @param fileId 回放视频的fileId
      */
-    void updatePlayBackVideVidAndPlay(String vid);
+    void updatePlayBackVideVidAndPlay(String vid, String fileId);
 
     /**
      * 获取sessionId
@@ -444,6 +445,16 @@ public interface IPLVLCMediaLayout {
      * 获取fileId
      */
     String getFileId();
+
+    /**
+     * 获取播放数据类型
+     */
+    String getPlayDataType();
+
+    /**
+     * 获取播放数据ID
+     */
+    String getPlayDataId();
 
     /**
      * 设置聊天回放是否可用

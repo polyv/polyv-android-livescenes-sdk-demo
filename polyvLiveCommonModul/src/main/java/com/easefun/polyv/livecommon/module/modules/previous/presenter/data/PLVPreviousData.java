@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.previous.presenter.data;
 
 import androidx.lifecycle.MutableLiveData;
+import android.util.Pair;
 
 import com.plv.livescenes.model.PLVPlaybackListVO;
 
@@ -18,18 +19,18 @@ public class PLVPreviousData {
     private PLVPlaybackListVO.DataBean.ContentsBean previousDetail;
 
     //播放回放视频的Vid
-    private MutableLiveData<String> playbackVideoVidData = new MutableLiveData<>();
+    private MutableLiveData<Pair<String, String>> playbackVideoVidData = new MutableLiveData<>();
 
     //播放中回放视频跳转的进度
     private MutableLiveData<Integer> playBackVidoSeekData = new MutableLiveData<>();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 回放视频数据获取、设置">
-    public MutableLiveData<String> getPlaybackVideoVidData() {
+    public MutableLiveData<Pair<String, String>> getPlaybackVideoVidData() {
         return playbackVideoVidData;
     }
 
-    public void setPlaybackVideoVidData(MutableLiveData<String> playbackVideoVidData) {
+    public void setPlaybackVideoVidData(MutableLiveData<Pair<String, String>> playbackVideoVidData) {
         this.playbackVideoVidData = playbackVideoVidData;
     }
 

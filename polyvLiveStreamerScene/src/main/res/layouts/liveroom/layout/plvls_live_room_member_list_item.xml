@@ -115,6 +115,16 @@
                 android:src="@drawable/plvls_chatroom_toolbar_grant_speaker_iv_selector"
                 android:visibility="gone" />
 
+                <ImageView
+                    android:id="@+id/plvls_member_set_first_view_iv"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/plvls_member_iv_bg_shape"
+                    android:src="@drawable/plvls_chatroom_toolbar_grant_first_screen_iv_selector"
+                    android:visibility="visible" />
+
             </LinearLayout>
 
             <LinearLayout

@@ -85,8 +85,8 @@ public class PLVFaceManager {
         mFaceMap.put("[难过]", R.drawable.polyv_119);// no need i18n
         mFaceMap.put("[ok]", R.drawable.polyv_120);// no need i18n
         mFaceMap.put("[爱心]", R.drawable.polyv_121);// no need i18n
-        mFaceMap.put("[加1]", R.drawable.polyv_122);// no need i18n
         mFaceMap.put("[心碎]", R.drawable.polyv_123);// no need i18n
+        mFaceMap.put("[加1]", R.drawable.polyv_122);// no need i18n
         mFaceMap.put("[正确]", R.drawable.polyv_124);// no need i18n
         mFaceMap.put("[错误]", R.drawable.polyv_125);// no need i18n
         mFaceMap.put("[满分]", R.drawable.polyv_126);// no need i18n

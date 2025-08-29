@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCChatNoticeViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperLandViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperPortViewHolder;
@@ -110,6 +111,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 } else {
                     viewHolder = new PLVChatMessageBaseViewHolder<>(
                             LayoutInflater.from(parent.getContext()).inflate(R.layout.plv_horizontal_linear_layout, parent, false), this);
+                }
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE:
+                if (!isLandscapeLayout) {
+                    viewHolder = new PLVLCChatNoticeViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_notice_portrait_item, parent, false),
+                            this
+                    );
+                } else {
+                    viewHolder = new PLVLCChatNoticeViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_notice_landscape_item, parent, false),
+                            this
+                    );
                 }
                 break;
             default:

@@ -901,7 +901,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
 
             @Override
-            public void onSoftKeyboardClosed() {
+            public void onSoftKeyboardClosed(boolean isFinished) {
                 setViewBottomParam(sendMsgTv, 0);
                 setViewBottomParam(moreIv, 0);
             }

@@ -192,6 +192,13 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
             }
 
             @Override
+            public void onSetFirstView(int position, String userId, boolean isSetFirstView) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onSetFirstView(position, userId, isSetFirstView);
+                }
+            }
+
+            @Override
             public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
                 if (onViewActionListener != null) {
                     return onViewActionListener.getPosition(memberItemDataBean);
@@ -574,6 +581,11 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
                 memberAdapter.updatePermissionChange();
                 memberSearchAdapter.updatePermissionChange();
             }
+        }
+
+        @Override
+        public void onFirstScreenChange(String linkMicUserId, boolean isFirstScreen) {
+            memberAdapter.onFirstViewUpdated();
         }
     };
     // </editor-fold>

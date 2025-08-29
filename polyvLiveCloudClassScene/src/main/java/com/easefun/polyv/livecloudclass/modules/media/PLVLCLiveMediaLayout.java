@@ -1241,7 +1241,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
-    public void updatePlayBackVideVidAndPlay(String vid) {
+    public void updatePlayBackVideVidAndPlay(String vid, String fileId) {
 
     }
 
@@ -1252,6 +1252,16 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     @Override
     public String getFileId() {
+        return null;
+    }
+
+    @Override
+    public String getPlayDataId() {
+        return null;
+    }
+
+    @Override
+    public String getPlayDataType() {
         return null;
     }
 

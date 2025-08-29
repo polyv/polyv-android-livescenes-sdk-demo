@@ -36,6 +36,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVLocalFeature;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -289,6 +290,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCLiveMediaController父接口IPolyvMediaController定义的方法">
     @Override
     public void onPrepared(PolyvPlaybackVideoView videoView) {
+        playerPresenter.setSpeed(PLVLocalFeature.getLiveWatchVideoSpeed());
         updateTotalTimeView();
         updateMoreLayout();
         updateVideoName();

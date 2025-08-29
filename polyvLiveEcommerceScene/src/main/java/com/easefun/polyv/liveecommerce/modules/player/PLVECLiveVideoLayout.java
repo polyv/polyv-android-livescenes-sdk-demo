@@ -587,7 +587,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
-    public void changePlaybackVidAndPlay(String vid) {
+    public void changePlaybackVidAndPlay(String vid, String fileId) {
         PLVCommonLog.d(TAG, "live video cannot change vid and play");
     }
 

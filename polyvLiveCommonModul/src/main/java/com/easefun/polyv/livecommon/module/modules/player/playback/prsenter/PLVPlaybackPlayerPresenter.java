@@ -57,6 +57,7 @@ import com.plv.foundationsdk.utils.PLVControlUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVLocalFeature;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
@@ -165,6 +166,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                 .buildOptions(PLVPlaybackVideoParams.ENABLE_AUTO_PLAY_TEMP_STORE_VIDEO, true)
                 .buildOptions(PLVPlaybackVideoParams.VIDEO_LISTTYPE, liveRoomDataManager.getConfig().getVideoListType())
                 .buildOptions(PLVPlaybackVideoParams.MATERIAL_LIBRARY_ENABLED, getConfig().isMaterialLibraryEnabled())
+                .buildOptions(PLVPlaybackVideoParams.FILE_ID, getConfig().getFileId())
                 .buildOptions(PLVBaseVideoParams.LOAD_SLOW_TIME, 15);
         if (videoView != null) {
             videoView.playByMode(playbackVideoParams, PLVPlayOption.PLAYMODE_VOD);
@@ -238,6 +240,22 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     }
 
     @Override
+    public String getPlayDataType() {
+        if (videoView != null && videoView.getPlaybackData() != null) {
+            return videoView.getPlaybackData().getPlayDataType();
+        }
+        return null;
+    }
+
+    @Override
+    public String getPlayDataId() {
+        if (videoView != null && videoView.getPlaybackData() != null) {
+            return videoView.getPlaybackData().getPlayDataId();
+        }
+        return null;
+    }
+
+    @Override
     public void seekTo(int duration) {
         if (videoView != null && checkCanSeekTo(duration)) {
             videoView.seekTo(duration);
@@ -286,6 +304,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
         if (videoView != null) {
             videoView.setSpeed(speed);
         }
+        PLVLocalFeature.setLiveWatchVideoSpeed(speed);
     }
 
     @Override
@@ -325,7 +344,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void setPlayerVidAndPlay(String vid) {
+        setPlayerVidAndPlay(vid,  null);
+    }
+
+    @Override
+    public void setPlayerVidAndPlay(String vid, String fileId) {
         liveRoomDataManager.setConfigVid(vid);
+        liveRoomDataManager.setConfigFileId(fileId);
         startPlay();
     }
 

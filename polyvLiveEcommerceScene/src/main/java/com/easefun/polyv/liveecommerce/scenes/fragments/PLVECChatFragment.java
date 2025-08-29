@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
+
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageItemType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
@@ -26,8 +29,10 @@ import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.send.custom.PolyvCustomEvent;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
+import com.plv.socket.event.chat.PLVChatNoticeEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -35,6 +40,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 聊天fragment
@@ -52,6 +58,9 @@ public class PLVECChatFragment extends PLVBaseFragment {
     private IPLVLiveRoomDataManager liveRoomDataManager;
     //聊天室presenter
     protected IPLVChatroomContract.IChatroomPresenter chatroomPresenter;
+
+    // 是否已经显示通知消息
+    private boolean hasAppendNoticeMessage = false;
     // </editor-folder>
 
     // <editor-folder defaultstate="collapsed" desc="生命周期">
@@ -195,6 +204,20 @@ public class PLVECChatFragment extends PLVBaseFragment {
         });
     }
 
+    @Nullable
+    private PLVChatNoticeEvent buildNoticeEvent() {
+        final Map<String, String> noticeMap = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_CHATROOM_NOTICE);
+        if (noticeMap == null) {
+            return null;
+        }
+        final String lang = PLVLanguageUtil.isENLanguage() ? PLVLiveClassDetailVO.LangType.LANG_TYPE_EN : PLVLiveClassDetailVO.LangType.LANG_TYPE_ZH_CN;
+        final String notice = noticeMap.get(lang);
+        if (notice == null || notice.trim().isEmpty()) {
+            return null;
+        }
+        return new PLVChatNoticeEvent(notice);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - MVP模式的view层实现">
@@ -273,6 +296,15 @@ public class PLVECChatFragment extends PLVBaseFragment {
                             swipeLoadView.setEnabled(false);
                         }
                     }
+                    if (!hasAppendNoticeMessage) {
+                        hasAppendNoticeMessage = true;
+                        final PLVChatNoticeEvent noticeEvent = buildNoticeEvent();
+                        if (noticeEvent != null) {
+                            addChatMessageToList(listOf(
+                                    new PLVBaseViewData(noticeEvent, PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE)
+                            ), true);
+                        }
+                    }
                 }
             });
         }
@@ -288,6 +320,15 @@ public class PLVECChatFragment extends PLVBaseFragment {
                         swipeLoadView.setEnabled(true);
                     }
                     ToastUtils.showShort(getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
+                    if (!hasAppendNoticeMessage) {
+                        hasAppendNoticeMessage = true;
+                        final PLVChatNoticeEvent noticeEvent = buildNoticeEvent();
+                        if (noticeEvent != null) {
+                            addChatMessageToList(listOf(
+                                    new PLVBaseViewData(noticeEvent, PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE)
+                            ), true);
+                        }
+                    }
                 }
             });
         }

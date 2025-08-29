@@ -65,7 +65,7 @@
 
             <LinearLayout
                 android:id="@+id/fl_speed"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="horizontal"
@@ -81,12 +81,14 @@
                     android:text="@string/plv_player_speed_2"
                     android:textColor="#C2C2C2"
                     android:textSize="12sp"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_more_speed"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="1dp" />
             </LinearLayout>
 

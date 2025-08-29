@@ -175,8 +175,7 @@ public class PLVLanguageUtil {
     // 注意此处不是Build.VERSION_CODES.N
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
     private static Pair<Context, Locale> createConfigurationContext(Context context) {
-        Resources resources = context.getResources();
-        Configuration configuration = resources.getConfiguration();
+        Configuration configuration = new Configuration();
         Locale locale = getLanguageLocale();
         PLVCommonLog.d(TAG, "PLVLanguageUtil.createConfigurationContext locale:" + locale);
         LocaleList localeList = new LocaleList(locale);

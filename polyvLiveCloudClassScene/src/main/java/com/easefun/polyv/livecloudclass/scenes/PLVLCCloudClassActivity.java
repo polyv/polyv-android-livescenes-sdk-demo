@@ -854,6 +854,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                         case PREPARED:
                             floatingPPTLayout.show();
                             livePageMenuLayout.onPlaybackVideoPrepared(mediaLayout.getSessionId(), liveRoomDataManager.getConfig().getChannelId(), mediaLayout.getFileId());
+                            livePageMenuLayout.onAISummaryPrepared(mediaLayout.getPlayDataId(), mediaLayout.getPlayDataType());
                             floatingWindow.updateWhenPlayerPrepared(true);
                             break;
                         case IDLE:
@@ -961,8 +962,8 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
-            public void onChangeVideoVidAction(String vid) {
-                mediaLayout.updatePlayBackVideVidAndPlay(vid);
+            public void onChangeVideoVidAction(String vid, String fileId) {
+                mediaLayout.updatePlayBackVideVidAndPlay(vid, fileId);
             }
 
             @Override

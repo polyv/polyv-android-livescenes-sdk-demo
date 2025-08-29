@@ -342,6 +342,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
                         this
                 );
                 break;
+            case PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE:
+                viewHolder = new PLVECChatNoticeViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chatroom_notice_item, parent, false),
+                        this
+                );
+                break;
             default:
                 PLVCommonLog.exception(new RuntimeException("itemType error"));
                 viewHolder = new PLVECChatMessageCommonViewHolder<>(

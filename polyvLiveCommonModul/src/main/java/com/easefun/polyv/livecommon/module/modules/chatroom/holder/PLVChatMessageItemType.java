@@ -23,6 +23,8 @@ public class PLVChatMessageItemType {
     public static final int ITEMTYPE_RECEIVE_RED_PAPER = 9;
     // 领取红包消息
     public static final int ITEMTYPE_RED_PAPER_RESULT = 11;
+    // 聊天室通知
+    public static final int ITEMTYPE_CHATROOM_NOTICE = 12;
 
     public static final int ITEMTYPE_TIPS_MSG = 99;//提示信息，例如聊天室开启/关闭
 

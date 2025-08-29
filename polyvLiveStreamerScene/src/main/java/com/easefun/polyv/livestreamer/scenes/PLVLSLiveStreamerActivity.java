@@ -506,6 +506,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onSetFirstView(int position, String userId, boolean isSetFirstView) {
+                plvlsStreamerLy.getStreamerPresenter().setUserFirstView(userId, isSetFirstView, null);
+            }
+
+            @Override
             public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
                 return plvlsStreamerLy.getPositionByMemberItem(memberItemDataBean);
             }

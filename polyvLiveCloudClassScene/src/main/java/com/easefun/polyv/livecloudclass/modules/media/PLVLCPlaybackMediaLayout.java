@@ -907,8 +907,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
-    public void updatePlayBackVideVidAndPlay(String vid) {
-        playbackPlayerPresenter.setPlayerVidAndPlay(vid);
+    public void updatePlayBackVideVidAndPlay(String vid, String fileId) {
+        playbackPlayerPresenter.setPlayerVidAndPlay(vid, fileId);
     }
 
     @Override
@@ -919,6 +919,16 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public String getFileId() {
         return playbackPlayerPresenter.getFileId();
+    }
+
+    @Override
+    public String getPlayDataId() {
+        return playbackPlayerPresenter.getPlayDataId();
+    }
+
+    @Override
+    public String getPlayDataType() {
+        return playbackPlayerPresenter.getPlayDataType();
     }
 
     @Override

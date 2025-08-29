@@ -149,6 +149,17 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/plvlc_chat_file_message_hit_area"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/chat_msg_ll"
+            app:layout_constraintEnd_toEndOf="@+id/chat_msg_ll"
+            app:layout_constraintStart_toStartOf="@+id/chat_msg_ll"
+            app:layout_constraintTop_toTopOf="@+id/chat_msg_ll"
+            tools:visibility="visible" />
+
+        <View
             android:id="@+id/plvlc_chat_msg_over_length_mask"
             android:layout_width="match_parent"
             android:layout_height="32dp"

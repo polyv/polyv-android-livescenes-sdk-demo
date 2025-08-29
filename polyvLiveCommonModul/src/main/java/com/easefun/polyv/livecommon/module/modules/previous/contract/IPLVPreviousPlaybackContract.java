@@ -75,8 +75,9 @@ public interface IPLVPreviousPlaybackContract {
         /**
          * 改变回放视频的vid
          * @param vid 回放视频的vid
+         * @param fileId 回放视频的fileId
          */
-        void changePlaybackVideoVid(String vid);
+        void changePlaybackVideoVid(String vid, String fileId);
 
         /**
          * 请求回放视频列表

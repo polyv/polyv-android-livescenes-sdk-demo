@@ -3,10 +3,13 @@ package com.easefun.polyv.livecommon.module.utils.water;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -16,21 +19,47 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.easefun.polyv.livecommon.R;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
-public class PLVStickerImageView extends ImageView {
+public class PLVStickerImageView extends ImageView implements IPLVToggleView {
     private PLVRoundedBorderDrawable mBorderDrawable;
+    private Drawable mDrawable;
     private boolean mBorderVisible = true;
     private int mMaxSize;
+    private boolean mUseNormalDrawable = false;
+    private Drawable finishDrawable;
+    private Rect finishRect = new Rect();
     private OnToggleBorderListener mOnToggleBorderListener;
 
     public PLVStickerImageView(Context context, int maxSizeDp) {
         super(context);
         init(maxSizeDp);
+        finishDrawable = ContextCompat.getDrawable(context, R.drawable.plv_sticker_finish_ic);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (isBorderVisible() && finishDrawable != null) {
+            int iconSize = Math.min(ConvertUtils.dp2px(24), Math.min(getHeight() / 3, getWidth() / 3));
+            int padding = ConvertUtils.dp2px(1);
+            int left = getWidth() - iconSize - padding;
+            int top = padding;
+            int right = getWidth() - padding;
+            int bottom = top + iconSize;
+            finishRect.set(left, top, right, bottom);
+            finishDrawable.setBounds(finishRect);
+            finishDrawable.draw(canvas);
+        }
     }
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (mOnToggleBorderListener != null && mOnToggleBorderListener.isSettingFinished()) {
+            return;
+        }
         postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -99,13 +128,18 @@ public class PLVStickerImageView extends ImageView {
                             return;
                         }
                         adjustImageSize(bitmap);
-                        mBorderDrawable = new PLVRoundedBorderDrawable(
-                                bitmap,
-                                PLVDisplayUtils.dpToPx(getContext(), 2),
-                                Color.WHITE,
-                                PLVDisplayUtils.dpToPx(getContext(), 1)
-                        );
-                        setImageDrawable(mBorderDrawable);
+                        if (mUseNormalDrawable) {
+                            mDrawable = resource;
+                        } else {
+                            mBorderDrawable = new PLVRoundedBorderDrawable(
+                                    bitmap,
+                                    PLVDisplayUtils.dpToPx(getContext(), 2),
+                                    Color.WHITE,
+                                    PLVDisplayUtils.dpToPx(getContext(), 1),
+                                    0
+                            );
+                        }
+                        setImageDrawable(mBorderDrawable != null ? mBorderDrawable : mDrawable);
                     }
                 });
     }
@@ -142,10 +176,26 @@ public class PLVStickerImageView extends ImageView {
         if (mOnToggleBorderListener != null) {
             mOnToggleBorderListener.onToggleBorder(show, this);
         }
+        invalidate();
     }
 
     public boolean isBorderVisible() {
         return mBorderVisible;
+    }
+
+    @Override
+    public void onClick(float upX, float upY) {
+        if (finishRect.contains((int) upX, (int) upY)) {
+            toggleBorder(false);
+            if (mOnToggleBorderListener != null) {
+                mOnToggleBorderListener.onExitEditMode();
+            }
+        }
+    }
+
+    @Override
+    public Rect getExtraPadding() {
+        return new Rect(0, 0, 0, 0);
     }
 
     public void removeFromParent() {
@@ -156,6 +206,11 @@ public class PLVStickerImageView extends ImageView {
         if (mOnToggleBorderListener != null) {
             mOnToggleBorderListener.onRemoveFromParent();
         }
+    }
+
+    @Override
+    public View getCanScaleView() {
+        return this;
     }
 
     public boolean isEditMode() {
@@ -169,8 +224,12 @@ public class PLVStickerImageView extends ImageView {
     public interface OnToggleBorderListener {
         void onToggleBorder(boolean show, View view);
 
+        void onExitEditMode();
+
         void onRemoveFromParent();
 
         boolean isEditMode();
+
+        boolean isSettingFinished();
     }
 }

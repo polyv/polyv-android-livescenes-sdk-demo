@@ -10,6 +10,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
@@ -103,6 +104,7 @@ public class PLVLCPlaybackMoreLayout {
         this.anchor = anchor;
 
         speedVO.add(0.5f);
+        speedVO.add(0.75f);
         speedVO.add(1.0f);
         speedVO.add(1.25f);
         speedVO.add(1.5f);
@@ -171,7 +173,7 @@ public class PLVLCPlaybackMoreLayout {
         rvSpeed = root.findViewById(R.id.rv_more_speed);
         rvAdapter = new RvSpeedAdapter();
         rvSpeed.setAdapter(rvAdapter);
-        rvSpeed.setLayoutManager(new LinearLayoutManager(root.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rvSpeed.setLayoutManager(new GridLayoutManager(root.getContext(), 4, GridLayoutManager.VERTICAL, false));
 
         llSpeed = root.findViewById(R.id.fl_speed);
 
@@ -384,7 +386,7 @@ public class PLVLCPlaybackMoreLayout {
     // <editor-fold defaultstate="collapsed" desc="切换横竖屏">
     private void onLandscape() {
         FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) containerLy.getLayoutParams();
-        flp.width = -2;
+        flp.width = ConvertUtils.dp2px(280);
         flp.height = -1;
         flp.gravity = Gravity.RIGHT;
         containerLy.setLayoutParams(flp);
@@ -680,7 +682,7 @@ public class PLVLCPlaybackMoreLayout {
         @NonNull
         @Override
         public RvMoreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_live_controller_bitrate_item, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_live_controller_speed_item, parent, false);
             return new RvMoreViewHolder(itemView);
         }
 
@@ -731,10 +733,7 @@ public class PLVLCPlaybackMoreLayout {
 
             RvMoreViewHolder(View itemView) {
                 super(itemView);
-                tvSpeed = (TextView) itemView.findViewById(R.id.tv_bitrate);
-                ViewGroup.LayoutParams layoutParams = tvSpeed.getLayoutParams();
-                layoutParams.width = ConvertUtils.dp2px(50);
-                tvSpeed.setLayoutParams(layoutParams);
+                tvSpeed = (TextView) itemView.findViewById(R.id.tv_speed);
             }
         }
 

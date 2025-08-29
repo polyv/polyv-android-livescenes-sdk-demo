@@ -1,5 +1,6 @@
 package com.easefun.polyv.livestreamer.modules.liveroom.adapter;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.thirdpart.svga.PLVSvgaHelper.loadFromAssets;
 
 import androidx.lifecycle.Observer;
@@ -59,6 +60,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public static final String PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE = "updateLinkMicMediaType";
     public static final String PAYLOAD_UPDATE_LINK_MIC_CONTROL = "updateLinkMicControl";
     public static final String PAYLOAD_UPDATE_PERMISSION_CHANGE = "updatePermissionChange";
+    public static final String PAYLOAD_UPDATE_FIRST_VIEW = "updateFirstView";
 
     private static final String LINK_MIC_INVITATION_DRAWABLE_FILE_NAME = "plvls_linkmic_invitation_waiting.svga";
 
@@ -173,6 +175,8 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         updateMicControlStatus(holder, position);
         //授权
         updatePermissionStatus(holder, linkMicItemDataBean);
+        // 第一画面
+        updateFirstViewStatus(holder, linkMicItemDataBean);
         //滑动view的设置
         if (isMe || isSpecialType || isGuest) {
             holder.plvlsMemberSwipeMenu.enabledSwipe(false);
@@ -364,6 +368,9 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                 case PAYLOAD_UPDATE_PERMISSION_CHANGE:
                     updatePermissionStatus(holder, linkMicItemDataBean);
                     break;
+                case PAYLOAD_UPDATE_FIRST_VIEW:
+                    updateFirstViewStatus(holder, linkMicItemDataBean);
+                    break;
                 default:
                     break;
             }
@@ -457,6 +464,10 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
 
     public void updatePermissionChange(){
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_PERMISSION_CHANGE);
+    }
+
+    public void onFirstViewUpdated() {
+        notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_FIRST_VIEW);
     }
 
     //添加用户数据
@@ -610,6 +621,27 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             holder.plvlsMemberGrantSpeakerIv.setSelected(linkMicItemDataBean.isHasSpeaker());
         }
     }
+
+    private void updateFirstViewStatus(MemberViewHolder holder, PLVLinkMicItemDataBean linkMicItemDataBean) {
+        final boolean canControlFirstView = PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER);
+        if (!canControlFirstView || linkMicItemDataBean == null) {
+            holder.memberSetFirstViewIv.setVisibility(View.GONE);
+            return;
+        }
+
+        final boolean canSetToFirstView = listOf(
+                PLVSocketUserConstant.USERTYPE_GUEST,
+                PLVSocketUserConstant.USERTYPE_SLICE,
+                PLVSocketUserConstant.USERTYPE_STUDENT
+        ).contains(linkMicItemDataBean.getUserType());
+        if (canSetToFirstView && linkMicItemDataBean.isRtcJoinStatus()) {
+            holder.memberSetFirstViewIv.setVisibility(View.VISIBLE);
+            holder.memberSetFirstViewIv.setSelected(linkMicItemDataBean.isFirstScreen());
+        } else {
+            holder.memberSetFirstViewIv.setVisibility(View.GONE);
+            holder.memberSetFirstViewIv.setSelected(false);
+        }
+    }
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -675,6 +707,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         private SVGAImageView plvlsMemberLinkmicControlIv;
         private ImageView plvlsMemberLinkmicConnectingIv;
         private ImageView plvlsMemberGrantSpeakerIv;
+        private ImageView memberSetFirstViewIv;
         private TextView plvlsMemberDoBanTv;
         private TextView plvlsMemberKickTv;
         private TextView plvlsMemberBanConfirmTv;
@@ -703,6 +736,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             plvlsMemberBanConfirmTv = findViewById(R.id.plvls_member_ban_confirm_tv);
             plvlsMemberKickConfirmTv = findViewById(R.id.plvls_member_kick_confirm_tv);
             plvlsMemberGrantSpeakerIv = findViewById(R.id.plvls_member_grant_speaker_iv);
+            memberSetFirstViewIv = findViewById(R.id.plvls_member_set_first_view_iv);
 
             AnimationDrawable animationDrawable = (AnimationDrawable) plvlsMemberLinkmicConnectingIv.getDrawable();
             animationDrawable.start();
@@ -819,6 +853,23 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     }
                 }
             });
+
+            memberSetFirstViewIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    int memberListPos = getPositionFromMemberList(pos);
+                    if (pos < 0 || memberListPos < 0) {
+                        return;
+                    }
+                    if (PLVDebounceClicker.tryClick(this, 1000)) {
+                        if (onViewActionListener != null) {
+                            String userId = dataList.get(pos).getSocketUserBean().getUserId();
+                            onViewActionListener.onSetFirstView(memberListPos, userId, !v.isSelected());
+                        }
+                    }
+                }
+            });
         }
 
         private <T extends View> T findViewById(@IdRes int id) {
@@ -890,6 +941,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
          * 赋予主讲权限
          */
         void onGrantSpeakerPermission(int position, String userId, boolean isGrant);
+
+        /**
+         * 设置第一画面
+         */
+        void onSetFirstView(int position, String userId, boolean isSetFirstView);
 
         /**
          * 获取成员列表中的索引

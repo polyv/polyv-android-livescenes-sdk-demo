@@ -34,7 +34,6 @@ import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
-import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
@@ -959,7 +958,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             }
         } else if (id == moreWaterLayout.getId()) {
             close();
-            PLVImagePickerUtil.openGallery((Activity) getContext());
+            PLVSAStickerLayout.tryShow();
         } else if (id == moreVirtualBgLayout.getId()) {
             PLVVirtualBackgroundLayout.tryShow();
         }

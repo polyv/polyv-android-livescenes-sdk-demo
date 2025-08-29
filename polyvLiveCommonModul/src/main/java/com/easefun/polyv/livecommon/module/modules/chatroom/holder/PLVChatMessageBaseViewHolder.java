@@ -94,6 +94,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
         userType = null;
         nickName = null;
         speakMsg = null;
+        speakFileData = null;
         userId = null;
         actor = null;
         fColor = PLVAuthorizationBean.FCOLOR_DEFAULT;
@@ -261,6 +262,7 @@ public class PLVChatMessageBaseViewHolder<Data extends PLVBaseViewData, Adapter 
             userId = chatPlaybackData.getUserId();
             avatar = chatPlaybackData.getPic();
             actor = chatPlaybackData.getActor();
+            speakFileData = chatPlaybackData.getFileData();
             if (chatPlaybackData.getObjects() != null) {
                 int validIndex = Math.min(chatPlaybackData.getObjects().length - 1, msgIndex);
                 if (validIndex == -1) {
