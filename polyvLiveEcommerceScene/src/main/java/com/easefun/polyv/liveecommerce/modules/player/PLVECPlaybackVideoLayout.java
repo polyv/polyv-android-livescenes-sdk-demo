@@ -59,6 +59,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.access.PLVLocalFeature;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
@@ -497,8 +498,8 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     @Override
-    public void changePlaybackVidAndPlay(String vid) {
-        playbackPlayerPresenter.setPlayerVidAndPlay(vid);
+    public void changePlaybackVidAndPlay(String vid, String fileId) {
+        playbackPlayerPresenter.setPlayerVidAndPlay(vid, fileId);
     }
 
     @Override
@@ -602,6 +603,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
                     }
                 }
             });
+            setSpeed(PLVLocalFeature.getLiveWatchVideoSpeed());
         }
 
         @Override

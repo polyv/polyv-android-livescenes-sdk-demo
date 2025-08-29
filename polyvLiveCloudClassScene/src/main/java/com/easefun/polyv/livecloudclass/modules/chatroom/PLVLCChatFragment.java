@@ -3,6 +3,7 @@ package com.easefun.polyv.livecloudclass.modules.chatroom;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.Manifest;
@@ -69,6 +70,7 @@ import com.easefun.polyv.livecommon.module.modules.reward.view.effect.IPLVPointR
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectQueue;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVPointRewardEffectWidget;
 import com.easefun.polyv.livecommon.module.modules.reward.view.effect.PLVRewardSVGAHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVStoragePermissionCompat;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
@@ -92,6 +94,8 @@ import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSDCardUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
@@ -103,6 +107,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
+import com.plv.socket.event.chat.PLVChatNoticeEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
 import com.plv.socket.event.chat.PLVFocusModeEvent;
@@ -123,6 +128,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 互动聊天tab页
@@ -258,6 +264,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private boolean isCloseRoomStatus;
     //专注模式状态
     private boolean isFocusModeStatus;
+    // 是否已经显示通知消息
+    private boolean hasAppendNoticeMessage = false;
 
     // 转播
     @Nullable
@@ -1067,6 +1075,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     swipeLoadView.setEnabled(false);
                 }
             }
+            if (!hasAppendNoticeMessage) {
+                hasAppendNoticeMessage = true;
+                final PLVChatNoticeEvent noticeEvent = buildNoticeEvent();
+                if (noticeEvent != null) {
+                    addChatMessageToList(listOf(
+                            new PLVBaseViewData(noticeEvent, PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE)
+                    ), true);
+                }
+            }
         }
 
         @Override
@@ -1081,6 +1098,15 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             }
             if (chatroomPresenter != null && viewIndex == chatroomPresenter.getViewIndex(chatroomView)) {
                 ToastUtils.showShort(getString(R.string.plv_chat_toast_history_load_failed) + ": " + errorMsg);
+            }
+            if (!hasAppendNoticeMessage) {
+                hasAppendNoticeMessage = true;
+                final PLVChatNoticeEvent noticeEvent = buildNoticeEvent();
+                if (noticeEvent != null) {
+                    addChatMessageToList(listOf(
+                            new PLVBaseViewData(noticeEvent, PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE)
+                    ), true);
+                }
             }
         }
 
@@ -1125,6 +1151,21 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 bulletinTv.startMarquee((CharSequence) speakEvent.getObjects()[0]);
             }
         }
+    }
+
+    @Nullable
+    private PLVChatNoticeEvent buildNoticeEvent() {
+        final Map<String, String> noticeMap = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_CHATROOM_NOTICE);
+        if (noticeMap == null) {
+            return null;
+        }
+        final String lang = PLVLanguageUtil.isENLanguage() ? PLVLiveClassDetailVO.LangType.LANG_TYPE_EN : PLVLiveClassDetailVO.LangType.LANG_TYPE_ZH_CN;
+        final String notice = noticeMap.get(lang);
+        if (notice == null || notice.trim().isEmpty()) {
+            return null;
+        }
+        return new PLVChatNoticeEvent(notice);
     }
     // </editor-fold>
 

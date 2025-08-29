@@ -136,12 +136,12 @@ public class PLVPreviousView extends FrameLayout {
      *
      * @param vid 视频的vid
      */
-    public void changePlaybackVideoVid(String vid) {
+    public void changePlaybackVideoVid(String vid, String fileId) {
         if (prepareChangeVideoVidListener != null) {
-            prepareChangeVideoVidListener.onPrepareChangeVideoVid(vid);
+            prepareChangeVideoVidListener.onPrepareChangeVideoVid(vid, fileId);
         }
         if (previousPresenter != null) {
-            previousPresenter.changePlaybackVideoVid(vid);
+            previousPresenter.changePlaybackVideoVid(vid, fileId);
         }
     }
     // </editor-fold>
@@ -177,7 +177,7 @@ public class PLVPreviousView extends FrameLayout {
                     dataList.addAll(playbackList.getData().getContents());
                 } else {
                     dataList.addAll(playbackList.getData().getContents());
-                    changePlaybackVideoVid(dataList.get(0).getVideoPoolId());
+                    changePlaybackVideoVid(dataList.get(0).getVideoPoolId(), dataList.get(0).getFileId());
                 }
             }
             if (previousAdapter != null) {
@@ -299,7 +299,7 @@ public class PLVPreviousView extends FrameLayout {
             previousAdapter.setCurrentPosition(currentPosition);
             previousAdapter.notifyItemChanged(old);
             previousAdapter.notifyItemChanged(currentPosition);
-            changePlaybackVideoVid(dataList.get(currentPosition).getVideoPoolId());
+            changePlaybackVideoVid(dataList.get(currentPosition).getVideoPoolId(), dataList.get(currentPosition).getFileId());
         }
     }
     //</editor-fold>
@@ -319,7 +319,7 @@ public class PLVPreviousView extends FrameLayout {
             /**
              * 在切换vid前的监听
              */
-            void onPrepareChangeVideoVid(String vid);
+            void onPrepareChangeVideoVid(String vid, String fileId);
         }
     }
     //</editor-fold>

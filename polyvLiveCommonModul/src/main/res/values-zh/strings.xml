@@ -108,7 +108,7 @@
     <string name="plv_chat_toast_send_msg_failed_param">发言失败: %s</string>
     <string name="plv_chat_toast_send_quiz_success">提问成功</string>
     <string name="plv_chat_toast_send_quiz_failed">提问失败</string>
-    <string name="plv_chat_toast_send_text_empty">发送内容不能为空！</string>
+    <string name="plv_chat_toast_send_text_empty">输入内容不能为空！</string>
     <string name="plv_chat_toast_history_all_loaded">历史记录已全部加载完成！</string>
     <string name="plv_chat_toast_history_load_failed">历史记录加载失败</string>
     <string name="plv_chat_view_all_message">查看全部</string>
@@ -422,6 +422,10 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">当前网络信号弱，开启失败，请检查网络！</string>
     <string name="plv_streamer_toast_call_streamer_start">请先发起直播</string>
     <string name="plv_streamer_sticker">贴图</string>
+    <string name="plv_streamer_sticker_text">文字</string>
+    <string name="plv_streamer_sticker_image">手机相册图片</string>
+    <string name="plv_streamer_sticker_finish">完成</string>
+    <string name="plv_streamer_sticker_text_select">选择文字模版</string>
     <string name="plv_streamer_virtual_background">虚拟背景</string>
     <string name="plv_streamer_upload">自定义</string>
     <string name="plv_streamer_blur_bg">背景模糊</string>

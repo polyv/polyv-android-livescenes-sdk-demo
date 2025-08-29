@@ -422,6 +422,10 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">目前網路訊號較弱，開啟失敗，請檢查網路！</string>
     <string name="plv_streamer_toast_call_streamer_start">請先發起直播</string>
     <string name="plv_streamer_sticker">貼圖</string>
+    <string name="plv_streamer_sticker_text">文字</string>
+    <string name="plv_streamer_sticker_image">手機相簿圖片</string>
+    <string name="plv_streamer_sticker_finish">完成</string>
+    <string name="plv_streamer_sticker_text_select">選擇文字模版</string>
     <string name="plv_streamer_virtual_background">虛擬背景</string>
     <string name="plv_streamer_upload">自訂</string>
     <string name="plv_streamer_blur_bg">背景模糊</string>

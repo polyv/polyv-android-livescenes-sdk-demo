@@ -200,7 +200,7 @@
     <string name="plv_chat_answer">Reply</string>
     <string name="plv_chat_input_tips_focus_2">In focus mode</string>
     <string name="plv_chat_input_tips_chat_6">Join the chat</string>
-    <string name="plv_chat_input_tips_quiz">Initiate a question</string>
+    <string name="plv_chat_input_tips_quiz">Ask</string>
     <string name="plv_chat_no_message">No chat messages at the moment</string>
     <string name="plv_chat_image_alt_text">[Image]</string>
 
@@ -422,6 +422,10 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">Weak network signal, activation failed. Check your connection!</string>
     <string name="plv_streamer_toast_call_streamer_start">Please start the live stream first</string>
     <string name="plv_streamer_sticker">Sticker</string>
+    <string name="plv_streamer_sticker_text">Text</string>
+    <string name="plv_streamer_sticker_image">Photo Album Image</string>
+    <string name="plv_streamer_sticker_finish">Finish</string>
+    <string name="plv_streamer_sticker_text_select">Select text template</string>
     <string name="plv_streamer_virtual_background">Virtual Background</string>
     <string name="plv_streamer_upload">Custom</string>
     <string name="plv_streamer_blur_bg">Background Blur</string>

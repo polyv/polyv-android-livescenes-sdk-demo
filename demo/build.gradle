@@ -90,7 +90,7 @@ dependencies {
     implementation project(':polyvLiveStreamerScene')
     implementation project(':polyvStreamerAloneScene')
 
-    api 'net.polyv.android:beauty-gpu-impl:1.1.5'
+    runtimeOnly 'net.polyv.android:beauty-gpu-impl:1.1.9'
 //    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.1.3'
     runtimeOnly 'net.polyv.android:meidapipe-impl:1.1.1'
 

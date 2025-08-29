@@ -1322,8 +1322,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         @Override
-        public void onChangePlaybackVidAndPlay(String vid) {
-            videoLayout.changePlaybackVidAndPlay(vid);
+        public void onChangePlaybackVidAndPlay(String vid, String fileId) {
+            videoLayout.changePlaybackVidAndPlay(vid, fileId);
         }
 
         @Override

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    tools:background="#66000000">
+
+    <LinearLayout
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:background="#262523"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/sticker_input_et"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:background="@drawable/plv_sticker_text_input_corner_bg"
+                android:gravity="center_vertical|left"
+                android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
+                android:maxLength="200"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/sticker_input_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8/8"
+                android:layout_gravity="center|right"
+                android:layout_marginRight="12dp"
+                android:alpha="0.4"
+                android:textColor="#ffffff" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/sticker_finish_tv"
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_marginLeft="12dp"
+            android:background="@drawable/plv_sticker_text_finish_bg"
+            android:gravity="center"
+            android:text="@string/plv_streamer_sticker_finish"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/sticker_input_bg"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#96ffffff"
+        android:visibility="gone" />
+</LinearLayout>

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class PLVBeautyLocalDataSource {
 
-    private final MutableLiveData<Map<PLVBeautyOption, Float>> beautyOptionIntensityLiveData = new PLVAutoSaveLiveData<Map<PLVBeautyOption, Float>>("plv_beauty_option_intensity_1") {};
+    private final MutableLiveData<Map<PLVBeautyOption, Float>> beautyOptionIntensityLiveData = new PLVAutoSaveLiveData<Map<PLVBeautyOption, Float>>("plv_beauty_option_intensity_2") {};
     private final MutableLiveData<Map<String, Float>> filterKeyIntensityLiveData = new PLVAutoSaveLiveData<Map<String, Float>>("plv_filter_option_intensity") {};
     private final MutableLiveData<String> lastUsedFilterKeyLiveData = new PLVAutoSaveLiveData<String>("plv_last_used_filter_key") {};
     private final MutableLiveData<Boolean> beautySwitchLiveData = new PLVAutoSaveLiveData<Boolean>("plv_beauty_switch") {};

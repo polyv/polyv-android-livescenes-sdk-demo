@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/plv_sticker_text_content_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_sticker_text_delete"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="-12dp"
+        android:background="@drawable/plv_sticker_text_border_bg"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/plv_sticker_text_left_icon"
+            android:layout_width="14dp"
+            android:layout_height="24dp"
+            android:visibility="gone" />
+
+        <com.easefun.polyv.livecommon.module.utils.water.PLVStrokeTextView
+            android:id="@+id/plv_sticker_text_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="#2979FF"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/plv_sticker_text_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:visibility="visible"
+        android:src="@drawable/plv_sticker_delete_ic" />
+
+    <ImageView
+        android:id="@+id/plv_sticker_text_edit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="-12dp"
+        android:layout_toRightOf="@+id/plv_sticker_text_content_layout"
+        android:visibility="visible"
+        android:src="@drawable/plv_sticker_edit_ic" />
+</RelativeLayout>

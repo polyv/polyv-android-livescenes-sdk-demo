@@ -668,7 +668,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 streamerManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
                 return;
             }
-            streamerManager.setupLocalVideo(renderView);
+            boolean isAloneChannelType = liveRoomDataManager.getConfig().isAloneChannelType();
+            streamerManager.setupLocalVideo(renderView, isAloneChannelType ? PLVStreamerConfig.RenderMode.RENDER_MODE_FIT : PLVStreamerConfig.RenderMode.RENDER_MODE_HIDDEN);
             myRenderView = renderView;
             tryAttachWaterToRenderParent();
         } else {
@@ -1198,6 +1199,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     //3、新授予用户主讲权限
                     currentSpeakerPermissionUser.setUserId(newPermissionUserId);
                     PLVLinkMicEventSender.getInstance().setSpeakerPermission(currentSpeakerPermissionUser, sessionId, true, ack);
+                    // 切换用户到第一画面
+                    PLVLinkMicEventSender.getInstance().setSwitchFirstView(currentSpeakerPermissionUser, null);
                 } else {
                     //3、收回权限时，把第一画面重新交给频道主讲
                     currentSpeakerPermissionUser.setUserId(findChannelTeacherUserId());
@@ -1206,12 +1209,41 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     } else if (ack != null) {
                         ack.call(objects);
                     }
+                    if (newPermissionUserId.equals(lastFirstScreenUserId)) {
+                        // 切换主讲到第一画面
+                        PLVLinkMicEventSender.getInstance().setSwitchFirstView(currentSpeakerPermissionUser, null);
+                    }
                 }
-                //4、切换用户到第一画面
-                PLVLinkMicEventSender.getInstance().setSwitchFirstView(currentSpeakerPermissionUser, null);
             }
         });
 
+    }
+
+    @Override
+    public void setUserFirstView(String userId, boolean isSetFirstView, final Ack ack) {
+        if (!PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+            //只有讲师可以控制第一画面
+            return;
+        }
+        if (currentSocketUserBean == null) {
+            return;
+        }
+
+        final PLVSocketUserBean firstViewUser = new PLVSocketUserBean();
+        if (isSetFirstView) {
+            firstViewUser.setUserId(userId);
+        } else {
+            firstViewUser.setUserId(currentSocketUserBean.getUserId());
+        }
+
+        PLVLinkMicEventSender.getInstance().setSwitchFirstView(firstViewUser, new Ack() {
+            @Override
+            public void call(Object... args) {
+                if (ack != null) {
+                    ack.call(args);
+                }
+            }
+        });
     }
 
     @Override
@@ -1782,8 +1814,14 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             forceHangUpHandler.remove(linkMicUid);
         }
         Pair<Integer, PLVMemberItemDataBean> item = getMemberItemWithUserId(linkMicUid);
+        if (lastFirstScreenUserId != null && lastFirstScreenUserId.equals(linkMicUid)) {
+            onFirstScreenChange(findChannelTeacherUserId(), true);
+        }
         if (item != null && item.second != null) {
             item.second.setLinkMicStatus(PLVLinkMicItemDataBean.STATUS_IDLE);
+            if (item.second.getLinkMicItemDataBean() != null) {
+                item.second.getLinkMicItemDataBean().setFirstScreen(false);
+            }
             callUpdateSortMemberList();
         }
         final Pair<Integer, PLVLinkMicItemDataBean> linkMicItem = getLinkMicItemWithLinkMicId(linkMicUid);

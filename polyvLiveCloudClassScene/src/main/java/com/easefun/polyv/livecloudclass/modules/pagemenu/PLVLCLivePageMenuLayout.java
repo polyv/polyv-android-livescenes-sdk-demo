@@ -31,6 +31,7 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.PLVLCQuizFragment;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCChatCommonMessageList;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.chatmore.PLVLCChatMoreFloatingView;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.aisummary.PLVLCAISummaryFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.chapter.PLVLCPlaybackChapterFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCProductPushCardLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.desc.PLVLCLiveDescFragment;
@@ -85,6 +86,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
+import com.plv.livescenes.feature.pagemenu.PLVAISummaryWebView;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackGetDataListener;
@@ -148,6 +150,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     //播放器准备完成的聊天回放任务
     private List<Triple<String, String, String>> needAddedChatPlaybackTask = new ArrayList<>();
 
+    //播放器准备完成的AI看任务
+    private List<Pair<String, String>> needAddedAISummaryTask = new ArrayList<>();
+
     //回放Presenter
     private IPLVPreviousPlaybackContract.IPreviousPlaybackPresenter previousPlaybackPresenter;
 
@@ -175,6 +180,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCTextFragment textFragment;//自定义图文菜单tab页
     private PLVLCIFrameFragment iFrameFragment;//推广外链tab页
     private PLVLCTuWenFragment tuWenFragment;//图文直播tab页
+    private PLVLCAISummaryFragment aiSummaryFragment;//AI看tab页
     private PLVLCQuizFragment quizFragment;//咨询提问tab页
     private PLVLCChatFragment chatFragment;//互动聊天tab页
     private PLVLCQAFragment questionsAndAnswersFragment;//问答tab页
@@ -521,6 +527,16 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
+    public void onAISummaryPrepared(String playDataId, String playDataType) {
+        if (needAddedAISummaryTask != null) {
+            needAddedAISummaryTask.add(new Pair<>(playDataId, playDataType));
+        }
+        if (aiSummaryFragment != null) {
+            aiSummaryFragment.setPlayDataIdAndType(playDataId, playDataType);
+        }
+    }
+
+    @Override
     public void onPlaybackVideoSeekComplete(int time) {
         if (isChatPlaybackEnabled() && chatPlaybackManager != null) {
             chatPlaybackManager.seek(time);
@@ -637,6 +653,33 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         questionsAndAnswersFragment.init(qaDataBean.getSocketMsg(), liveRoomDataManager, getContext());
         pageMenuTabFragmentList.add(questionsAndAnswersFragment);
     }
+
+    private void addAISummaryTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+        if (liveRoomDataManager.getConfig().isLive()) {
+            return;
+        }
+        pageMenuTabTitleList.add(channelMenusBean.getName());
+        aiSummaryFragment = new PLVLCAISummaryFragment();
+        aiSummaryFragment.setOnSeekVideoListener(new PLVAISummaryWebView.OnSeekVideoListener() {
+            @Override
+            public void onSeekVideo(int timeSecond) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onSeekToAction(timeSecond);
+                }
+            }
+        });
+        aiSummaryFragment.init(liveRoomDataManager, getContext());
+        pageMenuTabFragmentList.add(aiSummaryFragment);
+    }
+
+    private void checkStartAISummary() {
+        if (needAddedAISummaryTask != null && needAddedAISummaryTask.size() > 0 && aiSummaryFragment != null) {
+            Pair<String, String> data = needAddedAISummaryTask.get(needAddedAISummaryTask.size() - 1);
+            aiSummaryFragment.setPlayDataIdAndType(data.first, data.second);
+        }
+        needAddedChatPlaybackTask = null;
+    }
+
 
     private void addTuWenTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
@@ -1160,13 +1203,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (previousPlaybackPresenter != null) {
             //监听vid的变更
             previousPlaybackPresenter.getData().getPlaybackVideoVidData()
-                    .observe((LifecycleOwner) getContext(), new Observer<String>() {
+                    .observe((LifecycleOwner) getContext(), new Observer<Pair<String, String>>() {
                         @Override
-                        public void onChanged(@Nullable String vid) {
-                            if (TextUtils.isEmpty(vid)) {
+                        public void onChanged(@Nullable Pair<String, String> vidAndFileId) {
+                            if (vidAndFileId == null || TextUtils.isEmpty(vidAndFileId.first)) {
                                 return;
                             }
-                            onViewActionListener.onChangeVideoVidAction(vid);
+                            onViewActionListener.onChangeVideoVidAction(vidAndFileId.first, vidAndFileId.second);
                         }
                     });
 
@@ -1242,6 +1285,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     observeChatroomData();
                     observePointRewardOpen();
                     checkStartChatPlayback();
+                    checkStartAISummary();
                 }
             }
         });
@@ -1280,6 +1324,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 addBuyProductTab(channelMenusBean.getName());
             } else if (PLVLiveClassDetailVO.MENUTYPE_MEMBERS.equals(channelMenusBean.getMenuType())) {
                 addMemberListTab(channelMenusBean.getName());
+            } else if (PLVLiveClassDetailVO.MENUTYPE_AI_SUMMARY.equals(channelMenusBean.getMenuType())) {
+                addAISummaryTab(channelMenusBean);
             }
         }
         if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())

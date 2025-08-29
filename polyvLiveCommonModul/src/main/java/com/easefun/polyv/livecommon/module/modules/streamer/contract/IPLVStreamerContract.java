@@ -583,6 +583,11 @@ public interface IPLVStreamerContract {
          */
         void setUserPermissionSpeaker(String userId, boolean isSetPermission, Ack ack);
 
+        /**
+         * 设置用户第一画面
+         */
+        void setUserFirstView(String userId, boolean isSetFirstView, Ack ack);
+
         void setDocumentAndStreamerViewPosition(boolean documentInMainScreen);
 
         /**

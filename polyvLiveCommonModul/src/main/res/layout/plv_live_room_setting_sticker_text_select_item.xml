@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/plv_sticker_text_content_layout"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:layout_marginTop="12dp"
+    android:gravity="center"
+    android:background="@drawable/plv_sticker_text_content_bg_selector"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/plv_sticker_text_left_icon"
+        android:layout_width="12dp"
+        android:layout_height="22dp"
+        android:visibility="gone" />
+
+    <com.easefun.polyv.livecommon.module.utils.water.PLVStrokeTextView
+        android:id="@+id/plv_sticker_text_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="关注主播"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="#2979FF"
+        android:textSize="14sp" />
+</LinearLayout>

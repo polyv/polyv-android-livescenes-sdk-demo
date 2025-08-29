@@ -306,6 +306,16 @@ public interface IPLVPlaybackPlayerContract {
         String getFileId();
 
         /**
+         * 获取播放数据类型
+         */
+        String getPlayDataType();
+
+        /**
+         * 获取播放数据ID
+         */
+        String getPlayDataId();
+
+        /**
          * 跳转到指定的视频时间
          *
          * @param duration 时间，单位：ms
@@ -382,6 +392,14 @@ public interface IPLVPlaybackPlayerContract {
          * @param vid 回放视频的vid
          */
         void setPlayerVidAndPlay(String vid);
+
+        /**
+         * 切换播放器播放视频的vid并且立即播放视频
+         *
+         * @param vid    回放视频的vid
+         * @param fileId 文件Id，从回放列表播放时需要传递
+         */
+        void setPlayerVidAndPlay(String vid, String fileId);
 
         /**
          * 绑定PPTView

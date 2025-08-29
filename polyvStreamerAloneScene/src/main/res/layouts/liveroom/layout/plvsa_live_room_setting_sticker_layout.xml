@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/plv_setting_sticker_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/plvsa_setting_bitrate_ly_shape">
+
+    <TextView
+        android:id="@+id/plv_setting_sticker_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:text="@string/plv_streamer_sticker"
+        android:textColor="#F0F1F5"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/plvsa_setting_sticker_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_setting_sticker_tv"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:background="@drawable/plv_live_room_setting_sticker_text_bg"
+        android:paddingLeft="16dp"
+        android:paddingTop="12dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp"
+        android:text="@string/plv_streamer_sticker_text"
+        android:textColor="#ffffff"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plvsa_setting_sticker_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plvsa_setting_sticker_text"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/plv_live_room_setting_sticker_text_bg"
+        android:paddingLeft="16dp"
+        android:paddingTop="12dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp"
+        android:text="@string/plv_streamer_sticker_image"
+        android:textColor="#ffffff"
+        android:textSize="14sp" />
+</RelativeLayout>

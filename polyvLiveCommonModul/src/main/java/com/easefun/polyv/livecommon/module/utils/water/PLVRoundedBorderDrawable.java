@@ -17,11 +17,11 @@ public class PLVRoundedBorderDrawable extends Drawable {
     private Bitmap mBitmap;
     private boolean mShowBorder;
 
-    public PLVRoundedBorderDrawable(Bitmap bitmap, float cornerRadius, int borderColor, float borderWidth) {
+    public PLVRoundedBorderDrawable(Bitmap bitmap, float cornerRadius, int borderColor, float borderWidth, float borderMargin) {
         mBitmap = bitmap;
         mCornerRadius = cornerRadius;
         mBorderWidth = borderWidth;
-        mBorderMargin = ConvertUtils.dp2px(3f);
+        mBorderMargin = borderMargin;
 
         mImagePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mImagePaint.setFilterBitmap(true);

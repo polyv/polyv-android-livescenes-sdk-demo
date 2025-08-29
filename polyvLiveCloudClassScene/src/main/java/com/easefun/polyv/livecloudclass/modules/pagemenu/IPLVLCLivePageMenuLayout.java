@@ -100,6 +100,14 @@ public interface IPLVLCLivePageMenuLayout {
     void onPlaybackVideoPrepared(String sessionId, String channelId, String fileId);
 
     /**
+     * 回放视频准备完成通知AI看
+     *
+     * @param playDataId   播放数据Id
+     * @param playDataType 播放数据类型
+     */
+    void onAISummaryPrepared(String playDataId, String playDataType);
+
+    /**
      * 回放视频seek完成
      *
      * @param time 时间，单位：毫秒
@@ -162,8 +170,9 @@ public interface IPLVLCLivePageMenuLayout {
         /**
          * 切换往期视频的动作
          * @param vid 回放视频的vid
+         * @param fileId 回放视频的fileId
          */
-        void onChangeVideoVidAction(String vid);
+        void onChangeVideoVidAction(String vid, String fileId);
 
         /**
          * 跳转进度条的动作

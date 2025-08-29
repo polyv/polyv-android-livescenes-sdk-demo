@@ -98,6 +98,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVSABitrateLayout bitrateLayout;
     //混流布局设置布局
     private PLVSAMixLayout mixLayout;
+    private PLVSAStickerLayout stickerLayout;
     //推流开始倒计时布局
     private IPLVSACountDownWindow countDownWindow;
     // 降噪配置布局
@@ -184,6 +185,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         PLVVirtualBackgroundLayout.destroy();
+        PLVSAStickerLayout.destroy();
     }
     // </editor-fold>
 
@@ -242,6 +244,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         initTitleInputLayout();
         initBitrateLayout();
         initMixLayout();
+        initStickerLayout();
         initTitleTextOnClickListener();
         initBeginCountDownWindow();
         initDenoiseLayout();
@@ -416,6 +419,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         });
     }
 
+    private void initStickerLayout() {
+        stickerLayout = PLVSAStickerLayout.init(getContext(), new PLVSAStickerLayout.OnViewActionListener() {
+            @Override
+            public void onClick(boolean isClickText) {
+                stickerLayout.close();
+                if (isClickText) {
+                    waterLayout.previewTextSticker();
+                } else {
+                    PLVImagePickerUtil.openGallery((Activity) getContext());
+                }
+            }
+        });
+    }
+
     /**
      * 初始化直播标题点击事件
      * 点击直播标题时，显示直播标题输入布局
@@ -442,6 +459,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             public void onCountDownFinished() {
                 // 倒计时结束，隐藏设置布局，更新直播标题，开始直播
                 isSettingFinished = true;
+                waterLayout.setSettingFinished(true);
                 updateVisibility();
                 // 进入直播间时再设置水印
                 if (streamerPresenter != null) {
@@ -467,6 +485,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             public void onCountDownCanceled() {
                 // 倒计时取消，重新显示设置布局
                 isSettingFinished = false;
+                waterLayout.setSettingFinished(false);
                 updateVisibility();
             }
         });
@@ -897,9 +916,11 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                         switch (resolutionRatio) {
                             case RATIO_16_9:
                                 settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_16_9);
+                                waterLayout.setAspectRatio(16.0f / 9.0f);
                                 break;
                             case RATIO_4_3:
                                 settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_4_3);
+                                waterLayout.setAspectRatio(4.0f / 3.0f);
                                 break;
                             default:
                         }
@@ -1009,7 +1030,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         } else if (id == settingMoreLayout.getId()) {
             settingMorePopupLayout.show();
         } else if (id == settingWaterLayout.getId()) {
-            PLVImagePickerUtil.openGallery((Activity) getContext());
+            stickerLayout.open();
         } else if (id == settingVirtualBgLayout.getId()) {
             if (virtualBackgroundLayout != null) {
                 virtualBackgroundLayout.show();

@@ -78,6 +78,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     private ImageView chatMsgFileShareIv;
     @Nullable
     private View chatMsgOverLengthMask;
+    private View chatFileMessageHitArea;
 
     //横屏item
     //文本信息
@@ -123,6 +124,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         chatMsgFileShareIv = findViewById(R.id.plvlc_chat_msg_file_share_iv);
         chatLayout = findViewById(R.id.chat_msg_ll);
         chatMsgOverLengthMask = findViewById(R.id.plvlc_chat_msg_over_length_mask);
+        chatFileMessageHitArea = findViewById(R.id.plvlc_chat_file_message_hit_area);
 
         //land item
         chatMsgTv = (GifSpanTextView) findViewById(R.id.chat_msg_tv);
@@ -424,12 +426,13 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 chatMsgTv.setTextInner(nickSpan.append(speakFileData.getName()), false);
             }
-            if (chatMsgLl != null) {
-                chatMsgLl.setOnClickListener(new View.OnClickListener() {
+            if (chatFileMessageHitArea != null) {
+                chatFileMessageHitArea.setVisibility(View.VISIBLE);
+                chatFileMessageHitArea.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (speakFileData != null) {
-                            PLVWebUtils.openWebLink(speakFileData.getUrl(), chatMsgLl.getContext());
+                            PLVWebUtils.openWebLink(speakFileData.getUrl(), chatFileMessageHitArea.getContext());
                         }
                     }
                 });
@@ -468,8 +471,8 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             if (chatMsgFileShareLandIv != null) {
                 chatMsgFileShareLandIv.setVisibility(View.GONE);
             }
-            if (chatMsgLl != null) {
-                chatMsgLl.setOnClickListener(null);
+            if (chatFileMessageHitArea != null) {
+                chatFileMessageHitArea.setVisibility(View.GONE);
             }
             if (chatMsgLandLl != null) {
                 chatMsgLandLl.setOnClickListener(null);

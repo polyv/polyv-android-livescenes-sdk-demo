@@ -792,8 +792,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         PLVECPreviousAdapter plvecPreviousAdapter = new PLVECPreviousAdapter();
         plvecPreviousAdapter.setOnViewActionListener(new PLVPreviousAdapter.OnViewActionListener() {
             @Override
-            public void changeVideoVidClick(String vid) {
-                plvPreviousView.changePlaybackVideoVid(vid);
+            public void changeVideoVidClick(String vid, String fileId) {
+                plvPreviousView.changePlaybackVideoVid(vid, fileId);
             }
         });
         builder.setAdapter(plvecPreviousAdapter)
@@ -807,9 +807,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 }).setThemeColor("#FFFFA611")
                 .setOnPrepareChangeVidListener(new PLVPreviousView.PLVPreviousViewInterface.OnPrepareChangeVideoVidListener() {
                     @Override
-                    public void onPrepareChangeVideoVid(String vid) {
+                    public void onPrepareChangeVideoVid(String vid, String fileId) {
                         if (onViewActionListener != null) {
-                            onViewActionListener.onChangePlaybackVidAndPlay(vid);
+                            onViewActionListener.onChangePlaybackVidAndPlay(vid, fileId);
                         }
                     }
                 });
@@ -982,7 +982,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
          *
          * @param vid
          */
-        void onChangePlaybackVidAndPlay(String vid);
+        void onChangePlaybackVidAndPlay(String vid, String fileId);
 
         /**
          * 回调 拆开红包

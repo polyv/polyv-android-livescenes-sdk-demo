@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -1165,8 +1167,9 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (((Activity) getContext()).isInMultiWindowMode() && streamerPresenter.isScreenSharing()) {
-                View rootView = ((Activity) getContext()).getWindow().getDecorView();
-                isLandscape = rootView.getWidth() > rootView.getHeight();
+                Point realSize = new Point();
+                ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRealSize(realSize);
+                isLandscape = realSize.x > realSize.y;
             }
         }
         updateOnOrientationChanged(isLandscape);

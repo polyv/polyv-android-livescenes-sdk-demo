@@ -422,6 +422,10 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">現在のネットワーク信号が弱く、起動に失敗しました。ネットワークを確認してください！</string>
     <string name="plv_streamer_toast_call_streamer_start">最初にライブ ブロードキャストを開始してください</string>
     <string name="plv_streamer_sticker">ステッカー</string>
+    <string name="plv_streamer_sticker_text">文字</string>
+    <string name="plv_streamer_sticker_image">携帯アルバム画像</string>
+    <string name="plv_streamer_sticker_finish">完了</string>
+    <string name="plv_streamer_sticker_text_select">文字テンプレートを選択</string>
     <string name="plv_streamer_virtual_background">バーチャル背景</string>
     <string name="plv_streamer_upload">カスタム</string>
     <string name="plv_streamer_blur_bg">背景をぼかす</string>

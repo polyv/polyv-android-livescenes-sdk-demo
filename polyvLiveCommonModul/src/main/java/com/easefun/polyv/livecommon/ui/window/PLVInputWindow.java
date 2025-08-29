@@ -131,7 +131,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
                         willSelectPopupButton.setSelected(true);
                     }
                     if (inputListener instanceof SoftKeyboardListener && !isFinishing()) {
-                        ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed();
+                        ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed(false);
                     }
                 }
             }
@@ -150,7 +150,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
             return;
         }
         if (inputListener instanceof SoftKeyboardListener) {
-            ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed();
+            ((SoftKeyboardListener) inputListener).onSoftKeyboardClosed(true);
         }
         if (inputView != null && lastInputText == null) {
             lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏
@@ -244,7 +244,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
         inputView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                if (actionId == EditorInfo.IME_ACTION_SEND || actionId == EditorInfo.IME_ACTION_DONE) {
                     postMsg();
                     return true;
                 }
@@ -428,7 +428,7 @@ public abstract class PLVInputWindow extends PLVBaseActivity {
     public interface SoftKeyboardListener extends InputListener{
         void onSoftKeyboardOpened(int keyboardHeightInPx);
 
-        void onSoftKeyboardClosed();
+        void onSoftKeyboardClosed(boolean isFinished);
     }
     // </editor-fold>
 }

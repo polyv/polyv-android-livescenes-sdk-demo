@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.previous.presenter;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -75,11 +76,11 @@ public class PLVPreviousPlaybackPresenter implements IPLVPreviousPlaybackContrac
     }
 
     @Override
-    public void changePlaybackVideoVid(String vid) {
+    public void changePlaybackVideoVid(String vid, String fileId) {
         if (vid == null) {
             return;
         }
-        mPlvPreviousData.getPlaybackVideoVidData().postValue(vid);
+        mPlvPreviousData.getPlaybackVideoVidData().postValue(new Pair<String, String>(vid, fileId));
         //更新当前往期视频的信息
         mPlvPreviousData.update(mPlaybackList, vid);
     }

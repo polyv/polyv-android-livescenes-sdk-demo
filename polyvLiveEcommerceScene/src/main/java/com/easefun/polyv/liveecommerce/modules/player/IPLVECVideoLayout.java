@@ -323,7 +323,7 @@ public interface IPLVECVideoLayout {
      *
      * @param vid
      */
-    void changePlaybackVidAndPlay(String vid);
+    void changePlaybackVidAndPlay(String vid, String fileId);
 
     /**
      * 获取sessionId

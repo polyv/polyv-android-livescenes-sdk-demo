@@ -35,6 +35,11 @@ public class PLVLiveChannelConfig {
     private String vid;
 
     /**
+     * 回放文件id
+     */
+    private String fileId;
+
+    /**
      * 回放视频所在的列表类型
      */
     private PLVPlaybackListType videoListType;
@@ -102,6 +107,7 @@ public class PLVLiveChannelConfig {
         user = new User(old.user);
         channelId = old.channelId;
         vid = old.vid;
+        fileId = old.fileId;
         videoListType = old.videoListType;
         isLive = old.isLive;
         channelType = old.channelType;
@@ -196,6 +202,13 @@ public class PLVLiveChannelConfig {
     }
 
     /**
+     * 配置fileId
+     */
+    public void setupFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    /**
      * 配置回放视频所在的列表的类型
      */
     public void setupVideoListType(PLVPlaybackListType videoListType) {
@@ -282,6 +295,10 @@ public class PLVLiveChannelConfig {
 
     public String getVid() {
         return vid;
+    }
+
+    public String getFileId() {
+        return fileId;
     }
 
     public PLVPlaybackListType getVideoListType() {

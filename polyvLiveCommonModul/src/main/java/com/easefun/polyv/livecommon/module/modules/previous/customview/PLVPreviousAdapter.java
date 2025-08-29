@@ -109,7 +109,7 @@ public abstract class PLVPreviousAdapter<Data extends PLVBaseViewData, Holder ex
      */
     public void callChangeVideoVidClick(View view, PLVPlaybackListVO.DataBean.ContentsBean bean, int position) {
         if (listener != null) {
-            listener.changeVideoVidClick(bean.getVideoPoolId());
+            listener.changeVideoVidClick(bean.getVideoPoolId(), bean.getFileId());
             int old = currentPosition;
             currentPosition = position;
             notifyItemChanged(old);
@@ -129,7 +129,7 @@ public abstract class PLVPreviousAdapter<Data extends PLVBaseViewData, Holder ex
     // <editor-fold defaultstate="collapsed" desc="点击事件">
 
     public interface OnViewActionListener {
-        void changeVideoVidClick(String vid);
+        void changeVideoVidClick(String vid, String fileId);
     }
 
     // </editor-fold>

@@ -180,6 +180,12 @@ public interface IPLVLiveRoomDataManager {
      * @param vid 回放视频的vid
      */
     public void setConfigVid(String vid);
+
+    /**
+     * 设置config里面的fileId
+     * @param fileId 回放视频的fileId
+     */
+    void setConfigFileId(String fileId);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

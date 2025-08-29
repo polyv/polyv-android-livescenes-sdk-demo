@@ -61,6 +61,18 @@
                         app:layout_flexBasisPercent="19%" />
 
                     <TextView
+                        android:id="@+id/change_speed_0_75"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/plvec_route_corner_bg_sel"
+                        android:gravity="center"
+                        android:text="0.75x"
+                        android:textColor="@color/plvec_route_fg"
+                        android:textSize="14sp"
+                        app:layout_flexBasisPercent="19%" />
+
+                    <TextView
                         android:id="@+id/change_speed_1"
                         android:layout_width="0dp"
                         android:layout_height="26dp"

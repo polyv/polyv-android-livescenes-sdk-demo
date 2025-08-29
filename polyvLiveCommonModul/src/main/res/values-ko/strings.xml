@@ -422,6 +422,10 @@
     <string name="plv_streamer_allow_viewer_linkmic_fail_toast">현재 네트워크 신호가 약해서 시작에 실패했습니다. 네트워크를 확인해주세요! </string>
     <string name="plv_streamer_toast_call_streamer_start">먼저 라이브 방송을 시작해주세요</string>
     <string name="plv_streamer_sticker">스티커</string>
+    <string name="plv_streamer_sticker_text">문자</string>
+    <string name="plv_streamer_sticker_image">휴대폰 앨범 이미지</string>
+    <string name="plv_streamer_sticker_finish">완료</string>
+    <string name="plv_streamer_sticker_text_select">텍스트 템플릿 선택</string>
     <string name="plv_streamer_virtual_background">가상 배경</string>
     <string name="plv_streamer_upload">사용자 정의</string>
     <string name="plv_streamer_blur_bg">배경 흐리게</string>

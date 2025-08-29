@@ -244,6 +244,10 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
         liveChannelConfig.setupVid(vid);
     }
 
+    @Override
+    public void setConfigFileId(String fileId) {
+        liveChannelConfig.setupFileId(fileId);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 3、http接口请求">

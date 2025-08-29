@@ -58,8 +58,8 @@ public class PLVLCPlaybackPreviousFragment extends PLVBaseFragment {
         PLVLCPreviousAdapter plvlcPreviousAdapter = new PLVLCPreviousAdapter();
         plvlcPreviousAdapter.setOnViewActionListener(new PLVPreviousAdapter.OnViewActionListener() {
             @Override
-            public void changeVideoVidClick(String vid) {
-                plvPreviousView.changePlaybackVideoVid(vid);
+            public void changeVideoVidClick(String vid, String fileId) {
+                plvPreviousView.changePlaybackVideoVid(vid, fileId);
             }
         });
         builder.setAdapter(plvlcPreviousAdapter)
