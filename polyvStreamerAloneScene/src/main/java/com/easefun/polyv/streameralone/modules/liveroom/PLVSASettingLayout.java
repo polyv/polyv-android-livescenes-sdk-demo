@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyVie
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
@@ -135,6 +136,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private LinearLayout settingLiveReplaySwitchLayout;
     private LinearLayout settingMoreLayout;
     private LinearLayout settingWaterLayout;
+    private LinearLayout settingMediaOverlayLayout;
     private ViewGroup settingLayout;
     private LinearLayout settingVirtualBgLayout;
 
@@ -218,6 +220,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingMoreLayout = findViewById(R.id.plvsa_setting_more_layout);
         settingMorePopupLayout = new PLVSASettingMoreLayout(this);
         settingWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
+        settingMediaOverlayLayout = findViewById(R.id.plvsa_setting_media_overlay_layout);
         settingLayout = findViewById(R.id.plvsa_setting_ly);
         settingVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_background_layout);
 
@@ -238,6 +241,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingLiveReplaySwitchLayout.setOnClickListener(this);
         settingMoreLayout.setOnClickListener(this);
         settingWaterLayout.setOnClickListener(this);
+        settingMediaOverlayLayout.setOnClickListener(this);
         settingVirtualBgLayout.setOnClickListener(this);
 
         initWaterLayout();
@@ -411,9 +415,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
             @Override
             public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
-                mixLayout.close();
                 if (onViewActionListener != null) {
                     onViewActionListener.onChangeMixLayoutType(mix);
+                }
+            }
+
+            @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return onViewActionListener != null ? onViewActionListener.getMixBackground() : PLVStreamerMixBackground.DEFAULT;
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onChangeMixBackground(mixBackground);
                 }
             }
         });
@@ -1031,6 +1046,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             settingMorePopupLayout.show();
         } else if (id == settingWaterLayout.getId()) {
             stickerLayout.open();
+        } else if (id == settingMediaOverlayLayout.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowMediaOverlaySetting();
+            }
         } else if (id == settingVirtualBgLayout.getId()) {
             if (virtualBackgroundLayout != null) {
                 virtualBackgroundLayout.show();

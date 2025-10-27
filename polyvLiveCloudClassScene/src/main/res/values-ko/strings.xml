@@ -22,4 +22,5 @@
     <string name="plvlc_playback_subtitle_translate">자막 번역</string>
     <string name="plvlc_playback_subtitle_original">어쿠스틱 자막</string>
     <string name="plvlc_playback_subtitle_title">자막 재생</string>
+    <string name="plvlc_cast_not_allow_when_linkmic">투사 중 연맥을 신청할 수 없습니다</string>
 </resources>

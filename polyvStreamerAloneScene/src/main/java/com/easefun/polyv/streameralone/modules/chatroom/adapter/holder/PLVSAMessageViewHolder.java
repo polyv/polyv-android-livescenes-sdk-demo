@@ -1,7 +1,9 @@
 package com.easefun.polyv.streameralone.modules.chatroom.adapter.holder;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.setOnLongClickListenerRecursively;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -26,6 +28,10 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatu
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.span.PLVRadiusBackgroundSpan;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVChatMessagePopupMenu;
+import com.easefun.polyv.livecommon.ui.widget.PLVChatMessagePopupMenuAction;
+import com.easefun.polyv.livecommon.ui.widget.PLVChatMessagePopupMenuActions;
+import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -37,8 +43,11 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.chatroom.adapter.PLVSAMessageAdapter;
 import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLengthMessageLayout;
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgTipsWindow;
+import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVUserAbility;
+import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
@@ -47,9 +56,13 @@ import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.history.PLVFileShareHistoryEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.List;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 
 /**
@@ -118,6 +131,13 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
 
         initView();
         addOnSendImgListener();
+        setOnLongClickListenerRecursively((ViewGroup) itemView, new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                onLongClickMessage();
+                return true;
+            }
+        });
     }
 
     public void recycle() {
@@ -132,56 +152,6 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 @Override
                 public void webLinkOnClick(String url) {
                     PLVWebUtils.openWebLink(url, chatMsgTv.getContext());
-                }
-            });
-
-            chatMsgTv.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    final boolean onlyShowCopyItem = prohibitedWordVO != null;//严禁词的信息不能回复
-                    // 是否允许评论上墙
-                    final boolean isPinMsgEnabled = adapter.callIsPinMsgEnabled() && !(messageData instanceof PLVFileShareHistoryEvent) && (messageData instanceof IPLVIdEvent);
-                    getFullMessage(new PLVSugarUtil.Consumer<CharSequence>() {
-                        @Override
-                        public void accept(final CharSequence fullMessage) {
-                            PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, onlyShowCopyItem, fullMessage.toString(), new PLVCopyBoardPopupWindow.CopyBoardClickListener() {
-                                @Override
-                                public void onClickAnswerButton() {
-                                    PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                                    chatQuoteVO.setUserId(userId);
-                                    chatQuoteVO.setNick(nickName);
-                                    chatQuoteVO.setContent(fullMessage.toString());
-                                    chatQuoteVO.setObjects(PLVTextFaceLoader.messageToSpan(PLVChatroomPresenter.convertSpecialString(chatQuoteVO.getContent()), ConvertUtils.dp2px(12), Utils.getApp()));
-                                    adapter.callOnShowAnswerWindow(chatQuoteVO, ((IPLVIdEvent) messageData).getId());
-                                }
-
-                                @Override
-                                public boolean onClickCopyButton() {
-                                    return false;
-                                }
-
-                                @Override
-                                public void onClickPinButton() {
-                                    if (messageData instanceof IPLVIdEvent) {
-                                        if (PLVSocketWrapper.getInstance().isOnlineStatus()) {
-                                            if (adapter.callIsStreamerStartSuccess()) {
-                                                PLVChatroomManager.getInstance().toTopMessage(((IPLVIdEvent) messageData).getId());
-                                            } else {
-                                                PLVToast.Builder.context(chatMsgTv.getContext())
-                                                        .setText(com.easefun.polyv.livecommon.R.string.plv_streamer_toast_call_streamer_start)
-                                                        .show();
-                                            }
-                                        } else {
-                                            PLVToast.Builder.context(chatMsgTv.getContext())
-                                                    .setText(com.easefun.polyv.livecommon.R.string.plv_common_toast_network_error)
-                                                    .show();
-                                        }
-                                    }
-                                }
-                            }, isPinMsgEnabled);
-                        }
-                    });
-                    return true;
                 }
             });
         }
@@ -222,24 +192,6 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     ((PLVSAMessageAdapter) adapter).callOnChatImgClick(getVHPosition(), v, chatImgUrl, false);
                 }
             });
-
-            imgMessageIv.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    showAndAnswerWithImg();
-                    return true;
-                }
-            });
-        }
-
-        if (chatNickTv != null) {
-            chatNickTv.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    showAndAnswerWithImg();
-                    return true;
-                }
-            });
         }
 
         if (quoteImgMessageIv != null) {
@@ -255,24 +207,151 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
     }
 
-    private void showAndAnswerWithImg() {
-        if (localImgStatus != PolyvSendLocalImgEvent.SENDSTATUS_SUCCESS) {
-            return;//图片发送成功后才可回复
-        }
-        PLVCopyBoardPopupWindow.showAndAnswer(itemView, true, null, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                chatQuoteVO.setUserId(userId);
-                chatQuoteVO.setNick(nickName);
-                PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
-                imageBean.setUrl(chatImgUrl);
-                imageBean.setWidth(chatImgWidth);
-                imageBean.setHeight(chatImgHeight);
-                chatQuoteVO.setImage(imageBean);
-                adapter.callOnShowAnswerWindow(chatQuoteVO, ((IPLVIdEvent) messageData).getId());
-            }
-        });
+    private void onLongClickMessage() {
+        final boolean isViewer = !PLVEventHelper.isSpecialType(userType);
+        final boolean isImageMessage = chatImgUrl != null;
+        final boolean isProhibited = prohibitedWordVO != null;
+        final boolean canCopy = !isImageMessage;
+        final boolean canReply = !isProhibited;
+        final boolean canPinMessage = adapter.callIsPinMsgEnabled()
+                && !isImageMessage
+                && !(messageData instanceof PLVFileShareHistoryEvent)
+                && (messageData instanceof IPLVIdEvent);
+        final boolean canBan = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_MEMBER_CONTROL_BAN) && isViewer;
+        final boolean canKick = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_MEMBER_CONTROL_KICK) && isViewer;
+
+        PLVChatMessagePopupMenu.show(itemView, new PLVChatMessagePopupMenuActions.Builder()
+                .setCopy(new PLVChatMessagePopupMenuAction(
+                        canCopy,
+                        new Function1<PLVChatMessagePopupMenu, Unit>() {
+                            @Override
+                            public Unit invoke(final PLVChatMessagePopupMenu chatMessagePopupMenu) {
+                                chatMessagePopupMenu.hide();
+                                getFullMessage(new PLVSugarUtil.Consumer<CharSequence>() {
+                                    @Override
+                                    public void accept(CharSequence fullMessage) {
+                                        PLVChatMessagePopupMenuAction.copy(chatMessagePopupMenu.getAnchor().getContext(), fullMessage);
+                                        ToastUtils.showLong(R.string.plv_chat_copy_success);
+                                    }
+                                });
+                                return null;
+                            }
+                        }
+                ))
+                .setReply(new PLVChatMessagePopupMenuAction(
+                        canReply,
+                        new Function1<PLVChatMessagePopupMenu, Unit>() {
+                            @Override
+                            public Unit invoke(PLVChatMessagePopupMenu chatMessagePopupMenu) {
+                                chatMessagePopupMenu.hide();
+                                if (isImageMessage) {
+                                    PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
+                                    chatQuoteVO.setUserId(userId);
+                                    chatQuoteVO.setNick(nickName);
+                                    PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
+                                    imageBean.setUrl(chatImgUrl);
+                                    imageBean.setWidth(chatImgWidth);
+                                    imageBean.setHeight(chatImgHeight);
+                                    chatQuoteVO.setImage(imageBean);
+                                    adapter.callOnShowAnswerWindow(chatQuoteVO, ((IPLVIdEvent) messageData).getId());
+                                } else {
+                                    getFullMessage(new PLVSugarUtil.Consumer<CharSequence>() {
+                                        @Override
+                                        public void accept(CharSequence fullMessage) {
+                                            PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
+                                            chatQuoteVO.setUserId(userId);
+                                            chatQuoteVO.setNick(nickName);
+                                            chatQuoteVO.setContent(fullMessage.toString());
+                                            chatQuoteVO.setObjects(PLVTextFaceLoader.messageToSpan(PLVChatroomPresenter.convertSpecialString(chatQuoteVO.getContent()), ConvertUtils.dp2px(12), Utils.getApp()));
+                                            adapter.callOnShowAnswerWindow(chatQuoteVO, ((IPLVIdEvent) messageData).getId());
+                                        }
+                                    });
+                                }
+                                return null;
+                            }
+                        }
+                ))
+                .setPin(new PLVChatMessagePopupMenuAction(
+                        canPinMessage,
+                        new Function1<PLVChatMessagePopupMenu, Unit>() {
+                            @Override
+                            public Unit invoke(PLVChatMessagePopupMenu chatMessagePopupMenu) {
+                                chatMessagePopupMenu.hide();
+                                if (messageData instanceof IPLVIdEvent) {
+                                    if (PLVSocketWrapper.getInstance().isOnlineStatus()) {
+                                        if (adapter.callIsStreamerStartSuccess()) {
+                                            PLVChatroomManager.getInstance().toTopMessage(((IPLVIdEvent) messageData).getId());
+                                        } else {
+                                            PLVToast.Builder.context(chatMsgTv.getContext())
+                                                    .setText(com.easefun.polyv.livecommon.R.string.plv_streamer_toast_call_streamer_start)
+                                                    .show();
+                                        }
+                                    } else {
+                                        PLVToast.Builder.context(chatMsgTv.getContext())
+                                                .setText(com.easefun.polyv.livecommon.R.string.plv_common_toast_network_error)
+                                                .show();
+                                    }
+                                }
+                                return null;
+                            }
+                        }
+                ))
+                .setBan(new PLVChatMessagePopupMenuAction(
+                        canBan,
+                        new Function1<PLVChatMessagePopupMenu, Unit>() {
+                            @Override
+                            public Unit invoke(PLVChatMessagePopupMenu chatMessagePopupMenu) {
+                                chatMessagePopupMenu.hide();
+                                String toastMsg = "";
+                                int sendResult = PLVChatroomManager.getInstance().shield(userId);
+                                if (sendResult > 0) {
+                                    toastMsg = PLVAppUtils.getString(R.string.plv_chat_ban_success);
+                                } else {
+                                    toastMsg = PLVAppUtils.getString(R.string.plv_chat_ban_fail) + "(" + sendResult + ")";
+                                }
+                                PLVToast.Builder.context(itemView.getContext())
+                                        .setText(toastMsg)
+                                        .build()
+                                        .show();
+                                return null;
+                            }
+                        }
+                ))
+                .setKick(new PLVChatMessagePopupMenuAction(
+                        canKick,
+                        new Function1<PLVChatMessagePopupMenu, Unit>() {
+                            @Override
+                            public Unit invoke(PLVChatMessagePopupMenu chatMessagePopupMenu) {
+                                chatMessagePopupMenu.hide();
+                                new PLVSAConfirmDialog(chatMessagePopupMenu.getAnchor().getContext())
+                                        .setTitle(PLVAppUtils.formatString(R.string.plv_chat_confirm_kick, nickName))
+                                        .setContent(R.string.plv_chat_kick_hint)
+                                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                                        .setRightButtonText(R.string.plv_common_dialog_confirm_2)
+                                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, View v) {
+                                                dialog.dismiss();
+                                                String toastMsg = "";
+                                                int sendResult = PLVChatroomManager.getInstance().kick(userId);
+                                                if (sendResult > 0) {
+                                                    toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_success);
+                                                } else {
+                                                    toastMsg = PLVAppUtils.getString(R.string.plv_chat_kick_fail) + "(" + sendResult + ")";
+                                                }
+                                                PLVToast.Builder.context(itemView.getContext())
+                                                        .setText(toastMsg)
+                                                        .build()
+                                                        .show();
+                                            }
+                                        })
+                                        .show();
+                                return null;
+                            }
+                        }
+                ))
+                .build()
+        );
     }
 
     private void addOnSendImgListener() {

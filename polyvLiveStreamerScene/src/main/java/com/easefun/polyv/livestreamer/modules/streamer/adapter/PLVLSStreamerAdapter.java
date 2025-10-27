@@ -23,6 +23,7 @@ import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerVie
 import com.easefun.polyv.livestreamer.modules.streamer.widget.PLVLSLinkMicDurationLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 
@@ -115,7 +116,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         }
         nickString.append(nick);
         if (myLinkMicId.equals(linkMicId)) {
-            nickString.append(R.string.plv_chat_me);
+            nickString.append(PLVAppUtils.getString(R.string.plv_chat_me));
         }
         holder.plvlsStreamerNickTv.setText(nickString.toString());
 

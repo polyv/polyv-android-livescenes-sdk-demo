@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.scenes.PLVLCCloudClassActivity;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
+import com.easefun.polyv.livecommon.module.modules.cast.manager.PLVCastBusinessManager;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
 import com.easefun.polyv.livecommon.module.modules.player.playback.di.PLVPlaybackCacheModule;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.config.PLVPlaybackCacheConfig;
@@ -38,6 +39,7 @@ import com.easefun.polyv.liveecommerce.scenes.PLVECLiveEcommerceActivity;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
@@ -428,6 +430,12 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
             public void onLoginSuccess(PLVLiveLoginResult plvLiveLoginResult) {
                 loginProgressDialog.dismiss();
                 PLVLiveChannelConfigFiller.setupAccount(userId, appId, appSecret);
+
+                // 投屏初始化
+                if (plvLiveLoginResult.isProjectionScreenEnabled()) {
+                    PLVCastBusinessManager.getInstance().init(PLVAppUtils.getApp());
+                }
+
                 PLVLiveChannelType channelType = plvLiveLoginResult.getChannelTypeNew();
                 String langType = plvLiveLoginResult.getLangType();
                 switch (curScene) {

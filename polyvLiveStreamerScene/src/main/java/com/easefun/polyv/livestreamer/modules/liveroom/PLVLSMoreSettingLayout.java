@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyVie
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
@@ -212,9 +213,26 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         }
         moreSettingMixLayout.setOnViewActionListener(new PLVLSMixLayout.OnViewActionListener() {
             @Override
+            public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
+                return onViewActionListener != null ? onViewActionListener.getMixLayoutType() : PLVStreamerConfig.MixLayoutType.SPEAKER;
+            }
+
+            @Override
             public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 if (PLVLSMoreSettingLayout.this.onViewActionListener != null) {
                     PLVLSMoreSettingLayout.this.onViewActionListener.onChangeMixLayoutType(mix);
+                }
+            }
+
+            @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return onViewActionListener != null ? onViewActionListener.getMixBackground() : PLVStreamerMixBackground.DEFAULT;
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                if (PLVLSMoreSettingLayout.this.onViewActionListener != null) {
+                    PLVLSMoreSettingLayout.this.onViewActionListener.onChangeMixBackground(mixBackground);
                 }
             }
         });
@@ -466,7 +484,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             moreSettingBitrateLayout.updateData(onViewActionListener.getBitrateInfo().first, onViewActionListener.getBitrateInfo().second);
         }
         if (onViewActionListener != null) {
-            moreSettingMixLayout.updateData(onViewActionListener.getMixLayoutType());
+            moreSettingMixLayout.updateSelectedState();
         }
         showLayout(moreSettingSelectLayout);
 
@@ -656,6 +674,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         PLVStreamerConfig.MixLayoutType getMixLayoutType();
 
         void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
+
+        PLVStreamerMixBackground getMixBackground();
+
+        void onChangeMixBackground(PLVStreamerMixBackground mixBackground);
 
         boolean isCurrentLocalVideoEnable();
 

@@ -287,6 +287,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                 if (onPLVLinkMicLayoutListener != null) {
                     onPLVLinkMicLayoutListener.onRequestJoinLinkMic();
                 }
+                liveRoomDataManager.getLinkMicStartData().postValue(true);
             }
 
             @Override
@@ -299,6 +300,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                         onPLVLinkMicLayoutListener.onCancelRequestJoinLinkMic();
                     }
                 }
+                liveRoomDataManager.getLinkMicStartData().postValue(false);
             }
 
             @Override
@@ -345,6 +347,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         updatePushResolution(curIsLandscape);
         observeOnAudioState(liveRoomDataManager);
         observeLinkMicQueueOrder();
+        observeCastData();
     }
 
     @Override
@@ -766,6 +769,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             onPLVLinkMicLayoutListener.onJoinLinkMic();
         }
         tryShowOrHideLandscapeRTCLayout(true);
+        liveRoomDataManager.getLinkMicStartData().postValue(true);
     }
 
     @Override
@@ -777,6 +781,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onLeaveLinkMic();
         }
+        liveRoomDataManager.getLinkMicStartData().postValue(false);
     }
 
     @Override
@@ -1273,4 +1278,22 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         });
     }
     // </editor-fold >
+
+
+    // <editor-fold defaultstate="collapsed" desc="订阅数据 - 投屏状态">
+    private void observeCastData() {
+        liveRoomDataManager.getCastStartData().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if (aBoolean == null) {
+                    aBoolean = false;
+                }
+                if (linkMicControlBar != null) {
+                    linkMicControlBar.setRequestLinkMicEnable(!aBoolean);
+                }
+            }
+        });
+    }
+    // </editor-fold >
+
 }

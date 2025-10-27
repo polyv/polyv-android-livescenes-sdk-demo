@@ -25,6 +25,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
@@ -265,6 +266,16 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     @Override
     public void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout) {
         streamerPresenter.setMixLayoutType(mixLayout);
+    }
+
+    @Override
+    public PLVStreamerMixBackground getMixBackground() {
+        return streamerPresenter.getMixBackground();
+    }
+
+    @Override
+    public void setMixBackground(PLVStreamerMixBackground mixBackground) {
+        streamerPresenter.setMixBackground(mixBackground);
     }
 
     @Override

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plvls_setting_mix_background_item_root"
+    android:layout_width="52dp"
+    android:layout_height="56dp"
+    app:plv_check_icon_height="16dp"
+    app:plv_check_icon_width="14dp"
+    app:plv_radius="4dp">
+
+    <ImageView
+        android:id="@+id/plvls_setting_mix_background_item_iv"
+        android:layout_width="44dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="4dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvls_setting_mix_background_item_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#99FFFFFF"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvls_setting_mix_background_item_iv"
+        tools:text="@string/plv_streamer_mix_background_image_black" />
+
+</com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView>

@@ -190,4 +190,10 @@
         app:autoPlay="true"
         app:source="posche.svga" />
 
+    <com.easefun.polyv.livecommon.module.modules.cast.PLVScreencastLayout
+        android:id="@+id/plvlc_screencast_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </merge>

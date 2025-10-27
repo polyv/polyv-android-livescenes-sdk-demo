@@ -55,6 +55,10 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVWebviewUpdateAppStatusVO> interactStatusData = new MutableLiveData<>();
     //互动应用入口状态
     private MutableLiveData<List<PLVCallAppEvent.ValueBean.DataBean>> interactEntranceData = new MutableLiveData<>();
+    //是否开始投屏（投屏后将无法连麦）
+    private MutableLiveData<Boolean> isStartCast = new MutableLiveData<>();
+    //是否正在连麦
+    private MutableLiveData<Boolean> isLinkMicStart = new MutableLiveData<>();
     //有状态的课节详情数据
     private MutableLiveData<PLVStatefulData<PLVHiClassDataBean>> fulClassDataBean = new MutableLiveData<>();
     //课节详情数据
@@ -122,6 +126,16 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<Boolean>> getPointRewardEnableData() {
         return pointRewardEnableData;
+    }
+
+    @Override
+    public MutableLiveData<Boolean> getCastStartData() {
+        return isStartCast;
+    }
+
+    @Override
+    public MutableLiveData<Boolean> getLinkMicStartData() {
+        return isLinkMicStart;
     }
 
     @Override

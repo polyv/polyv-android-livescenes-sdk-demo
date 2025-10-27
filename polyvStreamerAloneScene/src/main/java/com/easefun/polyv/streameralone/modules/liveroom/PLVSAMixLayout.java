@@ -1,50 +1,49 @@
 package com.easefun.polyv.streameralone.modules.liveroom;
 
+import static com.plv.foundationsdk.ext.PLVViewGroupExt.children;
+
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
+import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerPreferenceCardView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.streameralone.R;
-import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 /**
  * 混流布局设置布局
  */
-public class PLVSAMixLayout extends FrameLayout {
+public class PLVSAMixLayout extends FrameLayout implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
 
-    // 混流布局表格每行显示数量
-    private static final int MIX_LAYOUT_SPAN_PORT = 3;
-    private static final int MIX_LAYOUT_SPAN_LAND = 1;
     // 混流布局弹层布局位置
     private static final Position MENU_DRAWER_POSITION_PORT = Position.BOTTOM;
     private static final Position MENU_DRAWER_POSITION_LAND = Position.END;
     // 混流布局宽度、高度、布局位置
     private static final int MIX_LAYOUT_WIDTH_PORT = ViewGroup.LayoutParams.MATCH_PARENT;
-    private static final int MIX_LAYOUT_WIDTH_LAND = ConvertUtils.dp2px(214);
-    private static final int MIX_LAYOUT_HEIGHT_PORT = ConvertUtils.dp2px(214);
+    private static final int MIX_LAYOUT_WIDTH_LAND = ConvertUtils.dp2px(375);
+    private static final int MIX_LAYOUT_HEIGHT_PORT = ConvertUtils.dp2px(462);
     private static final int MIX_LAYOUT_HEIGHT_LAND = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int MIX_LAYOUT_GRAVITY_PORT = Gravity.BOTTOM;
     private static final int MIX_LAYOUT_GRAVITY_LAND = Gravity.END;
@@ -56,14 +55,16 @@ public class PLVSAMixLayout extends FrameLayout {
     private PLVMenuDrawer menuDrawer;
 
     //view
-    private RelativeLayout plvsaSettingMixLayoutRoot;
-    private TextView plvsaSettingMixTv;
-    private RecyclerView plvsaSettingMixRv;
-
-    //adapter
-    private MixAdapter mixAdapter;
-    // Layout Manager
-    private GridLayoutManager mixLayoutManager;
+    private ConstraintLayout settingMixLayoutRoot;
+    private TextView settingMixTitle;
+    private TextView settingMixDesc;
+    private PLVStreamerPreferenceCardView settingMixSpeakerCard;
+    private PLVStreamerPreferenceCardView settingMixTileCard;
+    private PLVStreamerPreferenceCardView settingMixSingleCard;
+    private PLVStreamerPreferenceCardView settingMixListRightCard;
+    private PLVStreamerPreferenceCardView settingMixListBottomCard;
+    private TextView settingMixBackgroundTitle;
+    private LinearLayout settingMixBackgroundContainer;
 
     private String channelId;
 
@@ -91,14 +92,33 @@ public class PLVSAMixLayout extends FrameLayout {
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_setting_mix_layout, this, true);
 
-        plvsaSettingMixLayoutRoot = findViewById(R.id.plvsa_setting_mix_layout_root);
-        plvsaSettingMixTv = findViewById(R.id.plvsa_setting_mix_tv);
-        plvsaSettingMixRv = findViewById(R.id.plvsa_setting_mix_rv);
+        settingMixLayoutRoot = findViewById(R.id.plvsa_setting_mix_layout_root);
+        settingMixTitle = findViewById(R.id.plvsa_setting_mix_title);
+        settingMixDesc = findViewById(R.id.plvsa_setting_mix_desc);
+        settingMixSpeakerCard = findViewById(R.id.plvsa_setting_mix_speaker_card);
+        settingMixTileCard = findViewById(R.id.plvsa_setting_mix_tile_card);
+        settingMixSingleCard = findViewById(R.id.plvsa_setting_mix_single_card);
+        settingMixListRightCard = findViewById(R.id.plvsa_setting_mix_list_right_card);
+        settingMixListBottomCard = findViewById(R.id.plvsa_setting_mix_list_bottom_card);
+        settingMixBackgroundTitle = findViewById(R.id.plvsa_setting_mix_background_title);
+        settingMixBackgroundContainer = findViewById(R.id.plvsa_setting_mix_background_container);
 
-        mixAdapter = new MixAdapter();
-        mixLayoutManager = new GridLayoutManager(getContext(), 3);
-        plvsaSettingMixRv.setLayoutManager(mixLayoutManager);
-        plvsaSettingMixRv.setAdapter(mixAdapter);
+        settingMixSpeakerCard.setOnClickListener(this);
+        settingMixTileCard.setOnClickListener(this);
+        settingMixSingleCard.setOnClickListener(this);
+        settingMixListRightCard.setOnClickListener(this);
+        settingMixListBottomCard.setOnClickListener(this);
+
+        initMixBackgroundItems();
+    }
+
+    private void initMixBackgroundItems() {
+        for (PLVStreamerMixBackground mixBackground : PLVStreamerMixBackground.values()) {
+            final MixBackgroundItemLayout itemLayout = new MixBackgroundItemLayout(getContext());
+            itemLayout.setMixBackground(mixBackground);
+            itemLayout.setOnClickListener(this);
+            settingMixBackgroundContainer.addView(itemLayout);
+        }
     }
     // </editor-fold>
 
@@ -109,9 +129,7 @@ public class PLVSAMixLayout extends FrameLayout {
 
     public void open() {
         // 更新混流布局数据
-        if (onViewActionListener != null) {
-            mixAdapter.updateData(onViewActionListener.getMixLayoutType());
-        }
+        updateSelectedState();
         updateViewWithOrientation();
 
         if (menuDrawer == null) {
@@ -153,11 +171,12 @@ public class PLVSAMixLayout extends FrameLayout {
                     }
                 }
             });
-            menuDrawer.openMenu();
         } else {
             menuDrawer.attachToContainer();
-            menuDrawer.openMenu();
         }
+        menuDrawer.setMenuSize(ScreenUtils.isPortrait() ? MIX_LAYOUT_HEIGHT_PORT : MIX_LAYOUT_WIDTH_LAND);
+        menuDrawer.setPosition(ScreenUtils.isPortrait() ? MENU_DRAWER_POSITION_PORT : MENU_DRAWER_POSITION_LAND);
+        menuDrawer.openMenu();
     }
 
     public void close() {
@@ -183,129 +202,145 @@ public class PLVSAMixLayout extends FrameLayout {
         }
         return false;
     }
+
+    private void updateSelectedState() {
+        if (onViewActionListener == null) {
+            return;
+        }
+        final PLVStreamerConfig.MixLayoutType currentMixLayoutType = onViewActionListener.getMixLayoutType();
+        settingMixSpeakerCard.setSelected(currentMixLayoutType == PLVStreamerConfig.MixLayoutType.SPEAKER);
+        settingMixTileCard.setSelected(currentMixLayoutType == PLVStreamerConfig.MixLayoutType.TILE);
+        settingMixSingleCard.setSelected(currentMixLayoutType == PLVStreamerConfig.MixLayoutType.SINGLE);
+        settingMixListRightCard.setSelected(currentMixLayoutType == PLVStreamerConfig.MixLayoutType.SPEAKER_LIST_RIGHT);
+        settingMixListBottomCard.setSelected(currentMixLayoutType == PLVStreamerConfig.MixLayoutType.SPEAKER_LIST_BOTTOM);
+        final PLVStreamerMixBackground currentMixBackground = onViewActionListener.getMixBackground();
+        for (View mixBackgroundItem : children(settingMixBackgroundContainer)) {
+            if (mixBackgroundItem instanceof MixBackgroundItemLayout) {
+                ((MixBackgroundItemLayout) mixBackgroundItem).onCurrentSelectedMixBackground(currentMixBackground);
+            }
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="屏幕旋转">
 
     private void updateViewWithOrientation() {
-        Position menuDrawerPosition;
-        LayoutParams mixLayoutParam = (LayoutParams) plvsaSettingMixLayoutRoot.getLayoutParams();
+        LayoutParams mixLayoutParam = (LayoutParams) settingMixLayoutRoot.getLayoutParams();
 
-        if (PLVScreenUtils.isPortrait(getContext())) {
+        if (ScreenUtils.isPortrait()) {
             mixLayoutParam.width = MIX_LAYOUT_WIDTH_PORT;
             mixLayoutParam.height = MIX_LAYOUT_HEIGHT_PORT;
             mixLayoutParam.gravity = MIX_LAYOUT_GRAVITY_PORT;
-            mixLayoutManager.setSpanCount(MIX_LAYOUT_SPAN_PORT);
-            plvsaSettingMixLayoutRoot.setBackgroundResource(MIX_LAYOUT_BACKGROUND_RES_PORT);
-            menuDrawerPosition = MENU_DRAWER_POSITION_PORT;
+            settingMixLayoutRoot.setBackgroundResource(MIX_LAYOUT_BACKGROUND_RES_PORT);
         } else {
             mixLayoutParam.width = MIX_LAYOUT_WIDTH_LAND;
             mixLayoutParam.height = MIX_LAYOUT_HEIGHT_LAND;
             mixLayoutParam.gravity = MIX_LAYOUT_GRAVITY_LAND;
-            mixLayoutManager.setSpanCount(MIX_LAYOUT_SPAN_LAND);
-            plvsaSettingMixLayoutRoot.setBackgroundResource(MIX_LAYOUT_BACKGROUND_RES_LAND);
-            menuDrawerPosition = MENU_DRAWER_POSITION_LAND;
+            settingMixLayoutRoot.setBackgroundResource(MIX_LAYOUT_BACKGROUND_RES_LAND);
         }
 
-        plvsaSettingMixLayoutRoot.setLayoutParams(mixLayoutParam);
-        if (menuDrawer != null) {
-            menuDrawer.setPosition(menuDrawerPosition);
-        }
+        settingMixLayoutRoot.setLayoutParams(mixLayoutParam);
     }
 
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="内部类 - 混流布局适配器">
-    private class MixAdapter extends RecyclerView.Adapter<MixAdapter.MixViewHolder> {
-        private final LinkedHashMap<PLVStreamerConfig.MixLayoutType, String> MIX_LAYOUT_TYPE_MAP = new LinkedHashMap<PLVStreamerConfig.MixLayoutType, String>() {
-            {
-                put(PLVStreamerConfig.MixLayoutType.SPEAKER, PLVAppUtils.getString(R.string.plv_streamer_mix_type_speaker));
-                put(PLVStreamerConfig.MixLayoutType.TILE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_tile));
-                put(PLVStreamerConfig.MixLayoutType.SINGLE, PLVAppUtils.getString(R.string.plv_streamer_mix_type_single));
-            }
-        };
-        private int selPosition;
+    @Override
+    public void onClick(View v) {
+        final int id = v.getId();
+        if (id == settingMixSpeakerCard.getId()) {
+            changeMixLayoutType(PLVStreamerConfig.MixLayoutType.SPEAKER);
+        } else if (id == settingMixTileCard.getId()) {
+            changeMixLayoutType(PLVStreamerConfig.MixLayoutType.TILE);
+        } else if (id == settingMixSingleCard.getId()) {
+            changeMixLayoutType(PLVStreamerConfig.MixLayoutType.SINGLE);
+        } else if (id == settingMixListRightCard.getId()) {
+            changeMixLayoutType(PLVStreamerConfig.MixLayoutType.SPEAKER_LIST_RIGHT);
+        } else if (id == settingMixListBottomCard.getId()) {
+            changeMixLayoutType(PLVStreamerConfig.MixLayoutType.SPEAKER_LIST_BOTTOM);
+        } else if (v instanceof MixBackgroundItemLayout) {
+            changeMixBackground(((MixBackgroundItemLayout) v).getMixBackground());
+        }
+    }
 
-        @NonNull
-        @Override
-        public MixViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new MixViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.plvsa_live_room_setting_mix_item, parent, false));
+    private void changeMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayoutType) {
+        if (!PLVNetworkUtils.isConnected(getContext())) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_network_bad)
+                    .build()
+                    .show();
+            return;
+        }
+        if (onViewActionListener == null) {
+            return;
+        }
+        final PLVStreamerConfig.MixLayoutType currentMixLayoutType = onViewActionListener.getMixLayoutType();
+        if (currentMixLayoutType != mixLayoutType) {
+            onViewActionListener.onChangeMixLayoutType(mixLayoutType);
+            updateSelectedState();
+        }
+    }
+
+    private void changeMixBackground(PLVStreamerMixBackground mixBackground) {
+        if (!PLVNetworkUtils.isConnected(getContext())) {
+            PLVToast.Builder.context(getContext())
+                    .setText(R.string.plv_streamer_network_bad)
+                    .build()
+                    .show();
+            return;
+        }
+        if (onViewActionListener == null) {
+            return;
+        }
+        final PLVStreamerMixBackground currentMixBackground = onViewActionListener.getMixBackground();
+        if (currentMixBackground != mixBackground) {
+            onViewActionListener.onChangeMixBackground(mixBackground);
+            updateSelectedState();
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="内部类 - 连麦背景item">
+    public class MixBackgroundItemLayout extends FrameLayout {
+        private PLVStreamerPreferenceCardView settingMixBackgroundItemRoot;
+        private ImageView settingMixBackgroundItemIv;
+        private TextView settingMixBackgroundItemTv;
+
+        private PLVStreamerMixBackground mixBackground;
+
+        public MixBackgroundItemLayout(Context context) {
+            super(context);
+            init();
         }
 
-        @Override
-        public void onBindViewHolder(@NonNull final MixViewHolder holder, int position) {
-            holder.plvsaMixTv.setText(getMixValueByPos(position));
-            holder.plvsaMixParentLy.setSelected(position == selPosition);
-            holder.itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (holder.getAdapterPosition() == selPosition) {
-                        return;
-                    }
-                    if (!PLVNetworkUtils.isConnected(getContext())) {
-                        PLVToast.Builder.context(getContext())
-                                .setText(R.string.plv_streamer_network_bad)
-                                .build()
-                                .show();
-                        return;
-                    }
-                    selPosition = holder.getAdapterPosition();
-                    if (onViewActionListener != null) {
-                        onViewActionListener.onChangeMixLayoutType(getMixKeyByPos(selPosition));
-                    }
-                    notifyDataSetChanged();
-                }
-            });
+        public MixBackgroundItemLayout(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            init();
         }
 
-        @Override
-        public int getItemCount() {
-            return MIX_LAYOUT_TYPE_MAP.size();
+        public MixBackgroundItemLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+            init();
         }
 
-        public void updateData(PLVStreamerConfig.MixLayoutType selMix) {
-            int index = 0;
-            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
-                if (entry.getKey() == selMix) {
-                    this.selPosition = index;
-                    break;
-                }
-                index++;
-            }
-            notifyDataSetChanged();
+        private void init() {
+            LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_setting_mix_background_item, this);
+            settingMixBackgroundItemRoot = findViewById(R.id.plvsa_setting_mix_background_item_root);
+            settingMixBackgroundItemIv = findViewById(R.id.plvsa_setting_mix_background_item_iv);
+            settingMixBackgroundItemTv = findViewById(R.id.plvsa_setting_mix_background_item_tv);
         }
 
-        private String getMixValueByPos(int pos) {
-            int index = 0;
-            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
-                if (index == pos) {
-                    return entry.getValue();
-                }
-                index++;
-            }
-            return "";
+        public void setMixBackground(PLVStreamerMixBackground mixBackground) {
+            this.mixBackground = mixBackground;
+            settingMixBackgroundItemTv.setText(mixBackground.getDisplayName());
+            PLVImageLoader.getInstance().loadImage(mixBackground.getUrl(), settingMixBackgroundItemIv);
         }
 
-        private PLVStreamerConfig.MixLayoutType getMixKeyByPos(int pos) {
-            int index = 0;
-            for (Map.Entry<PLVStreamerConfig.MixLayoutType, String> entry : MIX_LAYOUT_TYPE_MAP.entrySet()) {
-                if (index == pos) {
-                    return entry.getKey();
-                }
-                index++;
-            }
-            return PLVStreamerConfig.MixLayoutType.TILE;
+        public PLVStreamerMixBackground getMixBackground() {
+            return mixBackground;
         }
 
-        class MixViewHolder extends RecyclerView.ViewHolder {
-            private ViewGroup plvsaMixParentLy;
-            private TextView plvsaMixTv;
-
-            MixViewHolder(View itemView) {
-                super(itemView);
-                plvsaMixParentLy = itemView.findViewById(R.id.plvsa_mix_parent_ly);
-                plvsaMixTv = itemView.findViewById(R.id.plvsa_mix_tv);
-            }
+        public void onCurrentSelectedMixBackground(PLVStreamerMixBackground mixBackground) {
+            boolean selected = mixBackground == this.mixBackground;
+            settingMixBackgroundItemRoot.setSelected(selected);
         }
     }
     // </editor-fold>
@@ -313,8 +348,11 @@ public class PLVSAMixLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
     public interface OnViewActionListener {
         PLVStreamerConfig.MixLayoutType getMixLayoutType();
-
         void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
+
+        PLVStreamerMixBackground getMixBackground();
+
+        void onChangeMixBackground(PLVStreamerMixBackground mixBackground);
     }
     // </editor-fold>
 }

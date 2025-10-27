@@ -223,6 +223,14 @@ public interface IPLVLCMediaLayout {
     boolean onBackPressed();
 
     /**
+     * 是否拦截按键事件
+     *
+     * @param keyCode 事件code
+     * @return true：拦截，false：不拦截
+     */
+    boolean onKeyDown(int keyCode);
+
+    /**
      * 销毁，销毁播放器及相关资源
      */
     void destroy();

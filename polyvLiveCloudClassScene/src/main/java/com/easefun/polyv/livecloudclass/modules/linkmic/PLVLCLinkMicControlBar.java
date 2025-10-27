@@ -118,6 +118,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private boolean isPortrait;
     private boolean isAudioState = false;
     private boolean isTeacherOpenLinkMic = false;
+    //是否允许连麦
+    private boolean isRequestLinkMicEnable = true;
 
     //Listener
     private OnPLCLinkMicControlBarListener onPLCLinkMicControlBarListener;
@@ -454,6 +456,12 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         PLVCommonLog.d(TAG, "hide");
         setVisibility(INVISIBLE);
     }
+
+    @Override
+    public void setRequestLinkMicEnable(boolean isEnabled) {
+        isRequestLinkMicEnable = isEnabled;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="动画">
@@ -614,6 +622,11 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             public void onClickRingUp() {
                 if (!PLVNetworkUtils.isConnected(getContext())) {
                     PLVCommonLog.w(TAG, "net work not available");
+                    return;
+                }
+                if (!isRequestLinkMicEnable) {
+                    PLVCommonLog.w(TAG, "you are casting can not request link mic");
+                    Toast.makeText(getContext(), R.string.plvlc_cast_not_allow_when_linkmic, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (toastWhenFloatingPlayerShowing()) {

@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentV
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVSipLinkMicViewModel;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingInListState;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.vo.PLVSipLinkMicCallingOutListState;
@@ -303,6 +304,16 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             @Override
             public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 onViewActionListener.onChangeMixLayoutType(mix);
+            }
+
+            @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return onViewActionListener.getMixBackground();
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                onViewActionListener.onChangeMixBackground(mixBackground);
             }
 
             @Override

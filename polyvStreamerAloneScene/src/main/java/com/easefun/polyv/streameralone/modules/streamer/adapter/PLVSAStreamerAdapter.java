@@ -27,6 +27,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberControlLayout;
 import com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerMemberControlTipsLayout;
+import com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayContainer;
 import com.easefun.polyv.streameralone.modules.streamer.widget.PLVSALinkMicDurationLayout;
 import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -35,6 +36,8 @@ import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import net.polyv.android.common.libs.lang.ui.ViewsKt;
 
 import java.util.List;
 
@@ -240,6 +243,10 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 && !itemDataBean.isTeacher();
         if (showLinkMicDuration && holder.streamerLinkmicDurationLayout != null) {
             holder.streamerLinkmicDurationLayout.start(itemDataBean);
+        }
+
+        if (isMe) {
+            holder.bindMediaOverlayLayout(adapterCallback.getMediaOverlayContainer());
         }
     }
 
@@ -782,6 +789,10 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         if (showLinkMicDuration && holder.streamerLinkmicDurationLayout != null) {
             holder.streamerLinkmicDurationLayout.start(itemDataBean);
         }
+
+        if (isMe) {
+            holder.bindMediaOverlayLayout(adapterCallback.getMediaOverlayContainer());
+        }
     }
 
     private List<PLVLinkMicItemDataBean> getFilteredDataList() {
@@ -857,6 +868,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
         private ImageView plvsaStreamerGrantSpeakerIv;
         @Nullable
         private PLVSALinkMicDurationLayout streamerLinkmicDurationLayout;
+        private FrameLayout streamerMediaOverlayContainer;
 
         private String lastBindVideoLinkMicId = null;
 
@@ -875,6 +887,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
             streamerScreenShareStopTv = itemView.findViewById(R.id.plvsa_streamer_screen_share_stop_tv);
             plvsaStreamerGrantSpeakerIv = itemView.findViewById(R.id.plvsa_streamer_grant_speaker_iv);
             streamerLinkmicDurationLayout = itemView.findViewById(R.id.plvsa_streamer_linkmic_duration_layout);
+            streamerMediaOverlayContainer = itemView.findViewById(R.id.plvsa_streamer_media_overlay_container);
 
             if (plvsaStreamerRoundRectLy != null) {
                 plvsaStreamerRoundRectLy.setOnOrientationChangedListener(new PLVRoundRectLayout.OnOrientationChangedListener() {
@@ -885,9 +898,20 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                             lp.dimensionRatio = "H,2:3";
                         } else {
                             lp.dimensionRatio = "H,3:2";
-
                         }
                         plvsaStreamerRoundRectLy.requestLayout();
+
+                        ConstraintLayout.LayoutParams mediaOverlayContainerLayoutParams = (ConstraintLayout.LayoutParams) streamerMediaOverlayContainer.getLayoutParams();
+                        if (isPortrait) {
+                            mediaOverlayContainerLayoutParams.width = 0;
+                            mediaOverlayContainerLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                            mediaOverlayContainerLayoutParams.dimensionRatio = "9:16";
+                        } else {
+                            mediaOverlayContainerLayoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                            mediaOverlayContainerLayoutParams.height = 0;
+                            mediaOverlayContainerLayoutParams.dimensionRatio = "16:9";
+                        }
+                        streamerMediaOverlayContainer.setLayoutParams(mediaOverlayContainerLayoutParams);
                     }
                 });
             }
@@ -899,6 +923,11 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 rectLyLp.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
                 plvsaStreamerRoundRectLy.setLayoutParams(rectLyLp);
             }
+        }
+
+        public void bindMediaOverlayLayout(PLVSAStreamerMediaOverlayContainer mediaOverlayContainer) {
+            ViewsKt.removeFromParent(mediaOverlayContainer);
+            streamerMediaOverlayContainer.addView(mediaOverlayContainer, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
     }
     // </editor-fold>
@@ -967,6 +996,11 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
          * 停止屏幕共享
          */
         void onClickCloseScreenShare();
+
+        /**
+         * 获取视频覆盖层容器
+         */
+        PLVSAStreamerMediaOverlayContainer getMediaOverlayContainer();
     }
     // </editor-fold>
 }

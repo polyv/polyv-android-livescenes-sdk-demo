@@ -524,6 +524,9 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         if (isChatPlaybackEnabled() && chatPlaybackManager != null) {
             chatPlaybackManager.start(sessionId, channelId, fileId);
         }
+        if (chatFragment != null) {
+            chatFragment.onPlaybackSessionId(sessionId);
+        }
     }
 
     @Override

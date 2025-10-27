@@ -485,4 +485,11 @@
         <attr name="plv_mask_consume_click" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="PLVStreamerPreferenceCardView">
+        <attr name="plv_check_icon_width" format="dimension" />
+        <attr name="plv_check_icon_height" format="dimension" />
+        <attr name="plv_radius" />
+        <attr name="plv_stroke_drawable" format="reference" />
+    </declare-styleable>
+
 </resources>

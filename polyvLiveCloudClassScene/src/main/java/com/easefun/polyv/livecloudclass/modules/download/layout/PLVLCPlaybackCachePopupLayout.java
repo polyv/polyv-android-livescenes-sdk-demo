@@ -3,7 +3,6 @@ package com.easefun.polyv.livecloudclass.modules.download.layout;
 import static com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO.bytesToFitSizeString;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
-import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
@@ -34,7 +33,6 @@ import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Hoshiiro
@@ -146,15 +144,21 @@ public class PLVLCPlaybackCachePopupLayout extends FrameLayout implements View.O
             final Intent intent = new Intent(getContext(), PLVPlaybackCacheActivity.class);
             getContext().startActivity(intent);
         } else if (id == playbackCacheDownloadStatusBtn.getId()) {
-            if (vo == null || vo.getDownloadStatusEnum() != PLVPlaybackCacheDownloadStatusEnum.NOT_IN_DOWNLOAD_LIST) {
+            if (vo == null) {
                 return;
             }
-            requirePermissionThenRun(new Runnable() {
-                @Override
-                public void run() {
-                    playbackCacheVideoViewModel.startDownload(vo);
-                }
-            });
+            if (listOf(
+                    PLVPlaybackCacheDownloadStatusEnum.NOT_IN_DOWNLOAD_LIST,
+                    PLVPlaybackCacheDownloadStatusEnum.WAITING,
+                    PLVPlaybackCacheDownloadStatusEnum.PAUSING
+            ).contains(vo.getDownloadStatusEnum())) {
+                requirePermissionThenRun(new Runnable() {
+                    @Override
+                    public void run() {
+                        playbackCacheVideoViewModel.startDownload(vo);
+                    }
+                });
+            }
         }
     }
 

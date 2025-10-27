@@ -32,6 +32,7 @@ import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteract
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
@@ -270,7 +271,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (topLayerViewPager != null) {
-            topLayerViewPager.onSuperTouchEvent(event);
+            if (streamerLayout == null || !streamerLayout.isDisallowTopLayerAcceptTouchEvent(event)) {
+                topLayerViewPager.onSuperTouchEvent(event);
+            }
         }
         if (streamerLayout != null) {
             streamerLayout.onRvSuperTouchEvent(event);
@@ -439,6 +442,13 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                         homeFragment.changeGiftEffectSwitch(isOpen);
                     }
                 }
+
+                @Override
+                public void onShowMediaOverlaySetting() {
+                    if (streamerLayout != null) {
+                        streamerLayout.showMediaOverlaySetting();
+                    }
+                }
             });
         }
     }
@@ -536,9 +546,26 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
             }
 
             @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return streamerLayout.getMixBackground();
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                streamerLayout.setMixBackground(mixBackground);
+            }
+
+            @Override
             public void onEditMode(boolean isEditMode) {
                 if (topLayerViewPager != null) {
                     topLayerViewPager.setAlpha(isEditMode ? 0.5f : 1);
+                }
+            }
+
+            @Override
+            public void onShowMediaOverlaySetting() {
+                if (streamerLayout != null) {
+                    streamerLayout.showMediaOverlaySetting();
                 }
             }
 

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+
+    <RelativeLayout
+        android:id="@+id/ll_title"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp">
+
+        <ImageView
+            android:id="@+id/plv_back_iv"
+            android:layout_centerVertical="true"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:padding="8dp"
+            android:src="@drawable/plv_cast_back_blue" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/plv_cast_search_device_title"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#FF333333" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_state"
+        android:layout_below="@id/ll_title"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="30dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+
+        <TextView
+            android:gravity="center_vertical"
+            android:id="@+id/plv_search_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:text="@string/plv_cast_search_device_result_title"
+            android:textSize="14sp"
+            android:textColor="#FF333333" />
+
+        <ImageView
+            android:id="@+id/plv_search_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/plv_cast_refresh" />
+
+
+        <pl.droidsonroids.gif.GifImageView
+            android:padding="5dp"
+            android:id="@+id/plv_searching_gif"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/plv_cast_searching" />
+    </RelativeLayout>
+
+
+    <View
+        android:layout_below="@id/rl_state"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E5E5E5" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/rl_state"
+        android:id="@+id/plv_devices_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        tools:visibility="gone"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" />
+
+    <LinearLayout
+        android:layout_below="@id/rl_state"
+        android:layout_marginTop="90dp"
+        android:id="@+id/plv_empty_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:src="@drawable/plv_cast_no_device" />
+
+
+        <TextView
+            android:id="@+id/plv_empty_status_tv"
+            android:layout_width="224dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/plv_cast_search_device_result_not_found"
+            android:textColor="#FF333333"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/plv_retry_tv"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:background="@drawable/plv_cast_btn_bule_conner_bg"
+            android:text="@string/plv_cast_search_device_retry"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/plv_cast_search_bg_icon" />
+</RelativeLayout>

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.cast.manager.PLVCastBusinessManager;
 import com.easefun.polyv.livecommon.module.modules.player.floating.IPLVFloatingWindow;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerConfig;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerManager;
@@ -101,7 +102,8 @@ public class PLVLCFloatingWindow implements IPLVFloatingWindow {
         return (canShowFloatingWindowStatus & IS_PLAYER_PREPARED) != 0
                 && (canShowFloatingWindowStatus & IS_OPEN_FLOAT_ENABLE) != 0
                 && (canShowFloatingWindowStatus & IS_JOIN_LINK_MIC) == 0
-                && (canShowFloatingWindowStatus & IS_JOIN_REQUEST_LINK_MIC) == 0;
+                && (canShowFloatingWindowStatus & IS_JOIN_REQUEST_LINK_MIC) == 0
+                && !PLVCastBusinessManager.getInstance().isCasting();
     }
 
     public void hideWhenOnlyShowByGoHome() {

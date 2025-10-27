@@ -54,6 +54,7 @@ import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCMarkToolControll
 import com.easefun.polyv.livecloudclass.modules.ppt.widget.PLVLCPPTInputWidget;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.cast.IPLVScreencastLayout;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayErrorMessageUtils;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -90,6 +91,7 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
@@ -144,6 +146,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private PLVPlayerLogoView logoView;
     //主播放器控制栏
     private IPLVLCLiveMediaController mediaController;
+    //投屏
+    private IPLVScreencastLayout screencastLayout;
     //封面图
     private ImageView coverImageView;
 
@@ -274,6 +278,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         toTopView = findViewById(R.id.plvlc_chatroom_to_top_view);
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
         productPushCardLayout = findViewById(R.id.plvlc_product_push_card_layout);
+        screencastLayout = findViewById(R.id.plvlc_screencast_view);
 
         //初始化
         svgaParser = new SVGAParser(getContext());
@@ -467,6 +472,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
             public void onShow(boolean show) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowMediaController(show);
+                }
+            }
+
+            @Override
+            public void onSearchCastDrivesAction() {
+                if (screencastLayout != null) {
+                    screencastLayout.browse();
                 }
             }
 
@@ -733,6 +745,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         observeLinkMicStatus(livePlayerPresenter);
 
         mediaController.setLivePlayerPresenter(livePlayerPresenter);
+        if (liveRoomDataManager.getConfig().getChannelType() == PLVLiveChannelType.ALONE) {
+            screencastLayout.init(liveRoomDataManager, livePlayerPresenter);
+        } else {
+            mediaController.setScreencastEnable(false);
+        }
 
         if(danmuSettingLayout != null){
             danmuSettingLayout.setChannelId(liveRoomDataManager.getConfig().getChannelId());
@@ -920,6 +937,15 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         return false;
     }
 
+
+    @Override
+    public boolean onKeyDown(int keyCode) {
+        if (screencastLayout != null && screencastLayout.onKeyDown(keyCode)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void destroy() {
         if (livePlayerPresenter != null) {
@@ -1029,6 +1055,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void updateWhenStartRtcWatch(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
+        screencastLayout.setRtcWatching(true);
         landscapeMarginRightForLinkMicLayout = linkMicLayoutLandscapeWidth;
 
         mediaController.updateWhenJoinRtc(liveRoomDataManager.isSupportRTC());
@@ -1060,6 +1087,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void updateWhenLeaveRtcWatch() {
         isJoinRTC = false;
+        screencastLayout.setRtcWatching(false);
         landscapeMarginRightForLinkMicLayout = 0;
 
         mediaController.updateWhenLeaveRtc();
@@ -1702,6 +1730,19 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     mediaController.updateRewardView(booleanPLVStatefulData.getData());
                 }
 
+            }
+        });
+
+
+        liveRoomDataManager.getLinkMicStartData().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean linkMicStart) {
+                if (linkMicStart == null) {
+                    linkMicStart = false;
+                }
+                if (liveRoomDataManager.getConfig().getChannelType() == PLVLiveChannelType.ALONE) {
+                    mediaController.setScreencastEnable(!linkMicStart);
+                }
             }
         });
 

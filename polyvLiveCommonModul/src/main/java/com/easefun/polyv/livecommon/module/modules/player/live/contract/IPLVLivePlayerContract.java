@@ -428,6 +428,16 @@ public interface IPLVLivePlayerContract {
          */
         void destroy();
 
+        /**
+         * 停止无延迟播放
+         */
+        void stopRTCPlay();
+
+        /**
+         * 开始无延迟播放
+         */
+        void startRTCPlay();
+
     }
     // </editor-fold>
 }

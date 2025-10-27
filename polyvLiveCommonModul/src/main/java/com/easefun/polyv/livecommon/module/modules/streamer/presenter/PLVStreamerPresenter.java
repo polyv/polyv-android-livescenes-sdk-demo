@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -29,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.usecase.PLVStreamerLinkMicMsgHandler;
 import com.easefun.polyv.livescenes.streamer.listener.IPLVSStreamerOnLiveStatusChangeListener;
@@ -91,6 +93,8 @@ import com.plv.socket.status.PLVSocketStatus;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
+
+import net.polyv.android.player.business.scene.common.player.IPLVMediaPlayer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -216,6 +220,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private Bitmap watermarkBitmap;
     private View myRenderView;
     private ViewGroup myRenderViewParent;
+    private PLVStreamerMixBackground mixBackground = PLVStreamerMixBackground.DEFAULT;
 
     /**** 容器 ****/
     //推流和连麦列表
@@ -376,6 +381,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 setMixLayoutType(mixLayoutType);
                 setDenoiseType(denoiseTypeKV.getOrDefault(PLVLinkMicDenoiseType.DEFAULT));
                 setIsUseExternalAudioInput(isUseExternalAudioInputKV.getOrDefault(false));
+                setMixBackground(mixBackground);
+                streamerData.postLocalAudioCaptureVolume(streamerManager.getLocalAudioCaptureVolume());
 
                 initStreamerListener();
 
@@ -500,6 +507,15 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerData.postEnableAudio(enable);
         callUserMuteAudio(streamerManager.getLinkMicUid(), !enable);
         return true;
+    }
+
+    @Override
+    public void setLocalAudioCaptureVolume(int volume) {
+        if (!isInitStreamerManager()) {
+            return;
+        }
+        streamerManager.adjustRecordingSignalVolume(volume);
+        streamerData.postLocalAudioCaptureVolume(volume);
     }
 
     @Override
@@ -635,6 +651,20 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public PLVStreamerConfig.MixLayoutType getMixLayoutType() {
         return mixLayoutType;
+    }
+
+    @Override
+    public void setMixBackground(PLVStreamerMixBackground mixBackground) {
+        this.mixBackground = mixBackground;
+        if (!isInitStreamerManager()) {
+            return;
+        }
+        streamerManager.setMixBackgroundImageUrl(mixBackground.getUrl());
+    }
+
+    @Override
+    public PLVStreamerMixBackground getMixBackground() {
+        return mixBackground;
     }
 
     @Override
@@ -1326,6 +1356,27 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground) {
         streamerManager.setVirtualBackground(bitmap, onlyBlurBackground);
+    }
+
+    @Override
+    public IPLVMediaPlayer createMediaOverlay() {
+        return streamerManager.createMediaOverlay();
+    }
+
+    @Override
+    public void setMediaOverlayDisplayRect(@NonNull RectF displayRect) {
+        streamerManager.setMediaOverlayDisplayRect(displayRect);
+    }
+
+    @Override
+    public void setMediaOverlayVolume(int remoteVolume) {
+        streamerManager.setMediaOverlayVolume(remoteVolume);
+        streamerData.postMediaOverlayRemoteVolume(remoteVolume);
+    }
+
+    @Override
+    public void removeMediaOverlay(IPLVMediaPlayer mediaOverlay) {
+        streamerManager.removeMediaOverlay(mediaOverlay);
     }
 
     @Override

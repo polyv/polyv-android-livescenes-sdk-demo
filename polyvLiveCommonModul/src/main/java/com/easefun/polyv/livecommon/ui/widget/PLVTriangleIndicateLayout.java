@@ -444,13 +444,16 @@ public class PLVTriangleIndicateLayout extends FrameLayout {
             roundRect = new RectF();
         }
 
+        Path pathRoundRect = new Path();
+        pathRoundRect.addRoundRect(roundRect, radius, radius, Path.Direction.CCW);
+        Path pathTriangle = new Path();
+        pathTriangle.moveTo(first.x, first.y);
+        pathTriangle.lineTo(second.x, second.y);
+        pathTriangle.lineTo(third.x, third.y);
+        pathTriangle.close();
+
         path = new Path();
-        path.setFillType(Path.FillType.WINDING);
-        path.addRoundRect(roundRect, radius, radius, Path.Direction.CCW);
-        path.moveTo(first.x, first.y);
-        path.lineTo(second.x, second.y);
-        path.lineTo(third.x, third.y);
-        path.close();
+        path.op(pathRoundRect, pathTriangle, Path.Op.UNION);
 
         shapeDrawable = new ShapeDrawable();
         PathShape pathShape = new PathShape(path, getMeasuredWidth(), getMeasuredHeight());

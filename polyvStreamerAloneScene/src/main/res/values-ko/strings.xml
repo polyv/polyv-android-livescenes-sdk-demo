@@ -32,4 +32,10 @@
     <string name="plvsa_login_streamer_error_channel_name_is_empty" translatable="false">channelName 为空，启动手机开播纯视频页失败！</string>
     <string name="plvsa_login_streamer_error_user_type_is_empty" translatable="false">usertype 为空，启动手机开播纯视频页失败！</string>
     <string name="plvsa_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播纯视频页失败！</string>
+
+    <string name="plvsa_streamer_media_overlay_title">비디오</string>
+    <string name="plvsa_streamer_media_overlay_audio_setting_title">소리</string>
+    <string name="plvsa_streamer_media_overlay_remote_volume_title">볼륨 푸시</string>
+    <string name="plvsa_streamer_media_overlay_local_volume_title">로컬 볼륨</string>
+    <string name="plvsa_streamer_media_overlay_default_mute_local_hint">로컬 볼륨은 기본적으로 0이며 크게 조절하면 생방송 메아리가 발생할 수 있으므로 이어폰을 끼고 감청하는 것이 좋습니다.</string>
 </resources>

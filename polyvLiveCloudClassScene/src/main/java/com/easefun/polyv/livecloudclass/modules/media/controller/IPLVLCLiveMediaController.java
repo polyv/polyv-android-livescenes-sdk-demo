@@ -189,6 +189,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateRewardView(boolean enable);
 
     /**
+     * 设置是否允许投屏按钮显示
+     */
+    void setScreencastEnable(boolean enable);
+
+    /**
      * 更新画笔模式状态
      *
      * @param isInPaintMode 是否正在画笔模式
@@ -247,6 +252,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * @param show true 表示显示，false表示隐藏
          */
         void onShow(boolean show);
+
+        /**
+         * 搜索投屏设备
+         */
+        void onSearchCastDrivesAction();
 
         /**
          * ppt翻页

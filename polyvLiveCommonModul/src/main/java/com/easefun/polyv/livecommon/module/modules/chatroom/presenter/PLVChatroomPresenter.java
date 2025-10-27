@@ -207,6 +207,9 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Long oldestChatHistoryTimestamp = null;
     // 跟最旧一条聊天消息时间戳相同的消息数量（包含最旧一条）
     private Long oldestChatHistoryTimestampCount = null;
+    // 只拉取指定场次的历史消息
+    private String limitRequestChatHistorySessionId = null;
+    private int requestHistoryPage = 1;
 
     //分组Id
     private String groupId;
@@ -543,6 +546,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void setLimitRequestChatHistorySessionId(String sessionId) {
+        this.limitRequestChatHistorySessionId = sessionId;
+    }
+
+    @Override
     public void requestChatHistory(final int viewIndex) {
         // socket登录成功之后才能获取历史记录(适配聊天室分组模式)
         if (!PolyvSocketWrapper.getInstance().isOnlineStatus()) {
@@ -555,10 +563,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (chatHistoryDisposable != null) {
             chatHistoryDisposable.dispose();
         }
-        final String userId = liveRoomDataManager.getConfig().getUser().getViewerId();
-        final String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
-        final String groupId = liveRoomDataManager.getConfig().getUser().getParam4();
-        chatHistoryDisposable = PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, groupId, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount)
+        chatHistoryDisposable = requestChatHistoryObservable()
                 .map(new Function<String, JSONArray>() {
                     @Override
                     public JSONArray apply(String responseBody) throws Exception {
@@ -608,6 +613,23 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         });
                     }
                 });
+    }
+
+    private Observable<String> requestChatHistoryObservable() {
+        if (limitRequestChatHistorySessionId == null) {
+            final String userId = liveRoomDataManager.getConfig().getUser().getViewerId();
+            final String userType = liveRoomDataManager.getConfig().getUser().getViewerType();
+            final String groupId = liveRoomDataManager.getConfig().getUser().getParam4();
+            return PLVChatApiRequestHelper.getInstance().getChatHistory(getRoomIdCombineDiscuss(), userId, userType, groupId, oldestChatHistoryTimestamp, oldestChatHistoryTimestampCount, getChatHistoryCount);
+        } else {
+            return PLVChatApiRequestHelper.getInstance().getChatHistoryBySessionId(getRoomIdCombineDiscuss(), limitRequestChatHistorySessionId, requestHistoryPage, getChatHistoryCount)
+                    .doOnNext(new Consumer<String>() {
+                        @Override
+                        public void accept(String s) throws Exception {
+                            requestHistoryPage++;
+                        }
+                    });
+        }
     }
 
     @Override
@@ -955,7 +977,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             JSONObject jsonObject = jsonArray.optJSONObject(i);
             if (jsonObject != null) {
                 String msgType = jsonObject.optString("msgType");
-                if (!TextUtils.isEmpty(msgType)) {
+                if (!TextUtils.isEmpty(msgType) && !"null".equals(msgType)) {
                     if (PLVHistoryConstant.MSGTYPE_CUSTOMMESSAGE.equals(msgType)) {
                         //custom message
                     }

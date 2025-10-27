@@ -69,6 +69,16 @@ public interface IPLVLiveRoomDataManager {
     MutableLiveData<PLVStatefulData<Boolean>> getPointRewardEnableData();
 
     /**
+     * 投屏是否开始Data
+     */
+    MutableLiveData<Boolean> getCastStartData();
+
+    /**
+     * 是否开始连麦Data（请求连麦则认为开始，知道取消连麦请求或者停止连麦则认为结束）
+     */
+    MutableLiveData<Boolean> getLinkMicStartData();
+
+    /**
      * 获取积分打赏事件数据
      */
     MutableLiveData<PLVRewardEvent> getRewardEventData();
