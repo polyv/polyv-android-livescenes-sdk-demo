@@ -21,6 +21,7 @@ import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -446,6 +447,16 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
                 plvlsStreamerLy.setMixLayoutType(mix);
+            }
+
+            @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return plvlsStreamerLy.getMixBackground();
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                plvlsStreamerLy.setMixBackground(mixBackground);
             }
 
             @Override

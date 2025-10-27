@@ -39,6 +39,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.PLVStreamerPresenter;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVForegroundService;
@@ -54,6 +55,7 @@ import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.streamer.adapter.PLVSAStreamerAdapter;
+import com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayContainer;
 import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.IPLVSAStreamerScreenShareFloatWindow;
 import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.PLVSAStreamerScreenShareFloatWindowV1;
 import com.easefun.polyv.streameralone.modules.streamer.widget.screenshare.PLVSAStreamerScreenShareFloatWindowV2;
@@ -127,6 +129,7 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     private GridLayoutManager gridLayoutManager;
     // 邀请连麦布局
     private final PLVSALinkMicInvitationLayout linkMicInvitationLayout = new PLVSALinkMicInvitationLayout(getContext());
+    private final PLVSAStreamerMediaOverlayContainer mediaOverlayContainer = new PLVSAStreamerMediaOverlayContainer(getContext());
 
     //退出直播间弹窗
     private PLVConfirmDialog leaveLiveConfirmDialog;
@@ -365,6 +368,11 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
                         })
                         .show();
             }
+
+            @Override
+            public PLVSAStreamerMediaOverlayContainer getMediaOverlayContainer() {
+                return mediaOverlayContainer;
+            }
         });
 
         final boolean isDefaultBackCamera = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
@@ -440,6 +448,16 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     @Override
     public void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout) {
         streamerPresenter.setMixLayoutType(mixLayout);
+    }
+
+    @Override
+    public PLVStreamerMixBackground getMixBackground() {
+        return streamerPresenter.getMixBackground();
+    }
+
+    @Override
+    public void setMixBackground(PLVStreamerMixBackground mixBackground) {
+        streamerPresenter.setMixBackground(mixBackground);
     }
 
     @Override
@@ -546,7 +564,15 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
+    public boolean isDisallowTopLayerAcceptTouchEvent(MotionEvent event) {
+        return mediaOverlayContainer.canProcessTouchEvent(event);
+    }
+
+    @Override
     public boolean onRvSuperTouchEvent(MotionEvent ev) {
+        if (mediaOverlayContainer.processTouchEvent(ev)) {
+            return true;
+        }
         boolean returnResult = plvsaStreamerRvLayout.getRecyclerView().onSuperTouchEvent(ev);
         streamerAdapter.checkScaleCamera(ev);
         streamerAdapter.checkClickItemView(ev);
@@ -554,7 +580,13 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     }
 
     @Override
+    public void showMediaOverlaySetting() {
+        mediaOverlayContainer.showSetting(this.streamerPresenter);
+    }
+
+    @Override
     public void destroy() {
+        mediaOverlayContainer.destroy();
         floatWindow.close();
         floatWindow.destroy();
         floatWindowV2.close();

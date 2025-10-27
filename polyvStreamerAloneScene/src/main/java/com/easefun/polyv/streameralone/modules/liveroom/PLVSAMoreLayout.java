@@ -29,6 +29,7 @@ import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
@@ -154,6 +155,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ViewGroup moreVirtualBgLayout;
     private TextView moreSettingsInteractTv;
     private FlexboxLayout moreSettingsInteractLayout;
+    private LinearLayout settingMediaOverlayLayout;
+    private ImageView settingMediaOverlayLayoutIv;
+    private TextView settingMediaOverlayLayoutTv;
 
     //streamerPresenter
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
@@ -276,6 +280,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_bg_layout);
         moreSettingsInteractTv = findViewById(R.id.plvsa_more_settings_interact_tv);
         moreSettingsInteractLayout = findViewById(R.id.plvsa_more_settings_interact_layout);
+        settingMediaOverlayLayout = findViewById(R.id.plvsa_setting_media_overlay_layout);
+        settingMediaOverlayLayoutIv = findViewById(R.id.plvsa_setting_media_overlay_layout_iv);
+        settingMediaOverlayLayoutTv = findViewById(R.id.plvsa_setting_media_overlay_layout_tv);
 
         plvsaMoreCameraIv.setOnClickListener(this);
         plvsaMoreCameraTv.setOnClickListener(this);
@@ -306,6 +313,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftEffectLayout.setOnClickListener(this);
         moreWaterLayout.setOnClickListener(this);
         moreVirtualBgLayout.setOnClickListener(this);
+        settingMediaOverlayLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
         plvsaMoreCloseRoomTv.setText(plvsaMoreCloseRoomIv.isSelected() ? R.string.plv_chat_cancel_close_room : R.string.plv_chat_confirm_close_room);
@@ -346,9 +354,20 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
 
             @Override
             public void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix) {
-                mixLayout.close();
                 if (streamerPresenter != null) {
                     streamerPresenter.setMixLayoutType(mix);
+                }
+            }
+
+            @Override
+            public PLVStreamerMixBackground getMixBackground() {
+                return streamerPresenter != null ? streamerPresenter.getMixBackground() : PLVStreamerMixBackground.DEFAULT;
+            }
+
+            @Override
+            public void onChangeMixBackground(PLVStreamerMixBackground mixBackground) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setMixBackground(mixBackground);
                 }
             }
         });
@@ -413,7 +432,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     liveRoomDataManager.getClassDetailVO().removeObserver(this);
                     if (polyvLiveClassDetailVOPLVStatefulData.getData() != null){
                         boolean isOpen = polyvLiveClassDetailVOPLVStatefulData.getData().isOpenPushShare();
-                        moreShareLl.setVisibility(isOpen == true ? VISIBLE : INVISIBLE);
+                        moreShareLl.setVisibility(isOpen ? VISIBLE : GONE);
                     }
                 }
             });
@@ -961,6 +980,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             PLVSAStickerLayout.tryShow();
         } else if (id == moreVirtualBgLayout.getId()) {
             PLVVirtualBackgroundLayout.tryShow();
+        } else if (id == settingMediaOverlayLayout.getId()) {
+            close();
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowMediaOverlaySetting();
+            }
         }
     }
 
@@ -1090,6 +1114,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
          * 礼物特效开关切换
          */
         void onGiftEffectSwitch(boolean isOpen);
+
+        /**
+         * 显示视频覆盖层设置弹层
+         */
+        void onShowMediaOverlaySetting();
     }
     // </editor-fold>
 }

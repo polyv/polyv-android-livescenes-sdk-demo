@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2c2c2c"
+    app:plv_mode="top"
+    app:plv_radius="16dp"
+    tools:layout_gravity="bottom"
+    tools:layout_height="110dp">
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayProgressTextView
+        android:id="@+id/plvsa_streamer_media_overlay_progress_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="00:00:00" />
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayDurationTextView
+        android:id="@+id/plvsa_streamer_media_overlay_duration_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="00:00:00" />
+
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayProgressSeekBar
+        android:id="@+id/plvsa_streamer_media_overlay_progress_seek_bar"
+        android:layout_width="0dp"
+        android:layout_height="14dp"
+        android:layout_marginHorizontal="12dp"
+        android:max="10000"
+        android:paddingHorizontal="12dp"
+        android:progressDrawable="@drawable/plvsa_streamer_media_overlay_progress_seek_bar_style_normal"
+        android:thumb="@drawable/plvsa_streamer_media_overlay_progress_position_point_style_normal"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_media_overlay_progress_tv"
+        app:layout_constraintEnd_toStartOf="@+id/plvsa_streamer_media_overlay_duration_tv"
+        app:layout_constraintStart_toEndOf="@+id/plvsa_streamer_media_overlay_progress_tv"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_media_overlay_progress_tv"
+        app:plv_progress_drawable_on_drag="@drawable/plvsa_streamer_media_overlay_progress_seek_bar_style_drag"
+        app:plv_seek_bar_height="2dp"
+        app:plv_seek_bar_height_on_drag="8dp"
+        app:plv_thumb_drawable_on_drag="@drawable/plvsa_streamer_media_overlay_progress_position_point_style_drag" />
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayPlayButton
+        android:id="@+id/plvsa_streamer_media_overlay_play_button"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvsa_streamer_media_overlay_progress_seek_bar"
+        tools:src="@drawable/plvsa_streamer_media_overlay_play_button_to_play_icon" />
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlaySeekBackwardIcon
+        android:id="@+id/plvsa_streamer_media_overlay_seek_backward_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintEnd_toStartOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_media_overlay_play_button" />
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlaySeekForwardIcon
+        android:id="@+id/plvsa_streamer_media_overlay_seek_forward_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintStart_toEndOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_media_overlay_play_button" />
+
+    <ImageView
+        android:id="@+id/plvsa_streamer_media_overlay_delete_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/plvsa_streamer_media_overlay_delete"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_media_overlay_play_button" />
+
+    <com.easefun.polyv.streameralone.modules.streamer.overlay.PLVSAStreamerMediaOverlayVolumeIcon
+        android:id="@+id/plvsa_streamer_media_overlay_volume_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/plvsa_streamer_media_overlay_play_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/plvsa_streamer_media_overlay_play_button"
+        tools:src="@drawable/plvsa_streamer_media_overlay_volume_open" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

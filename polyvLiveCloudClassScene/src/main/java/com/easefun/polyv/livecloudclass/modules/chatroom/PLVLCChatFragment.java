@@ -136,6 +136,8 @@ import java.util.Map;
 public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickListener {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private String TAG = getClass().getSimpleName();
+    // 回放场景只请求当前回放场次的历史消息
+    private static final boolean PLAYBACK_REQUEST_HISTORY_MESSAGE_ONLY_SESSION = true;
 
     private static final int REQUEST_SELECT_IMG = 0x01;//选择图片请求标志
     private static final int REQUEST_OPEN_CAMERA = 0x02;//打开相机请求标志
@@ -243,6 +245,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //是否是直播类型
     private boolean isLiveType;
+    // 当前播放场次
+    private String currentSessionId = null;
     //是否打开积分打赏按钮
     private boolean isOpenPointReward = false;
 
@@ -442,12 +446,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 if (chatroomPresenter != null) {
                     //设置信息索引，需在chatroomPresenter.registerView后设置
                     chatCommonMessageList.setMsgIndex(chatroomPresenter.getViewIndex(chatroomView));
-                    if (!isChatPlaybackLayout) {
-                        //附加成功后，加载历史记录
-                        if (chatroomPresenter.getChatHistoryTime() == 0) {
-                            chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));//加载一次历史记录
-                        }
-                    }
+                    loadHistoryMessageFirstTime();
                 }
             }
         }
@@ -837,6 +836,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     public IPLVChatPlaybackCallDataListener getChatPlaybackDataListener() {
         return chatPlaybackDataListener;
+    }
+
+    public void onPlaybackSessionId(String sessionId) {
+        currentSessionId = sessionId;
+        if (chatroomPresenter != null && PLAYBACK_REQUEST_HISTORY_MESSAGE_ONLY_SESSION) {
+            chatroomPresenter.setLimitRequestChatHistorySessionId(currentSessionId);
+        }
+        loadHistoryMessageFirstTime();
     }
     // </editor-fold>
 
@@ -1263,6 +1270,29 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             handler.post(runnable);
         }
     }
+
+    private void loadHistoryMessageFirstTime() {
+        if (chatroomPresenter == null || liveRoomDataManager == null) {
+            return;
+        }
+        final boolean isFirstTime = chatroomPresenter.getChatHistoryTime() == 0;
+        final boolean isChatReplay = isChatPlaybackLayout;
+        final boolean isPlayback = !liveRoomDataManager.getConfig().isLive();
+        boolean loadMessage = true;
+        if (!isFirstTime) {
+            loadMessage = false;
+        }
+        if (isChatReplay) {
+            loadMessage = false;
+        } else if (isPlayback && PLAYBACK_REQUEST_HISTORY_MESSAGE_ONLY_SESSION) {
+            if (currentSessionId == null) {
+                loadMessage = false;
+            }
+        }
+        if (loadMessage) {
+            chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(this.chatroomView));
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 发送聊天信息">
@@ -1653,13 +1683,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
             }
             boolean result = chatCommonMessageList.attachToParent(swipeLoadView, false);
             if (result && chatroomPresenter != null) {
+                //处理播放页面初始竖屏，然后在竖屏聊天室没加载完成前切换到横屏的情况，之后等竖屏聊天室加载完成后再切换竖屏，这时需要加载历史记录
                 chatCommonMessageList.setMsgIndex(chatroomPresenter.getViewIndex(chatroomView));
-                if (!isChatPlaybackLayout) {
-                    //处理播放页面初始竖屏，然后在竖屏聊天室没加载完成前切换到横屏的情况，之后等竖屏聊天室加载完成后再切换竖屏，这时需要加载历史记录
-                    if (chatroomPresenter.getChatHistoryTime() == 0) {
-                        chatroomPresenter.requestChatHistory(chatroomPresenter.getViewIndex(chatroomView));
-                    }
-                }
+                loadHistoryMessageFirstTime();
             }
         }
     }

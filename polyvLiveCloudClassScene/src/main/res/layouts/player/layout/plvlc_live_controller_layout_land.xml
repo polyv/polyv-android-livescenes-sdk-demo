@@ -153,6 +153,17 @@
             tools:visibility="visible" />
 
         <ImageView
+            android:id="@+id/plvlc_cast_search_land_iv"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="14dp"
+            android:padding="8dp"
+            android:src="@drawable/plvlc_controller_btn_cast"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
             android:id="@+id/plvlc_live_control_floating_land_iv"
             android:layout_width="40dp"
             android:layout_height="40dp"

@@ -22,4 +22,5 @@
     <string name="plvlc_playback_subtitle_translate">Translate subtitles</string>
     <string name="plvlc_playback_subtitle_original">Original subtitles</string>
     <string name="plvlc_playback_subtitle_title">Replay subtitles</string>
+    <string name="plvlc_cast_not_allow_when_linkmic">Unable to apply for microphone connection during screen casting</string>
 </resources>

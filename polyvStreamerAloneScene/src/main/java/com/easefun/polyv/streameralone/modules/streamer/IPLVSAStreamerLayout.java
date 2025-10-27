@@ -7,6 +7,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
@@ -74,6 +75,18 @@ public interface IPLVSAStreamerLayout {
      * @param mixLayout 混流布局
      */
     void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout);
+
+    /**
+     * @return 当前使用的混流背景图
+     */
+    PLVStreamerMixBackground getMixBackground();
+
+    /**
+     * 设置混流背景图
+     *
+     * @param mixBackground 混流背景图
+     */
+    void setMixBackground(PLVStreamerMixBackground mixBackground);
 
     /**
      * 获取推流的码率信息
@@ -179,10 +192,17 @@ public interface IPLVSAStreamerLayout {
      */
     boolean onBackPressed();
 
+    boolean isDisallowTopLayerAcceptTouchEvent(MotionEvent event);
+
     /**
      * 传递触摸事件
      */
     boolean onRvSuperTouchEvent(MotionEvent ev);
+
+    /**
+     * 显示视频覆盖层设置弹层
+     */
+    void showMediaOverlaySetting();
 
     /**
      * 销毁

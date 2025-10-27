@@ -88,6 +88,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView gradientBarTopPortView;
     //重新打开悬浮窗提示
     private TextView tvReopenFloatingViewTip;
+    //投屏按钮
+    private ImageView castPortIv;
     //ppt翻页
     private PLVLCPPTTurnPageLayout pptTurnPagePortLayout;
 
@@ -120,6 +122,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private PLVLCLikeIconView likesLandIv;
     //更多按钮
     private ImageView moreLandIv;
+    //投屏按钮
+    private ImageView castLandIv;
     // 小窗按钮
     private ImageView liveControlFloatingIv;
     //ppt 翻页
@@ -180,6 +184,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean isFloatWindowEnable = true;
     // 是否显示在线人数
     private boolean isShowOnlineCount = false;
+    //投屏初始化结果
+    private boolean isCastInitSuccess = false;
+    //强制关闭投屏按钮显示
+    private boolean isForceCloseCast = false;
 
     //view动作监听器
     private OnViewActionListener onViewActionListener;
@@ -223,6 +231,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_live_player_controller_tv_reopen_floating_view);
         pptTurnPagePortLayout = findViewById(R.id.video_ppt_turn_page_layout);
         livePlayerControllerEnterPaintIv = findViewById(R.id.plvlc_live_player_controller_enter_paint_iv);
+        castPortIv = findViewById(R.id.plvlc_cast_search_port_iv);
 
         backPortIv.setOnClickListener(this);
         videoPausePortIv.setOnClickListener(this);
@@ -232,6 +241,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         morePortIv.setOnClickListener(this);
         liveControlFloatingIv.setOnClickListener(this);
         livePlayerControllerEnterPaintIv.setOnClickListener(this);
+        castPortIv.setOnClickListener(this);
 
         pptTurnPagePortLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
@@ -409,6 +419,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     public void setLivePlayerPresenter(@NonNull IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter) {
         this.livePlayerPresenter = livePlayerPresenter;
         observePlayInfoVO();
+        observeCastStatus();
     }
 
     @Override
@@ -433,6 +444,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         pptTurnPageLandLayout = landscapeController.getPPTTurnPageLayout();
         livePlayerControllerEnterPaintLandIv = landscapeController.getEnterPaintView();
         liveWatchOnlineCountLandTv = landscapeController.getLiveWatchOnlineCountTextView();
+        castLandIv = landscapeController.getCastView();
 
         backLandIv.setOnClickListener(this);
         videoPauseLandIv.setOnClickListener(this);
@@ -447,6 +459,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         commodityView.setOnClickListener(this);
         livePlayerControllerEnterPaintLandIv.setOnClickListener(this);
         liveWatchOnlineCountLandTv.setOnClickListener(this);
+        castLandIv.setOnClickListener(this);
 
         pptTurnPageLandLayout.setOnPPTTurnPageListener(new PLVLCPPTTurnPageLayout.OnPPTTurnPageListener() {
             @Override
@@ -723,6 +736,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
 
     @Override
+    public void setScreencastEnable(boolean enable) {
+        isForceCloseCast = !enable;
+    }
+
+    @Override
     public void notifyPaintModeStatus(boolean isInPaintMode) {
         this.isInPaintMode = isInPaintMode;
         if (isInPaintMode) {
@@ -954,6 +972,44 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     }
     // </editor-fold>
 
+
+    // <editor-fold defaultstate="collapsed" desc="事件监听 - 监听投屏初始化结果">
+    private void observeCastStatus() {
+        livePlayerPresenter.getData().getCastInitState().observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                isCastInitSuccess = aBoolean;
+            }
+        });
+    }
+    // </editor-fold >
+
+
+    // <editor-fold defaultstate="collapsed" desc="投屏控制">
+
+    /**
+     * 更新投屏按钮可见状态
+     *
+     * @param isPlaying 是否正在播放
+     */
+    private void updateCastBtnVisibilityStatus(boolean isPlaying) {
+        if (isPlaying && isCastInitSuccess) {
+            setCastBtnVisibility(isForceCloseCast ? View.GONE : View.VISIBLE);
+        } else {
+            setCastBtnVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 设置投屏按钮状态
+     */
+    public void setCastBtnVisibility(int visibility) {
+        castLandIv.setVisibility(visibility);
+        castPortIv.setVisibility(visibility);
+    }
+
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
@@ -1028,6 +1084,10 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             if (onViewActionListener != null) {
                 onViewActionListener.onShowLandscapeMemberList();
             }
+        } else if (id == R.id.plvlc_cast_search_land_iv || id == R.id.plvlc_cast_search_port_iv) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onSearchCastDrivesAction();
+            }
         }
     }
     // </editor-fold>
@@ -1067,6 +1127,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             videoPauseLandIv.setVisibility(VISIBLE);
             videoRefreshPortIv.setVisibility(VISIBLE);
             videoRefreshLandIv.setVisibility(VISIBLE);
+            updateCastBtnVisibilityStatus(isPlaying());
             liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
@@ -1100,6 +1161,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             }
             videoPausePortIv.setSelected(playInfoVO.isPlaying());
             videoPauseLandIv.setSelected(playInfoVO.isPlaying());
+            updateCastBtnVisibilityStatus(playInfoVO.isPlaying());
         }
     }
 
@@ -1116,6 +1178,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 videoRefreshPortIv.setVisibility(GONE);
                 videoRefreshLandIv.setVisibility(GONE);
             }
+            updateCastBtnVisibilityStatus(isPlaying());
             liveControlFloatingIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             liveControlFloatingLandIv.setVisibility(isRequestingJoinLinkMic || !isFloatWindowEnable ? View.GONE : View.VISIBLE);
             final boolean showMoreButton = isMainVideoViewPlaying && !PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
@@ -1175,6 +1238,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             liveControlFloatingLandIv.setVisibility(View.GONE);
             morePortIv.setVisibility(View.GONE);
             moreLandIv.setVisibility(View.GONE);
+            //连麦时不允许显示投屏按钮
+            setCastBtnVisibility(GONE);
             //由于控件隐藏，因此需要调整信息发送控件的宽度
             MarginLayoutParams mlp = (MarginLayoutParams) startSendMessageLandIv.getLayoutParams();
             mlp.leftMargin = ConvertUtils.dp2px(32 + 47);

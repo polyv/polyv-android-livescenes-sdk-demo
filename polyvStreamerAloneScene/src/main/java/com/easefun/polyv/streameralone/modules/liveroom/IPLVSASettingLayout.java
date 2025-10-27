@@ -5,6 +5,7 @@ import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 
@@ -129,10 +130,27 @@ public interface IPLVSASettingLayout {
         void onChangeMixLayoutType(PLVStreamerConfig.MixLayoutType mix);
 
         /**
+         * @return 当前使用的混流背景图
+         */
+        PLVStreamerMixBackground getMixBackground();
+
+        /**
+         * 设置混流背景图
+         *
+         * @param mixBackground 混流背景图
+         */
+        void onChangeMixBackground(PLVStreamerMixBackground mixBackground);
+
+        /**
          * 是否进入贴图编辑模式
          * @param isEditMode
          */
         void onEditMode(boolean isEditMode);
+
+        /**
+         * 显示视频覆盖层设置弹层
+         */
+        void onShowMediaOverlaySetting();
 
         /**
          * 获取推流Presenter

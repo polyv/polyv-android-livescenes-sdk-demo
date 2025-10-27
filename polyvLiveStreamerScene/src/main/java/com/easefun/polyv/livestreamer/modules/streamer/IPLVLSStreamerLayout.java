@@ -7,6 +7,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -49,6 +50,18 @@ public interface IPLVLSStreamerLayout {
      * @param mixLayout 混流布局
      */
     void setMixLayoutType(PLVStreamerConfig.MixLayoutType mixLayout);
+
+    /**
+     * @return 当前使用的混流背景图
+     */
+    PLVStreamerMixBackground getMixBackground();
+
+    /**
+     * 设置混流背景图
+     *
+     * @param mixBackground 混流背景图
+     */
+    void setMixBackground(PLVStreamerMixBackground mixBackground);
 
     /**
      * 获取推流的码率信息

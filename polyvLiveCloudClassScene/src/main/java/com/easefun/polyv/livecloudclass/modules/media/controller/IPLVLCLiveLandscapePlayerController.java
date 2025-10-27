@@ -95,6 +95,11 @@ public interface IPLVLCLiveLandscapePlayerController {
     ImageView getMoreView();
 
     /**
+     * 获取投屏按钮
+     */
+    ImageView getCastView();
+
+    /**
      * 获取打赏按钮
      */
     ImageView getRewardView();

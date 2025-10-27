@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.streamer.presenter.data;
 
+import static net.polyv.android.common.libs.lang.state.MutableStateKt.mutableStateOf;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -7,6 +9,9 @@ import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
+
+import net.polyv.android.common.libs.lang.state.MutableState;
+import net.polyv.android.common.libs.lang.state.State;
 
 /**
  * 推流和连麦的数据，主要用于提供给 非mvp的v 监听/获取推流和连麦的数据
@@ -57,6 +62,9 @@ public class PLVStreamerData {
     private MutableLiveData<Boolean> videoLinkMicType = new MutableLiveData<>();
     private MutableLiveData<PLVLinkMicDenoiseType> denoiseType = new MutableLiveData<>();
     private MutableLiveData<Boolean> useExternalAudioInput = new MutableLiveData<>();
+
+    private MutableState<Integer> localAudioCaptureVolume = mutableStateOf(100);
+    private MutableState<Integer> mediaOverlayRemoteVolume = mutableStateOf(100);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="推流状态">
@@ -195,6 +203,22 @@ public class PLVStreamerData {
 
     public LiveData<Boolean> getUseExternalAudioInput() {
         return useExternalAudioInput;
+    }
+
+    public State<Integer> getLocalAudioCaptureVolume() {
+        return localAudioCaptureVolume;
+    }
+
+    public void postLocalAudioCaptureVolume(int volume) {
+        localAudioCaptureVolume.setValue(volume);
+    }
+
+    public State<Integer> getMediaOverlayRemoteVolume() {
+        return mediaOverlayRemoteVolume;
+    }
+
+    public void postMediaOverlayRemoteVolume(int volume) {
+        mediaOverlayRemoteVolume.setValue(volume);
     }
 
     // </editor-fold>

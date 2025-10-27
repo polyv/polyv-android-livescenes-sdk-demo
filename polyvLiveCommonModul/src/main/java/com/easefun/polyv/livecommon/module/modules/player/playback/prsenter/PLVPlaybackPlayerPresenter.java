@@ -65,6 +65,9 @@ import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
 import com.plv.livescenes.playback.vo.PLVPlaybackDataVO;
 import com.plv.livescenes.playback.vo.PLVPlaybackLocalCacheVO;
 
+import net.polyv.android.player.business.scene.common.model.api.vo.PLVVodVideoJsonVO;
+import net.polyv.android.player.business.scene.vod.model.vo.PLVVodVideoTokenVO;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -956,6 +959,13 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
                         }
                     }
                     videoView.setShowSubtitles(showSubtitles);
+                }
+            });
+            videoView.setOnVodTokenRequestListener(new IPLVPlaybackListenerEvent.OnVodTokenRequestListener() {
+                @Override
+                public void onRequestToken(String videoId, PLVVodVideoJsonVO videoJson, PLVSugarUtil.Consumer<PLVVodVideoTokenVO> callback) {
+                    // 播放点播的加密视频需要在这里配置点播系统token请求逻辑
+                    callback.accept(new PLVVodVideoTokenVO("", null));
                 }
             });
         }

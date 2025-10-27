@@ -22,4 +22,5 @@
     <string name="plvlc_playback_subtitle_translate">翻訳字幕</string>
     <string name="plvlc_playback_subtitle_original">オリジナル字幕</string>
     <string name="plvlc_playback_subtitle_title">再生タイトル</string>
+    <string name="plvlc_cast_not_allow_when_linkmic">投画面では連麦の申し込みはできません</string>
 </resources>

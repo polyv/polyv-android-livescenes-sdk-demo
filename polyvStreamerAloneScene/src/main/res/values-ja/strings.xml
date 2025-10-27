@@ -32,4 +32,10 @@
     <string name="plvsa_login_streamer_error_channel_name_is_empty" translatable="false">channelName 为空，启动手机开播纯视频页失败！</string>
     <string name="plvsa_login_streamer_error_user_type_is_empty" translatable="false">usertype 为空，启动手机开播纯视频页失败！</string>
     <string name="plvsa_login_streamer_error_colin_mic_type_is_empty" translatable="false">colinMicType 为空，启动手机开播纯视频页失败！</string>
+
+    <string name="plvsa_streamer_media_overlay_title">ビデオ</string>
+    <string name="plvsa_streamer_media_overlay_audio_setting_title">声</string>
+    <string name="plvsa_streamer_media_overlay_remote_volume_title">プッシュフロー音量</string>
+    <string name="plvsa_streamer_media_overlay_local_volume_title">ローカルボリューム</string>
+    <string name="plvsa_streamer_media_overlay_default_mute_local_hint">ローカル音量のデフォルトは0で、大きくするとライブエコーが発生する可能性があり、イヤホンをつけて傍受することをお勧めします。</string>
 </resources>

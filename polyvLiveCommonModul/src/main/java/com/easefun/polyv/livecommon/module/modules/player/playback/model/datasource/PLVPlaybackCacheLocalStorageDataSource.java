@@ -7,6 +7,7 @@ import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasou
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.download.IPLVDownloader;
 import com.plv.livescenes.download.IPLVDownloaderListener;
 import com.plv.livescenes.download.PLVDownloader;
@@ -14,7 +15,11 @@ import com.plv.livescenes.download.PLVDownloaderManager;
 import com.plv.livescenes.download.PLVPlaybackCacheVO;
 import com.plv.livescenes.download.listener.IPLVDownloaderBeforeStartListener;
 import com.plv.livescenes.download.listener.IPLVDownloaderStopListener;
+import com.plv.livescenes.playback.video.api.IPLVPlaybackListenerEvent;
 import com.plv.thirdpart.blankj.utilcode.util.FileUtils;
+
+import net.polyv.android.player.business.scene.common.model.api.vo.PLVVodVideoJsonVO;
+import net.polyv.android.player.business.scene.vod.model.vo.PLVVodVideoTokenVO;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -207,6 +212,13 @@ public class PLVPlaybackCacheLocalStorageDataSource {
                     videoVO.setDownloadStatusEnum(PLVPlaybackCacheDownloadStatusEnum.PAUSING);
                     notifyPlaybackCacheUpdate(videoVO.copy());
                 }
+            }
+        });
+        downloader.setOnVodTokenRequestListener(new IPLVPlaybackListenerEvent.OnVodTokenRequestListener() {
+            @Override
+            public void onRequestToken(String videoId, PLVVodVideoJsonVO videoJson, PLVSugarUtil.Consumer<PLVVodVideoTokenVO> callback) {
+                // 下载点播的加密视频需要在这里配置点播系统token请求逻辑
+                callback.accept(new PLVVodVideoTokenVO("", null));
             }
         });
     }

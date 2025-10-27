@@ -137,6 +137,11 @@ public class PLVLCLiveLandscapeChannelController extends FrameLayout implements 
     }
 
     @Override
+    public ImageView getCastView() {
+        return findViewById(R.id.plvlc_cast_search_land_iv);
+    }
+
+    @Override
     public PLVSimpleImageView getRewardView() {
         return rewardIv;
     }

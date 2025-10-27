@@ -36,6 +36,19 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="plv_buttom_popwindow_anim_style">
+        <item name="android:windowEnterAnimation">@anim/plv_cast_push_bottom_in</item>
+        <!-- 指定显示的动画xml -->
+
+        <item name="android:windowExitAnimation">@anim/plv_cast_push_bottom_out</item>
+        <!-- 指定消失的动画xml -->
+    </style>
+
+    <style name="plv_right_popwindow_anim_style">
+        <item name="android:windowEnterAnimation">@anim/plv_cast_push_right_in</item>
+        <item name="android:windowExitAnimation">@anim/plv_cast_push_right_out</item>
+    </style>
+
     <style name="Widget" />
 
     <!-- Base theme for the menu drawer. -->

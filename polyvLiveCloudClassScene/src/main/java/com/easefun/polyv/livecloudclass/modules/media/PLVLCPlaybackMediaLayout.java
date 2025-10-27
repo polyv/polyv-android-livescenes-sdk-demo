@@ -701,6 +701,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public boolean onKeyDown(int keyCode) {
+        return false;
+    }
+
+    @Override
     public void destroy() {
         if (playbackPlayerPresenter != null) {
             playbackPlayerPresenter.destroy();

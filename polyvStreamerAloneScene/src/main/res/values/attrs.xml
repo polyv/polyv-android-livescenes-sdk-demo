@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PLVSAStreamerMediaOverlayProgressSeekBar">
+        <attr name="plv_seek_bar_height" format="dimension" />
+        <attr name="plv_seek_bar_height_on_drag" format="dimension" />
+        <attr name="plv_progress_drawable_on_drag" format="reference" />
+        <attr name="plv_thumb_drawable_on_drag" format="reference" />
+    </declare-styleable>
+</resources>

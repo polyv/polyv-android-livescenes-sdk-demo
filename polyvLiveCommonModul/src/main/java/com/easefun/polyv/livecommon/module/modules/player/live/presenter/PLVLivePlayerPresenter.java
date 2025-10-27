@@ -25,6 +25,7 @@ import com.easefun.polyv.businesssdk.model.video.PolyvMediaPlayMode;
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.cast.manager.PLVCastBusinessManager;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonController;
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
@@ -160,6 +161,7 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         subVideoView = view.getSubVideoView();
         initSubVideoViewListener();
         initVideoViewListener();
+        initCastListener();
     }
 
     @Override
@@ -414,6 +416,20 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         if (videoView != null) {
             videoView.destroy();
             videoView = null;
+        }
+    }
+
+    @Override
+    public void stopRTCPlay() {
+        if (videoView != null) {
+            videoView.enableRTCPlay(false);
+        }
+    }
+
+    @Override
+    public void startRTCPlay() {
+        if (videoView != null) {
+            videoView.enableRTCPlay(true);
         }
     }
     // </editor-fold>
@@ -894,6 +910,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
         if (view != null && view.getBufferingIndicator() != null) {
             view.getBufferingIndicator().setVisibility(View.GONE);
         }
+    }
+
+    private void initCastListener() {
+        PLVCastBusinessManager.getInstance().setCastInitListener(new PLVCastBusinessManager.OnCastInitListener() {
+            @Override
+            public void onCastInit(boolean initResult) {
+                livePlayerData.postCastInitData(initResult);
+            }
+        });
     }
 
     private void resetErrorViewStatus() {

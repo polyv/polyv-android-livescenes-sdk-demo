@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -37,6 +38,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.modules.cast.manager.PLVCastBusinessManager;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
@@ -290,6 +292,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PLVCastBusinessManager.getInstance().resetState();
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
             @Override
             public void run() {
@@ -354,6 +357,14 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 ).show();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mediaLayout != null && mediaLayout.onKeyDown(keyCode)) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

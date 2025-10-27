@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.streamer.contract;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.SurfaceView;
@@ -12,6 +13,7 @@ import android.view.View;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
+import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.presenter.data.PLVStreamerData;
 import com.easefun.polyv.livescenes.streamer.config.PLVSStreamerConfig;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
@@ -24,6 +26,8 @@ import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.event.linkmic.PLVJoinAnswerSEvent;
 import com.plv.socket.event.linkmic.PLVJoinResponseSEvent;
 import com.plv.socket.user.PLVSocketUserBean;
+
+import net.polyv.android.player.business.scene.common.player.IPLVMediaPlayer;
 
 import java.util.List;
 
@@ -320,6 +324,11 @@ public interface IPLVStreamerContract {
         boolean enableRecordingAudioVolume(boolean enable);
 
         /**
+         * 设置本地麦克风采集音量
+         */
+        void setLocalAudioCaptureVolume(int volume);
+
+        /**
          * 当前是否打开麦克风
          */
         boolean isLocalAudioEnabled();
@@ -395,6 +404,18 @@ public interface IPLVStreamerContract {
          * @return 混流布局类型
          */
         PLVStreamerConfig.MixLayoutType getMixLayoutType();
+
+        /**
+         * 设置混流背景图
+         *
+         * @param mixBackground 混流背景图
+         */
+        void setMixBackground(PLVStreamerMixBackground mixBackground);
+
+        /**
+         * @return 当前使用的混流背景图
+         */
+        PLVStreamerMixBackground getMixBackground();
 
         /**
          * 设置直播推流，是否需要恢复上一场的流继续推流
@@ -653,6 +674,32 @@ public interface IPLVStreamerContract {
          * @param onlyBlurBackground 是否仅模糊背景，为true时，不会使用背景图片，而是使用周围原始背景的模糊效果
          */
         void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground);
+
+        /**
+         * 创建视频覆盖层
+         * <p>
+         * 同一时间只支持一个视频覆盖层，重复创建自动销毁上一个
+         */
+        IPLVMediaPlayer createMediaOverlay();
+
+        /**
+         * 更新视频覆盖层显示区域
+         *
+         * @param displayRect rect.ltrb in 0 ~ 1
+         */
+        void setMediaOverlayDisplayRect(@NonNull RectF displayRect);
+
+        /**
+         * 设置视频覆盖层混音音量
+         *
+         * @param remoteVolume 0 ~ 100
+         */
+        void setMediaOverlayVolume(int remoteVolume);
+
+        /**
+         * 移除视频覆盖层
+         */
+        void removeMediaOverlay(IPLVMediaPlayer mediaOverlay);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

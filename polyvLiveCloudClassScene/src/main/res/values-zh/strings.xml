@@ -22,4 +22,5 @@
     <string name="plvlc_playback_subtitle_title">回放字幕</string>
     <string name="plvlc_playback_subtitle_original">原声字幕</string>
     <string name="plvlc_playback_subtitle_translate">翻译字幕</string>
+    <string name="plvlc_cast_not_allow_when_linkmic">投屏中无法申请连麦</string>
 </resources>

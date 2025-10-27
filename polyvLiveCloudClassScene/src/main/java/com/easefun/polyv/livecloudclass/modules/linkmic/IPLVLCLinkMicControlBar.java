@@ -81,6 +81,11 @@ public interface IPLVLCLinkMicControlBar {
      * 隐藏
      */
     void hide();
+
+    /**
+     * 设置是否允许请求连麦
+     */
+    void setRequestLinkMicEnable(boolean isEnabled);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2. 需要外部响应的事件监听器">

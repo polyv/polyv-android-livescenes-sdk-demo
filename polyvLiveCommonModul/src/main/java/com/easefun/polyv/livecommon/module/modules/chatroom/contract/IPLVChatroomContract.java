@@ -401,6 +401,13 @@ public interface IPLVChatroomContract {
         void setGetChatHistoryCount(int count);
 
         /**
+         * 限制只拉取指定场次的历史消息
+         *
+         * @param sessionId 指定场次，null为不限制
+         */
+        void setLimitRequestChatHistorySessionId(@Nullable String sessionId);
+
+        /**
          * 请求聊天历史记录
          *
          * @param viewIndex 调用该方法的view的索引，没有时传0
