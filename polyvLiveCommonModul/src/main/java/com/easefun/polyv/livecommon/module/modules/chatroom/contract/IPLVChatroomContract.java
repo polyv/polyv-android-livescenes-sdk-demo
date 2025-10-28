@@ -414,6 +414,8 @@ public interface IPLVChatroomContract {
          */
         void requestChatHistory(int viewIndex);
 
+        void clearRequestChatHistoryRecord();
+
         void requestQuizHistory();
 
         /**
