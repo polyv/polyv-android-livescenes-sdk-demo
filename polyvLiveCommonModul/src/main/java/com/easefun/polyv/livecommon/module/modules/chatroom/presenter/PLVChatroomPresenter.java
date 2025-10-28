@@ -633,6 +633,11 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     }
 
     @Override
+    public void clearRequestChatHistoryRecord() {
+        clearHistoryInfo();
+    }
+
+    @Override
     public int[] getSpeakEmojiSizes() {
         return getEmojiSizes(1);
     }
@@ -1116,6 +1121,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         getChatHistoryTime = 0;
         hasRequestHistoryEvent = false;
         isNoMoreChatHistory = false;
+        requestHistoryPage = 1;
         if (chatHistoryDisposable != null) {
             chatHistoryDisposable.dispose();
         }

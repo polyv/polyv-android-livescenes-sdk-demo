@@ -72,7 +72,7 @@ public class PLVScreencastLayout extends FrameLayout implements IPLVScreencastLa
     private boolean isRtcWatch = false;
     private boolean isReconnect = false;
     private boolean stopLocalVideoByScreencast = false;
-    private boolean stopByBitrateChanged = false;
+    private boolean notRecoverLocalVideoOnNextStopState = false;
 
     private IPLVLivePlayerContract.ILivePlayerPresenter livePlayerPresenter;
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -126,6 +126,7 @@ public class PLVScreencastLayout extends FrameLayout implements IPLVScreencastLa
             public void onClick(PLVMediaCastDevice pInfo) {
                 PLVCommonLog.d(TAG, "CastDeviceItemClick: " + pInfo.getFriendlyName());
                 // 断开上一次连接的设备
+                notRecoverLocalVideoOnNextStopState = true;
                 PLVCastBusinessManager.getInstance().disConnect(PLVCastBusinessManager.getInstance().getSelectInfo());
                 PLVCastBusinessManager.getInstance().clearInfos();
 
@@ -148,7 +149,7 @@ public class PLVScreencastLayout extends FrameLayout implements IPLVScreencastLa
                 PLVMediaCastDevice selectInfo = PLVCastBusinessManager.getInstance().getSelectInfo();
 
                 if (selectInfo != null && PLVCastBusinessManager.getInstance().getCastBitratePos() != index) {
-                    stopByBitrateChanged = true;
+                    notRecoverLocalVideoOnNextStopState = true;
                     String url = livePlayerPresenter.getBitrateVO().get(index).getUrl();
                     startCast(url, selectInfo, false);
                     PLVCastBusinessManager.getInstance().setCastBitratePos(index);
@@ -476,11 +477,11 @@ public class PLVScreencastLayout extends FrameLayout implements IPLVScreencastLa
                     break;
                 case PLVCastBusinessManager.STATE_STOP:
                 case PLVCastBusinessManager.STATE_COMPLETION:
-                    if (!stopByBitrateChanged) {
+                    if (!notRecoverLocalVideoOnNextStopState) {
                         hide();
                         recoverLocalVideo();
                     }
-                    stopByBitrateChanged = false;
+                    notRecoverLocalVideoOnNextStopState = false;
                     break;
                 case PLVCastBusinessManager.STATE_CONNECT_FAILURE:
                 case PLVCastBusinessManager.STATE_PLAY_ERROR:

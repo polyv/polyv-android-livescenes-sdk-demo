@@ -839,10 +839,14 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
 
     public void onPlaybackSessionId(String sessionId) {
-        currentSessionId = sessionId;
         if (chatroomPresenter != null && PLAYBACK_REQUEST_HISTORY_MESSAGE_ONLY_SESSION) {
-            chatroomPresenter.setLimitRequestChatHistorySessionId(currentSessionId);
+            chatroomPresenter.setLimitRequestChatHistorySessionId(sessionId);
+            if (sessionId != null && !sessionId.equals(currentSessionId)) {
+                chatroomPresenter.clearRequestChatHistoryRecord();
+                removeChatMessageToList("", true);
+            }
         }
+        currentSessionId = sessionId;
         loadHistoryMessageFirstTime();
     }
     // </editor-fold>
