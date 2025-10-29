@@ -11,8 +11,6 @@ android {
         versionName rootProject.ext.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        renderscriptSupportModeEnabled true
-
         multiDexEnabled true
 
         //依赖的包可能支持很多类型的ABI
@@ -73,6 +71,7 @@ android {
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
         exclude 'lib/*/*_extension.so'
+        pickFirst 'lib/*/libpl_droidsonroids_gif.so'
     }
 }
 
