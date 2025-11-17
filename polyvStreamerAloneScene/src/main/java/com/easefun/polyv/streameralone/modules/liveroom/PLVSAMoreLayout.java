@@ -36,6 +36,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
+import com.easefun.polyv.livecommon.ui.widget.PLVFlexboxLayoutExtKt;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
@@ -1086,12 +1087,16 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_PORT;
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_PORT);
             settingLayoutParam.topMargin = ConvertUtils.dp2px(10);
+            PLVFlexboxLayoutExtKt.placeChildrenEvenly(plvsaMoreSettingsLayout, 5);
+            PLVFlexboxLayoutExtKt.placeChildrenEvenly(moreSettingsInteractLayout, 5);
         } else {
             menuPosition = MENU_DRAWER_POSITION_LAND;
             moreLayoutParam.height = MORE_LAYOUT_HEIGHT_LAND;
             moreLayoutParam.gravity = MORE_LAYOUT_GRAVITY_LAND;
             plvsaMoreLayout.setBackgroundResource(MORE_LAYOUT_BACKGROUND_RES_LAND);
             settingLayoutParam.topMargin = ConvertUtils.dp2px(plvsaMoreSettingsLayout.getChildCount() > 9 ? 48 : 0);
+            PLVFlexboxLayoutExtKt.placeChildrenEvenly(plvsaMoreSettingsLayout, 3);
+            PLVFlexboxLayoutExtKt.placeChildrenEvenly(moreSettingsInteractLayout, 3);
         }
 
         if (menuDrawer != null) {

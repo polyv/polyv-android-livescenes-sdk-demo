@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/plvec_margin_common"
+    android:paddingBottom="8dp"
     android:paddingLeft="@dimen/plvec_margin_common"
     android:paddingRight="@dimen/plvec_margin_common">
 

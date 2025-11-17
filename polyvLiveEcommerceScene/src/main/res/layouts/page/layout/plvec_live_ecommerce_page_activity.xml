@@ -22,61 +22,70 @@
         android:layout_height="match_parent"
         android:inflatedId="@+id/plvec_linkmic_viewstub"
         android:layout="@layout/plvec_linkmic_layout_view_stub"/>
-    <!--跑马灯-->
-    <com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView
-        android:id="@+id/plvec_marquee_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <!-- 上层的viewpager布局 -->
-    <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager
-        android:id="@+id/watch_info_vp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="none"
-        android:overScrollMode="never" />
 
-    <!-- 页面关闭按钮 -->
-    <ImageView
-        android:id="@+id/close_page_iv"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="right"
-        android:layout_marginTop="@dimen/plvec_margin_top_l"
-        android:layout_marginRight="@dimen/plvec_margin_common"
-        android:src="@drawable/plvec_close" />
-
-    <!-- 连麦控制器 -->
-    <ViewStub
-        android:id="@+id/plvec_ppt_linkmic_controller"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:inflatedId="@+id/plvec_ppt_linkmic_controller"
-        android:layout="@layout/plvec_linkmic_controller_view_stub" />
-
-    <!--直播间弹层布局容器-->
-    <FrameLayout
-        android:id="@+id/plvec_popup_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
-        <!-- 互动应用 -->
-        <ViewStub
-            android:id="@+id/plvec_ppt_interact_layout"
+
+        <!--跑马灯-->
+        <com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView
+            android:id="@+id/plvec_marquee_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 上层的viewpager布局 -->
+        <com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager
+            android:id="@+id/watch_info_vp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:inflatedId="@+id/plvec_ppt_interact_layout"
-            android:layout="@layout/plv_interact_layout_view_stub" />
+            android:fadingEdge="none"
+            android:overScrollMode="never" />
 
+        <!-- 页面关闭按钮 -->
+        <ImageView
+            android:id="@+id/close_page_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="@dimen/plvec_margin_common"
+            android:src="@drawable/plvec_close" />
+
+        <!-- 连麦控制器 -->
         <ViewStub
-            android:id="@+id/plvec_popover_layout"
-            android:inflatedId="@+id/plvec_float_layout"
-            android:layout="@layout/plv_popover_layout_stub"
+            android:id="@+id/plvec_ppt_linkmic_controller"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:inflatedId="@+id/plvec_ppt_linkmic_controller"
+            android:layout="@layout/plvec_linkmic_controller_view_stub" />
+
+        <!--直播间弹层布局容器-->
+        <FrameLayout
+            android:id="@+id/plvec_popup_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 可以在全屏下根据键盘弹起的布局-->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- 互动应用 -->
+            <ViewStub
+                android:id="@+id/plvec_ppt_interact_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inflatedId="@+id/plvec_ppt_interact_layout"
+                android:layout="@layout/plv_interact_layout_view_stub" />
+
+            <ViewStub
+                android:id="@+id/plvec_popover_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inflatedId="@+id/plvec_float_layout"
+                android:layout="@layout/plv_popover_layout_stub" />
+        </FrameLayout>
+
     </FrameLayout>
+
 </FrameLayout>

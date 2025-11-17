@@ -35,11 +35,14 @@ import com.easefun.polyv.livescenes.feature.interact.PLVInteractWebView;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import net.plv.android.jsbridge.CallBackFunction;
 
 import java.util.List;
 
@@ -142,7 +145,22 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void setOnClickProductDetailListener(PLVInteractLayout2.OnClickProductDetailListener listener) {
+
+    }
+
+    @Override
+    public void processClickProductEvent(String param, CallBackFunction callBackFunction) {
+
+    }
+
+    @Override
     public void onShowJobDetail(PLVShowJobDetailEvent param) {
+
+    }
+
+    @Override
+    public void onShowProductDetail(PLVShowProductDetailEvent param) {
 
     }
 

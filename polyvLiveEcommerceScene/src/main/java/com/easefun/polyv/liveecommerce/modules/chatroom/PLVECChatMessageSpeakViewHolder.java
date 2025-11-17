@@ -104,6 +104,7 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
                                 chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                             }
                             chatQuoteVO.setUserId(userId);
+                            chatQuoteVO.setUserType(userType);
                             chatQuoteVO.setNick(nickName);
                             chatQuoteVO.setContent(speakMsg.toString());
                             chatQuoteVO.setObjects(speakMsg);

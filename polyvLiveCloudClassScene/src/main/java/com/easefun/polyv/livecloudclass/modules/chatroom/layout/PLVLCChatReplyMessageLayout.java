@@ -15,7 +15,11 @@ import android.widget.TextView;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
@@ -85,12 +89,23 @@ public class PLVLCChatReplyMessageLayout extends FrameLayout {
 
         final boolean isImageContent = chatQuoteVO.getContent() == null && chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
 
-        chatReplyNameTv.setText(format("{}：", chatQuoteVO.getNick()));
+        String nick = maskViewerName(chatQuoteVO);
+        chatReplyNameTv.setText(format("{}：", nick));
         if (isImageContent) {
             chatReplyContentTv.setText("[图片]");// no need i18n
         } else {
             chatReplyContentTv.setText((CharSequence) chatQuoteVO.getObjects()[0]);
         }
+    }
+
+    private String maskViewerName(PLVChatQuoteVO chatQuoteVO) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                chatQuoteVO.getNick(),
+                chatQuoteVO.getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())
+        );
     }
 
 }

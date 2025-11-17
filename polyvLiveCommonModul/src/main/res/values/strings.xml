@@ -226,6 +226,10 @@
     <string name="plv_commodity_now_knowledge">Knowledge</string>
     <string name="plv_commodity_position_details">Position Details</string>
     <string name="plv_commodity_price_not_opened">To Be Revealed</string>
+    <string name="plv_commodity_watch_now">Watch Now</string>
+    <string name="plv_commodity_pending">Pending</string>
+    <string name="plv_commodity_explaining">Explaining</string>
+    <string name="plv_commodity_ai_card">AI Card</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">Call failed</string>
@@ -549,6 +553,7 @@
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">Confirm to exit playback</string>
     <string name="plv_playback_title">Live Replay</string>
+    <string name="plv_playback_video_marks_title">Exciting highlights</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">No more data</string>
     <string name="plv_previous_load_error">Loading failed, please tap retry</string>
@@ -677,6 +682,7 @@
     <string name="plv_beauty_filter_aesthetic">Aesthetic</string>
 
     <string name="plv_interact_sign_in_timeout_toast">You do not sign in on time, automatically quit the live room</string>
+    <string name="plv_subtitle_setting_title">Subtitle settings</string>
     <string name="plv_subtitle_language_chinese">Chinese</string>
     <string name="plv_subtitle_language_english">English</string>
     <string name="plv_subtitle_language_cantonese">Cantonese</string>

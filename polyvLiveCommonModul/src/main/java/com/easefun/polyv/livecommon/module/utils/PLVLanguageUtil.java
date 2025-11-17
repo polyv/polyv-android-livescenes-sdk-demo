@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.LocaleList;
 import android.support.annotation.RequiresApi;
 import android.support.v4.os.ConfigurationCompat;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 
@@ -127,6 +126,13 @@ public class PLVLanguageUtil {
 
     public static boolean isENLanguage() {
         return userLocale != null && !LANGUAGE_ZH.equals(userLocale.getLanguage());
+    }
+
+    public static Locale getLocale() {
+        if (userLocale != null) {
+            return userLocale;
+        }
+        return Locale.SIMPLIFIED_CHINESE;
     }
 
     public static boolean isEqualsLanguage(int languageType) {

@@ -36,11 +36,15 @@ import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
@@ -305,6 +309,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                 }
                 chatQuoteVO.setUserId(userId);
+                chatQuoteVO.setUserType(userType);
                 chatQuoteVO.setNick(nickName);
                 chatQuoteVO.setContent(speakMsg.toString());
                 chatQuoteVO.setObjects(speakMsg);
@@ -329,6 +334,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                     chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                 }
                 chatQuoteVO.setUserId(userId);
+                chatQuoteVO.setUserType(userType);
                 chatQuoteVO.setNick(nickName);
                 PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
                 imageBean.setUrl(chatImgUrl);
@@ -380,7 +386,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
         //设置昵称
         if (nickName != null) {
-            String showName = nickName;
+            String showName = maskViewerName(nickName);
             if (loginUserId != null && loginUserId.equals(userId)) {
                 showName = showName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
@@ -406,7 +412,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             }
             if (chatMsgTv != null) {
                 chatMsgTv.setVisibility(View.VISIBLE);
-                SpannableStringBuilder nickSpan = new SpannableStringBuilder(nickName);
+                SpannableStringBuilder nickSpan = new SpannableStringBuilder(maskViewerName(nickName));
                 nickSpan.append(": ");
                 nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 chatMsgTv.setTextInner(nickSpan.append(speakMsg), isSpecialType);
@@ -421,7 +427,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             }
             if (chatMsgTv != null) {
                 chatMsgTv.setVisibility(View.VISIBLE);
-                SpannableStringBuilder nickSpan = new SpannableStringBuilder(nickName);
+                SpannableStringBuilder nickSpan = new SpannableStringBuilder(maskViewerName(nickName));
                 nickSpan.append(": ");
                 nickSpan.setSpan(new ForegroundColorSpan(Color.parseColor(actor != null ? "#FFD36D" : "#6DA7FF")), 0, nickSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 chatMsgTv.setTextInner(nickSpan.append(speakFileData.getName()), false);
@@ -483,7 +489,7 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
 
         //设置被回复人相关的信息
         if (chatQuoteVO != null) {
-            String nickName = chatQuoteVO.getNick();
+            String nickName = maskViewerName(chatQuoteVO);
             if (loginUserId != null && loginUserId.equals(chatQuoteVO.getUserId())) {
                 nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
             }
@@ -517,6 +523,26 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         }
 
         processOverLengthMessage();
+    }
+
+    private String maskViewerName(String nickName) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                nickName,
+                userType,
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(userId)
+        );
+    }
+
+    private String maskViewerName(PLVChatQuoteVO chatQuoteVO) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                chatQuoteVO.getNick(),
+                chatQuoteVO.getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())
+        );
     }
 
     // </editor-fold>

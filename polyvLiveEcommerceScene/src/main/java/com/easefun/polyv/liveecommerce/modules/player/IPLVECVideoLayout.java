@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.linkmic.PLVLinkMicConstant;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 
 import java.util.List;
 
@@ -132,6 +133,12 @@ public interface IPLVECVideoLayout {
     void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener);
 
     void updatePlayCenterView();
+
+    List<PLVPlaybackSubtitleVO> getAllSubtitleSettings();
+
+    List<PLVPlaybackSubtitleVO> getShowSubtitles();
+
+    void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
 
     /**
      * 销毁，销毁播放器及相关资源

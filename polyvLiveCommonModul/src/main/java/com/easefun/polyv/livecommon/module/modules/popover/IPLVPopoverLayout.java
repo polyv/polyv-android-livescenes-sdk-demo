@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductDetailLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
@@ -32,6 +33,10 @@ public interface IPLVPopoverLayout {
      */
     PLVPointRewardLayout getRewardView();
 
+    /**
+     * 获取商品详情布局
+     */
+    PLVProductDetailLayout getProductDetailLayout();
 
     /**
      * 设置积分打赏配置回调监听

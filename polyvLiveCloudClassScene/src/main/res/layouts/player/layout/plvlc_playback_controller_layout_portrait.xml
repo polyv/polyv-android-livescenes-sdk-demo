@@ -24,6 +24,7 @@
         android:src="@drawable/plvlc_controller_video_bottom_portrait_gradient" />
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/plvlc_playback_controller_bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -67,7 +68,7 @@
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <SeekBar
+        <com.easefun.polyv.livecloudclass.modules.media.controller.widget.PLVLCPlaybackControllerSeekBar
             android:id="@+id/plvlc_playback_controller_port_sb_playprogress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -109,6 +110,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/plvlc_playback_controller_port_iv_full_screen" />
     </android.support.constraint.ConstraintLayout>
+
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackVideoMarksBar
+        android:id="@+id/plvlc_playback_video_marks_bar_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/plvlc_playback_controller_bottom_layout"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/plvlc_playback_more_control_ll"

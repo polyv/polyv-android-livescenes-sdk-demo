@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductExplainActivity;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeEventConst;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
@@ -31,6 +32,7 @@ import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
@@ -112,12 +114,37 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                         PLVECCommodityDetailActivity.start(getContext(), productLink);
                     }
                 })
+                .setOnReceiveEventClickProductExplainButtonHandler(new BridgeHandler() {
+                    @Override
+                    public void handler(String s, CallBackFunction callBackFunction) {
+                        if (!PLVDebounceClicker.tryClick(this.getClass().getName(), seconds(1).toMillis())) {
+                            return;
+                        }
+                        final PLVInteractProductOnClickDataVO onClickDataVO = PLVGsonUtil.fromJson(PLVInteractProductOnClickDataVO.class, s);
+                        if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
+                            return;
+                        }
+                        PLVProductExplainActivity.start(getContext(), onClickDataVO.getData().getProductId(), getNativeAppPramsInfo());
+                    }
+                })
                 .setOnReceiverEventShowJobDetailHandler(new BridgeHandler() {
                     @Override
                     public void handler(String data, CallBackFunction function) {
                         if (listener != null) {
                             PLVShowJobDetailEvent event = PLVGsonUtil.fromJson(PLVShowJobDetailEvent.class, data);
                             listener.onShowJobDetail(event);
+                        }
+                    }
+                })
+                .setOnReceiveEventShowProductDetailHandler(new BridgeHandler() {
+                    @Override
+                    public void handler(String data, CallBackFunction function) {
+                        if (listener != null) {
+                            PLVShowProductDetailEvent event = PLVGsonUtil.fromJson(PLVShowProductDetailEvent.class, data);
+                            if (event == null) {
+                                return;
+                            }
+                            listener.onShowProductDetail(event);
                         }
                     }
                 })
@@ -293,6 +320,8 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
 
     public interface OnViewActionListener {
         void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        void onShowProductDetail(PLVShowProductDetailEvent param);
 
         void onShowOpenLink();
     }

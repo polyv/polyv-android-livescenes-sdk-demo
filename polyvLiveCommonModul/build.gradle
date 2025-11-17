@@ -7,8 +7,6 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         consumerProguardFiles 'proguard-rules.pro'
-
-        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -32,14 +30,14 @@ android {
 dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:gridlayout-v7:27.1.1'
-    api 'net.polyv.android:polyvSDKLiveScenes:1.29.1'
+    api 'net.polyv.android:polyvSDKLiveScenes:1.29.3'
 
     //glide
     api("com.github.bumptech.glide:okhttp3-integration:4.7.1") {
 //        exclude group:'com.github.bumptech.glide',module:'glide'
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.23'
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.28'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
     api 'android.arch.persistence.room:runtime:1.1.1'

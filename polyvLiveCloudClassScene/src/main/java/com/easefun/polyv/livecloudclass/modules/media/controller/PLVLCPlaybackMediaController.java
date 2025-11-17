@@ -19,7 +19,9 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
+import com.easefun.polyv.livecloudclass.modules.media.controller.widget.PLVLCPlaybackControllerSeekBar;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackMoreLayout;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackVideoMarksBar;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
@@ -30,6 +32,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
@@ -62,7 +65,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private TextView tvCurrentTimeLand;
     private TextView tvTotalTimeLand;
     private ImageView ivSubviewShowLand;
-    private SeekBar sbPlayProgressLand;
+    private PLVLCPlaybackControllerSeekBar sbPlayProgressLand;
     private ImageView btnMoreLand;
     private ImageView floatingLandIv;
     private ImageView ivBackLand;
@@ -86,11 +89,13 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
 
     //观看热度
     private TextView videoViewerCountLandTv;
+    private PLVLCPlaybackVideoMarksBar playbackVideoMarksBarLand;
+
     /**** 竖屏View **/
     private ImageView ivPlayPausePort;
     private TextView tvCurrentTimePort;
     private TextView tvTotalTimePort;
-    private SeekBar sbPlayProgressPort;
+    private PLVLCPlaybackControllerSeekBar sbPlayProgressPort;
     private ImageView iVFullScreenPort;
     private ImageView ivSubviewShowPort;
     private ImageView btnMorePort;
@@ -102,6 +107,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private RelativeLayout rlRootPort;
     //观看热度
     private TextView videoViewerCountPortTv;
+    private PLVLCPlaybackVideoMarksBar playbackVideoMarksBarPort;
     /**** 更多布局 **/
     private PLVLCPlaybackMoreLayout moreLayout;
     //重新打开悬浮窗提示
@@ -185,6 +191,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         welfareLotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_welfare_lottery_enter_tips_land_view);
 
         videoViewerCountLandTv = findViewById(R.id.plvlc_playback_count_land_tv);
+        playbackVideoMarksBarLand = findViewById(R.id.plvlc_playback_video_marks_bar_land);
 
         //port layout
         ivPlayPausePort = findViewById(R.id.plvlc_playback_controller_port_iv_play_pause);
@@ -200,6 +207,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         tvVideoNamePort = findViewById(R.id.plvlc_playback_controller_port_tv_video_name);
         rlRootPort = findViewById(R.id.plvlc_playback_controller_port_rl_root);
         videoViewerCountPortTv = findViewById(R.id.plvlc_playback_viewer_count_port_tv);
+        playbackVideoMarksBarPort = findViewById(R.id.plvlc_playback_video_marks_bar_port);
 
         tvReopenFloatingViewTip = findViewById(R.id.plvlc_playback_player_controller_tv_reopen_floating_view);
 
@@ -283,6 +291,22 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                         }
                     }
                 });
+        commodityViewModel.getProductExplainLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+                        if (aBoolean != null) {
+                            if (aBoolean) {
+                                playerPresenter.pause();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player pause");
+                            } else {
+                                playerPresenter.resume();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player resume");
+                            }
+                        }
+                    }
+                });
     }
 
     // </editor-fold>
@@ -338,6 +362,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     public void setPlaybackPlayerPresenter(IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter) {
         this.playerPresenter = playerPresenter;
         observePlayInfoVO();
+        playbackVideoMarksBarPort.initData(playerPresenter);
+        playbackVideoMarksBarLand.initData(playerPresenter);
+        sbPlayProgressPort.initData(playerPresenter);
+        sbPlayProgressLand.initData(playerPresenter);
     }
 
     @Override

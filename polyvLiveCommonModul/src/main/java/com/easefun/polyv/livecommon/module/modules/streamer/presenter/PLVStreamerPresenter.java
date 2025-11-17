@@ -698,8 +698,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 streamerManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
                 return;
             }
-            boolean isAloneChannelType = liveRoomDataManager.getConfig().isAloneChannelType();
-            streamerManager.setupLocalVideo(renderView, isAloneChannelType ? PLVStreamerConfig.RenderMode.RENDER_MODE_FIT : PLVStreamerConfig.RenderMode.RENDER_MODE_HIDDEN);
+            int renderMode = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .getOrDefault(PLVChannelFeature.LIVE_LINKMIC_VIDEO_RENDER_MODE, PLVLinkMicConstant.RenderMode.RENDER_MODE_HIDDEN);
+            streamerManager.setupLocalVideo(renderView, renderMode);
             myRenderView = renderView;
             tryAttachWaterToRenderParent();
         } else {
@@ -747,6 +748,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         streamerStatus = STREAMER_STATUS_STOP;
         streamerManager.stopLiveStream();
         streamerData.postStreamerStatus(false);
+        liveRoomDataManager.getStreamerStatusLiveData().postValue(false);
         callbackToView(new ViewRunnable() {
             @Override
             public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -1510,6 +1512,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             public void onLiveStreamingStart() {
                 streamerStatus = STREAMER_STATUS_START_SUCCESS;
                 streamerData.postStreamerStatus(true);
+                liveRoomDataManager.getStreamerStatusLiveData().postValue( true);
                 streamerLinkMicMsgHandler.changeLinkMicType(streamerLinkMicMsgHandler.isVideoLinkMic());
                 callbackToView(new ViewRunnable() {
                     @Override
@@ -2092,6 +2095,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                     callUpdateGuestStatus(false);
                 }
                 streamerData.postStreamerStatus(isLive);
+                liveRoomDataManager.getStreamerStatusLiveData().postValue(isLive);
                 callbackToView(new ViewRunnable() {
                     @Override
                     public void run(@NonNull @NotNull IPLVStreamerContract.IStreamerView view) {

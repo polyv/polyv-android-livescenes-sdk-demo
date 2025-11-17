@@ -79,9 +79,11 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -1263,6 +1265,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         @Override
+        public void onShowProductDetail(PLVShowProductDetailEvent param) {
+            if (popoverLayout != null) {
+                popoverLayout.getProductDetailLayout().showProductDetail(param.getProductId());
+            }
+        }
+
+        @Override
         public void onShowOpenLink() {
             if (popoverLayout != null) {
                 popoverLayout.getInteractLayout().onShowOpenLink();
@@ -1348,10 +1357,32 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         @Override
+        public void onShowProductDetail(PLVShowProductDetailEvent param) {
+            if (popoverLayout != null) {
+                popoverLayout.getProductDetailLayout().showProductDetail(param.getProductId());
+            }
+        }
+
+        @Override
         public void onShowOpenLink() {
             if (popoverLayout != null) {
                 popoverLayout.getInteractLayout().onShowOpenLink();
             }
+        }
+
+        @Override
+        public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+            return videoLayout.getAllSubtitleSettings();
+        }
+
+        @Override
+        public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+            return videoLayout.getShowSubtitles();
+        }
+
+        @Override
+        public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+            videoLayout.setShowSubtitles(subtitles);
         }
 
         @Override

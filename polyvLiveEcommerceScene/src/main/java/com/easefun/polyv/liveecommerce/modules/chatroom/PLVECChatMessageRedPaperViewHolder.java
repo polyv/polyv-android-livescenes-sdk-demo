@@ -15,8 +15,12 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 /**
@@ -56,7 +60,7 @@ public class PLVECChatMessageRedPaperViewHolder extends PLVECChatMessageCommonVi
                         return drawable;
                     }
                 })
-                .append(PLVAppUtils.formatString(R.string.plv_red_paper_send_msg, redPaperEvent.getUser().getNick(), PLVRedPaperType.matchOrDefault(redPaperEvent.getType(), PLVRedPaperType.DEFAULT_RED_PAPER).getTypeName()))
+                .append(PLVAppUtils.formatString(R.string.plv_red_paper_send_msg, maskViewerName(redPaperEvent.getUser().getNick()), PLVRedPaperType.matchOrDefault(redPaperEvent.getType(), PLVRedPaperType.DEFAULT_RED_PAPER).getTypeName()))
                 .appendExclude(PLVAppUtils.formatString(R.string.plv_red_paper_get), new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
@@ -72,5 +76,15 @@ public class PLVECChatMessageRedPaperViewHolder extends PLVECChatMessageCommonVi
                 });
         chatroomRedPaperContentTv.setText(text);
         chatroomRedPaperContentTv.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private String maskViewerName(String nickName) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                nickName,
+                userType,
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(userId)
+        );
     }
 }

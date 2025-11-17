@@ -254,6 +254,54 @@
 
     </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
 
+    <FrameLayout
+        android:id="@+id/plvsa_status_bar_card_layout"
+        android:layout_width="match_parent"
+        android:layout_height="222dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plvsa_status_bar_notification_layout"
+        app:plv_radius="18dp">
+
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+            android:id="@+id/plvsa_status_bar_ai_card_iv_layout"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="#33000000"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            app:plv_radius="4dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:src="@drawable/plvsa_status_bar_ai_card_ic" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="@drawable/plvsa_status_bar_card_bg"
+                android:gravity="center"
+                android:text="@string/plv_commodity_ai_card"
+                android:textColor="#ff5252"
+                android:textSize="8sp" />
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+
+        <com.easefun.polyv.livecommon.module.modules.commodity.PLVProductAICardLayout
+            android:id="@+id/plvsa_status_bar_ai_card_web_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+    </FrameLayout>
+
     <com.easefun.polyv.streameralone.modules.statusbar.PLVSAPushDowngradeAlertLayout
         android:id="@+id/plvsa_status_bar_push_downgrade_alert_layout"
         android:layout_width="wrap_content"

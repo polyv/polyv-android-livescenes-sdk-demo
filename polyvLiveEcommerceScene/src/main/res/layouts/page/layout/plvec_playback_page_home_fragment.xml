@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingBottom="@dimen/plvec_margin_common"
-    android:paddingTop="@dimen/plvec_margin_top">
+    android:paddingBottom="8dp"
+    android:paddingTop="2dp">
 
     <!--观看信息布局-->
     <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView
@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="63dp">
+        android:layout_marginBottom="47dp">
 
         <ImageView
             android:id="@+id/play_control_iv"
@@ -179,7 +179,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="@dimen/plvec_margin_common"
         android:layout_toStartOf="@+id/more_iv"
-        android:layout_marginBottom="15dp"
         android:visibility="gone"
         tools:visibility="visible"
         android:src="@drawable/plvec_shopping_trolley" />
@@ -192,7 +191,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/plvec_margin_common"
-        android:layout_marginBottom="15dp"
         android:src="@drawable/plvec_more" />
 
     <!--回放列表-->
@@ -203,7 +201,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="15dp"
         android:src="@drawable/plvec_playback_list" />
 
     <LinearLayout

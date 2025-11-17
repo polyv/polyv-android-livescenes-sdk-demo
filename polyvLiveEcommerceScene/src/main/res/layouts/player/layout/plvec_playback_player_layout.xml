@@ -104,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="130dp"
         android:background="#99000000"
         android:paddingHorizontal="12dp"
         android:paddingVertical="7dp"

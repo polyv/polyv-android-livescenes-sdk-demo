@@ -27,6 +27,7 @@ import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayError;
 import com.easefun.polyv.businesssdk.api.common.player.PolyvPlayerScreenRatio;
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.marquee.IPLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeView;
 import com.easefun.polyv.livecommon.module.modules.player.PLVEmptyMediaController;
@@ -53,6 +54,7 @@ import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveAudioModeView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.business.api.common.player.PLVPlayerConstant;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.log.elog.PLVELogsService;
 import com.plv.foundationsdk.utils.PLVAppUtils;
@@ -60,11 +62,13 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -75,7 +79,7 @@ import java.util.List;
 public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayout, View.OnClickListener {
     private static final String TAG = "PLVECLiveVideoLayout";
     // <editor-fold defaultstate="collapsed" desc="变量">
-
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
     //是否允许播放片头广告
     private boolean isAllowOpenAdHead = true;
     //直播播放器横屏视频、音频模式的播放器区域位置
@@ -209,6 +213,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         initPlayErrorView();
         initSubVideoViewChangeListener();
         observeFloatingPlayer();
+        observeCommodityStatus();
     }
 
     private void initVideoView() {
@@ -309,6 +314,25 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                     }
                 });
     }
+
+    private void observeCommodityStatus() {
+        commodityViewModel.getProductExplainLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+                        if (aBoolean != null && !isJoinLinkMic) {
+                            if (aBoolean) {
+                                livePlayerPresenter.pause();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player pause");
+                            } else {
+                                livePlayerPresenter.restartPlay();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player restart");
+                            }
+                        }
+                    }
+                });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的common方法">
@@ -396,6 +420,21 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     @Override
     public void addOnPlayerStateListener(IPLVOnDataChangedListener<PLVPlayerState> listener) {
         livePlayerPresenter.getData().getPlayerState().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
+    public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+
     }
 
     @Override

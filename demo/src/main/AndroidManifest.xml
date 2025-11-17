@@ -12,6 +12,7 @@
         android:label="@string/plv_app_name"
         android:roundIcon="@drawable/ic_launcher"
         android:networkSecurityConfig="@xml/polyv_network_security_config"
+        android:enableOnBackInvokedCallback="false"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"

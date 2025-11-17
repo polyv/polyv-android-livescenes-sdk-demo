@@ -63,6 +63,10 @@ public class PLVECMoreLayout extends FrameLayout {
      * 截屏
      */
     public static final String MORE_FUNCTION_TYPE_SCREENSHOT = "MORE_FUNCTION_TYPE_SCREENSHOT";
+    /**
+     * 字幕
+     */
+    public static final String MORE_FUNCTION_TYPE_SUBTITLE = "MORE_FUNCTION_TYPE_SUBTITLE";
 
     /**
      * 抽奖挂件事件
@@ -83,7 +87,8 @@ public class PLVECMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_RATE, R.drawable.plvec_live_more_rate, PLVAppUtils.getString(R.string.plv_player_speed), false),
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvec_live_more_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true),
             new PLVChatFunctionVO(MORE_FUNCTION_TYPE_PLAY_SETTING, R.drawable.plvec_live_more_play_setting, PLVAppUtils.getString(R.string.plv_live_play_setting), true),
-            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_SCREENSHOT, R.drawable.plvec_more_screenshot, PLVAppUtils.getString(R.string.plv_live_screenshot), PLVScreenshotHelper.SHOW_SCREENSHOT_VIEW)
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_SCREENSHOT, R.drawable.plvec_more_screenshot, PLVAppUtils.getString(R.string.plv_live_screenshot), PLVScreenshotHelper.SHOW_SCREENSHOT_VIEW),
+            new PLVChatFunctionVO(MORE_FUNCTION_TYPE_SUBTITLE, R.drawable.plvec_live_more_subtitle_setting, PLVAppUtils.getString(R.string.plv_subtitle_setting_title), false)
     );
 
     //初始化不支持的事件

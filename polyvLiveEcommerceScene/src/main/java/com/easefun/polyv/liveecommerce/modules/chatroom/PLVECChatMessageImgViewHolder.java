@@ -53,6 +53,7 @@ public class PLVECChatMessageImgViewHolder extends PLVECChatMessageCommonViewHol
                             chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                         }
                         chatQuoteVO.setUserId(userId);
+                        chatQuoteVO.setUserType(userType);
                         chatQuoteVO.setNick(nickName);
                         PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
                         imageBean.setUrl(chatImgUrl);

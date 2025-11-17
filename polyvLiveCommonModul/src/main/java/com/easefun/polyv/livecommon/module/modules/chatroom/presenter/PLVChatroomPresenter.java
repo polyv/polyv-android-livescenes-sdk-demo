@@ -71,6 +71,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
@@ -1039,6 +1040,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                                 }
                                 String goodImage = rewardEvent.getContent().getGimg();
                                 String nickName = rewardEvent.getContent().getUnick();
+                                nickName = maskViewerName(nickName, PLVSocketUserConstant.USERTYPE_STUDENT, rewardEvent.getContent().getRewardUser().getUserId());
                                 int goodNum = rewardEvent.getContent().getGoodNum();
                                 Spannable rewardSpan = generateRewardSpan(nickName, goodImage, goodNum);
                                 if (rewardSpan != null) {
@@ -1417,6 +1419,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             if (rewardEvent.getContent() != null) {
                                 String goodImage = rewardEvent.getContent().getGimg();
                                 String nickName = rewardEvent.getContent().getUnick();
+                                nickName = maskViewerName(nickName, PLVSocketUserConstant.USERTYPE_STUDENT, rewardEvent.getContent().getRewardUser().getUserId());
                                 int goodNum = rewardEvent.getContent().getGoodNum();
                                 Spannable rewardSpan = generateRewardSpan(nickName, goodImage, goodNum);
                                 if (rewardSpan != null) {
@@ -1773,6 +1776,16 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 initializer.accept(overLengthMessageEvent.getData().getContent());
             }
         });
+    }
+
+    private String maskViewerName(String nickName, String userType, String userId) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                nickName,
+                userType,
+                getConfig().getUser().getViewerId().equals(userId)
+        );
     }
     // </editor-fold>
     

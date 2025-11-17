@@ -11,8 +11,6 @@ android {
         versionName rootProject.ext.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        renderscriptSupportModeEnabled true
-
         multiDexEnabled true
 
         //依赖的包可能支持很多类型的ABI
@@ -73,6 +71,7 @@ android {
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
         exclude 'lib/*/*_extension.so'
+        pickFirst 'lib/*/libpl_droidsonroids_gif.so'
     }
 }
 
@@ -90,7 +89,7 @@ dependencies {
     implementation project(':polyvLiveStreamerScene')
     implementation project(':polyvStreamerAloneScene')
 
-    runtimeOnly 'net.polyv.android:beauty-gpu-impl:1.1.9'
+    runtimeOnly 'net.polyv.android:beauty-gpu-impl:1.1.10'
 //    runtimeOnly 'net.polyv.android:beauty-byted-impl:1.1.3'
     runtimeOnly 'net.polyv.android:meidapipe-impl:1.1.1'
 

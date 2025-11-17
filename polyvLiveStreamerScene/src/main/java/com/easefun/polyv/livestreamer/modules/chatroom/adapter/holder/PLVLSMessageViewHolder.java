@@ -248,6 +248,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                                 if (isImageMessage) {
                                     PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
                                     chatQuoteVO.setUserId(userId);
+                                    chatQuoteVO.setUserType(userType);
                                     chatQuoteVO.setNick(nickName);
                                     PLVChatQuoteVO.ImageBean imageBean = new PLVChatQuoteVO.ImageBean();
                                     imageBean.setUrl(chatImgUrl);
@@ -261,6 +262,7 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                                         public void accept(CharSequence fullMessage) {
                                             PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
                                             chatQuoteVO.setUserId(userId);
+                                            chatQuoteVO.setUserType(userType);
                                             chatQuoteVO.setNick(nickName);
                                             chatQuoteVO.setContent(fullMessage.toString());
                                             chatQuoteVO.setObjects(PLVTextFaceLoader.messageToSpan(PLVChatroomPresenter.convertSpecialString(chatQuoteVO.getContent()), ConvertUtils.dp2px(12), Utils.getApp()));

@@ -337,6 +337,22 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                         }
                     }
                 });
+        commodityViewModel.getProductExplainLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<Boolean>() {
+
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+                        if (aBoolean != null && getLiveMediaDispatcher() instanceof VideoViewDispatcher) {
+                            if (aBoolean) {
+                                livePlayerPresenter.pause();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player pause");
+                            } else {
+                                livePlayerPresenter.restartPlay();
+                                PLVCommonLog.d(TAG, "onProductExplainLiveData player restart");
+                            }
+                        }
+                    }
+                });
     }
 
     private void observePaintAbility() {

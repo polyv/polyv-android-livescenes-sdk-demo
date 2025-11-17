@@ -67,12 +67,14 @@ import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackCallDataExListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackData;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -80,6 +82,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import kotlin.Triple;
@@ -195,7 +198,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             toTopViewLayoutParams = (RelativeLayout.LayoutParams) toTopView.getLayoutParams();
         }
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+//            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             backIv.setVisibility(View.VISIBLE);
             if (morePopupView != null) {
                 morePopupView.onLandscape();
@@ -207,7 +210,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(16), 0, 0);
             }
         } else {
-            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+//            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             backIv.setVisibility(View.GONE);
 
             if (morePopupView != null) {
@@ -263,6 +266,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 public void onShowJobDetail(PLVShowJobDetailEvent param) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onShowJobDetail(param);
+                    }
+                }
+
+                @Override
+                public void onShowProductDetail(PLVShowProductDetailEvent param) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowProductDetail(param);
                     }
                 }
 
@@ -921,6 +931,29 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                         onViewActionListener.onClickDynamicFunction(event);
                     }
                 }
+
+                @Override
+                public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+                    if (onViewActionListener != null) {
+                        return onViewActionListener.getAllSubtitleSettings();
+                    }
+                    return Collections.emptyList();
+                }
+
+                @Override
+                public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+                    if (onViewActionListener != null) {
+                        return onViewActionListener.getShowSubtitles();
+                    }
+                    return Collections.emptyList();
+                }
+
+                @Override
+                public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.setShowSubtitles(subtitles);
+                    }
+                }
             });
         } else if (id == R.id.more_video_list_iv) {
             //弹出更多回放视频的popview
@@ -1003,9 +1036,21 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         void onShowJobDetail(PLVShowJobDetailEvent param);
 
         /**
+         * 展示商品详情
+         * @param param
+         */
+        void onShowProductDetail(PLVShowProductDetailEvent param);
+
+        /**
          * 展示用于跳转微信复制的二维码
          */
         void onShowOpenLink();
+
+        List<PLVPlaybackSubtitleVO> getAllSubtitleSettings();
+
+        List<PLVPlaybackSubtitleVO> getShowSubtitles();
+
+        void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
     }
     // </editor-fold>
 }

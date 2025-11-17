@@ -4,6 +4,9 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.plv.livescenes.playback.vo.PLVPlaybackMarksResponseVO;
+
+import java.util.List;
 
 /**
  * 回放播放器数据，主要用于提供给 非mvp的v 监听/获取播放器的数据
@@ -20,6 +23,8 @@ public class PLVPlaybackPlayerData {
 
     //seek完成
     private MutableLiveData<Integer> seekCompleteVO = new MutableLiveData<>();
+    // 精彩看点
+    private MutableLiveData<List<PLVPlaybackMarksResponseVO.Data>> videoMarks = new MutableLiveData<>();
 
     // <editor-fold defaultstate="collapsed" desc="播放状态">
     public void postPrepared() {
@@ -58,6 +63,16 @@ public class PLVPlaybackPlayerData {
 
     public LiveData<Integer> getSeekCompleteVO() {
         return seekCompleteVO;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="精彩看点">
+    public void postVideoMarks(List<PLVPlaybackMarksResponseVO.Data> videoMarks) {
+        this.videoMarks.postValue(videoMarks);
+    }
+
+    public LiveData<List<PLVPlaybackMarksResponseVO.Data>> getVideoMarks() {
+        return videoMarks;
     }
     // </editor-fold>
 }

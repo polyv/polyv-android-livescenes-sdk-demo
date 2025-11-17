@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductAICardLayout;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
@@ -29,6 +31,7 @@ import com.easefun.polyv.streameralone.R;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSALinkMicRequestTipsLayout;
 import com.easefun.polyv.streameralone.modules.liveroom.PLVSAMemberLayout;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.proxy.PLVDynamicProxy;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
@@ -36,6 +39,9 @@ import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
@@ -49,7 +55,7 @@ import java.util.Locale;
 public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBarLayout, View.OnClickListener {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
-
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
     private View rootView;
     private ImageView plvsaStatusBarCloseIv;
     private PLVRoundRectLayout plvsaStatusBarChannelInfoRl;
@@ -72,6 +78,9 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private PLVRoundRectLayout plvsaStatusBarNotificationLayout;
     private TextView plvsaStatusBarNotificationLabel;
     private TextView plvsaStatusBarNotificationTv;
+    private FrameLayout plvsaStatusBarCardLayout;
+    private PLVRoundRectLayout plvsaStatusBarAICardIvLayout;
+    private PLVProductAICardLayout plvsaStatusBarAICardWebLayout;
     // 有人申请连麦时 连麦提示条布局
     private PLVSALinkMicRequestTipsLayout linkMicRequestTipsLayout;
     private PLVSAChannelInfoLayout channelInfoLayout;
@@ -87,6 +96,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     // 是否打开麦克风、摄像头
     private boolean isOpenAudio = true;
     private boolean isOpenVideo = true;
+    private boolean aiCardEnabled = false;
 
     private OnViewActionListener onViewActionListener;
 
@@ -117,6 +127,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         findView();
         initOnClickListener();
         observeLinkmicRequestLayout();
+        observeCommodityStatus();
     }
 
     private void findView() {
@@ -142,6 +153,9 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         plvsaStatusBarNotificationLabel = (TextView) findViewById(R.id.plvsa_status_bar_notification_label);
         plvsaStatusBarNotificationTv = (TextView) findViewById(R.id.plvsa_status_bar_notification_tv);
         linkMicRequestTipsLayout = findViewById(R.id.plvsa_linkmic_request_layout);
+        plvsaStatusBarCardLayout = findViewById(R.id.plvsa_status_bar_card_layout);
+        plvsaStatusBarAICardIvLayout = findViewById(R.id.plvsa_status_bar_ai_card_iv_layout);
+        plvsaStatusBarAICardWebLayout = findViewById(R.id.plvsa_status_bar_ai_card_web_layout);
 
         memberLayout = new PLVSAMemberLayout(getContext());
     }
@@ -165,6 +179,25 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                 openMemberLayoutAndHideUserRequestTips();
             }
         });
+    }
+
+    private void observeCommodityStatus() {
+        commodityViewModel.getProductRedactLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<PLVProductContentBean>() {
+
+                    @Override
+                    public void onChanged(@Nullable PLVProductContentBean contentBean) {
+                        if (contentBean == null || !aiCardEnabled) {
+                            return;
+                        }
+                        plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
+                        if (contentBean.isProductExplaining()) {
+                            plvsaStatusBarAICardWebLayout.showProductAICard(contentBean.getProductId());
+                        } else if (contentBean.isProductExplained()) {
+                            plvsaStatusBarAICardWebLayout.hideAndStop();
+                        }
+                    }
+                });
     }
 
     private void showStopLiveConfirmLayout() {
@@ -207,6 +240,74 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                 : getContext().getString(R.string.plv_live_room_dialog_steamer_exit_confirm_ask);
     }
 
+    private void initAICardLayout(IPLVLiveRoomDataManager liveRoomDataManager) {
+        aiCardEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.LIVE_PRODUCT_AI_CARD_ENABLED);
+        plvsaStatusBarAICardWebLayout.init(liveRoomDataManager);
+        plvsaStatusBarAICardWebLayout.setOnClickPackUpListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                plvsaStatusBarAICardWebLayout.animate()
+                    .scaleX(0.1f)
+                    .scaleY(0.1f)
+                    .alpha(0f)
+                    .translationX(-plvsaStatusBarAICardWebLayout.getWidth() / 2f)
+                    .translationY(-plvsaStatusBarAICardWebLayout.getHeight() / 2f)
+                    .setDuration(300)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            plvsaStatusBarAICardWebLayout.hide();
+
+                            plvsaStatusBarAICardWebLayout.setScaleX(1f);
+                            plvsaStatusBarAICardWebLayout.setScaleY(1f);
+                            plvsaStatusBarAICardWebLayout.setAlpha(1f);
+                            plvsaStatusBarAICardWebLayout.setTranslationX(0);
+                            plvsaStatusBarAICardWebLayout.setTranslationY(0);
+
+                            plvsaStatusBarAICardIvLayout.setAlpha(0f);
+                            plvsaStatusBarAICardIvLayout.setVisibility(VISIBLE);
+                            plvsaStatusBarAICardIvLayout.animate()
+                                .alpha(1f)
+                                .setDuration(100)
+                                .start();
+                        }
+                    })
+                    .start();
+            }
+        });
+        plvsaStatusBarAICardIvLayout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                plvsaStatusBarAICardIvLayout.animate()
+                    .alpha(0f)
+                    .setDuration(100)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
+                            plvsaStatusBarAICardIvLayout.setAlpha(1f);
+                            
+                            plvsaStatusBarAICardWebLayout.setScaleX(0.1f);
+                            plvsaStatusBarAICardWebLayout.setScaleY(0.1f);
+                            plvsaStatusBarAICardWebLayout.setAlpha(0f);
+                            plvsaStatusBarAICardWebLayout.setTranslationX(-plvsaStatusBarAICardWebLayout.getWidth() / 2f);
+                            plvsaStatusBarAICardWebLayout.setTranslationY(-plvsaStatusBarAICardWebLayout.getHeight() / 2f);
+                            
+                            plvsaStatusBarAICardWebLayout.show();
+                            plvsaStatusBarAICardWebLayout.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .alpha(1f)
+                                .translationX(0)
+                                .translationY(0)
+                                .setDuration(300)
+                                .start();
+                        }
+                    })
+                    .start();
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSAStatusBarLayout定义的方法">
@@ -220,6 +321,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         initTeacherName(liveRoomDataManager);
         initChannelInfoLayout(liveRoomDataManager);
         initCloseTipContent(liveRoomDataManager);
+        initAICardLayout(liveRoomDataManager);
     }
 
     @Override
@@ -292,7 +394,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
 
     @Override
     public void destroy() {
-
+        plvsaStatusBarAICardWebLayout.destroy();
     }
 
     // </editor-fold>
@@ -487,6 +589,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         ConstraintLayout.LayoutParams networkStatusLayoutParam = (ConstraintLayout.LayoutParams) statusBarNetworkStatusLayout.getLayoutParams();
         ConstraintLayout.LayoutParams teacherLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarStreamerTeacherLayout.getLayoutParams();
         ConstraintLayout.LayoutParams pushDowngradeLayoutParam = (ConstraintLayout.LayoutParams) statusBarPushDowngradeAlertLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams cardLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarCardLayout.getLayoutParams();
         if (PLVScreenUtils.isPortrait(getContext())) {
             networkStatusLayoutParam.topToBottom = idStatusBarCloseIv;
             networkStatusLayoutParam.rightToRight = idStatusBarCloseIv;
@@ -510,6 +613,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             pushDowngradeLayoutParam.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
             pushDowngradeLayoutParam.leftMargin = 0;
             pushDowngradeLayoutParam.topMargin = ConvertUtils.dp2px(8);
+
+            cardLayoutParam.height = ConvertUtils.dp2px(222);
         } else {
             networkStatusLayoutParam.topToBottom = ConstraintLayout.LayoutParams.UNSET;
             networkStatusLayoutParam.rightToRight = ConstraintLayout.LayoutParams.UNSET;
@@ -540,6 +645,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                 pushDowngradeLayoutParam.leftMargin = 0;
             }
             pushDowngradeLayoutParam.topMargin = 0;
+
+            cardLayoutParam.height = ConvertUtils.dp2px(112);
         }
 
         statusBarNetworkStatusLayout.setLayoutParams(networkStatusLayoutParam);

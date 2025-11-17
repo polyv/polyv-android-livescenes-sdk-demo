@@ -77,6 +77,8 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
     // 当前是ppt模式
     private boolean isInPPTMode;
+    private PLVPPTLayoutEnum pptLayout = PLVPPTLayoutEnum.FOLLOWTEACHER;
+    private boolean hasChangePPTLocationByEvent = false;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -410,7 +412,6 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
     }
 
     private void observer(IPLVLiveRoomDataManager liveRoomDataManager) {
-
         liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @Override
             public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> data) {
@@ -421,15 +422,39 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
                 if (watchLayout == null) {
                     return;
                 }
-                PLVPPTLayoutEnum layoutEnum = PLVPPTLayoutEnum.FOLLOWTEACHER;
                 if (PLVPPTLayoutEnum.PPT.getValue().equals(watchLayout)) {
-                    layoutEnum = PLVPPTLayoutEnum.PPT;
+                    pptLayout = PLVPPTLayoutEnum.PPT;
                 } else if (PLVPPTLayoutEnum.VIDEO.getValue().equals(watchLayout)) {
-                    layoutEnum = PLVPPTLayoutEnum.VIDEO;
+                    pptLayout = PLVPPTLayoutEnum.VIDEO;
+                } else if (PLVPPTLayoutEnum.FOLLOWTEACHER.getValue().equals(watchLayout)) {
+                    pptLayout = PLVPPTLayoutEnum.FOLLOWTEACHER;
                 }
-                presenter.notifyIsWatchLayout(layoutEnum);
+                if (!liveRoomDataManager.getConfig().isPPTChannelType()) {
+                    pptLayout = PLVPPTLayoutEnum.VIDEO;
+                }
+                presenter.notifyIsWatchLayout(pptLayout);
+
+                if (pptLayout != PLVPPTLayoutEnum.FOLLOWTEACHER) {
+                    onTeacherPPTLocationChanged(pptLayout == PLVPPTLayoutEnum.PPT);
+                }
             }
         });
+    }
+
+    private void onTeacherPPTLocationChanged(boolean teacherPPTInMainScreen) {
+        if (pptLayout == PLVPPTLayoutEnum.FOLLOWTEACHER) {
+            if (onPlaybackPPTViewListener != null) {
+                onPlaybackPPTViewListener.onPlaybackSwitchPPTViewLocation(teacherPPTInMainScreen);
+            }
+        } else {
+            if (hasChangePPTLocationByEvent) {
+                return;
+            }
+            hasChangePPTLocationByEvent = true;
+            if (onPlaybackPPTViewListener != null) {
+                onPlaybackPPTViewListener.onPlaybackSwitchPPTViewLocation(pptLayout == PLVPPTLayoutEnum.PPT);
+            }
+        }
     }
 
     // </editor-fold>
@@ -460,9 +485,7 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
 
             @Override
             public void pptPositionChange(boolean isVideoInMain) {
-                if (onPlaybackPPTViewListener != null) {
-                    onPlaybackPPTViewListener.onPlaybackSwitchPPTViewLocation(!isVideoInMain);
-                }
+                onTeacherPPTLocationChanged(isVideoInMain);
             }
         });
         pptWebView.registerProcessor(processor);

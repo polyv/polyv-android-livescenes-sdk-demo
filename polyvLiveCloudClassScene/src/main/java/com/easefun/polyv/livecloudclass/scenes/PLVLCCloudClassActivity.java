@@ -62,6 +62,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
+import com.easefun.polyv.livecommon.ui.widget.menudrawer.IPLVMenuDrawerContainer;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -81,11 +82,14 @@ import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -96,7 +100,7 @@ import java.io.File;
  * 直播支持的功能有：播放器、页面菜单、悬浮PPT(三分屏频道独有)、连麦、互动应用。
  * 回放支持的功能有：播放器、页面菜单、悬浮PPT(三分屏频道独有)。
  */
-public class PLVLCCloudClassActivity extends PLVBaseActivity {
+public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenuDrawerContainer {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVLCCloudClassActivity.class.getSimpleName();
@@ -596,6 +600,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
         } else {
             PLVScreenUtils.enterLandscape(this);
         }
+        PLVScreenUtils.setStatusBarDark(this);
         plvPlayerLogoView = mediaLayout.getLogoView();
         floatingWindow = PLVDependManager.getInstance().get(PLVLCFloatingWindow.class);
     }
@@ -1059,6 +1064,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onShowProductDetail(PLVShowProductDetailEvent param) {
+                if (popoverLayout != null) {
+                    popoverLayout.getProductDetailLayout().showProductDetail(param.getProductId());
+                }
+            }
+
+            @Override
             public void onShowOpenLink() {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().onShowOpenLink();
@@ -1395,5 +1407,15 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             mediaLayout.onTurnPageLayoutChange(true);
         }
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="IPLVMenuDrawerContainer">
+
+    @Override
+    @NotNull
+    public ViewGroup menuDrawerContainer() {
+        return findViewById(R.id.plvlc_popup_container);
+    }
+
     // </editor-fold>
 }

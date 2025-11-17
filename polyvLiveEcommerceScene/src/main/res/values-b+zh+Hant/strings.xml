@@ -21,4 +21,7 @@
     <string name="plvec_product_push_hot_effect_text_normal">熱賣中</string>
     <string name="plvec_product_push_hot_effect_text_finance">選購中</string>
     <string name="plvec_product_push_hot_effect_text_job">投遞中</string>
+    <string name="plvec_playback_subtitle_translate">翻譯字幕</string>
+    <string name="plvec_playback_subtitle_original">原聲字幕</string>
+    <string name="plvec_playback_subtitle_title">重播字幕</string>
 </resources>
