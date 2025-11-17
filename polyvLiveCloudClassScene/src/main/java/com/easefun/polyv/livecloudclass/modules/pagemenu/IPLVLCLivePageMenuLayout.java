@@ -12,6 +12,7 @@ import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviou
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
@@ -232,6 +233,11 @@ public interface IPLVLCLivePageMenuLayout {
          * 回调 展示职位详情
          */
         void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        /**
+         * 回调 展示产品详情
+         */
+        void onShowProductDetail(PLVShowProductDetailEvent param);
 
         /**
          * 展示用于跳转微信复制的二维码

@@ -3,12 +3,12 @@ package com.easefun.polyv.livecommon.ui.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 
 import com.plv.foundationsdk.utils.PLVControlUtils;
 
 
-public class PLVSoftView extends LinearLayout {
+public class PLVSoftView extends FrameLayout {
 
     public static final byte KEYBOARD_STATE_SHOW = -3;
     public static final byte KEYBOARD_STATE_HIDE = -2;

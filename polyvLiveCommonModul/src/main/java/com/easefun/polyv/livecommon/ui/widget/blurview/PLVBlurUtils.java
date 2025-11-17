@@ -9,7 +9,7 @@ public class PLVBlurUtils {
     public static void initBlurView(PLVBlurView blurView) {
         blurView.setupWith((ViewGroup) ((Activity) blurView.getContext()).findViewById(Window.ID_ANDROID_CONTENT))
                 .setFrameClearDrawable(null)
-                .setBlurAlgorithm(new SupportRenderScriptBlur(blurView.getContext()))
+                .setBlurAlgorithm(new RenderScriptBlur(blurView.getContext()))
                 .setBlurRadius(1)
                 .setHasFixedTransformationMatrix(false);
     }

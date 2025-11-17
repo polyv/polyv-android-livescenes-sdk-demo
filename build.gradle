@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.android.tools.build:gradle:4.2.2'
         classpath 'com.guardsquare:proguard-gradle:7.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.32"
     }
@@ -50,11 +50,11 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 34
+    compileSdkVersion = 33
     minSdkVersion = 21
-    targetSdkVersion = 34
-    versionCode = 1291
-    versionName = "1.29.1"
+    targetSdkVersion = 36
+    versionCode = 1293
+    versionName = "1.29.3"
 }
 
 task clean(type: Delete) {

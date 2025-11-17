@@ -87,6 +87,7 @@ import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -237,7 +238,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         RelativeLayout.LayoutParams blackTabLayoutParams = (RelativeLayout.LayoutParams) blackTabLayout.getLayoutParams();
         RelativeLayout.LayoutParams effectWidgetLayoutParams = (RelativeLayout.LayoutParams) polyvPointRewardEffectWidget.getLayoutParams();
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+//            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 16), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             chatViewPagerLayoutParams.leftMargin = marginLandscape;
             blackTabLayoutParams.leftMargin = marginLandscape;
             sendMsgTvLayoutParams.setMargins(marginLandscape, 0, 0, 0);
@@ -254,7 +255,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 toTopViewLayoutParams.setMargins(0, ConvertUtils.dp2px(16), 0, 0);
             }
         } else {
-            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
+//            view.setPadding(0, PLVUIUtil.dip2px(this.getContext(), 30), 0, PLVUIUtil.dip2px(this.getContext(), 16));
             chatViewPagerLayoutParams.leftMargin = marginPortrait;
             blackTabLayoutParams.leftMargin = marginPortrait;
             sendMsgTvLayoutParams.setMargins(marginPortrait, 0, 0, 0);
@@ -360,6 +361,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 public void onShowJobDetail(PLVShowJobDetailEvent param) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onShowJobDetail(param);
+                    }
+                }
+
+                @Override
+                public void onShowProductDetail(PLVShowProductDetailEvent param) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowProductDetail(param);
                     }
                 }
 
@@ -892,18 +900,18 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public void onSoftKeyboardOpened(int keyboardHeightInPx) {
-                if (getContext() != null && PLVScreenUtils.isLandscape(getContext())) {
-                    return;
-                }
-                int bottom = keyboardHeightInPx - ConvertUtils.dp2px(16 + 32);
-                setViewBottomParam(sendMsgTv, bottom);
-                setViewBottomParam(moreIv, bottom);
+//                if (getContext() != null && PLVScreenUtils.isLandscape(getContext())) {
+//                    return;
+//                }
+//                int bottom = keyboardHeightInPx - ConvertUtils.dp2px(16 + 32);
+//                setViewBottomParam(sendMsgTv, bottom);
+//                setViewBottomParam(moreIv, bottom);
             }
 
             @Override
             public void onSoftKeyboardClosed(boolean isFinished) {
-                setViewBottomParam(sendMsgTv, 0);
-                setViewBottomParam(moreIv, 0);
+//                setViewBottomParam(sendMsgTv, 0);
+//                setViewBottomParam(moreIv, 0);
             }
 
             @Override
@@ -1248,6 +1256,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
          * @param param
          */
         void onShowJobDetail(PLVShowJobDetailEvent param);
+
+        /**
+         * 展示商品详情
+         * @param param
+         */
+        void onShowProductDetail(PLVShowProductDetailEvent param);
 
         /**
          * 展示用于跳转微信复制的二维码

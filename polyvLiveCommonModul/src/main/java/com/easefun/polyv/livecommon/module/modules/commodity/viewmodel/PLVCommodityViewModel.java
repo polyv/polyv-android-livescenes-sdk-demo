@@ -6,15 +6,18 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.annotation.WorkerThread;
 
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductExplainActivity;
 import com.easefun.polyv.livecommon.module.modules.commodity.model.PLVCommodityRepo;
 import com.easefun.polyv.livecommon.module.modules.commodity.model.vo.PLVCommodityProductVO;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
 import com.plv.foundationsdk.component.di.IPLVLifecycleAwareDependComponent;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.rx.PLVRxBus;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.commodity.PLVProductClickTimesEvent;
+import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -34,6 +37,9 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
 
     private final MutableLiveData<PLVCommodityUiState> commodityUiStateLiveData = new MutableLiveData<>();
     private final MutableLiveData<PLVProductClickTimesEvent> productClickTimesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> productDetailLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> productExplainLiveData = new MutableLiveData<>();
+    private final MutableLiveData<PLVProductContentBean> productRedactLiveData = new MutableLiveData<>();
     private final PLVCommodityUiState commodityUiState = new PLVCommodityUiState();
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -45,6 +51,7 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
 
         initUiState();
         observeProductEvent();
+        observeProductExplainEvent();
     }
 
     private void initUiState() {
@@ -93,6 +100,22 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
         compositeDisposable.add(clickTimesDisposable);
     }
 
+    private void observeProductExplainEvent() {
+        Disposable disposable = PLVRxBus.get().toObservable(PLVProductExplainActivity.PLVProductExplainEvent.class)
+                .subscribe(new Consumer<PLVProductExplainActivity.PLVProductExplainEvent>() {
+                    @Override
+                    public void accept(PLVProductExplainActivity.PLVProductExplainEvent plvProductExplainEvent) throws Exception {
+                        productExplainLiveData.postValue(plvProductExplainEvent.isShow);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        // ignore
+                    }
+                });
+        compositeDisposable.add(disposable);
+    }
+
     @WorkerThread
     private void reduceProductEventUpdate(final PLVCommodityProductVO commodityProductVO) {
         final String message = commodityProductVO.getMessage().getMessage();
@@ -120,6 +143,10 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                 // 推送
                 commodityUiState.productContentBeanPushToShow = productControlEvent.getContent();
                 commodityUiStateLiveData.postValue(commodityUiState.copyWithPushState());
+            }
+            if (productControlEvent.isRedact()) {
+                // 编辑/AI卡片
+                productRedactLiveData.postValue(productControlEvent.getContent());
             }
         } else if (productEvent.isProductRemoveEvent()) {
             // 商品下架/删除事件
@@ -184,6 +211,10 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
         commodityUiStateLiveData.postValue(commodityUiState.copy());
     }
 
+    public void onShowProductDetail(int productId) {
+        productDetailLiveData.postValue(productId);
+    }
+
     public LiveData<PLVCommodityUiState> getCommodityUiStateLiveData() {
         return commodityUiStateLiveData;
     }
@@ -192,4 +223,15 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
         return productClickTimesLiveData;
     }
 
+    public LiveData<Integer> getProductDetailLiveData() {
+        return productDetailLiveData;
+    }
+
+    public LiveData<Boolean> getProductExplainLiveData() {
+        return productExplainLiveData;
+    }
+
+    public LiveData<PLVProductContentBean> getProductRedactLiveData() {
+        return productRedactLiveData;
+    }
 }

@@ -17,6 +17,9 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.socket.user.PLVSocketUserConstant;
 
@@ -108,10 +111,11 @@ public class PLVECMemberListAdapter extends RecyclerView.Adapter<PLVECMemberList
                     return;
                 }
                 PLVImageLoader.getInstance().loadImage(liveViewer.getAvatarUrl(), memberListAvatarIv);
+                String nick = maskViewerName(liveViewer);
                 if (Boolean.TRUE.equals(liveViewer.isMe())) {
-                    memberListNickTv.setText(liveViewer.getNick() + itemView.getContext().getString(R.string.plv_chat_me_2));
+                    memberListNickTv.setText(nick + itemView.getContext().getString(R.string.plv_chat_me_2));
                 } else {
-                    memberListNickTv.setText(liveViewer.getNick());
+                    memberListNickTv.setText(nick);
                 }
                 memberListNickTv.requestLayout();
                 if (!TextUtils.isEmpty(liveViewer.getActor())) {
@@ -126,6 +130,16 @@ public class PLVECMemberListAdapter extends RecyclerView.Adapter<PLVECMemberList
                 } else {
                     memberListActorTv.setVisibility(View.GONE);
                 }
+            }
+
+            private String maskViewerName(PLVLiveViewerListVO.Data.LiveViewer liveViewer) {
+                PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(liveViewer.getChannelId())
+                        .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+                return mapper.invoke(
+                        liveViewer.getNick(),
+                        liveViewer.getUserType(),
+                        Boolean.TRUE.equals(liveViewer.isMe())
+                );
             }
 
         }

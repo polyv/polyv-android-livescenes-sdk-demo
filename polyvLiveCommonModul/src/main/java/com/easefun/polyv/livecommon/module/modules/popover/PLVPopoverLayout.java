@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.modules.popover;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
@@ -12,10 +14,16 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductDetailLayout;
+import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
+import com.plv.foundationsdk.component.di.PLVDependManager;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
+
+import net.plv.android.jsbridge.CallBackFunction;
 
 /**
  * date: 2021-2-24
@@ -26,8 +34,10 @@ import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
 public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
+    private final PLVCommodityViewModel commodityViewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel.class);
     private PLVPointRewardLayout plvLayoutReward;
     private IPLVInteractLayout plvLayoutInteract;
+    private PLVProductDetailLayout plvLayoutProductDetail;
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -57,7 +67,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
 
     @Override
     public boolean onBackPress() {
-        if (plvLayoutInteract.onBackPress() || plvLayoutReward.onBackPress()) {
+        if (plvLayoutProductDetail.onBackPress() || plvLayoutInteract.onBackPress() || plvLayoutReward.onBackPress()) {
             return true;
         }
         return false;
@@ -73,6 +83,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
         plvLayoutReward.initChannelConfig(PLVLiveChannelConfigFiller.generateNewChannelConfig(), roomDataManager);
         plvLayoutReward.changeScene(scene);
         plvLayoutInteract.init(roomDataManager, scene);
+        plvLayoutProductDetail.init(roomDataManager);
     }
 
     @Override
@@ -97,9 +108,17 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     }
 
     @Override
+    public PLVProductDetailLayout getProductDetailLayout() {
+        return plvLayoutProductDetail;
+    }
+
+    @Override
     public void destroy() {
         if (plvLayoutInteract != null) {
             plvLayoutInteract.destroy();
+        }
+        if (plvLayoutProductDetail != null) {
+            plvLayoutProductDetail.destroy();
         }
     }
     // </editor-fold >
@@ -110,7 +129,31 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
         plvLayoutReward = findViewById(R.id.plv_layout_reward);
 
         plvLayoutInteract = findViewById(R.id.plv_layout_interact);
+        plvLayoutInteract.setOnClickProductDetailListener(new PLVInteractLayout2.OnClickProductDetailListener() {
+            @Override
+            public void onClickProductDetail(PLVShowProductDetailEvent event) {
+                plvLayoutProductDetail.showProductDetail(event.getProductId());
+            }
+        });
 
+        plvLayoutProductDetail = findViewById(R.id.plv_layout_product_detail);
+        plvLayoutProductDetail.setOnClickProductListener(new PLVProductDetailLayout.OnClickProductListener() {
+
+            @Override
+            public void onClickProduct(String param, CallBackFunction callBackFunction) {
+                plvLayoutInteract.processClickProductEvent(param, callBackFunction);
+            }
+        });
+
+        commodityViewModel.getProductDetailLiveData()
+                .observe((LifecycleOwner) getContext(), new Observer<Integer>() {
+                    @Override
+                    public void onChanged(@Nullable Integer integer) {
+                        if (integer != null) {
+                            plvLayoutProductDetail.showProductDetail(integer);
+                        }
+                    }
+                });
     }
     // </editor-fold >
 

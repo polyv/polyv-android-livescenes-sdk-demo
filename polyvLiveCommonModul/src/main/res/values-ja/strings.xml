@@ -226,6 +226,10 @@
     <string name="plv_commodity_now_knowledge">今すぐ学習</string>
     <string name="plv_commodity_position_details">ポジションの詳細</string>
     <string name="plv_commodity_price_not_opened">待開価格</string>
+    <string name="plv_commodity_watch_now">解説を見る</string>
+    <string name="plv_commodity_pending">解説待ち</string>
+    <string name="plv_commodity_explaining">解説中</string>
+    <string name="plv_commodity_ai_card">AIカード</string>
 
     <!--连麦-->
     <string name="plv_linkmic_toast_error">リンクマイク エラー</string>
@@ -549,6 +553,7 @@
     <!--回放-->
     <string name="plv_playback_room_dialog_exit_confirm_ask">再生の終了を確認する</string>
     <string name="plv_playback_title">ライブ再生</string>
+    <string name="plv_playback_video_marks_title">すばらしい見所</string>
     <!--回放-往期-->
     <string name="plv_previous_no_more_data">データがありません</string>
     <string name="plv_previous_load_error">読み込みに失敗しました。クリックして再試行してください。</string>
@@ -676,6 +681,7 @@
     <string name="plv_beauty_filter_aesthetic">美的</string>
 
     <string name="plv_interact_sign_in_timeout_toast">チェックインがおくれ遅れたばあい場合,じどう自動てき的にスタジオをたいしつ退室されます</string>
+    <string name="plv_subtitle_setting_title">字幕設定</string>
     <string name="plv_subtitle_language_chinese">中国語</string>
     <string name="plv_subtitle_language_english">英語</string>
     <string name="plv_subtitle_language_cantonese">広東語</string>

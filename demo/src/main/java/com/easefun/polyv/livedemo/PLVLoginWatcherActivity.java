@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -40,6 +41,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.livedata.Event;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.livescenes.config.PLVLiveChannelType;
@@ -85,6 +87,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     private TextView tvLogin;
     private RadioGroup rgScene;
     private SwitchCompat swtichPlaybackVodlistSw;
+    private FrameLayout loginBottomLayout;
     private TextView tvCopyright;
     private PLVSoftView softListenerLayout;
 
@@ -193,6 +196,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         initMultiVenueViewModel();
         observePlaybackCacheLaunch();
         observeMultiVenueLaunch();
+
+        PLVScreenUtils.setStatusBarDark(this);
     }
 
     private void findAllView() {
@@ -215,6 +220,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
         swtichPlaybackVodlistSw = findViewById(R.id.plv_login_playback_vodlist_sw);
         softListenerLayout = findViewById(R.id.plv_login_soft_listener_layout);
         rgScene = findViewById(R.id.plv_login_rg_scene);
+        loginBottomLayout = findViewById(R.id.plv_login_bottom_layout);
         tvCopyright = findViewById(R.id.plv_login_tv_copyright);
     }
 
@@ -226,7 +232,7 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 boolean showTitleLogo = state != PLVSoftView.KEYBOARD_STATE_SHOW;
                 tvLogoText.setVisibility(!showTitleLogo ? View.VISIBLE : View.GONE);
                 ivLogo.setVisibility(showTitleLogo ? View.VISIBLE : View.GONE);
-                tvCopyright.setVisibility(!showTitleLogo ? View.GONE : View.VISIBLE);
+                loginBottomLayout.setVisibility(!showTitleLogo ? View.GONE : View.VISIBLE);
             }
         });
 

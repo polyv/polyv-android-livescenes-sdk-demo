@@ -25,6 +25,8 @@ import com.easefun.polyv.streameralone.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.commodity.PLVCommodityControlWebView;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -56,6 +58,8 @@ public class PLVSACommodityControlLayout extends FrameLayout {
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
+    @Nullable
+    private Observer<String> sessionIdObserver;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造方法">
@@ -97,6 +101,10 @@ public class PLVSACommodityControlLayout extends FrameLayout {
     // <editor-fold defaultstate="collapsed" desc="API">
 
     public void show() {
+        if (liveRoomDataManager == null) {
+            PLVCommonLog.w(TAG, "initWebView error, liveRoomDataManager is null");
+            return;
+        }
         initWebView();
         if (menuDrawer == null) {
             menuDrawer = PLVMenuDrawer.attach(
@@ -151,11 +159,14 @@ public class PLVSACommodityControlLayout extends FrameLayout {
     private void initWebView() {
         if (commodityControlWebView != null) {
             removeAllViews();
+            commodityControlWebView.destroy();
         }
+        boolean productV2Enable = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_CLIENT_PRODUCT_V2_ENABLED);
         commodityControlWebView = new PLVCommodityControlWebView(getContext());
         addView(commodityControlWebView, MATCH_PARENT, MATCH_PARENT);
         commodityControlWebView
-                .setLang(PLVLanguageUtil.isENLanguage() ? PLVCommodityControlWebView.LANG_EN : PLVCommodityControlWebView.LANG_ZH_CN)
+                .setLocale(PLVLanguageUtil.getLocale())
+                .setProductV2Enabled(productV2Enable)
                 .setOnNeedUpdateNativeAppParamsInfoHandler(new BridgeHandler() {
                     @Override
                     public void handler(String data, CallBackFunction callBackFunction) {
@@ -176,6 +187,18 @@ public class PLVSACommodityControlLayout extends FrameLayout {
     }
 
     private void observeLiveData() {
+        if (liveRoomDataManager == null) {
+            return;
+        }
+        if (sessionIdObserver != null) {
+            liveRoomDataManager.getSessionIdLiveData().removeObserver(sessionIdObserver);
+        }
+        liveRoomDataManager.getSessionIdLiveData().observeForever(sessionIdObserver = new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                updateNativeAppParamToWebView();
+            }
+        });
         //更新chatToken
         liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
             @Override
@@ -190,6 +213,23 @@ public class PLVSACommodityControlLayout extends FrameLayout {
                 }
             }
         });
+    }
+
+    private void updateNativeAppParamToWebView() {
+        if (liveRoomDataManager == null
+                || TextUtils.isEmpty(liveRoomDataManager.getSessionId())
+                || commodityControlWebView == null) {
+            return;
+        }
+        commodityControlWebView.updateNativeAppParamsInfo(generateAppParams());
+    }
+
+    @Nullable
+    private PLVInteractNativeAppParams generateAppParams() {
+        if (liveRoomDataManager == null) {
+            return null;
+        }
+        return PLVLiveRoomDataMapper.toInteractNativeAppParams(liveRoomDataManager);
     }
 
     private String getNativeAppPramsInfo() {

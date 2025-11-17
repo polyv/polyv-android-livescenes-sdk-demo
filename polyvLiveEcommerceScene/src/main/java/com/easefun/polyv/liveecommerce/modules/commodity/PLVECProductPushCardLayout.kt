@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager
+import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductExplainActivity
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel
 import com.easefun.polyv.livecommon.module.modules.log.PLVTrackLogHelper
 import com.easefun.polyv.livecommon.module.utils.PLVToast
@@ -23,6 +24,8 @@ import com.easefun.polyv.liveecommerce.R
 import com.plv.foundationsdk.component.di.PLVDependManager
 import com.plv.foundationsdk.utils.PLVGsonUtil
 import com.plv.foundationsdk.utils.fromJson
+import com.plv.livescenes.access.PLVChannelFeature
+import com.plv.livescenes.access.PLVChannelFeatureManager
 import com.plv.livescenes.socket.PLVSocketWrapper
 import com.plv.socket.event.PLVEventConstant
 import com.plv.socket.event.commodity.PLVProductClickBean
@@ -44,12 +47,16 @@ class PLVECProductPushCardLayout @JvmOverloads constructor(
     fun init(liveRoomDataManager: IPLVLiveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager
         val viewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel::class.java)
+        val isProductExplainEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_EXPLAIN_ENABLED) ?: false
+        val isProductOutLinkEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_OUT_LINK_ENABLED) ?: false
 
         viewModel.commodityUiStateLiveData.observe(context as LifecycleOwner, Observer { uiState ->
             val pushCardProduct = uiState?.productContentBeanPushToShow?.takeIf { !it.isBigProduct }
             removeAllViews()
             pushCardLayout = null
             if (pushCardProduct != null) {
+                pushCardProduct.isProductExplainEnabled = isProductExplainEnabled
+                pushCardProduct.isProductOutLinkEnabled = isProductOutLinkEnabled
                 pushCardLayout = AbsCardLayout.newLayout(context, pushCardProduct).apply {
                     bindProduct(pushCardProduct)
                     onViewActionListener = object : AbsCardLayout.OnViewActionListener {
@@ -64,6 +71,14 @@ class PLVECProductPushCardLayout @JvmOverloads constructor(
                             if (enterCommodity(product)) {
                                 viewModel.onCloseProductPush()
                             }
+                        }
+
+                        override fun onShowDetail(productId: Int) {
+                            viewModel.onShowProductDetail(productId)
+                        }
+
+                        override fun onClickExplain(productId: Int) {
+                            PLVProductExplainActivity.start(context, productId, liveRoomDataManager.nativeAppPramsInfo)
                         }
                     }
                 }
@@ -176,8 +191,11 @@ private sealed class AbsCardLayout(
         }
     }
 
-    protected fun bindIndex(textView: TextView, product: PLVProductContentBean) {
-        textView.text = product.showId.toString()
+    protected fun bindIndexOrExplain(textView: TextView, product: PLVProductContentBean) {
+        textView.text = if (!product.isProductExplainEnabled) product.showId.toString()
+        else if (product.isProductExplained) context.getString(R.string.plv_commodity_watch_now)
+        else if (product.isProductExplaining) context.getString(R.string.plv_commodity_explaining)
+        else context.getString(R.string.plv_commodity_pending)
     }
 
     protected fun bindCover(imageView: ImageView, product: PLVProductContentBean) {
@@ -240,6 +258,8 @@ private sealed class AbsCardLayout(
     interface OnViewActionListener {
         fun onClickClose(product: PLVProductContentBean)
         fun onClickBuyAction(product: PLVProductContentBean)
+        fun onShowDetail(productId: Int)
+        fun onClickExplain(productId: Int)
     }
 
 }
@@ -269,14 +289,28 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
     override fun bindProduct(product: PLVProductContentBean) {
         bindHotEffectIcon(productPushHotEffectIv, product)
         bindHotEffectTypeText(productPushHotEffectTypeTv, product)
-        bindIndex(productPushIndexTv, product)
+        bindIndexOrExplain(productPushIndexTv, product)
         bindCover(productPushImage, product)
         bindTag(productPushTagTv, product)
         bindName(productPushNameTv, product)
         bindPrice(productPushPriceTv, product)
         bindBuyText(productPushBuyActionTv, product)
+        setOnClickListener {
+            if (product.isProductOutLinkEnabled) {
+                onViewActionListener?.onClickBuyAction(product)
+            } else {
+                onViewActionListener?.onShowDetail(product.productId)
+            }
+        }
         productPushBuyActionTv.setOnClickListener { onViewActionListener?.onClickBuyAction(product) }
         productPushCloseIv.setOnClickListener { onViewActionListener?.onClickClose(product) }
+        if (product.isProductExplainEnabled && product.isProductExplained) {
+            productPushIndexTv.setOnClickListener {
+                onViewActionListener?.onClickExplain(product.productId)
+            }
+        } else {
+            productPushIndexTv.setOnClickListener(null)
+        }
     }
 
     override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent) {
@@ -306,13 +340,27 @@ private class NoImageProductCard(context: Context) : AbsCardLayout(context) {
     override fun bindProduct(product: PLVProductContentBean) {
         bindHotEffectIcon(productPushHotEffectIv, product)
         bindHotEffectTypeText(productPushHotEffectTypeTv, product)
-        bindIndex(productPushIndexTv, product)
+        bindIndexOrExplain(productPushIndexTv, product)
         bindTag(productPushTagTv, product)
         bindName(productPushNameTv, product)
         bindPrice(productPushPriceTv, product)
         bindBuyText(productPushBuyActionTv, product)
+        setOnClickListener {
+            if (product.isProductOutLinkEnabled) {
+                onViewActionListener?.onClickBuyAction(product)
+            } else {
+                onViewActionListener?.onShowDetail(product.productId)
+            }
+        }
         productPushBuyActionTv.setOnClickListener { onViewActionListener?.onClickBuyAction(product) }
         productPushCloseIv.setOnClickListener { onViewActionListener?.onClickClose(product) }
+        if (product.isProductExplainEnabled && product.isProductExplained) {
+            productPushIndexTv.setOnClickListener {
+                onViewActionListener?.onClickExplain(product.productId)
+            }
+        } else {
+            productPushIndexTv.setOnClickListener(null)
+        }
     }
 
     override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent) {

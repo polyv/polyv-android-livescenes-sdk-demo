@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plv_interact_fl_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#66000000"
+    android:paddingBottom="8dp"
+    app:plv_radius="8dp">
+
+    <ImageView
+        android:id="@+id/plv_ai_card_ic_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plv_pack_up_iv"
+        android:layout_alignBottom="@+id/plv_pack_up_iv"
+        android:layout_marginLeft="8dp"
+        android:padding="4dp"
+        android:src="@drawable/plv_product_ai_card_ic" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/plv_pack_up_iv"
+        android:layout_alignBottom="@+id/plv_pack_up_iv"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/plv_ai_card_ic_iv"
+        android:gravity="center"
+        android:text="@string/plv_commodity_ai_card"
+        android:textColor="#ffffff"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/plv_pack_up_iv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:padding="4dp"
+        android:src="@drawable/plv_pack_up_ic" />
+
+    <com.plv.livescenes.feature.pagemenu.product.PLVProductAICardWebView
+        android:id="@+id/plv_product_ai_card_web"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/plv_pack_up_iv">
+
+    </com.plv.livescenes.feature.pagemenu.product.PLVProductAICardWebView>
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

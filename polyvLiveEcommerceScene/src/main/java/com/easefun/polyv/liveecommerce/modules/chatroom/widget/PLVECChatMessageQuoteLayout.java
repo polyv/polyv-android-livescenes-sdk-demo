@@ -15,7 +15,11 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.impl.PLVSocketManager;
 
 /**
  * @author Hoshiiro
@@ -57,8 +61,9 @@ public class PLVECChatMessageQuoteLayout extends FrameLayout {
         }
         setVisibility(VISIBLE);
 
+        String nick = maskViewerName(chatQuoteVO);
         final CharSequence quoteMsg = chatQuoteVO.getObjects() == null || chatQuoteVO.getObjects().length == 0 ? "" : (CharSequence) chatQuoteVO.getObjects()[0];
-        chatQuoteMsgNameContentTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
+        chatQuoteMsgNameContentTv.setText(new SpannableStringBuilder(nick).append("：").append(quoteMsg));
 
         final boolean hasImage = chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
         chatQuoteMsgImageIv.setVisibility(hasImage ? VISIBLE : GONE);
@@ -74,6 +79,16 @@ public class PLVECChatMessageQuoteLayout extends FrameLayout {
                 }
             });
         }
+    }
+
+    private String maskViewerName(PLVChatQuoteVO chatQuoteVO) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                chatQuoteVO.getNick(),
+                chatQuoteVO.getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())
+        );
     }
 
     public void setOnActionListener(OnViewActionListener onViewActionListener) {

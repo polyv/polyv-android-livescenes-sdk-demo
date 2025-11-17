@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/plv_widget_blur_top_radius_layout"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+        android:layout_gravity="bottom"
+        android:visibility="invisible" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/plvec_playback_subtitle_setting_layout"
+        android:layout_width="match_parent"
+        android:layout_height="132dp"
+        android:layout_gravity="bottom"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/plvec_playback_subtitle_setting_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/plvec_playback_subtitle_title"
+            android:textColor="#C2C2C2"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/plvec_playback_subtitle_setting_original_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:buttonTint="#6DA7FF"
+            android:text="@string/plvec_playback_subtitle_original"
+            android:textColor="#C2C2C2"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvec_playback_subtitle_setting_title"
+            app:layout_constraintStart_toEndOf="@+id/plvec_playback_subtitle_setting_title"
+            app:layout_constraintTop_toTopOf="@+id/plvec_playback_subtitle_setting_title" />
+
+        <CheckBox
+            android:id="@+id/plvec_playback_subtitle_setting_translate_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#6DA7FF"
+            android:text="@string/plvec_playback_subtitle_translate"
+            android:textColor="#C2C2C2"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/plvec_playback_subtitle_setting_original_checkbox"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_playback_subtitle_setting_original_checkbox" />
+
+        <TextView
+            android:id="@+id/plvec_playback_subtitle_setting_translate_option_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/plvec_playback_subtitle_translate_option_background"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textColor="#C2C2C2"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/plvec_playback_subtitle_setting_translate_checkbox"
+            app:layout_constraintStart_toEndOf="@+id/plvec_playback_subtitle_setting_translate_checkbox"
+            app:layout_constraintTop_toTopOf="@+id/plvec_playback_subtitle_setting_translate_checkbox"
+            tools:text="英语" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

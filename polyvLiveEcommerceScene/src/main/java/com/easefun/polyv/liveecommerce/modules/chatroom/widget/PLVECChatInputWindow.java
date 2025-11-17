@@ -11,7 +11,11 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.ui.window.PLVInputWindow;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.impl.PLVSocketManager;
 
 public class PLVECChatInputWindow extends PLVInputWindow {
 
@@ -132,7 +136,18 @@ public class PLVECChatInputWindow extends PLVInputWindow {
         if (isImageContent) {
             quoteMsg = "[图片]";// no need i18n
         }
-        chatQuoteNameContentTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
+        String nick = maskViewerName(chatQuoteVO);
+        chatQuoteNameContentTv.setText(new SpannableStringBuilder(nick).append("：").append(quoteMsg));
+    }
+
+    private String maskViewerName(PLVChatQuoteVO chatQuoteVO) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                chatQuoteVO.getNick(),
+                chatQuoteVO.getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())
+        );
     }
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - 信息发送监听器">

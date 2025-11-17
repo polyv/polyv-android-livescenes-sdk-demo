@@ -22,7 +22,11 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecommon.ui.widget.PLVOrientationSensibleLinearLayout;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.thirdpart.blankj.utilcode.util.KeyboardUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -196,7 +200,18 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
         if (isImageContent) {
             quoteMsg = "[图片]";// no need i18n
         }
-        chatSendMsgQuoteTv.setText(new SpannableStringBuilder(chatQuoteVO.getNick()).append("：").append(quoteMsg));
+        String nick = maskViewerName(chatQuoteVO);
+        chatSendMsgQuoteTv.setText(new SpannableStringBuilder(nick).append("：").append(quoteMsg));
+    }
+
+    private String maskViewerName(PLVChatQuoteVO chatQuoteVO) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                chatQuoteVO.getNick(),
+                chatQuoteVO.getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())
+        );
     }
 
     @Override

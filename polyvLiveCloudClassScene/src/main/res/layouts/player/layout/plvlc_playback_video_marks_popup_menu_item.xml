@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="94dp"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="9dp">
+
+    <ImageView
+        android:id="@+id/plvlc_playback_video_marks_preview_iv"
+        android:layout_width="134dp"
+        android:layout_height="76dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/plvlc_playback_video_marks_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="#333333"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/plvlc_playback_video_marks_preview_iv"
+        app:layout_constraintTop_toTopOf="@+id/plvlc_playback_video_marks_preview_iv"
+        tools:text="打点标题打点标题打点标题打点标题打点标题打点标题打点标题打点标题打点标题" />
+
+    <TextView
+        android:id="@+id/plvlc_playback_video_marks_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#333333"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/plvlc_playback_video_marks_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_playback_video_marks_title_tv"
+        tools:text="00:00:00" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

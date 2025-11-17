@@ -33,10 +33,24 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <activity
+            android:name=".module.modules.commodity.PLVProductExplainActivity"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
             android:name=".module.utils.water.PLVStickerTextInputWindow"
             android:configChanges="orientation|keyboard|screenSize"
             android:screenOrientation="behind"
             android:theme="@style/AppTheme.Translucent" />
+
+        <activity
+            android:name=".module.modules.commodity.PLVProductExplainActivity"
+            android:configChanges="orientation|keyboard|screenSize"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <provider
             android:name="com.easefun.polyv.livecommon.module.utils.PLVFileProvider"

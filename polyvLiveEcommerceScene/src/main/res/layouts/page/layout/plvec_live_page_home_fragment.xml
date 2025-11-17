@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/plvec_margin_top"
-    android:paddingBottom="@dimen/plvec_margin_common">
+    android:paddingTop="2dp"
+    android:paddingBottom="8dp">
 
     <!--观看信息布局-->
     <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView

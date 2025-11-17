@@ -46,12 +46,14 @@ public class PLVLiveRoomDataMapper {
                         new PLVInteractNativeAppParams.ChannelInfoDTO()
                                 .setChannelId(liveRoomDataManager.getConfig().getChannelId())
                                 .setRoomId(liveRoomDataManager.getConfig().getChannelId())
+                                .setLiveStatus(liveRoomDataManager.getStreamerStatusLiveData().getValue())
                 )
                 .setUserInfo(
                         new PLVInteractNativeAppParams.UserInfoDTO()
                                 .setUserId(liveRoomDataManager.getConfig().getUser().getViewerId())
                                 .setNick(liveRoomDataManager.getConfig().getUser().getViewerName())
                                 .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
+                                .setUserType(liveRoomDataManager.getConfig().getUser().getViewerType())
                 )
                 .setIsLive(isLive);
     }

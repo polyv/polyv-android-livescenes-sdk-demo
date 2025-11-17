@@ -32,7 +32,6 @@ import kotlin.jvm.functions.Function1;
 /**
  * 投屏封装管理类
  */
-//投屏统计方案：http://wiki.igeeker.org/pages/viewpage.action?pageId=156303739
 public class PLVCastBusinessManager {
     // <editor-fold defaultstate="collapsed" desc="投屏状态码">
     //搜索状态

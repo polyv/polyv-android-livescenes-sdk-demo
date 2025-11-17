@@ -101,6 +101,7 @@ import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.login.PLVKickEvent;
 import com.plv.socket.event.login.PLVLoginRefuseEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
@@ -846,6 +847,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             public void onShowJobDetail(PLVShowJobDetailEvent param) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowJobDetail(param);
+                }
+            }
+
+            @Override
+            public void onShowProductDetail(PLVShowProductDetailEvent param) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowProductDetail(param);
                 }
             }
 

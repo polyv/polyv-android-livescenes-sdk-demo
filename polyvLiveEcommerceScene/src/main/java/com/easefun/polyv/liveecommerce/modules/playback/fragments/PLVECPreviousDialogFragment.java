@@ -22,7 +22,7 @@ import android.widget.ImageView;
 
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
-import com.easefun.polyv.livecommon.ui.widget.blurview.SupportRenderScriptBlur;
+import com.easefun.polyv.livecommon.ui.widget.blurview.RenderScriptBlur;
 import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVViewPagerAdapter;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVMagicIndicator;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.PLVViewPagerHelper;
@@ -140,7 +140,7 @@ public class PLVECPreviousDialogFragment extends DialogFragment implements IPLVE
         PLVBlurView blurView = view.findViewById(R.id.blur_ly);
         blurView.setupWith((ViewGroup) (getActivity()).findViewById(Window.ID_ANDROID_CONTENT))
                 .setFrameClearDrawable(null)
-                .setBlurAlgorithm(new SupportRenderScriptBlur(blurView.getContext()))
+                .setBlurAlgorithm(new RenderScriptBlur(blurView.getContext()))
                 .setBlurRadius(1)
                 .setHasFixedTransformationMatrix(false);
         pageTabIndicator = view.findViewById(R.id.plvec_playback_videos_tab);

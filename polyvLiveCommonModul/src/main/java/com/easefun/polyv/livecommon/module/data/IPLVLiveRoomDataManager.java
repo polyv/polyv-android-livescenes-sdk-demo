@@ -119,6 +119,11 @@ public interface IPLVLiveRoomDataManager {
     LiveData<String> getChatTokenLiveData();
 
     /**
+     * 获取推流状态LiveData
+     */
+    MutableLiveData<Boolean> getStreamerStatusLiveData();
+
+    /**
      * 获取回放频道的详细信息LiveData
      * @return
      */
@@ -196,6 +201,11 @@ public interface IPLVLiveRoomDataManager {
      * @param fileId 回放视频的fileId
      */
     void setConfigFileId(String fileId);
+
+    /**
+     * 获取原生app参数信息
+     */
+    String getNativeAppPramsInfo();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

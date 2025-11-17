@@ -13,7 +13,11 @@ import android.widget.TextView;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.socket.event.login.PLVLoginEvent;
+import com.plv.socket.impl.PLVSocketManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +81,11 @@ public class PLVECGreetingView extends FrameLayout {
             int ls = 0;
             for (int i = 0; i <= 2; i++) {
                 PLVLoginEvent loginEvent = loginEventList.get(i);
+                String viewerName = maskViewerName(loginEvent);
                 if (i != 2) {
-                    stringBuilder.append(loginEvent.getUser().getNick()).append("、");
+                    stringBuilder.append(viewerName).append("、");
                 } else {
-                    stringBuilder.append(loginEvent.getUser().getNick());
+                    stringBuilder.append(viewerName);
                 }
                 if (i == 0) {
                     lf = stringBuilder.toString().length() - 1;
@@ -99,7 +104,8 @@ public class PLVECGreetingView extends FrameLayout {
             loginEventList.clear();
         } else {
             PLVLoginEvent loginEvent = loginEventList.remove(0);
-            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join, loginEvent.getUser().getNick()));
+            String viewerName = maskViewerName(loginEvent);
+            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join, viewerName));
 
             /**
              * ///暂时保留该代码
@@ -149,5 +155,15 @@ public class PLVECGreetingView extends FrameLayout {
                 }
             }
         });
+    }
+
+    private String maskViewerName(PLVLoginEvent loginEvent) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(loginEvent.getUser().getChannelId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                loginEvent.getUser().getNick(),
+                loginEvent.getUser().getUserType(),
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(loginEvent.getUser().getUserId())
+        );
     }
 }

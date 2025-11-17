@@ -6,8 +6,11 @@ import androidx.annotation.NonNull;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
+import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
@@ -73,6 +76,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
     //聊天室token
     private MutableLiveData<String> chatTokenLiveData = new MutableLiveData<>();
+    //推流状态
+    private MutableLiveData<Boolean> streamerStatusLiveData = new MutableLiveData<>();
     //直播场次Id
     private String sessionId;
     //聊天室token
@@ -179,6 +184,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     }
 
     @Override
+    public MutableLiveData<Boolean> getStreamerStatusLiveData() {
+        return streamerStatusLiveData;
+    }
+
+    @Override
     public MutableLiveData<PLVWebviewUpdateAppStatusVO> getInteractStatusData() {
         return interactStatusData;
     }
@@ -261,6 +271,12 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public void setConfigFileId(String fileId) {
         liveChannelConfig.setupFileId(fileId);
+    }
+
+    @Override
+    public String getNativeAppPramsInfo() {
+        PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(this, PLVLiveScene.CLOUDCLASS);
+        return PLVGsonUtil.toJsonSimple(nativeAppParams);
     }
     // </editor-fold>
 

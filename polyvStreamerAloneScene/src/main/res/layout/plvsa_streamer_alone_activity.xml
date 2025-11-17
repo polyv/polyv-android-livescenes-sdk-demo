@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/plvsa_streamer_page_bg">
+    android:background="@drawable/plvsa_streamer_page_bg"
+    android:fitsSystemWindows="true">
 
     <!--推流和连麦布局-->
     <com.easefun.polyv.streameralone.modules.streamer.PLVSAStreamerLayout
@@ -108,8 +109,7 @@
     <!-- 可以在全屏下根据键盘弹起的布局-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
         <com.easefun.polyv.livecommon.module.modules.interact.PLVStreamerInteractLayout
             android:id="@+id/plvsa_interact_layout"

@@ -9,6 +9,7 @@ import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreL
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_RATE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_ROUTE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_SCREENSHOT;
+import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_SUBTITLE;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
@@ -44,8 +45,10 @@ import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.interact.PLVChatFunctionVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -68,6 +71,8 @@ public class PLVECMorePopupView {
     private PLVPlaySettingPopupWindow playSettingPopupWindow;
     //播放速度弹窗
     private PLVSpeedPopupView speedPopupView;
+    //回放字幕弹窗
+    private PLVECPlaybackSubtitlePopupWindow playbackSubtitlePopupWindow;
 
     private PLVECMoreLatencyPopupView latencyPopupView;
 
@@ -162,6 +167,7 @@ public class PLVECMorePopupView {
             PLVBlurUtils.initBlurView((PLVBlurView) rootview.findViewById(R.id.blur_ly));
             moreLayout = rootview.findViewById(R.id.plvec_more_ly);
 
+            updateSubViewVisibility();
         }
     }
 
@@ -581,6 +587,37 @@ public class PLVECMorePopupView {
                             });
                             hideAll();
                             break;
+                        case MORE_FUNCTION_TYPE_SUBTITLE:
+                            if (playbackSubtitlePopupWindow == null) {
+                                playbackSubtitlePopupWindow = new PLVECPlaybackSubtitlePopupWindow(v);
+                                playbackSubtitlePopupWindow.setOnSubtitleActionListener(new PLVECPlaybackSubtitlePopupWindow.OnSubtitleActionListener() {
+                                    @Override
+                                    public List<PLVPlaybackSubtitleVO> getAllSubtitleSettings() {
+                                        if (clickListener != null) {
+                                            return clickListener.getAllSubtitleSettings();
+                                        }
+                                        return Collections.emptyList();
+                                    }
+
+                                    @Override
+                                    public List<PLVPlaybackSubtitleVO> getShowSubtitles() {
+                                        if (clickListener != null) {
+                                            return clickListener.getShowSubtitles();
+                                        }
+                                        return Collections.emptyList();
+                                    }
+
+                                    @Override
+                                    public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
+                                        if (clickListener != null) {
+                                            clickListener.setShowSubtitles(subtitles);
+                                        }
+                                    }
+                                });
+                            }
+                            hideAll();
+                            playbackSubtitlePopupWindow.show();
+                            break;
                         default:
                             if (clickListener != null) {
                                 clickListener.onClickDynamicFunction(data);
@@ -591,6 +628,7 @@ public class PLVECMorePopupView {
                 }
             });
         }
+        updateSubViewVisibility();
         playbackMorePopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
     }
     // </editor-fold>
@@ -623,6 +661,9 @@ public class PLVECMorePopupView {
         }
         if (speedPopupView != null) {
             speedPopupView.dismiss();
+        }
+        if (playbackSubtitlePopupWindow != null) {
+            playbackSubtitlePopupWindow.dismiss();
         }
     }
     // </editor-fold>
@@ -677,6 +718,7 @@ public class PLVECMorePopupView {
         updateLatencyLayoutVisibility();
         updateFloatingControlVisibility();
         updatePlaySettingVisibility();
+        updateSubtitleVisibility();
     }
 
     private void updateSpeedControlVisibility() {
@@ -690,8 +732,9 @@ public class PLVECMorePopupView {
         if (moreLayout == null) {
             return;
         }
+        final boolean isLive = liveMorePopupWindow != null;
         final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
-        final boolean showPlayMode = mediaPlaying && !isLowLatencyWatching && !isJoinRtcChannel;
+        final boolean showPlayMode = isLive && mediaPlaying && !isLowLatencyWatching && !isJoinRtcChannel;
         moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_PLAY_MODE, showPlayMode);
     }
 
@@ -719,10 +762,11 @@ public class PLVECMorePopupView {
         if (moreLayout == null) {
             return;
         }
+        final boolean isLive = liveMorePopupWindow != null;
         final boolean supportLowLatencyWatch = PLVLinkMicConfig.getInstance().isLowLatencyWatchEnabled();
         final boolean mediaPlaying = playStatusViewVisibility == View.VISIBLE;
         final boolean isFloatingPlayerShowing = PLVFloatingPlayerManager.getInstance().isFloatingWindowShowing();
-        final boolean showLatencyLayout = supportLowLatencyWatch && mediaPlaying && !isFloatingPlayerShowing && !isJoinLinkMic;
+        final boolean showLatencyLayout = isLive && supportLowLatencyWatch && mediaPlaying && !isFloatingPlayerShowing && !isJoinLinkMic;
         moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_LATENCY, showLatencyLayout);
     }
 
@@ -739,6 +783,15 @@ public class PLVECMorePopupView {
             return;
         }
         moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_PLAY_SETTING, isOpenFloatEnable);
+    }
+
+    private void updateSubtitleVisibility() {
+        if (moreLayout == null) {
+            return;
+        }
+        final boolean isPlayback = playbackMorePopupWindow != null;
+        final boolean hasSubtitle = playbackMoreClickListener != null && !playbackMoreClickListener.getAllSubtitleSettings().isEmpty();
+        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_SUBTITLE, isPlayback && hasSubtitle);
     }
     // </editor-fold>
 
@@ -898,6 +951,12 @@ public class PLVECMorePopupView {
          * @param event 动态功能的event data
          */
         void onClickDynamicFunction(String event);
+
+        List<PLVPlaybackSubtitleVO> getAllSubtitleSettings();
+
+        List<PLVPlaybackSubtitleVO> getShowSubtitles();
+
+        void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
     }
     // </editor-fold>
 }

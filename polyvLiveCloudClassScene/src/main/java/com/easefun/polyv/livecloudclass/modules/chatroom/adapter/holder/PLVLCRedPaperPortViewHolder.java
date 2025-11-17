@@ -20,10 +20,14 @@ import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.event.redpack.PLVRedPaperHistoryEvent;
 import com.plv.socket.event.redpack.enums.PLVRedPaperReceiveType;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 /**
@@ -101,7 +105,7 @@ public class PLVLCRedPaperPortViewHolder extends PLVChatMessageBaseViewHolder<PL
                 return PLVSocketWrapper.getInstance().getLoginVO().getUserId();
             }
         });
-        String showName = nickName;
+        String showName = maskViewerName(nickName);
         if (loginUserId != null && loginUserId.equals(userId)) {
             showName = showName + PLVAppUtils.getString(R.string.plv_chat_me_2);
         }
@@ -175,6 +179,16 @@ public class PLVLCRedPaperPortViewHolder extends PLVChatMessageBaseViewHolder<PL
                         }
                     }
                 });
+    }
+
+    private String maskViewerName(String nickName) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                nickName,
+                userType,
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(userId)
+        );
     }
 
 }

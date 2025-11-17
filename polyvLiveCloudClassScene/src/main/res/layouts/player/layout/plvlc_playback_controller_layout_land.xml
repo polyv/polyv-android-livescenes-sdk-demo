@@ -56,7 +56,7 @@
             android:textSize="11sp" />
     </LinearLayout>
 
-    <SeekBar
+    <com.easefun.polyv.livecloudclass.modules.media.controller.widget.PLVLCPlaybackControllerSeekBar
         android:id="@+id/plvlc_playback_controller_land_sb_playprogress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,6 +75,17 @@
         android:secondaryProgress="0"
         android:thumb="@drawable/plvlc_sb_thumb"
         android:thumbOffset="0dp" />
+
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCPlaybackVideoMarksBar
+        android:id="@+id/plvlc_playback_video_marks_bar_land"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/plvlc_playback_controller_land_sb_playprogress"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/plvlc_playback_controller_land_tv_video_name"

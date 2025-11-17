@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.easefun.polyv.livecloudclass.R;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.HashMap;
@@ -20,12 +21,15 @@ import net.polyv.danmaku.controller.DrawHandler;
 import net.polyv.danmaku.controller.IDanmakuView;
 import net.polyv.danmaku.danmaku.model.BaseDanmaku;
 import net.polyv.danmaku.danmaku.model.DanmakuTimer;
+import net.polyv.danmaku.danmaku.model.Duration;
 import net.polyv.danmaku.danmaku.model.IDanmakus;
 import net.polyv.danmaku.danmaku.model.IDisplayer;
+import net.polyv.danmaku.danmaku.model.R2LDanmaku;
 import net.polyv.danmaku.danmaku.model.android.DanmakuContext;
 import net.polyv.danmaku.danmaku.model.android.Danmakus;
 import net.polyv.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import net.polyv.danmaku.danmaku.parser.BaseDanmakuParser;
+import net.polyv.danmaku.ui.widget.DanmakuView;
 
 /**
  * 弹幕Fragment

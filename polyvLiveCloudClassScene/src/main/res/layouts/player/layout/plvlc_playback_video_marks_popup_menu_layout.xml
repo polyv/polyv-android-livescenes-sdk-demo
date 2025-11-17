@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/plvlc_playback_video_marks_popup_menu_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    app:plv_mode="top"
+    app:plv_radius="8dp">
+
+    <TextView
+        android:id="@+id/plvlc_playback_video_marks_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="@string/plv_playback_video_marks_title"
+        android:textColor="#CC000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/plvlc_playback_video_marks_split_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ededef"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_playback_video_marks_title_tv" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/plvlc_playback_video_marks_rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plvlc_playback_video_marks_split_line" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

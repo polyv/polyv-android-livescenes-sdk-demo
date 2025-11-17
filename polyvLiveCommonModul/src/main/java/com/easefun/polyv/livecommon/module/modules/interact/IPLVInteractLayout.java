@@ -8,8 +8,11 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
+
+import net.plv.android.jsbridge.CallBackFunction;
 
 import java.util.List;
 
@@ -43,10 +46,26 @@ public interface IPLVInteractLayout {
     void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener);
 
     /**
+     * 添加商品详情监听
+     */
+    void setOnClickProductDetailListener(PLVInteractLayout2.OnClickProductDetailListener listener);
+
+    /**
+     * 处理点击商品事件
+     */
+    void processClickProductEvent(String param, final CallBackFunction callBackFunction);
+
+    /**
      * 展示职业详情
      * @param event
      */
     void onShowJobDetail(PLVShowJobDetailEvent event);
+
+    /**
+     * 显示商品详情
+     * @param param
+     */
+    void onShowProductDetail(PLVShowProductDetailEvent param);
 
     /**
      * 展示跳转微信复制的页面

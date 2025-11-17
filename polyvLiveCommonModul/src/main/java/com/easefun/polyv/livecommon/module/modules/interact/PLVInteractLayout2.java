@@ -62,6 +62,7 @@ import com.plv.socket.event.interact.PLVOpenOtherAppEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowOpenLinkEvent;
+import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.interact.PLVShowWelfareLotteryEvent;
 import com.plv.socket.event.interact.PLVUpdateChannelSwitchEvent;
@@ -98,6 +99,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private OnOpenInsideWebViewListener onOpenInsideWebViewListener;
     private PLVInsideWebViewLayout insideWebViewLayout;
     private OnClickProductListener onClickProductListener;
+    private OnClickProductDetailListener onClickProductDetailListener;
 
     //是否锁定到竖屏
     private boolean isLockPortrait = false;
@@ -112,6 +114,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT,
             PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO,
             PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON,
+            PLVInteractJSBridgeEventConst.V2_SHOW_PRODUCT_DETAIL,
             PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_COMMENT_SUCCESS,
             PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_ENTRANCE_CHANGE,
             PLVInteractJSBridgeEventConst.V2_SIGN_IN_TIMEOUT_RECV
@@ -197,6 +200,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON:
                 processClickProductEvent(param, callBackFunction);
                 break;
+            case PLVInteractJSBridgeEventConst.V2_SHOW_PRODUCT_DETAIL:
+                processShowProductDetail(param, callBackFunction);
+                break;
             case PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_COMMENT_SUCCESS:
                 processWelfareLotteryComment(param);
                 break;
@@ -244,7 +250,23 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void setOnClickProductDetailListener(OnClickProductDetailListener listener) {
+        this.onClickProductDetailListener = listener;
+    }
+
+    @Override
     public void onShowJobDetail(PLVShowJobDetailEvent event) {
+        String data = PLVGsonUtil.toJsonSimple(event);
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String data) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + data);
+            }
+        });
+    }
+
+    @Override
+    public void onShowProductDetail(PLVShowProductDetailEvent event) {
         String data = PLVGsonUtil.toJsonSimple(event);
         plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
             @Override
@@ -599,7 +621,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         }
     }
 
-    private void processClickProductEvent(String param, final CallBackFunction callBackFunction) {
+    @Override
+    public void processClickProductEvent(String param, final CallBackFunction callBackFunction) {
         if (onClickProductListener != null) {
             if (!PLVDebounceClicker.tryClick(this.getClass().getName(), seconds(1).toMillis())) {
                 return;
@@ -623,6 +646,16 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             }
             onClickProductListener.onClickProduct(productLink);
 
+        }
+    }
+
+    private void processShowProductDetail(String param, final CallBackFunction callBackFunction) {
+        if (onClickProductDetailListener != null) {
+            PLVShowProductDetailEvent event = PLVGsonUtil.fromJson(PLVShowProductDetailEvent.class, param);
+            if (event == null) {
+                return;
+            }
+            onClickProductDetailListener.onClickProductDetail(event);
         }
     }
 
@@ -762,6 +795,10 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
 
     public interface OnClickProductListener {
         void onClickProduct(String link);
+    }
+
+    public interface OnClickProductDetailListener {
+        void onClickProductDetail(PLVShowProductDetailEvent event);
     }
     // </editor-fold>
 }

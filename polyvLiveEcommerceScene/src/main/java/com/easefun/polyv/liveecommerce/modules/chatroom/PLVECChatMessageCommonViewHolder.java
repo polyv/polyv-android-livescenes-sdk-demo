@@ -17,6 +17,10 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.adapter.PLVBaseAdapter;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.livescenes.access.PLVChannelFeature;
+import com.plv.livescenes.access.PLVChannelFeatureManager;
+import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
+import com.plv.socket.impl.PLVSocketManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import java.lang.ref.WeakReference;
@@ -64,7 +68,7 @@ public class PLVECChatMessageCommonViewHolder<Data extends PLVBaseViewData, Adap
         if (TextUtils.isEmpty(nickName)) {
             return;
         }
-        nickSpan = new SpannableStringBuilder(nickName);
+        nickSpan = new SpannableStringBuilder(maskViewerName(nickName));
         if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
             nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
         }
@@ -89,5 +93,15 @@ public class PLVECChatMessageCommonViewHolder<Data extends PLVBaseViewData, Adap
         PLVRadiusBackgroundSpan radiusBackgroundSpan = new PLVRadiusBackgroundSpan(
                 itemView.getContext(), bgColor, Color.parseColor("#ffffff"), actor);
         nickSpan.setSpan(radiusBackgroundSpan, 0, userType.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private String maskViewerName(String nickName) {
+        PLVViewerNameMaskMapper mapper = PLVChannelFeatureManager.onChannel(PLVSocketManager.getInstance().getLoginRoomId())
+                .getOrDefault(PLVChannelFeature.LIVE_VIEWER_NAME_MASK_TYPE, PLVViewerNameMaskMapper.KEEP_SOURCE);
+        return mapper.invoke(
+                nickName,
+                userType,
+                PLVSocketManager.getInstance().getLoginVO().getUserId().equals(userId)
+        );
     }
 }
