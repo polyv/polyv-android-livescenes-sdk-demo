@@ -63,4 +63,22 @@
 
     <string name="plvls_live_room_new_link_mic_first_intro_hint_title">「Lian Mic」機能が更新されました</string>
     <string name="plvls_live_room_new_link_mic_first_intro_hint_content">この機能ボタンをクリックして視聴者接続マイクを有効にします</string>
+
+    <string name="plvls_streamer_sharescreen_exit">共有を終了</string>
+    <string name="plvls_streamer_sharescreen_start">画面共有</string>
+    <string name="plvls_streamer_sharescreen_float_message">デスクトップメッセージ</string>
+    <string name="plvls_streamer_sharescreen_float_message_condition_hint">画面共有期間のみ有効で、システムの「他のアプリケーションの上位に表示」権限をオンにする必要があります</string>
+    <string name="plvls_streamer_sharescreen_start_tip">他の人があなたの画面を見ることができるようになりました</string>
+    <string name="plvls_streamer_sharescreen_already_stop">共有が終了しました</string>
+    <string name="plvls_streamer_sharescreen_error">画面共有に失敗しました:</string>
+    <string name="plvls_streamer_sharescreen_need_permission">画面共有にはインストラクターの承認が必要です</string>
+    <string name="plvls_streamer_sharescreen_need_video_first">最初にカメラをオンにしてください</string>
+    <string name="plvls_streamer_remove_speaker_and_stop_screenshare">発言権限が削除され、共有が終了しました</string>
+    <string name="plvls_streamer_screenshare_start">共有を開始</string>
+    <string name="plvls_streamer_screenshare_stop">共有を終了</string>
+    <string name="plvls_streamer_screenshare_stop_only">終了</string>
+    <string name="plvls_streamer_screenshare_ing">画面を共有しています</string>
+    <string name="plvls_streamer_screenshare_stop_confirm">画面共有を終了しますか？</string>
+    <string name="plvls_float_window_permission_need">バックグラウンド操作を確実にするには、フローティング ウィンドウの権限を承認する必要があります</string>
+    <string name="plvls_float_window_permission_denied_and_not_show">権限が制限されているため、フローティング ウィンドウは開きません</string>
 </resources>

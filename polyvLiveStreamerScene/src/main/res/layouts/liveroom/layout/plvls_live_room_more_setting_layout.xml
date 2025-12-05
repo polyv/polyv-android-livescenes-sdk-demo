@@ -103,6 +103,33 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/plvls_more_setting_share_screen_item_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvls_more_share_screen_iv"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plvls_streamer_share_screen_selector" />
+
+                        <TextView
+                            android:id="@+id/plvls_more_share_screen_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/plvls_streamer_sharescreen_start"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/plvls_more_setting_bitrate_item_layout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

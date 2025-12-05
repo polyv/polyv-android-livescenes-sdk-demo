@@ -599,6 +599,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
     }
 
     @Override
+    public void setIsStartShareScreen(boolean isStartShareScreen) {
+        memberLayout.setIsStartShareScreen(isStartShareScreen);
+    }
+
+    @Override
     public void switchPptType(int pptType){
         if(pptType == PLVDocumentMode.WHITEBOARD.ordinal()){
             PLVDocumentPresenter.getInstance().switchShowMode(PLVDocumentMode.WHITEBOARD);

@@ -13,7 +13,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import androidx.annotation.ColorRes;
 import androidx.core.content.ContextCompat;
-import android.util.Log;
 
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 

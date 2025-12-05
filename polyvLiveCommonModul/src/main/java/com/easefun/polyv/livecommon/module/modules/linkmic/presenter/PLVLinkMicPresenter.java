@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Toast;
 
@@ -663,6 +664,11 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
+    public TextureView createTextureRenderView(Context context) {
+        return linkMicManager.createTextureRenderView(context);
+    }
+
+    @Override
     public String getLinkMicId() {
         return linkMicManager.getLinkMicUid();
     }
@@ -673,7 +679,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
-    public void setupRenderView(SurfaceView renderView, String linkMicId) {
+    public void setupRenderView(View renderView, String linkMicId) {
         if (linkMicManager.getLinkMicUid().equals(linkMicId)) {
             if (liveRoomDataManager.isOnlyAudio()) {
                 linkMicManager.setupLocalVideo(renderView, PLVStreamerConfig.RenderMode.RENDER_MODE_NONE);
@@ -691,7 +697,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     @Override
-    public void releaseRenderView(SurfaceView renderView) {
+    public void releaseRenderView(View renderView) {
         linkMicManager.releaseRenderView(renderView);
     }
 

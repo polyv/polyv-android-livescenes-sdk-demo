@@ -1,7 +1,5 @@
 package com.easefun.polyv.livecommon.ui.window;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
@@ -12,7 +10,6 @@ import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVSafeWebView;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewContentUtils;
 import com.easefun.polyv.livecommon.ui.widget.webview.PLVWebViewHelper;
-import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
 /**
  * 仅包含webView的Activity

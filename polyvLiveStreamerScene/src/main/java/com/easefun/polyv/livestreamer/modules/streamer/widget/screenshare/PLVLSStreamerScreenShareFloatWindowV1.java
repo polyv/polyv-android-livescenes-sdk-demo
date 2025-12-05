@@ -1,4 +1,4 @@
-package com.easefun.polyv.streameralone.modules.streamer.widget.screenshare;
+package com.easefun.polyv.livestreamer.modules.streamer.widget.screenshare;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -22,8 +22,8 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.ui.widget.floating.PLVFloatingWindowManager;
 import com.easefun.polyv.livecommon.ui.widget.floating.enums.PLVFloatingEnums;
-import com.easefun.polyv.streameralone.R;
-import com.easefun.polyv.streameralone.scenes.PLVSAStreamerAloneActivity;
+import com.easefun.polyv.livestreamer.R;
+import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
 import com.plv.linkmic.PLVLinkMicConstant;
@@ -36,16 +36,16 @@ import java.lang.ref.WeakReference;
  * 纯视频开播悬浮窗，系统级别悬浮窗，需要申请悬浮窗权限。
  * 用于显示屏幕共享状态，仅在后台时显示
  */
-public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScreenShareFloatWindow, View.OnClickListener {
+public class PLVLSStreamerScreenShareFloatWindowV1 implements IPLVLSStreamerScreenShareFloatWindow, View.OnClickListener {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
     private Context context;
 
-    private View plvsaStreamerWindowRoot;
-    private ImageView plvsaStreamerWindowFold;
-    private ImageView plvsaStreamerWindowStatusIv;
-    private TextView plvsaStreamerWindowStatusTv;
-    private View plvsaStreamerWindowContentView;
+    private View streamerWindowRoot;
+    private ImageView streamerWindowFold;
+    private ImageView streamerWindowStatusIv;
+    private TextView streamerWindowStatusTv;
+    private View streamerWindowContentView;
 
     private HomeKeyEventBroadCastReceiver receiver;
 
@@ -64,25 +64,25 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="构造方法/初始化">
-    public PLVSAStreamerScreenShareFloatWindowV1(Context context) {
+    public PLVLSStreamerScreenShareFloatWindowV1(Context context) {
         this.context = context;
         handler = new Handler(context.getMainLooper());
 
-        view = LayoutInflater.from(context).inflate(R.layout.plvsa_widget_floating_screen_share, null, false);
+        view = LayoutInflater.from(context).inflate(R.layout.plvls_widget_floating_screen_share, null, false);
 
-        plvsaStreamerWindowRoot = view.findViewById(R.id.plvsa_streamer_window_root);
-        plvsaStreamerWindowFold = view.findViewById(R.id.plvsa_streamer_window_fold);
-        plvsaStreamerWindowStatusIv = view.findViewById(R.id.plvsa_streamer_window_status_iv);
-        plvsaStreamerWindowStatusTv = view.findViewById(R.id.plvsa_streamer_window_status_tv);
-        plvsaStreamerWindowContentView = view.findViewById(R.id.plvsa_streamer_window_content);
+        streamerWindowRoot = view.findViewById(R.id.plvls_streamer_window_root);
+        streamerWindowFold = view.findViewById(R.id.plvls_streamer_window_fold);
+        streamerWindowStatusIv = view.findViewById(R.id.plvls_streamer_window_status_iv);
+        streamerWindowStatusTv = view.findViewById(R.id.plvls_streamer_window_status_tv);
+        streamerWindowContentView = view.findViewById(R.id.plvls_streamer_window_content);
 
-        plvsaStreamerWindowFold.setSelected(false);
-        plvsaStreamerWindowRoot.setSelected(false);
-        plvsaStreamerWindowStatusIv.setSelected(false);
+        streamerWindowFold.setSelected(false);
+        streamerWindowRoot.setSelected(false);
+        streamerWindowStatusIv.setSelected(false);
 
-        plvsaStreamerWindowFold.setOnClickListener(this);
-        plvsaStreamerWindowStatusIv.setOnClickListener(this);
-        plvsaStreamerWindowStatusTv.setOnClickListener(this);
+        streamerWindowFold.setOnClickListener(this);
+        streamerWindowStatusIv.setOnClickListener(this);
+        streamerWindowStatusTv.setOnClickListener(this);
 
         receiver = new HomeKeyEventBroadCastReceiver(new WeakReference<>(this));
     }
@@ -178,15 +178,15 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
     // <editor-fold defaultstate="collapsed" desc="点击事件">
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.plvsa_streamer_window_fold) {
+        if (v.getId() == R.id.plvls_streamer_window_fold) {
             if (isExpand) {
-                expand(plvsaStreamerWindowContentView);
+                expand(streamerWindowContentView);
             } else {
-                collapse(plvsaStreamerWindowContentView);
+                collapse(streamerWindowContentView);
             }
             isExpand = !isExpand;
-        } else if (v.getId() == R.id.plvsa_streamer_window_status_iv ||
-                v.getId() == R.id.plvsa_streamer_window_status_tv) {
+        } else if (v.getId() == R.id.plvls_streamer_window_status_iv ||
+                v.getId() == R.id.plvls_streamer_window_status_tv) {
             exitScreencast();
         }
 
@@ -196,7 +196,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
 
     // <editor-fold defaultstate="collapsed" desc="功能方法">
     private void exitScreencast() {
-        Intent intent = new Intent(context, PLVSAStreamerAloneActivity.class);
+        Intent intent = new Intent(context, PLVLSLiveStreamerActivity.class);
         //service context 6.0↓(test 7.0~9.0 no error) only use Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT, report： Calling startActivity() from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         context.startActivity(intent);
@@ -228,7 +228,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
         animation.setDuration(200);
         animation.setInterpolator(new FastOutLinearInInterpolator());
         view.startAnimation(animation);
-        plvsaStreamerWindowFold.setSelected(false);
+        streamerWindowFold.setSelected(false);
     }
 
     private void collapse(final View view) {
@@ -253,7 +253,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
         animation.setDuration(200);
         animation.setInterpolator(new FastOutLinearInInterpolator());
         view.startAnimation(animation);
-        plvsaStreamerWindowFold.setSelected(true);
+        streamerWindowFold.setSelected(true);
     }
 
 
@@ -263,9 +263,9 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
             @Override
             public void run() {
                 if (expand) {
-                    expand(plvsaStreamerWindowContentView);
+                    expand(streamerWindowContentView);
                 } else {
-                    collapse(plvsaStreamerWindowContentView);
+                    collapse(streamerWindowContentView);
                 }
                 isExpand = !isExpand;
             }
@@ -273,15 +273,15 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
     }
 
     private void updateWhenShareScering() {
-        plvsaStreamerWindowRoot.setSelected(false);
-        plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_exit_share_screen);
+        streamerWindowRoot.setSelected(false);
+        streamerWindowStatusIv.setSelected(false);
+        streamerWindowStatusTv.setText(R.string.plv_streamer_exit_share_screen);
     }
 
     private void updateWhenStreamStop() {
-        plvsaStreamerWindowRoot.setSelected(true);
-        plvsaStreamerWindowStatusIv.setSelected(false);
-        plvsaStreamerWindowStatusTv.setText(R.string.plv_streamer_stop_live);
+        streamerWindowRoot.setSelected(true);
+        streamerWindowStatusIv.setSelected(false);
+        streamerWindowStatusTv.setText(R.string.plv_streamer_stop_live);
     }
 
     // </editor-fold >
@@ -294,9 +294,9 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
         static final String SYSTEM_HOME_KEY_LONG = "recentapps";
         static final String SYSTEM_HOME__MIUI_GESTURE = "fs_gesture";//小米全面屏返回桌面触发事件
 
-        private WeakReference<PLVSAStreamerScreenShareFloatWindowV1> window;
+        private WeakReference<PLVLSStreamerScreenShareFloatWindowV1> window;
 
-        public HomeKeyEventBroadCastReceiver(WeakReference<PLVSAStreamerScreenShareFloatWindowV1> window) {
+        public HomeKeyEventBroadCastReceiver(WeakReference<PLVLSStreamerScreenShareFloatWindowV1> window) {
             this.window = window;
         }
 
@@ -305,7 +305,7 @@ public class PLVSAStreamerScreenShareFloatWindowV1 implements IPLVSAStreamerScre
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
                 String reason = intent.getStringExtra(SYSTEM_REASON);
-                final PLVSAStreamerScreenShareFloatWindowV1 floatWindow = window.get();
+                final PLVLSStreamerScreenShareFloatWindowV1 floatWindow = window.get();
                 if (floatWindow == null) {
                     return;
                 }

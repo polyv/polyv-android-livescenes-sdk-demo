@@ -449,6 +449,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
             @Override
             public void onScreenShareError(final int errorCode) {
+                if (curCameraFront) {
+                    streamerManager.setLocalPushMirror(isFrontMirror);
+                }
                 Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getLinkMicItemWithLinkMicId(streamerManager.getLinkMicUid());
                 final int pos = streamerItem.first;
                 streamerItem.second.setScreenShare(false);

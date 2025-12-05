@@ -38,7 +38,6 @@ import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
 import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
-import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.chatroom.PLVECChatMessageAdapter;
 import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLengthMessageLayout;

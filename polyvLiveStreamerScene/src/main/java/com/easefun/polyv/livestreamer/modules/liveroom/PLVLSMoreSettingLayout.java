@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
@@ -35,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreame
 import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
@@ -54,10 +58,12 @@ import com.plv.image.segmenter.api.IPLVImageSegmenterManager;
 import com.plv.image.segmenter.api.PLVImageSegmenterManager;
 import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -84,6 +90,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private TextView moreSettingTitleTv;
     private View moreSettingTitleSeparator;
     private LinearLayout moreSettingBeautyItemLayout;
+    private LinearLayout moreSettingShareScreenItemLayout;
+    private ImageView moreShareScreenIv;
+    private TextView moreShareScreenTv;
     private LinearLayout moreSettingBitrateItemLayout;
     private LinearLayout moreSettingMixItemLayout;
     private LinearLayout moreSettingShareItemLayout;
@@ -163,6 +172,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingTitleTv = findViewById(R.id.plvls_more_setting_title_tv);
         moreSettingTitleSeparator = findViewById(R.id.plvls_more_setting_title_separator);
         moreSettingBeautyItemLayout = findViewById(R.id.plvls_more_setting_beauty_item_layout);
+        moreSettingShareScreenItemLayout = findViewById(R.id.plvls_more_setting_share_screen_item_layout);
+        moreShareScreenIv = findViewById(R.id.plvls_more_share_screen_iv);
+        moreShareScreenTv = findViewById(R.id.plvls_more_share_screen_tv);
         moreSettingBitrateItemLayout = findViewById(R.id.plvls_more_setting_bitrate_item_layout);
         moreSettingBitrateLayout = findViewById(R.id.plvls_more_setting_bitrate_layout);
         moreSettingMixItemLayout = findViewById(R.id.plvls_more_setting_mix_item_layout);
@@ -184,6 +196,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
 
         moreSettingExitTv.setOnClickListener(this);
         moreSettingBeautyItemLayout.setOnClickListener(this);
+        moreSettingShareScreenItemLayout.setOnClickListener(this);
         moreSettingBitrateItemLayout.setOnClickListener(this);
         moreSettingMixItemLayout.setOnClickListener(this);
         morePushDowngradeItemLayout.setOnClickListener(this);
@@ -192,6 +205,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreVirtualBgItemLayout.setOnClickListener(this);
         moreDenoiseItemLayout.setOnClickListener(this);
         moreExternalAudioInputItemLayout.setOnClickListener(this);
+
+        // 开始直播后才可以进行屏幕共享
+        moreSettingShareScreenItemLayout.setClickable(false);
+        moreShareScreenIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
     }
 
     private void initBitrateLayout() {
@@ -315,6 +332,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         }
         if (!showSignInLayout) {
             PLVViewUtil.setGridLayoutItemVisible(moreInteractSigninLl, false);
+        }
+        if (!PLVLinkMicConfig.getInstance().isSupportScreenShare()){
+            PLVViewUtil.setGridLayoutItemVisible(moreSettingShareScreenItemLayout, false);
         }
         updateInteractMenuVisibility();
     }
@@ -575,6 +595,36 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         @Override
         public void setPresenter(@NonNull IPLVStreamerContract.IStreamerPresenter presenter) {
             streamerPresenter = presenter;
+
+            presenter.getData().getIsStartShareScreen().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isStartShare) {
+                    if (isStartShare == null) {
+                        return;
+                    }
+                    moreShareScreenIv.setSelected(isStartShare);
+                    moreShareScreenTv.setText(isStartShare ? getContext().getString(R.string.plvls_streamer_sharescreen_exit) : getContext().getString(R.string.plvls_streamer_sharescreen_start));
+                }
+            });
+
+            presenter.getData().getStreamerStatus().observe((LifecycleOwner) getContext(), new IPLVOnDataChangedListener<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean aBoolean) {
+                    if (aBoolean == null) {
+                        return;
+                    }
+                    moreSettingShareScreenItemLayout.setClickable(aBoolean);
+                    if(!aBoolean) {
+                        moreShareScreenIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    } else {
+                        moreShareScreenIv.clearColorFilter();
+                    }
+                    // 停止直播后退出屏幕共享
+                    if (!aBoolean && Boolean.TRUE.equals(presenter.getData().getIsStartShareScreen().getValue())) {
+                        presenter.exitShareScreen();
+                    }
+                }
+            });
         }
 
         @Override
@@ -639,6 +689,27 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 return;
             }
             PLVDependManager.getInstance().get(PLVBeautyViewModel.class).showBeautyMenu();
+        } else if (id == moreSettingShareScreenItemLayout.getId()) {
+            close();
+            if(!PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_GRANT_PERMISSION_SHARE_SCREEN)){
+                PLVToast.Builder.context(getContext())
+                        .setText(getContext().getString(R.string.plvls_streamer_sharescreen_need_permission))
+                        .build()
+                        .show();
+                return;
+            }
+
+            //开始屏幕共享
+            if (streamerPresenter != null) {
+                if (!moreShareScreenIv.isSelected()) {
+                    final PLVCustomScreenShareData customScreenShareData = new PLVCustomScreenShareData();
+                    customScreenShareData.notificationIcon = R.drawable.plvls_ic_launcher;
+                    customScreenShareData.notificationText = "正在录制/投射您的屏幕";
+                    streamerPresenter.requestShareScreen((Activity) getContext(), customScreenShareData);
+                } else {
+                    streamerPresenter.exitShareScreen();
+                }
+            }
         } else if (id == moreSettingBitrateItemLayout.getId()) {
             showLayout(moreSettingBitrateLayout);
         } else if (id == moreSettingMixItemLayout.getId()) {

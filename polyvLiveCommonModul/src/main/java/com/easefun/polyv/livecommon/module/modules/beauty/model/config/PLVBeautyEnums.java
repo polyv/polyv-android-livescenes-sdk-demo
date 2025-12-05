@@ -154,6 +154,16 @@ public class PLVBeautyEnums {
         },
 
         /**
+         * 微整形 - 红唇
+         */
+        BEAUTY_LIPSTICK(PLVBeautyOption.RESHAPE_BEAUTY_LIPSTICK, "", R.drawable.plv_beauty_lipstick_icon) {
+            @Override
+            public String getName() {
+                return getString(R.string.plv_beauty_lipstick);
+            }
+        },
+
+        /**
          * 微整形 - 白牙
          */
         RESHAPE_BEAUTY_WHITEN_TEETH(PLVBeautyOption.RESHAPE_BEAUTY_WHITEN_TEETH, "", R.drawable.plv_beauty_whiten_teeth_icon) {

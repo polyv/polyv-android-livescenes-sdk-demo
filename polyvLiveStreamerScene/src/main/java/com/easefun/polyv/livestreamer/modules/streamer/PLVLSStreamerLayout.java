@@ -18,6 +18,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
@@ -33,6 +34,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVMessageRecyclerView;
+import com.easefun.polyv.livecommon.ui.widget.floating.permission.PLVFloatPermissionUtils;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.streamer.IPLVSStreamerManager;
 import com.easefun.polyv.livescenes.streamer.transfer.PLVSStreamerInnerDataTransfer;
@@ -40,6 +42,8 @@ import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.streamer.adapter.PLVLSStreamerAdapter;
 import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
 import com.easefun.polyv.livestreamer.modules.streamer.position.vo.PLVLSStreamerViewPositionUiState;
+import com.easefun.polyv.livestreamer.modules.streamer.widget.screenshare.IPLVLSStreamerScreenShareFloatWindow;
+import com.easefun.polyv.livestreamer.modules.streamer.widget.screenshare.PLVLSStreamerScreenShareFloatWindowV1;
 import com.easefun.polyv.livestreamer.scenes.PLVLSLiveStreamerActivity;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.business.model.ppt.PLVPPTAuthentic;
@@ -50,6 +54,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.screenshare.IPLVScreenShareListener;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
@@ -84,11 +89,16 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     private RecyclerView plvlsStreamerRv;
     private final PLVLSLinkMicInvitationLayout linkMicInvitationLayout = new PLVLSLinkMicInvitationLayout(getContext());
 
+    //返回home时的悬浮窗
+    public final PLVLSStreamerScreenShareFloatWindowV1 floatWindow = new PLVLSStreamerScreenShareFloatWindowV1(getContext());
+
     //适配器
     private PLVLSStreamerAdapter streamerAdapter;
 
     private boolean isLocalAudioMuted = false;
     private long lastNotifyLocalAudioMutedTimestamp;
+    //是否显示悬浮窗请求弹窗
+    private boolean isShowWindowPermissionDialog = true;
 
     private PLVUserAbilityManager.OnUserRoleChangedListener onSpeakerRoleChangedListener;
     // </editor-fold>
@@ -155,6 +165,25 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
             @Override
             public void setupRenderView(View renderView, String linkMicId) {
                 streamerPresenter.setupRenderView(renderView, linkMicId);
+            }
+
+            @Override
+            public void onClickCloseScreenShare() {
+                if (streamerPresenter == null) {
+                    return;
+                }
+                PLVLSConfirmDialog.Builder.context(getContext())
+                        .setContent(R.string.plvls_streamer_screenshare_stop_confirm)
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setRightButtonText(R.string.plv_common_dialog_confirm)
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                streamerPresenter.exitShareScreen();
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
         streamerAdapter.setIsOnlyAudio(PLVSStreamerInnerDataTransfer.getInstance().isOnlyAudio());
@@ -243,6 +272,9 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         streamerPresenter.init();
 
         linkMicInvitationLayout.setIsOnlyAudio(liveRoomDataManager.isOnlyAudio());
+
+        //初始化悬浮窗
+        streamerPresenter.registerView(floatWindow.getStreamerView());
 
         observeClassDetailData();
         observeStreamerStatus();
@@ -374,6 +406,11 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
     }
 
     @Override
+    public void addIsStartShareScreen(IPLVOnDataChangedListener<Boolean> listener) {
+        streamerPresenter.getData().getIsStartShareScreen().observe((LifecycleOwner) getContext(), listener);
+    }
+
+    @Override
     public PLVLinkMicConstant.NetworkQuality getNetworkQuality() {
         return streamerPresenter.getNetworkQuality();
     }
@@ -398,6 +435,8 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
 
     @Override
     public void destroy() {
+        floatWindow.close();
+        floatWindow.destroy();
         linkMicInvitationLayout.destroy();
         streamerPresenter.destroy();
         PLVForegroundService.stopForegroundService();
@@ -571,6 +610,32 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
         }
 
         @Override
+        public void onScreenShareChange(final int position, final boolean isShare, int extra, String userId, boolean isMyself) {
+            super.onScreenShareChange(position, isShare, extra, userId, isMyself);
+            streamerAdapter.updateUserScreenSharing(position, isShare);
+
+            if (isMyself) {
+                if (isShare) {
+                    showFloatWindow();
+                } else {
+                    hideFloatWindow();
+                }
+                String msg;
+                if (extra == IPLVScreenShareListener.PLV_SCREEN_SHARE_OK) {
+                    msg = isShare ? getContext().getString(R.string.plvls_streamer_sharescreen_start_tip) : getContext().getString(R.string.plvls_streamer_sharescreen_already_stop);
+                    if (!isShare && !PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_GRANT_PERMISSION_SHARE_SCREEN)) {
+                        msg = getContext().getString(R.string.plvls_streamer_remove_speaker_and_stop_screenshare);
+                    }
+                } else {
+                    msg = getContext().getString(R.string.plvls_streamer_sharescreen_error) + extra;
+                }
+                PLVToast.Builder.context(getContext())
+                        .setText(msg)
+                        .build().show();
+            }
+        }
+
+        @Override
         public void onTeacherInviteMeJoinLinkMic(PLVJoinResponseSEvent event) {
             linkMicInvitationLayout.setCurrentEnableVideo(streamerPresenter.isLocalVideoEnabled());
             linkMicInvitationLayout.setCurrentEnableAudio(streamerPresenter.isLocalAudioEnabled());
@@ -666,5 +731,54 @@ public class PLVLSStreamerLayout extends FrameLayout implements IPLVLSStreamerLa
                 .show();
     }
 
+    private void showFloatWindow() {
+        if(PLVFloatPermissionUtils.checkPermission((Activity) getContext())){
+            getCurrentScreenShareFloatWindow().show();
+        } else {
+            if(isShowWindowPermissionDialog) {
+                PLVLSConfirmDialog.Builder.context(getContext())
+                        .setTitleVisibility(View.GONE)
+                        .setContent(getContext().getString(R.string.plvls_float_window_permission_need))
+                        .setLeftButtonText(R.string.plv_common_dialog_cancel)
+                        .setLeftBtnListener(new PLVConfirmDialog.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                dialog.dismiss();
+                                Toast.makeText(getContext(), getContext().getString(R.string.plvls_float_window_permission_denied_and_not_show), Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setRightButtonText(R.string.plv_common_dialog_confirm)
+                        .setRightBtnListener(new PLVConfirmDialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, View v) {
+                                dialog.dismiss();
+                                PLVFloatPermissionUtils.requestPermission((Activity) getContext(), new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
+                                    @Override
+                                    public void onResult(boolean isGrant) {
+                                        if(isGrant){
+                                            getCurrentScreenShareFloatWindow().show();
+                                        } else {
+                                            Toast.makeText(getContext(), getContext().getString(R.string.plvls_float_window_permission_denied_and_not_show), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .build()
+                        .show();
+                isShowWindowPermissionDialog = false;//只显示一次
+            }
+        }
+
+    }
+
+    private void hideFloatWindow(){
+        getCurrentScreenShareFloatWindow().close();
+    }
+
+    @NonNull
+    private IPLVLSStreamerScreenShareFloatWindow getCurrentScreenShareFloatWindow() {
+        return floatWindow;
+    }
     // </editor-fold>
 }

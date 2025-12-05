@@ -63,6 +63,11 @@ public interface IPLVLSChatroomLayout {
     void setFrontCameraViewStatus(boolean isFront);
 
     /**
+     * 设置是否开始屏幕共享
+     */
+    void setIsStartShareScreen(boolean isStartShareScreen);
+
+    /**
      * 通知文档区域标注工具栏展开状态
      *
      * @param isExpand 是否展开

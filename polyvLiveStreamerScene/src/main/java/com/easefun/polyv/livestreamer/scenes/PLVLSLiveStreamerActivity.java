@@ -639,6 +639,16 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
                 plvlsChatroomLy.setFrontCameraViewStatus(aBoolean);
             }
         });
+        plvlsStreamerLy.addIsStartShareScreen(new IPLVOnDataChangedListener<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if (aBoolean == null) {
+                    return;
+                }
+                plvlsChatroomLy.setIsStartShareScreen(aBoolean);
+                plvlsStatusBarLy.setIsStartShareScreen(aBoolean);
+            }
+        });
     }
 
     private void initPushDowngradeAlertLayout() {

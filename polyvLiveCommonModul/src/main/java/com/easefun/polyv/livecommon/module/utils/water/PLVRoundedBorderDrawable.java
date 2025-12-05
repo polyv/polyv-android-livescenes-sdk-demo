@@ -4,8 +4,6 @@ import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 
-import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-
 public class PLVRoundedBorderDrawable extends Drawable {
     private final Paint mBorderPaint;
     private final Paint mImagePaint;

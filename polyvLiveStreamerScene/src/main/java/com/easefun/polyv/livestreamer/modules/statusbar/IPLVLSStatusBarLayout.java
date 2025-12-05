@@ -69,6 +69,13 @@ public interface IPLVLSStatusBarLayout {
     void setStreamerStatus(boolean isStartedStatus);
 
     /**
+     * 设置屏幕共享状态
+     *
+     * @param setIsStartShareScreen 屏幕共享状态
+     */
+    void setIsStartShareScreen(boolean setIsStartShareScreen);
+
+    /**
      * 切换选择的ppt类型
      * @param pptType 0-白板；1-ppt
      */

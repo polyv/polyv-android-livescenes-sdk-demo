@@ -14,7 +14,6 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -124,7 +123,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     @Nullable
     private LinkMicItemViewHolder teacherViewHolder;
     @Nullable
-    private SurfaceView localRenderView;
+    private View localRenderView;
     private View checkClickView;
 
     private int itemType = ITEM_TYPE_DEFAULT;
@@ -420,7 +419,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     public LinkMicItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_linkmic_recycler_view_multi_item, parent, false);
 
-        SurfaceView renderView = adapterCallback.createLinkMicRenderView();
+        View renderView = adapterCallback.createLinkMicRenderView();
 
         final LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
         viewHolder.renderView = renderView;
@@ -809,7 +808,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private LinearLayout llCupLayout;
         private ImageView ivMicState;
         @Nullable
-        private SurfaceView renderView;
+        private View renderView;
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         private PLVSwitchViewAnchorLayout switchViewAnchorLayoutParent;
         private PLVRoundRectLayout roundRectLayout;
@@ -870,23 +869,23 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
          *
          * @return 渲染器
          */
-        SurfaceView createLinkMicRenderView();
+        View createLinkMicRenderView();
 
         /**
-         * 安装SurfaceView。
-         * 将创建好的SurfaceView与连麦ID关联，并设置到SDK
+         * 安装renderView。
+         * 将创建好的renderView与连麦ID关联，并设置到SDK
          *
-         * @param surfaceView 渲染器
+         * @param renderView 渲染器
          * @param linkMicId   连麦ID
          */
-        void setupRenderView(SurfaceView surfaceView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 释放渲染器
          *
-         * @param surfaceView 渲染器
+         * @param view 渲染器
          */
-        void releaseRenderView(SurfaceView surfaceView);
+        void releaseRenderView(View view);
 
         /**
          * 静音音频和禁用视频
