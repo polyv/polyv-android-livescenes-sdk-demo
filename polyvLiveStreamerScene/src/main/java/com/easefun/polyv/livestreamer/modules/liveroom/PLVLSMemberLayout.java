@@ -451,6 +451,11 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         memberSearchAdapter.setStreamerStatus(isStartedStatus);
     }
 
+    public void setIsStartShareScreen(boolean isStartShare) {
+        memberAdapter.updateUserScreenSharing(0, isStartShare);
+        memberSearchAdapter.updateUserScreenSharing(0, isStartShare);
+    }
+
     public void updateLinkMicMediaType(boolean isVideoLinkMicType, boolean isOpenLinkMic) {
         memberAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);
         memberSearchAdapter.updateLinkMicMediaType(isVideoLinkMicType, isOpenLinkMic);

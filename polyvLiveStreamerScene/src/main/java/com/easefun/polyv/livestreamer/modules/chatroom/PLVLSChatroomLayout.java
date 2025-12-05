@@ -9,6 +9,8 @@ import android.arch.lifecycle.ViewModelStoreOwner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -344,6 +346,21 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
     @Override
     public void setFrontCameraViewStatus(boolean isFront) {
         plvlsChatroomToolbarFrontCameraControlIv.setTag(isFront ? null : "back");
+    }
+
+    @Override
+    public void setIsStartShareScreen(boolean isStartShare) {
+        //去掉摄像头可选项
+        plvlsChatroomToolbarCameraControlIv.setClickable(!isStartShare);
+        plvlsChatroomToolbarFrontCameraControlIv.setClickable(!isStartShare);
+        //置灰
+        if(isStartShare) {
+            plvlsChatroomToolbarCameraControlIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            plvlsChatroomToolbarFrontCameraControlIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        } else {
+            plvlsChatroomToolbarCameraControlIv.clearColorFilter();
+            plvlsChatroomToolbarFrontCameraControlIv.clearColorFilter();
+        }
     }
 
     @Override

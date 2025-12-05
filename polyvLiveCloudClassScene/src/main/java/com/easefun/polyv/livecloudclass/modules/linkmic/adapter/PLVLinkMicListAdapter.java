@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -115,7 +114,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     @Nullable
     private LinkMicItemViewHolder teacherViewHolder;
     @Nullable
-    private SurfaceView localRenderView;
+    private View localRenderView;
 
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
     // </editor-fold>
@@ -393,7 +392,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         itemView.getLayoutParams().width = getItemWidth();
         itemView.requestLayout();
 
-        SurfaceView renderView = adapterCallback.createLinkMicRenderView();
+        View renderView = adapterCallback.createLinkMicRenderView();
 
         final LinkMicItemViewHolder viewHolder = new LinkMicItemViewHolder(itemView);
         if (renderView != null) {
@@ -858,7 +857,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private LinearLayout llCupLayout;
         private ImageView ivMicState;
         @Nullable
-        private SurfaceView renderView;
+        private View renderView;
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         private PLVRoundRectLayout roundRectLayout;
         private PLVLSNetworkQualityWidget qualityWidget;
@@ -919,23 +918,23 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
          *
          * @return 渲染器
          */
-        SurfaceView createLinkMicRenderView();
+        View createLinkMicRenderView();
 
         /**
-         * 安装SurfaceView。
-         * 将创建好的SurfaceView与连麦ID关联，并设置到SDK
+         * 安装renderView。
+         * 将创建好的renderView与连麦ID关联，并设置到SDK
          *
-         * @param surfaceView 渲染器
+         * @param renderView 渲染器
          * @param linkMicId   连麦ID
          */
-        void setupRenderView(SurfaceView surfaceView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 释放渲染器
          *
-         * @param surfaceView 渲染器
+         * @param renderView 渲染器
          */
-        void releaseRenderView(SurfaceView surfaceView);
+        void releaseRenderView(View renderView);
 
         /**
          * 静音音频和禁用视频

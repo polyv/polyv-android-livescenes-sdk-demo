@@ -66,4 +66,21 @@
     <string name="plvls_live_room_new_link_mic_first_intro_hint_title">New Voice Chat available</string>
     <string name="plvls_live_room_new_link_mic_first_intro_hint_content">Click here to allow viewer requesting voice chat</string>
 
+    <string name="plvls_streamer_sharescreen_exit">Stop Sharing</string>
+    <string name="plvls_streamer_sharescreen_start">Screen Sharing</string>
+    <string name="plvls_streamer_sharescreen_float_message">Desktop message</string>
+    <string name="plvls_streamer_sharescreen_float_message_condition_hint">Valid only during screen sharing period, system \'Display on Other Applications\' permission needs to be enabled</string>
+    <string name="plvls_streamer_sharescreen_start_tip">Others can now see your screen</string>
+    <string name="plvls_streamer_sharescreen_already_stop">Sharing ended</string>
+    <string name="plvls_streamer_sharescreen_error">Screen sharing failed:&#160;</string>
+    <string name="plvls_streamer_sharescreen_need_permission">Screen sharing requires teacher authorization</string>
+    <string name="plvls_streamer_sharescreen_need_video_first">Please turn on the camera first</string>
+    <string name="plvls_streamer_remove_speaker_and_stop_screenshare">The anchor has withdrawn your permission to lecture, sharing has ended</string>
+    <string name="plvls_streamer_screenshare_start">Screen Sharing</string>
+    <string name="plvls_streamer_screenshare_stop">Stop Sharing</string>
+    <string name="plvls_streamer_screenshare_stop_only">Stop</string>
+    <string name="plvls_streamer_screenshare_ing">You are sharing your screen</string>
+    <string name="plvls_streamer_screenshare_stop_confirm">Are you sure to end screen sharing?</string>
+    <string name="plvls_float_window_permission_need">To ensure that it runs in the background, you need to authorize the floating window permissions</string>
+    <string name="plvls_float_window_permission_denied_and_not_show">Permissions are limited and the floating window will not be opened</string>
 </resources>

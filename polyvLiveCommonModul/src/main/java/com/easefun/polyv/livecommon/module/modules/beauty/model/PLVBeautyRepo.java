@@ -52,7 +52,9 @@ public class PLVBeautyRepo {
         if (localBeautyIntensityMap != null) {
             // 本地有缓存的强度数据，重新设置强度
             for (Map.Entry<PLVBeautyOption, Float> entry : localBeautyIntensityMap.entrySet()) {
-                entry.getKey().intensity(entry.getValue());
+                if (entry.getKey() != null) {
+                    entry.getKey().intensity(entry.getValue());
+                }
             }
             source = localBeautyIntensityMap;
         } else {

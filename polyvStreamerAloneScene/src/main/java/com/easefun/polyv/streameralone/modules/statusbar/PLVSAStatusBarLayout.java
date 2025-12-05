@@ -192,7 +192,11 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                         }
                         plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
                         if (contentBean.isProductExplaining()) {
-                            plvsaStatusBarAICardWebLayout.showProductAICard(contentBean.getProductId());
+                            if (contentBean.hasAiCard()) {
+                                plvsaStatusBarAICardWebLayout.showProductAICard(contentBean.getProductId());
+                            } else {
+                                plvsaStatusBarAICardWebLayout.hideAndStop();
+                            }
                         } else if (contentBean.isProductExplained()) {
                             plvsaStatusBarAICardWebLayout.hideAndStop();
                         }

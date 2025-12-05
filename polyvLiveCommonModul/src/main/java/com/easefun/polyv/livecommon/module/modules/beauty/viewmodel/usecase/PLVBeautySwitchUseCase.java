@@ -27,7 +27,9 @@ public class PLVBeautySwitchUseCase {
         beautyRepo.setBeautySwitch(true);
 
         for (PLVBeautyOption beautyOption : beautyRepo.getBeautyOptionList()) {
-            beautyRepo.updateBeautyOption(beautyOption, beautyOption.getIntensity());
+            if (beautyOption != null) {
+                beautyRepo.updateBeautyOption(beautyOption, beautyOption.getIntensity());
+            }
         }
 
         final PLVFilterOption filterOption = beautyRepo.getLastUsedFilterOption();

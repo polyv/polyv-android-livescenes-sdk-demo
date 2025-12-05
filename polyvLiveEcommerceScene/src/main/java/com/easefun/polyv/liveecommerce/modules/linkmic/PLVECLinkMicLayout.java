@@ -22,7 +22,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -65,7 +65,6 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.thirdpart.blankj.utilcode.util.ImageUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
-import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -177,18 +176,22 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //init adapter
         linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, gridLayoutManager, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
             @Override
-            public SurfaceView createLinkMicRenderView() {
-                return linkMicPresenter.createRenderView(Utils.getApp());
+            public View createLinkMicRenderView() {
+                View renderView = linkMicPresenter.createTextureRenderView(getContext());
+                if (renderView == null) {
+                    renderView = linkMicPresenter.createRenderView(getContext());
+                }
+                return renderView;
             }
 
             @Override
-            public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
-                linkMicPresenter.setupRenderView(surfaceView, linkMicId);
+            public void setupRenderView(View renderView, String linkMicId) {
+                linkMicPresenter.setupRenderView(renderView, linkMicId);
             }
 
             @Override
-            public void releaseRenderView(SurfaceView surfaceView) {
-                linkMicPresenter.releaseRenderView(surfaceView);
+            public void releaseRenderView(View renderView) {
+                linkMicPresenter.releaseRenderView(renderView);
             }
 
             @Override

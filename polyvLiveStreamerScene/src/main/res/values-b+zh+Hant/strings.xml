@@ -65,4 +65,21 @@
     <string name="plvls_live_room_new_link_mic_first_intro_hint_title">「連麥」功能更新</string>
     <string name="plvls_live_room_new_link_mic_first_intro_hint_content">點選此功能按鈕開啟觀眾連麥</string>
 
+    <string name="plvls_streamer_sharescreen_exit">退出共享</string>
+    <string name="plvls_streamer_sharescreen_start">螢幕共享</string>
+    <string name="plvls_streamer_sharescreen_float_message">案頭消息</string>
+    <string name="plvls_streamer_sharescreen_float_message_condition_hint">僅限荧幕共亯期間有效，需開啟系統「在其他應用上層顯示」許可權</string>
+    <string name="plvls_streamer_sharescreen_start_tip">其他人現在可以看到你的螢幕</string>
+    <string name="plvls_streamer_sharescreen_already_stop">共享已結束</string>
+    <string name="plvls_streamer_sharescreen_error">螢幕分享失敗：</string>
+    <string name="plvls_streamer_sharescreen_need_permission">螢幕共享需講師授權</string>
+    <string name="plvls_streamer_sharescreen_need_video_first">請先開啟攝影機</string>
+    <string name="plvls_streamer_remove_speaker_and_stop_screenshare">您已被移除主講權限，共享已結束</string>
+    <string name="plvls_streamer_screenshare_start">開始共享</string>
+    <string name="plvls_streamer_screenshare_stop">結束共享</string>
+    <string name="plvls_streamer_screenshare_stop_only">結束</string>
+    <string name="plvls_streamer_screenshare_ing">您正在分享畫面</string>
+    <string name="plvls_streamer_screenshare_stop_confirm">確定結束荧幕共亯嗎？</string>
+    <string name="plvls_float_window_permission_need">為保證後台運行，需要您授權浮窗權限</string>
+    <string name="plvls_float_window_permission_denied_and_not_show">權限受限，將不開啟懸浮窗</string>
 </resources>

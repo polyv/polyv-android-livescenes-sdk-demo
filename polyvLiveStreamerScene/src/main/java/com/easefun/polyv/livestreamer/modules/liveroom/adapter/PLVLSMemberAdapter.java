@@ -4,6 +4,8 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.thirdpart.svga.PLVSvgaHelper.loadFromAssets;
 
 import android.arch.lifecycle.Observer;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.AnimationDrawable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -59,6 +61,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public static final String PAYLOAD_UPDATE_SOCKET_USER_DATA = "updateSocketUserData";
     public static final String PAYLOAD_UPDATE_LINK_MIC_MEDIA_TYPE = "updateLinkMicMediaType";
     public static final String PAYLOAD_UPDATE_LINK_MIC_CONTROL = "updateLinkMicControl";
+    public static final String PAYLOAD_UPDATE_SCREEN_SHARED = "updateScreenShared";
     public static final String PAYLOAD_UPDATE_PERMISSION_CHANGE = "updatePermissionChange";
     public static final String PAYLOAD_UPDATE_FIRST_VIEW = "updateFirstView";
 
@@ -133,7 +136,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         String actor = PLVEventHelper.fixActor(socketUserBean.getActor(), socketUserBean.getUserType());
 
         holder.currentMemberItemDataBean = memberItemDataBean;
-
+        boolean isScreenShare = linkMicItemDataBean != null && linkMicItemDataBean.isScreenShare();
         boolean isMe = PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
 
         //加载头像
@@ -188,6 +191,19 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         if (isOnlyShowAudioUI) {
             holder.plvlsMemberCamIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
             holder.plvlsMemberCamFrontIv.setVisibility(isOnlyShowAudioUI ? View.GONE : View.VISIBLE);
+        }
+        //更新屏幕共享时的媒体按钮状态
+        holder.plvlsMemberCamIv.setClickable(true);
+        holder.plvlsMemberCamFrontIv.setClickable(true);
+        holder.plvlsMemberCamIv.clearColorFilter();
+        holder.plvlsMemberCamFrontIv.clearColorFilter();
+        if (isMe && isScreenShare) {
+            //去掉摄像头可选项
+            holder.plvlsMemberCamIv.setClickable(false);
+            holder.plvlsMemberCamFrontIv.setClickable(false);
+            //置灰
+            holder.plvlsMemberCamIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            holder.plvlsMemberCamFrontIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
         //设置禁言状态
         holder.plvlsMemberBanTv.setVisibility(socketUserBean.isBanned() ? View.VISIBLE : View.GONE);
@@ -304,6 +320,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         boolean isMe = PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(socketUserBean.getUserId());
         @Nullable
         PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
+        boolean isScreenShare = linkMicItemDataBean != null && linkMicItemDataBean.isScreenShare();
         for (Object payload : payloads) {
             switch (payload.toString()) {
                 case PAYLOAD_UPDATE_VOLUME:
@@ -364,6 +381,21 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     break;
                 case PAYLOAD_UPDATE_LINK_MIC_CONTROL:
                     updateMicControlStatus(holder, position);
+                    break;
+                case PAYLOAD_UPDATE_SCREEN_SHARED:
+                    if (isMe) {
+                        //去掉摄像头可选项
+                        holder.plvlsMemberCamIv.setClickable(!isScreenShare);
+                        holder.plvlsMemberCamFrontIv.setClickable(!isScreenShare);
+                        //置灰
+                        if(isScreenShare) {
+                            holder.plvlsMemberCamIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                            holder.plvlsMemberCamFrontIv.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                        } else {
+                            holder.plvlsMemberCamIv.clearColorFilter();
+                            holder.plvlsMemberCamFrontIv.clearColorFilter();
+                        }
+                    }
                     break;
                 case PAYLOAD_UPDATE_PERMISSION_CHANGE:
                     updatePermissionStatus(holder, linkMicItemDataBean);
@@ -460,6 +492,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             this.isOpenLinkMic = isOpenLinkMic;
             notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_LINK_MIC_CONTROL);
         }
+    }
+
+    //更新屏幕共享状态
+    public void updateUserScreenSharing(int pos, boolean isShare) {
+        notifyItemChanged(pos, PAYLOAD_UPDATE_SCREEN_SHARED);
     }
 
     public void updatePermissionChange(){

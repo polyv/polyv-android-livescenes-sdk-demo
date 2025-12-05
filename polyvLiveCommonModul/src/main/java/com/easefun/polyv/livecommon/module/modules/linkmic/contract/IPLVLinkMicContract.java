@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.linkmic.contract;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
@@ -337,6 +338,14 @@ public interface IPLVLinkMicContract {
         SurfaceView createRenderView(Context context);
 
         /**
+         * 创建渲染器
+         *
+         * @param context 上下文
+         * @return 渲染器
+         */
+        TextureView createTextureRenderView(Context context);
+
+        /**
          * 获取当前用户的连麦ID
          *
          * @return 连麦ID
@@ -356,14 +365,14 @@ public interface IPLVLinkMicContract {
          * @param renderView 渲染器
          * @param linkMicId  连麦ID
          */
-        void setupRenderView(SurfaceView renderView, String linkMicId);
+        void setupRenderView(View renderView, String linkMicId);
 
         /**
          * 释放渲染器
          *
          * @param renderView 渲染器
          */
-        void releaseRenderView(SurfaceView renderView);
+        void releaseRenderView(View renderView);
 
         /**
          * 设置rtc混流观看渲染

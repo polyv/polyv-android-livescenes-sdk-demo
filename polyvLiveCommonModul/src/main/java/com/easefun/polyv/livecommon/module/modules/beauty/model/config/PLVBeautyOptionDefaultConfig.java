@@ -43,7 +43,9 @@ public class PLVBeautyOptionDefaultConfig {
             // 白牙
             pair(PLVBeautyOption.RESHAPE_BEAUTY_WHITEN_TEETH, 0.35F),
             // 亮眼
-            pair(PLVBeautyOption.RESHAPE_BEAUTY_BRIGHTEN_EYE, 0.35F)
+            pair(PLVBeautyOption.RESHAPE_BEAUTY_BRIGHTEN_EYE, 0.35F),
+            // 红唇
+            pair(PLVBeautyOption.RESHAPE_BEAUTY_LIPSTICK, 0F)
     );
 
     // 滤镜默认强度

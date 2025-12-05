@@ -196,6 +196,13 @@ public interface IPLVLSStreamerLayout {
     void addOnIsFrontCameraListener(IPLVOnDataChangedListener<Boolean> listener);
 
     /**
+     * 添加是否开始推流屏幕共享的监听器
+     *
+     * @param listener 监听器
+     */
+    void addIsStartShareScreen(IPLVOnDataChangedListener<Boolean> listener);
+
+    /**
      * 获取网络质量
      *
      * @return 网络质量常量

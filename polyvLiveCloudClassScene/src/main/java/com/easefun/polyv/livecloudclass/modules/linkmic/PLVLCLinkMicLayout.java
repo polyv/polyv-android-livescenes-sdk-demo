@@ -20,7 +20,6 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -186,18 +185,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //init adapter
         linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, linearLayoutManager, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
             @Override
-            public SurfaceView createLinkMicRenderView() {
+            public View createLinkMicRenderView() {
                 return linkMicPresenter.createRenderView(Utils.getApp());
             }
 
             @Override
-            public void setupRenderView(SurfaceView surfaceView, String linkMicId) {
-                linkMicPresenter.setupRenderView(surfaceView, linkMicId);
+            public void setupRenderView(View renderView, String linkMicId) {
+                linkMicPresenter.setupRenderView(renderView, linkMicId);
             }
 
             @Override
-            public void releaseRenderView(SurfaceView surfaceView) {
-                linkMicPresenter.releaseRenderView(surfaceView);
+            public void releaseRenderView(View renderView) {
+                linkMicPresenter.releaseRenderView(renderView);
             }
 
             @Override

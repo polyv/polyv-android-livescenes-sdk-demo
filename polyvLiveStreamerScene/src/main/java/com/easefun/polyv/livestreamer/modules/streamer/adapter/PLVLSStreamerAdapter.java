@@ -6,8 +6,14 @@ import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -16,6 +22,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livestreamer.R;
@@ -24,6 +31,7 @@ import com.easefun.polyv.livestreamer.modules.streamer.widget.PLVLSLinkMicDurati
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.access.PLVUserAbilityManager;
 import com.plv.livescenes.access.PLVUserRole;
 
@@ -41,6 +49,7 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     private static final String PAYLOAD_UPDATE_VOLUME = "updateVolume";
     private static final String PAYLOAD_UPDATE_VIDEO_MUTE = "updateVideoMute";
     private static final String PAYLOAD_UPDATE_GUEST_STATUS = "updateGuestStatus";
+    private static final String PAYLOAD_UPDATE_SCREEN_SHARED = "updateScreenShared";
     private static final String PAYLOAD_UPDATE_COVER_IMAGE = "updateCoverImage";
     private static final String PAYLOAD_UPDATE_PERMISSION_CHANGE = "updatePermission";
 
@@ -105,6 +114,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
+        boolean isScreenShare = itemDataBean.isScreenShare();
+        boolean isMe = linkMicId != null && linkMicId.equals(myLinkMicId);
         String actor = itemDataBean.getActor();
 
         holder.onBindLinkMicItem(itemDataBean);
@@ -135,6 +146,25 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
 
         //更新主讲权限状态
         updatePermissionChange(holder, itemDataBean);
+
+        //更新屏幕共享占位图显示状态
+        if (isMe) {
+            holder.plvlsScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
+            holder.streamerScreenShareStopTv.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    adapterCallback.onClickCloseScreenShare();
+                    return false;
+                }
+            });
+            holder.setOnStopScreenShareClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapterCallback.onClickCloseScreenShare();
+                }
+            });
+        }
+
 
         //设置点击事件监听器
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +200,8 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         int curVolume = itemDataBean.getCurVolume();
         boolean isTeacher = itemDataBean.isTeacher();
         boolean isGuest = itemDataBean.isGuest();
+        boolean isScreenShare = itemDataBean.isScreenShare();
+        boolean isMe = linkMicId != null && linkMicId.equals(myLinkMicId);
 
         for (Object payload : payloads) {
             switch (payload.toString()) {
@@ -209,6 +241,12 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     break;
                 case PAYLOAD_UPDATE_GUEST_STATUS:
                     updateGuestViewStatus(holder, itemDataBean);
+                    break;
+                case PAYLOAD_UPDATE_SCREEN_SHARED:
+                    if (!isMe) {
+                        break;
+                    }
+                    holder.plvlsScreenSharePlaceholderView.setVisibility(isScreenShare ? View.VISIBLE : View.INVISIBLE);
                     break;
                 case PAYLOAD_UPDATE_COVER_IMAGE:
                     bindCoverImage(holder, isOnlyAudio, isTeacher);
@@ -279,6 +317,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
     //更新嘉宾状态
     public void updateGuestStatus(int pos) {
         notifyItemChanged(pos, PAYLOAD_UPDATE_GUEST_STATUS);
+    }
+
+    //更新屏幕共享状态
+    public void updateUserScreenSharing(int pos, boolean isShare) {
+        notifyItemChanged(pos, PAYLOAD_UPDATE_SCREEN_SHARED);
     }
 
     public void updatePermissionChange(){
@@ -411,10 +454,17 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
         private TextView plvsStreamerGuestLinkStatusTv;
         private ImageView plvlsStreamerSpeakerPermissionStatusIv;
         private View plvlsPlaceholderView;
+        //屏幕分享时的占位图
+        private View plvlsScreenSharePlaceholderView;
+        private View screenShareLargeLy;
+        private TextView screenShareSmallTv;
+        private PLVRoundRectGradientTextView streamerScreenShareStopTv;
         private PLVLSLinkMicDurationLayout streamerLinkmicDurationLayout;
 
         private PLVLinkMicItemDataBean linkMicItemDataBean;
         private String lastBindVideoLinkMicId = null;
+
+        private View.OnClickListener onStopScreenShareClickListener;
 
         public StreamerItemViewHolder(View itemView) {
             super(itemView);
@@ -426,30 +476,67 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
             plvsStreamerGuestLinkStatusTv = itemView.findViewById(R.id.plvls_streamer_guest_link_status_tv);
             plvlsStreamerCoverImage = itemView.findViewById(R.id.plvls_streamer_cover_image);
             plvlsPlaceholderView = itemView.findViewById(R.id.plvsa_no_streamer_placeholder);
+            plvlsScreenSharePlaceholderView = itemView.findViewById(R.id.plvls_streamer_screen_share_placeholder);
+            screenShareLargeLy = itemView.findViewById(R.id.plvls_streamer_screen_share_large_ly);
+            screenShareSmallTv = itemView.findViewById(R.id.plvls_streamer_screen_share_small_tv);
+            streamerScreenShareStopTv = itemView.findViewById(R.id.plvls_streamer_screen_share_stop_tv);
             plvlsStreamerSpeakerPermissionStatusIv = itemView.findViewById(R.id.plvls_streamer_speaker_permission_status_iv);
             streamerLinkmicDurationLayout = itemView.findViewById(R.id.plvls_streamer_linkmic_duration_layout);
 
+            setupCombinedText(screenShareSmallTv);
             observeSwitchPositionToUpdateViewSize();
+        }
+
+        public void setOnStopScreenShareClickListener(View.OnClickListener listener) {
+            onStopScreenShareClickListener = listener;
         }
 
         private void onBindLinkMicItem(PLVLinkMicItemDataBean itemDataBean) {
             this.linkMicItemDataBean = itemDataBean;
         }
 
+        private void setupCombinedText(TextView textView) {
+            String text1 = PLVAppUtils.getString(R.string.plvls_streamer_screenshare_ing);
+            String text2 = PLVAppUtils.getString(R.string.plvls_streamer_screenshare_stop_only);
+            SpannableStringBuilder ssb = new SpannableStringBuilder();
+            ssb.append(text1);
+            ssb.append(" ");
+            int start = ssb.length();
+            ssb.append(text2);
+            int end = ssb.length();
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    if (onStopScreenShareClickListener != null) {
+                        onStopScreenShareClickListener.onClick(widget);
+                    }
+                }
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setColor(PLVFormatUtils.parseColor("#FF6363"));
+                    ds.setUnderlineText(false); // 移除下划线
+                }
+            };
+            ssb.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(ssb);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+
         private void observeSwitchPositionToUpdateViewSize() {
             streamerItemSwitchAnchorLayout.setOnSwitchListener(new PLVSwitchViewAnchorLayout.IPLVSwitchViewAnchorLayoutListener() {
                 @Override
                 protected void onSwitchElsewhereAfter() {
-                    updateViewSize();
+                    updateViewSize(true);
                     rebindItemIfRecycled();
                 }
 
                 @Override
                 protected void onSwitchBackAfter() {
-                    updateViewSize();
+                    updateViewSize(false);
                 }
 
-                private void updateViewSize() {
+                private void updateViewSize(boolean isElsewhere) {
                     final View child = firstNotNull(
                             streamerItemSwitchAnchorLayout.findViewById(R.id.plvls_streamer_round_rect_ly),
                             streamerItemSwitchAnchorLayout.findViewById(R.id.plvls_document_layout_container)
@@ -460,6 +547,9 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
                     final ViewGroup.LayoutParams lp = child.getLayoutParams();
                     lp.height = 0;
                     child.setLayoutParams(lp);
+
+                    screenShareLargeLy.setVisibility(isElsewhere ? View.VISIBLE : View.GONE);
+                    screenShareSmallTv.setVisibility(isElsewhere ? View.GONE : View.VISIBLE);
                 }
 
                 private void rebindItemIfRecycled() {
@@ -497,6 +587,11 @@ public class PLVLSStreamerAdapter extends RecyclerView.Adapter<PLVLSStreamerAdap
          * @param linkMicId   连麦ID
          */
         void setupRenderView(View renderView, String linkMicId);
+
+        /**
+         * 停止屏幕共享
+         */
+        void onClickCloseScreenShare();
     }
     // </editor-fold>
 }
