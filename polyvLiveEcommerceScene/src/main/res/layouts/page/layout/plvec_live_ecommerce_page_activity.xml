@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/plvec_player_bg">
 
     <!-- 聊天室背景图 -->
@@ -41,6 +42,16 @@
             android:layout_height="match_parent"
             android:fadingEdge="none"
             android:overScrollMode="never" />
+
+        <!--  单独显示的连麦视图  -->
+        <com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView
+            android:id="@+id/plvec_linkmic_separate_linkmic_view"
+            android:layout_width="90dp"
+            android:layout_height="160dp"
+            android:visibility="gone"
+            app:plvDrag="cornerAll|edgeAll|center"
+            app:plvAutoAttachEdge="onFinishTouch"
+            app:plvAutoAttachEdgeSide="edgeLeft|edgeRight" />
 
         <!-- 页面关闭按钮 -->
         <ImageView

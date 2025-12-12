@@ -134,6 +134,11 @@ public abstract class PLVAbsLinkMicView implements IPLVLinkMicContract.IPLVLinkM
     }
 
     @Override
+    public void onVideoSizeChanged(String uid, int width, int height) {
+
+    }
+
+    @Override
     public void onSwitchFirstScreen(String linkMicId) {
 
     }

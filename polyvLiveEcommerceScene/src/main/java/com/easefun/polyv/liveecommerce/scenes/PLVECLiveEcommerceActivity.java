@@ -56,6 +56,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailActivity;
 import com.easefun.polyv.liveecommerce.modules.linkmic.IPLVECLinkMicLayout;
 import com.easefun.polyv.liveecommerce.modules.linkmic.PLVECLinkMicControlBar;
+import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView;
 import com.easefun.polyv.liveecommerce.modules.player.IPLVECVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.PLVECLiveVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.PLVECPlaybackVideoLayout;
@@ -132,6 +133,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private PLVECEmptyFragment emptyFragment;
     //弹窗Layout
     private IPLVPopoverLayout popoverLayout;
+    // 单独显示的连麦视图
+    private PLVECSeparateLinkMicView separateLinkmicView;
 
     // 悬浮小窗
     private PLVECFloatingWindow floatingWindow;
@@ -480,6 +483,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面UI">
     private void initView() {
+        separateLinkmicView = findViewById(R.id.plvec_linkmic_separate_linkmic_view);
+
         // 页面关闭按钮
         closeIm = findViewById(R.id.close_page_iv);
         findViewById(R.id.close_page_iv).setOnClickListener(new View.OnClickListener() {
@@ -517,6 +522,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             ViewStub linkmicLayoutViewStub = findViewById(R.id.plvec_linkmic_viewstub);
             linkMicLayout = (IPLVECLinkMicLayout) linkmicLayoutViewStub.inflate();
             linkMicLayout.init(liveRoomDataManager, linkMicControlBar);
+            linkMicLayout.setupSeparateLinkMicView(separateLinkmicView);
             linkMicLayout.hideAll();
         } else {
             // 页面底层播放器

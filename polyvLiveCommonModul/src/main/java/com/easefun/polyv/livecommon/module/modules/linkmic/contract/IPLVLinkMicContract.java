@@ -165,6 +165,11 @@ public interface IPLVLinkMicContract {
         void onNetQuality(PLVLinkMicConstant.NetworkQuality quality);
 
         /**
+         * 视频尺寸变更回调
+         */
+        void onVideoSizeChanged(String uid, int width, int height);
+
+        /**
          * 切换第一画面
          *
          * @param linkMicId 新的第一画面的连麦Id
