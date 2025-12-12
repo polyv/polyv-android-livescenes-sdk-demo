@@ -1388,6 +1388,13 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 linkMicView.onNetQuality(quality);
             }
         }
+
+        @Override
+        public void onVideoSizeChanged(String uid, int width, int height) {
+            if (linkMicView != null) {
+                linkMicView.onVideoSizeChanged(uid, width, height);
+            }
+        }
     }
 // </editor-fold>
 

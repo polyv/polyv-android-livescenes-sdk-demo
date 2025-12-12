@@ -1,8 +1,11 @@
 package com.easefun.polyv.liveecommerce.modules.linkmic.adapter;
 
+import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
+
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
@@ -40,6 +43,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +73,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private static final String PAYLOAD_UPDATE_CUP = "updateCup";
     private static final String PAYLOAD_UPDATE_NET_QUALITY = "updateNetQuality";
     private static final String PAYLOAD_UPDATE_COVER_IMAGE = "updateCoverImage";
+    private static final String PAYLOAD_UPDATE_VIDEO_SIZE = "updateVideoSize";
 
     //默认的封面图
     private static final String DEFAULT_LIVE_STREAM_COVER_IMAGE = "https://s1.videocc.net/default-img/channel/default-splash.png";
@@ -77,6 +82,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     /**** data ****/
     private List<PLVLinkMicItemDataBean> dataList;
     private Map<String, Bitmap> linkMicIdSnapshotBitmapMap = new HashMap<>();
+    private Map<String, Rect> linkMicIdVideoSizeMap = new HashMap<>();
 
     /**** listener ****/
     @NotNull
@@ -85,6 +91,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private OnTeacherSwitchViewBindListener onTeacherSwitchViewBindListener;
 
     /**** status ****/
+    // 连麦时单独显示自己的摄像头
+    private final boolean myselfShowSeparately;
+    // 连麦需要单独显示的item
+    @Nullable
+    private PLVLinkMicItemDataBean linkMicItemDataBeanRemovedByShowSeparate;
     //是否是音频连麦
     private boolean isAudio;
     //当前用户的连麦ID
@@ -132,9 +143,10 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
-    public PLVLinkMicListAdapter(RecyclerView rv, GridLayoutManager gridLayoutManager, @NotNull OnPLVLinkMicAdapterCallback adapterCallback) {
+    public PLVLinkMicListAdapter(RecyclerView rv, GridLayoutManager gridLayoutManager, boolean myselfShowSeparately, @NotNull OnPLVLinkMicAdapterCallback adapterCallback) {
         this.rv = rv;
         this.gridLayoutManager = gridLayoutManager;
+        this.myselfShowSeparately = myselfShowSeparately;
         this.adapterCallback = adapterCallback;
     }
     // </editor-fold>
@@ -210,8 +222,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     // <editor-fold defaultstate="collapsed" desc="API - 第一画面">
     //获取第一画面的切换View
     public PLVSwitchViewAnchorLayout getFirstScreenSwitchView() {
-        for (int i = 0; i < dataList.size(); i++) {
-            if (dataList.get(i).getLinkMicId().equals(firstScreenLinkMicId)) {
+        for (int i = 0; i < getDataListFiltered().size(); i++) {
+            if (getDataListFiltered().get(i).getLinkMicId().equals(firstScreenLinkMicId)) {
                 LinkMicItemViewHolder viewHolder = (LinkMicItemViewHolder) rv.findViewHolderForAdapterPosition(i);
                 if (viewHolder != null) {
                     return viewHolder.switchViewAnchorLayoutParent;
@@ -267,7 +279,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         if (switchViewHasMedia == null) {
             return -1;
         }
-        for (int i = 0; i < dataList.size(); i++) {
+        for (int i = 0; i < getDataListFiltered().size(); i++) {
             LinkMicItemViewHolder viewHolder = (LinkMicItemViewHolder) rv.findViewHolderForAdapterPosition(i);
             if (viewHolder != null && viewHolder.switchViewAnchorLayoutParent == switchViewHasMedia) {
                 return i;
@@ -340,8 +352,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
         //找到隐藏的view holder，并更新其中的view（虽然view holder的item view隐藏了，但是子view切到别的地方去，还是能显示出来的，这里就是要更新切到别的地方去的子view）
         if (!TextUtils.isEmpty(invisibleItemLinkMicId)) {
-            for (int i = 0; i < dataList.size(); i++) {
-                if (dataList.get(i).getLinkMicId().equals(invisibleItemLinkMicId)) {
+            for (int i = 0; i < getDataListFiltered().size(); i++) {
+                if (getDataListFiltered().get(i).getLinkMicId().equals(invisibleItemLinkMicId)) {
                     notifyItemChanged(i, PAYLOAD_UPDATE_VOLUME);
                 }
             }
@@ -374,8 +386,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
         //找到我的位置
         int myPos = 0;
-        for (int i = 0; i < dataList.size(); i++) {
-            PLVLinkMicItemDataBean index = dataList.get(i);
+        for (int i = 0; i < getDataListFiltered().size(); i++) {
+            PLVLinkMicItemDataBean index = getDataListFiltered().get(i);
             if (index.getLinkMicId().equals(myLinkMicId)) {
                 myPos = i;
                 break;
@@ -385,13 +397,26 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         notifyItemChanged(myPos, PAYLOAD_UPDATE_NET_QUALITY);
     }
 
+    public void updateVideoSizeChanged(String linkMicId, int width, int height) {
+        if (linkMicIdVideoSizeMap.containsKey(linkMicId)) {
+            Rect videoSize = linkMicIdVideoSizeMap.get(linkMicId);
+            if (videoSize != null && videoSize.width() == width && videoSize.height() == height) {
+                return;
+            }
+        }
+        linkMicIdVideoSizeMap.put(linkMicId, new Rect(0, 0, width, height));
+        if (itemType == ITEM_TYPE_ONLY_ONE) {
+            notifyItemRangeChanged(0, getDataListFiltered().size(), PAYLOAD_UPDATE_VIDEO_SIZE);
+        }
+    }
+
     public void updateTeacherCoverImage(){
         if(dataList == null){
             return;
         }
         int teacherPosition = 0;
-        for (int i = 0; i < dataList.size(); i++) {
-            PLVLinkMicItemDataBean index = dataList.get(i);
+        for (int i = 0; i < getDataListFiltered().size(); i++) {
+            PLVLinkMicItemDataBean index = getDataListFiltered().get(i);
             if (index.isTeacher()) {
                 teacherPosition = i;
                 break;
@@ -433,7 +458,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     @Override
     public int getItemViewType(int position) {
-        return dataList.get(position).getLinkMicId().hashCode();
+        return getDataListFiltered().get(position).getLinkMicId().hashCode();
     }
 
     @Override
@@ -443,12 +468,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             holder.renderView = adapterCallback.createLinkMicRenderView();
             if (holder.renderView != null) {
                 holder.flRenderViewContainer.addView(holder.renderView, 0, getRenderViewLayoutParam());
-                holder.isRenderViewSetup = false;
             } else {
                 PLVCommonLog.e(TAG, String.format(Locale.US, "create render view return null at position:%d", position));
             }
         }
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getDataListFiltered().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
         int cupNum = itemDataBean.getCupNum();
@@ -481,19 +505,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         bindLogoView(holder, isFirstScreen);
 
         //调整item的宽高
-        ViewGroup.LayoutParams switchViewAnchorLayoutLp = holder.switchViewAnchorLayout.getLayoutParams();
-        ConstraintLayout.LayoutParams vlp = (ConstraintLayout.LayoutParams) holder.roundRectLayout.getLayoutParams();
-        if (itemType == ITEM_TYPE_ONLY_ONE) {
-            switchViewAnchorLayoutLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            vlp.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
-            holder.tvNick.setVisibility(View.GONE);
-            holder.ivMicState.setVisibility(View.GONE);
-        } else {
-            switchViewAnchorLayoutLp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            vlp.height = 0;
-            holder.tvNick.setVisibility(View.VISIBLE);
-            holder.ivMicState.setVisibility(View.VISIBLE);
-        }
+        processVideoSizeChanged(holder, itemDataBean);
         if (position == 0) {
             final PLVECFloatingWindow floatingWindow = PLVDependManager.getInstance().get(PLVECFloatingWindow.class);
             floatingWindow.bindContentView(holder.switchViewAnchorLayoutParent);
@@ -562,7 +574,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             super.onBindViewHolder(holder, position, payloads);
             return;
         }
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getDataListFiltered().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
         String actor = itemDataBean.getActor();
@@ -606,6 +618,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
                 case PAYLOAD_UPDATE_COVER_IMAGE:
                     bindCoverImage(holder, isOnlyAudio, isTeacher);
                     break;
+                case PAYLOAD_UPDATE_VIDEO_SIZE:
+                    processVideoSizeChanged(holder, itemDataBean);
                 default:
                     break;
             }
@@ -630,7 +644,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
     @Override
     public int getItemCount() {
-        return dataList == null ? 0 : dataList.size();
+        return dataList == null ? 0 : getDataListFiltered().size();
     }
 
     // </editor-fold>
@@ -672,7 +686,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
      * @return isMuteVideo
      */
     private boolean resolveListShowMode(LinkMicItemViewHolder holder, int position) {
-        PLVLinkMicItemDataBean itemDataBean = dataList.get(position);
+        PLVLinkMicItemDataBean itemDataBean = getDataListFiltered().get(position);
         String linkMicId = itemDataBean.getLinkMicId();
         String nick = itemDataBean.getNick();
         int cupNum = itemDataBean.getCupNum();
@@ -722,9 +736,8 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
      * 安装渲染器
      */
     private void trySetupRenderView(final LinkMicItemViewHolder holder, String linkMicId) {
-        if (holder.renderView != null && !holder.isRenderViewSetup) {
+        if (holder.renderView != null) {
             adapterCallback.setupRenderView(holder.renderView, linkMicId);
-            holder.isRenderViewSetup = true;
         }
     }
 
@@ -774,6 +787,39 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         }
     }
 
+    private void processVideoSizeChanged(LinkMicItemViewHolder holder, PLVLinkMicItemDataBean itemDataBean) {
+        Rect videoSize = itemDataBean.getLinkMicId() == null ? null : linkMicIdVideoSizeMap.get(itemDataBean.getLinkMicId());
+        boolean isLandscape = videoSize != null && videoSize.width() > videoSize.height();
+        ViewGroup.LayoutParams switchViewAnchorLayoutLp = holder.switchViewAnchorLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams vlp = (ConstraintLayout.LayoutParams) holder.roundRectLayout.getLayoutParams();
+        if (itemType == ITEM_TYPE_ONLY_ONE) {
+            switchViewAnchorLayoutLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            if (!isLandscape) {
+                vlp.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                vlp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+                vlp.topMargin = 0;
+                vlp.dimensionRatio = "H,2:3";
+            } else {
+                vlp.height = 0;
+                vlp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+                vlp.topMargin = (int) (ScreenUtils.getScreenOrientatedHeight() * 0.166);
+                vlp.dimensionRatio = format("H,{}:{}", videoSize.width(), videoSize.height());
+            }
+            holder.tvNick.setVisibility(View.GONE);
+            holder.ivMicState.setVisibility(View.GONE);
+        } else {
+            switchViewAnchorLayoutLp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            vlp.height = 0;
+            vlp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            vlp.topMargin = 0;
+            vlp.dimensionRatio = "H,2:3";
+            holder.tvNick.setVisibility(View.VISIBLE);
+            holder.ivMicState.setVisibility(View.VISIBLE);
+        }
+        holder.switchViewAnchorLayout.setLayoutParams(switchViewAnchorLayoutLp);
+        holder.roundRectLayout.setLayoutParams(vlp);
+    }
+
     private void bindLogoView(LinkMicItemViewHolder holder, boolean isFirstScreen) {
         if (isFirstScreen && (holder != null)) {
             holder.plvPlayerLogoView.addLogo(plvPlayerLogoView.getParamZero());
@@ -782,6 +828,60 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         } else if (!isFirstScreen && (holder != null)) {
             holder.plvPlayerLogoView.setVisibility(View.GONE);
         }
+    }
+
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="内部方法 - 列表过滤">
+
+    private List<PLVLinkMicItemDataBean> getDataListFiltered() {
+        return filterShowMyselfSeparate(dataList);
+    }
+
+    private List<PLVLinkMicItemDataBean> filterShowMyselfSeparate(List<PLVLinkMicItemDataBean> upstream) {
+        if (upstream.size() != 2 || !myselfShowSeparately) {
+            linkMicItemDataBeanRemovedByShowSeparate = null;
+            callLinkMicShowSeparateChanged();
+            return upstream;
+        }
+        final List<PLVLinkMicItemDataBean> result = new ArrayList<>(upstream);
+        PLVLinkMicItemDataBean myLinkMicItem = null;
+        PLVLinkMicItemDataBean teacherLinkMicItem = null;
+        PLVLinkMicItemDataBean firstLinkMicItem = null;
+        for (PLVLinkMicItemDataBean linkMicItemDataBean : upstream) {
+            if (myLinkMicId != null && myLinkMicId.equals(linkMicItemDataBean.getLinkMicId())) {
+                myLinkMicItem = linkMicItemDataBean;
+            }
+            if (linkMicItemDataBean.isTeacher()) {
+                teacherLinkMicItem = linkMicItemDataBean;
+            }
+            if (firstLinkMicItem == null && linkMicItemDataBean != myLinkMicItem) {
+                firstLinkMicItem = linkMicItemDataBean;
+            }
+        }
+        if (myLinkMicItem == null) {
+            linkMicItemDataBeanRemovedByShowSeparate = null;
+            callLinkMicShowSeparateChanged();
+            return result;
+        }
+        if (myLinkMicItem.isFirstScreen()) {
+            if (teacherLinkMicItem != null) {
+                result.remove(teacherLinkMicItem);
+                linkMicItemDataBeanRemovedByShowSeparate = teacherLinkMicItem;
+            } else {
+                result.remove(firstLinkMicItem);
+                linkMicItemDataBeanRemovedByShowSeparate = firstLinkMicItem;
+            }
+        } else {
+            result.remove(myLinkMicItem);
+            linkMicItemDataBeanRemovedByShowSeparate = myLinkMicItem;
+        }
+        callLinkMicShowSeparateChanged();
+        return result;
+    }
+
+    private void callLinkMicShowSeparateChanged() {
+        adapterCallback.onLinkMicItemShowSeparateChanged(linkMicItemDataBeanRemovedByShowSeparate);
     }
 
     // </editor-fold>
@@ -819,8 +919,6 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
         //是否被回收过（渲染器如果被回收过，则下一次复用的时候，必须重新渲染器）
         private boolean isViewRecycled = false;
-
-        private boolean isRenderViewSetup = false;
 
         public LinkMicItemViewHolder(View itemView) {
             super(itemView);
@@ -905,6 +1003,14 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
          * @param switchViewGoMainScreen 将要到主屏幕的switchView
          */
         void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen);
+
+
+        /**
+         * 单独显示的连麦视图变更回调
+         *
+         * @param linkMicItemDataBean 需要单独显示的视图
+         */
+        void onLinkMicItemShowSeparateChanged(PLVLinkMicItemDataBean linkMicItemDataBean);
     }
 
     /**

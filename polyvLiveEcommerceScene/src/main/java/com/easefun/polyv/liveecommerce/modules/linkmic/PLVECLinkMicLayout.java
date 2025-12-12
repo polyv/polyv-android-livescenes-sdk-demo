@@ -48,6 +48,7 @@ import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.linkmic.adapter.PLVLinkMicListAdapter;
 import com.easefun.polyv.liveecommerce.modules.linkmic.handler.PLVECRtcMixStreamHandler;
 import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECLinkMicInvitationLayout;
+import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView;
 import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVLinkMicRvLandscapeItemDecoration;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -96,6 +97,9 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private static final int DP_LAND_LINK_MIC_LIST_MARGIN_RIGHT = 34;
     private static final int DP_LAND_SPEAKING_USER_VIEW_MARGIN_RIGHT_TO_LINK_MIC_LIST = 24;
 
+    // 连麦时单独显示自己的摄像头
+    private static boolean enableSeparateLinkMicLayout = false;
+
     //Presenter
     private IPLVLinkMicContract.IPLVLinkMicPresenter linkMicPresenter;
 
@@ -103,6 +107,8 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private IPLVECLinkMicControlBar linkMicControlBar;
     private FrameLayout flMediaLinkMicRoot;
     private PLVNoInterceptTouchRecyclerView rvLinkMicList;
+    @Nullable
+    private PLVECSeparateLinkMicView separateLinkmicView;
     private ImageView linkMicBgIv;
     //连麦列表布局管理
     private GridLayoutManager gridLayoutManager;
@@ -135,6 +141,16 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     private PLVECFloatingWindow floatingWindow;
     // </editor-fold>
+
+    // <editor-folder defaultstate="collapsed" desc="静态方法">
+    public static void enableSeparateLinkMicLayout(boolean showMyselfSeparately) {
+        enableSeparateLinkMicLayout = showMyselfSeparately;
+    }
+
+    public static boolean isEnableSeparateLinkMicLayout() {
+        return enableSeparateLinkMicLayout;
+    }
+    // </editor-folder>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
     public PLVECLinkMicLayout(@NonNull Context context) {
@@ -174,7 +190,7 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         rvLinkMicList.setLayoutManager(gridLayoutManager);
 
         //init adapter
-        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, gridLayoutManager, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
+        linkMicListAdapter = new PLVLinkMicListAdapter(rvLinkMicList, gridLayoutManager, enableSeparateLinkMicLayout, new PLVLinkMicListAdapter.OnPLVLinkMicAdapterCallback() {
             @Override
             public View createLinkMicRenderView() {
                 View renderView = linkMicPresenter.createTextureRenderView(getContext());
@@ -208,6 +224,13 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
             @Override
             public void onClickItemListener(int pos, @Nullable PLVSwitchViewAnchorLayout switchViewHasMedia, PLVSwitchViewAnchorLayout switchViewGoMainScreen) {
+            }
+
+            @Override
+            public void onLinkMicItemShowSeparateChanged(PLVLinkMicItemDataBean linkMicItemDataBean) {
+                if (separateLinkmicView != null) {
+                    separateLinkmicView.updateLinkMicShowSeparateChanged(linkMicItemDataBean);
+                }
             }
         });
 
@@ -319,9 +342,36 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         observeData();
     }
 
+    @Override
+    public void setupSeparateLinkMicView(PLVECSeparateLinkMicView separateLinkMicView) {
+        this.separateLinkmicView = separateLinkMicView;
+        separateLinkmicView.setOnViewActionListener(new PLVECSeparateLinkMicView.OnViewActionListener() {
+            @Override
+            public View createLinkMicRenderView() {
+                View renderView = linkMicPresenter.createTextureRenderView(PLVAppUtils.getApp());
+                if (renderView == null) {
+                    renderView = linkMicPresenter.createRenderView(PLVAppUtils.getApp());
+                }
+                return renderView;
+            }
+
+            @Override
+            public void setupRenderView(View view, String linkMicId) {
+                linkMicPresenter.setupRenderView(view, linkMicId);
+            }
+
+            @Override
+            public void releaseRenderView(View view) {
+                linkMicPresenter.releaseRenderView(view);
+            }
+        });
+    }
 
     @Override
     public void destroy() {
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateLinkMicShowSeparateChanged(null);
+        }
         linkMicPresenter.destroy();
         linkMicInvitationLayout.destroy();
     }
@@ -410,6 +460,9 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void setIsAudio(boolean isAudioLinkMic) {
+        if (separateLinkmicView != null) {
+            separateLinkmicView.setIsAudio(isAudioLinkMic);
+        }
         linkMicControlBar.setAudioState(isAudioLinkMic);
         linkMicPresenter.setIsAudioLinkMic(isAudioLinkMic);
     }
@@ -610,6 +663,9 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         linkMicListAdapter.setDataList(linkMicList);
         linkMicListAdapter.setListShowMode(linkMicListShowMode);
         linkMicListAdapter.setMyLinkMicId(linkMicUid);
+        if (separateLinkmicView != null) {
+            separateLinkmicView.setMyLinkMicId(linkMicUid);
+        }
 
         rvLinkMicList.setAdapter(linkMicListAdapter);
 
@@ -812,6 +868,9 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (uid.equals(linkMicPresenter.getLinkMicId())) {
             linkMicControlBar.setCameraOpenOrClose(!mute);
         }
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateBindingProperties(uid);
+        }
     }
 
     @Override
@@ -821,16 +880,25 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (uid.equals(linkMicPresenter.getLinkMicId())) {
             linkMicControlBar.setMicrophoneOpenOrClose(!mute);
         }
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateBindingProperties(uid);
+        }
     }
 
     @Override
     public void onLocalUserMicVolumeChanged() {
         linkMicListAdapter.updateVolumeChanged();
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateBindingProperties(null);
+        }
     }
 
     @Override
     public void onRemoteUserVolumeChanged(List<PLVLinkMicItemDataBean> linkMicList) {
         linkMicListAdapter.updateVolumeChanged();
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateBindingProperties(null);
+        }
     }
 
     @Override
@@ -839,6 +907,14 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         if (onPLVLinkMicLayoutListener != null) {
             onPLVLinkMicLayoutListener.onNetworkQuality(quality);
         }
+        if (separateLinkmicView != null) {
+            separateLinkmicView.updateLocalLinkMicNetworkQuality(quality);
+        }
+    }
+
+    @Override
+    public void onVideoSizeChanged(String uid, int width, int height) {
+        linkMicListAdapter.updateVideoSizeChanged(uid, width, height);
     }
 
     @Override

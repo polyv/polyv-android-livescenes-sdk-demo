@@ -321,6 +321,18 @@
 
             <flag name="multiTouch" value="0x0100" />
         </attr>
+        <attr name="plvAutoAttachEdge" format="flags">
+            <flag name="onTouching" value="0x1" />
+            <flag name="onFinishTouch" value="0x2" />
+            <flag name="always" value="0x3" />
+        </attr>
+        <attr name="plvAutoAttachEdgeSide" format="flags">
+            <flag name="edgeRight" value="0x10" />
+            <flag name="edgeTop" value="0x20" />
+            <flag name="edgeLeft" value="0x40" />
+            <flag name="edgeBottom" value="0x80" />
+            <flag name="edgeAll" value="0xf0" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="PLVRedPointImageView">
