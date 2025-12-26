@@ -645,8 +645,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         final boolean channelAllowChangeRatio = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId()).isFeatureSupport(PLVChannelFeature.STREAMER_ALONE_ALLOW_CHANGE_PUSH_RESOLUTION_RATIO);
         settingPushResolutionRatioLl.setShowOnLandscape(userAllowChangeRatio && channelAllowChangeRatio);
 
+        final boolean showLiveReplayButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .getOrDefault(PLVChannelFeature.STREAMER_SHOW_FUNCTION_REPLAY, true);
         final boolean userAllowChangeLiveReplay = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CHANGE_REPLAY_OPEN);
-        settingLiveReplaySwitchLayout.setVisibility(userAllowChangeLiveReplay ? View.VISIBLE : View.GONE);
+        settingLiveReplaySwitchLayout.setVisibility((userAllowChangeLiveReplay && showLiveReplayButton) ? View.VISIBLE : View.GONE);
 
         final boolean showOrientationButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .getOrDefault(PLVChannelFeature.STREAMER_SETTING_SHOW_ORIENTATION_BUTTON, true);

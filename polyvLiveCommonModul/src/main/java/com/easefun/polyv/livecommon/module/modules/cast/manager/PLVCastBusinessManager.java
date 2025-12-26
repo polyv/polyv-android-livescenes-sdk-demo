@@ -689,8 +689,8 @@ public class PLVCastBusinessManager {
     }
 
     public void setCastInitListener(OnCastInitListener listener) {
+        this.castInitListener = listener;
         if (listener != null) {
-            this.castInitListener = listener;
         /*
         投屏初始化结果回调，设置完成后会立即回调当前初始化结果。
         如果因为网络原因初始化结果加载较慢，会第二次回调

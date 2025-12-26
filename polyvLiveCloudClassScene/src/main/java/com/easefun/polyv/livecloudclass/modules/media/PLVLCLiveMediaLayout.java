@@ -44,6 +44,7 @@ import com.easefun.polyv.livecloudclass.modules.media.danmu.PLVLCLandscapeMessag
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLightTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveAudioModeView;
+import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveSubtitleLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCNetworkTipsView;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVideoLoadingLayout;
 import com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCVolumeTipsView;
@@ -96,6 +97,8 @@ import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleSettingVO;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
@@ -148,6 +151,8 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     private IPLVLCLiveMediaController mediaController;
     //投屏
     private IPLVScreencastLayout screencastLayout;
+    //字幕
+    private PLVLCLiveSubtitleLayout liveSubtitleLayout;
     //封面图
     private ImageView coverImageView;
 
@@ -279,6 +284,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         rewardSvgaView = findViewById(R.id.plvlc_reward_svg);
         productPushCardLayout = findViewById(R.id.plvlc_product_push_card_layout);
         screencastLayout = findViewById(R.id.plvlc_screencast_view);
+        liveSubtitleLayout = findViewById(R.id.plvlc_live_subtitle_layout);
 
         //初始化
         svgaParser = new SVGAParser(getContext());
@@ -549,6 +555,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                     onViewActionListener.onShowLandscapeMemberList();
                 }
             }
+
+            @Override
+            public void onChangeShowRealTimeSubtitle(boolean showRealTime) {
+                liveSubtitleLayout.setVisibility(showRealTime ? View.VISIBLE : View.GONE);
+            }
         });
     }
 
@@ -728,6 +739,17 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         });
     }
 
+    private void observeSubtitles(IPLVLivePlayerContract.ILivePlayerPresenter presenter) {
+        presenter.getData().getAllSubtitles().observe((LifecycleOwner) getContext(), new Observer<List<PLVLiveSubtitleTranslation>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVLiveSubtitleTranslation> subtitles) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onSubtitleUpdate(subtitles);
+                }
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的common方法">
@@ -756,6 +778,13 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         }
 
         productPushCardLayout.init(liveRoomDataManager);
+
+        PLVLiveSubtitleSettingVO subtitleSetting = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_SUBTITLE_SETTING);
+        boolean enableSubtitle = subtitleSetting != null && subtitleSetting.getEnable();
+        liveSubtitleLayout.initData(livePlayerPresenter);
+        mediaController.updateShowRealTimeSubtitle(enableSubtitle, enableSubtitle);
+        observeSubtitles(livePlayerPresenter);
     }
 
     private void initWithLiveRoomData(IPLVLiveRoomDataManager liveRoomDataManager) {
@@ -1201,6 +1230,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
         if (liveMarkToolControllerLayout.isInPaintMode() && isInLinkMicList) {
             liveMarkToolControllerLayout.exitPaintMode();
         }
+    }
+
+    @Override
+    public void updateSubtitleTranslateLanguage(String language) {
+        livePlayerPresenter.setRealTimeSubtitleTranslateLanguage(language);
     }
 
     // </editor-fold>

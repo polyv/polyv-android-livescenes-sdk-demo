@@ -64,6 +64,7 @@ import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.log.player.PLVPlayerElog;
 import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
@@ -333,6 +334,17 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
                     }
                 });
     }
+
+    private void observeSubtitles(IPLVLivePlayerContract.ILivePlayerPresenter presenter) {
+        presenter.getData().getAllSubtitles().observe((LifecycleOwner) getContext(), new Observer<List<PLVLiveSubtitleTranslation>>() {
+            @Override
+            public void onChanged(@Nullable List<PLVLiveSubtitleTranslation> subtitles) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onSubtitleUpdate(subtitles);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的common方法">
@@ -344,6 +356,8 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         livePlayerPresenter.registerView(livePlayerView);
         livePlayerPresenter.init();
         livePlayerPresenter.setAllowOpenAdHead(isAllowOpenAdHead);
+
+        observeSubtitles(livePlayerPresenter);
     }
 
     @Override
@@ -560,12 +574,14 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     public void updateWhenJoinLinkMic() {
         isJoinLinkMic = true;
         videoView.setIsLinkMic(true);
+        setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void updateWhenLeaveLinkMic() {
         isJoinLinkMic = false;
         videoView.setIsLinkMic(false);
+        setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -582,6 +598,12 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
         videoView.setOnRTCPlayEventListener(listener);
     }
+
+    @Override
+    public void updateSubtitleTranslateLanguage(String language) {
+        livePlayerPresenter.setRealTimeSubtitleTranslateLanguage(language);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API- 实现IPLVECVideoLayout定义的playback方法，空实现">

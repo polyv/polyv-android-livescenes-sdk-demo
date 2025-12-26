@@ -12,9 +12,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.easefun.polyv.businesssdk.model.video.PolyvDefinitionVO;
@@ -58,6 +60,9 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
     private TextView plvlcLiveControlMoreLatencyTv;
     private RecyclerView plvlcLiveControlMoreLatencyRv;
     private LinearLayout plvlcLiveControlMoreLatencyLl;
+    private LinearLayout liveControlSubtitleLl;
+    private TextView liveControlSubtitleTv;
+    private Switch liveControlSubtitleSwitch;
     private PLVOrientationSensibleLinearLayout llMoreVertical;
     private FrameLayout containerLy;
 
@@ -70,6 +75,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
     private OnLinesSelectedListener onLinesSelectedListener;
     private OnOnlyAudioSwitchListener onOnlyAudioSwitchListener;
     private OnChangeLowLatencyListener onChangeLowLatencyListener;
+    private OnChangeShowRealTimeSubtitleListener onChangeShowRealTimeSubtitleListener;
 
     private int portraitHeight;
 
@@ -79,6 +85,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
     private boolean isAudioMode;
     // 是否无延迟观看
     private boolean isLowLatency;
+    private boolean showRealTimeSubtitle;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造方法">
@@ -146,6 +153,7 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         tvOnlyAudioSwitch.setOnClickListener(this);
 
         initLatencyRv();
+        initSubtitleSwitch();
     }
 
     private void findView() {
@@ -163,6 +171,9 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         plvlcLiveControlMoreLatencyTv = root.findViewById(R.id.plvlc_live_control_more_latency_tv);
         plvlcLiveControlMoreLatencyRv = root.findViewById(R.id.plvlc_live_control_more_latency_rv);
         plvlcLiveControlMoreLatencyLl = root.findViewById(R.id.plvlc_live_control_more_latency_ll);
+        liveControlSubtitleLl = root.findViewById(R.id.plvlc_live_control_subtitle_ll);
+        liveControlSubtitleTv = root.findViewById(R.id.plvlc_live_control_subtitle_tv);
+        liveControlSubtitleSwitch = root.findViewById(R.id.plvlc_live_control_subtitle_switch);
         llMoreVertical = root.findViewById(R.id.ll_more_vertical);
         containerLy = root.findViewById(R.id.plvlc_danmu_container_ly);
     }
@@ -191,6 +202,17 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
 
         plvlcLiveControlMoreLatencyRv.setLayoutManager(new LinearLayoutManager(root.getContext(), LinearLayoutManager.HORIZONTAL, false));
         plvlcLiveControlMoreLatencyRv.setAdapter(rvLatencyAdapter);
+    }
+
+    private void initSubtitleSwitch() {
+        liveControlSubtitleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (onChangeShowRealTimeSubtitleListener != null) {
+                    onChangeShowRealTimeSubtitleListener.onChangeShowRealTimeSubtitle(isChecked);
+                }
+            }
+        });
     }
 
     // </editor-fold>
@@ -235,6 +257,11 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
     public void setOnChangeLowLatencyListener(OnChangeLowLatencyListener onChangeLowLatencyListener) {
         this.onChangeLowLatencyListener = onChangeLowLatencyListener;
     }
+
+    public void setOnChangeShowRealTimeSubtitleListener(OnChangeShowRealTimeSubtitleListener onChangeShowRealTimeSubtitleListener) {
+        this.onChangeShowRealTimeSubtitleListener = onChangeShowRealTimeSubtitleListener;
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="API - 参数配置">
@@ -275,6 +302,11 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
         this.isLowLatency = isLowLatency;
         rvLatencyAdapter.setCurrentIsLowLatency(isLowLatency);
         updateViewVisibility();
+    }
+
+    public void updateShowRealTimeSubtitle(boolean subtitleEnable, boolean showRealTimeSubtitle) {
+        liveControlSubtitleLl.setVisibility(subtitleEnable ? View.VISIBLE : View.GONE);
+        liveControlSubtitleSwitch.setChecked(showRealTimeSubtitle);
     }
     // </editor-fold>
 
@@ -713,6 +745,13 @@ public class PLVLCLiveMoreLayout implements View.OnClickListener {
      * 延迟选择变更监听器
      */
     public interface OnChangeLowLatencyListener extends PLVSugarUtil.Consumer<Boolean> {}
+
+    /**
+     * 实时字幕显示切换监听
+     */
+    public interface OnChangeShowRealTimeSubtitleListener {
+        void onChangeShowRealTimeSubtitle(boolean showRealTime);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="点击事件">

@@ -846,6 +846,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     }
 
+    @Override
+    public void updateSubtitleTranslateLanguage(String language) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVLCMediaLayout定义的playback方法">

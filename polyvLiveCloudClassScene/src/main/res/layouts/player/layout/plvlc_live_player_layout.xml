@@ -92,6 +92,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- 字幕 -->
+    <com.easefun.polyv.livecloudclass.modules.media.widget.PLVLCLiveSubtitleLayout
+        android:id="@+id/plvlc_live_subtitle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- 防盗水印 -->
     <com.easefun.polyv.livecommon.module.modules.watermark.PLVWatermarkView
         android:id="@+id/polyv_watermark_view"

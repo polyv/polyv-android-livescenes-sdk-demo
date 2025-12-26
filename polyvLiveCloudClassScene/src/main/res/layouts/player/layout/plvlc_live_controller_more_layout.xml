@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/plvlc_danmu_container_ly"
@@ -142,6 +143,35 @@
                     android:id="@+id/plvlc_live_control_more_latency_rv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/plvlc_live_control_subtitle_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/plvlc_live_control_subtitle_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plv_live_real_time_subtitle"
+                    android:textColor="#C2C2C2"
+                    android:textSize="12sp" />
+
+                <Switch
+                    android:id="@+id/plvlc_live_control_subtitle_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:thumb="@drawable/plvlc_live_subtitle_setting_switch_thumb"
+                    android:track="@drawable/plvlc_live_subtitle_setting_switch_track"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </LinearLayout>
 

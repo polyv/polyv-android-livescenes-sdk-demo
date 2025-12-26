@@ -43,6 +43,14 @@
             android:fadingEdge="none"
             android:overScrollMode="never" />
 
+        <!--  实时字幕覆盖层  -->
+        <com.easefun.polyv.liveecommerce.modules.subtitle.PLVECRealTimeSubtitleLayout
+            android:id="@+id/plvec_real_time_subtitle_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:plvDrag="edgeRight" />
+
         <!--  单独显示的连麦视图  -->
         <com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView
             android:id="@+id/plvec_linkmic_separate_linkmic_view"

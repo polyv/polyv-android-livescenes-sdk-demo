@@ -492,6 +492,12 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     public void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener) {
 
     }
+
+    @Override
+    public void updateSubtitleTranslateLanguage(String language) {
+
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVECVideoLayout定义的playback方法">

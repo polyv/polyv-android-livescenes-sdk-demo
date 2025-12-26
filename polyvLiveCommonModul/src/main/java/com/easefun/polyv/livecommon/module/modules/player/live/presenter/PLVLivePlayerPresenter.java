@@ -55,6 +55,8 @@ import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.marquee.PLVMarqueeSDKController;
 import com.plv.livescenes.video.api.IPLVLiveListenerEvent;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleVO;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -395,7 +397,15 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
     }
 
     @Override
+    public void setRealTimeSubtitleTranslateLanguage(String language) {
+        if (videoView != null) {
+            videoView.setRealTimeSubtitleTranslateLanguage(language);
+        }
+    }
+
+    @Override
     public void destroy() {
+        PLVCastBusinessManager.getInstance().setCastInitListener(null);
         stopPlayProgressTimer();
         stopMarqueeView();
         unregisterView();
@@ -898,6 +908,17 @@ public class PLVLivePlayerPresenter implements IPLVLivePlayerContract.ILivePlaye
                 @Override
                 public void onSessionChanged(String sessionId) {
                     liveRoomDataManager.setSessionId(sessionId);
+                }
+            });
+            videoView.setOnSubtitleUpdateListener(new IPLVLiveListenerEvent.OnSubtitleUpdateListener() {
+                @Override
+                public void onRealTimeSubtitle(@Nullable PLVLiveSubtitleVO subtitle) {
+                    livePlayerData.postRealTimeSubtitle(subtitle);
+                }
+
+                @Override
+                public void onAllSubtitles(List<PLVLiveSubtitleTranslation> subtitles) {
+                    livePlayerData.postAllSubtitles(subtitles);
                 }
             });
         }

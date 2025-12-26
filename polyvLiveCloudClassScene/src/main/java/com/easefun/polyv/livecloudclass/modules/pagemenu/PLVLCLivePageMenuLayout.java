@@ -42,6 +42,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.previous.PLVLCPlaybackP
 import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.product.PLVLCProductLayout;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.question.PLVLCQAFragment;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.subtitle.PLVLCRealTimeSubtitleFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.text.PLVLCTextFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.tuwen.PLVLCTuWenFragment;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.venue.PLVLCMultipleVenueFragment;
@@ -96,6 +97,8 @@ import com.plv.livescenes.playback.chat.PLVChatPlaybackFootDataListener;
 import com.plv.livescenes.playback.chat.PLVChatPlaybackManager;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
 import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleSettingVO;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -111,6 +114,8 @@ import com.plv.thirdpart.blankj.utilcode.util.NetworkUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,6 +195,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private PLVLCProductFragment productFragment;
     private PLVLCMemberListPortFragment memberListFragment;
     private PLVLCMultipleVenueFragment venueFragment;
+    private PLVLCRealTimeSubtitleFragment subtitleFragment;
 
     private PLVLCProductPushCardLayout productPushCardLayout;
     // </editor-fold>
@@ -579,6 +585,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     }
 
     @Override
+    public void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles) {
+        if (subtitleFragment != null) {
+            subtitleFragment.updateSubtitles(subtitles);
+        }
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (chatCommonMessageList != null && chatCommonMessageList.onBackPressed()) {
             return true;
@@ -674,6 +687,29 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         });
         aiSummaryFragment.init(liveRoomDataManager, getContext());
         pageMenuTabFragmentList.add(aiSummaryFragment);
+    }
+
+    private void addRealTimeSubtitleTab(PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+        if (!liveRoomDataManager.getConfig().isLive()) {
+            return;
+        }
+        PLVLiveSubtitleSettingVO subtitleSetting = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_SUBTITLE_SETTING);
+        if (subtitleSetting == null || !subtitleSetting.getEnable()) {
+            return;
+        }
+        pageMenuTabTitleList.add(channelMenusBean.getName());
+        subtitleFragment = new PLVLCRealTimeSubtitleFragment();
+        subtitleFragment.initData(liveRoomDataManager);
+        subtitleFragment.setOnViewActionListener(new PLVLCRealTimeSubtitleFragment.OnViewActionListener() {
+            @Override
+            public void onSetSubtitleTranslateLanguage(@NotNull String language) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onSetSubtitleTranslateLanguage(language);
+                }
+            }
+        });
+        pageMenuTabFragmentList.add(subtitleFragment);
     }
 
     private void checkStartAISummary() {
@@ -1337,6 +1373,8 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 addMemberListTab(channelMenusBean.getName());
             } else if (PLVLiveClassDetailVO.MENUTYPE_AI_SUMMARY.equals(channelMenusBean.getMenuType())) {
                 addAISummaryTab(channelMenusBean);
+            } else if (PLVLiveClassDetailVO.MENUTYPE_SUBTITLE.equals(channelMenusBean.getMenuType())) {
+                addRealTimeSubtitleTab(channelMenusBean);
             }
         }
         if (PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())

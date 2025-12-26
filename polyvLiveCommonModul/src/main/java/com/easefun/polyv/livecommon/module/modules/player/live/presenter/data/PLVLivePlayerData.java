@@ -5,6 +5,10 @@ import android.arch.lifecycle.MutableLiveData;
 import android.util.Pair;
 
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleVO;
+
+import java.util.List;
 
 /**
  * 直播播放器数据，主要用于提供给 非mvp的v 监听/获取播放器的数据
@@ -30,6 +34,10 @@ public class PLVLivePlayerData {
 
     //投屏初始化状态
     private MutableLiveData<Boolean> castOpen = new MutableLiveData<>();
+
+    // 实时字幕
+    private MutableLiveData<PLVLiveSubtitleVO> realTimeSubtitle = new MutableLiveData<>();
+    private MutableLiveData<List<PLVLiveSubtitleTranslation>> allSubtitles = new MutableLiveData<>();
 
     // <editor-fold defaultstate="collapsed" desc="播放信息">
     public void postPlayInfoVO(PLVPlayInfoVO playInfo) {
@@ -123,4 +131,22 @@ public class PLVLivePlayerData {
         castOpen.postValue(initResult);
     }
     // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="字幕">
+    public void postRealTimeSubtitle(PLVLiveSubtitleVO subtitle) {
+        realTimeSubtitle.postValue(subtitle);
+    }
+
+    public LiveData<PLVLiveSubtitleVO> getRealTimeSubtitle() {
+        return realTimeSubtitle;
+    }
+
+    public void postAllSubtitles(List<PLVLiveSubtitleTranslation> subtitles) {
+        allSubtitles.postValue(subtitles);
+    }
+
+    public LiveData<List<PLVLiveSubtitleTranslation>> getAllSubtitles() {
+        return allSubtitles;
+    }
+    // </editor-fold>
 }

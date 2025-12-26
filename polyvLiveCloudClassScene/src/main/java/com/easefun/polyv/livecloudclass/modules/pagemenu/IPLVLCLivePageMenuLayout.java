@@ -11,10 +11,13 @@ import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStat
 import com.easefun.polyv.livecommon.module.modules.previous.contract.IPLVPreviousPlaybackContract;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
+import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
-import com.plv.socket.event.chat.PLVChatQuoteVO;
+
+import java.util.List;
 
 /**
  * 直播页面菜单布局的接口
@@ -133,6 +136,11 @@ public interface IPLVLCLivePageMenuLayout {
     void onCloseChatQuote();
 
     /**
+     * 实时字幕更新
+     */
+    void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles);
+
+    /**
      * 是否拦截返回事件，拦截的情况有：
      * 1.当前显示的tab是推广外链，并且其webView可以返回
      * 2.当前显示的tab是聊天，并且表情等布局是显示状态
@@ -249,6 +257,10 @@ public interface IPLVLCLivePageMenuLayout {
          */
         void onScreenshot();
 
+        /**
+         * 修改实时字幕翻译语言
+         */
+        void onSetSubtitleTranslateLanguage(String language);
     }
     // </editor-fold>
 }

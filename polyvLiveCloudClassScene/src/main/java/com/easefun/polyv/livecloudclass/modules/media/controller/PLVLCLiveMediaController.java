@@ -298,6 +298,14 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
                 }
             }
         });
+        moreLayout.setOnChangeShowRealTimeSubtitleListener(new PLVLCLiveMoreLayout.OnChangeShowRealTimeSubtitleListener() {
+            @Override
+            public void onChangeShowRealTimeSubtitle(boolean showRealTime) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onChangeShowRealTimeSubtitle(showRealTime);
+                }
+            }
+        });
     }
 
     private void observeFloatingPlayerShowingState() {
@@ -717,6 +725,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             startSendMessageLandIv.setText(text);
             startSendMessageLandIv.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
+    }
+
+    @Override
+    public void updateShowRealTimeSubtitle(boolean subtitleEnable, boolean showRealTimeSubtitle) {
+        moreLayout.updateShowRealTimeSubtitle(subtitleEnable, showRealTimeSubtitle);
     }
 
     @Override

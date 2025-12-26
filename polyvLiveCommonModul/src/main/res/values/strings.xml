@@ -728,4 +728,9 @@
     <string name="plv_cast_connect_device_title">Connect devices ..</string>
     <string name="plv_cast_connect_device_status_connecting">Connecting ..</string>
     <string name="plv_cast_connect_device_switch">Switch devices></string>
+    <string name="plv_live_real_time_subtitle">Live subtitle</string>
+    <string name="plv_live_subtitle_double_language">Bilingual subtitles</string>
+    <string name="plv_live_subtitle_setting_language">subtitle language</string>
+    <string name="plv_live_subtitle_language_origin_not_translated">Original text (without translation)</string>
+    <string name="plv_live_subtitle_not_show">Do not display subtitles</string>
 </resources>

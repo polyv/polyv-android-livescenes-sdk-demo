@@ -728,4 +728,9 @@
     <string name="plv_cast_connect_device_title">連接設備. ..</string>
     <string name="plv_cast_connect_device_status_connecting">正在連接. ..</string>
     <string name="plv_cast_connect_device_switch">切換設備></string>
+    <string name="plv_live_real_time_subtitle">實时字幕</string>
+    <string name="plv_live_subtitle_double_language">雙語字幕</string>
+    <string name="plv_live_subtitle_setting_language">字幕語言</string>
+    <string name="plv_live_subtitle_language_origin_not_translated">原文（不翻譯）</string>
+    <string name="plv_live_subtitle_not_show">不顯示字幕</string>
 </resources>

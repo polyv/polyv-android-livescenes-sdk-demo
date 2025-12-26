@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="#16171b">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/plvec_live_real_time_subtitle_origin_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            tools:text="原声字幕" />
+
+        <View
+            android:id="@+id/plvec_live_real_time_subtitle_translate_divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp" />
+
+        <TextView
+            android:id="@+id/plvec_live_real_time_subtitle_translate_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:alpha="0.6"
+            tools:text="翻译字幕" />
+
+        <View
+            android:id="@+id/plvec_live_real_time_subtitle_translate_divider_next_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1aFFFFFF"
+            android:layout_marginVertical="10dp" />
+
+    </LinearLayout>
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>

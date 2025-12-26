@@ -22,11 +22,13 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.chatroom.view.widget.PLVChatQuoteHintMyselfDrawableSpan;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
 import com.easefun.polyv.livecommon.module.utils.span.PLVRadiusBackgroundSpan;
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.livecommon.module.utils.span.PLVTextFaceLoader;
 import com.easefun.polyv.livecommon.ui.widget.PLVChatMessagePopupMenu;
 import com.easefun.polyv.livecommon.ui.widget.PLVChatMessagePopupMenuAction;
@@ -45,6 +47,7 @@ import com.easefun.polyv.streameralone.modules.chatroom.layout.PLVSAChatOverLeng
 import com.easefun.polyv.streameralone.modules.chatroom.widget.PLVSAChatMsgTipsWindow;
 import com.easefun.polyv.streameralone.ui.widget.PLVSAConfirmDialog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
@@ -463,21 +466,38 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         //设置被回复人相关的信息
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
-            if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
-            }
+            boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId());
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
             }
             if (chatQuoteVO.isSpeakMessage()) {
                 if (quoteChatMsgTv != null) {
                     quoteChatMsgTv.setVisibility(View.VISIBLE);
-                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(quoteSpeakMsg));
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    sb.append(quoteSpeakMsg);
+                    quoteChatMsgTv.setText(sb);
                 }
             } else {
                 if (quoteChatNickTv != null) {
                     quoteChatNickTv.setVisibility(View.VISIBLE);
-                    quoteChatNickTv.setText(nickName + ": ");
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    quoteChatNickTv.setText(sb);
                 }
                 if (chatQuoteVO.getImage() != null) {
                     if (quoteImgMessageIv != null) {

@@ -14,6 +14,7 @@ import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 
 import java.lang.ref.WeakReference;
@@ -49,7 +50,9 @@ public class PLVECChatMessageImgViewHolder extends PLVECChatMessageCommonViewHol
                     @Override
                     public void onClick(View v) {
                         PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                        if (messageData instanceof IPLVIdEvent) {
+                        if (messageData instanceof IPLVMessageIdEvent) {
+                            chatQuoteVO.setMessageId(((IPLVMessageIdEvent) messageData).getMessageId());
+                        } else if (messageData instanceof IPLVIdEvent) {
                             chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                         }
                         chatQuoteVO.setUserId(userId);
