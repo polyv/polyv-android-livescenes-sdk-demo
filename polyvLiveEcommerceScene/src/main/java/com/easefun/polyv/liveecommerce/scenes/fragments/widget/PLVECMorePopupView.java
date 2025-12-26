@@ -98,6 +98,7 @@ public class PLVECMorePopupView {
     private boolean isHasDefinitionVO;
     //是否有多线路信息
     private boolean isHasLinesInfo;
+    private boolean isLiveRealTimeSubtitleEnable;
 
     //更多弹窗布局
     private View rootview;
@@ -270,6 +271,11 @@ public class PLVECMorePopupView {
                             }
                             hideAll();
                             break;
+                        case MORE_FUNCTION_TYPE_SUBTITLE:
+                            hideAll();
+                            if (clickListener != null) {
+                                clickListener.onShowLiveSubtitleSetting();
+                            }
                         default:
                             if (clickListener != null) {
                                 clickListener.onClickDynamicFunction(data);
@@ -527,6 +533,11 @@ public class PLVECMorePopupView {
         if (moreLayout != null) {
             moreLayout.updateFunctionView(webviewUpdateAppStatusVO);
         }
+    }
+
+    public void updateLiveRealTimeSubtitleEnable(boolean enable) {
+        this.isLiveRealTimeSubtitleEnable = enable;
+        updateSubtitleVisibility();
     }
     // </editor-fold>
 
@@ -789,9 +800,13 @@ public class PLVECMorePopupView {
         if (moreLayout == null) {
             return;
         }
-        final boolean isPlayback = playbackMorePopupWindow != null;
-        final boolean hasSubtitle = playbackMoreClickListener != null && !playbackMoreClickListener.getAllSubtitleSettings().isEmpty();
-        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_SUBTITLE, isPlayback && hasSubtitle);
+        final boolean isLive = liveMorePopupWindow != null;
+        if (isLive) {
+            moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_SUBTITLE, isLiveRealTimeSubtitleEnable);
+        } else {
+            final boolean hasSubtitle = playbackMoreClickListener != null && !playbackMoreClickListener.getAllSubtitleSettings().isEmpty();
+            moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_SUBTITLE, hasSubtitle);
+        }
     }
     // </editor-fold>
 
@@ -938,6 +953,8 @@ public class PLVECMorePopupView {
          * @param event 动态功能的event data
          */
         void onClickDynamicFunction(String event);
+
+        void onShowLiveSubtitleSetting();
     }
 
     public interface OnPlaybackMoreClickListener {

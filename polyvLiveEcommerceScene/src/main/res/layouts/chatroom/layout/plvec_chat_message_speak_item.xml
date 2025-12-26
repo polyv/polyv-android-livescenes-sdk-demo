@@ -96,7 +96,7 @@
 
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatMessageQuoteLayout
         android:id="@+id/plvec_chat_msg_quote_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp" />
 

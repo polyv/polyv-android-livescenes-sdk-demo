@@ -19,6 +19,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 
 import java.util.List;
 
@@ -265,6 +266,11 @@ public interface IPLVECVideoLayout {
     void addOnLinkMicStateListener(IPLVOnDataChangedListener<Pair<Boolean, Boolean>> listener);
 
     void setOnRTCPlayEventListener(IPolyvLiveListenerEvent.OnRTCPlayEventListener listener);
+
+    /**
+     * 修改实时字幕翻译语言
+     */
+    void updateSubtitleTranslateLanguage(String language);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -390,6 +396,13 @@ public interface IPLVECVideoLayout {
          * @return
          */
         boolean isRtcMixStreamPlaying();
+
+        /**
+         * 实时字幕更新
+         *
+         * @param subtitles
+         */
+        void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles);
     }
     // </editor-fold>
 }

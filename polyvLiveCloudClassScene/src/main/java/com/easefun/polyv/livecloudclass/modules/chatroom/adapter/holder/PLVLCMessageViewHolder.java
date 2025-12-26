@@ -23,9 +23,11 @@ import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.PLVLCMessageAdapter;
 import com.easefun.polyv.livecloudclass.modules.chatroom.layout.PLVLCChatOverLengthMessageLayout;
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
+import com.easefun.polyv.livecommon.module.modules.chatroom.view.widget.PLVChatQuoteHintMyselfDrawableSpan;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.livecommon.ui.widget.PLVCopyBoardPopupWindow;
 import com.easefun.polyv.livecommon.ui.widget.gif.GifSpanTextView;
 import com.easefun.polyv.livecommon.ui.widget.itemview.PLVBaseViewData;
@@ -34,6 +36,7 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVChannelFeature;
@@ -42,6 +45,7 @@ import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
 import com.plv.socket.impl.PLVSocketManager;
@@ -305,7 +309,9 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             @Override
             public void onClick(View v) {
                 final PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                if (messageData instanceof IPLVIdEvent) {
+                if (messageData instanceof IPLVMessageIdEvent) {
+                    chatQuoteVO.setMessageId(((IPLVMessageIdEvent) messageData).getMessageId());
+                } else if (messageData instanceof IPLVIdEvent) {
                     chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                 }
                 chatQuoteVO.setUserId(userId);
@@ -330,7 +336,9 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
             @Override
             public void onClick(View v) {
                 PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                if (messageData instanceof IPLVIdEvent) {
+                if (messageData instanceof IPLVMessageIdEvent) {
+                    chatQuoteVO.setMessageId(((IPLVMessageIdEvent) messageData).getMessageId());
+                } else if (messageData instanceof IPLVIdEvent) {
                     chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                 }
                 chatQuoteVO.setUserId(userId);
@@ -490,15 +498,22 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         //设置被回复人相关的信息
         if (chatQuoteVO != null) {
             String nickName = maskViewerName(chatQuoteVO);
-            if (loginUserId != null && loginUserId.equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
-            }
+            boolean isMyself = loginUserId != null && loginUserId.equals(chatQuoteVO.getUserId());
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
             }
             if (quoteNickTv != null) {
                 quoteNickTv.setVisibility(View.VISIBLE);
-                quoteNickTv.setText(nickName + ": ");
+                final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                if (isMyself) {
+                    sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                    sb.append(" ");
+                    sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                } else {
+                    sb.append(nickName);
+                }
+                sb.append(": ");
+                quoteNickTv.setText(sb);
             }
             if (chatQuoteVO.isSpeakMessage()) {
                 if (quoteTextMessageTv != null) {
@@ -507,12 +522,31 @@ public class PLVLCMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
                 }
                 if (quoteChatMsgTv != null) {
                     quoteChatMsgTv.setVisibility(View.VISIBLE);
-                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(fixQuoteMessageForFileShare(quoteSpeakMsg)));
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    sb.append(fixQuoteMessageForFileShare(quoteSpeakMsg));
+                    quoteChatMsgTv.setText(sb);
                 }
             } else {
                 if (quoteChatNickTv != null) {
                     quoteChatNickTv.setVisibility(View.VISIBLE);
-                    quoteChatNickTv.setText(nickName + ": ");
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    quoteChatNickTv.setText(sb);
                 }
                 if (quoteImgMessageIv != null && chatQuoteVO.getImage() != null) {
                     quoteImgMessageIv.setVisibility(View.VISIBLE);

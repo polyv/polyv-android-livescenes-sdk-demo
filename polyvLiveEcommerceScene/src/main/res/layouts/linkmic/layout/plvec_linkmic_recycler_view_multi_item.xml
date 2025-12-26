@@ -18,7 +18,6 @@
         android:id="@+id/plvec_linkmic_item_round_rect_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/plvec_linkmic_item_ly_bg_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,2:3"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -32,6 +31,7 @@
             android:layout_height="match_parent">
 
             <FrameLayout
+                android:id="@+id/plvec_linkmic_bg_ly"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/plvec_linkmic_item_ly_bg_shape">

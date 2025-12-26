@@ -441,7 +441,9 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         }
         final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
-        if (!isNewLinkMicStrategy) {
+        final boolean showMemberList = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER);
+        if (!isNewLinkMicStrategy && showMemberList) {
             plvsaToolBarLinkmicIv.setVisibility(View.VISIBLE);
         } else {
             plvsaToolBarLinkmicIv.setVisibility(View.GONE);

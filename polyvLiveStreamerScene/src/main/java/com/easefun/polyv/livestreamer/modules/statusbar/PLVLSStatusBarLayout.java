@@ -496,6 +496,12 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         });
     }
 
+    private void updateMemberListIconVisible() {
+        final boolean showMemberList = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER);
+        plvlsStatusBarMemberIv.setVisibility(showMemberList ? VISIBLE : GONE);
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Streamer - Mvp View">
@@ -535,6 +541,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         }
         updateLinkMicShowType(liveRoomDataManager.isOnlyAudio());
         updateLinkMicStrategy(liveRoomDataManager);
+        updateMemberListIconVisible();
     }
 
     @Override
@@ -717,7 +724,12 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         }
         final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
-        if (!isNewLinkMicStrategy) {
+        final boolean showMemberList = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER);
+        if (!showMemberList) {
+            plvlsStatusBarLinkmicIv.setVisibility(View.GONE);
+            statusBarAllowViewerLinkmicIv.setVisibility(View.GONE);
+        } else if (!isNewLinkMicStrategy) {
             plvlsStatusBarLinkmicIv.setVisibility(View.VISIBLE);
             statusBarAllowViewerLinkmicIv.setVisibility(View.GONE);
         } else {

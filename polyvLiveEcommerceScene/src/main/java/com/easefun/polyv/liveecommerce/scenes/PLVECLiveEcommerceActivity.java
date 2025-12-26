@@ -51,6 +51,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.PLVNoInterceptTouchViewPager;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
+import com.easefun.polyv.livecommon.ui.widget.menudrawer.IPLVMenuDrawerContainer;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailActivity;
@@ -62,6 +63,7 @@ import com.easefun.polyv.liveecommerce.modules.player.PLVECLiveVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.PLVECPlaybackVideoLayout;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindow;
 import com.easefun.polyv.liveecommerce.modules.player.floating.PLVECFloatingWindowModule;
+import com.easefun.polyv.liveecommerce.modules.subtitle.PLVECRealTimeSubtitleLayout;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECCommonHomeFragment;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECEmptyFragment;
 import com.easefun.polyv.liveecommerce.scenes.fragments.PLVECLiveDetailFragment;
@@ -82,12 +84,15 @@ import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.subtitle.vo.PLVPlaybackSubtitleVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
 import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -97,7 +102,7 @@ import java.util.List;
  * 直播支持的功能有：播放器、聊天室、商品、打赏、互动应用。
  * 回放支持的功能有：播放器。
  */
-public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
+public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVMenuDrawerContainer {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVECLiveEcommerceActivity.class.getSimpleName();
     // 参数 - 定义进入页面所需参数
@@ -135,6 +140,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     private IPLVPopoverLayout popoverLayout;
     // 单独显示的连麦视图
     private PLVECSeparateLinkMicView separateLinkmicView;
+    // 实时字幕
+    private PLVECRealTimeSubtitleLayout realTimeSubtitleLayout;
 
     // 悬浮小窗
     private PLVECFloatingWindow floatingWindow;
@@ -298,6 +305,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        realTimeSubtitleLayout.destroy();
         PLVFloatingPlayerManager.getInstance().runOnFloatingWindowClosed(new Runnable() {
             @Override
             public void run() {
@@ -543,6 +551,8 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         //聊天室背景图
         chatroomBgIv = findViewById(R.id.plvec_chat_room_bg_iv);
 
+        initRealTimeSubtitleLayout();
+
         final String vid = liveRoomDataManager.getConfig().getVid();
         final boolean isPlayback = !liveRoomDataManager.getConfig().isLive();
         if (isPlayback && TextUtils.isEmpty(vid)) {
@@ -746,6 +756,19 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         });
     }
 
+    private void initRealTimeSubtitleLayout() {
+        realTimeSubtitleLayout = findViewById(R.id.plvec_real_time_subtitle_layout);
+        realTimeSubtitleLayout.initData(liveRoomDataManager);
+        realTimeSubtitleLayout.setOnViewActionListener(new PLVECRealTimeSubtitleLayout.OnViewActionListener() {
+            @Override
+            public void onSetSubtitleTranslateLanguage(@NotNull String language) {
+                if (videoLayout != null) {
+                    videoLayout.updateSubtitleTranslateLanguage(language);
+                }
+            }
+        });
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化弹窗Layout - 积分打赏、互动应用">
@@ -942,6 +965,11 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             @Override
             public boolean isRtcMixStreamPlaying() {
                 return linkMicLayout != null && linkMicLayout.isPlayRtcAsMixStream() && !linkMicLayout.isPausing();
+            }
+
+            @Override
+            public void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles) {
+                realTimeSubtitleLayout.updateSubtitles(subtitles);
             }
         });
         //监听播放状态
@@ -1285,6 +1313,11 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
         }
 
         @Override
+        public void onShowLiveSubtitleSetting() {
+            realTimeSubtitleLayout.showSettingPopupMenu();
+        }
+
+        @Override
         public void onViewCreated() {
             observerDataToLiveHomeFragment();
             setupPopoverLayout();
@@ -1397,6 +1430,16 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
             setupPopoverLayout();
         }
     };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="IPLVMenuDrawerContainer">
+
+    @Override
+    @NotNull
+    public ViewGroup menuDrawerContainer() {
+        return findViewById(R.id.plvec_popup_container);
+    }
+
     // </editor-fold>
 
 }

@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessageBaseViewHolder;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
+import com.easefun.polyv.livecommon.module.modules.chatroom.view.widget.PLVChatQuoteHintMyselfDrawableSpan;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVAbsProgressStatusListener;
@@ -36,13 +36,13 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectSpan;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendChatImageListener;
 import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
-import com.easefun.polyv.livescenes.socket.PolyvSocketWrapper;
 import com.easefun.polyv.livestreamer.R;
 import com.easefun.polyv.livestreamer.modules.chatroom.adapter.PLVLSMessageAdapter;
 import com.easefun.polyv.livestreamer.modules.chatroom.layout.PLVLSChatOverLengthMessageLayout;
 import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgTipsWindow;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.livescenes.access.PLVUserAbility;
 import com.plv.livescenes.access.PLVUserAbilityManager;
@@ -489,21 +489,38 @@ public class PLVLSMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         //设置被回复人相关的信息
         if (chatQuoteVO != null) {
             String nickName = chatQuoteVO.getNick();
-            if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId())) {
-                nickName = nickName + PLVAppUtils.getString(R.string.plv_chat_me_2);
-            }
+            boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId());
             if (quoteSplitView != null) {
                 quoteSplitView.setVisibility(View.VISIBLE);
             }
             if (chatQuoteVO.isSpeakMessage()) {
                 if (quoteChatMsgTv != null) {
                     quoteChatMsgTv.setVisibility(View.VISIBLE);
-                    quoteChatMsgTv.setText(new SpannableStringBuilder(nickName).append(": ").append(quoteSpeakMsg));
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    sb.append(quoteSpeakMsg);
+                    quoteChatMsgTv.setText(sb);
                 }
             } else {
                 if (quoteChatNickTv != null) {
                     quoteChatNickTv.setVisibility(View.VISIBLE);
-                    quoteChatNickTv.setText(nickName + ": ");
+                    final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+                    if (isMyself) {
+                        sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+                        sb.append(" ");
+                        sb.appendExclude(nickName, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+                    } else {
+                        sb.append(nickName);
+                    }
+                    sb.append(": ");
+                    quoteChatNickTv.setText(sb);
                 }
                 if (chatQuoteVO.getImage() != null) {
                     if (quoteImgMessageIv != null) {

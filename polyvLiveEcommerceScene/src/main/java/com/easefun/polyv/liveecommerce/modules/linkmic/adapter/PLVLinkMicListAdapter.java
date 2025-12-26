@@ -653,17 +653,20 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     private void bindVideoMute(@NonNull LinkMicItemViewHolder holder, boolean isMuteVideo, String linkMicId) {
         final boolean holderIsMuted = holder.flRenderViewContainer.getVisibility() != View.VISIBLE;
         if (holderIsMuted == isMuteVideo) {
+            updateBgLayout(holder, isMuteVideo);
             return;
         }
         //是否关闭摄像头
         if (isMuteVideo) {
             holder.flRenderViewContainer.setVisibility(View.INVISIBLE);
+            updateBgLayout(holder, true);
 //            // 移除渲染器
 //            if (holder.renderView != null) {
 //                holder.flRenderViewContainer.removeView(holder.renderView);
 //            }
         } else {
             holder.flRenderViewContainer.setVisibility(View.VISIBLE);
+            updateBgLayout(holder, false);
 //            // 重新配置渲染器
 //            if (holder.renderView != null) {
 //                adapterCallback.releaseRenderView(holder.renderView);
@@ -674,6 +677,16 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 //            if (holder.renderView != null && holder.renderView.getParent() == null) {
 //                holder.flRenderViewContainer.addView(holder.renderView, 0, getRenderViewLayoutParam());
 //            }
+        }
+    }
+
+    private void updateBgLayout(@NonNull LinkMicItemViewHolder holder, boolean isMuteVideo) {
+        if (myselfShowSeparately) {
+            if (isMuteVideo) {
+                holder.bgLayout.setBackgroundResource(R.drawable.plvec_linkmic_item_ly_bg_shape);
+            } else {
+                holder.bgLayout.setBackground(null);
+            }
         }
     }
 
@@ -912,6 +925,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
         private PLVSwitchViewAnchorLayout switchViewAnchorLayout;
         private PLVSwitchViewAnchorLayout switchViewAnchorLayoutParent;
         private PLVRoundRectLayout roundRectLayout;
+        private ViewGroup bgLayout;
         private PLVLSNetworkQualityWidget qualityWidget;
         private ImageView coverImageView;
         private PLVPlayerLogoView plvPlayerLogoView;
@@ -931,6 +945,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
             roundRectLayout = itemView.findViewById(R.id.plvec_linkmic_item_round_rect_layout);
             switchViewAnchorLayout = itemView.findViewById(R.id.plvec_linkmic_switch_anchor_item);
             switchViewAnchorLayoutParent = itemView.findViewById(R.id.plvec_linkmic_switch_anchor_item_parent);
+            bgLayout = itemView.findViewById(R.id.plvec_linkmic_bg_ly);
             qualityWidget = itemView.findViewById(R.id.plvec_link_mic_net_quality_view);
             coverImageView = itemView.findViewById(R.id.plvec_link_mic_iv_cover_image);
             plvPlayerLogoView = itemView.findViewById(R.id.plvec_link_mic_logo_view);

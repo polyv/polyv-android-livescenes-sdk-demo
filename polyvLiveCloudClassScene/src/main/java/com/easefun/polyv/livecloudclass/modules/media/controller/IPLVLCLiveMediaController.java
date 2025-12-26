@@ -170,6 +170,14 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
 
     /**
+     * 更新实时字幕显示状态
+     *
+     * @param subtitleEnable       频道是否支持实时字幕
+     * @param showRealTimeSubtitle 是否显示实时字幕
+     */
+    void updateShowRealTimeSubtitle(boolean subtitleEnable, boolean showRealTimeSubtitle);
+
+    /**
      * 设置聊天tab是否显示
      *
      * @param isDisplayEnabled 聊天tab是否显示
@@ -294,6 +302,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
          * 显示用户列表
          */
         void onShowLandscapeMemberList();
+
+        /**
+         * 实时字幕显示切换监听
+         */
+        void onChangeShowRealTimeSubtitle(boolean showRealTime);
     }
     // </editor-fold>
 }

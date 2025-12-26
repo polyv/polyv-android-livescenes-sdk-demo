@@ -424,6 +424,11 @@ public interface IPLVLivePlayerContract {
         PLVLivePlayerData getData();
 
         /**
+         * 修改实时字幕翻译语言
+         */
+        void setRealTimeSubtitleTranslateLanguage(String language);
+
+        /**
          * 销毁，包括销毁播放器、解除view
          */
         void destroy();

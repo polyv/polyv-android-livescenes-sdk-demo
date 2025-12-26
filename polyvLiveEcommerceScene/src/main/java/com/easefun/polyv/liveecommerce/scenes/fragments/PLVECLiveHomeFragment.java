@@ -74,6 +74,7 @@ import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleSettingVO;
 import com.plv.socket.event.chat.PLVChatImgEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.chat.PLVCloseRoomEvent;
@@ -424,6 +425,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         chatroomRedPackWidgetView = findViewById(R.id.plvec_chatroom_red_pack_widget_view);
         chatroomRedPackWidgetView.initData(liveRoomDataManager);
+
+        final PLVLiveSubtitleSettingVO subtitleSetting = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .get(PLVChannelFeature.LIVE_SUBTITLE_SETTING);
+        final boolean liveSubtitleEnable = subtitleSetting != null && subtitleSetting.getEnable();
+        morePopupView.updateLiveRealTimeSubtitleEnable(liveSubtitleEnable);
 
         updateOnlineCount(0);
         initNetworkTipsLayout();
@@ -1100,6 +1106,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                     onViewActionListener.onClickDynamicFunction(event);
                 }
             }
+
+            @Override
+            public void onShowLiveSubtitleSetting() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowLiveSubtitleSetting();
+                }
+            }
         });
     }
     // </editor-fold>
@@ -1266,6 +1279,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
          * 展示用于跳转微信复制的二维码
          */
         void onShowOpenLink();
+
+        void onShowLiveSubtitleSetting();
     }
     // </editor-fold>
 }

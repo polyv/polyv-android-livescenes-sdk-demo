@@ -728,4 +728,9 @@
     <string name="plv_cast_connect_device_title">장치를 연결합니다...</string>
     <string name="plv_cast_connect_device_status_connecting">연결 중입니다...</string>
     <string name="plv_cast_connect_device_switch">장치 전환 ></string>
+    <string name="plv_live_real_time_subtitle">실시간 자막</string>
+    <string name="plv_live_subtitle_double_language">이중 언어 자막</string>
+    <string name="plv_live_subtitle_setting_language">자막 언어</string>
+    <string name="plv_live_subtitle_language_origin_not_translated">원문 (번역하지 않음)</string>
+    <string name="plv_live_subtitle_not_show">텍스트 트랙 표시 안 함</string>
 </resources>

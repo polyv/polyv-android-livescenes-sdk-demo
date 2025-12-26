@@ -29,6 +29,7 @@ public class PLVProductAICardLayout extends FrameLayout {
     private PLVProductAICardWebView productAICardWebView;
     private ImageView packUpIv;
     private OnClickListener onClickPackUpListener;
+    private int productId = -1;
 
     public PLVProductAICardLayout(@NonNull Context context) {
         this(context, null);
@@ -77,6 +78,7 @@ public class PLVProductAICardLayout extends FrameLayout {
     }
 
     public void showProductAICard(int productId) {
+        this.productId = productId;
         productAICardWebView.setProductId(productId);
         productAICardWebView.loadWeb();
         setVisibility(View.VISIBLE);
@@ -94,10 +96,14 @@ public class PLVProductAICardLayout extends FrameLayout {
         }
     }
 
-    public void hideAndStop() {
+    public boolean hideAndStop(int productId) {
+        if (this.productId != productId) {
+            return false;
+        }
         hide();
         productAICardWebView.stopLoading();
         productAICardWebView.loadUrl("about:blank");
+        return true;
     }
 
     public void destroy() {

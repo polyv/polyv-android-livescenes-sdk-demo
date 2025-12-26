@@ -24,8 +24,11 @@ import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.livescenes.document.model.PLVPPTPaintStatus;
 import com.plv.livescenes.document.model.PLVPPTStatus;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
+
+import java.util.List;
 
 /**
  * 云课堂场景下，针对 播放器布局 进行封装的 接口
@@ -362,6 +365,11 @@ public interface IPLVLCMediaLayout {
      * @param isInLinkMicList 是否在连麦列表内
      */
     void notifyMediaLayoutPosition(boolean isInLinkMicList);
+
+    /**
+     * 修改实时字幕翻译语言
+     */
+    void updateSubtitleTranslateLanguage(String language);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="1、外部直接调用的方法 - playback部分，定义 回放播放器布局 独有的方法">
@@ -502,6 +510,8 @@ public interface IPLVLCMediaLayout {
         PLVChatQuoteVO getChatQuoteContent();
 
         void onCloseChatQuote();
+
+        void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles);
 
         /**
          * 显示公告动作（直播独有）

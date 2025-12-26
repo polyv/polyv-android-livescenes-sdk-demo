@@ -531,7 +531,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         final boolean canControlLinkMic = PLVUserAbilityManager.myAbility().hasAbility(PLVUserAbility.STREAMER_ALLOW_CONTROL_LINK_MIC_OPEN);
         final boolean isNewLinkMicStrategy = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_STRATEGY);
-        if (!canControlLinkMic || !isNewLinkMicStrategy) {
+        final boolean showMemberList = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER);
+        if (!canControlLinkMic || !isNewLinkMicStrategy || !showMemberList) {
             moreAllowViewerLinkmicLayout.setVisibility(View.GONE);
             moreLinkmicSettingLayout.setVisibility(View.GONE);
             moreHangUpViewerLinkmicLayout.setVisibility(View.GONE);

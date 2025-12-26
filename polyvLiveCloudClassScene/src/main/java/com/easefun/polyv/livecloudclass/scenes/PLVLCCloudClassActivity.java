@@ -79,6 +79,7 @@ import com.plv.livescenes.document.model.PLVPPTStatus;
 import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.playback.video.PLVPlaybackListType;
+import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
@@ -92,6 +93,7 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * date: 2020/10/12
@@ -692,6 +694,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             }
 
             @Override
+            public void onSubtitleUpdate(List<PLVLiveSubtitleTranslation> subtitles) {
+                livePageMenuLayout.onSubtitleUpdate(subtitles);
+            }
+
+            @Override
             public void onShowBulletinAction() {
                 if (liveRoomDataManager.getConfig().isLive() && popoverLayout != null) {
                     popoverLayout.getInteractLayout().showBulletin();
@@ -1080,6 +1087,11 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             @Override
             public void onScreenshot() {
                 screenshotHelper.startScreenCapture(PLVLCCloudClassActivity.this);
+            }
+
+            @Override
+            public void onSetSubtitleTranslateLanguage(String language) {
+                mediaLayout.updateSubtitleTranslateLanguage(language);
             }
         });
         //当前页面 监听 聊天室数据中的观看热度变化

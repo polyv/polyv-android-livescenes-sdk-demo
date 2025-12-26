@@ -144,8 +144,8 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                 commodityUiState.productContentBeanPushToShow = productControlEvent.getContent();
                 commodityUiStateLiveData.postValue(commodityUiState.copyWithPushState());
             }
-            if (productControlEvent.isRedact()) {
-                // 编辑/AI卡片
+            if (productControlEvent.isAICard()) {
+                // AI卡片
                 productRedactLiveData.postValue(productControlEvent.getContent());
             }
         } else if (productEvent.isProductRemoveEvent()) {

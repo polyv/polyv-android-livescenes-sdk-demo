@@ -5,7 +5,7 @@ import static com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVCha
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +13,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.modules.chatroom.view.widget.PLVChatQuoteHintMyselfDrawableSpan;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
+import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder;
 import com.easefun.polyv.liveecommerce.R;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.impl.PLVSocketManager;
 
@@ -62,8 +66,19 @@ public class PLVECChatMessageQuoteLayout extends FrameLayout {
         setVisibility(VISIBLE);
 
         String nick = maskViewerName(chatQuoteVO);
+        boolean isMyself = PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(chatQuoteVO.getUserId());
         final CharSequence quoteMsg = chatQuoteVO.getObjects() == null || chatQuoteVO.getObjects().length == 0 ? "" : (CharSequence) chatQuoteVO.getObjects()[0];
-        chatQuoteMsgNameContentTv.setText(new SpannableStringBuilder(nick).append("：").append(quoteMsg));
+        final PLVSpannableStringBuilder sb = new PLVSpannableStringBuilder();
+        if (isMyself) {
+            sb.appendExclude("[我]", new PLVChatQuoteHintMyselfDrawableSpan());
+            sb.append(" ");
+            sb.appendExclude(nick, new ForegroundColorSpan(PLVFormatUtils.parseColor("#993F76FC")));
+        } else {
+            sb.append(nick);
+        }
+        sb.append(": ");
+        sb.append(quoteMsg);
+        chatQuoteMsgNameContentTv.setText(sb);
 
         final boolean hasImage = chatQuoteVO.getImage() != null && chatQuoteVO.getImage().getUrl() != null;
         chatQuoteMsgImageIv.setVisibility(hasImage ? VISIBLE : GONE);

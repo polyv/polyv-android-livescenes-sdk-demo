@@ -22,6 +22,7 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLeng
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatMessageQuoteLayout;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.socket.event.chat.IPLVIdEvent;
+import com.plv.socket.event.chat.IPLVMessageIdEvent;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.ppt.PLVPptShareFileVO;
 
@@ -100,7 +101,9 @@ public class PLVECChatMessageSpeakViewHolder extends PLVECChatMessageCommonViewH
                         @Override
                         public void onClick(View v) {
                             final PLVChatQuoteVO chatQuoteVO = new PLVChatQuoteVO();
-                            if (messageData instanceof IPLVIdEvent) {
+                            if (messageData instanceof IPLVMessageIdEvent) {
+                                chatQuoteVO.setMessageId(((IPLVMessageIdEvent) messageData).getMessageId());
+                            } else if (messageData instanceof IPLVIdEvent) {
                                 chatQuoteVO.setMessageId(((IPLVIdEvent) messageData).getId());
                             }
                             chatQuoteVO.setUserId(userId);

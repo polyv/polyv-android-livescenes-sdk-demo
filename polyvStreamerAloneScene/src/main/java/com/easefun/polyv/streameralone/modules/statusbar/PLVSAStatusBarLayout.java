@@ -190,15 +190,14 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
                         if (contentBean == null || !aiCardEnabled) {
                             return;
                         }
-                        plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
                         if (contentBean.isProductExplaining()) {
-                            if (contentBean.hasAiCard()) {
-                                plvsaStatusBarAICardWebLayout.showProductAICard(contentBean.getProductId());
-                            } else {
-                                plvsaStatusBarAICardWebLayout.hideAndStop();
-                            }
+                            plvsaStatusBarAICardWebLayout.showProductAICard(contentBean.getProductId());
+                            plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
                         } else if (contentBean.isProductExplained()) {
-                            plvsaStatusBarAICardWebLayout.hideAndStop();
+                            boolean result = plvsaStatusBarAICardWebLayout.hideAndStop(contentBean.getProductId());
+                            if (result) {
+                                plvsaStatusBarAICardIvLayout.setVisibility(INVISIBLE);
+                            }
                         }
                     }
                 });
@@ -312,6 +311,12 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             }
         });
     }
+
+    private void initMemberCountLayout(IPLVLiveRoomDataManager liveRoomDataManager) {
+        final boolean showMemberList = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.STREAMER_SHOW_FUNCTION_MEMBER);
+        plvsaStatusBarMemberCountRl.setVisibility(showMemberList ? VISIBLE : GONE);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 实现IPLVSAStatusBarLayout定义的方法">
@@ -326,6 +331,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         initChannelInfoLayout(liveRoomDataManager);
         initCloseTipContent(liveRoomDataManager);
         initAICardLayout(liveRoomDataManager);
+        initMemberCountLayout(liveRoomDataManager);
     }
 
     @Override
