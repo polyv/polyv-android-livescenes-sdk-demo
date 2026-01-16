@@ -14,7 +14,6 @@
         android:networkSecurityConfig="@xml/polyv_network_security_config"
         android:enableOnBackInvokedCallback="false"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:replace="android:icon,android:theme,android:label">

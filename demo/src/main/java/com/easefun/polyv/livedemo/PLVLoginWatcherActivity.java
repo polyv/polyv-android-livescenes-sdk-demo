@@ -95,7 +95,8 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
     //当前是否显示的是直播，默认显示直播tab
     private boolean isShowLive = true;
     //当前选择的场景
-    private PLVLiveScene curScene = PLVLiveScene.CLOUDCLASS;
+    @Nullable
+    private PLVLiveScene curScene = null;
 
     //listener
     private TextWatcher textWatcher = new TextWatcher() {
@@ -280,6 +281,10 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
+                    //check 跟随频道配置
+                    case R.id.plv_login_rb_from_channel:
+                        curScene = null;
+                        break;
                     //check 云课堂场景
                     case R.id.plv_login_rb_cloudclass_scene:
                         curScene = PLVLiveScene.CLOUDCLASS;
@@ -444,6 +449,15 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
 
                 PLVLiveChannelType channelType = plvLiveLoginResult.getChannelTypeNew();
                 String langType = plvLiveLoginResult.getLangType();
+                PLVLiveScene curScene = PLVLoginWatcherActivity.this.curScene;
+                if (curScene == null) {
+                    if (plvLiveLoginResult.isNormalWatchLayout() || PLVLiveChannelType.PPT.equals(channelType)) {
+                        // 后台配置横屏模版或者是三分屏频道，则进入云课堂场景
+                        curScene = PLVLiveScene.CLOUDCLASS;
+                    } else {
+                        curScene = PLVLiveScene.ECOMMERCE;
+                    }
+                }
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:
@@ -510,7 +524,15 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 if (materialLibraryEnabled) {
                     plvPlaybackListType = PLVPlaybackListType.PLAYBACK;
                 }
-
+                PLVLiveScene curScene = PLVLoginWatcherActivity.this.curScene;
+                if (curScene == null) {
+                    if (plvPlaybackLoginResult.isNormalWatchLayout() || PLVLiveChannelType.PPT.equals(channelType)) {
+                        // 后台配置横屏模版或者是三分屏频道，则进入云课堂场景
+                        curScene = PLVLiveScene.CLOUDCLASS;
+                    } else {
+                        curScene = PLVLiveScene.ECOMMERCE;
+                    }
+                }
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:
@@ -575,7 +597,15 @@ public class PLVLoginWatcherActivity extends PLVBaseActivity {
                 PLVLiveChannelType channelType = plvPlaybackLoginResult.getChannelTypeNew();
                 String langType = plvPlaybackLoginResult.getLangType();
                 boolean materialLibraryEnabled = plvPlaybackLoginResult.isMaterialLibraryEnabled();
-
+                PLVLiveScene curScene = PLVLoginWatcherActivity.this.curScene;
+                if (curScene == null) {
+                    if (plvPlaybackLoginResult.isNormalWatchLayout() || PLVLiveChannelType.PPT.equals(channelType)) {
+                        // 后台配置横屏模版或者是三分屏频道，则进入云课堂场景
+                        curScene = PLVLiveScene.CLOUDCLASS;
+                    } else {
+                        curScene = PLVLiveScene.ECOMMERCE;
+                    }
+                }
                 switch (curScene) {
                     //进入云课堂场景
                     case CLOUDCLASS:
