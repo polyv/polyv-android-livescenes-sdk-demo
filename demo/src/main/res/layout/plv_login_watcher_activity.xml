@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dm_60"
+            android:layout_marginTop="@dimen/dm_48"
             android:src="@drawable/plv_login_logo" />
 
         <TextView
@@ -172,10 +172,18 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <android.support.v7.widget.AppCompatRadioButton
-                            android:id="@+id/plv_login_rb_cloudclass_scene"
+                            android:id="@+id/plv_login_rb_from_channel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
+                            android:text="跟随频道配置"
+                            app:buttonTint="@drawable/plv_login_radio_button_color" />
+
+                        <android.support.v7.widget.AppCompatRadioButton
+                            android:id="@+id/plv_login_rb_cloudclass_scene"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:text="云课堂场景"
                             app:buttonTint="@drawable/plv_login_radio_button_color" />
 
@@ -183,7 +191,7 @@
                             android:id="@+id/plv_login_rb_ecommerce_scene"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
+                            android:layout_marginTop="8dp"
                             android:text="直播带货场景"
                             app:buttonTint="@drawable/plv_login_radio_button_color" />
                     </RadioGroup>
