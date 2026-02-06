@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindow;
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.player.floating.PLVFloatingPlayerConfig;
 import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewActivity;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -22,9 +23,9 @@ public class PLVLCCommodityDetailActivity extends PLVSimpleWebViewActivity {
 
     private boolean showFlag = false;
 
-    public static void start(Context context, String commodityDetailUrl) {
+    public static void start(Context context, String commodityDetailUrl, IPLVLiveRoomDataManager liveRoomDataManager) {
         Intent intent = new Intent(context, PLVLCCommodityDetailActivity.class);
-        intent.putExtra(EXTRA_COMMODITY_DETAIL_URL, commodityDetailUrl);
+        intent.putExtra(EXTRA_COMMODITY_DETAIL_URL, liveRoomDataManager != null ? liveRoomDataManager.appendIFrameParams(commodityDetailUrl) : commodityDetailUrl);
         context.startActivity(intent);
     }
 

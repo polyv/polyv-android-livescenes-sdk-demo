@@ -773,7 +773,32 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
     @Override
     public void onLeaveLinkMic() {
-        //我，离开频道
+        //将连麦列表和主屏幕区域的media分离，各自回到各自的位置
+        //这里实际存在3种情况：
+        //1. 纯视频且支持RTC：将隐藏在连麦列表的media区域切回主屏幕。
+        //2. 纯视频且不支持RTC：将连麦列表的media区域的播放器切回到主屏幕。
+        //3. 三分屏：将连麦列表的media区域的PPT切回到主屏幕。
+        if (linkMicPresenter.isAloneChannelTypeSupportRTC()) {
+            //如果是纯视频并且支持RTC的频道
+
+            //把之前切换到连麦列表讲师位置的media(video)切回主屏
+            if (teacherLocationViewSwitcher != null && teacherLocationViewSwitcher.isViewSwitched()) {
+                teacherLocationViewSwitcher.switchView();
+            } else {
+                PLVCommonLog.exception(new Exception("teacherLocationViewSwitcher should not be null"));
+            }
+        } else {
+            //如果是：1. 三分屏频道；2. 纯视频且不支持RTC的频道
+
+            //如果media此时还在连麦列表，则将media从连麦列表切回到主屏幕
+            if (isMediaShowInLinkMicList && linkMicListAdapter.getSwitchViewHasMedia() != null) {
+                if (onPLVLinkMicLayoutListener != null) {
+                    onPLVLinkMicLayoutListener.onClickSwitchWithMediaOnce(linkMicListAdapter.getSwitchViewHasMedia());
+                }
+            }
+        }
+        linkMicListAdapter.updateAllItem();
+        linkMicListAdapter.releaseView();
 
         //更新连麦控制器
         linkMicControlBar.setLeaveLinkMic();

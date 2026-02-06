@@ -69,6 +69,7 @@ import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.lang.ref.WeakReference;
@@ -114,8 +115,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     //view
     private ImageView plvsaSettingClosePageIv;
     private ConstraintLayout plvsaSettingConfigLy;
+    private PLVSASettingSplashLayout settingSplashLayout;
     private TextView plvsaSettingLiveTitleTv;
-    private View plvsaSettingLiveTitleSplitView;
     private FlexboxLayout settingActionScrollContainer;
     private ImageView plvsaSettingCameraOrientIv;
     private ImageView plvsaSettingMirrorIv;
@@ -197,8 +198,8 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
         plvsaSettingClosePageIv = findViewById(R.id.plvsa_setting_close_page_iv);
         plvsaSettingConfigLy = findViewById(R.id.plvsa_setting_config_ly);
+        settingSplashLayout = findViewById(R.id.plvsa_setting_splash_layout);
         plvsaSettingLiveTitleTv = findViewById(R.id.plvsa_setting_live_title_tv);
-        plvsaSettingLiveTitleSplitView = findViewById(R.id.plvsa_setting_live_title_split_view);
         settingActionScrollContainer = findViewById(R.id.plvsa_setting_action_scroll_container);
         plvsaSettingCameraOrientIv = findViewById(R.id.plvsa_setting_camera_orient_iv);
         plvsaSettingMirrorIv = findViewById(R.id.plvsa_setting_mirror_iv);
@@ -846,6 +847,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         }
         if (streamerPresenter != null) {
             streamerPresenter.registerView(streamerView);
+            settingSplashLayout.init(liveRoomDataManager, streamerPresenter);
             observePushResolutionRatio();
             streamerPresenter.getData().getCurBitrate().observe((LifecycleOwner) getContext(), new Observer<Integer>() {
                 @Override
@@ -953,9 +955,20 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         final boolean isLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        updateLayoutOnOrientationChanged(isLandscape);
         updatePushResolutionRatioOnOrientationChanged(isLandscape);
         if (virtualBackgroundLayout != null) {
             virtualBackgroundLayout.onOrientationChanged(!isLandscape);
+        }
+    }
+
+    private void updateLayoutOnOrientationChanged(boolean isLandscape) {
+        if (!isLandscape) {
+            plvsaSettingConfigLy.setMaxWidth(ConvertUtils.dp2px(351));
+            plvsaSettingLiveTitleTv.setMaxWidth(ConvertUtils.dp2px(231));
+        } else {
+            plvsaSettingConfigLy.setMaxWidth(ConvertUtils.dp2px(620));
+            plvsaSettingLiveTitleTv.setMaxWidth(ConvertUtils.dp2px(500));
         }
     }
 

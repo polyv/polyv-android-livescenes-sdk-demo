@@ -38,4 +38,5 @@
     <string name="plvsa_streamer_media_overlay_remote_volume_title">プッシュフロー音量</string>
     <string name="plvsa_streamer_media_overlay_local_volume_title">ローカルボリューム</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">ローカル音量のデフォルトは0で、大きくするとライブエコーが発生する可能性があり、イヤホンをつけて傍受することをお勧めします。</string>
+    <string name="plvsa_setting_splash_change_hint">表紙の変更</string>
 </resources>

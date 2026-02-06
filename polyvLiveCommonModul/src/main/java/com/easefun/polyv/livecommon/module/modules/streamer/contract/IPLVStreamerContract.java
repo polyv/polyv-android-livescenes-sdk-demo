@@ -31,6 +31,7 @@ import net.polyv.android.player.business.scene.common.player.IPLVMediaPlayer;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.socket.client.Ack;
 
@@ -700,6 +701,14 @@ public interface IPLVStreamerContract {
          * 移除视频覆盖层
          */
         void removeMediaOverlay(IPLVMediaPlayer mediaOverlay);
+
+        /**
+         * 更新频道封面图
+         *
+         * @param splashImage 封面图
+         * @return 上传后的封面图地址
+         */
+        Observable<String> updateChannelSplashImage(Bitmap splashImage);
 
         /**
          * 销毁，包括销毁推流和连麦操作、解除view操作

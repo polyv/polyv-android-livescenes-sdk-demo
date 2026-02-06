@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.pagemenu.iframe;
 
+import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewFragment;
 
 /**
@@ -8,8 +9,8 @@ import com.easefun.polyv.livecommon.ui.window.PLVSimpleWebViewFragment;
 public class PLVLCIFrameFragment extends PLVSimpleWebViewFragment {
     private String url;
 
-    public void init(String url) {
-        this.url = url;
+    public void init(String url, IPLVLiveRoomDataManager liveRoomDataManager) {
+        this.url = liveRoomDataManager != null ? liveRoomDataManager.appendIFrameParams(url) : url;
     }
 
     @Override

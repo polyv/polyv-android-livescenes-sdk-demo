@@ -551,7 +551,7 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             @Override
             public void onClickProduct(String link) {
                 if (!TextUtils.isEmpty(link)) {
-                    PLVLCCommodityDetailActivity.start(PLVLCCloudClassActivity.this, link);
+                    PLVLCCommodityDetailActivity.start(PLVLCCloudClassActivity.this, link, liveRoomDataManager);
                 }
             }
         });

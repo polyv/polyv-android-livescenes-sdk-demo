@@ -100,7 +100,7 @@ public class PLVLCProductLayout extends FrameLayout {
                                     .show();
                             return;
                         }
-                        PLVLCCommodityDetailActivity.start(getContext(), productLink);
+                        PLVLCCommodityDetailActivity.start(getContext(), productLink, liveRoomDataManager);
                     }
                 })
                 .setOnReceiveEventClickProductExplainButtonHandler(new BridgeHandler() {

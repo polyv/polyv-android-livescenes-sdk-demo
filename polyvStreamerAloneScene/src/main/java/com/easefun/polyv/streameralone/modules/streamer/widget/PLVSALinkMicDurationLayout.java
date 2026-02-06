@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.streameralone.R;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -65,7 +65,7 @@ public class PLVSALinkMicDurationLayout extends FrameLayout {
     }
 
     private void startTimer() {
-        updateDurationTimer = PLVRxTimer.timer(1000, new Consumer<Long>() {
+        updateDurationTimer = PLVTimer.timer(1000, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 updateDuration();

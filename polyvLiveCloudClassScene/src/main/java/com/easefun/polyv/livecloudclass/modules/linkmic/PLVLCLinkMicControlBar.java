@@ -45,7 +45,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVNetworkUtils;
@@ -317,9 +317,17 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     @Override
     public void setJoinLinkMicSuccess() {
         state = PLVLCLinkMicControllerState.STATE_JOIN_LINK_MIC_SUCCESS;
-        isCameraOpen = false;
+        if (isAudioState) {
+            setCameraOpenOrClose(false);
+            setMicrophoneOpenOrClose(isMicrophoneOpen);
+        } else {
+            setCameraOpenOrClose(isCameraOpen);
+            setMicrophoneOpenOrClose(isMicrophoneOpen);
+        }
+        if (onPLCLinkMicControlBarListener != null) {
+            onPLCLinkMicControlBarListener.onClickCameraOpenOrClose(!isCameraOpen);
+        }
         isCameraFront = true;
-        isMicrophoneOpen = true;
 
         setOrientation(isPortrait);
         animateMoveToShowBiggestWidth();
@@ -339,17 +347,6 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
 
     @Override
     public void updateIsAudioWidth(boolean isAudio) {
-        if (isAudio) {
-            btnCameraOpenPortrait.setVisibility(GONE);
-            btnCameraOpenLandscape.setVisibility(GONE);
-            btnCameraFrontBackPortrait.setVisibility(GONE);
-            btnCameraFrontBackLandscape.setVisibility(GONE);
-        } else {
-            btnCameraOpenPortrait.setVisibility(VISIBLE);
-            btnCameraOpenLandscape.setVisibility(VISIBLE);
-            btnCameraFrontBackPortrait.setVisibility(VISIBLE);
-            btnCameraFrontBackLandscape.setVisibility(VISIBLE);
-        }
         //设置了音频模式后，竖屏下有两个按钮隐藏了，因此最大长度会变小，要重新获取最大长度。
         post(new Runnable() {
             @Override
@@ -371,6 +368,17 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                 tvRequestTip.setText(R.string.plv_linkmic_tip_request_video_link_mic);
                 tvRequestTipLandscape.setText(R.string.plv_linkmic_tip_request_video_link_mic);
             }
+        }
+        if (isAudio) {
+            btnCameraOpenPortrait.setVisibility(GONE);
+            btnCameraOpenLandscape.setVisibility(GONE);
+            btnCameraFrontBackPortrait.setVisibility(GONE);
+            btnCameraFrontBackLandscape.setVisibility(GONE);
+        } else {
+            btnCameraOpenPortrait.setVisibility(VISIBLE);
+            btnCameraOpenLandscape.setVisibility(VISIBLE);
+            btnCameraFrontBackPortrait.setVisibility(VISIBLE);
+            btnCameraFrontBackLandscape.setVisibility(VISIBLE);
         }
     }
 
@@ -544,9 +552,9 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         } else {
             return;
         }
-        autoHideDisposable = PLVRxTimer.delay(delay, new Consumer<Object>() {
+        autoHideDisposable = PLVTimer.delay(delay, new Consumer<Long>() {
             @Override
-            public void accept(Object o) throws Exception {
+            public void accept(Long o) throws Exception {
                 animateMoveToShowSmallestWidth();
                 tipGradientShowOrHide(false, DURATION_MS_LINK_MIC_OPEN_OFF);
                 switch (state) {

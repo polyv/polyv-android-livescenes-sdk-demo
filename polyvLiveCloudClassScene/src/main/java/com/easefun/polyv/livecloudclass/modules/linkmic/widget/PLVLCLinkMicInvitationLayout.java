@@ -35,7 +35,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
@@ -286,7 +286,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
 
     private void startFetchAcceptInviteLinkMicLimit() {
         stopFetchAcceptInviteLinkMicLimit();
-        fetchAcceptInviteLinkMicLimitDisposable = PLVRxTimer.timer(
+        fetchAcceptInviteLinkMicLimitDisposable = PLVTimer.timer(
                 (int) seconds(9).toMillis(),
                 new Consumer<Long>() {
                     @Override
@@ -315,7 +315,7 @@ public class PLVLCLinkMicInvitationLayout extends FrameLayout {
 
     private void startUpdateTimeLeft() {
         stopUpdateTimeLeft();
-        updateTimeLeftDisposable = PLVRxTimer.timer(
+        updateTimeLeftDisposable = PLVTimer.timer(
                 (int) millis(500).getValue(),
                 new Consumer<Long>() {
                     @Override

@@ -11,7 +11,9 @@ import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.streamer.linkmic.PLVLinkMicEventSender;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -87,9 +89,12 @@ public class PLVForceHangUpHandler {
     }
 
     public void destroy() {
-        for (Map.Entry<String, PLVLinkMicItemDataBean> entry : waitForceHangUpMap.entrySet()) {
-            remove(entry.getKey());
+        List<String> keys = new ArrayList<>(waitForceHangUpMap.keySet());
+        for (String key : keys) {
+            remove(key);
         }
+        waitForceHangUpMap.clear();
+        disposableMap.clear();
     }
 
     private void showForceHangUpDialog(final String linkMicId, final PLVLinkMicItemDataBean linkMicItemDataBean) {

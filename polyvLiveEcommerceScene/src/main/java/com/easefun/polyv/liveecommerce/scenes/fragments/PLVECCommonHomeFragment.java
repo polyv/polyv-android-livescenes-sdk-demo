@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import static net.polyv.android.common.libs.lang.concurrent.ThreadsKt.postToMainThread;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import androidx.lifecycle.LiveData;
@@ -44,7 +46,13 @@ import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
+import net.polyv.android.common.libs.kava.Nullables;
+import net.polyv.android.common.libs.lang.Duration;
+
 import java.util.List;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * 直播和回放主页共同业务的fragment
@@ -300,6 +308,24 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         public void handleLoginFailed(@NonNull Throwable throwable) {
             super.handleLoginFailed(throwable);
             ToastUtils.showShort(getResources().getString(R.string.plv_chat_toast_login_failed) + ":" + throwable.getMessage());
+            final boolean isSmallClass = Nullables.of(new Function0<Boolean>() {
+                @Override
+                public Boolean invoke() {
+                    return "smallclass".equals(liveRoomDataManager.getClassDetailVO().getValue().getData().getData().getNewScene());
+                }
+            }).getOrDefault(false);
+            if (isSmallClass) {
+                // 小班课登录失败踢出房间
+                postToMainThread(Duration.seconds(3), new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        if (getContext() != null) {
+                            ((Activity) getContext()).finish();
+                        }
+                        return null;
+                    }
+                });
+            }
         }
 
         @Override

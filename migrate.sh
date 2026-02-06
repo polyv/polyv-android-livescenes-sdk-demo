@@ -21,7 +21,7 @@ if [ -f "$GRADLE_FILE" ]; then
     sed -i '' 's/com.github.bumptech.glide:okhttp3-integration:4.7.1/com.github.bumptech.glide:okhttp3-integration:4.10.0/g' "$GRADLE_FILE"
     # 修改 compiler
     sed -i '' 's/com.github.bumptech.glide:compiler:4.7.1/com.github.bumptech.glide:compiler:4.10.0/g' "$GRADLE_FILE"
-    
+
     echo "✅ Glide 依赖已尝试更新至 4.10.0"
 else
     echo "⚠️ 警告：未找到文件 $GRADLE_FILE，跳过版本修改。"
@@ -76,9 +76,9 @@ echo "📝 执行提交..."
 git add .
 
 if [ "$(git rev-list $SOURCE_BRANCH..HEAD --count)" -gt 0 ]; then
-    echo "🔄 Amend Commit..."
-    git commit --amend --no-edit
-else
+#    echo "🔄 Amend Commit..."
+#    git commit --amend --no-edit
+#else
     echo "🆕 新建迁移提交..."
     git commit -m "chore: migrate project to AndroidX"
 fi

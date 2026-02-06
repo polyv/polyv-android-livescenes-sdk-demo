@@ -23,45 +23,49 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
             android:id="@+id/plvsa_setting_config_ly"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="48dp"
             android:layout_marginTop="72dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
+            android:background="#33000000"
+            android:maxWidth="351dp"
+            android:minWidth="264dp"
+            android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:plv_mode="all"
+            app:plv_radius="8dp">
+
+            <com.easefun.polyv.streameralone.modules.liveroom.PLVSASettingSplashLayout
+                android:id="@+id/plvsa_setting_splash_layout"
+                android:layout_width="88dp"
+                android:layout_height="50dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/plvsa_setting_live_title_tv"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:background="@null"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:maxWidth="231dp"
                 android:maxLines="2"
-                android:textColor="#F0F1F5"
+                android:minWidth="144dp"
+                android:textColor="#B3FFFFFF"
                 android:textSize="18sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/plvsa_setting_splash_layout"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本测试一行文本" />
 
-            <View
-                android:id="@+id/plvsa_setting_live_title_split_view"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="12dp"
-                android:alpha="0.7"
-                android:background="#99FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/plvsa_setting_live_title_tv" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/plvsa_setting_action_scroll_container"

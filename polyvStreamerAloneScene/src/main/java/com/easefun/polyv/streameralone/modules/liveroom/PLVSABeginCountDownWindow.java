@@ -9,7 +9,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.streameralone.R;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -91,7 +91,7 @@ public class PLVSABeginCountDownWindow implements IPLVSACountDownWindow {
         if (countDownDisposable != null) {
             countDownDisposable.dispose();
         }
-        countDownDisposable = PLVRxTimer.timer(oneCountDownDurationInMillis, oneCountDownDurationInMillis, new Consumer<Long>() {
+        countDownDisposable = PLVTimer.timer(oneCountDownDurationInMillis, oneCountDownDurationInMillis, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 int countDown = countDownTimes.decrementAndGet();

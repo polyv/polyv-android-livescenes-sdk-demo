@@ -39,4 +39,5 @@
     <string name="plvsa_streamer_media_overlay_remote_volume_title">Remote volume</string>
     <string name="plvsa_streamer_media_overlay_local_volume_title">Local volume</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">Turning up volume may bring echo, recommend headphones</string>
+    <string name="plvsa_setting_splash_change_hint">Modify the cover</string>
 </resources>

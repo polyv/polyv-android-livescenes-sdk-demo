@@ -41,7 +41,7 @@ import com.plv.foundationsdk.component.kv.PLVAutoSaveKV;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
@@ -1385,6 +1385,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public Observable<String> updateChannelSplashImage(Bitmap splashImage) {
+        return streamerManager.updateChannelSplashImage(splashImage);
+    }
+
+    @Override
     public void destroy() {
         if (currentSocketUserBean != null && currentSocketUserBean.getUserId() != null && !currentSocketUserBean.isTeacher()) {
             setUserPermissionSpeaker(currentSocketUserBean.getUserId(), false, null);
@@ -1685,7 +1690,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
 
     private void requestLinkMicListApiTimer() {
         dispose(linkMicListTimerDisposable);
-        linkMicListTimerDisposable = PLVRxTimer.timer(1000, INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+        linkMicListTimerDisposable = PLVTimer.timer(1000, INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 if (TextUtils.isEmpty(liveRoomDataManager.getSessionId())) {
@@ -2680,7 +2685,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 return;
             }
             dispose(timerDisposable);
-            timerDisposable = PLVRxTimer.timer(1000, new Consumer<Long>() {
+            timerDisposable = PLVTimer.timer(1000, new Consumer<Long>() {
                 @Override
                 public void accept(Long aLong) throws Exception {
                     if (aLong >= secondsToShow) {

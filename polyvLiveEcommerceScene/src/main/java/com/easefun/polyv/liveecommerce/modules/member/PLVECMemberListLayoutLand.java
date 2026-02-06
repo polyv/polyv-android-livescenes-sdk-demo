@@ -23,7 +23,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.member.adapter.PLVECMemberListAdapter;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
@@ -142,7 +142,7 @@ public class PLVECMemberListLayoutLand extends FrameLayout {
 
     private void startUpdateViewerList() {
         stopUpdateViewerList();
-        updateViewerListDisposable = PLVRxTimer.timer((int) minutes(1).toMillis(), new Consumer<Long>() {
+        updateViewerListDisposable = PLVTimer.timer((int) minutes(1).toMillis(), new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 if (chatroomPresenter != null) {

@@ -33,7 +33,7 @@ import com.easefun.polyv.livecommon.ui.widget.imageview.PLVSimpleImageView;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
@@ -486,7 +486,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
             hasShowReopenFloatingViewTip = true;
             tvReopenFloatingViewTip.setVisibility(VISIBLE);
             dispose(reopenFloatingDelay);
-            reopenFloatingDelay = PLVRxTimer.delay(3000, new Consumer<Long>() {
+            reopenFloatingDelay = PLVTimer.delay(3000, new Consumer<Long>() {
                 @Override
                 public void accept(Long aLong) throws Exception {
                     tvReopenFloatingViewTip.setVisibility(GONE);
@@ -652,7 +652,7 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     //开启/重置 延迟3s隐藏控制栏
     private void resetHideControllerBarDelay(){
         dispose(hideMediaControllerDisable);
-        hideMediaControllerDisable = PLVRxTimer.delay(3000, new Consumer<Long>() {
+        hideMediaControllerDisable = PLVTimer.delay(3000, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 hide();

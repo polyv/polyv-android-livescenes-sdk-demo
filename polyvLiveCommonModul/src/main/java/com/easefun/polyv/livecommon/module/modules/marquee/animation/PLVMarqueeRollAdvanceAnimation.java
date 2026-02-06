@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver;
 
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 
 import java.util.HashMap;
 
@@ -51,7 +51,7 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
         if (viewPositionChangeDisposable != null) {
             viewPositionChangeDisposable.dispose();
         }
-        viewPositionChangeDisposable = PLVRxTimer.timer((int) seconds(5).toMillis(),
+        viewPositionChangeDisposable = PLVTimer.timer((int) seconds(5).toMillis(),
                 new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {

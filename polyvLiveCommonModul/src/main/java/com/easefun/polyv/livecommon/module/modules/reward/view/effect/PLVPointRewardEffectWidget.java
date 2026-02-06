@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
 import com.easefun.polyv.livecommon.module.utils.imageloader.PLVImageLoader;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -246,9 +246,9 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
                 final boolean isStop = isRelease;
 
                 //停留两秒
-                PLVRxTimer.delay(2 * 1000, new Consumer<Object>() {
+                PLVTimer.delay(2 * 1000, new Consumer<Long>() {
                     @Override
-                    public void accept(Object o) throws Exception {
+                    public void accept(Long o) throws Exception {
                         final boolean stopTag = isStop || isRelease;
 
                         //向上消失0.1s
@@ -302,9 +302,9 @@ public class PLVPointRewardEffectWidget extends FrameLayout {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        PLVRxTimer.delay((long) (0.05 * 1000), new Consumer<Object>() {
+                        PLVTimer.delay((long) (0.05 * 1000), new Consumer<Long>() {
                             @Override
-                            public void accept(Object o) throws Exception {
+                            public void accept(Long o) throws Exception {
                                 Animation shrink = new ScaleAnimation(1.5f, 1f, 1.5f, 1f,
                                         Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
                                 );

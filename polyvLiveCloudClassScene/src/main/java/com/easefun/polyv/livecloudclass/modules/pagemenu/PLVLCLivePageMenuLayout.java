@@ -115,12 +115,15 @@ import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
 
+import net.polyv.android.common.libs.kava.Nullables;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Triple;
+import kotlin.jvm.functions.Function0;
 
 /**
  * 直播页面菜单布局，实现 IPLVLCLivePageMenuLayout 接口
@@ -651,7 +654,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
     private void addIFrameTab(PolyvLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
         pageMenuTabTitleList.add(channelMenusBean.getName());
         iFrameFragment = new PLVLCIFrameFragment();
-        iFrameFragment.init(channelMenusBean.getContent());
+        iFrameFragment.init(channelMenusBean.getContent(), liveRoomDataManager);
         pageMenuTabFragmentList.add(iFrameFragment);
     }
 
@@ -1090,6 +1093,23 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
         public void handleLoginFailed(@NonNull Throwable throwable) {
             super.handleLoginFailed(throwable);
             ToastUtils.showShort(getResources().getString(R.string.plv_chat_toast_login_failed) + ":" + throwable.getMessage());
+            final boolean isSmallClass = Nullables.of(new Function0<Boolean>() {
+                @Override
+                public Boolean invoke() {
+                    return "smallclass".equals(liveRoomDataManager.getClassDetailVO().getValue().getData().getData().getNewScene());
+                }
+            }).getOrDefault(false);
+            if (isSmallClass) {
+                // 小班课登录失败踢出房间
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getContext() != null) {
+                            ((Activity) getContext()).finish();
+                        }
+                    }
+                }, 3000);
+            }
         }
 
         @Override

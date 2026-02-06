@@ -13,7 +13,7 @@ import com.easefun.polyv.livescenes.log.PolyvELogSender;
 import com.easefun.polyv.livescenes.log.ppt.PolyvPPTElog;
 import com.plv.business.api.common.ppt.PLVLivePPTProcessor;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.document.model.PLVChangePPTInfo;
 import com.plv.livescenes.socket.PLVSocketWrapper;
@@ -86,9 +86,9 @@ public class PLVPPTPresenter implements IPLVPPTContract.IPLVPPTPresenter {
                             loginEvent.getUser().getUserId().
                                     equals(PLVSocketWrapper.getInstance().getLoginVO().getUserId())) {
                         dispose(delaySendLoginEventDisposable);
-                        delaySendLoginEventDisposable = PLVRxTimer.delay(1000, new Consumer<Object>() {
+                        delaySendLoginEventDisposable = PLVTimer.delay(1000, new Consumer<Long>() {
                             @Override
-                            public void accept(Object o) throws Exception {
+                            public void accept(Long o) throws Exception {
                                 if (view != null) {
                                     view.sendMsgToWebView(CHAT_LOGIN, loginEvent.getUser().toString());
                                 }
