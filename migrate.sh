@@ -76,9 +76,9 @@ echo "📝 执行提交..."
 git add .
 
 if [ "$(git rev-list $SOURCE_BRANCH..HEAD --count)" -gt 0 ]; then
-    echo "🔄 Amend Commit..."
-    git commit --amend --no-edit
-else
+#    echo "🔄 Amend Commit..."
+#    git commit --amend --no-edit
+#else
     echo "🆕 新建迁移提交..."
     git commit -m "chore: migrate project to AndroidX"
 fi
