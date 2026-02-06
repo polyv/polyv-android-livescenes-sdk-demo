@@ -798,7 +798,7 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
                 @Override
                 public void onClickProduct(String link) {
                     if (!TextUtils.isEmpty(link)) {
-                        PLVECCommodityDetailActivity.start(PLVECLiveEcommerceActivity.this, link);
+                        PLVECCommodityDetailActivity.start(PLVECLiveEcommerceActivity.this, link, liveRoomDataManager);
                     }
                 }
             });

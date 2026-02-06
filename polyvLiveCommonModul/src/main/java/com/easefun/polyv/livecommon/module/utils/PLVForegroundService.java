@@ -20,7 +20,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.AppUtils;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
@@ -168,7 +168,7 @@ public class PLVForegroundService extends Service {
 
         private void startTimer() {
             dispose();
-            this.disposable = PLVRxTimer.timer(3000, new Consumer<Long>() {
+            this.disposable = PLVTimer.timer(3000, new Consumer<Long>() {
                 @Override
                 public void accept(Long aLong) throws Exception {
                     if (AppUtils.isAppForeground()) {

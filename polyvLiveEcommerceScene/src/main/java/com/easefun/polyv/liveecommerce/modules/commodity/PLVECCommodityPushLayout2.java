@@ -513,7 +513,7 @@ public class PLVECCommodityPushLayout2 extends FrameLayout implements View.OnCli
         clickBean.setRoomId(liveRoomDataManager.getConfig().getChannelId());
         PLVSocketWrapper.getInstance().emit(PLVEventConstant.Chatroom.EVENT_PRODUCT, new Gson().toJson(clickBean));
 
-        PLVECCommodityDetailActivity.start(getContext(), link);
+        PLVECCommodityDetailActivity.start(getContext(), link, liveRoomDataManager);
         return true;
     }
 

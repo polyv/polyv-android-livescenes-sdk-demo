@@ -38,7 +38,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.video.PolyvLiveVideoView;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.access.PLVUserAbility;
@@ -679,7 +679,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
             hasShowReopenFloatingViewTip = true;
             tvReopenFloatingViewTip.setVisibility(VISIBLE);
             dispose(reopenFloatingDelay);
-            reopenFloatingDelay = PLVRxTimer.delay(3000, new Consumer<Long>() {
+            reopenFloatingDelay = PLVTimer.delay(3000, new Consumer<Long>() {
                 @Override
                 public void accept(Long aLong) throws Exception {
                     tvReopenFloatingViewTip.setVisibility(GONE);
@@ -874,7 +874,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         int popupHeight = child.getMeasuredHeight();
         bitRatePopupWindow.showAtLocation(showView, Gravity.NO_GRAVITY, (location[0] + 10), location[1] - popupHeight - 10);
         dispose(bitPopupWindowTimer);
-        bitPopupWindowTimer = PLVRxTimer.delay(5000, new Consumer<Long>() {
+        bitPopupWindowTimer = PLVTimer.delay(5000, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 hideBitPopup();

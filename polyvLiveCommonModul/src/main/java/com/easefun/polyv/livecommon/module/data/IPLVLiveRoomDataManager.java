@@ -206,6 +206,11 @@ public interface IPLVLiveRoomDataManager {
      * 获取原生app参数信息
      */
     String getNativeAppPramsInfo();
+
+    /**
+     * 拼接iframe参数信息
+     */
+    String appendIFrameParams(String url);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="3、http接口请求">

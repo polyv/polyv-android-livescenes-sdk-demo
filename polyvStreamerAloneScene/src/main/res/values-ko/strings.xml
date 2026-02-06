@@ -38,4 +38,5 @@
     <string name="plvsa_streamer_media_overlay_remote_volume_title">볼륨 푸시</string>
     <string name="plvsa_streamer_media_overlay_local_volume_title">로컬 볼륨</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">로컬 볼륨은 기본적으로 0이며 크게 조절하면 생방송 메아리가 발생할 수 있으므로 이어폰을 끼고 감청하는 것이 좋습니다.</string>
+    <string name="plvsa_setting_splash_change_hint">표지 수정</string>
 </resources>

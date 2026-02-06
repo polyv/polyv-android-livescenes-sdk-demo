@@ -25,7 +25,7 @@ import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.vo.PLVDelay
 import com.easefun.polyv.livecommon.ui.util.PLVPopupHelper;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVTimeUtils;
 
 import io.reactivex.disposables.Disposable;
@@ -156,7 +156,7 @@ public class PLVLCRedpackView extends FrameLayout {
 
     private void start() {
         stop();
-        countDownDisposable = PLVRxTimer.timer((int) seconds(1).toMillis(), new Consumer<Long>() {
+        countDownDisposable = PLVTimer.timer((int) seconds(1).toMillis(), new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 if (delayRedpackVO == null || delayRedpackVO.getRedpackSendTime() <= System.currentTimeMillis()) {

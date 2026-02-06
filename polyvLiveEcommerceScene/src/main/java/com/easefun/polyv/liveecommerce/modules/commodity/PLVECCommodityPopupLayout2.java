@@ -111,7 +111,7 @@ public class PLVECCommodityPopupLayout2 extends FrameLayout {
                                     .show();
                             return;
                         }
-                        PLVECCommodityDetailActivity.start(getContext(), productLink);
+                        PLVECCommodityDetailActivity.start(getContext(), productLink, liveRoomDataManager);
                     }
                 })
                 .setOnReceiveEventClickProductExplainButtonHandler(new BridgeHandler() {

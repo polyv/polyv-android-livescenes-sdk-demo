@@ -17,7 +17,7 @@ import com.easefun.polyv.livecloudclass.modules.pagemenu.member.adapter.PLVLCMem
 import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseFragment;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
 
 import java.util.List;
@@ -104,7 +104,7 @@ public class PLVLCMemberListPortFragment extends PLVBaseFragment {
 
     private void startUpdateViewerList() {
         stopUpdateViewerList();
-        updateViewerListDisposable = PLVRxTimer.timer((int) minutes(1).toMillis(), new Consumer<Long>() {
+        updateViewerListDisposable = PLVTimer.timer((int) minutes(1).toMillis(), new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 if (!isVisibleToUser) {

@@ -39,7 +39,7 @@ import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.permission.PLVFastPermission;
 import com.plv.foundationsdk.permission.PLVOnPermissionCallback;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
@@ -286,7 +286,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             }
                             stopJoinTimeoutCount();
                             dispose(getLinkMicListTimer);
-                            getLinkMicListTimer = PLVRxTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+                            getLinkMicListTimer = PLVTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
                                     requestLinkMicListFromServer();
@@ -371,7 +371,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             loadLinkMicConnectMode(avConnectMode);
 
                             dispose(getLinkMicListTimer);
-                            getLinkMicListTimer = PLVRxTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+                            getLinkMicListTimer = PLVTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
                                     requestLinkMicListFromServer();
@@ -427,7 +427,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                             loadLinkMicConnectMode(avConnectMode);
 
                             dispose(getLinkMicListTimer);
-                            getLinkMicListTimer = PLVRxTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+                            getLinkMicListTimer = PLVTimer.timer(INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
                                     requestLinkMicListFromServer();
@@ -1071,7 +1071,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         if (linkJoinTimer != null) {
             linkJoinTimer.dispose();
         }
-        linkJoinTimer = PLVRxTimer.delay(TIME_OUT_JOIN_CHANNEL, new Consumer<Long>() {
+        linkJoinTimer = PLVTimer.delay(TIME_OUT_JOIN_CHANNEL, new Consumer<Long>() {
             @Override
             public void accept(Long l) throws Exception {
                 timeout.run();
@@ -1285,9 +1285,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         public void onUserJoined(String uid) {
             PLVCommonLog.d(TAG, "PolyvLinkMicEventListenerImpl.onUserJoined, uid=" + uid);
             dispose(getLinkMicListDelay);
-            getLinkMicListDelay = PLVRxTimer.delay(DELAY_TO_GET_LINK_MIC_LIST, new Consumer<Object>() {
+            getLinkMicListDelay = PLVTimer.delay(DELAY_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
                 @Override
-                public void accept(Object o) throws Exception {
+                public void accept(Long o) throws Exception {
                     requestLinkMicListFromServer();
                 }
             });

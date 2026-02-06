@@ -64,7 +64,7 @@ import com.easefun.polyv.livestreamer.modules.chatroom.widget.PLVLSChatMsgInputW
 import com.easefun.polyv.livestreamer.modules.managerchat.PLVLSManagerChatroomLayout;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.component.viewmodel.PLVViewModels;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
@@ -958,7 +958,7 @@ public class PLVLSChatroomLayout extends FrameLayout implements IPLVLSChatroomLa
             unreadManagerChatNotifyTimerDisposable = null;
         }
 
-        unreadManagerChatNotifyTimerDisposable = PLVRxTimer.timer(
+        unreadManagerChatNotifyTimerDisposable = PLVTimer.timer(
                 NOTIFY_UNREAD_MANAGER_CHAT_MESSAGE_INTERVAL,
                 NOTIFY_UNREAD_MANAGER_CHAT_MESSAGE_INTERVAL,
                 new Consumer<Long>() {

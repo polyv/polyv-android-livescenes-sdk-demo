@@ -9,7 +9,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicDataMapper;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVJoinInfoEvent;
@@ -177,7 +177,7 @@ public class PLVMultiRoleLinkMicList {
     // <editor-fold defaultstate="collapsed" desc="连麦列表API请求">
     private void requestLinkMicListApi() {
         dispose(linkMicListTimerDisposable);
-        linkMicListTimerDisposable = PLVRxTimer.timer(DELAY_TO_GET_LINK_MIC_LIST, INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+        linkMicListTimerDisposable = PLVTimer.timer(DELAY_TO_GET_LINK_MIC_LIST, INTERVAL_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 acceptGetLinkMicListStatus();
@@ -187,7 +187,7 @@ public class PLVMultiRoleLinkMicList {
 
     private void requestLinkMicListApiOnce() {
         dispose(linkMicListOnceDisposable);
-        linkMicListOnceDisposable = PLVRxTimer.delay(DELAY_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
+        linkMicListOnceDisposable = PLVTimer.delay(DELAY_TO_GET_LINK_MIC_LIST, new Consumer<Long>() {
             @Override
             public void accept(Long aLong) throws Exception {
                 acceptGetLinkMicListStatus();

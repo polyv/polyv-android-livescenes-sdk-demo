@@ -16,7 +16,7 @@ import com.easefun.polyv.livescenes.model.answer.PolyvQuestionSResult;
 import com.easefun.polyv.livescenes.model.answer.PolyvQuestionSocketVO;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.model.web.PLVJSResponseVO;
-import com.plv.foundationsdk.rx.PLVRxTimer;
+import com.plv.foundationsdk.rx.PLVTimer;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 
 import net.plv.android.jsbridge.BridgeHandler;
@@ -197,9 +197,9 @@ public class PLVInteractAnswer extends PLVInteractAppAbs {
 
     // <editor-fold defaultstate="collapsed" desc="utils">
     private void delay(final Runnable runnable) {
-        PLVRxTimer.delay(DELAY_SOCKET_MSG, new Consumer<Object>() {
+        PLVTimer.delay(DELAY_SOCKET_MSG, new Consumer<Long>() {
             @Override
-            public void accept(Object o) {
+            public void accept(Long o) {
                 if (!isDestroyed) {
                     runnable.run();
                 }

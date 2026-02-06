@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.data;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
@@ -20,7 +21,9 @@ import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 直播间数据管理器，实现IPLVLiveRoomDataManager接口。
@@ -277,6 +280,50 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     public String getNativeAppPramsInfo() {
         PLVInteractNativeAppParams nativeAppParams = PLVLiveRoomDataMapper.toInteractNativeAppParams(this, PLVLiveScene.CLOUDCLASS);
         return PLVGsonUtil.toJsonSimple(nativeAppParams);
+    }
+
+    @Override
+    public String appendIFrameParams(String url) {
+        if (url == null) {
+            return "";
+        }
+        String userId = getConfig().getUser().getViewerId();
+        String nickName = getConfig().getUser().getViewerName();
+        String channelId = getConfig().getChannelId();
+        String sessionId = getSessionId();
+        String param4 = getConfig().getUser().getParam4();
+        String param5 = getConfig().getUser().getParam5();
+        Map<String, String> iFrameParams = new HashMap<>();
+        if (!TextUtils.isEmpty(userId)) {
+            iFrameParams.put("userId", userId);
+        }
+        if (!TextUtils.isEmpty(nickName)) {
+            iFrameParams.put("nickname", nickName);
+        }
+        if (!TextUtils.isEmpty(channelId)) {
+            iFrameParams.put("channelId", channelId);
+        }
+        if (!TextUtils.isEmpty(sessionId)) {
+            iFrameParams.put("sessionId", sessionId);
+        }
+        if (!TextUtils.isEmpty(param4)) {
+            iFrameParams.put("param4", param4);
+        }
+        if (!TextUtils.isEmpty(param5)) {
+            iFrameParams.put("param5", param5);
+        }
+        String symbol = url.contains("?") ? "&" : "?";
+        String params = "";
+        int i = 0;
+        for (Map.Entry<String, String> entry : iFrameParams.entrySet()) {
+            i++;
+            if (i == 1) {
+                params += symbol + entry.getKey() + "=" + entry.getValue();
+            } else {
+                params += "&" + entry.getKey() + "=" + entry.getValue();
+            }
+        }
+        return url + params;
     }
     // </editor-fold>
 

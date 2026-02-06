@@ -121,7 +121,7 @@ class PLVECProductPushCardLayout @JvmOverloads constructor(
         }
         PLVSocketWrapper.getInstance().emit(PLVEventConstant.Chatroom.EVENT_PRODUCT, PLVGsonUtil.toJson(clickBean))
 
-        PLVECCommodityDetailActivity.start(context, link)
+        PLVECCommodityDetailActivity.start(context, link, liveRoomDataManager)
         return true
     }
 
