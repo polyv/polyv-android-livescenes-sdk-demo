@@ -83,11 +83,7 @@ class PLVLCPlaybackVideoMarksPopupMenu @JvmOverloads constructor(
             onClickVideoMark(it)
             hide()
         }
-        playbackVideoMarksRv.layoutManager = LinearLayoutManager(
-            context,
-            LinearLayoutManager.VERTICAL,
-            false
-        )
+        playbackVideoMarksRv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         playbackVideoMarksRv.adapter = adapter
     }
 

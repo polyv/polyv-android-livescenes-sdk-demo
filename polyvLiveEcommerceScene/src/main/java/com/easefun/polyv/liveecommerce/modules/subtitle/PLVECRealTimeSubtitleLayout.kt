@@ -55,11 +55,7 @@ class PLVECRealTimeSubtitleLayout @JvmOverloads constructor(
     private val languageSetting = mutableStateOf<PLVECRealTimeSubtitleLanguageSetting>()
     private val settingPopupMenu by lazy { PLVECLiveSubtitleSettingPopupMenu(context, languageSetting) }
 
-    private val layoutManager = LinearLayoutManager(
-        context,
-        LinearLayoutManager.VERTICAL,
-        false
-    )
+    private val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     private val adapter = PLVECRealTimeSubtitleAdapter(languageSetting)
 
     var onViewActionListener: OnViewActionListener? = null
@@ -425,11 +421,7 @@ private class PLVECLiveSubtitleSettingLanguagePopupMenu(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.plvec_live_subtitle_setting_language_popup_menu, this)
-        liveSubtitleSettingLanguageRv.layoutManager = LinearLayoutManager(
-            context,
-            LinearLayoutManager.VERTICAL,
-            false
-        )
+        liveSubtitleSettingLanguageRv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         liveSubtitleSettingLanguageRv.adapter = adapter
     }
 
