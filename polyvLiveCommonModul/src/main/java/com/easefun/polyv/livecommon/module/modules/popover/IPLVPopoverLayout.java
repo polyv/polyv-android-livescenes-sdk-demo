@@ -6,6 +6,7 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductDetailLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVIARLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
@@ -37,6 +38,11 @@ public interface IPLVPopoverLayout {
      * 获取商品详情布局
      */
     PLVProductDetailLayout getProductDetailLayout();
+
+    /**
+     * 获取互动应用 - 我的奖励 布局
+     */
+    PLVIARLayout getIARLayout();
 
     /**
      * 设置积分打赏配置回调监听

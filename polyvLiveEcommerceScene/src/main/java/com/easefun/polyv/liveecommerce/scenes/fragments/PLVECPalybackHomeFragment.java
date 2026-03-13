@@ -466,6 +466,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
+    protected void acceptMyRewardFunctionShow(boolean isShow) {
+        if (morePopupView != null) {
+            morePopupView.updateMyRewardFunctionShow(isShow);
+        }
+    }
+
+    @Override
     public boolean isInterceptViewAction(MotionEvent motionEvent) {
         if (backIv.getVisibility() == View.VISIBLE) {
             float x = backIv.getX() + backIv.getWidth();
@@ -477,7 +484,6 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         }
         return false;
     }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -953,6 +959,13 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                         onViewActionListener.setShowSubtitles(subtitles);
                     }
                 }
+
+                @Override
+                public void onShowMyRewardAction() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowMyRewardAction();
+                    }
+                }
             });
         } else if (id == R.id.more_video_list_iv) {
             //弹出更多回放视频的popview
@@ -1050,6 +1063,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         List<PLVPlaybackSubtitleVO> getShowSubtitles();
 
         void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
+
+        void onShowMyRewardAction();
     }
     // </editor-fold>
 }

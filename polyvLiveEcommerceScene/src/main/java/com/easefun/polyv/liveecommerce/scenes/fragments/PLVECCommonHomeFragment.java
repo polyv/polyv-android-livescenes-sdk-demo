@@ -179,6 +179,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         acceptLotteryVO(webviewUpdateAppStatusVO);
     }
 
+    protected void acceptMyRewardFunctionShow(boolean isShow) {
+    }
+
     private void acceptLotteryVO(PLVWebviewUpdateAppStatusVO  webviewUpdateAppStatusVO) {
         if (lotteryManager != null) {
             lotteryManager.acceptLotteryVo(webviewUpdateAppStatusVO);
@@ -421,6 +424,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         if (!isOpenQuiz) {
                             acceptCloseQuiz();
                         }
+                        acceptMyRewardFunctionShow(classDetailVO.getData().isMyRewardsEnabled());
                     }
                 }
             }

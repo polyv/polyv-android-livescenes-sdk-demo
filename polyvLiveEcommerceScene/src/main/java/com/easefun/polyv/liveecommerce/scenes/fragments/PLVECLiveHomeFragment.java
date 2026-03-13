@@ -559,6 +559,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             morePopupView.acceptInteractStatusData(webviewUpdateAppStatusVO);
         }
     }
+
+    @Override
+    protected void acceptMyRewardFunctionShow(boolean isShow) {
+        if (morePopupView != null) {
+            morePopupView.updateMyRewardFunctionShow(isShow);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -1113,6 +1120,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                     onViewActionListener.onShowLiveSubtitleSetting();
                 }
             }
+
+            @Override
+            public void onShowMyRewardAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowMyRewardAction();
+                }
+            }
         });
     }
     // </editor-fold>
@@ -1281,6 +1295,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         void onShowOpenLink();
 
         void onShowLiveSubtitleSetting();
+
+        /**
+         * 显示我的奖励
+         */
+        void onShowMyRewardAction();
     }
     // </editor-fold>
 }

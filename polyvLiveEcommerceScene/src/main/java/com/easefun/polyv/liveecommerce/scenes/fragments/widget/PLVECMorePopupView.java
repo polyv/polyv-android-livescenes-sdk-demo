@@ -4,6 +4,7 @@ import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreL
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_FLOATING;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_LANGUAGE_SWITCH;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_LATENCY;
+import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_MY_REWARD;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_MODE;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_PLAY_SETTING;
 import static com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMoreLayout.MORE_FUNCTION_TYPE_RATE;
@@ -276,6 +277,13 @@ public class PLVECMorePopupView {
                             if (clickListener != null) {
                                 clickListener.onShowLiveSubtitleSetting();
                             }
+                            break;
+                        case MORE_FUNCTION_TYPE_MY_REWARD:
+                            if (clickListener != null) {
+                                clickListener.onShowMyRewardAction();
+                            }
+                            hideAll();
+                            break;
                         default:
                             if (clickListener != null) {
                                 clickListener.onClickDynamicFunction(data);
@@ -629,6 +637,12 @@ public class PLVECMorePopupView {
                             hideAll();
                             playbackSubtitlePopupWindow.show();
                             break;
+                        case MORE_FUNCTION_TYPE_MY_REWARD:
+                            if (clickListener != null) {
+                                clickListener.onShowMyRewardAction();
+                            }
+                            hideAll();
+                            break;
                         default:
                             if (clickListener != null) {
                                 clickListener.onClickDynamicFunction(data);
@@ -645,6 +659,10 @@ public class PLVECMorePopupView {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 弹窗控制">
+    public void updateMyRewardFunctionShow(boolean isShow) {
+        moreLayout.updateFunctionShow(MORE_FUNCTION_TYPE_MY_REWARD, isShow);
+    }
+
     public void hideMoreWindow() {
         if (liveMorePopupWindow != null) {
             liveMorePopupWindow.dismiss();
@@ -955,6 +973,8 @@ public class PLVECMorePopupView {
         void onClickDynamicFunction(String event);
 
         void onShowLiveSubtitleSetting();
+
+        void onShowMyRewardAction();
     }
 
     public interface OnPlaybackMoreClickListener {
@@ -974,6 +994,8 @@ public class PLVECMorePopupView {
         List<PLVPlaybackSubtitleVO> getShowSubtitles();
 
         void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles);
+
+        void onShowMyRewardAction();
     }
     // </editor-fold>
 }

@@ -733,4 +733,5 @@
     <string name="plv_live_subtitle_setting_language">subtitle language</string>
     <string name="plv_live_subtitle_language_origin_not_translated">Original text (without translation)</string>
     <string name="plv_live_subtitle_not_show">Do not display subtitles</string>
+    <string name="plv_interact_my_reward">My reward</string>
 </resources>

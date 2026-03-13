@@ -630,12 +630,6 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             onViewActionListener.onScreenshot();
                         }
                         break;
-                    default:
-                        hideSoftInputAndPopupLayout();
-                        if (onViewActionListener != null) {
-                            onViewActionListener.onClickDynamicFunction(data);
-                        }
-                        break;
                     case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT:
                         hideSoftInputAndPopupLayout();
                         isSelectCloseEffect = !isSelectCloseEffect;
@@ -657,6 +651,18 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             onViewActionListener.onShowEffectAction(!isSelectCloseEffect);
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MY_REWARD:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowMyRewardAction();
+                        }
+                        break;
+                    default:
+                        hideSoftInputAndPopupLayout();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onClickDynamicFunction(data);
+                        }
+                        break;
                 }
             }
         });
@@ -674,6 +680,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         return;
                     }
                     chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
+                    chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MY_REWARD, liveClassDetail.getData().isMyRewardsEnabled());
                     // 聊天室背景图
                     String chatBackgroundUrl = liveClassDetail.getData().getChatBackgroundImage();
                     if (!TextUtils.isEmpty(chatBackgroundUrl)) {
@@ -1780,6 +1787,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 回调 拆开红包
          */
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        /**
+         * 显示我的奖励
+         */
+        void onShowMyRewardAction();
     }
     // </editor-fold>
 }

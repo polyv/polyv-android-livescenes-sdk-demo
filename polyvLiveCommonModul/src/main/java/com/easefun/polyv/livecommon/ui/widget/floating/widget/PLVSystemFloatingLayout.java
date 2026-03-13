@@ -32,8 +32,6 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
     //系统级别悬浮窗实现
     protected WindowManager windowManager;
     protected WindowManager.LayoutParams wmLayoutParams;
-    //悬浮窗填充布局
-    private View contentView;
     //contentView的原始布局
     private ViewGroup originContentParentVG;
 
@@ -199,10 +197,11 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     @Override
     public void updateFloatSize(int width, int height) {
-        wmLayoutParams.width = width;
-        wmLayoutParams.height = height;
-        floatWindowWidth = width;
-        floatWindowHeight = height;
+        // 调用父类方法处理原始尺寸记录和缩放基准
+        super.updateFloatSize(width, height);
+        
+        wmLayoutParams.width = floatWindowWidth;
+        wmLayoutParams.height = floatWindowHeight;
         if (windowManager != null && isShowing()) {
             windowManager.updateViewLayout(this, wmLayoutParams);
         }
@@ -211,12 +210,11 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
 
     @Override
     public void updateFloatLocation(int x, int y) {
-        x = fitInsideScreenX(x);
-        y = fitInsideScreenY(y);
-        floatingLocationX = x;
-        floatingLocationY = y;
-        wmLayoutParams.x = x;
-        wmLayoutParams.y = y;
+        // 调用父类方法处理位置计算
+        super.updateFloatLocation(x, y);
+        
+        wmLayoutParams.x = floatingLocationX;
+        wmLayoutParams.y = floatingLocationY;
         if (windowManager != null && isShowing()) {
             windowManager.updateViewLayout(this, wmLayoutParams);
         }
@@ -232,6 +230,50 @@ public class PLVSystemFloatingLayout extends PLVAbsFloatingLayout {
         Utils.getApp().unregisterActivityLifecycleCallbacks(callbacks);
         originContentParentVG = null;
         contentView = null;
+    }
+
+    // 实现新的接口方法
+    @Override
+    public void setEnableScale(boolean enableScale) {
+        super.setEnableScale(enableScale);
+    }
+
+    @Override
+    public void setScaleRange(float minScale, float maxScale) {
+        super.setScaleRange(minScale, maxScale);
+    }
+
+    @Override
+    public float getCurrentScale() {
+        return super.getCurrentScale();
+    }
+
+    @Override
+    public void resetScale() {
+        super.resetScale();
+    }
+
+    @Override
+    public void setScale(float scale) {
+        super.setScale(scale);
+    }
+
+    @Override
+    protected void onFloatSizeChanged(int width, int height) {
+        if (windowManager != null && isShowing()) {
+            wmLayoutParams.width = width;
+            wmLayoutParams.height = height;
+            windowManager.updateViewLayout(this, wmLayoutParams);
+        }
+    }
+
+    @Override
+    protected void onFloatLocationChanged(int x, int y) {
+        if (windowManager != null && isShowing()) {
+            wmLayoutParams.x = x;
+            wmLayoutParams.y = y;
+            windowManager.updateViewLayout(this, wmLayoutParams);
+        }
     }
 
     // </editor-fold>

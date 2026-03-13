@@ -17,6 +17,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductDetailLayout;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVInteractLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.PLVIARLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.reward.OnPointRewardListener;
 import com.easefun.polyv.livecommon.module.modules.reward.PLVPointRewardLayout;
@@ -38,6 +39,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     private PLVPointRewardLayout plvLayoutReward;
     private IPLVInteractLayout plvLayoutInteract;
     private PLVProductDetailLayout plvLayoutProductDetail;
+    private PLVIARLayout plvLayoutIAR;
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -67,7 +69,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
 
     @Override
     public boolean onBackPress() {
-        if (plvLayoutProductDetail.onBackPress() || plvLayoutInteract.onBackPress() || plvLayoutReward.onBackPress()) {
+        if (plvLayoutIAR.onBackPress() || plvLayoutProductDetail.onBackPress() || plvLayoutInteract.onBackPress() || plvLayoutReward.onBackPress()) {
             return true;
         }
         return false;
@@ -84,6 +86,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
         plvLayoutReward.changeScene(scene);
         plvLayoutInteract.init(roomDataManager, scene);
         plvLayoutProductDetail.init(roomDataManager);
+        plvLayoutIAR.init(roomDataManager, scene);
     }
 
     @Override
@@ -113,12 +116,20 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     }
 
     @Override
+    public PLVIARLayout getIARLayout() {
+        return plvLayoutIAR;
+    }
+
+    @Override
     public void destroy() {
         if (plvLayoutInteract != null) {
             plvLayoutInteract.destroy();
         }
         if (plvLayoutProductDetail != null) {
             plvLayoutProductDetail.destroy();
+        }
+        if (plvLayoutIAR != null) {
+            plvLayoutIAR.destroy();
         }
     }
     // </editor-fold >
@@ -154,6 +165,8 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
                         }
                     }
                 });
+
+        plvLayoutIAR = findViewById(R.id.plv_layout_iar);
     }
     // </editor-fold >
 

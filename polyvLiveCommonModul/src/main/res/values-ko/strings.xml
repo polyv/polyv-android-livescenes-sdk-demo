@@ -733,4 +733,5 @@
     <string name="plv_live_subtitle_setting_language">자막 언어</string>
     <string name="plv_live_subtitle_language_origin_not_translated">원문 (번역하지 않음)</string>
     <string name="plv_live_subtitle_not_show">텍스트 트랙 표시 안 함</string>
+    <string name="plv_interact_my_reward">나의 보상</string>
 </resources>

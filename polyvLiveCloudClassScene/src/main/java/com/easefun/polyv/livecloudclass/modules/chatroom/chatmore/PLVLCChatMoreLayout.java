@@ -62,11 +62,19 @@ public class PLVLCChatMoreLayout extends FrameLayout {
      * 屏蔽/展示 特效
      */
     public static final String CHAT_FUNCTION_TYPE_EFFECT = "CHAT_FUNCTION_TYPE_EFFECT";
+    /**
+     * 我的奖励
+     */
+    public static final String CHAT_FUNCTION_TYPE_MY_REWARD = "CHAT_FUNCTION_TYPE_MY_REWARD";
 
     /**
      * 抽奖挂件事件
      */
     public static final String CLICK_LOTTERY_PENDANT= "CLICK_LOTTERY_PENDANT";
+    /**
+     * 消息事件
+     */
+    public static final String SHOW_LOTTERY_RECORD = "SHOW_LOTTERY_RECORD";
 
 
     //每行显示的功能模块数量
@@ -81,12 +89,13 @@ public class PLVLCChatMoreLayout extends FrameLayout {
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_LANGUAGE_SWITCH, R.drawable.plvlc_chatroom_btn_language_switch, PLVAppUtils.getString(R.string.plv_live_language_switch), true),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_PLAY_SETTING, R.drawable.plvlc_chatroom_more_play_setting, PLVAppUtils.getString(R.string.plv_live_play_setting), true),
             new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_SCREENSHOT, R.drawable.plvlc_chatroom_btn_screenshot, PLVAppUtils.getString(R.string.plv_live_screenshot), PLVScreenshotHelper.SHOW_SCREENSHOT_VIEW),
-            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, PLVAppUtils.getString(R.string.plv_live_message), false)
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MESSAGE, R.drawable.plvlc_chatroom_btn_message, PLVAppUtils.getString(R.string.plv_live_message), false),
+            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_MY_REWARD, R.drawable.plvlc_interact_my_reward, PLVAppUtils.getString(R.string.plv_interact_my_reward), false)
 //            new PLVChatFunctionVO(CHAT_FUNCTION_TYPE_EFFECT, R.drawable.plvlc_chatroom_btn_view_effect_selector, PLVAppUtils.getString(R.string.plv_chat_view_close_effect), false)
     );
 
     //初始化不支持的事件
-    private ArrayList<String> unacceptFunctions = arrayListOf(CLICK_LOTTERY_PENDANT);
+    private ArrayList<String> unacceptFunctions = arrayListOf(CLICK_LOTTERY_PENDANT, SHOW_LOTTERY_RECORD);
 
     //功能响应监听
     private PLVLCChatFunctionListener functionListener;
@@ -160,10 +169,15 @@ public class PLVLCChatMoreLayout extends FrameLayout {
                 }
             }
 
+            boolean isUnacceptFunction = false;
             for (String unacceptFunction : unacceptFunctions) {
                 if (function.getEvent().equals(unacceptFunction)) {
-                    return;
+                    isUnacceptFunction = true;
+                    break;
                 }
+            }
+            if (isUnacceptFunction) {
+                continue;
             }
 
             PLVChatFunctionVO chatFunctionVO = new PLVChatFunctionVO(function.getEvent(), function.getTitle(), function.isShow(), function.getIcon());

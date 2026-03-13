@@ -348,6 +348,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             }
 
             @Override
+            public void onShowMyRewardAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowMyRewardAction();
+                }
+            }
+
+            @Override
             public void onClickDynamicFunction(String event) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onClickChatMoreDynamicFunction(event);
@@ -799,6 +806,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
                     if (onViewActionListener != null) {
                         onViewActionListener.onReceiveRedPaper(redPaperEvent);
+                    }
+                }
+
+                @Override
+                public void onShowMyRewardAction() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowMyRewardAction();
                     }
                 }
 

@@ -543,6 +543,13 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     @Override
+    public void onRtcMixStreamVideoSizeChanged(int width, int height) {
+        if (width > 0 && height > 0) {
+            onVideoSizeChanged(width, height);
+        }
+    }
+
+    @Override
     public void updateWhenJoinRTC(int linkMicLayoutLandscapeWidth) {
         isJoinRTC = true;
 
