@@ -191,6 +191,11 @@ public interface IPLVECLinkMicLayout {
         ViewGroup onRequireMixStreamVideoContainer();
 
         /**
+         * rtc混流观看尺寸变化回调
+         */
+        void onMixStreamVideoSizeChanged(int width, int height);
+
+        /**
          * 加入rtc
          */
         void onJoinRtcChannel();

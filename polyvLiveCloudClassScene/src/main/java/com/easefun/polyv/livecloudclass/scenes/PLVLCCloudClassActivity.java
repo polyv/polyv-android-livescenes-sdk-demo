@@ -1093,6 +1093,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             public void onSetSubtitleTranslateLanguage(String language) {
                 mediaLayout.updateSubtitleTranslateLanguage(language);
             }
+
+            @Override
+            public void onShowMyRewardAction() {
+                if (popoverLayout != null) {
+                    popoverLayout.getIARLayout().showLotteryRecord();
+                }
+            }
         });
         //当前页面 监听 聊天室数据中的观看热度变化
         livePageMenuLayout.addOnViewerCountListener(new IPLVOnDataChangedListener<Long>() {

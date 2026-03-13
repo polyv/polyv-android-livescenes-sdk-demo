@@ -80,7 +80,7 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
 
 
     /**** data ****/
-    private List<PLVLinkMicItemDataBean> dataList;
+    private List<PLVLinkMicItemDataBean> dataList = new ArrayList<>();
     private Map<String, Bitmap> linkMicIdSnapshotBitmapMap = new HashMap<>();
     private Map<String, Rect> linkMicIdVideoSizeMap = new HashMap<>();
 
@@ -154,7 +154,11 @@ public class PLVLinkMicListAdapter extends RecyclerView.Adapter<PLVLinkMicListAd
     // <editor-fold defaultstate="collapsed" desc="API - set & get">
     //设置数据源
     public void setDataList(List<PLVLinkMicItemDataBean> dataList) {
-        this.dataList = dataList;
+        if (dataList == null) {
+            this.dataList = new ArrayList<>();
+        } else {
+            this.dataList = dataList;
+        }
     }
 
     public List<PLVLinkMicItemDataBean> getDataList() {

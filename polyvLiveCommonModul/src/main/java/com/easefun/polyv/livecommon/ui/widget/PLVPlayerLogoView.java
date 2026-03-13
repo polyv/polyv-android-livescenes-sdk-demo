@@ -93,6 +93,9 @@ public class PLVPlayerLogoView extends FrameLayout {
         getBitmapSize(logoParam, new OnGetBitmapSizeCallback() {
             @Override
             public void onGetBitmapSize(int bitmapWidth, int bitmapHeight) {
+                if (((Activity) getContext()).isFinishing()) {
+                    return;
+                }
                 //处理输入的宽和高
                 float inputLogoWidth = logoParam.width;
                 float inputLogoHeight = logoParam.height;

@@ -19,4 +19,9 @@
         android:id="@+id/plv_layout_product_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.easefun.polyv.livecommon.module.modules.interact.PLVIARLayout
+        android:id="@+id/plv_layout_iar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </RelativeLayout>

@@ -152,6 +152,46 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
     }
 
     @Override
+    public void setEnableScale(boolean enableScale) {
+        if (floatingLayout != null) {
+            floatingLayout.setEnableScale(enableScale);
+        }
+    }
+
+    @Override
+    public void setScaleRange(float minScale, float maxScale) {
+        if (floatingLayout != null) {
+            floatingLayout.setScaleRange(minScale, maxScale);
+        }
+    }
+
+    @Override
+    public float getCurrentScale() {
+        return floatingLayout != null ? floatingLayout.getCurrentScale() : 1f;
+    }
+
+    @Override
+    public void resetScale() {
+        if (floatingLayout != null) {
+            floatingLayout.resetScale();
+        }
+    }
+
+    @Override
+    public void setScale(float scale) {
+        if (floatingLayout != null) {
+            floatingLayout.setScale(scale);
+        }
+    }
+
+    @Override
+    public void setEnableCollapse(boolean enableCollapse) {
+        if (floatingLayout != null) {
+            floatingLayout.setEnableCollapse(enableCollapse);
+        }
+    }
+
+    @Override
     public void destroy() {
         if (floatingLayout != null) {
             floatingLayout.destroy();
@@ -221,6 +261,16 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
             return this;
         }
 
+        public WindowBuilder setEnableCollapse(boolean enableCollapse) {
+            buildParam.enableCollapse = enableCollapse;
+            return this;
+        }
+
+        public WindowBuilder setEnableScale(boolean enableScale) {
+            buildParam.enableScale = enableScale;
+            return this;
+        }
+
         public PLVFloatingWindowManager build() {
             PLVFloatingWindowManager.getInstance().floatingLayout = buildParam.create();
             return PLVFloatingWindowManager.getInstance();
@@ -240,6 +290,8 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
             private boolean enableDragX = true;
             private boolean enableDragY = true;
             private boolean consumeTouchEventOnMove = true;
+            private boolean enableCollapse = false;
+            private boolean enableScale = false;
 
             private PLVAbsFloatingLayout create() {
                 final PLVAbsFloatingLayout floatingLayout;
@@ -264,6 +316,8 @@ public class PLVFloatingWindowManager implements IPLVFloatingLayout {
                 floatingLayout.setEnableDragX(enableDragX);
                 floatingLayout.setEnableDragY(enableDragY);
                 floatingLayout.setConsumeTouchEventOnMove(consumeTouchEventOnMove);
+                floatingLayout.setEnableCollapse(enableCollapse);
+                floatingLayout.setEnableScale(enableScale);
 
                 return floatingLayout;
             }

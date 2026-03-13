@@ -940,6 +940,11 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void onVideoSizeChanged(String uid, int width, int height) {
         linkMicListAdapter.updateVideoSizeChanged(uid, width, height);
+        if (rtcMixStreamHandler.isPlayRtcAsMixStream() && rtcMixStreamHandler.isPlaying()) {
+            if (onPLVLinkMicLayoutListener != null) {
+                onPLVLinkMicLayoutListener.onMixStreamVideoSizeChanged(width, height);
+            }
+        }
     }
 
     @Override
@@ -1160,6 +1165,11 @@ public class PLVECLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
                                 } else {
                                     linkMicBgIv.setImageBitmap(bitmapDrawable.getBitmap());
                                 }
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                PLVCommonLog.warn(throwable);
                             }
                         });
             }

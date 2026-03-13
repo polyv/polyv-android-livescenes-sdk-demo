@@ -70,12 +70,39 @@ public interface IPLVFloatingLayout {
     Point getFloatLocation();
 
     /**
+     * 启用缩放功能
+     */
+    void setEnableScale(boolean enableScale);
+
+    /**
+     * 设置缩放范围
+     */
+    void setScaleRange(float minScale, float maxScale);
+
+    /**
+     * 获取当前缩放比例
+     */
+    float getCurrentScale();
+
+    /**
+     * 重置缩放比例
+     */
+    void resetScale();
+
+    /**
+     * 设置缩放比例
+     */
+    void setScale(float scale);
+
+    /**
+     * 启用收起功能
+     */
+    void setEnableCollapse(boolean enableCollapse);
+
+    /**
      * 销毁
      */
     void destroy();
-
-
-
 
 
 }

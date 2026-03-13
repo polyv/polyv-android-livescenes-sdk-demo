@@ -227,7 +227,9 @@ public class PLVFloatingPlayerManager {
                 .setSize(width, height)
                 .setFloatLocation(left, top)
                 .setShowType(showType)
-                .setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType.NO_AUTO_MOVE)
+                .setEnableCollapse(true)
+                .setEnableScale(true)
+                .setAutoMoveToEdge(PLVFloatingEnums.AutoEdgeType.AUTO_MOVE_TO_NEAREST_EDGE)
                 .build()
                 .show((Activity) floatingView.getContext());
     }

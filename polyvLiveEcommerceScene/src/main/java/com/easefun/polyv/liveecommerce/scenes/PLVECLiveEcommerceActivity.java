@@ -1080,6 +1080,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
             }
 
             @Override
+            public void onMixStreamVideoSizeChanged(int width, int height) {
+                if (videoLayout != null) {
+                    videoLayout.onRtcMixStreamVideoSizeChanged(width, height);
+                }
+            }
+
+            @Override
             public void onJoinRtcChannel() {
                 //更新播放器布局
                 videoLayout.updateWhenJoinRTC(linkMicLayout.getLandscapeWidth());
@@ -1318,6 +1325,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
         }
 
         @Override
+        public void onShowMyRewardAction() {
+            if (popoverLayout != null) {
+                popoverLayout.getIARLayout().showLotteryRecord();
+            }
+        }
+
+        @Override
         public void onViewCreated() {
             observerDataToLiveHomeFragment();
             setupPopoverLayout();
@@ -1422,6 +1436,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
         @Override
         public void setShowSubtitles(List<PLVPlaybackSubtitleVO> subtitles) {
             videoLayout.setShowSubtitles(subtitles);
+        }
+
+        @Override
+        public void onShowMyRewardAction() {
+            if (popoverLayout != null) {
+                popoverLayout.getIARLayout().showLotteryRecord();
+            }
         }
 
         @Override

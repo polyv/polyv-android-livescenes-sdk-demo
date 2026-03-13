@@ -94,6 +94,12 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                             onViewActionListener.onScreenshot();
                         }
                         break;
+                    case PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MY_REWARD:
+                        popupWindow.dismiss();
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onShowMyRewardAction();
+                        }
+                        break;
                     default:
                         popupWindow.dismiss();
                         if (onViewActionListener != null) {
@@ -140,6 +146,7 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
                     return;
                 }
                 updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
+                updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MY_REWARD, liveClassDetail.getData().isMyRewardsEnabled());
             }
         });
     }
@@ -184,6 +191,11 @@ public class PLVLCChatMoreFloatingView extends FrameLayout {
          * 截屏
          */
         void onScreenshot();
+
+        /**
+         * 显示我的奖励
+         */
+        void onShowMyRewardAction();
 
         /**
          * 点击了动态功能控件

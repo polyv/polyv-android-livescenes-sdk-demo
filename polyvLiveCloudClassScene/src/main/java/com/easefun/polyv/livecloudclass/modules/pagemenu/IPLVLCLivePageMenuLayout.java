@@ -261,6 +261,11 @@ public interface IPLVLCLivePageMenuLayout {
          * 修改实时字幕翻译语言
          */
         void onSetSubtitleTranslateLanguage(String language);
+
+        /**
+         * 显示我的奖励
+         */
+        void onShowMyRewardAction();
     }
     // </editor-fold>
 }

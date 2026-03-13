@@ -235,6 +235,11 @@ public interface IPLVECVideoLayout {
     ViewGroup getRtcMixStreamContainer();
 
     /**
+     * rtc混流观看尺寸变化回调
+     */
+    void onRtcMixStreamVideoSizeChanged(int width, int height);
+
+    /**
      * 当加入RTC时，更新布局
      *
      * @param linkMicLayoutLandscapeWidth 连麦布局在横屏的宽度

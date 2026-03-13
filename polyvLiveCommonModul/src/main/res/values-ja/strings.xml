@@ -732,4 +732,5 @@
     <string name="plv_live_subtitle_setting_language">字幕言語</string>
     <string name="plv_live_subtitle_language_origin_not_translated">原文（翻訳しない）</string>
     <string name="plv_live_subtitle_not_show">字幕を表示しない</string>
+    <string name="plv_interact_my_reward">私のご褒美</string>
 </resources>

@@ -1205,31 +1205,36 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     //文本类型发言
                     case PLVEventConstant.Chatroom.MESSAGE_EVENT_SPEAK:
                         final PLVSpeakEvent speakEvent = PLVEventHelper.toMessageEventModel(message, PLVSpeakEvent.class);
-                        if (speakEvent != null && speakEvent.getUser() != null) {
-                            parseSpeakEventFileData(speakEvent);
-                            parseSpeakEventOverLength(speakEvent);
-                            if (!PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(speakEvent.getUser().getUserId())) {
-                                //把带表情的信息解析保存下来
-                                speakEvent.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(convertSpecialString(speakEvent.getValues().get(0)), getSpeakEmojiSizes(), Utils.getApp()));
-                                //被回复人信息
-                                PLVChatQuoteVO chatQuoteVO = speakEvent.getQuote();
-                                if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
-                                    chatQuoteVO.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(convertSpecialString(chatQuoteVO.getContent()), getSpeakEmojiSizes(), Utils.getApp()));
-                                }
-                                chatMessage = speakEvent;
-                                itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
-                                isSpecialType = PLVEventHelper.isSpecialType(speakEvent.getUser().getUserType());
-                                specialTypeUserId = speakEvent.getUser().getUserId();
-                                callbackToView(new ViewRunnable() {
-                                    @Override
-                                    public void run(IPLVChatroomContract.IChatroomView view) {
-                                        view.onSpeakEvent(speakEvent);
-                                    }
-                                });
-                                if (!speakEvent.isFileShareEvent()) {
-                                    chatroomData.postSpeakMessageData((CharSequence) speakEvent.getObjects()[0], isSpecialType);
-                                }
+                        if (speakEvent == null || speakEvent.getUser() == null) {
+                            break;
+                        }
+                        parseSpeakEventFileData(speakEvent);
+                        parseSpeakEventOverLength(speakEvent);
+                        if (!PLVChatroomManager.getInstance().sendReliableMessageCallback(speakEvent)) {
+                            break;
+                        }
+                        if (PLVSocketWrapper.getInstance().getLoginVO().getUserId().equals(speakEvent.getUser().getUserId())) {
+                            break;
+                        }
+                        //把带表情的信息解析保存下来
+                        speakEvent.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(convertSpecialString(speakEvent.getValues().get(0)), getSpeakEmojiSizes(), Utils.getApp()));
+                        //被回复人信息
+                        PLVChatQuoteVO chatQuoteVO = speakEvent.getQuote();
+                        if (chatQuoteVO != null && chatQuoteVO.isSpeakMessage()) {
+                            chatQuoteVO.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(convertSpecialString(chatQuoteVO.getContent()), getSpeakEmojiSizes(), Utils.getApp()));
+                        }
+                        chatMessage = speakEvent;
+                        itemType = PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK;
+                        isSpecialType = PLVEventHelper.isSpecialType(speakEvent.getUser().getUserType());
+                        specialTypeUserId = speakEvent.getUser().getUserId();
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(IPLVChatroomContract.IChatroomView view) {
+                                view.onSpeakEvent(speakEvent);
                             }
+                        });
+                        if (!speakEvent.isFileShareEvent()) {
+                            chatroomData.postSpeakMessageData((CharSequence) speakEvent.getObjects()[0], isSpecialType);
                         }
                         break;
                     //图片类型发言
