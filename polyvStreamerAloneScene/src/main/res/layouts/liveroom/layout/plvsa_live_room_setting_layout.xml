@@ -402,6 +402,32 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/plvsa_setting_live_template_layout"
+                android:layout_width="62dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:id="@+id/plvsa_setting_live_template_layout_iv"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="13dp"
+                    android:src="@drawable/plvsa_live_setting_template" />
+
+                <TextView
+                    android:id="@+id/plvsa_setting_live_template_layout_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/plv_streamer_setting_template"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/plvsa_setting_media_overlay_layout"
                 android:layout_width="62dp"
                 android:layout_height="wrap_content"

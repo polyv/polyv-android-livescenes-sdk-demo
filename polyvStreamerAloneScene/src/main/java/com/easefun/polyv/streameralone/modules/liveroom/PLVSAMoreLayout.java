@@ -34,6 +34,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.template.PLVTemplateController;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVFlexboxLayoutExtKt;
@@ -154,6 +155,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView moreGiftEffectTv;
     private ViewGroup moreWaterLayout;
     private ViewGroup moreVirtualBgLayout;
+    private ViewGroup moreTemplateLayout;
     private TextView moreSettingsInteractTv;
     private FlexboxLayout moreSettingsInteractLayout;
     private LinearLayout settingMediaOverlayLayout;
@@ -279,6 +281,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftEffectTv = findViewById(R.id.plvsa_more_gift_effect_tv);
         moreWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
         moreVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_bg_layout);
+        moreTemplateLayout = findViewById(R.id.plvsa_setting_template_layout);
         moreSettingsInteractTv = findViewById(R.id.plvsa_more_settings_interact_tv);
         moreSettingsInteractLayout = findViewById(R.id.plvsa_more_settings_interact_layout);
         settingMediaOverlayLayout = findViewById(R.id.plvsa_setting_media_overlay_layout);
@@ -314,6 +317,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreGiftEffectLayout.setOnClickListener(this);
         moreWaterLayout.setOnClickListener(this);
         moreVirtualBgLayout.setOnClickListener(this);
+        moreTemplateLayout.setOnClickListener(this);
         settingMediaOverlayLayout.setOnClickListener(this);
 
         plvsaMoreCloseRoomIv.setSelected(PolyvChatroomManager.getInstance().isCloseRoom());
@@ -518,6 +522,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
         if (moreWaterLayout != null) {
             moreWaterLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
+        }
+        if (moreTemplateLayout != null) {
+            moreTemplateLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
         }
         screenShareFloatMessageLayout.init(liveRoomDataManager);
         initBitrateMapIcon();
@@ -796,8 +803,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                     boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                             .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+                    boolean enabled = showWatermarkButton && !isShare && !hasLinkMicUser;
                     if (moreWaterLayout != null) {
-                        moreWaterLayout.setVisibility((showWatermarkButton && !isShare && !hasLinkMicUser) ? View.VISIBLE : View.GONE);
+                        moreWaterLayout.setVisibility(enabled ? View.VISIBLE : View.GONE);
+                    }
+                    if (moreTemplateLayout != null) {
+                        moreTemplateLayout.setVisibility(enabled ? View.VISIBLE : View.GONE);
                     }
                 }
             });
@@ -820,8 +831,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             this.hasLinkMicUser = hasHasLinkMicUser;
             boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                     .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
+            boolean enabled = showWatermarkButton && !isShare && !hasHasLinkMicUser;
             if (moreWaterLayout != null) {
-                moreWaterLayout.setVisibility((showWatermarkButton && !isShare && !hasHasLinkMicUser) ? View.VISIBLE : View.GONE);
+                moreWaterLayout.setVisibility(enabled ? View.VISIBLE : View.GONE);
+            }
+            if (moreTemplateLayout != null) {
+                moreTemplateLayout.setVisibility(enabled ? View.VISIBLE : View.GONE);
             }
         }
     };
@@ -983,6 +998,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             PLVSAStickerLayout.tryShow();
         } else if (id == moreVirtualBgLayout.getId()) {
             PLVVirtualBackgroundLayout.tryShow();
+        } else if (id == moreTemplateLayout.getId()) {
+            PLVTemplateController.tryShowTemplateDialog();
         } else if (id == settingMediaOverlayLayout.getId()) {
             close();
             if (onViewActionListener != null) {

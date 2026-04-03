@@ -26,6 +26,10 @@ public class PLVInteractEntranceLayout extends FrameLayout {
     private ImageView plvQuestionIv;
     private TextView plvQuestionTv;
 
+    private LinearLayout plvAnswerSheetLy;
+    private ImageView plvAnswerSheetIv;
+    private TextView plvAnswerSheetTv;
+
     private OnViewActionListener onViewActionListener;
     // </editor-folder>
 
@@ -60,6 +64,19 @@ public class PLVInteractEntranceLayout extends FrameLayout {
                 }
             }
         });
+
+        plvAnswerSheetLy = (LinearLayout) findViewById(R.id.plv_answer_ly);
+        plvAnswerSheetIv = (ImageView) findViewById(R.id.plv_answer_iv);
+        plvAnswerSheetTv = (TextView) findViewById(R.id.plv_answer_tv);
+
+        plvAnswerSheetLy.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowAnswerSheet();
+                }
+            }
+        });
     }
     // </editor-folder>
 
@@ -68,9 +85,11 @@ public class PLVInteractEntranceLayout extends FrameLayout {
         if (isCloudClassStyle) {
             setBackgroundColor(Color.parseColor("#1A1B1F"));
             plvQuestionLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_lc);
+            plvAnswerSheetLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_lc);
         } else {
             setBackgroundColor(Color.parseColor("#00000000"));
             plvQuestionLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_ec);
+            plvAnswerSheetLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_ec);
         }
     }
 
@@ -91,8 +110,12 @@ public class PLVInteractEntranceLayout extends FrameLayout {
                 if (dataBean.isShow()) {
                     isShowLayout = true;
                 }
-                //暂时只处理问卷
-                break;
+            } else if (dataBean.isShowAnswerSheetEvent()) {
+                plvAnswerSheetLy.setVisibility(dataBean.isShow() ? View.VISIBLE : View.GONE);
+                plvAnswerSheetTv.setText(dataBean.getTitle());
+                if (dataBean.isShow()) {
+                    isShowLayout = true;
+                }
             }
         }
         setVisibility(isShowLayout ? View.VISIBLE : View.GONE);
@@ -106,6 +129,11 @@ public class PLVInteractEntranceLayout extends FrameLayout {
          * 显示问卷
          */
         void onShowQuestionnaire();
+
+        /**
+         * 显示答题卡
+         */
+        void onShowAnswerSheet();
     }
     // </editor-folder>
 }

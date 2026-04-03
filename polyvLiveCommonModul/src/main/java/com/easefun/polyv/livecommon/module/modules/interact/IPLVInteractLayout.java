@@ -83,6 +83,11 @@ public interface IPLVInteractLayout {
     void showQuestionnaire();
 
     /**
+     * 显示答题卡
+     */
+    void showAnswerSheet();
+
+    /**
      * 显示卡片推送
      */
     void showCardPush(PLVShowPushCardEvent showPushCardEvent);

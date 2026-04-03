@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/vg_template"
+    android:layout_width="128dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/plv_template_item_bg"
+    android:orientation="vertical"
+    android:padding="2dp"
+    app:plv_radius="8dp">
+
+    <FrameLayout
+        android:id="@+id/iv_template_ll"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginBottom="8dp">
+        <!-- 模版图片 -->
+        <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+            android:id="@+id/iv_template_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F5F5F5"
+            android:scaleType="centerCrop"
+            app:plv_mode_iv="top"
+            app:plv_radius_iv="8dp" />
+
+        <ImageView
+            android:id="@+id/iv_template_sel_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:src="@drawable/plv_template_sel_ic"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+    <!-- 模版名称 -->
+    <TextView
+        android:id="@+id/tv_template_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_template_ll"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="模版名称"
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

@@ -734,4 +734,7 @@
     <string name="plv_live_subtitle_language_origin_not_translated">원문 (번역하지 않음)</string>
     <string name="plv_live_subtitle_not_show">텍스트 트랙 표시 안 함</string>
     <string name="plv_interact_my_reward">나의 보상</string>
+    <string name="plv_streamer_setting_template">템플릿</string>
+    <string name="plv_streamer_setting_template_no_support_tips">가로에서 템플릿을 설정할 수 없습니다. 세로로 전환한 후 다시 시도하십시오!</string>
+    <string name="plv_common_text_no_data">데이터 없음</string>
 </resources>

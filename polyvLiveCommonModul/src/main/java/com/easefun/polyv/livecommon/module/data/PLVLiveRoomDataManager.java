@@ -10,6 +10,10 @@ import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfigFiller;
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.easefun.polyv.livescenes.model.template.PLVWaterTemplateVO;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
@@ -21,9 +25,17 @@ import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.ResponseBody;
 
 /**
  * 直播间数据管理器，实现IPLVLiveRoomDataManager接口。
@@ -75,6 +87,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<PLVPlaybackChannelDetailVO>> playbackChannelDetailVO = new MutableLiveData<>();
     //打赏配置
     private MutableLiveData<PLVStatefulData<PLVRewardSettingVO>> rewardSettingVO = new MutableLiveData<>();
+    //模版列表
+    private MutableLiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> templateListVO = new MutableLiveData<>();
     //直播场次Id
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
     //聊天室token
@@ -174,6 +188,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<PLVRewardSettingVO>> getRewardSettingData() {
         return rewardSettingVO;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> getTemplateListData() {
+        return templateListVO;
     }
 
     @Override
@@ -482,6 +501,43 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             @Override
             public void onFailed(String msg, Throwable throwable) {
                 rewardSettingVO.postValue(PLVStatefulData.<PLVRewardSettingVO>error(msg, throwable));
+            }
+        });
+    }
+
+    @Override
+    public void requestTemplateList() {
+        liveRoomDataRequester.requestTemplateList(new PLVLiveRoomDataRequester.IPLVNetRequestListener<ResponseBody>() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) {
+                try {
+                    JSONObject json = new JSONObject(responseBody.string());
+                    int code = json.optInt("statusCode");
+                    if (code == 200) {
+                        JSONObject jsonData = json.optJSONObject("data");
+                        if (jsonData != null) {
+                            JSONArray templateList = jsonData.optJSONArray("list");
+                            if (templateList != null) {
+                                Type listType = new TypeToken<List<PLVWaterTemplateVO>>() {
+                                }.getType();
+                                List<PLVWaterTemplateVO> dataList = new Gson().fromJson(templateList.toString(), listType);
+                                templateListVO.postValue(PLVStatefulData.success(dataList));
+                            }
+                        }
+                    } else {
+                        String message = json.optString("message");
+                        templateListVO.postValue(PLVStatefulData.error(message, new Throwable(message)));
+                    }
+                } catch (IOException | JSONException e) {
+                    PLVCommonLog.warn(e);
+                    templateListVO.postValue(PLVStatefulData.error(e.getMessage(), e));
+                }
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                PLVCommonLog.warn(throwable);
+                templateListVO.postValue(PLVStatefulData.error(msg, throwable));
             }
         });
     }

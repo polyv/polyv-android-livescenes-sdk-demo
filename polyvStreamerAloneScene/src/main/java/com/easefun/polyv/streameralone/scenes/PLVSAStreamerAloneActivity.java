@@ -373,6 +373,8 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         liveRoomDataManager.requestChannelDetail();
         // 进行网络请求，请求打赏配置
         liveRoomDataManager.requestRewardSetting();
+        // 进行网络请求，请求模版列表
+        liveRoomDataManager.requestTemplateList();
     }
     // </editor-fold>
 

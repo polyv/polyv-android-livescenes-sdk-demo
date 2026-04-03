@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class PLVPhotoContainer extends RelativeLayout {
     private float mAspectRatio = DEFAULT_ASPECT_RATIO;
     private int mContainerWidth = 0;
     private int mContainerHeight = 0;
+    private boolean isFeatureEnabled;
     private OnViewActionListener mOnViewActionListener;
 
     public PLVPhotoContainer(Context context) {
@@ -228,6 +230,14 @@ public class PLVPhotoContainer extends RelativeLayout {
         updateContainerLayout();
     }
 
+    public void setFeatureEnabled(boolean enabled) {
+        this.isFeatureEnabled = enabled;
+    }
+
+    public boolean isFeatureEnabled() {
+        return isFeatureEnabled;
+    }
+
     public void setSettingFinished(boolean settingFinished) {
         isSettingFinished = settingFinished;
     }
@@ -241,10 +251,53 @@ public class PLVPhotoContainer extends RelativeLayout {
         updateContainerLayout();
     }
 
-    public void addImage(String path) {
+    public void clear() {
+        for (int i = mStickerContainer.getChildCount() - 1; i >= 0; i--) {
+            View child = mStickerContainer.getChildAt(i);
+            if (child instanceof IPLVToggleView) {
+                ((IPLVToggleView) child).removeFromParent();
+            }
+        }
+    }
+
+    public void addImage(String path, double x, double y, double width, double height, Runnable finishRunnable) {
+        PLVStickerImageView imageView = addImage(path);
+        if (imageView == null) {
+            return;
+        }
+        Runnable setImageSizeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                params.width = (int) (mStickerContainer.getWidth() * (float) width);
+                params.height = (int) (mStickerContainer.getHeight() * (float) height);
+                imageView.setLayoutParams(params);
+                imageView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.setX(mStickerContainer.getWidth() * (float) x);
+                        imageView.setY(mStickerContainer.getHeight() * (float) y);
+                        if (finishRunnable != null) {
+                            finishRunnable.run();
+                        }
+                    }
+                });
+            }
+        };
+        setImageSizeRunnable.run();
+        imageView.setOnImageSizeChangeListener(new PLVStickerImageView.OnImageSizeChangeListener() {
+            @Override
+            public void onImageSizeChange(int srcWidth, int srcHeight) {
+                setImageSizeRunnable.run();
+                imageView.toggleBorder(false);
+            }
+        });
+    }
+
+    public PLVStickerImageView addImage(String path) {
         if (getImageCount() >= MAX_IMAGE_COUNT) {
             ToastUtils.showShort("最多添加10张图片"); // no need i18n
-            return;
+            return null;
         }
         final PLVStickerImageView imageView = new PLVStickerImageView(getContext(), 160);
         imageView.setOnClickListener(new OnClickListener() {
@@ -303,6 +356,7 @@ public class PLVPhotoContainer extends RelativeLayout {
         imageView.setOnTouchListener(new PLVStickerTouchController(getContext(), mDeleteTextView));
         mStickerContainer.addView(imageView);
         onEditMode(true);
+        return imageView;
     }
 
     public void previewTextSticker() {
@@ -314,10 +368,33 @@ public class PLVPhotoContainer extends RelativeLayout {
         addText(PLVStickerTextSelectLayout.stickerTextModels[0].text, PLVStickerTextSelectLayout.stickerTextModels[0].style);
     }
 
-    public void addText(final String text, final int style) {
+    public void addText(final String text, final int style, double x, double y, double width, double height) {
+        PLVStickerTextView textView = addText(text, style);
+        if (textView == null) {
+            return;
+        }
+        textView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (x <= 0.5) {
+                    textView.setX(mStickerContainer.getWidth() * (float) x);
+                } else {
+                    textView.setX((float) (mStickerContainer.getWidth() - textView.getWidth() - mStickerContainer.getWidth() * (1 - x - width)));
+                }
+                if (y <= 0.5) {
+                    textView.setY(mStickerContainer.getHeight() * (float) y);
+                } else {
+                    textView.setY((float) (mStickerContainer.getHeight() - textView.getHeight() - mStickerContainer.getHeight() * (1 - y - height)));
+                }
+                textView.toggleBorder(false);
+            }
+        });
+    }
+
+    public PLVStickerTextView addText(final String text, final int style) {
         if (getTextCount() >= MAX_TEXT_COUNT) {
             ToastUtils.showShort("最多添加10个文字贴图");
-            return;
+            return null;
         }
         final PLVStickerTextView textView = new PLVStickerTextView(getContext());
         textView.setText(text, style);
@@ -389,6 +466,7 @@ public class PLVPhotoContainer extends RelativeLayout {
         if (mStickerTextSelectLayout.isShowing()) {
             mPreviewTextView = textView;
         }
+        return textView;
     }
 
     private void onEditMode(boolean isEditMode) {
@@ -449,7 +527,7 @@ public class PLVPhotoContainer extends RelativeLayout {
         return bitmap;
     }
 
-    private void hideAllBorders() {
+    public void hideAllBorders() {
         for (int i = 0; i < mStickerContainer.getChildCount(); i++) {
             View child = mStickerContainer.getChildAt(i);
             if (child instanceof IPLVToggleView) {

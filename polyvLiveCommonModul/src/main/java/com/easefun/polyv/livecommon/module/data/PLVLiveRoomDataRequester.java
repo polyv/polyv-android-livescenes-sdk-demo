@@ -12,6 +12,7 @@ import com.plv.foundationsdk.net.PLVResponseExcutor;
 import com.plv.foundationsdk.net.PLVrResponseCallback;
 import com.plv.foundationsdk.rx.PLVRxBaseRetryFunction;
 import com.plv.foundationsdk.rx.PLVRxBaseTransformer;
+import com.plv.foundationsdk.sign.PLVSignCreator;
 import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.livescenes.feature.pointreward.IPLVPointRewardDataSource;
 import com.plv.livescenes.feature.pointreward.PLVRewardDataSource;
@@ -27,6 +28,9 @@ import com.plv.livescenes.net.PLVApiManager;
 import com.plv.socket.user.PLVSocketUserConstant;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -59,6 +63,7 @@ public class PLVLiveRoomDataRequester {
     private Disposable updateChannelNameDisposable;
     private Disposable lessonDetailDisposable;
     private Disposable playbackChannelDetail;
+    private Disposable requestTemplateListDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -450,6 +455,42 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-folder>
 
+    // <editor-folder defaultstate="collapsed" desc="请求模版列表">
+    void requestTemplateList(final IPLVNetRequestListener<ResponseBody> listener) {
+        disposeTemplateList();
+        String appId = getConfig().getAccount().getAppId();
+        String appSecret = getConfig().getAccount().getAppSecret();
+        long timestamp = System.currentTimeMillis();
+        Map<String, String> map = new HashMap<>();
+        map.put("appId", appId);
+        map.put("timestamp", String.valueOf(timestamp));
+        String sign = PLVSignCreator.createSign(appSecret, map);
+        requestTemplateListDisposable = PLVApiManager.getPlvLiveStatusApi().getMobileTemplates(appId, timestamp + "", sign, PLVSignCreator.getSignatureMethod())
+                .compose(new PLVRxBaseTransformer<ResponseBody, ResponseBody>())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody plvTemplateListVO) throws Exception {
+                        if (listener != null) {
+                            listener.onSuccess(plvTemplateListVO);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposeTemplateList() {
+        if (requestTemplateListDisposable != null) {
+            requestTemplateListDisposable.dispose();
+        }
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -461,6 +502,7 @@ public class PLVLiveRoomDataRequester {
         disposeLessonDetail();
         disposePlayBackChannelDetail();
         disposeRewardSetting();
+        disposeTemplateList();
     }
     // </editor-fold>
 
