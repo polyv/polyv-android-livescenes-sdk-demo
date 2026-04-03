@@ -38,6 +38,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerV
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.template.PLVTemplateController;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
@@ -137,6 +138,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private LinearLayout settingLiveReplaySwitchLayout;
     private LinearLayout settingMoreLayout;
     private LinearLayout settingWaterLayout;
+    private LinearLayout settingTemplateLayout;
     private LinearLayout settingMediaOverlayLayout;
     private ViewGroup settingLayout;
     private LinearLayout settingVirtualBgLayout;
@@ -144,6 +146,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVSASettingMoreLayout settingMorePopupLayout;
     private PLVPhotoContainer waterLayout;
     private PLVVirtualBackgroundLayout virtualBackgroundLayout;
+    private PLVTemplateController templateController;
 
     private String liveTitle;
 
@@ -189,6 +192,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         super.onDetachedFromWindow();
         PLVVirtualBackgroundLayout.destroy();
         PLVSAStickerLayout.destroy();
+        PLVTemplateController.destroy();
     }
     // </editor-fold>
 
@@ -221,6 +225,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingMoreLayout = findViewById(R.id.plvsa_setting_more_layout);
         settingMorePopupLayout = new PLVSASettingMoreLayout(this);
         settingWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
+        settingTemplateLayout = findViewById(R.id.plvsa_setting_live_template_layout);
         settingMediaOverlayLayout = findViewById(R.id.plvsa_setting_media_overlay_layout);
         settingLayout = findViewById(R.id.plvsa_setting_ly);
         settingVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_background_layout);
@@ -242,9 +247,11 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingLiveReplaySwitchLayout.setOnClickListener(this);
         settingMoreLayout.setOnClickListener(this);
         settingWaterLayout.setOnClickListener(this);
+        settingTemplateLayout.setOnClickListener(this);
         settingMediaOverlayLayout.setOnClickListener(this);
         settingVirtualBgLayout.setOnClickListener(this);
 
+        initTemplateController();
         initWaterLayout();
         initTitleInputLayout();
         initBitrateLayout();
@@ -257,6 +264,10 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
         observeBeautyModuleInitResult();
         observeBeautyLayoutStatus();
+    }
+
+    private void initTemplateController() {
+        templateController = new PLVTemplateController(getContext());
     }
 
     private void initWaterLayout() {
@@ -330,6 +341,13 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 }
             }
         });
+        if (settingVirtualBgLayout.getVisibility() == View.VISIBLE) {
+            virtualBackgroundLayout.setFeatureEnabled(true);
+        }
+        templateController.setup(waterLayout, virtualBackgroundLayout);
+        if (!waterLayout.isFeatureEnabled() && !virtualBackgroundLayout.isFeatureEnabled()) {
+            settingTemplateLayout.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -666,6 +684,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         boolean showWatermarkButton = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
                 .getOrDefault(PLVChannelFeature.STREAMER_WATERMARK_ENABLE, false);
         settingWaterLayout.setVisibility(showWatermarkButton ? View.VISIBLE : View.GONE);
+        waterLayout.setFeatureEnabled(showWatermarkButton);
 
         // 监听图片分割初始化回调
         PLVImageSegmenterManager.getInstance().addInitCallback(new WeakReference<>(imageSegmenterInitCallback = new IPLVImageSegmenterManager.InitCallback() {
@@ -674,6 +693,9 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 PLVCommonLog.i(TAG, "onImageSegmenterFinishInit, code: " + code);
                 if (code == PLVImageSegmenterInitCode.SUCCESS) {
                     settingVirtualBgLayout.setVisibility(View.VISIBLE);
+                    if (virtualBackgroundLayout != null) {
+                        virtualBackgroundLayout.setFeatureEnabled(true);
+                    }
                 }
             }
         }));
@@ -731,6 +753,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         titleInputLayout.initTitle(liveTitle);
         bitrateLayout.init(liveRoomDataManager);
         mixLayout.init(liveRoomDataManager);
+        templateController.init(liveRoomDataManager);
         initButtonVisibility(liveRoomDataManager);
         initBitrateMapIcon();
         initStartLiveBtnText();
@@ -1005,7 +1028,6 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (!PLVDebounceClicker.tryClick(this)) {
             return;
         }
-        settingMorePopupLayout.dismiss();
         int id = v.getId();
         if (id == R.id.plvsa_setting_close_page_iv) {
             ((Activity) getContext()).onBackPressed();
@@ -1059,8 +1081,14 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                     });
         } else if (id == settingMoreLayout.getId()) {
             settingMorePopupLayout.show();
+            return;
         } else if (id == settingWaterLayout.getId()) {
             stickerLayout.open();
+        } else if (id == settingTemplateLayout.getId()) {
+            boolean result = templateController.showTemplateDialog();
+            if (!result) {
+                return;
+            }
         } else if (id == settingMediaOverlayLayout.getId()) {
             if (onViewActionListener != null) {
                 onViewActionListener.onShowMediaOverlaySetting();
@@ -1070,6 +1098,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                 virtualBackgroundLayout.show();
             }
         }
+        settingMorePopupLayout.dismiss();
     }
     // </editor-fold>
 

@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.utils.virtualbg;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,6 +25,7 @@ import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurUtils;
 import com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.google.gson.reflect.TypeToken;
+import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -34,6 +36,13 @@ import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class PLVVirtualBackgroundLayout {
     private static final String KEY_UPLOAD_VIRTUAL_BACKGROUND = "key_upload_virtual_background";
@@ -81,6 +90,7 @@ public class PLVVirtualBackgroundLayout {
     private boolean currentIsPortrait = false;
     private OnViewActionListener onViewActionListener;
     private boolean isUseBlackStyle;
+    private boolean isFeatureEnabled;
 
     public static PLVVirtualBackgroundLayout init(View anchorView, OnViewActionListener listener) {
         if (instance == null) {
@@ -176,6 +186,66 @@ public class PLVVirtualBackgroundLayout {
         if (isUseBlackStyle) {
             setUseBlackStyle();
         }
+    }
+
+    public void reset() {
+        selectedPosition = 0;
+        virtualBgTopAdapter.updateSelected(0);
+        virtualBgBottomAdapter.updateSelected(-1);
+        SPUtils.getInstance().put(KEY_SELECT_VIRTUAL_BACKGROUND, 0);
+        onCallBySelectedBg(0, virtualBgTopAdapter.dataList, true);
+    }
+
+    public void setBgByStyle(int id) {
+        int position = id - 1;
+        if (position >= 0 && position < virtualBgImageIdList.size()) {
+            Bitmap bitmap;
+            int drawableId = virtualBgImageIdList.get(position);
+            bitmap = PLVBitmapUtil.getBitmapFromResource(view.getContext(), drawableId);
+            selectedPosition = -1;
+            virtualBgTopAdapter.updateSelected(-1);
+            if (onViewActionListener != null) {
+                onViewActionListener.onSelectedBg(bitmap);
+            }
+        }
+    }
+
+    public void setBgByUrl(String url) {
+        Disposable loadBgDisposable = Observable.just(1).map(new Function<Integer, BitmapDrawable>() {
+                    @Override
+                    public BitmapDrawable apply(Integer integer) throws Exception {
+                        return (BitmapDrawable) PLVImageLoader.getInstance().getImageAsDrawable(view.getContext(), url);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<BitmapDrawable>() {
+                    @Override
+                    public void accept(BitmapDrawable bitmapDrawable) throws Exception {
+                        if (bitmapDrawable == null) {
+                            return;
+                        }
+                        Bitmap bitmapBg = bitmapDrawable.getBitmap();
+                        selectedPosition = -1;
+                        virtualBgTopAdapter.updateSelected(-1);
+                        if (onViewActionListener != null) {
+                            onViewActionListener.onSelectedBg(bitmapBg);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.warn(throwable);
+                    }
+                });
+    }
+
+    public void setFeatureEnabled(boolean isFeatureEnabled) {
+        this.isFeatureEnabled = isFeatureEnabled;
+    }
+
+    public boolean isFeatureEnabled() {
+        return isFeatureEnabled;
     }
 
     public void setUseBlackStyle() {

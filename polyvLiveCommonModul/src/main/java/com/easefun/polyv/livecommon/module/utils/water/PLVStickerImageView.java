@@ -31,6 +31,7 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
     private Drawable finishDrawable;
     private Rect finishRect = new Rect();
     private OnToggleBorderListener mOnToggleBorderListener;
+    private OnImageSizeChangeListener mOnImageSizeChangeListener;
 
     public PLVStickerImageView(Context context, int maxSizeDp) {
         super(context);
@@ -127,7 +128,7 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
                         if (bitmap == null) {
                             return;
                         }
-                        adjustImageSize(bitmap);
+                        int[] targetSize = adjustImageSize(bitmap);
                         if (mUseNormalDrawable) {
                             mDrawable = resource;
                         } else {
@@ -140,11 +141,14 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
                             );
                         }
                         setImageDrawable(mBorderDrawable != null ? mBorderDrawable : mDrawable);
+                        if (mOnImageSizeChangeListener != null) {
+                            mOnImageSizeChangeListener.onImageSizeChange(targetSize[0], targetSize[1]);
+                        }
                     }
                 });
     }
 
-    private void adjustImageSize(Bitmap bitmap) {
+    private int[] adjustImageSize(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         float ratio = (float) width / height;
@@ -166,6 +170,7 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
             params.height = targetHeight;
         }
         setLayoutParams(params);
+        return new int[]{targetWidth, targetHeight};
     }
 
     public void toggleBorder(boolean show) {
@@ -221,6 +226,10 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
         mOnToggleBorderListener = onToggleBorderListener;
     }
 
+    public void setOnImageSizeChangeListener(OnImageSizeChangeListener onImageSizeChangeListener) {
+        mOnImageSizeChangeListener = onImageSizeChangeListener;
+    }
+
     public interface OnToggleBorderListener {
         void onToggleBorder(boolean show, View view);
 
@@ -231,5 +240,9 @@ public class PLVStickerImageView extends ImageView implements IPLVToggleView {
         boolean isEditMode();
 
         boolean isSettingFinished();
+    }
+
+    public interface OnImageSizeChangeListener {
+        void onImageSizeChange(int width, int height);
     }
 }

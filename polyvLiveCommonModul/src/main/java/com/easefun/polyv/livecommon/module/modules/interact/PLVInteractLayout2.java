@@ -329,6 +329,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     }
 
     @Override
+    public void showAnswerSheet() {
+        String data = "{\"event\" : \"SHOW_ANSWER_CARD\"}";
+        plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
     public void showCardPush(PLVShowPushCardEvent showPushCardEvent) {
         String data = PLVGsonUtil.toJsonSimple(showPushCardEvent);
         plvlcInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {

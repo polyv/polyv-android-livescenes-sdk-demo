@@ -401,6 +401,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                     onViewActionListener.onShowQuestionnaire();
                 }
             }
+
+            @Override
+            public void onShowAnswerSheet() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowAnswerSheet();
+                }
+            }
         });
 
         //评论上墙
@@ -1250,6 +1257,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         //显示问卷
         void onShowQuestionnaire();
+
+        //显示答题卡
+        void onShowAnswerSheet();
 
         /**
          * 当前是否无延迟模式

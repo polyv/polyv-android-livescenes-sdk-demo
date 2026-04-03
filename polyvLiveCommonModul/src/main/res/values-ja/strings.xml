@@ -733,4 +733,7 @@
     <string name="plv_live_subtitle_language_origin_not_translated">原文（翻訳しない）</string>
     <string name="plv_live_subtitle_not_show">字幕を表示しない</string>
     <string name="plv_interact_my_reward">私のご褒美</string>
+    <string name="plv_streamer_setting_template">テンプレート</string>
+    <string name="plv_streamer_setting_template_no_support_tips">横画面でのテンプレート設定はしばらくサポートされていません。縦画面に切り替えて再試行してください！</string>
+    <string name="plv_common_text_no_data">データが一時的にありません</string>
 </resources>

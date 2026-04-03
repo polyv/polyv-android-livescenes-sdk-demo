@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 底部弹窗样式 -->
+    <style name="PLVTheme.Dialog.BottomSheet" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowAnimationStyle">@style/PLVAnimation.BottomSheet</item>
+    </style>
+
+    <!-- 底部弹窗动画 -->
+    <style name="PLVAnimation.BottomSheet" parent="Animation.AppCompat.Dialog">
+        <item name="android:windowEnterAnimation">@anim/plv_slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/plv_slide_out_bottom</item>
+    </style>
+</resources>

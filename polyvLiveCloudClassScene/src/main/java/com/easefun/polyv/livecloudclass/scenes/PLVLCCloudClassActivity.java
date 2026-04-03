@@ -1043,6 +1043,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             }
 
             @Override
+            public void onShowAnswerSheet() {
+                if (popoverLayout != null) {
+                    popoverLayout.getInteractLayout().showAnswerSheet();
+                }
+            }
+
+            @Override
             public void onClickChatMoreDynamicFunction(String event) {
                 if (popoverLayout != null) {
                     popoverLayout.getInteractLayout().onCallDynamicFunction(event);

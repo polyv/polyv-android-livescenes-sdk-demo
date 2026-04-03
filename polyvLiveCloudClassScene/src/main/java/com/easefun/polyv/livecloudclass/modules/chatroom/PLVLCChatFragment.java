@@ -550,6 +550,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     onViewActionListener.onShowQuestionnaire();
                 }
             }
+
+            @Override
+            public void onShowAnswerSheet() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowAnswerSheet();
+                }
+            }
         });
 
         chatReplyLayout = findViewById(R.id.plvlc_chat_reply_layout);
@@ -1773,6 +1780,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 显示问卷
          */
         void onShowQuestionnaire();
+
+        /**
+         * 显示答题卡
+         */
+        void onShowAnswerSheet();
 
         /**
          * 点击了动态功能控件

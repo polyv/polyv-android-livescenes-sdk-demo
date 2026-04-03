@@ -1275,6 +1275,13 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
         }
 
         @Override
+        public void onShowAnswerSheet() {
+            if (popoverLayout != null) {
+                popoverLayout.getInteractLayout().showAnswerSheet();
+            }
+        }
+
+        @Override
         public boolean isCurrentLowLatencyMode() {
             return videoLayout.isCurrentLowLatencyMode();
         }

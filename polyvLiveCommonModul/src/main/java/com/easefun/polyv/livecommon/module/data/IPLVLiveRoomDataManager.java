@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.easefun.polyv.livescenes.model.template.PLVWaterTemplateVO;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
@@ -134,6 +135,11 @@ public interface IPLVLiveRoomDataManager {
      * @return
      */
     LiveData<PLVStatefulData<PLVRewardSettingVO>> getRewardSettingData();
+
+    /**
+     * 获取模板列表LiveData
+     */
+    LiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> getTemplateListData();
 
     /**
      * 获取请求商品接口的rank
@@ -266,6 +272,11 @@ public interface IPLVLiveRoomDataManager {
      * 请求打赏设置
      */
     void requestRewardSetting();
+
+    /**
+     * 请求模版列表
+     */
+    void requestTemplateList();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

@@ -221,6 +221,11 @@ public interface IPLVLCLivePageMenuLayout {
         void onShowQuestionnaire();
 
         /**
+         * 显示答题卡
+         */
+        void onShowAnswerSheet();
+
+        /**
          * 点击了聊天室更多-动态功能按钮
          *
          * @param event 功能event

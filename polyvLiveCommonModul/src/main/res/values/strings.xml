@@ -734,4 +734,7 @@
     <string name="plv_live_subtitle_language_origin_not_translated">Original text (without translation)</string>
     <string name="plv_live_subtitle_not_show">Do not display subtitles</string>
     <string name="plv_interact_my_reward">My reward</string>
+    <string name="plv_streamer_setting_template">template</string>
+    <string name="plv_streamer_setting_template_no_support_tips">We currently do not support setting templates in landscape mode. Please switch to portrait mode and try again!</string>
+    <string name="plv_common_text_no_data">No data available</string>
 </resources>

@@ -836,6 +836,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                         onViewActionListener.onShowQuestionnaire();
                     }
                 }
+
+                @Override
+                public void onShowAnswerSheet() {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowAnswerSheet();
+                    }
+                }
             });
             pageMenuTabFragmentList.add(chatFragment);
         }
