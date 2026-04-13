@@ -737,4 +737,5 @@
     <string name="plv_streamer_setting_template">模版</string>
     <string name="plv_streamer_setting_template_no_support_tips">暫不支持在橫屏設定模版，請切換到豎屏後重試！</string>
     <string name="plv_common_text_no_data">暫無數據</string>
+    <string name="plv_streamer_set_first_view_text">設為主畫面</string>
 </resources>

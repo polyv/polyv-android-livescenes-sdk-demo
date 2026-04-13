@@ -901,7 +901,13 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     }
                     if (PLVDebounceClicker.tryClick(this, 1000)) {
                         if (onViewActionListener != null) {
-                            String userId = dataList.get(pos).getSocketUserBean().getUserId();
+                            String userId = "";
+                            PLVLinkMicItemDataBean itemDataBean = dataList.get(pos).getLinkMicItemDataBean();
+                            if (itemDataBean != null) {
+                                userId = itemDataBean.getUserId();
+                            } else {
+                                userId = dataList.get(pos).getSocketUserBean().getUserId();
+                            }
                             onViewActionListener.onSetFirstView(memberListPos, userId, !v.isSelected());
                         }
                     }

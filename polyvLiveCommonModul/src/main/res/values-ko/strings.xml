@@ -737,4 +737,5 @@
     <string name="plv_streamer_setting_template">템플릿</string>
     <string name="plv_streamer_setting_template_no_support_tips">가로에서 템플릿을 설정할 수 없습니다. 세로로 전환한 후 다시 시도하십시오!</string>
     <string name="plv_common_text_no_data">데이터 없음</string>
+    <string name="plv_streamer_set_first_view_text">주 화면으로 설정</string>
 </resources>

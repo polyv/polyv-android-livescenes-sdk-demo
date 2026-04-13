@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -304,6 +303,13 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             public void onCameraControl(int position, boolean isMute) {
                 if (streamerPresenter != null) {
                     streamerPresenter.muteUserMediaInLinkMicList(position, true, isMute);
+                }
+            }
+
+            @Override
+            public void onFirstViewControl(int position, String userId, boolean isFirstView) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setUserFirstView(userId, isFirstView, null);
                 }
             }
 

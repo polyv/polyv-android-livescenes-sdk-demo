@@ -70,10 +70,33 @@
             android:visibility="visible" />
 
         <ImageView
-            android:id="@+id/plvsa_member_grant_speaker_iv"
+            android:id="@+id/plvsa_member_first_view_iv"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_below="@+id/plvsa_member_mic_iv"
+            android:padding="10dp"
+            android:src="@drawable/plvsa_chatroom_toolbar_grant_first_screen_iv_selector"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plvsa_member_first_view_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/plvsa_member_first_view_iv"
+            android:layout_alignBottom="@id/plvsa_member_first_view_iv"
+            android:layout_toRightOf="@+id/plvsa_member_first_view_iv"
+            android:gravity="center|left"
+            android:minEms="4"
+            android:text="@string/plv_streamer_set_first_view_text"
+            android:textColor="#FFF0F1F5"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/plvsa_member_grant_speaker_iv"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/plvsa_member_first_view_iv"
             android:padding="10dp"
             android:src="@drawable/plvsa_streamer_speaker"
             android:visibility="visible" />
