@@ -243,6 +243,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 && !itemDataBean.isTeacher();
         if (showLinkMicDuration && holder.streamerLinkmicDurationLayout != null) {
             holder.streamerLinkmicDurationLayout.start(itemDataBean);
+        } else if (holder.streamerLinkmicDurationLayout != null) {
+            holder.streamerLinkmicDurationLayout.stop();
         }
 
         if (isMe) {
@@ -473,7 +475,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                             @Override
                             public void onClickCamera(boolean isWillOpen) {
                                 int pos = adapterIndex;
-                                if (pos <= 0) {
+                                if (pos < 0) {
                                     return;
                                 }
                                 if (adapterCallback != null) {
@@ -484,7 +486,7 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                             @Override
                             public void onClickMic(boolean isWillOpen) {
                                 int pos = adapterIndex;
-                                if (pos <= 0) {
+                                if (pos < 0) {
                                     return;
                                 }
                                 if (adapterCallback != null) {
@@ -493,9 +495,24 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                             }
 
                             @Override
+                            public void onClickFirstView(boolean isWillGrant) {
+                                int pos = adapterIndex;
+                                if (pos < 0) {
+                                    return;
+                                }
+                                String userId = null;
+                                if (linkMicItemDataBean != null) {
+                                    userId = linkMicItemDataBean.getUserId();
+                                }
+                                if (adapterCallback != null) {
+                                    adapterCallback.onFirstViewControl(pos, userId, isWillGrant);
+                                }
+                            }
+
+                            @Override
                             public void onClickDownLinkMic() {
                                 int pos = adapterIndex;
-                                if (pos <= 0) {
+                                if (pos < 0) {
                                     return;
                                 }
                                 if (adapterCallback != null) {
@@ -788,6 +805,8 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
                 && !itemDataBean.isTeacher();
         if (showLinkMicDuration && holder.streamerLinkmicDurationLayout != null) {
             holder.streamerLinkmicDurationLayout.start(itemDataBean);
+        } else if (holder.streamerLinkmicDurationLayout != null) {
+            holder.streamerLinkmicDurationLayout.stop();
         }
 
         if (isMe) {
@@ -967,6 +986,11 @@ public class PLVSAStreamerAdapter extends RecyclerView.Adapter<PLVSAStreamerAdap
          * 摄像机控制
          */
         void onCameraControl(int position, boolean isMute);
+
+        /**
+         * 设置为第一画面
+         */
+        void onFirstViewControl(int position, String userId, boolean isFirstView);
 
         /**
          * 用户加入或离开连麦控制

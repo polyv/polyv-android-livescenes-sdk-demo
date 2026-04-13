@@ -25,7 +25,6 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -207,6 +206,13 @@ public class PLVSAMemberLayout extends FrameLayout {
                 if (streamerPresenter != null) {
                     streamerPresenter.muteUserMedia(position, true, isMute);
                     toastMuteCamera(isMute);
+                }
+            }
+
+            @Override
+            public void onFirstViewControl(int position, String userId, boolean isFirstView) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setUserFirstView(userId, isFirstView, null);
                 }
             }
 

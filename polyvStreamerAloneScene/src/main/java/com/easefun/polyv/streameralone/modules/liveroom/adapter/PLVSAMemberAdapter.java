@@ -285,10 +285,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
                 boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
                 boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
+                boolean isFirstView = linkMicItemDataBean != null && linkMicItemDataBean.isFirstScreen();
                 if (isSpecialType && !isRTCJoin) {
                     lastShowControlWindow.dismiss();
                 } else {
-                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
+                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, isFirstView, speakerUser);
                 }
             }
         }
@@ -311,10 +312,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
                 boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
                 boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
+                boolean isFirstView = linkMicItemDataBean != null && linkMicItemDataBean.isFirstScreen();
                 if (isSpecialType && !isRTCJoin) {
                     lastShowControlWindow.dismiss();
                 } else {
-                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
+                    lastShowControlWindow.update(isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, isFirstView, speakerUser);
                 }
             }
         }
@@ -492,6 +494,25 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
 
                 @Override
+                public void onClickFirstView(boolean isGrant) {
+                    final int pos = getAdapterPosition();
+                    if (pos < 0) {
+                        return;
+                    }
+                    String userId = "";
+                    PLVMemberItemDataBean dataBean = dataBeanList.get(pos);
+                    PLVLinkMicItemDataBean linkMicItemDataBean = dataBean.getLinkMicItemDataBean();
+                    if (linkMicItemDataBean != null) {
+                        userId = linkMicItemDataBean.getUserId();
+                    } else {
+                        userId = dataBean.getSocketUserBean().getUserId();
+                    }
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onFirstViewControl(pos, userId, isGrant);
+                    }
+                }
+
+                @Override
                 public void onClickKick() {
                     final int pos = getAdapterPosition();
                     if (pos < 0) {
@@ -586,10 +607,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             boolean isSpecialType = PLVEventHelper.isSpecialType(socketUserBean.getUserType());
             boolean isGuest = linkMicItemDataBean != null && linkMicItemDataBean.isGuest();
             boolean isHasSpeaker = linkMicItemDataBean != null && linkMicItemDataBean.isHasSpeaker();
+            boolean isFirstView = linkMicItemDataBean != null && linkMicItemDataBean.isFirstScreen();
             String userId = socketUserBean.getUserId();
             String linkMicId = linkMicItemDataBean != null ? linkMicItemDataBean.getLinkMicId() : "";
             memberControlWindow.bindData(userId, linkMicId, pos);
-            memberControlWindow.show(plvsaMemberMoreIv, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, speakerUser);
+            memberControlWindow.show(plvsaMemberMoreIv, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType,isGuest, isHasSpeaker, isFirstView, speakerUser);
             lastShowControlWindow = memberControlWindow;
         }
 
@@ -838,6 +860,11 @@ public class PLVSAMemberAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
          * 摄像机控制
          */
         void onCameraControl(int position, boolean isMute);
+
+        /**
+         * 第一画面控制
+         */
+        void onFirstViewControl(int position, String userId, boolean isFirstView);
 
         /**
          * 用户加入或离开连麦控制

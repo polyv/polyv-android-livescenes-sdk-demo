@@ -65,6 +65,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
     private List<Pair<Integer, String>> list = new ArrayList(Arrays.asList(
             new Pair<Integer, String>(R.drawable.plvsa_more_camera_selector, PLVAppUtils.getString(R.string.plv_linkmic_camera)),
             new Pair<Integer, String>(R.drawable.plvsa_more_mic_selector, PLVAppUtils.getString(R.string.plv_linkmic_microphone)),
+            new Pair<Integer, String>(R.drawable.plvsa_chatroom_toolbar_grant_first_screen_iv_selector, PLVAppUtils.getString(R.string.plv_streamer_set_first_view_text)),
             new Pair<Integer, String>(R.drawable.plvsa_streamer_down_linkmic, PLVAppUtils.getString(R.string.plv_linkmic_hang_off)),
             new Pair<Integer, String>(R.drawable.plvsa_streamer_speaker, PLVAppUtils.getString(R.string.plv_streamer_grant_speaker_permission_3)),
             new Pair<Integer, String>(R.drawable.plvsa_streamer_fullscreen, PLVAppUtils.getString(R.string.plv_live_full_screen))
@@ -72,9 +73,10 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
     //对应功能在list中的position
     private int CONTROL_CAMERA = 0;
     private int CONTROL_MIC = 1;
-    private int CONTROL_DOWN_LINKMIC = 2;
-    private int CONTROL_GRANT_SPEAKER = 3;
-    private int CONTROL_FULLSCREEN = 4;
+    private int CONTROL_FIRST_VIEW = 2;
+    private int CONTROL_DOWN_LINKMIC = 3;
+    private int CONTROL_GRANT_SPEAKER = 4;
+    private int CONTROL_FULLSCREEN = 5;
 
 
     //data
@@ -150,6 +152,13 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
                         onViewActionListener.onClickMic(isSelected);
                     }
                     controlAdapter.updateItemSelectStatus(position, !isSelected);
+                } else if (position == CONTROL_FIRST_VIEW) {
+                    isSelected = !isSelected;
+                    close();
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onClickFirstView(isSelected);
+                    }
+                    controlAdapter.updateItemSelectStatus(position, isSelected);
                 } else if (position == CONTROL_DOWN_LINKMIC) {
                     close();
                     final int pos = position;
@@ -243,6 +252,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
         controlAdapter.updateItemVisibility(CONTROL_MIC, isShow);
         controlAdapter.updateItemVisibility(CONTROL_DOWN_LINKMIC, isShow);
         controlAdapter.updateItemVisibility(CONTROL_GRANT_SPEAKER, isShow);
+        controlAdapter.updateItemVisibility(CONTROL_FIRST_VIEW, isShow);
         //全屏不做限制
         controlAdapter.updateItemVisibility(CONTROL_FULLSCREEN, true);
     }
@@ -287,6 +297,7 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
         // 媒体状态
         controlAdapter.updateItemSelectStatus(CONTROL_CAMERA, linkMicItemDataBean.isMuteVideo());
         controlAdapter.updateItemSelectStatus(CONTROL_MIC, linkMicItemDataBean.isMuteAudio());
+        controlAdapter.updateItemSelectStatus(CONTROL_FIRST_VIEW, linkMicItemDataBean.isFirstScreen());
 
         // 主讲权限
         if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) && linkMicItemDataBean.isGuest()) {
@@ -454,6 +465,8 @@ public class PLVSAStreamerMemberControlLayout extends FrameLayout {
         void onClickCamera(boolean isWillOpen);
 
         void onClickMic(boolean isWillOpen);
+
+        void onClickFirstView(boolean isWillGrant);
 
         void onClickDownLinkMic();
 

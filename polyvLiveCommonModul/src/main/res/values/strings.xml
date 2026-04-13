@@ -737,4 +737,5 @@
     <string name="plv_streamer_setting_template">template</string>
     <string name="plv_streamer_setting_template_no_support_tips">We currently do not support setting templates in landscape mode. Please switch to portrait mode and try again!</string>
     <string name="plv_common_text_no_data">No data available</string>
+    <string name="plv_streamer_set_first_view_text">Set as the main screen</string>
 </resources>

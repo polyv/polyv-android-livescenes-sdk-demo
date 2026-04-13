@@ -43,6 +43,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
     private View plvsaMemberTopTriangleView;
     private ImageView plvsaMemberGrantSpeakerIv;
     private TextView plvsaMemberGrantSpeakerTv;
+    private ImageView plvsaMemberFirstViewIv;
+    private TextView plvsaMemberFirstViewTv;
     //window parentView
     private View windowParentView;
     //data
@@ -78,6 +80,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberBanTv = (TextView) contentView.findViewById(R.id.plvsa_member_ban_tv);
         plvsaMemberGrantSpeakerIv = contentView.findViewById(R.id.plvsa_member_grant_speaker_iv);
         plvsaMemberGrantSpeakerTv = contentView.findViewById(R.id.plvsa_member_grant_speaker_tv);
+        plvsaMemberFirstViewIv = contentView.findViewById(R.id.plvsa_member_first_view_iv);
+        plvsaMemberFirstViewTv = contentView.findViewById(R.id.plvsa_member_first_view_tv);
         plvsaMemberBottomTriangleView = contentView.findViewById(R.id.plvsa_member_bottom_triangle_view);
         plvsaMemberTopTriangleView = contentView.findViewById(R.id.plvsa_member_top_triangle_view);
 
@@ -91,6 +95,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         plvsaMemberBanTv.setOnClickListener(this);
         plvsaMemberGrantSpeakerIv.setOnClickListener(this);
         plvsaMemberGrantSpeakerTv.setOnClickListener(this);
+        plvsaMemberFirstViewIv.setOnClickListener(this);
+        plvsaMemberFirstViewTv.setOnClickListener(this);
     }
     // </editor-fold>
 
@@ -101,7 +107,7 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         this.linkmicId = linkmicId;
     }
 
-    public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType, boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
+    public void show(View view, boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType, boolean isGuest, boolean isHasSpeaker, boolean isFirstView, PLVSocketUserBean speakerUser) {
         this.windowParentView = view;
         final boolean isVideoLinkMicType = getOrDefault(linkMicLocalShareData.isVideoLinkMic, true);
         final int mediaViewVisibility = isRTCJoin ? View.VISIBLE : View.GONE;
@@ -137,6 +143,13 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         } else {
             isNeedPermissionDialogShow = speakerUser != null;
         }
+
+        //第一画面
+        int firstViewVisibility = isRTCJoin ? View.VISIBLE : View.GONE;
+        plvsaMemberFirstViewTv.setVisibility(firstViewVisibility);
+        plvsaMemberFirstViewIv.setVisibility(firstViewVisibility);
+        plvsaMemberFirstViewIv.setSelected(isFirstView);
+
 
         final int maxScreenLength = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
         final int minScreenLength = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
@@ -179,11 +192,11 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         }
     }
 
-    public void update(boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType,boolean isGuest, boolean isHasSpeaker, PLVSocketUserBean speakerUser) {
+    public void update(boolean isRTCJoin, boolean isOpenCamera, boolean isOpenMic, boolean isBan, boolean isSpecialType,boolean isGuest, boolean isHasSpeaker, boolean isFirstView, PLVSocketUserBean speakerUser) {
         if (windowParentView == null) {
             return;
         }
-        show(windowParentView, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType, isGuest, isHasSpeaker, speakerUser);
+        show(windowParentView, isRTCJoin, isOpenCamera, isOpenMic, isBan, isSpecialType, isGuest, isHasSpeaker, isFirstView, speakerUser);
     }
 
     public boolean isShowing() {
@@ -303,6 +316,14 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
                         }
                     })
                     .show();
+        } else if (id == R.id.plvsa_member_first_view_iv
+                || id == R.id.plvsa_member_first_view_tv) {
+            popupWindow.dismiss();
+            boolean isFirstView = plvsaMemberFirstViewIv.isSelected();
+            if (onViewActionListener != null) {
+                onViewActionListener.onClickFirstView(!isFirstView);
+            }
+
         }
     }
     // </editor-fold>
@@ -312,6 +333,8 @@ public class PLVSAMemberControlWindow implements View.OnClickListener {
         void onClickCamera(boolean isWillOpen);
 
         void onClickMic(boolean isWillOpen);
+
+        void onClickFirstView(boolean isGrant);
 
         void onClickKick();
 
