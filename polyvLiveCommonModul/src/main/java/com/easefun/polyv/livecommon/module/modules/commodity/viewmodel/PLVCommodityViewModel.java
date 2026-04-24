@@ -2,10 +2,10 @@ package com.easefun.polyv.livecommon.module.modules.commodity.viewmodel;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.WorkerThread;
-import android.support.v4.util.ArrayMap;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.WorkerThread;
+import androidx.collection.ArrayMap;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductExplainActivity;
