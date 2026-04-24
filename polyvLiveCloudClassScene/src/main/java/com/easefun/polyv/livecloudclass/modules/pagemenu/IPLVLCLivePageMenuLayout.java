@@ -14,7 +14,6 @@ import com.plv.livescenes.playback.chat.IPLVChatPlaybackManager;
 import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
-import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 
 import java.util.List;
@@ -250,7 +249,7 @@ public interface IPLVLCLivePageMenuLayout {
         /**
          * 回调 展示产品详情
          */
-        void onShowProductDetail(PLVShowProductDetailEvent param);
+        void onShowProductDetail(int productId);
 
         /**
          * 展示用于跳转微信复制的二维码

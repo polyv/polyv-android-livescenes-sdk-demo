@@ -545,6 +545,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             moreLinkmicSettingLayout.setVisibility(View.GONE);
             moreHangUpViewerLinkmicLayout.setVisibility(View.GONE);
         }
+        final boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
+        if (isSmallClass) {
+            moreAllowViewerLinkmicTv.setText(R.string.plv_linkmic_allow_viewer_auto_join);
+        }
         updateInteractMenuVisibility();
     }
 
@@ -824,6 +829,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     }
                 }
             });
+
+            boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
+            if (streamerPresenter.isSmallClassAllowViewerRaiseHand() && isSmallClass) {
+                moreAllowViewerLinkmicLayout.setActivated(true);
+            }
         }
 
         @Override
@@ -997,6 +1008,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             close();
             PLVSAStickerLayout.tryShow();
         } else if (id == moreVirtualBgLayout.getId()) {
+            close();
             PLVVirtualBackgroundLayout.tryShow();
         } else if (id == moreTemplateLayout.getId()) {
             PLVTemplateController.tryShowTemplateDialog();
@@ -1019,14 +1031,15 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                     .show();
             return;
         }
-
+        final boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
         boolean success;
         if (toAllow) {
             success = streamerPresenter.allowViewerRaiseHand(new Ack() {
                 @Override
                 public void call(Object... args) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plv_streamer_allow_viewer_linkmic_toast)
+                            .setText(isSmallClass ? R.string.plv_streamer_allow_viewer_auto_linkmic_toast : R.string.plv_streamer_allow_viewer_linkmic_toast)
                             .show();
                     moreAllowViewerLinkmicLayout.setActivated(true);
                 }
@@ -1036,7 +1049,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 @Override
                 public void call(Object... args) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plv_streamer_disallow_viewer_linkmic_toast)
+                            .setText(isSmallClass ? R.string.plv_streamer_disallow_viewer_auto_linkmic_toast : R.string.plv_streamer_disallow_viewer_linkmic_toast)
                             .show();
                     moreAllowViewerLinkmicLayout.setActivated(false);
                 }

@@ -521,6 +521,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     }
                 }
             });
+            boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                    .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
+            if (streamerPresenter.isSmallClassAllowViewerRaiseHand() && isSmallClass) {
+                statusBarAllowViewerLinkmicIv.setActivated(true);
+            }
         }
     };
 
@@ -752,14 +757,15 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     .show();
             return;
         }
-
+        final boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
         boolean success;
         if (toAllow) {
             success = streamerPresenter.allowViewerRaiseHand(new Ack() {
                 @Override
                 public void call(Object... args) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plv_streamer_allow_viewer_linkmic_toast)
+                            .setText(isSmallClass ? R.string.plv_streamer_allow_viewer_auto_linkmic_toast : R.string.plv_streamer_allow_viewer_linkmic_toast)
                             .show();
                     statusBarAllowViewerLinkmicIv.setActivated(true);
                 }
@@ -769,7 +775,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                 @Override
                 public void call(Object... args) {
                     PLVToast.Builder.context(getContext())
-                            .setText(R.string.plv_streamer_disallow_viewer_linkmic_toast)
+                            .setText(isSmallClass ? R.string.plv_streamer_disallow_viewer_auto_linkmic_toast : R.string.plv_streamer_disallow_viewer_linkmic_toast)
                             .show();
                     statusBarAllowViewerLinkmicIv.setActivated(false);
                 }

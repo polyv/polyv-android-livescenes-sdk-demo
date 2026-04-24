@@ -737,5 +737,16 @@
     <string name="plv_streamer_setting_template">템플릿</string>
     <string name="plv_streamer_setting_template_no_support_tips">가로에서 템플릿을 설정할 수 없습니다. 세로로 전환한 후 다시 시도하십시오!</string>
     <string name="plv_common_text_no_data">데이터 없음</string>
+    <string name="plv_linkmic_allow_viewer_auto_join">관중이 주동적으로 밀에 오르다.</string>
+    <string name="plv_streamer_allow_viewer_auto_linkmic_toast">이미 관중이 주동적으로 밀에 오르기 시작했다</string>
+    <string name="plv_streamer_disallow_viewer_auto_linkmic_toast">이미 폐쇄된 관중은 주동적으로 밀에 올랐다</string>
     <string name="plv_streamer_set_first_view_text">주 화면으로 설정</string>
+    <string name="plv_streamer_professional_green_screen">프로 그린 스크린</string>
+    <string name="plv_streamer_curtain_color">커튼 색상</string>
+    <string name="plv_streamer_advanced_regulation">고급 튜닝 (전문적이지 않은 경우 수정하지 않음)</string>
+    <string name="plv_streamer_restore_recommendations">추천 복원</string>
+    <string name="plv_streamer_chroma_keying_range">인화 범위</string>
+    <string name="plv_streamer_edge_softening">가장자리 부드러움</string>
+    <string name="plv_streamer_remove_ambient_light">환경광 제거</string>
+    <string name="plv_streamer_need_camera_in_main_screen">카메라 및 문서 위치를 전환한 후 사용</string>
 </resources>

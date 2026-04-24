@@ -20,6 +20,7 @@ import com.plv.foundationsdk.utils.PLVSugarUtil;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.processor.PLVRTCPickColorListener;
 import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
 import com.plv.livescenes.linkmic.vo.PLVLinkMicDenoiseType;
 import com.plv.livescenes.streamer.config.PLVStreamerConfig;
@@ -507,6 +508,11 @@ public interface IPLVStreamerContract {
         boolean disallowViewerRaiseHand(Ack ack);
 
         /**
+         * 小班课是否允许观众主动加入连麦
+         */
+        boolean isSmallClassAllowViewerRaiseHand();
+
+        /**
          * 更改连麦类型 音频/视频
          *
          * @param isVideoType 是否视频连麦
@@ -675,6 +681,36 @@ public interface IPLVStreamerContract {
          * @param onlyBlurBackground 是否仅模糊背景，为true时，不会使用背景图片，而是使用周围原始背景的模糊效果
          */
         void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground);
+
+        /**
+         * 设置并开启幕布颜色抠像，需要结合虚拟背景的背景图片使用
+         *
+         * @param curtainColor 不为null时，表示使用幕布颜色抠像，并替换AI抠像，为null时表示不使用幕布颜色抠像
+         * @param similarity   抠像范围，0 ~ 1
+         * @param smoothness   边缘优化，0 ~ 1
+         * @param spill        去环境光，0 ~ 1
+         */
+        void setCurtainColor(float[] curtainColor, float similarity, float smoothness, float spill);
+
+        /**
+         * 开启取颜色
+         *
+         * @param isStart true：开启，false：关闭
+         */
+        void setStartPickColor(boolean isStart);
+
+        /**
+         * 设置取颜色位置
+         *
+         * @param xPercent 位置占比，0 ~ 1
+         * @param yPercent 位置占比，0 ~ 1
+         */
+        void setPickColorPosition(float xPercent, float yPercent);
+
+        /**
+         * 设置取颜色监听器
+         */
+        void setPickColorListener(PLVRTCPickColorListener listener);
 
         /**
          * 创建视频覆盖层

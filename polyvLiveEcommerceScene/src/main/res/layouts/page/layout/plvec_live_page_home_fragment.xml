@@ -88,15 +88,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/greet_ly"
-        android:layout_marginBottom="@dimen/plvec_margin_common" />
+        android:layout_marginBottom="6dp" />
 
     <!--欢迎语布局-->
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView
         android:id="@+id/greet_ly"
         android:layout_width="258dp"
         android:layout_height="22dp"
+        android:layout_above="@+id/product_click_tips_ly"
+        android:layout_marginBottom="6dp"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECProductClickTipsView
+        android:id="@+id/product_click_tips_ly"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:layout_above="@+id/sign_in_tips_ly"
+        android:layout_marginBottom="6dp"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECSignInTipsView
+        android:id="@+id/sign_in_tips_ly"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
         android:layout_above="@+id/chat_msg_vp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:visibility="invisible"
         tools:visibility="visible" />
 

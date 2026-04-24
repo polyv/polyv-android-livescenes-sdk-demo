@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plv_color_picker_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:visibility="visible"
+    tools:visibility="visible">
+
+    <FrameLayout
+        android:id="@+id/plv_sticker_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:clipChildren="false">
+
+        <LinearLayout
+            android:id="@+id/plv_color_indicator_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView
+                android:id="@+id/plv_color_preview_view"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@color/plv_white"
+                app:plv_radius_iv="60dp" />
+
+            <ImageView
+                android:id="@+id/plv_color_crosshair_view"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/plv_ic_crosshair" />
+
+        </LinearLayout>
+    </FrameLayout>
+</RelativeLayout>

@@ -2,19 +2,25 @@ package com.easefun.polyv.livecommon.module.modules.commodity.viewmodel;
 
 import static com.plv.foundationsdk.utils.PLVSugarUtil.getNullableOrDefault;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.annotation.WorkerThread;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.WorkerThread;
+import android.support.v4.util.ArrayMap;
+import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductExplainActivity;
 import com.easefun.polyv.livecommon.module.modules.commodity.model.PLVCommodityRepo;
 import com.easefun.polyv.livecommon.module.modules.commodity.model.vo.PLVCommodityProductVO;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.vo.PLVCommodityUiState;
+import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
 import com.plv.foundationsdk.component.di.IPLVLifecycleAwareDependComponent;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.rx.PLVRxBus;
+import com.plv.foundationsdk.sign.PLVSignCreator;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVSugarUtil;
+import com.plv.foundationsdk.utils.PLVUtils;
+import com.plv.livescenes.net.PLVApiManager;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.commodity.PLVProductClickTimesEvent;
 import com.plv.socket.event.commodity.PLVProductContentBean;
@@ -23,10 +29,15 @@ import com.plv.socket.event.commodity.PLVProductEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 
 /**
  * @author Hoshiiro
@@ -96,8 +107,27 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                 .retry()
                 .subscribe();
 
+        final Disposable refreshProductListDisposable = commodityRepo.productRefreshProductListObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .doOnNext(new Consumer<String>() {
+                    @Override
+                    public void accept(String message) throws Exception {
+                        refreshPushProduct();
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                    }
+                })
+                .retry()
+                .subscribe();
+
         compositeDisposable.add(disposable);
         compositeDisposable.add(clickTimesDisposable);
+        compositeDisposable.add(refreshProductListDisposable);
     }
 
     private void observeProductExplainEvent() {
@@ -114,6 +144,48 @@ public class PLVCommodityViewModel implements IPLVLifecycleAwareDependComponent 
                     }
                 });
         compositeDisposable.add(disposable);
+    }
+
+    @WorkerThread
+    private void refreshPushProduct() {
+        if (commodityUiState.productContentBeanPushToShow != null) {
+            int productId = commodityUiState.productContentBeanPushToShow.getProductId();
+            String channelId = commodityUiState.productContentBeanPushToShow.getChannelId();
+            String appId = PolyvLiveSDKClient.getInstance().getAppId();
+            String appSecret = PolyvLiveSDKClient.getInstance().getAppSecret();
+            long timestamp = System.currentTimeMillis();
+            Map<String, String> map = new ArrayMap<>();
+            map.put("appId", appId);
+            map.put("timestamp", timestamp + "");
+            map.put("channelId", channelId);
+            map.put("productId", productId + "");
+            String[] signWithSignatureNonce = PLVSignCreator.createSignWithSignatureNonce(appSecret, map);
+            Disposable disposable = PLVApiManager.getPlvLiveStatusApi().getProductById(productId, timestamp, channelId, appId, signWithSignatureNonce[0], PLVSignCreator.getSignatureMethod(), signWithSignatureNonce[1])
+                    .subscribe(new Consumer<ResponseBody>() {
+                        @Override
+                        public void accept(ResponseBody responseBody) throws Exception {
+                            String data = responseBody.string();
+                            JSONObject jsonObject = new JSONObject(data);
+                            String dataString = jsonObject.optString("data");
+                            if (!TextUtils.isEmpty(dataString)) {
+                                String parseData = PLVUtils.parseProductEncryptData(dataString);
+                                PLVProductContentBean productContentBean = PLVGsonUtil.fromJson(PLVProductContentBean.class, parseData);
+                                if (productContentBean != null
+                                        && commodityUiState.productContentBeanPushToShow != null
+                                        && commodityUiState.productContentBeanPushToShow.getProductId() == productContentBean.getProductId()) {
+                                    commodityUiState.productContentBeanPushToShow = productContentBean;
+                                    commodityUiStateLiveData.postValue(commodityUiState.copy());
+                                }
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            PLVCommonLog.warn(throwable);
+                        }
+                    });
+            compositeDisposable.add(disposable);
+        }
     }
 
     @WorkerThread

@@ -22,7 +22,7 @@ public abstract class PLVStreamerLinkMicMsgHandler {
 
     protected boolean isVideoLinkMic;
     protected boolean isOpenLinkMic;
-    protected boolean isAllowViewerRaiseHand;
+    public boolean isAllowViewerRaiseHand;
 
     protected PLVStreamerPresenter streamerPresenter = null;
 

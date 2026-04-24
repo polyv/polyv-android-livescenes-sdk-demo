@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.easefun.polyv.livecloudclass.R;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCChatNoticeViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCMessageViewHolder;
+import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCProductClickViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperLandViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperPortViewHolder;
 import com.easefun.polyv.livecloudclass.modules.chatroom.adapter.holder.PLVLCRedPaperResultViewHolder;
@@ -122,6 +123,19 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
                 } else {
                     viewHolder = new PLVLCChatNoticeViewHolder(
                             LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_notice_landscape_item, parent, false),
+                            this
+                    );
+                }
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_PRODUCT_CLICK_TIPS:
+                if (!isLandscapeLayout) {
+                    viewHolder = new PLVLCProductClickViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_message_product_click_port_item, parent, false),
+                            this
+                    );
+                } else {
+                    viewHolder = new PLVLCProductClickViewHolder(
+                            LayoutInflater.from(parent.getContext()).inflate(R.layout.plvlc_chatroom_message_product_click_land_item, parent, false),
                             this
                     );
                 }
@@ -395,6 +409,8 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
         void onReplyMessage(PLVChatQuoteVO quoteVO);
 
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        void callOnClickProductDetail(int productId);
     }
 
     public void callOnChatImgClick(int position, View view, String imgUrl, boolean isQuoteImg) {
@@ -418,6 +434,12 @@ public class PLVLCMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
     public void callOnReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
         if (onViewActionListener != null) {
             onViewActionListener.onReceiveRedPaper(redPaperEvent);
+        }
+    }
+
+    public void callOnClickProductDetail(int productId) {
+        if (onViewActionListener != null) {
+            onViewActionListener.callOnClickProductDetail(productId);
         }
     }
     // </editor-fold>

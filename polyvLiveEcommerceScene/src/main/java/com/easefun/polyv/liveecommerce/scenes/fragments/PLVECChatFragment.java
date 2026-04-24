@@ -112,6 +112,13 @@ public class PLVECChatFragment extends PLVBaseFragment {
                     messageAdapterListener.onReceiveRedPaper(redPaperEvent);
                 }
             }
+
+            @Override
+            public void onClickProductDetail(int productId) {
+                if (messageAdapterListener != null) {
+                    messageAdapterListener.onClickProductDetail(productId);
+                }
+            }
         });
         // 追踪红包曝光事件
         PLVTrackLogHelper.trackReadRedpack(chatMsgRv, chatMessageAdapter.getDataList(), liveRoomDataManager);

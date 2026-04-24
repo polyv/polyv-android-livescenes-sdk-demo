@@ -77,6 +77,8 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         void onShowOverLengthMessage(PLVECChatOverLengthMessageLayout.BaseChatMessageDataBean chatMessageDataBean);
 
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        void onClickProductDetail(int productId);
     }
 
     public void callOnChatImgClick(View view, String imgUrl) {
@@ -100,6 +102,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     public void callOnReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
         if (onViewActionListener != null) {
             onViewActionListener.onReceiveRedPaper(redPaperEvent);
+        }
+    }
+
+    public void callOnClickProductDetail(int productId) {
+        if (onViewActionListener != null) {
+            onViewActionListener.onClickProductDetail(productId);
         }
     }
     // </editor-fold>
@@ -345,6 +353,12 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
             case PLVChatMessageItemType.ITEMTYPE_CHATROOM_NOTICE:
                 viewHolder = new PLVECChatNoticeViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chatroom_notice_item, parent, false),
+                        this
+                );
+                break;
+            case PLVChatMessageItemType.ITEMTYPE_PRODUCT_CLICK_TIPS:
+                viewHolder = new PLVECChatMessageProductClickViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.plvec_chat_message_product_click_item, parent, false),
                         this
                 );
                 break;

@@ -39,6 +39,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStrea
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVColorPickerView;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
@@ -49,6 +50,7 @@ import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livestreamer.R;
+import com.easefun.polyv.livestreamer.modules.streamer.position.PLVLSStreamerViewPositionManager;
 import com.easefun.polyv.livestreamer.ui.widget.PLVLSConfirmDialog;
 import com.plv.foundationsdk.component.collection.PLVSequenceWrapper;
 import com.plv.foundationsdk.component.di.PLVDependManager;
@@ -58,6 +60,7 @@ import com.plv.image.segmenter.api.IPLVImageSegmenterManager;
 import com.plv.image.segmenter.api.PLVImageSegmenterManager;
 import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
+import com.plv.linkmic.processor.PLVRTCPickColorListener;
 import com.plv.linkmic.screenshare.vo.PLVCustomScreenShareData;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
@@ -124,6 +127,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private IPLVStreamerContract.IStreamerPresenter streamerPresenter;
 
     private PLVVirtualBackgroundLayout virtualBackgroundLayout;
+    private PLVColorPickerView colorPickerView;
 
     private OnViewActionListener onViewActionListener;
     private IPLVImageSegmenterManager.InitCallback imageSegmenterInitCallback = null;
@@ -131,6 +135,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private IPLVLiveRoomDataManager liveRoomDataManager;
     private Disposable updateBlurViewDisposable;
 
+    private PLVLSStreamerViewPositionManager streamerViewPositionManager;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -159,9 +164,12 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         initPushDowngradeLayout();
         initShareLayout();
         initVirtualBackgroundItemLayout();
+        initColorPickerView();
         initDenoiseLayout();
         initExternalAudioInputLayout();
         observeBeautyModuleInitResult();
+
+        streamerViewPositionManager = PLVDependManager.getInstance().get(PLVLSStreamerViewPositionManager.class);
 
         PLVBlurUtils.initBlurView(blurLy);
     }
@@ -399,6 +407,30 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                     streamerPresenter.setVirtualBackground(null, true);
                 }
             }
+
+            @Override
+            public void onClickColorPicker() {
+                if ((streamerViewPositionManager.isDocumentInMainScreen())) {
+                    PLVToast.Builder.context(getContext())
+                            .setText(getContext().getString(R.string.plv_streamer_need_camera_in_main_screen))
+                            .show();
+                    return;
+                }
+                virtualBackgroundLayout.dismiss();
+                if (streamerPresenter != null) {
+                    streamerPresenter.setStartPickColor(true);
+                }
+                if (colorPickerView != null) {
+                    colorPickerView.show();
+                }
+            }
+
+            @Override
+            public void onCurtainColorChanged(float[] curtainColor, float similarity, float smoothness, float spill) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setCurtainColor(curtainColor, similarity, smoothness, spill);
+                }
+            }
         });
         virtualBackgroundLayout.setUseBlackStyle();
     }
@@ -414,6 +446,34 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
                 initVirtualBackgroundItemLayout(isVisible);
             }
         }));
+    }
+
+    private void initColorPickerView() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                colorPickerView = ((Activity) getContext()).findViewById(R.id.plvls_color_picker_view);
+                colorPickerView.setOnColorPickerListener(new PLVColorPickerView.OnColorPickerListener() {
+                    @Override
+                    public void onPositionChanged(float xPercent, float yPercent) {
+                        if (streamerPresenter != null) {
+                            streamerPresenter.setPickColorPosition(xPercent, yPercent);
+                        }
+                    }
+
+                    @Override
+                    public void onPickedColor(float[] rgb) {
+                        if (streamerPresenter != null) {
+                            streamerPresenter.setStartPickColor(false);
+                        }
+                        if (virtualBackgroundLayout != null) {
+                            virtualBackgroundLayout.updateSelectCurtainColor(rgb);
+                            virtualBackgroundLayout.show();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void initVirtualBackgroundItemLayout(boolean isVisible) {
@@ -630,6 +690,16 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         @Override
         public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
             initVirtualBackgroundLayout();
+            if (streamerPresenter != null) {
+                streamerPresenter.setPickColorListener(new PLVRTCPickColorListener() {
+                    @Override
+                    public void onPickedColor(float[] rgb) {
+                        if (colorPickerView != null) {
+                            colorPickerView.updatePickedColor(rgb);
+                        }
+                    }
+                });
+            }
         }
     };
     // </editor-folder>

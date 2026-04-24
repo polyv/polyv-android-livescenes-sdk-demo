@@ -737,5 +737,16 @@
     <string name="plv_streamer_setting_template">模版</string>
     <string name="plv_streamer_setting_template_no_support_tips">暂不支持在横屏设置模版，请切换到竖屏后重试！</string>
     <string name="plv_common_text_no_data">暂无数据</string>
+    <string name="plv_linkmic_allow_viewer_auto_join">观众主动上麦</string>
+    <string name="plv_streamer_allow_viewer_auto_linkmic_toast">已开启观众主动上麦</string>
+    <string name="plv_streamer_disallow_viewer_auto_linkmic_toast">已关闭观众主动上麦</string>
     <string name="plv_streamer_set_first_view_text">设为主画面</string>
+    <string name="plv_streamer_professional_green_screen">专业绿幕</string>
+    <string name="plv_streamer_curtain_color">幕布颜色</string>
+    <string name="plv_streamer_advanced_regulation">高级调节 (非专业请勿修改)</string>
+    <string name="plv_streamer_restore_recommendations">恢复推荐</string>
+    <string name="plv_streamer_chroma_keying_range">抠像范围</string>
+    <string name="plv_streamer_edge_softening">边缘柔化</string>
+    <string name="plv_streamer_remove_ambient_light">去环境光</string>
+    <string name="plv_streamer_need_camera_in_main_screen">请切换摄像头和文档位置后使用</string>
 </resources>

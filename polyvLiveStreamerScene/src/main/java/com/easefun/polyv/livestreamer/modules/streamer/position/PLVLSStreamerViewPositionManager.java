@@ -100,7 +100,7 @@ public class PLVLSStreamerViewPositionManager {
 
     // </editor-fold>
 
-    private boolean isDocumentInMainScreen() {
+    public boolean isDocumentInMainScreen() {
         return !documentStreamerViewSwitcher.isViewSwitched();
     }
 

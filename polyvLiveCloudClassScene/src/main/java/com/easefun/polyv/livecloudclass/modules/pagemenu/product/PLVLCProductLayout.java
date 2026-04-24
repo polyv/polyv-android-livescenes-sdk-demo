@@ -21,11 +21,15 @@ import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractJSBridgeE
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.google.gson.Gson;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.feature.pagemenu.product.PLVProductWebView;
 import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.event.commodity.PLVProductClickBean;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 
@@ -87,6 +91,20 @@ public class PLVLCProductLayout extends FrameLayout {
                         if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
                             return;
                         }
+
+                        if (liveRoomDataManager != null) {
+                            //发送点击卡片事件
+                            PLVProductClickBean clickBean = new PLVProductClickBean();
+                            PLVProductClickBean.DataBean dataBean = new PLVProductClickBean.DataBean();
+                            dataBean.setType(onClickDataVO.getData().getProductType());
+                            dataBean.setPositionName(onClickDataVO.getData().getName());
+                            dataBean.setProductId(onClickDataVO.getData().getProductId());
+                            dataBean.setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+                            clickBean.setData(dataBean);
+                            clickBean.setRoomId(liveRoomDataManager.getConfig().getChannelId());
+                            PLVSocketWrapper.getInstance().emit(PLVEventConstant.Chatroom.EVENT_PRODUCT, new Gson().toJson(clickBean));
+                        }
+
                         if (onClickDataVO.getData().isInnerBuy()) {
                             if (listener != null) {
                                 listener.onShowOpenLink();

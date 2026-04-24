@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.TypedArray
+import android.graphics.Paint
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -24,10 +25,12 @@ import com.easefun.polyv.livecommon.module.utils.span.PLVSpannableStringBuilder
 import com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout
 import com.plv.foundationsdk.component.di.PLVDependManager
+import com.plv.foundationsdk.component.exts.getString
 import com.plv.foundationsdk.utils.PLVGsonUtil
 import com.plv.foundationsdk.utils.fromJson
 import com.plv.livescenes.access.PLVChannelFeature
 import com.plv.livescenes.access.PLVChannelFeatureManager
+import com.plv.livescenes.model.PLVLiveClassDetailVO.DataBean.ProductHotEffectBean
 import com.plv.livescenes.socket.PLVSocketWrapper
 import com.plv.socket.event.PLVEventConstant
 import com.plv.socket.event.commodity.PLVProductClickBean
@@ -67,6 +70,12 @@ class PLVLCProductPushCardLayout @JvmOverloads constructor(
         val viewModel = PLVDependManager.getInstance().get(PLVCommodityViewModel::class.java)
         val isProductExplainEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_EXPLAIN_ENABLED) ?: false
         val isProductOutLinkEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_OUT_LINK_ENABLED) ?: false
+        val isProductHotEffectEnabled = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_HOT_EFFECT_ENABLED) ?: false
+        val productHotEffectTips = PLVChannelFeatureManager.onChannel(liveRoomDataManager.config.channelId).get(PLVChannelFeature.LIVE_PRODUCT_HOT_EFFECT_TIPS) ?: ProductHotEffectBean().apply {
+            normalProductTips = getString(R.string.plvlc_product_push_hot_effect_text_normal)
+            financeProductTips = getString(R.string.plvlc_product_push_hot_effect_text_finance)
+            jobProductTips = getString(R.string.plvlc_product_push_hot_effect_text_job)
+        }
 
         viewModel.commodityUiStateLiveData.observe(context as LifecycleOwner, Observer { uiState ->
             val pushCardProduct = uiState?.productContentBeanPushToShow?.takeIf { !it.isBigProduct }
@@ -75,8 +84,9 @@ class PLVLCProductPushCardLayout @JvmOverloads constructor(
             if (pushCardProduct != null) {
                 pushCardProduct.isProductExplainEnabled = isProductExplainEnabled
                 pushCardProduct.isProductOutLinkEnabled = isProductOutLinkEnabled
+                pushCardProduct.isProductHotEffectEnabled = isProductHotEffectEnabled
                 pushCardLayout = AbsCardLayout.newLayout(context, pushCardProduct).apply {
-                    bindProduct(pushCardProduct)
+                    bindProduct(pushCardProduct, productHotEffectTips)
                     onViewActionListener = object : AbsCardLayout.OnViewActionListener {
                         override fun onClickClose(product: PLVProductContentBean) {
                             viewModel.onCloseProductPush()
@@ -108,7 +118,7 @@ class PLVLCProductPushCardLayout @JvmOverloads constructor(
 
         viewModel.productClickTimesLiveData.observe(context as LifecycleOwner, Observer { clickTimes ->
             clickTimes ?: return@Observer
-            pushCardLayout?.bindClickTimes(clickTimes)
+            pushCardLayout?.bindClickTimes(clickTimes, isProductHotEffectEnabled)
         })
     }
 
@@ -175,9 +185,9 @@ private sealed class AbsCardLayout(
 
     var onViewActionListener: OnViewActionListener? = null
 
-    abstract fun bindProduct(product: PLVProductContentBean)
+    abstract fun bindProduct(product: PLVProductContentBean, productHotEffectTips: ProductHotEffectBean)
 
-    abstract fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent)
+    abstract fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent, isProductHotEffectEnabled: Boolean)
 
     protected fun bindHotEffectIcon(imageView: ImageView, product: PLVProductContentBean) {
         when {
@@ -188,11 +198,11 @@ private sealed class AbsCardLayout(
         }
     }
 
-    protected fun bindHotEffectTypeText(textView: TextView, product: PLVProductContentBean) {
+    protected fun bindHotEffectTypeText(textView: TextView, product: PLVProductContentBean, productHotEffectTips: ProductHotEffectBean) {
         when {
-            product.isNormalProduct -> textView.setText(R.string.plvlc_product_push_hot_effect_text_normal)
-            product.isFinanceProduct -> textView.setText(R.string.plvlc_product_push_hot_effect_text_finance)
-            product.isPositionProduct -> textView.setText(R.string.plvlc_product_push_hot_effect_text_job)
+            product.isNormalProduct -> textView.text = productHotEffectTips.normalProductTips
+            product.isFinanceProduct -> textView.text = productHotEffectTips.financeProductTips
+            product.isPositionProduct -> textView.text = productHotEffectTips.jobProductTips
             else -> textView.setText(R.string.plvlc_product_push_hot_effect_text_normal)
         }
     }
@@ -265,6 +275,10 @@ private sealed class AbsCardLayout(
             product.isPositionProduct -> product.treatment
             else -> ""
         }
+        bindPrice(textView, product, priceText)
+    }
+
+    protected fun bindPrice(textView: TextView, product: PLVProductContentBean, priceText: String) {
         val priceNotOpenedText = when {
             product.isNormalProduct && !product.isOpenPrice -> context.getString(R.string.plv_commodity_price_not_opened)
             else -> null
@@ -310,17 +324,21 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
     private val productPushTagTv by lazy { findViewById<PLVRoundRectGradientTextView>(R.id.plvlc_product_push_tag_tv) }
     private val productPushNameTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_name_tv) }
     private val productPushPriceTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_price_tv) }
+    private val productPushPriceStrickOutTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_strick_out_price_tv) }
     private val productPushBuyActionTv by lazy { findViewById<PLVRoundRectGradientTextView>(R.id.plvlc_product_push_buy_action_tv) }
     private val productPushCloseIv by lazy { findViewById<ImageView>(R.id.plvlc_product_push_close_iv) }
+    private val productPushSeckillLy by lazy { findViewById<ViewGroup>(R.id.plvlc_product_push_seckill_ly) }
+    private val productPushSeckillTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_seckill_tv) }
+    private var startCountDown: Runnable? = null
 
 
     init {
         LayoutInflater.from(context).inflate(R.layout.plvlc_product_push_card_layout_with_image, this)
     }
 
-    override fun bindProduct(product: PLVProductContentBean) {
+    override fun bindProduct(product: PLVProductContentBean, productHotEffectTips: ProductHotEffectBean) {
         bindHotEffectIcon(productPushHotEffectIv, product)
-        bindHotEffectTypeText(productPushHotEffectTypeTv, product)
+        bindHotEffectTypeText(productPushHotEffectTypeTv, product, productHotEffectTips)
         bindIndexOrExplain(productPushIndexTv, product)
         bindCover(productPushImage, product)
         bindTag(productPushTagTv, product)
@@ -343,9 +361,39 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
         } else {
             productPushIndexTv.setOnClickListener(null)
         }
+        productPushHotEffectLayout.visibility = View.GONE
+        productPushPriceStrickOutTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or productPushPriceStrickOutTv.paintFlags
+        productPushPriceStrickOutTv.visibility = if (product.isNormalProduct) View.VISIBLE else View.GONE
+        if (product.isNormalProduct) {
+            productPushPriceStrickOutTv.text = "¥${product.price}"
+        }
+        if (product.isSeckillProduct) {
+            startCountDown = object : Runnable {
+                override fun run() {
+                    val text = product.seckillCountdownText
+                    if (text != null) {
+                        productPushSeckillLy.visibility = View.VISIBLE
+                        productPushSeckillTv.text = text
+                        bindPrice(productPushPriceTv, product, "¥${product.seckillPrice}")
+                    } else {
+                        productPushSeckillLy.visibility = View.GONE
+                        productPushSeckillTv.text = ""
+                        bindPrice(productPushPriceTv, product)
+                    }
+                    productPushSeckillTv.postDelayed(this, 1000)
+                }
+            }
+            productPushSeckillTv.post(startCountDown)
+        }
     }
 
-    override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent) {
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        productPushSeckillTv.removeCallbacks(startCountDown)
+    }
+
+    override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent, isProductHotEffectEnabled: Boolean) {
+        productPushHotEffectLayout.visibility = if (isProductHotEffectEnabled) View.VISIBLE else View.GONE
         bindHotEffectCount(productPushHotEffectMultiplyTv, productPushHotEffectCountTv, clickTimesEvent)
     }
 }
@@ -369,9 +417,9 @@ private class NoImageProductCard(context: Context) : AbsCardLayout(context) {
         LayoutInflater.from(context).inflate(R.layout.plvlc_product_push_card_layout_no_image, this)
     }
 
-    override fun bindProduct(product: PLVProductContentBean) {
+    override fun bindProduct(product: PLVProductContentBean, productHotEffectTips: ProductHotEffectBean) {
         bindHotEffectIcon(productPushHotEffectIv, product)
-        bindHotEffectTypeText(productPushHotEffectTypeTv, product)
+        bindHotEffectTypeText(productPushHotEffectTypeTv, product, productHotEffectTips)
         bindIndexOrExplain(productPushIndexTv, product)
         bindTag(productPushTagTv, product)
         bindName(productPushNameTv, product)
@@ -393,9 +441,11 @@ private class NoImageProductCard(context: Context) : AbsCardLayout(context) {
         } else {
             productPushIndexTv.setOnClickListener(null)
         }
+        productPushHotEffectLayout.visibility = View.GONE
     }
 
-    override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent) {
+    override fun bindClickTimes(clickTimesEvent: PLVProductClickTimesEvent, isProductHotEffectEnabled: Boolean) {
+        productPushHotEffectLayout.visibility = if (isProductHotEffectEnabled) View.VISIBLE else View.GONE
         bindHotEffectCount(productPushHotEffectMultiplyTv, productPushHotEffectCountTv, clickTimesEvent)
     }
 

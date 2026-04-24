@@ -31,11 +31,13 @@ import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.chat.PLVToTopEvent;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -104,6 +106,18 @@ public interface IPLVChatroomContract {
          */
         @WorkerThread
         void onRewardEvent(@NonNull PLVRewardEvent rewardEvent);
+
+        /**
+         * 签到事件
+         */
+        @WorkerThread
+        void onSignInTimesEvent(@NonNull PLVSignInTimesEvent signInTimesEvent);
+
+        /**
+         * 商品点击事件
+         */
+        @WorkerThread
+        void onProductClickEvent(@NonNull PLVProductClickEvent productClickEvent);
 
         /**
          * 用户登录事件

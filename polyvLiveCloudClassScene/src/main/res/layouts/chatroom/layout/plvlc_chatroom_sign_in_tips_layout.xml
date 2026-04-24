@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/sign_in_tips_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="22dp"
+        android:layout_marginLeft="16dp"
+        android:alpha="0.9"
+        android:background="@drawable/plvlc_chatroom_sign_in_tips_tv_bg"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:singleLine="true"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:visibility="visible"
+        tools:text="欢迎 xx 进入直播间"
+        tools:visibility="visible" />
+</merge>

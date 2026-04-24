@@ -53,6 +53,8 @@ import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCBulletinTex
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLayout;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCGreetingTextView;
 import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCLikeIconView;
+import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCProductClickTipsView;
+import com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCSignInTipsView;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.chatroom.PLVSpecialTypeTag;
@@ -114,8 +116,10 @@ import com.plv.socket.event.chat.PLVFocusModeEvent;
 import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -229,6 +233,8 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
     //欢迎语
     private PLVLCGreetingTextView greetingTv;
+    private PLVLCSignInTipsView signInTipsView;
+    private PLVLCProductClickTipsView productClickTipsView;
     private boolean isShowGreeting;//是否显示欢迎语
 
     //公告(管理员发言)
@@ -395,6 +401,13 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         onViewActionListener.onReceiveRedPaper(redPaperEvent);
                     }
                 }
+
+                @Override
+                public void onClickProductDetail(int productId) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onClickProductDetail(productId);
+                    }
+                }
             });
         }
         //聊天室背景
@@ -500,6 +513,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
 
         //欢迎语
         greetingTv = findViewById(R.id.greeting_tv);
+        //签到提示
+        signInTipsView = findViewById(R.id.sign_in_tips_ly);
+        //商品点击提示
+        productClickTipsView = findViewById(R.id.product_click_tips_ly);
 
         //公告(管理员发言)
         bulletinTv = findViewById(R.id.bulletin_tv);
@@ -983,6 +1000,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         }
 
         @Override
+        public void onSignInTimesEvent(@NonNull PLVSignInTimesEvent signInTimesEvent) {
+            acceptSignInTimesEvent(signInTimesEvent);
+        }
+
+        @Override
+        public void onProductClickEvent(@NonNull PLVProductClickEvent productClickEvent) {
+            acceptProductClickEvent(productClickEvent);
+        }
+
+        @Override
         public void onCloseRoomEvent(@NonNull final PLVCloseRoomEvent closeRoomEvent) {
             super.onCloseRoomEvent(closeRoomEvent);
             if (isChatPlaybackLayout || !isLiveType) {
@@ -1151,7 +1178,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="聊天室 - 欢迎语、公告处理">
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 欢迎语、公告、签到、商品点击提示处理">
     private void acceptLoginEvent(final PLVLoginEvent loginEvent) {
         //非聊天回放布局并且非直播类型则不显示欢迎语
         if (!isChatPlaybackLayout && !isLiveType) {
@@ -1166,6 +1193,26 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                 }
             }
         });
+    }
+
+    private void acceptSignInTimesEvent(PLVSignInTimesEvent signInTimesEvent) {
+        //非聊天回放布局并且非直播类型则不显示
+        if (!isChatPlaybackLayout && !isLiveType) {
+            return;
+        }
+        if (signInTipsView != null) {
+            signInTipsView.acceptMessage(signInTimesEvent);
+        }
+    }
+
+    private void acceptProductClickEvent(PLVProductClickEvent productClickEvent) {
+        //非聊天回放布局并且非直播类型则不显示
+        if (!isChatPlaybackLayout && !isLiveType) {
+            return;
+        }
+        if (productClickTipsView != null) {
+            productClickTipsView.acceptMessage(productClickEvent);
+        }
     }
 
     private void acceptSpeakEvent(PLVSpeakEvent speakEvent) {
@@ -1554,7 +1601,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         break;
                     //欢迎语开关
                     case PolyvChatFunctionSwitchVO.TYPE_WELCOME:
-                        isShowGreeting = isSwitchEnabled;
+                        isShowGreeting = true;
                         break;
                     //送花/点赞开关
                     case PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED:
@@ -1804,6 +1851,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
          * 显示我的奖励
          */
         void onShowMyRewardAction();
+
+        /**
+         * 点击商品详情
+         */
+        void onClickProductDetail(int productId);
     }
     // </editor-fold>
 }

@@ -25,6 +25,8 @@ public class PLVChatMessageItemType {
     public static final int ITEMTYPE_RED_PAPER_RESULT = 11;
     // 聊天室通知
     public static final int ITEMTYPE_CHATROOM_NOTICE = 12;
+    // 商品点击提示
+    public static final int ITEMTYPE_PRODUCT_CLICK_TIPS = 13;
 
     public static final int ITEMTYPE_TIPS_MSG = 99;//提示信息，例如聊天室开启/关闭
 

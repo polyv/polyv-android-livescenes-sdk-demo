@@ -138,12 +138,41 @@
                 android:textColor="@color/plvec_product_push_card_tag_text_with_image"
                 android:textSize="10sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/plvec_product_push_seckill_ly"
                 app:layout_constraintStart_toStartOf="parent"
                 app:plvGradientMiddleColor="@color/plvec_product_push_card_tag_background_with_image"
                 app:plvRadius="2dp"
                 tools:text="商品标签" />
 
+            <LinearLayout
+                android:id="@+id/plvec_product_push_seckill_ly"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:background="@drawable/plvec_product_push_seckill_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="4dp"
+                    android:src="@drawable/plvec_product_push_seckill_text" />
+
+                <TextView
+                    android:id="@+id/plvec_product_push_seckill_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text="01天:00:51:42"
+                    android:textStyle="bold"
+                    android:textSize="11sp"
+                    android:textColor="#e6FFFFFF"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
         </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectConstraintLayout>
 
         <TextView
@@ -161,7 +190,7 @@
 
         <TextView
             android:id="@+id/plvec_product_push_price_tv"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="4dp"
             android:ellipsize="end"
@@ -169,6 +198,25 @@
             android:textColor="@color/plvec_product_push_card_price"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_name_tv"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:text="¥10" />
+
+        <TextView
+            android:id="@+id/plvec_product_push_strick_out_price_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#ADADC0"
+            android:textSize="8sp"
+            android:gravity="bottom"
+            android:translationY="-1dp"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_name_tv"
+            app:layout_constraintLeft_toRightOf="@+id/plvec_product_push_price_tv"
+            app:layout_constraintBottom_toBottomOf="@+id/plvec_product_push_price_tv"
+            tools:visibility="visible"
+            android:visibility="gone"
             tools:text="¥10" />
 
         <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView

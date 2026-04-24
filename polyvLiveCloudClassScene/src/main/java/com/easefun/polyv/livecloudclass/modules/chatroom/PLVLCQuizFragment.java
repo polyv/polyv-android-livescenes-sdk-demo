@@ -160,6 +160,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
             public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
 
             }
+
+            @Override
+            public void callOnClickProductDetail(int productId) {
+
+            }
         });
         //设置信息索引，需在chatroomPresenter.registerView后设置
         messageAdapter.setMsgIndex(chatroomPresenter.getViewIndex(chatroomView));

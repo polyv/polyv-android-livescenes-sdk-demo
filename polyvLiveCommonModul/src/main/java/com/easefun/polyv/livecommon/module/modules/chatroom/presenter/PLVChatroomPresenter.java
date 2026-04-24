@@ -94,6 +94,7 @@ import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.chat.PLVToTopEvent;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
@@ -104,6 +105,7 @@ import com.plv.socket.event.history.PLVFileShareHistoryEvent;
 import com.plv.socket.event.history.PLVHistoryConstant;
 import com.plv.socket.event.history.PLVSpeakHistoryEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.ppt.PLVOnSliceIDEvent;
@@ -186,6 +188,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private int kickCount;
     //是否专注特殊身份发言模式
     private boolean isFocusMode;
+    private boolean isEnableProductEffect = false;
 
     //每次获取的历史记录条数
     private int getChatHistoryCount = GET_CHAT_HISTORY_COUNT;
@@ -1527,6 +1530,18 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             redpackRepo.onRedPaperForDelayEvent(redPaperForDelayEvent);
                         }
                         break;
+                    case PLVSignInTimesEvent.EVENT:
+                        final PLVSignInTimesEvent signInTimesEvent = PLVEventHelper.toMessageEventModel(message, PLVSignInTimesEvent.class);
+                        if (signInTimesEvent != null) {
+                            signInTimesEvent.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    view.onSignInTimesEvent(signInTimesEvent);
+                                }
+                            });
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -1598,6 +1613,26 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                             }
                         });
                     }
+                }
+            } else if (PLVEventConstant.Chatroom.EVENT_PRODUCT.equals(listenEvent)) {
+                if (PLVProductClickEvent.EVENT.equals(event) && isEnableProductEffect) {
+                    PLVProductClickEvent productClickEvent = PLVGsonUtil.fromJson(PLVProductClickEvent.class, message);
+                    if (productClickEvent != null) {
+                        productClickEvent.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+                        if (liveRoomDataManager.getConfig().isLive()) {
+                            itemType = PLVChatMessageItemType.ITEMTYPE_PRODUCT_CLICK_TIPS;
+                            chatMessage = productClickEvent;
+                        }
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onProductClickEvent(productClickEvent);
+                            }
+                        });
+                    }
+                }
+                if (chatMessage != null) {
+                    chatMessageDataList.add(new PLVBaseViewData<>(chatMessage, itemType, isSpecialType ? new PLVSpecialTypeTag(specialTypeUserId) : null));
                 }
             }
         }
