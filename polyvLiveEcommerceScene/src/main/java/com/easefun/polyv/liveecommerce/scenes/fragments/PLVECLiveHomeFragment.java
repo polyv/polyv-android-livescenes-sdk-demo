@@ -52,7 +52,9 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanP
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatInputWindow;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECLikeIconView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECProductClickTipsView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECSignInTipsView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECProductPushCardLayout;
 import com.easefun.polyv.liveecommerce.modules.member.PLVECMemberListLayoutLand;
@@ -83,11 +85,13 @@ import com.plv.socket.event.chat.PLVLikesEvent;
 import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowProductDetailEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
@@ -111,6 +115,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private PLVECBulletinView bulletinLy;
     //欢迎语
     private PLVECGreetingView greetLy;
+    private PLVECSignInTipsView signInTipsView;
+    private PLVECProductClickTipsView productClickTipsView;
     //viewpager
     private PLVNoOverScrollViewPager chatViewPager;
     private PLVECChatFragment chatFragment;
@@ -290,6 +296,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             }
         });
         greetLy = findViewById(R.id.greet_ly);
+        signInTipsView = findViewById(R.id.sign_in_tips_ly);
+        productClickTipsView = findViewById(R.id.product_click_tips_ly);
         //聊天区域
         chatViewPager = findViewById(R.id.chat_msg_vp);
         chatViewPager.setPageMargin(ConvertUtils.dp2px(20));
@@ -367,7 +375,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                 @Override
                 public void onShowProductDetail(PLVShowProductDetailEvent param) {
                     if (onViewActionListener != null) {
-                        onViewActionListener.onShowProductDetail(param);
+                        onViewActionListener.onShowProductDetail(param.getProductId());
                     }
                 }
 
@@ -699,10 +707,18 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="聊天室 - 欢迎语控制">
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 信息提示">
     private void acceptLoginMessage(PLVLoginEvent loginEvent) {
         //显示欢迎语
         greetLy.acceptGreetingMessage(loginEvent);
+    }
+
+    private void acceptSignInTipsMessage(PLVSignInTimesEvent signInTimesEvent) {
+        signInTipsView.acceptMessage(signInTimesEvent);
+    }
+
+    private void acceptProductClickMessage(PLVProductClickEvent productClickEvent) {
+        productClickTipsView.acceptMessage(productClickEvent);
     }
     // </editor-fold>
 
@@ -822,6 +838,16 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         }
 
         @Override
+        public void onSignInTimesEvent(@NonNull PLVSignInTimesEvent signInTimesEvent) {
+            acceptSignInTipsMessage(signInTimesEvent);
+        }
+
+        @Override
+        public void onProductClickEvent(@NonNull PLVProductClickEvent productClickEvent) {
+            acceptProductClickMessage(productClickEvent);
+        }
+
+        @Override
         public void onRemoveBulletinEvent() {
             super.onRemoveBulletinEvent();
             removeBulletin();
@@ -903,6 +929,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
             if (onViewActionListener != null) {
                 onViewActionListener.onReceiveRedPaper(redPaperEvent);
+            }
+        }
+
+        @Override
+        public void onClickProductDetail(int productId) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowProductDetail(productId);
             }
         }
     };
@@ -1295,9 +1328,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         /**
          * 展示商品详情
-         * @param param
+         * @param productId
          */
-        void onShowProductDetail(PLVShowProductDetailEvent param);
+        void onShowProductDetail(int productId);
 
         /**
          * 展示用于跳转微信复制的二维码

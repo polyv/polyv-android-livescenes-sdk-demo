@@ -39,6 +39,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.template.PLVTemplateController;
+import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVColorPickerView;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
 import com.easefun.polyv.livecommon.module.utils.water.PLVImagePickerUtil;
@@ -62,6 +63,7 @@ import com.plv.image.segmenter.api.PLVImageSegmenterManager;
 import com.plv.image.segmenter.api.enums.PLVImageSegmenterInitCode;
 import com.plv.linkmic.PLVLinkMicConstant;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
+import com.plv.linkmic.processor.PLVRTCPickColorListener;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.access.PLVUserAbility;
@@ -147,6 +149,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private PLVPhotoContainer waterLayout;
     private PLVVirtualBackgroundLayout virtualBackgroundLayout;
     private PLVTemplateController templateController;
+    private PLVColorPickerView colorPickerView;
 
     private String liveTitle;
 
@@ -253,6 +256,7 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
 
         initTemplateController();
         initWaterLayout();
+        initColorPickerView();
         initTitleInputLayout();
         initBitrateLayout();
         initMixLayout();
@@ -299,6 +303,29 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         });
     }
 
+    private void initColorPickerView() {
+        colorPickerView = findViewById(R.id.plvsa_color_picker_view);
+        colorPickerView.setOnColorPickerListener(new PLVColorPickerView.OnColorPickerListener() {
+            @Override
+            public void onPositionChanged(float xPercent, float yPercent) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setPickColorPosition(xPercent, yPercent);
+                }
+            }
+
+            @Override
+            public void onPickedColor(float[] rgb) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setStartPickColor(false);
+                }
+                if (virtualBackgroundLayout != null) {
+                    virtualBackgroundLayout.updateSelectCurtainColor(rgb);
+                    virtualBackgroundLayout.show();
+                }
+            }
+        });
+    }
+
     private void initVirtualBgLayout() {
         virtualBackgroundLayout = PLVVirtualBackgroundLayout.init(this, new PLVVirtualBackgroundLayout.OnViewActionListener() {
             @Override
@@ -338,6 +365,24 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
             public void onSelectedBlur() {
                 if (streamerPresenter != null) {
                     streamerPresenter.setVirtualBackground(null, true);
+                }
+            }
+
+            @Override
+            public void onClickColorPicker() {
+                virtualBackgroundLayout.dismiss();
+                if (streamerPresenter != null) {
+                    streamerPresenter.setStartPickColor(true);
+                }
+                if (colorPickerView != null) {
+                    colorPickerView.show();
+                }
+            }
+
+            @Override
+            public void onCurtainColorChanged(float[] curtainColor, float similarity, float smoothness, float spill) {
+                if (streamerPresenter != null) {
+                    streamerPresenter.setCurtainColor(curtainColor, similarity, smoothness, spill);
                 }
             }
         });
@@ -895,6 +940,16 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         @Override
         public void onStreamerEngineCreatedSuccess(String linkMicUid, List<PLVLinkMicItemDataBean> linkMicList) {
             initVirtualBgLayout();
+            if (streamerPresenter != null) {
+                streamerPresenter.setPickColorListener(new PLVRTCPickColorListener() {
+                    @Override
+                    public void onPickedColor(float[] rgb) {
+                        if (colorPickerView != null) {
+                            colorPickerView.updatePickedColor(rgb);
+                        }
+                    }
+                });
+            }
         }
 
         @Override
@@ -959,10 +1014,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
                             case RATIO_16_9:
                                 settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_16_9);
                                 waterLayout.setAspectRatio(16.0f / 9.0f);
+                                colorPickerView.updateLayout(16.0f / 9.0f);
                                 break;
                             case RATIO_4_3:
                                 settingPushResolutionRatioIv.setImageResource(R.drawable.plvsa_live_room_setting_ratio_4_3);
                                 waterLayout.setAspectRatio(4.0f / 3.0f);
+                                colorPickerView.updateLayout(4.0f / 3.0f);
                                 break;
                             default:
                         }

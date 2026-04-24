@@ -83,7 +83,6 @@ import com.plv.livescenes.video.subtitle.vo.PLVLiveSubtitleTranslation;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowLotteryEvent;
-import com.plv.socket.event.interact.PLVShowProductDetailEvent;
 import com.plv.socket.event.interact.PLVShowPushCardEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.socket.user.PLVSocketUserConstant;
@@ -1078,9 +1077,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
             }
 
             @Override
-            public void onShowProductDetail(PLVShowProductDetailEvent param) {
+            public void onShowProductDetail(int productId) {
                 if (popoverLayout != null) {
-                    popoverLayout.getProductDetailLayout().showProductDetail(param.getProductId());
+                    popoverLayout.getProductDetailLayout().showProductDetail(productId);
                 }
             }
 

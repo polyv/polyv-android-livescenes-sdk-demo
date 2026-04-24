@@ -99,6 +99,11 @@ public class PLVECQuizFragment extends PLVBaseFragment {
             @Override
             public void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent) {
             }
+
+            @Override
+            public void onClickProductDetail(int productId) {
+
+            }
         });
         //下拉控件
         swipeLoadView = findViewById(R.id.swipe_load_view);

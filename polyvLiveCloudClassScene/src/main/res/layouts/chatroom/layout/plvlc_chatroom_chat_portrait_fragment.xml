@@ -49,7 +49,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/bulletin_ly"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -95,11 +94,29 @@
             android:src="@drawable/plvlc_chatroom_welcome_start_right" />
     </RelativeLayout>
 
+    <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCProductClickTipsView
+        android:id="@+id/product_click_tips_ly"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:layout_below="@+id/greeting_fl"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCSignInTipsView
+        android:id="@+id/sign_in_tips_ly"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:layout_below="@+id/product_click_tips_ly"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <com.easefun.polyv.livecloudclass.modules.chatroom.widget.PLVLCChatTipsLayout
         android:id="@+id/plvlc_chat_tips_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bulletin_ly"
+        android:layout_below="@+id/bulletin_ly"
         android:visibility="gone" />
 
     <!--    积分打赏动画-->
@@ -107,7 +124,8 @@
         android:id="@+id/plvlc_point_reward_effect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/greeting_fl" />
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/sign_in_tips_ly" />
 
     <!--   积分打赏动画特效 -->
     <com.opensource.svgaplayer.SVGAImageView

@@ -736,5 +736,16 @@
     <string name="plv_streamer_setting_template">テンプレート</string>
     <string name="plv_streamer_setting_template_no_support_tips">横画面でのテンプレート設定はしばらくサポートされていません。縦画面に切り替えて再試行してください！</string>
     <string name="plv_common_text_no_data">データが一時的にありません</string>
+    <string name="plv_linkmic_allow_viewer_auto_join">観衆が進んで麦を割る</string>
+    <string name="plv_streamer_allow_viewer_auto_linkmic_toast">観客が積極的に麦を入れるようになった</string>
+    <string name="plv_streamer_disallow_viewer_auto_linkmic_toast">観客をシャットダウンして麦をすすめる</string>
     <string name="plv_streamer_set_first_view_text">メイン画面にする</string>
+    <string name="plv_streamer_professional_green_screen">プログリーンカーテン</string>
+    <string name="plv_streamer_curtain_color">幕の色</string>
+    <string name="plv_streamer_advanced_regulation">高度な調整（専門外の場合は変更しないでください）</string>
+    <string name="plv_streamer_restore_recommendations">リカバリの推奨事項</string>
+    <string name="plv_streamer_chroma_keying_range">キーイングレンジ</string>
+    <string name="plv_streamer_edge_softening">エッジフレキシブル</string>
+    <string name="plv_streamer_remove_ambient_light">アンビエントライトを除去するには</string>
+    <string name="plv_streamer_need_camera_in_main_screen">カメラとドキュメントの場所を切り替えて使用してください</string>
 </resources>

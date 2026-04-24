@@ -41,6 +41,7 @@ import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
@@ -55,6 +56,9 @@ import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.model.interact.PLVWelfareLotteryVO;
+import com.plv.livescenes.socket.PLVSocketWrapper;
+import com.plv.socket.event.PLVEventConstant;
+import com.plv.socket.event.commodity.PLVProductClickBean;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 import com.plv.socket.event.interact.PLVChangeRedpackStatusEvent;
 import com.plv.socket.event.interact.PLVCheckLotteryCommentEvent;
@@ -642,6 +646,17 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
                 return;
             }
+
+            //发送点击卡片事件
+            PLVProductClickBean clickBean = new PLVProductClickBean();
+            PLVProductClickBean.DataBean dataBean = new PLVProductClickBean.DataBean();
+            dataBean.setType(onClickDataVO.getData().getProductType());
+            dataBean.setPositionName(onClickDataVO.getData().getName());
+            dataBean.setProductId(onClickDataVO.getData().getProductId());
+            dataBean.setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+            clickBean.setData(dataBean);
+            clickBean.setRoomId(liveRoomDataManager.getConfig().getChannelId());
+            PLVSocketWrapper.getInstance().emit(PLVEventConstant.Chatroom.EVENT_PRODUCT, new Gson().toJson(clickBean));
 
             if (onClickDataVO.getData().isInnerBuy()) {
                 onShowOpenLink();

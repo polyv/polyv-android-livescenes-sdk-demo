@@ -23,11 +23,13 @@ import com.plv.socket.event.chat.PLVRewardEvent;
 import com.plv.socket.event.chat.PLVSpeakEvent;
 import com.plv.socket.event.chat.PLVTAnswerEvent;
 import com.plv.socket.event.chat.PLVToTopEvent;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.commodity.PLVProductMenuSwitchEvent;
 import com.plv.socket.event.commodity.PLVProductMoveEvent;
 import com.plv.socket.event.commodity.PLVProductRemoveEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.user.PLVSocketUserBean;
@@ -75,6 +77,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onRewardEvent(@NonNull PLVRewardEvent rewardEvent) {
+
+    }
+
+    @Override
+    public void onSignInTimesEvent(@NonNull PLVSignInTimesEvent signInTimesEvent) {
+
+    }
+
+    @Override
+    public void onProductClickEvent(@NonNull PLVProductClickEvent productClickEvent) {
 
     }
 

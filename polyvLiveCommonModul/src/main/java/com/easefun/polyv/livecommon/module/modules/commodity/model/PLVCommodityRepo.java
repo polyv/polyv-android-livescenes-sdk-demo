@@ -45,8 +45,16 @@ public class PLVCommodityRepo implements IPLVLifecycleAwareDependComponent {
         }
     });
 
+    public Observable<String> productRefreshProductListObservable = Observable.create(new ObservableOnSubscribe<String>() {
+        @Override
+        public void subscribe(@NonNull ObservableEmitter<String> emitter) throws Exception {
+            productRefreshProductListEmitter = emitter;
+        }
+    });
+
     private Emitter<PLVCommodityProductVO> productEmitter;
     private Emitter<PLVProductClickTimesEvent> productClickTimesEmitter;
+    private Emitter<String> productRefreshProductListEmitter;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -75,7 +83,8 @@ public class PLVCommodityRepo implements IPLVLifecycleAwareDependComponent {
                             }
                         }) != null;
                         final boolean isProductClickTimesEvent = PLVEventConstant.Chatroom.EVENT_PRODUCT_CLICK_TIMES.equals(message.getEvent());
-                        return (isMessageEvent && isProductEvent && checkSocketValid) || isProductClickTimesEvent;
+                        final boolean isProductRefreshProductListEvent = PLVEventConstant.Chatroom.EVENT_PRODUCT_REFRESH_PRODUCT_LIST.equals(message.getEvent());
+                        return (isMessageEvent && isProductEvent && checkSocketValid) || isProductClickTimesEvent || isProductRefreshProductListEvent;
                     }
                 })
                 .doOnNext(new Consumer<PLVSocketMessage>() {
@@ -88,6 +97,9 @@ public class PLVCommodityRepo implements IPLVLifecycleAwareDependComponent {
                         if (PLVEventConstant.Chatroom.EVENT_PRODUCT_CLICK_TIMES.equals(message.getEvent())) {
                             PLVProductClickTimesEvent clickTimes = PLVGsonUtil.fromJson(PLVProductClickTimesEvent.class, message.getMessage());
                             productClickTimesEmitter.onNext(clickTimes);
+                        }
+                        if (PLVEventConstant.Chatroom.EVENT_PRODUCT_REFRESH_PRODUCT_LIST.equals(message.getEvent())) {
+                            productRefreshProductListEmitter.onNext(message.getMessage());
                         }
                     }
                 })

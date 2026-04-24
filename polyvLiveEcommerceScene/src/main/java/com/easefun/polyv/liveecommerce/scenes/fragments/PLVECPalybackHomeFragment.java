@@ -44,7 +44,9 @@ import com.easefun.polyv.liveecommerce.modules.chatroom.layout.PLVECChatOverLeng
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECChatImgScanPopupView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECGreetingView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECProductClickTipsView;
 import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECRedpackView;
+import com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECSignInTipsView;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityPopupLayout2;
 import com.easefun.polyv.liveecommerce.modules.commodity.PLVECProductPushCardLayout;
 import com.easefun.polyv.liveecommerce.modules.playback.fragments.IPLVECPreviousDialogFragment;
@@ -71,9 +73,11 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.event.chat.PLVChatQuoteVO;
+import com.plv.socket.event.commodity.PLVProductClickEvent;
 import com.plv.socket.event.interact.PLVNewsPushStartEvent;
 import com.plv.socket.event.interact.PLVShowJobDetailEvent;
 import com.plv.socket.event.interact.PLVShowProductDetailEvent;
+import com.plv.socket.event.interact.PLVSignInTimesEvent;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.event.redpack.PLVRedPaperEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
@@ -107,6 +111,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     //欢迎语
     private PLVECGreetingView greetLy;
+    private PLVECSignInTipsView signInTipsView;
+    private PLVECProductClickTipsView productClickTipsView;
     //聊天区域
     private PLVMessageRecyclerView chatMsgRv;
     private PLVECChatMessageAdapter chatMessageAdapter;
@@ -284,6 +290,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             });
         }
         greetLy = findViewById(R.id.greet_ly);
+        signInTipsView = findViewById(R.id.sign_in_tips_ly);
+        productClickTipsView = findViewById(R.id.product_click_tips_ly);
         chatMsgRv = findViewById(R.id.chat_msg_rv);
         PLVMessageRecyclerView.setLayoutManager(chatMsgRv).setStackFromEnd(true);
         chatMsgRv.addItemDecoration(new PLVMessageRecyclerView.SpacesItemDecoration(ConvertUtils.dp2px(4)));
@@ -312,6 +320,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
                 if (onViewActionListener != null) {
                     onViewActionListener.onReceiveRedPaper(redPaperEvent);
                 }
+            }
+
+            @Override
+            public void onClickProductDetail(int productId) {
+
             }
         });
         // 追踪红包曝光事件
@@ -740,7 +753,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="聊天室 - 欢迎语控制">
+    // <editor-fold defaultstate="collapsed" desc="聊天室 - 信息提示">
     private void acceptLoginMessage(PLVLoginEvent loginEvent) {
         //暂不支持在线聊天，因此也不显示非聊天回放的欢迎语
         if (!isChatPlaybackEnabled) {
@@ -748,6 +761,22 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         }
         //显示欢迎语
         greetLy.acceptGreetingMessage(loginEvent);
+    }
+
+    private void acceptSignInTipsMessage(PLVSignInTimesEvent signInTimesEvent) {
+        //暂不支持在线聊天，因此也不显示非聊天回放的欢迎语
+        if (!isChatPlaybackEnabled) {
+            return;
+        }
+        signInTipsView.acceptMessage(signInTimesEvent);
+    }
+
+    private void acceptProductClickMessage(PLVProductClickEvent productClickEvent) {
+        //暂不支持在线聊天，因此也不显示非聊天回放的欢迎语
+        if (!isChatPlaybackEnabled) {
+            return;
+        }
+        productClickTipsView.acceptMessage(productClickEvent);
     }
     // </editor-fold>
 
@@ -762,6 +791,16 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         public void onLoginEvent(@NonNull PLVLoginEvent loginEvent) {
             super.onLoginEvent(loginEvent);
             acceptLoginMessage(loginEvent);
+        }
+
+        @Override
+        public void onSignInTimesEvent(@NonNull PLVSignInTimesEvent signInTimesEvent) {
+            acceptSignInTipsMessage(signInTimesEvent);
+        }
+
+        @Override
+        public void onProductClickEvent(@NonNull PLVProductClickEvent productClickEvent) {
+            acceptProductClickMessage(productClickEvent);
         }
 
         @Override

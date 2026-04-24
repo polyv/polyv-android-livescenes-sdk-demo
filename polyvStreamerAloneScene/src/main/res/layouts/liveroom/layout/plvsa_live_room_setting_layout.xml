@@ -514,4 +514,11 @@
         android:id="@+id/plvsa_water_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!--取色布局-->
+    <com.easefun.polyv.livecommon.module.utils.virtualbg.PLVColorPickerView
+        android:id="@+id/plvsa_color_picker_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
 </FrameLayout>

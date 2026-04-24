@@ -101,6 +101,13 @@ public class PLVLCChatCommonMessageList {
                     onViewActionListener.onReceiveRedPaper(redPaperEvent);
                 }
             }
+
+            @Override
+            public void callOnClickProductDetail(int productId) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onClickProductDetail(productId);
+                }
+            }
         });
         chatMsgRv.setAdapter(messageAdapter);
     }
@@ -342,6 +349,8 @@ public class PLVLCChatCommonMessageList {
         void onReplyMessage(PLVChatQuoteVO chatQuoteVO);
 
         void onReceiveRedPaper(PLVRedPaperEvent redPaperEvent);
+
+        void onClickProductDetail(int productId);
     }
 
     // </editor-fold>

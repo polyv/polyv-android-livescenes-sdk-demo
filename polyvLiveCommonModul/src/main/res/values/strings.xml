@@ -737,5 +737,16 @@
     <string name="plv_streamer_setting_template">template</string>
     <string name="plv_streamer_setting_template_no_support_tips">We currently do not support setting templates in landscape mode. Please switch to portrait mode and try again!</string>
     <string name="plv_common_text_no_data">No data available</string>
+    <string name="plv_linkmic_allow_viewer_auto_join">Self-Mic-On</string>
+    <string name="plv_streamer_allow_viewer_auto_linkmic_toast">The audience has initiated the live streaming feature</string>
+    <string name="plv_streamer_disallow_viewer_auto_linkmic_toast">Viewers have turned off active microphone access</string>
     <string name="plv_streamer_set_first_view_text">Set as the main screen</string>
+    <string name="plv_streamer_professional_green_screen">Professional Green Screen</string>
+    <string name="plv_streamer_curtain_color">Screen color</string>
+    <string name="plv_streamer_advanced_regulation">Advanced adjustment (need professional)</string>
+    <string name="plv_streamer_restore_recommendations">Restore recommendation</string>
+    <string name="plv_streamer_chroma_keying_range">Range of cutout</string>
+    <string name="plv_streamer_edge_softening">edge softness </string>
+    <string name="plv_streamer_remove_ambient_light">Go to ambient light</string>
+    <string name="plv_streamer_need_camera_in_main_screen">Please switch the camera and document location before use</string>
 </resources>

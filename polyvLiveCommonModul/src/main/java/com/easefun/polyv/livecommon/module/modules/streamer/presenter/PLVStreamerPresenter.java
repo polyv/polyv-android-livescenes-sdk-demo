@@ -52,6 +52,7 @@ import com.plv.linkmic.model.PLVLinkMicJoinSuccess;
 import com.plv.linkmic.model.PLVNetworkStatusVO;
 import com.plv.linkmic.model.PLVPushDowngradePreference;
 import com.plv.linkmic.model.PLVPushStreamTemplateJsonBean;
+import com.plv.linkmic.processor.PLVRTCPickColorListener;
 import com.plv.linkmic.repository.PLVLinkMicDataRepository;
 import com.plv.linkmic.repository.PLVLinkMicHttpRequestException;
 import com.plv.linkmic.screenshare.IPLVScreenShareListener;
@@ -217,6 +218,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     private boolean isMyselfJoinRtc = false;
     private PLVAutoSaveKV<PLVLinkMicDenoiseType> denoiseTypeKV = new PLVAutoSaveKV<PLVLinkMicDenoiseType>("plv_streamer_denoise_type_new") {};
     private PLVAutoSaveKV<Boolean> isUseExternalAudioInputKV = new PLVAutoSaveKV<Boolean>("plv_streamer_is_use_external_audio_input") {};
+    private PLVAutoSaveKV<Boolean> isSmallClassAllowLinkMic = new PLVAutoSaveKV<Boolean>("plv_streamer_is_small_class_allow_link_mic") {};
     private Bitmap watermarkBitmap;
     private View myRenderView;
     private ViewGroup myRenderViewParent;
@@ -255,6 +257,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         curBitrate = loadBitrate();
         streamerLinkMicMsgHandler = PLVStreamerLinkMicMsgHandler.create(liveRoomDataManager.getConfig().getChannelId());
         streamerLinkMicMsgHandler.setStreamerPresenter(this);
+        if (isSmallClassType()) {
+            streamerLinkMicMsgHandler.isAllowViewerRaiseHand = isSmallClassAllowLinkMic.getOrDefault(false);
+        }
         initMixLayoutType();
         initNewLinkMicStrategyDefaultType();
 
@@ -853,6 +858,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 if (ack != null) {
                     ack.call(args);
                 }
+                if (isSmallClassType()) {
+                    isSmallClassAllowLinkMic.set(true);
+                }
                 callbackToView(new ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -870,6 +878,9 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             public void call(Object... args) {
                 if (ack != null) {
                     ack.call(args);
+                }
+                if (isSmallClassType()) {
+                    isSmallClassAllowLinkMic.set(false);
                 }
                 callbackToView(new ViewRunnable() {
                     @Override
@@ -898,6 +909,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 callUpdateSortMemberList();
             }
         });
+    }
+
+    @Override
+    public boolean isSmallClassAllowViewerRaiseHand() {
+        return isSmallClassAllowLinkMic.getOrDefault(false);
     }
 
     @Override
@@ -1361,6 +1377,26 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     @Override
     public void setVirtualBackground(Bitmap bitmap, boolean onlyBlurBackground) {
         streamerManager.setVirtualBackground(bitmap, onlyBlurBackground);
+    }
+
+    @Override
+    public void setCurtainColor(float[] curtainColor, float similarity, float smoothness, float spill) {
+        streamerManager.setCurtainColor(curtainColor, similarity, smoothness, spill);
+    }
+
+    @Override
+    public void setStartPickColor(boolean isStart) {
+        streamerManager.setStartPickColor(isStart);
+    }
+
+    @Override
+    public void setPickColorPosition(float xPercent, float yPercent) {
+        streamerManager.setPickColorPosition(xPercent, yPercent);
+    }
+
+    @Override
+    public void setPickColorListener(PLVRTCPickColorListener listener) {
+        streamerManager.setPickColorListener(listener);
     }
 
     @Override
@@ -2633,6 +2669,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         }
     }
 
+    private boolean isSmallClassType() {
+        return PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view回调">

@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.utils.virtualbg;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
@@ -27,6 +30,7 @@ import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVAppUtils;
+import com.plv.foundationsdk.utils.PLVFormatUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
@@ -47,6 +51,7 @@ import io.reactivex.schedulers.Schedulers;
 public class PLVVirtualBackgroundLayout {
     private static final String KEY_UPLOAD_VIRTUAL_BACKGROUND = "key_upload_virtual_background";
     private static final String KEY_SELECT_VIRTUAL_BACKGROUND = "key_select_virtual_background";
+    private static final String KEY_SELECT_CURTAIN_COLOR = "key_select_curtain_color";
     private static final String NUMBER_PREFIX = "本地0";
     private static final int CAN_UPLOAD_SIZE = 3;
     private static final int NORMAL_BUTTON_COUNT = 3;
@@ -59,6 +64,20 @@ public class PLVVirtualBackgroundLayout {
     private RecyclerView virtualBgTopRv;
     private RecyclerView virtualBgBottomRv;
     private List<VirtualBgItemData> virtualBgTopDataList;
+
+    // Professional Green Screen UI Components
+    private Switch professionalGreenScreenToggle;
+    private View professionalGreenScreenSettings;
+    private ImageView curtainColorGreen;
+    private ImageView curtainColorBlue;
+    private ImageView curtainColorPicker;
+    private View advancedAdjustmentHeader;
+    private View advancedAdjustmentContent;
+    private TextView advancedAdjustmentArrow;
+    private TextView restoreRecommendedBtn;
+    private SeekBar keyingRangeSlider;
+    private SeekBar edgeSoftnessSlider;
+    private SeekBar removeAmbientLightSlider;
     private VirtualBgAdapter virtualBgTopAdapter;
     private VirtualBgAdapter virtualBgBottomAdapter;
     private List<Integer> virtualBgImageIdList = Arrays.asList(
@@ -91,6 +110,17 @@ public class PLVVirtualBackgroundLayout {
     private OnViewActionListener onViewActionListener;
     private boolean isUseBlackStyle;
     private boolean isFeatureEnabled;
+    // 绿幕抠像
+    private static final String CURTAIN_COLOR_GREEN = "#75FB4C";
+    private static final String CURTAIN_COLOR_BLUE = "#0000F5";
+    private static final float DEFAULT_SIMILARITY = 0.4f;
+    private static final float DEFAULT_SMOOTHNESS = 0.4f;
+    private static final float DEFAULT_SPILL = 0.0f;
+    private String selectedCurtainColor = CURTAIN_COLOR_GREEN;
+    private float[] curtainColor = null;
+    private float similarity = DEFAULT_SIMILARITY;
+    private float smoothness = DEFAULT_SMOOTHNESS;
+    private float spill = DEFAULT_SPILL;
 
     public static PLVVirtualBackgroundLayout init(View anchorView, OnViewActionListener listener) {
         if (instance == null) {
@@ -114,6 +144,23 @@ public class PLVVirtualBackgroundLayout {
         instance = null;
     }
 
+    public static float[] toFloatColor(String color) {
+        int colorInt = PLVFormatUtils.parseColor(color);
+        return new float[]{
+                Color.red(colorInt) / 255f,
+                Color.green(colorInt) / 255f,
+                Color.blue(colorInt) / 255f
+        };
+    }
+
+    public static int toIntColor(float[] rgb) {
+        return Color.rgb((int) (rgb[0] * 255), (int) (rgb[1] * 255), (int) (rgb[2] * 255));
+    }
+
+    public static String toStringColor(float[] rgb) {
+        return String.format("#%06X", (0xFFFFFF & toIntColor(rgb)));
+    }
+
     public PLVVirtualBackgroundLayout(View anchorView, OnViewActionListener listener) {
         this.currentIsPortrait = ScreenUtils.isPortrait();
         this.onViewActionListener = listener;
@@ -124,6 +171,14 @@ public class PLVVirtualBackgroundLayout {
             }, uploadVirtualBackgroundString);
         }
         popupWindow = new PopupWindow(anchorView.getContext());
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                if (advancedAdjustmentContent.getVisibility() == View.VISIBLE) {
+                    advancedAdjustmentHeader.performClick();
+                }
+            }
+        });
         view = PLVViewInitUtils.initPopupWindow(anchorView, R.layout.plv_virtual_background_layout, popupWindow, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,8 +238,195 @@ public class PLVVirtualBackgroundLayout {
             virtualBgBottomAdapter.updateSelected(selectedPosition - CAN_UPLOAD_SIZE - NORMAL_BUTTON_COUNT);
             onCallBySelectedBg(selectedPosition - CAN_UPLOAD_SIZE - NORMAL_BUTTON_COUNT, virtualBgBottomAdapter.dataList, false);
         }
+
+        // Initialize Professional Green Screen UI Components
+        initProfessionalGreenScreenUI();
+
         if (isUseBlackStyle) {
             setUseBlackStyle();
+        }
+    }
+
+    private void initProfessionalGreenScreenUI() {
+        // Find all professional green screen UI components
+        professionalGreenScreenToggle = view.findViewById(R.id.plv_professional_green_screen_toggle);
+        professionalGreenScreenSettings = view.findViewById(R.id.plv_professional_green_screen_settings);
+        curtainColorGreen = view.findViewById(R.id.plv_curtain_color_green);
+        curtainColorBlue = view.findViewById(R.id.plv_curtain_color_blue);
+        curtainColorPicker = view.findViewById(R.id.plv_curtain_color_picker);
+        advancedAdjustmentHeader = view.findViewById(R.id.plv_advanced_adjustment_header);
+        advancedAdjustmentContent = view.findViewById(R.id.plv_advanced_adjustment_content);
+        advancedAdjustmentArrow = view.findViewById(R.id.plv_advanced_adjustment_arrow);
+        restoreRecommendedBtn = view.findViewById(R.id.plv_restore_recommended_btn);
+        keyingRangeSlider = view.findViewById(R.id.plv_keying_range_slider);
+        edgeSoftnessSlider = view.findViewById(R.id.plv_edge_softness_slider);
+        removeAmbientLightSlider = view.findViewById(R.id.plv_remove_ambient_light_slider);
+
+        // Set default curtain color selection
+        curtainColorGreen.setSelected(true);
+
+        String savedCurtainColor = SPUtils.getInstance().getString(KEY_SELECT_CURTAIN_COLOR, "");
+        if (!TextUtils.isEmpty(savedCurtainColor)) {
+            CurtainColorBean curtainColorBean = PLVGsonUtil.fromJson(CurtainColorBean.class, savedCurtainColor);
+            if (curtainColorBean != null) {
+                this.similarity = curtainColorBean.similarity;
+                this.smoothness = curtainColorBean.smoothness;
+                this.spill = curtainColorBean.spill;
+                this.selectedCurtainColor = curtainColorBean.selectedColor;
+                if (curtainColorBean.color != null) {
+                    professionalGreenScreenToggle.setChecked(true);
+                    professionalGreenScreenSettings.setVisibility(View.VISIBLE);
+                    updateSelectCurtainColor(curtainColorBean.color);
+                }
+                if (CURTAIN_COLOR_GREEN.equals(selectedCurtainColor)) {
+                    selectCurtainColor("green");
+                } else if (CURTAIN_COLOR_BLUE.equals(selectedCurtainColor)) {
+                    selectCurtainColor("blue");
+                } else {
+                    curtainColorPicker.setBackgroundColor(PLVFormatUtils.parseColor(selectedCurtainColor));
+                    selectCurtainColor("custom");
+                }
+            }
+        }
+
+        keyingRangeSlider.setProgress((int) (similarity * 100));
+        edgeSoftnessSlider.setProgress((int) (smoothness * 100));
+        removeAmbientLightSlider.setProgress((int) (spill * 100));
+
+        // Professional Green Screen Toggle Listener
+        professionalGreenScreenToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            professionalGreenScreenSettings.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (isChecked && advancedAdjustmentContent.getVisibility() == View.VISIBLE) {
+                advancedAdjustmentHeader.performClick();
+            }
+            if (isChecked) {
+                curtainColor = toFloatColor(selectedCurtainColor);
+            } else {
+                curtainColor = null;
+            }
+            onCurtainColorChanged();
+        });
+
+        // Curtain Color Listeners
+        curtainColorGreen.setOnClickListener(v -> {
+            selectedCurtainColor = CURTAIN_COLOR_GREEN;
+            curtainColor = toFloatColor(selectedCurtainColor);
+            selectCurtainColor("green");
+            onCurtainColorChanged();
+        });
+
+        curtainColorBlue.setOnClickListener(v -> {
+            selectedCurtainColor = CURTAIN_COLOR_BLUE;
+            curtainColor = toFloatColor(selectedCurtainColor);
+            selectCurtainColor("blue");
+            onCurtainColorChanged();
+        });
+
+        curtainColorPicker.setOnClickListener(v -> {
+            if (onViewActionListener != null) {
+                onViewActionListener.onClickColorPicker();
+            }
+        });
+
+        // Advanced Adjustment Header Listener
+        advancedAdjustmentHeader.setOnClickListener(v -> {
+            boolean isExpanded = advancedAdjustmentContent.getVisibility() == View.VISIBLE;
+            advancedAdjustmentContent.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
+            restoreRecommendedBtn.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
+            advancedAdjustmentArrow.setRotation(isExpanded ? 90f : 270f);
+        });
+
+        // Restore Recommended Button Listener
+        restoreRecommendedBtn.setOnClickListener(v -> {
+            // Reset sliders to default values
+            keyingRangeSlider.setProgress((int) (DEFAULT_SIMILARITY * 100));
+            edgeSoftnessSlider.setProgress((int) (DEFAULT_SMOOTHNESS * 100));
+            removeAmbientLightSlider.setProgress((int) (DEFAULT_SPILL * 100));
+            similarity = DEFAULT_SIMILARITY;
+            smoothness = DEFAULT_SMOOTHNESS;
+            spill = DEFAULT_SPILL;
+
+            onCurtainColorChanged();
+        });
+
+        // Slider Listeners
+        keyingRangeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    similarity = progress / 100f;
+                    onCurtainColorChanged();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        edgeSoftnessSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    smoothness = progress / 100f;
+                    onCurtainColorChanged();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        removeAmbientLightSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && onViewActionListener != null) {
+                    spill = progress / 100f;
+                    onCurtainColorChanged();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    public void updateSelectCurtainColor(float[] curtainColor) {
+        this.selectedCurtainColor = toStringColor(curtainColor);
+        this.curtainColor = curtainColor;
+        curtainColorPicker.setBackgroundColor(toIntColor(curtainColor));
+        selectCurtainColor("custom");
+        onCurtainColorChanged();
+    }
+
+    private void onCurtainColorChanged() {
+        if (onViewActionListener != null) {
+            onViewActionListener.onCurtainColorChanged(curtainColor, similarity, smoothness, spill);
+        }
+        SPUtils.getInstance().put(KEY_SELECT_CURTAIN_COLOR, PLVGsonUtil.toJson(new CurtainColorBean(curtainColor, selectedCurtainColor, similarity, smoothness, spill)));
+    }
+
+    private void selectCurtainColor(String color) {
+        curtainColorGreen.setSelected("green".equals(color));
+        curtainColorBlue.setSelected("blue".equals(color));
+        curtainColorPicker.setSelected("custom".equals(color));
+        ((ViewGroup) curtainColorPicker.getParent()).setBackgroundColor(color.equals("custom") ? Color.WHITE : Color.TRANSPARENT);
+        if (!"custom".equals(color)) {
+            curtainColorPicker.setBackgroundColor(PLVFormatUtils.parseColor("#394150"));
         }
     }
 
@@ -250,13 +492,14 @@ public class PLVVirtualBackgroundLayout {
 
     public void setUseBlackStyle() {
         this.isUseBlackStyle = true;
-        widgetRoundLy.setPadding(ConvertUtils.dp2px(16), 0, ConvertUtils.dp2px(16), 0);
+        virtualBgTopRv.setBackground(null);
+        virtualBgBottomRv.setBackground(null);
         widgetRoundLy.setBackground(null);
         widgetRoundLy.setRoundMode(PLVRoundRectLayout.MODE_NONE);
 
         ViewGroup.MarginLayoutParams titleTvLayoutParams = (ViewGroup.MarginLayoutParams) virtualBgTitleTv.getLayoutParams();
         titleTvLayoutParams.topMargin = ConvertUtils.dp2px(14);
-        titleTvLayoutParams.bottomMargin = ConvertUtils.dp2px(23);
+        titleTvLayoutParams.bottomMargin = ConvertUtils.dp2px(14);
         virtualBgTitleTv.setLayoutParams(titleTvLayoutParams);
 
         titleSeparator.setVisibility(View.VISIBLE);
@@ -303,7 +546,7 @@ public class PLVVirtualBackgroundLayout {
             popupWindow.update();
         }
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) widgetRoundLy.getLayoutParams();
-        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = Math.min(ScreenUtils.getScreenHeight(), ScreenUtils.getScreenWidth());
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.gravity = Gravity.BOTTOM;
         widgetRoundLy.setLayoutParams(layoutParams);
@@ -520,6 +763,10 @@ public class PLVVirtualBackgroundLayout {
         void onCancelBgAndBlur();
 
         void onSelectedBlur();
+
+        void onClickColorPicker();
+
+        void onCurtainColorChanged(float[] curtainColor, float similarity, float smoothness, float spill);
     }
 
     private static class VirtualBgItemData {
@@ -533,6 +780,22 @@ public class PLVVirtualBackgroundLayout {
             this.drawableId = drawableId;
             this.drawablePath = drawablePath;
             this.canDelete = canDelete;
+        }
+    }
+
+    private static class CurtainColorBean {
+        public float[] color;
+        public String selectedColor;
+        public float similarity;
+        public float smoothness;
+        public float spill;
+
+        public CurtainColorBean(float[] color, String selectedColor, float similarity, float smoothness, float spill) {
+            this.color = color;
+            this.selectedColor = selectedColor;
+            this.similarity = similarity;
+            this.smoothness = smoothness;
+            this.spill = spill;
         }
     }
 }

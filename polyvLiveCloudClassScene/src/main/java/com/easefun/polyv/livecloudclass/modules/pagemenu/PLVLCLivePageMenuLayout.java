@@ -817,6 +817,13 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                 }
 
                 @Override
+                public void onClickProductDetail(int productId) {
+                    if (onViewActionListener != null) {
+                        onViewActionListener.onShowProductDetail(productId);
+                    }
+                }
+
+                @Override
                 public void onShowRewardAction() {
                     if (onViewActionListener != null) {
                         onViewActionListener.onShowRewardAction();
@@ -913,7 +920,7 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
             @Override
             public void onShowProductDetail(PLVShowProductDetailEvent param) {
                 if (onViewActionListener != null) {
-                    onViewActionListener.onShowProductDetail(param);
+                    onViewActionListener.onShowProductDetail(param.getProductId());
                 }
             }
 

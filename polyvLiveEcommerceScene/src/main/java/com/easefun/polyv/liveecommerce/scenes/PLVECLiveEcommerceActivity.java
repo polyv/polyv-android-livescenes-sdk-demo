@@ -1313,9 +1313,9 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
         }
 
         @Override
-        public void onShowProductDetail(PLVShowProductDetailEvent param) {
+        public void onShowProductDetail(int productId) {
             if (popoverLayout != null) {
-                popoverLayout.getProductDetailLayout().showProductDetail(param.getProductId());
+                popoverLayout.getProductDetailLayout().showProductDetail(productId);
             }
         }
 
