@@ -39,19 +39,28 @@ public class PLVECChatMessageProductClickViewHolder extends PLVECChatMessageComm
             String symbol = ">";
             // 1. 构造完整文本
             String fullText = String.format("%s %s %s %s", nickName, buyType, positionName, symbol);
+            if ("正在选购".equals(buyType)) {
+                fullText = productClickEvent.getClickFinancialProductEffectTip(nickName, positionName) + symbol;
+            } else if ("正在投递".equals(buyType)) {
+                fullText = productClickEvent.getClickJobProductEffectTip(nickName, positionName) + symbol;
+            } else {
+                fullText = productClickEvent.getClickOrdinaryProductEffectTip(nickName, positionName) + symbol;
+            }
             SpannableStringBuilder spannable = new SpannableStringBuilder(fullText);
 
             // 2. 设置 NickName 颜色（灰色）
-            int nickNameEnd = nickName.length();
-            spannable.setSpan(
-                    new ForegroundColorSpan(Color.parseColor("#ABABAE")), // 灰色
-                    0,
-                    nickNameEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            );
+            int nickNameEnd = fullText.startsWith(nickName) ? nickName.length() : 0;
+            if (nickNameEnd > 0) {
+                spannable.setSpan(
+                        new ForegroundColorSpan(Color.parseColor("#ABABAE")), // 灰色
+                        0,
+                        nickNameEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+            }
 
             // 3. 设置后续文字颜色（白色）并添加点击事件
-            int actionStart = nickNameEnd + 1; // 加1跳过空格
+            int actionStart = nickNameEnd;
             int actionEnd = fullText.length();
 
             // 设置白色

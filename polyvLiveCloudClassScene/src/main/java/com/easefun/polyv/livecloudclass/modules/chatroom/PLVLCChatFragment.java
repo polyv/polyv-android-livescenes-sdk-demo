@@ -703,6 +703,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     if (liveClassDetail == null || liveClassDetail.getData() == null) {
                         return;
                     }
+                    productClickTipsView.setEnableEffect(liveClassDetail.getData().productEffectEnabled(), liveClassDetail);
+                    signInTipsView.setEnableEffect(liveClassDetail.getData().interactionEffectEnabled(), liveClassDetail);
+                    greetingTv.setClassDetailVO(liveClassDetail);
                     chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_PLAY_SETTING, liveClassDetail.getData().getGlobalRtcRecordSetting().isFenestrulePlayEnabled());
                     chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_MY_REWARD, liveClassDetail.getData().isMyRewardsEnabled());
                     // 聊天室背景图
@@ -1583,6 +1586,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     public void updateRewardEffectBtnVisibility(boolean isShow) {
 //        chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_EFFECT, isShow);
     }
+
+    public void updateIsShowGreeting(boolean isShow) {
+        isShowGreeting = isShow;
+    }
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 功能开关处理">
@@ -1598,10 +1605,6 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                             chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_SEND_IMAGE, isSwitchEnabled);
                             chatMoreLayout.updateFunctionShow(PLVLCChatMoreLayout.CHAT_FUNCTION_TYPE_OPEN_CAMERA, isSwitchEnabled);
                         }
-                        break;
-                    //欢迎语开关
-                    case PolyvChatFunctionSwitchVO.TYPE_WELCOME:
-                        isShowGreeting = true;
                         break;
                     //送花/点赞开关
                     case PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED:
