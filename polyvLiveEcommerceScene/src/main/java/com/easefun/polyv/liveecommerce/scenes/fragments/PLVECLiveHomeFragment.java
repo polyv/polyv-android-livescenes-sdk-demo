@@ -115,6 +115,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     private PLVECBulletinView bulletinLy;
     //欢迎语
     private PLVECGreetingView greetLy;
+    private boolean isShowGreeting;//是否显示欢迎语
     private PLVECSignInTipsView signInTipsView;
     private PLVECProductClickTipsView productClickTipsView;
     //viewpager
@@ -581,6 +582,28 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             morePopupView.updateMyRewardFunctionShow(isShow);
         }
     }
+
+    @Override
+    protected void acceptProductEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        if (productClickTipsView != null) {
+            productClickTipsView.setEnableEffect(isEnable, detailVO);
+        }
+    }
+
+    @Override
+    protected void acceptInteractEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        if (signInTipsView != null) {
+            signInTipsView.setEnableEffect(isEnable, detailVO);
+        }
+    }
+
+    @Override
+    protected void acceptVisitEffectEnabled(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        isShowGreeting = isEnable;
+        if (greetLy != null) {
+            greetLy.setClassDetailVO(detailVO);
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
@@ -710,7 +733,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 信息提示">
     private void acceptLoginMessage(PLVLoginEvent loginEvent) {
         //显示欢迎语
-        greetLy.acceptGreetingMessage(loginEvent);
+        if (isShowGreeting) {
+            greetLy.acceptGreetingMessage(loginEvent);
+        }
     }
 
     private void acceptSignInTipsMessage(PLVSignInTimesEvent signInTimesEvent) {

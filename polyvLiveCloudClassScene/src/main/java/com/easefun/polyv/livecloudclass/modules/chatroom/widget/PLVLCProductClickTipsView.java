@@ -16,6 +16,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.commodity.PLVProductClickEvent;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class PLVLCProductClickTipsView extends FrameLayout {
     private boolean isStart;
     private boolean isEnableEffect = false;
     private Disposable acceptDisposable;
+    private PLVLiveClassDetailVO classDetailVO;
 
     public PLVLCProductClickTipsView(@NonNull Context context) {
         this(context, null);
@@ -98,7 +100,18 @@ public class PLVLCProductClickTipsView extends FrameLayout {
                 }
             }
             String text = PLVStringTruncator.truncateToMax6ChineseWidth(stringBuilder.toString());
-            span = new SpannableStringBuilder(String.format("%s 等%s人" + buyType + " %s", text, eventList.size() + "", productName));
+            String nickName = String.format("%s 等%s人", text, eventList.size() + "");
+            String fullText = nickName + buyType + " " + productName;
+            if (classDetailVO != null && classDetailVO.getData() != null) {
+                if ("正在选购".equals(buyType)) {
+                    fullText = classDetailVO.getData().getClickFinancialProductEffectTip(nickName, productName);
+                } else if ("正在投递".equals(buyType)) {
+                    fullText = classDetailVO.getData().getClickJobProductEffectTip(nickName, productName);
+                } else {
+                    fullText = classDetailVO.getData().getClickOrdinaryProductEffectTip(nickName, productName);
+                }
+            }
+            span = new SpannableStringBuilder(fullText);
             /**
              * ///暂时保留该代码
              *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -112,7 +125,17 @@ public class PLVLCProductClickTipsView extends FrameLayout {
             String viewerName = maskViewerName(event);
             viewerName = PLVStringTruncator.truncateToMax6ChineseWidth(viewerName);
             String buyType = event.isFinanceProduct() ? "正在选购" : event.isPositionProduct() ? "正在投递" : "正在购买";
-            span = new SpannableStringBuilder(String.format("%s " + buyType + " %s", viewerName, event.getPositionName()));
+            String fullText = String.format("%s " + buyType + " %s", viewerName, event.getPositionName());
+            if (classDetailVO != null && classDetailVO.getData() != null) {
+                if ("正在选购".equals(buyType)) {
+                    fullText = classDetailVO.getData().getClickFinancialProductEffectTip(viewerName, event.getPositionName());
+                } else if ("正在投递".equals(buyType)) {
+                    fullText = classDetailVO.getData().getClickJobProductEffectTip(viewerName, event.getPositionName());
+                } else {
+                    fullText = classDetailVO.getData().getClickOrdinaryProductEffectTip(viewerName, event.getPositionName());
+                }
+            }
+            span = new SpannableStringBuilder(fullText);
 
             /**
              * ///暂时保留该代码
@@ -146,6 +169,11 @@ public class PLVLCProductClickTipsView extends FrameLayout {
                         PLVCommonLog.e(TAG, "accept throwable:" + throwable.toString());
                     }
                 });
+    }
+
+    public void setEnableEffect(boolean enableEffect, PLVLiveClassDetailVO detailVO) {
+        isEnableEffect = enableEffect;
+        classDetailVO = detailVO;
     }
 
     public void acceptMessage(final PLVProductClickEvent event) {

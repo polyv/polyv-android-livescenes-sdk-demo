@@ -182,6 +182,15 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected void acceptMyRewardFunctionShow(boolean isShow) {
     }
 
+    protected void acceptProductEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+    }
+
+    protected void acceptInteractEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+    }
+
+    protected void acceptVisitEffectEnabled(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+    }
+
     private void acceptLotteryVO(PLVWebviewUpdateAppStatusVO  webviewUpdateAppStatusVO) {
         if (lotteryManager != null) {
             lotteryManager.acceptLotteryVo(webviewUpdateAppStatusVO);
@@ -425,6 +434,9 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                             acceptCloseQuiz();
                         }
                         acceptMyRewardFunctionShow(classDetailVO.getData().isMyRewardsEnabled());
+                        acceptProductEffectEnable(classDetailVO.getData().productEffectEnabled(), classDetailVO);
+                        acceptInteractEffectEnable(classDetailVO.getData().interactionEffectEnabled(), classDetailVO);
+                        acceptVisitEffectEnabled(classDetailVO.getData().visitEffectEnabled(), classDetailVO);
                     }
                 }
             }

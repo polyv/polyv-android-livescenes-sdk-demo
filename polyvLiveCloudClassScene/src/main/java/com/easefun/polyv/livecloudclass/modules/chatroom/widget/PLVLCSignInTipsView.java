@@ -16,6 +16,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.interact.PLVSignInTimesEvent;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class PLVLCSignInTipsView extends FrameLayout {
     private boolean isStart;
     private boolean isEnableEffect = false;
     private Disposable acceptDisposable;
+    private PLVLiveClassDetailVO classDetailVO;
 
     public PLVLCSignInTipsView(@NonNull Context context) {
         this(context, null);
@@ -94,7 +96,12 @@ public class PLVLCSignInTipsView extends FrameLayout {
                 }
             }
             String text = PLVStringTruncator.truncateToMax6ChineseWidth(stringBuilder.toString());
-            span = new SpannableStringBuilder(String.format("%s 等%s人签到成功", text, eventList.size() + ""));
+            String nickName = String.format("%s 等%s人", text, eventList.size() + "");
+            String fullText = nickName + "签到成功";
+            if (classDetailVO != null && classDetailVO.getData() != null) {
+                fullText = classDetailVO.getData().getCheckinInteractionEffectTip(nickName);
+            }
+            span = new SpannableStringBuilder(fullText);
             /**
              * ///暂时保留该代码
              *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -107,7 +114,11 @@ public class PLVLCSignInTipsView extends FrameLayout {
             PLVSignInTimesEvent event = eventList.remove(0);
             String viewerName = maskViewerName(event);
             viewerName = PLVStringTruncator.truncateToMax6ChineseWidth(viewerName);
-            span = new SpannableStringBuilder(String.format("%s 签到成功", viewerName));
+            String fullText = String.format("%s 签到成功", viewerName);
+            if (classDetailVO != null && classDetailVO.getData() != null) {
+                fullText = classDetailVO.getData().getCheckinInteractionEffectTip(viewerName);
+            }
+            span = new SpannableStringBuilder(fullText);
 
             /**
              * ///暂时保留该代码
@@ -141,6 +152,11 @@ public class PLVLCSignInTipsView extends FrameLayout {
                         PLVCommonLog.e(TAG, "accept throwable:" + throwable.toString());
                     }
                 });
+    }
+
+    public void setEnableEffect(boolean enableEffect, PLVLiveClassDetailVO detailVO) {
+        isEnableEffect = enableEffect;
+        classDetailVO = detailVO;
     }
 
     public void acceptMessage(final PLVSignInTimesEvent event) {

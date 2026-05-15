@@ -1382,6 +1382,10 @@ public class PLVLCLivePageMenuLayout extends FrameLayout implements IPLVLCLivePa
                     checkStartChatPlayback();
                     checkStartAISummary();
                 }
+
+                if (chatFragment != null) {
+                    chatFragment.updateIsShowGreeting(liveClassDetail.getData().visitEffectEnabled());
+                }
             }
         });
     }

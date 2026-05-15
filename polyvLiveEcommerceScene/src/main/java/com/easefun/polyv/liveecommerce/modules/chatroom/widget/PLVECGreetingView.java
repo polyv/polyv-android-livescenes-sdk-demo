@@ -10,12 +10,13 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.easefun.polyv.livecommon.module.utils.PLVStringTruncator;
 import com.easefun.polyv.liveecommerce.R;
 import com.plv.foundationsdk.log.PLVCommonLog;
-import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.socket.event.login.PLVLoginEvent;
 import com.plv.socket.impl.PLVSocketManager;
 
@@ -36,6 +37,7 @@ public class PLVECGreetingView extends FrameLayout {
     private List<PLVLoginEvent> loginEventList = new ArrayList<>();
     private boolean isStart;
     private Disposable acceptLoginDisposable;
+    private PLVLiveClassDetailVO classDetailVO;
 
     public PLVECGreetingView(@NonNull Context context) {
         this(context, null);
@@ -93,19 +95,23 @@ public class PLVECGreetingView extends FrameLayout {
                     ls = stringBuilder.toString().length() - lf - 2;
                 }
             }
-            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join_multi, stringBuilder.toString(), loginEventList.size() + ""));
-            /**
-             * ///暂时保留该代码
-             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3, 3 + lf, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1, 3 + lf + 1 + ls, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-             *  span.setSpan(new ForegroundColorSpan(Color.rgb(129, 147, 199)), 3 + lf + 1 + ls + 1, span.length() - 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-             *
-             */
+            String text = PLVStringTruncator.truncateToMax6ChineseWidth(stringBuilder.toString());
+            String nickName = String.format("%s 等%s人", text, loginEventList.size() + "");
+            String fullText = "欢迎" + nickName + "加入";
+            if (classDetailVO != null && classDetailVO.getData() != null && classDetailVO.getData().visitEffectEnabled()) {
+                fullText = classDetailVO.getData().getJoinVisitEffectTip(nickName);
+            }
+            span = new SpannableStringBuilder(fullText);
             loginEventList.clear();
         } else {
             PLVLoginEvent loginEvent = loginEventList.remove(0);
             String viewerName = maskViewerName(loginEvent);
-            span = new SpannableStringBuilder(PLVAppUtils.formatString(R.string.plv_chat_welcome_join, viewerName));
+            viewerName = PLVStringTruncator.truncateToMax6ChineseWidth(viewerName);
+            String fullText = "欢迎" + viewerName + "加入";
+            if (classDetailVO != null && classDetailVO.getData() != null && classDetailVO.getData().visitEffectEnabled()) {
+                fullText = classDetailVO.getData().getJoinVisitEffectTip(viewerName);
+            }
+            span = new SpannableStringBuilder(fullText);
 
             /**
              * ///暂时保留该代码
@@ -139,6 +145,10 @@ public class PLVECGreetingView extends FrameLayout {
                         PLVCommonLog.e(TAG, "accept throwable:" + throwable.toString());
                     }
                 });
+    }
+
+    public void setClassDetailVO(PLVLiveClassDetailVO classDetailVO) {
+        this.classDetailVO = classDetailVO;
     }
 
     public void acceptGreetingMessage(final PLVLoginEvent loginEvent) {

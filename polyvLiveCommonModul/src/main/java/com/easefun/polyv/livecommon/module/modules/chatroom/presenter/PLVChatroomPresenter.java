@@ -1619,6 +1619,14 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                     PLVProductClickEvent productClickEvent = PLVGsonUtil.fromJson(PLVProductClickEvent.class, message);
                     if (productClickEvent != null) {
                         productClickEvent.setChannelId(liveRoomDataManager.getConfig().getChannelId());
+                        if (liveRoomDataManager.getClassDetailVO().getValue() != null) {
+                            PLVStatefulData<PolyvLiveClassDetailVO> classDetailVOFullData = liveRoomDataManager.getClassDetailVO().getValue();
+                            if (classDetailVOFullData != null && classDetailVOFullData.getData() != null && classDetailVOFullData.getData().getData() != null) {
+                                productClickEvent.setClickOrdinaryProductEffectTip(classDetailVOFullData.getData().getData().getClickOrdinaryProductEffectTip());
+                                productClickEvent.setClickFinancialProductEffectTip(classDetailVOFullData.getData().getData().getClickFinancialProductEffectTip());
+                                productClickEvent.setClickJobProductEffectTip(classDetailVOFullData.getData().getData().getClickJobProductEffectTip());
+                            }
+                        }
                         if (liveRoomDataManager.getConfig().isLive()) {
                             itemType = PLVChatMessageItemType.ITEMTYPE_PRODUCT_CLICK_TIPS;
                             chatMessage = productClickEvent;
@@ -1892,6 +1900,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 chatroomData.postLikesCountData(likesCount);
                 chatroomData.postViewerCountData(viewerCount);
                 multiRoomTransmitRepo.updateChannelDetail(classDetailVO);
+                isEnableProductEffect = classDetailVO.getData().productEffectEnabled();
             }
         };
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);

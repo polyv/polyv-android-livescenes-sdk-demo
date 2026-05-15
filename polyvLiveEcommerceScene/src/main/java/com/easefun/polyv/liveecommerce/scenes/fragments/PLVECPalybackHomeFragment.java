@@ -60,6 +60,7 @@ import com.plv.foundationsdk.utils.PLVTimeUtils;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.config.PLVLivePlaybackSeekBarStrategy;
+import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.PLVPlaybackListVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.playback.chat.IPLVChatPlaybackCallDataListener;
@@ -111,6 +112,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     //欢迎语
     private PLVECGreetingView greetLy;
+    private boolean isShowGreeting;//是否显示欢迎语
     private PLVECSignInTipsView signInTipsView;
     private PLVECProductClickTipsView productClickTipsView;
     //聊天区域
@@ -486,6 +488,28 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
+    protected void acceptProductEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        if (productClickTipsView != null) {
+            productClickTipsView.setEnableEffect(isEnable, detailVO);
+        }
+    }
+
+    @Override
+    protected void acceptInteractEffectEnable(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        if (signInTipsView != null) {
+            signInTipsView.setEnableEffect(isEnable, detailVO);
+        }
+    }
+
+    @Override
+    protected void acceptVisitEffectEnabled(boolean isEnable, PLVLiveClassDetailVO detailVO) {
+        isShowGreeting = isEnable;
+        if (greetLy != null) {
+            greetLy.setClassDetailVO(detailVO);
+        }
+    }
+
+    @Override
     public boolean isInterceptViewAction(MotionEvent motionEvent) {
         if (backIv.getVisibility() == View.VISIBLE) {
             float x = backIv.getX() + backIv.getWidth();
@@ -756,7 +780,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 信息提示">
     private void acceptLoginMessage(PLVLoginEvent loginEvent) {
         //暂不支持在线聊天，因此也不显示非聊天回放的欢迎语
-        if (!isChatPlaybackEnabled) {
+        if (!isChatPlaybackEnabled || !isShowGreeting) {
             return;
         }
         //显示欢迎语
