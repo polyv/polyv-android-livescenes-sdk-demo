@@ -72,7 +72,7 @@
             android:background="#202126"
             android:padding="8dp">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/plv_warning_content_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
