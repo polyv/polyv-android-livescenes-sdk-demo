@@ -75,6 +75,15 @@
         app:layout_constraintRight_toRightOf="@+id/plvls_document_ly"
         app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
 
+    <!-- 音频审核违规提醒布局 -->
+    <com.easefun.polyv.livecommon.module.utils.warning.PLVCheckVoiceWarningLayout
+        android:id="@+id/plvls_check_voice_warning_ly"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@+id/plvls_document_ly"
+        app:layout_constraintTop_toTopOf="@+id/plvls_document_ly" />
+
     <!-- 网络断开遮罩布局 -->
     <com.easefun.polyv.livestreamer.modules.liveroom.PLVLSNetworkDisconnectMaskLayout
         android:id="@+id/plvls_network_disconnect_mask_layout"

@@ -56,7 +56,7 @@ public class PLVMultiRoomTransmitRepo {
                     final PLVMultiRoomTransmitMode transmitMode = requireNotNull(PLVMultiRoomTransmitMode.match(transmitDoubleMode));
                     onLoginUpdateTransmitMode(transmitMode);
                 } catch (Exception e) {
-                    PLVCommonLog.exception(e);
+                    PLVCommonLog.warn(e);
                 }
             }
         }, PLVEventConstant.LOGIN_ACK_EVENT);

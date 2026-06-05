@@ -749,4 +749,11 @@
     <string name="plv_streamer_edge_softening">edge softness </string>
     <string name="plv_streamer_remove_ambient_light">Go to ambient light</string>
     <string name="plv_streamer_need_camera_in_main_screen">Please switch the camera and document location before use</string>
+    <string name="plv_streamer_check_voice_tips">Detected %s content</string>
+    <string name="plv_streamer_check_voice_high_risk">high risk</string>
+    <string name="plv_streamer_check_voice_medium_risk">medium risk</string>
+    <string name="plv_streamer_check_voice_low_risk">low risk</string>
+    <string name="plv_streamer_check_voice_risk_tips">Risk Warning</string>
+    <string name="plv_streamer_check_voice_read_new_tips">View new reminders</string>
+    <string name="plv_streamer_check_voice_read_remind_tips">View this reminder%s</string>
 </resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#16171A"
+    android:padding="12dp"
+    app:plv_radius="8dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/plv_warning_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/plv_red_warning_bg"
+        android:padding="3dp"
+        android:src="@drawable/plv_red_warning_fg" />
+
+    <TextView
+        android:id="@+id/plv_warning_level_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:text="检测到{高风险}内容"
+        android:textColor="@color/plv_white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/plv_warning_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_level_title_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="6dp"
+        android:layout_toLeftOf="@+id/plv_warning_level_tv"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:text="风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容"
+        android:textColor="@color/plv_white"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_level_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_close_iv"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/plv_red_warning_bg"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:text="高风险"
+        android:textColor="#AB4B45"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/plv_warning_close_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:layout_alignTop="@+id/plv_warning_level_title_tv"
+        android:layout_alignBottom="@+id/plv_warning_level_title_tv"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/plv_close_ic" />
+
+    <LinearLayout
+        android:id="@+id/plv_warning_go_detail_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_content_tv"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/plv_red_warning_ly_bg"
+        android:orientation="horizontal"
+        android:paddingVertical="4dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="4dp">
+
+        <TextView
+            android:id="@+id/plv_warning_go_detail_tv_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="查看详情"
+            android:textColor="@color/plv_white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/plv_warning_go_detail_tv_2"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:rotation="90"
+            android:scaleY="1.5"
+            android:text=">"
+            android:textColor="@color/plv_white"
+            android:textSize="12sp" />
+    </LinearLayout>
+</com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>

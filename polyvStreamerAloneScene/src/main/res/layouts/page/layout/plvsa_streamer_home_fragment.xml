@@ -8,13 +8,6 @@
     android:clipToPadding="false"
     android:padding="8dp">
 
-    <!--状态栏布局-->
-    <com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout
-        android:id="@+id/plvsa_status_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <!-- 评论上墙布局 -->
     <com.easefun.polyv.livecommon.ui.widget.PLVToTopView
         android:id="@+id/plvsa_chatroom_to_top_view"
@@ -58,6 +51,13 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/plvsa_tool_bar_call_input_tv"
         app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!--状态栏布局，放在聊天布局上层，部分弹出控件需覆盖聊天室显示-->
+    <com.easefun.polyv.streameralone.modules.statusbar.PLVSAStatusBarLayout
+        android:id="@+id/plvsa_status_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!--输入框呼出按钮-->
     <TextView

@@ -18,12 +18,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.commodity.PLVProductAICardLayout;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.ui.PLVStreamerNetworkStatusLayout;
+import com.easefun.polyv.livecommon.module.utils.warning.PLVCheckVoiceWarningLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundImageView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
@@ -44,6 +46,7 @@ import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.socket.event.commodity.PLVProductContentBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
+import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 import com.plv.thirdpart.blankj.utilcode.util.StringUtils;
 
 import java.util.List;
@@ -81,6 +84,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
     private FrameLayout plvsaStatusBarCardLayout;
     private PLVRoundRectLayout plvsaStatusBarAICardIvLayout;
     private PLVProductAICardLayout plvsaStatusBarAICardWebLayout;
+    private PLVCheckVoiceWarningLayout plvsaCheckVoiceWarningLayout;
     // 有人申请连麦时 连麦提示条布局
     private PLVSALinkMicRequestTipsLayout linkMicRequestTipsLayout;
     private PLVSAChannelInfoLayout channelInfoLayout;
@@ -156,6 +160,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         plvsaStatusBarCardLayout = findViewById(R.id.plvsa_status_bar_card_layout);
         plvsaStatusBarAICardIvLayout = findViewById(R.id.plvsa_status_bar_ai_card_iv_layout);
         plvsaStatusBarAICardWebLayout = findViewById(R.id.plvsa_status_bar_ai_card_web_layout);
+        plvsaCheckVoiceWarningLayout = findViewById(R.id.plvsa_check_voice_warning_layout);
 
         memberLayout = new PLVSAMemberLayout(getContext());
     }
@@ -347,6 +352,11 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         if (channelInfoLayout != null) {
             channelInfoLayout.updateChannelName(channelName);
         }
+    }
+
+    @Override
+    public IPLVChatroomContract.IChatroomView getCheckVoiceChatroomView() {
+        return plvsaCheckVoiceWarningLayout.getChatroomView();
     }
 
     @Override
@@ -600,6 +610,7 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
         ConstraintLayout.LayoutParams teacherLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarStreamerTeacherLayout.getLayoutParams();
         ConstraintLayout.LayoutParams pushDowngradeLayoutParam = (ConstraintLayout.LayoutParams) statusBarPushDowngradeAlertLayout.getLayoutParams();
         ConstraintLayout.LayoutParams cardLayoutParam = (ConstraintLayout.LayoutParams) plvsaStatusBarCardLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams checkVoiceLayoutParam = (ConstraintLayout.LayoutParams) plvsaCheckVoiceWarningLayout.getLayoutParams();
         if (PLVScreenUtils.isPortrait(getContext())) {
             networkStatusLayoutParam.topToBottom = idStatusBarCloseIv;
             networkStatusLayoutParam.rightToRight = idStatusBarCloseIv;
@@ -625,6 +636,8 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             pushDowngradeLayoutParam.topMargin = ConvertUtils.dp2px(8);
 
             cardLayoutParam.height = ConvertUtils.dp2px(222);
+
+            checkVoiceLayoutParam.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
         } else {
             networkStatusLayoutParam.topToBottom = ConstraintLayout.LayoutParams.UNSET;
             networkStatusLayoutParam.rightToRight = ConstraintLayout.LayoutParams.UNSET;
@@ -657,11 +670,14 @@ public class PLVSAStatusBarLayout extends FrameLayout implements IPLVSAStatusBar
             pushDowngradeLayoutParam.topMargin = 0;
 
             cardLayoutParam.height = ConvertUtils.dp2px(112);
+
+            checkVoiceLayoutParam.width = Math.min(ScreenUtils.getScreenHeight(), ScreenUtils.getScreenWidth());
         }
 
         statusBarNetworkStatusLayout.setLayoutParams(networkStatusLayoutParam);
         plvsaStatusBarStreamerTeacherLayout.setLayoutParams(teacherLayoutParam);
         statusBarPushDowngradeAlertLayout.setLayoutParams(pushDowngradeLayoutParam);
+        plvsaCheckVoiceWarningLayout.setLayoutParams(checkVoiceLayoutParam);
     }
 
     // </editor-fold>

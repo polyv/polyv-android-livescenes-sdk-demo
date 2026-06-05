@@ -13,6 +13,7 @@ import com.easefun.polyv.livescenes.chatroom.send.img.PolyvSendLocalImgEvent;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.socket.event.PLVBaseEvent;
+import com.plv.socket.event.backword.PLVCheckVoiceEvent;
 import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -242,6 +243,11 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
 
     @Override
     public void onLiveViewerListUpdate(List<PLVLiveViewerListVO.Data.LiveViewer> liveViewerList) {
+
+    }
+
+    @Override
+    public void onCheckVoiceWarning(PLVCheckVoiceEvent checkVoiceEvent) {
 
     }
 }

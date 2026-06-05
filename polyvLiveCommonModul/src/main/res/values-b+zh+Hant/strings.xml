@@ -749,4 +749,11 @@
     <string name="plv_streamer_edge_softening">邊緣柔化</string>
     <string name="plv_streamer_remove_ambient_light">去環境光</string>
     <string name="plv_streamer_need_camera_in_main_screen">請切換監視器和檔案位置後使用</string>
+    <string name="plv_streamer_check_voice_tips">檢測到%s內容</string>
+    <string name="plv_streamer_check_voice_high_risk">高風險</string>
+    <string name="plv_streamer_check_voice_medium_risk">中風險</string>
+    <string name="plv_streamer_check_voice_low_risk">低風險</string>
+    <string name="plv_streamer_check_voice_risk_tips">風險提醒</string>
+    <string name="plv_streamer_check_voice_read_new_tips">查看新提醒</string>
+    <string name="plv_streamer_check_voice_read_remind_tips">查看本次提醒%s</string>
 </resources>

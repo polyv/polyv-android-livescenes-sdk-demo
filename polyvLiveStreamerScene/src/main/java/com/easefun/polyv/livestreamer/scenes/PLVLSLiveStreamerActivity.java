@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.result.PLVLaunchResult;
+import com.easefun.polyv.livecommon.module.utils.warning.PLVCheckVoiceWarningLayout;
 import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
@@ -97,6 +98,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private IPLVLSChatroomLayout plvlsChatroomLy;
     // 评论上墙布局
     private PLVToTopView toTopView;
+    private PLVCheckVoiceWarningLayout checkVoiceWarningLayout;
     // 美颜布局
     private IPLVLSBeautyLayout beautyLayout;
     // 推流降级提示布局
@@ -324,6 +326,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         plvlsStreamerLy = findViewById(R.id.plvls_streamer_ly);
         plvlsChatroomLy = findViewById(R.id.plvls_chatroom_ly);
         toTopView = findViewById(R.id.plvls_chatroom_to_top_view);
+        checkVoiceWarningLayout = findViewById(R.id.plvls_check_voice_warning_ly);
         pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
         networkDisconnectMaskLayout = findViewById(R.id.plvls_network_disconnect_mask_layout);
@@ -365,12 +368,15 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         // 初始化美颜布局
         beautyLayout = new PLVLSBeautyLayout(this);
 
+        checkVoiceWarningLayout.setUseBlackStyle();
+
         // 初始化评论上墙布局
         toTopView.setIsLiveType(true);
         if (PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
             toTopView.setCancelTopStyle();
         }
-         plvlsChatroomLy.getChatroomPresenter().registerView(toTopView.getChatroomView());
+        plvlsChatroomLy.getChatroomPresenter().registerView(toTopView.getChatroomView());
+        plvlsChatroomLy.getChatroomPresenter().registerView(checkVoiceWarningLayout.getChatroomView());
     }
     // </editor-fold>
 

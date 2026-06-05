@@ -748,4 +748,11 @@
     <string name="plv_streamer_edge_softening">エッジフレキシブル</string>
     <string name="plv_streamer_remove_ambient_light">アンビエントライトを除去するには</string>
     <string name="plv_streamer_need_camera_in_main_screen">カメラとドキュメントの場所を切り替えて使用してください</string>
+    <string name="plv_streamer_check_voice_tips">%sコンテンツが検出されました</string>
+    <string name="plv_streamer_check_voice_high_risk">ハイリスク</string>
+    <string name="plv_streamer_check_voice_medium_risk">中リスク</string>
+    <string name="plv_streamer_check_voice_low_risk">低リスク</string>
+    <string name="plv_streamer_check_voice_risk_tips">リスク警告</string>
+    <string name="plv_streamer_check_voice_read_new_tips">新規リマインダの表示</string>
+    <string name="plv_streamer_check_voice_read_remind_tips">今回のリマインダ%sの表示</string>
 </resources>

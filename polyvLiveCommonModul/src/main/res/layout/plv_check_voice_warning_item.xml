@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    tools:background="#000000">
+
+    <TextView
+        android:id="@+id/plv_warning_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="16:36:19"
+        android:textColor="#93979E"
+        android:textSize="14sp" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/plv_warning_iv"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/plv_warning_time_tv"
+        android:background="@drawable/plv_red_warning_bg"
+        android:padding="3dp"
+        android:src="@drawable/plv_red_warning_fg" />
+
+    <TextView
+        android:id="@+id/plv_warning_level_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginLeft="6dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:gravity="center"
+        android:text="{高风险}"
+        android:textColor="@color/plv_white"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_level_title_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="6dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:text="风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容风险内容"
+        android:textColor="@color/plv_white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_type_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_content_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="12dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:gravity="center"
+        android:text="风险类型"
+        android:textColor="#93979E"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_type_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_type_title_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:gravity="center"
+        android:text="风险类型"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_type_level_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_type_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="12dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:gravity="center"
+        android:text="风险等级"
+        android:textColor="#93979E"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plv_warning_type_level_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/plv_warning_type_level_title_tv"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toRightOf="@+id/plv_warning_iv"
+        android:gravity="center"
+        android:text="{高风险}"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+</RelativeLayout>
