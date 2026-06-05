@@ -1,6 +1,7 @@
 package com.easefun.polyv.streameralone.modules.statusbar;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 
 /**
  * 状态栏布局API接口
@@ -29,6 +30,8 @@ public interface IPLVSAStatusBarLayout {
      * @param channelName 频道名称
      */
     void updateChannelName(String channelName);
+
+    IPLVChatroomContract.IChatroomView getCheckVoiceChatroomView();
 
     void setOnViewActionListener(PLVSAStatusBarLayout.OnViewActionListener onViewActionListener);
 

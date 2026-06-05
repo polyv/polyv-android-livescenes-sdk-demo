@@ -302,6 +302,16 @@
             tools:visibility="visible" />
     </FrameLayout>
 
+    <com.easefun.polyv.livecommon.module.utils.warning.PLVCheckVoiceWarningLayout
+        android:id="@+id/plvsa_check_voice_warning_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plvsa_status_bar_notification_layout" />
+
     <com.easefun.polyv.streameralone.modules.statusbar.PLVSAPushDowngradeAlertLayout
         android:id="@+id/plvsa_status_bar_push_downgrade_alert_layout"
         android:layout_width="wrap_content"

@@ -80,6 +80,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVBaseEvent;
 import com.plv.socket.event.PLVEventConstant;
 import com.plv.socket.event.PLVEventHelper;
+import com.plv.socket.event.backword.PLVCheckVoiceEvent;
 import com.plv.socket.event.chat.PLVCancelTopEvent;
 import com.plv.socket.event.chat.PLVChatEmotionEvent;
 import com.plv.socket.event.chat.PLVChatImgEvent;
@@ -1641,6 +1642,19 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 }
                 if (chatMessage != null) {
                     chatMessageDataList.add(new PLVBaseViewData<>(chatMessage, itemType, isSpecialType ? new PLVSpecialTypeTag(specialTypeUserId) : null));
+                }
+            } else if (PLVEventConstant.BadWord.SOCKET_EVENT_BAD_WORD.equals(listenEvent)) {
+                if (PLVEventConstant.BadWord.EVENT_CHECK_VOICE.equals(event)) {
+                    final PLVCheckVoiceEvent checkVoiceEvent = PLVGsonUtil.fromJson(PLVCheckVoiceEvent.class, message);
+                    if (checkVoiceEvent != null) {
+                        checkVoiceEvent.set_timestamp(System.currentTimeMillis());
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onCheckVoiceWarning(checkVoiceEvent);
+                            }
+                        });
+                    }
                 }
             }
         }

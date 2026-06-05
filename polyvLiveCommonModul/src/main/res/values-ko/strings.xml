@@ -749,4 +749,11 @@
     <string name="plv_streamer_edge_softening">가장자리 부드러움</string>
     <string name="plv_streamer_remove_ambient_light">환경광 제거</string>
     <string name="plv_streamer_need_camera_in_main_screen">카메라 및 문서 위치를 전환한 후 사용</string>
+    <string name="plv_streamer_check_voice_tips">%s 컨텐트가 감지되었습니다.</string>
+    <string name="plv_streamer_check_voice_high_risk">고위험</string>
+    <string name="plv_streamer_check_voice_medium_risk">중위험</string>
+    <string name="plv_streamer_check_voice_low_risk">낮은 위험</string>
+    <string name="plv_streamer_check_voice_risk_tips">위험 알림</string>
+    <string name="plv_streamer_check_voice_read_new_tips">새 알림 보기</string>
+    <string name="plv_streamer_check_voice_read_remind_tips">이번 알림 보기%s</string>
 </resources>

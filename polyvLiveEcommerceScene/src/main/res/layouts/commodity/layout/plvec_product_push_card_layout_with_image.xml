@@ -219,6 +219,21 @@
             android:visibility="gone"
             tools:text="¥10" />
 
+        <TextView
+            android:id="@+id/plvec_product_push_strick_out_price_tv_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#ADADC0"
+            android:textSize="8sp"
+            android:gravity="bottom"
+            app:layout_constraintLeft_toLeftOf="@+id/plvec_product_push_price_tv"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_price_tv"
+            tools:visibility="visible"
+            android:visibility="gone"
+            tools:text="¥10" />
+
         <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
             android:id="@+id/plvec_product_push_buy_action_tv"
             android:layout_width="match_parent"
@@ -229,7 +244,7 @@
             android:text="@string/plv_commodity_buy"
             android:textColor="@color/plvec_product_push_card_buy_action_text"
             android:textSize="12sp"
-            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_price_tv"
+            app:layout_constraintTop_toBottomOf="@+id/plvec_product_push_strick_out_price_tv_2"
             app:plvGradientMiddleColor="@color/plvec_product_push_card_buy_action_background"
             app:plvRadius="4dp" />
 

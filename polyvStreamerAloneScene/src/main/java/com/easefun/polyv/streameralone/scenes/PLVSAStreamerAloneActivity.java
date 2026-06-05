@@ -682,6 +682,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 homeFragment.init(liveRoomDataManager);
                 homeFragment.chatroomLogin();
                 homeFragment.registerToTopView();
+                homeFragment.registerToStatusBarLayout();
                 //注册streamerView
                 streamerLayout.getStreamerPresenter().registerView(homeFragment.getStreamerView());
 

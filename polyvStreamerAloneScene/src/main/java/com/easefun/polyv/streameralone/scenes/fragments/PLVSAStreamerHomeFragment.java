@@ -315,6 +315,12 @@ public class PLVSAStreamerHomeFragment extends PLVBaseFragment implements View.O
         }
     }
 
+    public void registerToStatusBarLayout() {
+        if (plvsaStatusBarLayout != null) {
+            getChatroomPresenter().registerView(plvsaStatusBarLayout.getCheckVoiceChatroomView());
+        }
+    }
+
     public void updateUserRequestStatus() {
         plvsaStatusBarLayout.showUserRequestTips();
     }

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:plv_blurOverlayColor="#BF1B202D" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plv_check_voice_warning_ly"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="bottom"
+        android:background="#2c2c2c"
+        android:clickable="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="12dp"
+        app:plv_mode="all"
+        app:plv_radius="10dp">
+
+        <TextView
+            android:id="@+id/plv_warning_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/plv_streamer_check_voice_risk_tips"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/plv_warning_title_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:rotation="90"
+                android:text="→"
+                android:textColor="#2E5AB1"
+                android:textSize="14sp"
+                android:translationY="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/plv_streamer_check_voice_read_new_tips"
+                android:textColor="#2E5AB1"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/plv_warning_content_ly"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_above="@+id/plv_warning_confirm_tv"
+            android:layout_below="@+id/plv_warning_title_tv"
+            android:layout_marginTop="12dp"
+            android:background="#202126"
+            android:padding="8dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/plv_warning_content_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/plv_warning_confirm_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/plv_warning_confirm_tv_bg"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="@string/plv_common_dialog_confirm_5"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

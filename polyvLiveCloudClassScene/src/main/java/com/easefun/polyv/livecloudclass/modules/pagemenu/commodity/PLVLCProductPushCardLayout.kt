@@ -325,6 +325,7 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
     private val productPushNameTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_name_tv) }
     private val productPushPriceTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_price_tv) }
     private val productPushPriceStrickOutTv by lazy { findViewById<TextView>(R.id.plvlc_product_push_strick_out_price_tv) }
+    private val productPushPriceStrickOutTv2 by lazy { findViewById<TextView>(R.id.plvlc_product_push_strick_out_price_tv_2) }
     private val productPushBuyActionTv by lazy { findViewById<PLVRoundRectGradientTextView>(R.id.plvlc_product_push_buy_action_tv) }
     private val productPushCloseIv by lazy { findViewById<ImageView>(R.id.plvlc_product_push_close_iv) }
     private val productPushSeckillLy by lazy { findViewById<ViewGroup>(R.id.plvlc_product_push_seckill_ly) }
@@ -362,11 +363,10 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
             productPushIndexTv.setOnClickListener(null)
         }
         productPushHotEffectLayout.visibility = View.GONE
-        productPushPriceStrickOutTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or productPushPriceStrickOutTv.paintFlags
-        productPushPriceStrickOutTv.visibility = if (product.isNormalProduct) View.VISIBLE else View.GONE
-        if (product.isNormalProduct) {
-            productPushPriceStrickOutTv.text = "¥${product.price}"
-        }
+        setupStrickOutPrice(productPushPriceStrickOutTv, product)
+        setupStrickOutPrice(productPushPriceStrickOutTv2, product)
+        // 只有在自定义秒杀价格的时候显示
+        productPushPriceStrickOutTv2.visibility = View.GONE
         if (product.isSeckillProduct) {
             startCountDown = object : Runnable {
                 override fun run() {
@@ -374,16 +374,33 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
                     if (text != null) {
                         productPushSeckillLy.visibility = View.VISIBLE
                         productPushSeckillTv.text = text
-                        bindPrice(productPushPriceTv, product, "¥${product.seckillPrice}")
+                        val priceText = if (product.isCustomSeckillPriceType) product.customSeckillPrice else "¥${product.seckillPrice}"
+                        bindPrice(productPushPriceTv, product, priceText)
+                        if (product.isCustomSeckillPriceType && product.isNormalProduct) {
+                            productPushPriceStrickOutTv2.visibility = View.VISIBLE
+                            productPushPriceStrickOutTv.visibility = View.GONE
+                        }
                     } else {
                         productPushSeckillLy.visibility = View.GONE
                         productPushSeckillTv.text = ""
                         bindPrice(productPushPriceTv, product)
+                        productPushPriceStrickOutTv2.visibility = View.GONE
+                        if (product.isNormalProduct) {
+                            productPushPriceStrickOutTv.visibility = View.VISIBLE
+                        }
                     }
                     productPushSeckillTv.postDelayed(this, 1000)
                 }
             }
             productPushSeckillTv.post(startCountDown)
+        }
+    }
+
+    private fun setupStrickOutPrice(productPushPriceStrickOutTv: TextView, product: PLVProductContentBean) {
+        productPushPriceStrickOutTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or productPushPriceStrickOutTv.paintFlags
+        productPushPriceStrickOutTv.visibility = if (product.isNormalProduct) View.VISIBLE else View.GONE
+        if (product.isNormalProduct) {
+            productPushPriceStrickOutTv.text = "¥${product.price}"
         }
     }
 
