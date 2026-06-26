@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 public class PLVWelfareLotteryManager implements IPLVLifecycleAwareDependComponent {
@@ -167,7 +168,10 @@ public class PLVWelfareLotteryManager implements IPLVLifecycleAwareDependCompone
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
                         forView(new RunnableT<TextView>() {
                             @Override
                             public void run(@NonNull TextView textView) {

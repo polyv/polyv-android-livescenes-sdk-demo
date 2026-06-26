@@ -232,10 +232,15 @@ private sealed class AbsCardLayout(
     }
 
     protected fun bindPrice(textView: TextView, product: PLVProductContentBean) {
-        val priceText = when {
+        val priceText = priceText(product)
+        bindPrice(textView, product, priceText)
+    }
+
+    protected fun priceText(product: PLVProductContentBean): String {
+        return when {
             product.isNormalProduct -> when {
                 !product.isOpenPrice -> "¥??"
-                !product.customPrice.isNullOrBlank() -> product.customPrice
+                product.isCustomPrice -> product.customPrice
                 product.isFreeForPay -> context.getString(R.string.plv_commodity_free)
                 else -> "¥${product.realPrice}"
             }
@@ -243,12 +248,11 @@ private sealed class AbsCardLayout(
             product.isPositionProduct -> product.treatment
             else -> ""
         }
-        bindPrice(textView, product, priceText)
     }
 
     protected fun bindPrice(textView: TextView, product: PLVProductContentBean, priceText: String) {
         val priceNotOpenedText = when {
-            product.isNormalProduct && !product.isOpenPrice -> context.getString(R.string.plv_commodity_price_not_opened)
+            isPriceNotOpened(product) -> context.getString(R.string.plv_commodity_price_not_opened)
             else -> null
         }
 
@@ -258,6 +262,10 @@ private sealed class AbsCardLayout(
                 appendExclude(priceNotOpenedText, ForegroundColorSpan(0xFF999999.toInt()))
             }
         }
+    }
+
+    protected fun isPriceNotOpened(product: PLVProductContentBean): Boolean {
+        return product.isNormalProduct && !product.isOpenPrice
     }
 
     protected fun bindBuyText(textView: TextView, product: PLVProductContentBean) {
@@ -292,7 +300,6 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
     private val productPushTagTv by lazy { findViewById<PLVRoundRectGradientTextView>(R.id.plvec_product_push_tag_tv) }
     private val productPushNameTv by lazy { findViewById<TextView>(R.id.plvec_product_push_name_tv) }
     private val productPushPriceTv by lazy { findViewById<TextView>(R.id.plvec_product_push_price_tv) }
-    private val productPushPriceStrickOutTv by lazy { findViewById<TextView>(R.id.plvec_product_push_strick_out_price_tv) }
     private val productPushPriceStrickOutTv2 by lazy { findViewById<TextView>(R.id.plvec_product_push_strick_out_price_tv_2) }
     private val productPushBuyActionTv by lazy { findViewById<PLVRoundRectGradientTextView>(R.id.plvec_product_push_buy_action_tv) }
     private val productPushCloseIv by lazy { findViewById<ImageView>(R.id.plvec_product_push_close_iv) }
@@ -331,10 +338,7 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
             productPushIndexTv.setOnClickListener(null)
         }
         productPushHotEffectLayout.visibility = View.GONE
-        setupStrickOutPrice(productPushPriceStrickOutTv, product)
         setupStrickOutPrice(productPushPriceStrickOutTv2, product)
-        // 只有在自定义秒杀价格的时候显示
-        productPushPriceStrickOutTv2.visibility = View.GONE
         if (product.isSeckillProduct) {
             startCountDown = object : Runnable {
                 override fun run() {
@@ -344,18 +348,12 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
                         productPushSeckillTv.text = text
                         val priceText = if (product.isCustomSeckillPriceType) product.customSeckillPrice else "¥${product.seckillPrice}"
                         bindPrice(productPushPriceTv, product, priceText)
-                        if (product.isCustomSeckillPriceType && product.isNormalProduct) {
-                            productPushPriceStrickOutTv2.visibility = View.VISIBLE
-                            productPushPriceStrickOutTv.visibility = View.GONE
-                        }
+                        setupStrickOutPrice(productPushPriceStrickOutTv2, product, priceText(product))
                     } else {
                         productPushSeckillLy.visibility = View.GONE
                         productPushSeckillTv.text = ""
                         bindPrice(productPushPriceTv, product)
-                        productPushPriceStrickOutTv2.visibility = View.GONE
-                        if (product.isNormalProduct) {
-                            productPushPriceStrickOutTv.visibility = View.VISIBLE
-                        }
+                        setupStrickOutPrice(productPushPriceStrickOutTv2, product)
                     }
                     productPushSeckillTv.postDelayed(this, 1000)
                 }
@@ -365,10 +363,17 @@ private class ImageProductCard(context: Context) : AbsCardLayout(context) {
     }
 
     private fun setupStrickOutPrice(productPushPriceStrickOutTv: TextView, product: PLVProductContentBean) {
-        productPushPriceStrickOutTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or productPushPriceStrickOutTv.paintFlags
-        productPushPriceStrickOutTv.visibility = if (product.isNormalProduct) View.VISIBLE else View.GONE
         if (product.isNormalProduct) {
-            productPushPriceStrickOutTv.text = "¥${product.price}"
+            val priceText = if (product.isCustomOriginalPrice) product.customOriginalPrice else "¥${product.price}"
+            setupStrickOutPrice(productPushPriceStrickOutTv, product, priceText)
+        }
+    }
+
+    private fun setupStrickOutPrice(productPushPriceStrickOutTv: TextView, product: PLVProductContentBean, priceText: String) {
+        productPushPriceStrickOutTv.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or productPushPriceStrickOutTv.paintFlags
+        productPushPriceStrickOutTv.visibility = if (product.isNormalProduct && !isPriceNotOpened(product)) View.VISIBLE else View.GONE
+        if (product.isNormalProduct) {
+            productPushPriceStrickOutTv.text = priceText
         }
     }
 

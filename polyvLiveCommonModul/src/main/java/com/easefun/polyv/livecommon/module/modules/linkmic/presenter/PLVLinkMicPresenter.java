@@ -97,6 +97,8 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
 
     //未初始化
     private static final int LINK_MIC_UNINITIATED = 1;
+    //初始化错误
+    private static final int LINK_MIC_INITIATE_ERROR = 2;
     //已经初始化
     private static final int LINK_MIC_INITIATED = 3;
 
@@ -130,6 +132,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     /**** 连麦状态数据 ****/
     //连麦初始化状态
     private int linkMicInitState = LINK_MIC_UNINITIATED;
+    private boolean isSuccessInit = false;
     private volatile PLVViewerLinkMicState viewerLinkMicState = PLVViewerLinkMicState.initState().setOnStateActionListener(this);
     private String myLinkMicId = "";
     private boolean isAudioLinkMic;
@@ -236,32 +239,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         destroyLinkMicManager();
         linkMicManager = PLVLinkMicManagerFactory.createNewLinkMicManager();
 
-        final PLVLinkMicEngineParam param = new PLVLinkMicEngineParam()
-                .setChannelId(getCurrentLinkMicChannelId())
-                .setViewerId(liveRoomDataManager.getConfig().getUser().getViewerId())
-                .setViewerType(liveRoomDataManager.getConfig().getUser().getViewerType())
-                .setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
-        linkMicManager.initEngine(param, new PLVLinkMicListener() {
-            @Override
-            public void onLinkMicEngineCreatedSuccess() {
-                PLVCommonLog.d(TAG, "连麦初始化成功");// no need i18n
-                linkMicInitState = LINK_MIC_INITIATED;
-                linkMicManager.addEventHandler(eventListener);
-
-                for (Runnable action : actionAfterLinkMicEngineCreated) {
-                    action.run();
-                }
-                actionAfterLinkMicEngineCreated.clear();
-            }
-
-            @Override
-            public void onLinkMicError(int errorCode, Throwable throwable) {
-                linkMicInitState = LINK_MIC_UNINITIATED;
-                if (linkMicView != null) {
-                    linkMicView.onLinkMicError(errorCode, throwable);
-                }
-            }
-        });
+        initLinkMicEngine();
         myLinkMicId = linkMicManager.getLinkMicUid();
         if (TextUtils.isEmpty(myLinkMicId)) {
             if (linkMicView != null) {
@@ -270,6 +248,38 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             return false;
         }
         return true;
+    }
+
+    private void initLinkMicEngine() {
+        final PLVLinkMicEngineParam param = new PLVLinkMicEngineParam()
+                .setChannelId(getCurrentLinkMicChannelId())
+                .setViewerId(liveRoomDataManager.getConfig().getUser().getViewerId())
+                .setViewerType(liveRoomDataManager.getConfig().getUser().getViewerType())
+                .setNickName(liveRoomDataManager.getConfig().getUser().getViewerName());
+        if (linkMicManager != null) {
+            linkMicManager.initEngine(param, new PLVLinkMicListener() {
+                @Override
+                public void onLinkMicEngineCreatedSuccess() {
+                    PLVCommonLog.d(TAG, "连麦初始化成功");// no need i18n
+                    isSuccessInit = true;
+                    linkMicInitState = LINK_MIC_INITIATED;
+                    linkMicManager.addEventHandler(eventListener);
+
+                    for (Runnable action : actionAfterLinkMicEngineCreated) {
+                        action.run();
+                    }
+                    actionAfterLinkMicEngineCreated.clear();
+                }
+
+                @Override
+                public void onLinkMicError(int errorCode, Throwable throwable) {
+                    linkMicInitState = LINK_MIC_INITIATE_ERROR;
+                    if (linkMicView != null) {
+                        linkMicView.onLinkMicError(errorCode, throwable);
+                    }
+                }
+            });
+        }
     }
 
     private void initRTCInvokeStrategy() {
@@ -517,6 +527,7 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
         muteCacheList.clear();
         myLinkMicId = "";
         this.linkMicView = null;
+        isSuccessInit = false;
         destroyLinkMicManager();
         if (linkMicMsgHandler != null) {
             linkMicMsgHandler.destroy();
@@ -1233,6 +1244,12 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
             case LINK_MIC_UNINITIATED:
                 actionAfterLinkMicEngineCreated.add(action);
                 break;
+            case LINK_MIC_INITIATE_ERROR:
+                actionAfterLinkMicEngineCreated.add(action);
+                if (!isSuccessInit) {
+                    initLinkMicEngine();
+                }
+                break;
             case LINK_MIC_INITIATED:
                 action.run();
                 break;
@@ -1699,6 +1716,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
         ));
+        if (PLVLinkMicConfig.getInstance().isNeedBluetoothPermission()) {
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
+        }
         PLVFastPermission.getInstance()
                 .start(activity, permissions, new PLVOnPermissionCallback() {
                     @Override
@@ -1726,8 +1746,9 @@ public class PLVLinkMicPresenter implements IPLVLinkMicContract.IPLVLinkMicPrese
     }
 
     private void showRequestPermissionDialog() {
+        int tipsMessageId = PLVLinkMicConfig.getInstance().isNeedBluetoothPermission() ? R.string.plv_linkmic_error_tip_permission_denied_2 : R.string.plv_linkmic_error_tip_permission_denied;
         new AlertDialog.Builder(ActivityUtils.getTopActivity()).setTitle(R.string.plv_common_dialog_tip)
-                .setMessage(R.string.plv_linkmic_error_tip_permission_denied)
+                .setMessage(tipsMessageId)
                 .setPositiveButton(R.string.plv_common_dialog_confirm_2, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

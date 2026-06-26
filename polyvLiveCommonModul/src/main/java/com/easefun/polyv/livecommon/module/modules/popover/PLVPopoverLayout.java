@@ -85,7 +85,7 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
         plvLayoutReward.initChannelConfig(PLVLiveChannelConfigFiller.generateNewChannelConfig(), roomDataManager);
         plvLayoutReward.changeScene(scene);
         plvLayoutInteract.init(roomDataManager, scene);
-        plvLayoutProductDetail.init(roomDataManager);
+        plvLayoutProductDetail.init(roomDataManager, scene);
         plvLayoutIAR.init(roomDataManager, scene);
     }
 

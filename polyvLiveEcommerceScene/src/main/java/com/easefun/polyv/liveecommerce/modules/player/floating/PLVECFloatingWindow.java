@@ -444,12 +444,13 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
             }
         } else {
             final Activity topActivity = ActivityUtils.getTopActivity();
-            alertDialog = new AlertDialog.Builder(topActivity == null ? context : topActivity)
+            final Activity requestActivity = topActivity == null ? (Activity) context : topActivity;
+            alertDialog = new AlertDialog.Builder(requestActivity)
                     .setMessage(PLVAppUtils.getString(R.string.plv_player_floating_permission_apply_tips))
                     .setPositiveButton(PLVAppUtils.getString(R.string.plv_common_dialog_confirm_3), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            PLVFloatPermissionUtils.requestPermission((Activity) context, new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
+                            PLVFloatPermissionUtils.requestPermission(requestActivity, new PLVFloatPermissionUtils.IPLVOverlayPermissionListener() {
                                 @Override
                                 public void onResult(final boolean isGrant) {
                                     if (onBackPressedRunnable != null) {
