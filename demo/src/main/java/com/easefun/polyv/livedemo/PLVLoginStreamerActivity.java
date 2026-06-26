@@ -47,6 +47,7 @@ import com.plv.livescenes.config.PLVLiveChannelType;
 import com.plv.livescenes.feature.login.IPLVSceneLoginManager;
 import com.plv.livescenes.feature.login.PLVSceneLoginManager;
 import com.plv.livescenes.feature.login.model.PLVLoginVO;
+import com.plv.livescenes.linkmic.manager.PLVLinkMicConfig;
 import com.plv.thirdpart.blankj.utilcode.util.EncodeUtils;
 import com.plv.thirdpart.blankj.utilcode.util.LogUtils;
 import com.plv.thirdpart.blankj.utilcode.util.SPUtils;
@@ -437,6 +438,9 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
         if (audio) {
             permissions.add(Manifest.permission.RECORD_AUDIO);
         }
+        if (PLVLinkMicConfig.getInstance().isNeedBluetoothPermission()) {
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
+        }
         if (permissions.isEmpty() || PLVFastPermission.hasPermission(this, permissions)) {
             runnable.run();
             return;
@@ -452,17 +456,21 @@ public class PLVLoginStreamerActivity extends PLVBaseActivity implements View.On
             public void onPartialGranted(ArrayList<String> grantedPermissions, ArrayList<String> deniedPermissions, ArrayList<String> deniedForeverP) {
                 final boolean hasCameraPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.CAMERA);
                 final boolean hasAudioPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.RECORD_AUDIO);
-                if (hasCameraPermission && hasAudioPermission) {
+                final boolean hasBluetoothPermission = PLVFastPermission.hasPermission(PLVLoginStreamerActivity.this, Manifest.permission.BLUETOOTH_CONNECT);
+                if (hasCameraPermission && hasAudioPermission && (!PLVLinkMicConfig.getInstance().isNeedBluetoothPermission() || hasBluetoothPermission)) {
                     runnable.run();
                     return;
                 }
-                final String notGrantedPermissionDescription;
-                if (hasCameraPermission) {
-                    notGrantedPermissionDescription = "麦克风";
-                } else if (hasAudioPermission) {
-                    notGrantedPermissionDescription = "摄像头";
-                } else {
+                String notGrantedPermissionDescription = "";
+                if (!hasCameraPermission && !hasAudioPermission){
                     notGrantedPermissionDescription = "摄像头和麦克风";
+                } else if (!hasCameraPermission) {
+                    notGrantedPermissionDescription = "摄像头";
+                } else if (!hasAudioPermission) {
+                    notGrantedPermissionDescription = "麦克风";
+                }
+                if (PLVLinkMicConfig.getInstance().isNeedBluetoothPermission() && !hasBluetoothPermission) {
+                    notGrantedPermissionDescription += (notGrantedPermissionDescription.isEmpty() ? "" : "和") + "附近的设备";
                 }
 
                 new PLVLoginStreamerConfirmDialog(PLVLoginStreamerActivity.this)

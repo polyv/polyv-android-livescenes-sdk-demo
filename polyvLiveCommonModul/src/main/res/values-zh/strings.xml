@@ -756,4 +756,5 @@
     <string name="plv_streamer_check_voice_risk_tips">风险提醒</string>
     <string name="plv_streamer_check_voice_read_new_tips">查看新提醒</string>
     <string name="plv_streamer_check_voice_read_remind_tips">查看本次提醒%s</string>
+    <string name="plv_linkmic_error_tip_permission_denied_2">通话所需的相机或麦克风或附近的设备权限被拒绝，请到应用设置的权限管理中恢复</string>
 </resources>

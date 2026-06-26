@@ -755,4 +755,5 @@
     <string name="plv_streamer_check_voice_risk_tips">リスク警告</string>
     <string name="plv_streamer_check_voice_read_new_tips">新規リマインダの表示</string>
     <string name="plv_streamer_check_voice_read_remind_tips">今回のリマインダ%sの表示</string>
+    <string name="plv_linkmic_error_tip_permission_denied_2">通話に必要なカメラまたはマイクまたは近くのデバイス権限は拒否されました。アプリケーション設定の権限管理に復元してください</string>
 </resources>

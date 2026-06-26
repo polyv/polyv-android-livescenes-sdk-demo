@@ -55,6 +55,7 @@ public class PLVLiveRoomDataMapper {
                                 .setPic(liveRoomDataManager.getConfig().getUser().getViewerAvatar())
                                 .setUserType(liveRoomDataManager.getConfig().getUser().getViewerType())
                 )
+                .setUseProductWebCard(true)
                 .setIsLive(isLive);
     }
 

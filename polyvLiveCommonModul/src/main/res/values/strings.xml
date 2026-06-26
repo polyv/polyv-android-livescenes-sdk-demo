@@ -756,4 +756,5 @@
     <string name="plv_streamer_check_voice_risk_tips">Risk Warning</string>
     <string name="plv_streamer_check_voice_read_new_tips">View new reminders</string>
     <string name="plv_streamer_check_voice_read_remind_tips">View this reminder%s</string>
+    <string name="plv_linkmic_error_tip_permission_denied_2">The camera, microphone, or nearby device permissions required for the call have been denied. Please restore them in the permission management of the application settings</string>
 </resources>

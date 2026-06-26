@@ -494,9 +494,7 @@ public class PLVStreamerMsgHandler {
         }
         final String linkMicUid = joinAnswerSEvent.getUserId();
         final Pair<Integer, PLVMemberItemDataBean> currentMemberItemDataBean = streamerPresenter.getMemberItemWithUserId(linkMicUid);
-        if (joinAnswerSEvent.isAccept()) {
-            streamerPresenter.updateMemberListWithJoin(linkMicUid);
-        } else {
+        if (joinAnswerSEvent.isRefuse()) {
             streamerPresenter.updateMemberListWithLeave(linkMicUid, false);
         }
 

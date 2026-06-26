@@ -756,4 +756,5 @@
     <string name="plv_streamer_check_voice_risk_tips">위험 알림</string>
     <string name="plv_streamer_check_voice_read_new_tips">새 알림 보기</string>
     <string name="plv_streamer_check_voice_read_remind_tips">이번 알림 보기%s</string>
+    <string name="plv_linkmic_error_tip_permission_denied_2">통화에 필요한 카메라 또는 마이크 또는 주변 장치 권한이 거부되었으므로 설정을 적용한 권한 관리에서 복원하십시오.</string>
 </resources>
