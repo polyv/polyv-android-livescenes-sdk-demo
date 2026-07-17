@@ -1,6 +1,6 @@
 package com.easefun.polyv.livecommon.module.modules.interact.luckybag;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;

@@ -342,7 +342,7 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp">
@@ -399,7 +399,7 @@
                         app:plv_trianglePosition="right"
                         app:plv_triangleWidth="10dp"
                         tools:visibility="visible" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 

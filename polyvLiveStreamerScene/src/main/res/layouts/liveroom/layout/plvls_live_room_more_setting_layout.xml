@@ -520,4 +520,4 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:constraint_referenced_ids="plvls_more_setting_exit_separator, plvls_more_setting_exit_tv" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
