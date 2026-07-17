@@ -72,6 +72,8 @@ public class PLVInteractJSBridgeEventConst {
     public static final String V2_SHOW_PRODUCT_DETAIL = "showProductDetail";
     public static final String V2_WELFARE_LOTTERY_COMMENT_SUCCESS = "welfareLotteryCommentSuccess";
     public static final String V2_WELFARE_LOTTERY_ENTRANCE_CHANGE = "welfareLotteryEntranceDataChange";
+    public static final String V2_LUCKY_BAG_COMMENT_SUCCESS = "luckyBagCommentSuccess";
+    public static final String V2_LUCKY_BAG_ENTRANCE_CHANGE = "luckyBagEntranceDataChange";
     public static final String V2_SIGN_IN_TIMEOUT_RECV = "notCheckIn";
 
 

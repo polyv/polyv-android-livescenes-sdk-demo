@@ -87,6 +87,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private TextView welfareLotteryEnterCdLandTv;
     private PLVTriangleIndicateTextView welfareLotteryEnterTipsLandView;
 
+    private PLVSimpleImageView luckyBagEnterLandView;
+    private TextView luckyBagEnterCdLandTv;
+    private PLVTriangleIndicateTextView luckyBagEnterTipsLandView;
+
     //观看热度
     private TextView videoViewerCountLandTv;
     private PLVLCPlaybackVideoMarksBar playbackVideoMarksBarLand;
@@ -118,6 +122,8 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private boolean isPbDragging;
     //已经显示过 可从此处重新打开浮窗 的提示了
     private boolean hasShowReopenFloatingViewTip = false;
+    // 是否显示观看热度
+    private boolean isViewerCountEnabled = true;
 
     //延迟隐藏 可从此处重新打开浮窗
     private Disposable reopenFloatingDelay;
@@ -189,6 +195,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
         welfareLotteryEnterLandView = findViewById(R.id.plvlc_playback_welfare_lottery_enter_land_view);
         welfareLotteryEnterCdLandTv = findViewById(R.id.plvlc_playback_welfare_lottery_enter_cd_land_tv);
         welfareLotteryEnterTipsLandView = findViewById(R.id.plvlc_playback_welfare_lottery_enter_tips_land_view);
+
+        luckyBagEnterLandView = findViewById(R.id.plvlc_playback_lucky_bag_enter_land_view);
+        luckyBagEnterCdLandTv = findViewById(R.id.plvlc_playback_lucky_bag_enter_cd_land_tv);
+        luckyBagEnterTipsLandView = findViewById(R.id.plvlc_playback_lucky_bag_enter_tips_land_view);
 
         videoViewerCountLandTv = findViewById(R.id.plvlc_playback_count_land_tv);
         playbackVideoMarksBarLand = findViewById(R.id.plvlc_playback_video_marks_bar_land);
@@ -435,6 +445,21 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public ImageView getLuckyBagEnterView() {
+        return luckyBagEnterLandView;
+    }
+
+    @Override
+    public TextView getLuckyBagEnterCdView() {
+        return luckyBagEnterCdLandTv;
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLuckyBagEnterTipsView() {
+        return luckyBagEnterTipsLandView;
+    }
+
+    @Override
     public void setOnLikesSwitchEnabled(boolean isSwitchEnabled) {
         this.isLikesSwitchEnabled = isSwitchEnabled;
         ivLikesLand.setVisibility(isLikesSwitchEnabled && isChatDisplayEnabled ? View.VISIBLE : View.INVISIBLE);
@@ -534,6 +559,11 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     public void updateViewerCount(long viewerCount) {
+        if (!isViewerCountEnabled) {
+            videoViewerCountPortTv.setVisibility(View.GONE);
+            videoViewerCountLandTv.setVisibility(View.GONE);
+            return;
+        }
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
@@ -545,7 +575,21 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     }
 
     @Override
+    public void setViewerCountEnabled(boolean enabled) {
+        isViewerCountEnabled = enabled;
+        if (!enabled) {
+            videoViewerCountPortTv.setVisibility(View.GONE);
+            videoViewerCountLandTv.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
     public void updateViewerOnlineCount(int onlineCount) {
+        if (!isViewerCountEnabled) {
+            videoViewerCountPortTv.setVisibility(View.GONE);
+            videoViewerCountLandTv.setVisibility(View.GONE);
+            return;
+        }
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 

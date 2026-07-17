@@ -162,6 +162,21 @@ public interface IPLVLCLiveLandscapePlayerController {
     PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView();
 
     /**
+     * 获取福袋入口按钮
+     */
+    ImageView getLuckyBagEnterView();
+
+    /**
+     * 获取福袋入口倒计时控件
+     */
+    TextView getLuckyBagEnterCdView();
+
+    /**
+     * 获取福袋入口提示控件
+     */
+    PLVTriangleIndicateTextView getLuckyBagEnterTipsView();
+
+    /**
      * 进入画笔模式控件
      */
     ImageView getEnterPaintView();

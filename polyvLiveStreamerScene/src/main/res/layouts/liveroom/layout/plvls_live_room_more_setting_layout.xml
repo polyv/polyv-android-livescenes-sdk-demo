@@ -181,6 +181,33 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/plvls_more_kick_banned_users_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvls_more_kick_banned_users_iv"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plv_kick_banned_icon" />
+
+                        <TextView
+                            android:id="@+id/plvls_more_kick_banned_users_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/plv_live_more_kick_banned_users"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/plvls_more_push_downgrade_item_layout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -313,13 +340,6 @@
                         android:layout_rowWeight="1"
                         android:layout_columnWeight="1" />
 
-                    <!--  placeholder  -->
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_rowWeight="1"
-                        android:layout_columnWeight="1" />
-
                 </GridLayout>
 
                 <TextView
@@ -370,6 +390,35 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:text="@string/plv_live_more_interact_signin"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/plvls_more_interact_lucky_bag_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/plvls_more_interact_lucky_bag_iv"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/plvls_more_interact_lucky_bag" />
+
+                        <TextView
+                            android:id="@+id/plvls_more_interact_lucky_bag_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/plv_live_more_interact_lucky_bag"
                             android:textColor="#99F0F1F5"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -471,4 +520,4 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:constraint_referenced_ids="plvls_more_setting_exit_separator, plvls_more_setting_exit_tv" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>

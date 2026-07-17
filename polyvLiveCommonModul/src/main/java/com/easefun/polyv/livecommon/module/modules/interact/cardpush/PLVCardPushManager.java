@@ -185,7 +185,7 @@ public class PLVCardPushManager {
             public void run(@NonNull TextView cardEnterCdTv) {
                 cardEnterCdTv.setVisibility(isEntranceOrNeedLook && needLookTime > 0 ? View.VISIBLE : View.GONE);
                 if (needLookTime > 0) {
-                    cardEnterCdTv.setText(PLVTimeUtils.generateTime(needLookTime, true));
+                    cardEnterCdTv.setText(PLVTimeUtils.generateTime(needLookTime, false));
                 }
             }
         }, cardEnterCdTvs);
@@ -244,7 +244,7 @@ public class PLVCardPushManager {
                         forView(new RunnableT<TextView>() {
                             @Override
                             public void run(@NonNull TextView textView) {
-                                textView.setText(PLVTimeUtils.generateTime(remainTime, true));
+                                textView.setText(PLVTimeUtils.generateTime(remainTime, false));
                                 if (remainTime <= 0) {
                                     textView.setVisibility(View.GONE);
                                 }

@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMemberLayout;
 import com.easefun.polyv.livestreamer.modules.liveroom.PLVLSMoreSettingLayout;
@@ -27,6 +28,11 @@ public interface IPLVLSStatusBarLayout {
      * @param liveRoomDataManager 直播间数据管理器
      */
     void init(IPLVLiveRoomDataManager liveRoomDataManager);
+
+    /**
+     * 绑定聊天室 presenter，用于更多面板中的踢出/禁言用户列表。
+     */
+    void bindChatroomPresenter(IPLVChatroomContract.IChatroomPresenter chatroomPresenter);
 
     /**
      * 设置view交互事件监听器

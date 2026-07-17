@@ -30,6 +30,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.modules.chatroom.model.enums.PLVRedPaperType;
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.data.PLVChatroomData;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagManager;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.PLVMultiRoomTransmitRepo;
 import com.easefun.polyv.livecommon.module.modules.redpack.model.PLVRedpackRepo;
 import com.easefun.polyv.livecommon.module.modules.socket.PLVSocketMessage;
@@ -73,6 +74,7 @@ import com.plv.livescenes.chatroom.PLVChatApiRequestHelper;
 import com.plv.livescenes.chatroom.PLVChatroomManager;
 import com.plv.livescenes.chatroom.PLVViewerNameMaskMapper;
 import com.plv.livescenes.chatroom.send.custom.PLVCustomEvent;
+import com.plv.livescenes.model.PLVBannedUsersVO;
 import com.plv.livescenes.model.PLVKickUsersVO;
 import com.plv.livescenes.model.PLVLiveViewerListVO;
 import com.plv.livescenes.model.interact.PLVCardPushVO;
@@ -121,6 +123,7 @@ import com.plv.socket.log.PLVELogSender;
 import com.plv.socket.socketio.PLVSocketIOClient;
 import com.plv.socket.socketio.PLVSocketIOObservable;
 import com.plv.socket.status.PLVSocketStatus;
+import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 import com.plv.thirdpart.blankj.utilcode.util.Utils;
@@ -169,6 +172,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private final PLVMultiRoomTransmitRepo multiRoomTransmitRepo = PLVDependManager.getInstance().get(PLVMultiRoomTransmitRepo.class);
     private final PLVRedpackRepo redpackRepo = PLVDependManager.getInstance().get(PLVRedpackRepo.class);
     private final PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
+    private final PLVLuckyBagManager luckyBagManager = PLVDependManager.getInstance().get(PLVLuckyBagManager.class);
 
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
@@ -224,6 +228,10 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     //请求踢出的用户列表的disposable
     private Disposable kickUsersDisposable;
+    //请求禁言用户列表的disposable
+    private Disposable bannedUsersDisposable;
+    //请求禁言IP列表的disposable
+    private Disposable bannedIpsDisposable;
     //定时获取观看热度的disposable
     private Disposable getPageViewDisposable;
     //定时检查聊天消息最大数量disposable
@@ -357,6 +365,13 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         welfareLotteryManager.setJSLotteryCommentListener(new PLVWelfareLotteryManager.OnJSLotteryCommentListener() {
             @Override
             public void onJSLotteryComment(String comment) {
+                PolyvLocalMessage message = new PolyvLocalMessage(comment);
+                acceptLocalChatMessage(message, "");
+            }
+        });
+        luckyBagManager.setJSLuckyBagCommentListener(new PLVLuckyBagManager.OnJSLuckyBagCommentListener() {
+            @Override
+            public void onJSLuckyBagComment(String comment) {
                 PolyvLocalMessage message = new PolyvLocalMessage(comment);
                 acceptLocalChatMessage(message, "");
             }
@@ -725,10 +740,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         if (kickUsersDisposable != null) {
             kickUsersDisposable.dispose();
         }
-        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
-        if (TextUtils.isEmpty(loginRoomId)) {
-            loginRoomId = getConfig().getChannelId();//socket未登录时，使用频道号
-        }
+        String loginRoomId = getCurrentChatroomId();
         kickUsersDisposable = PLVChatApiRequestHelper.getKickUsers(loginRoomId)
                 .subscribe(new Consumer<PLVKickUsersVO>() {
                     @Override
@@ -754,6 +766,72 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                         PLVELogSender.send(PolyvChatroomELog.class, PolyvChatroomELog.Event.GET_KICKUSERS_FAIL, throwable);
                     }
                 });
+    }
+
+    @Override
+    public void requestBannedUsers() {
+        if (bannedUsersDisposable != null) {
+            bannedUsersDisposable.dispose();
+        }
+        String loginRoomId = getCurrentChatroomId();
+        bannedUsersDisposable = PLVChatApiRequestHelper.getBannedUsers(loginRoomId)
+                .subscribe(new Consumer<PLVBannedUsersVO>() {
+                    @Override
+                    public void accept(final PLVBannedUsersVO plvBannedUsersVO) throws Exception {
+                        if (plvBannedUsersVO.getCode() == 200 || plvBannedUsersVO.getDataList() != null) {
+                            callbackToView(new ViewRunnable() {
+                                @Override
+                                public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                    view.onBannedUsersList(plvBannedUsersVO.getDataList() == null ? Collections.<PLVSocketUserBean>emptyList() : plvBannedUsersVO.getDataList());
+                                }
+                            });
+                        } else {
+                            PLVCommonLog.exception(new Throwable(plvBannedUsersVO.toString()));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                        //发送错误日志，便于排查问题
+                        PLVELogSender.send(PolyvChatroomELog.class, PolyvChatroomELog.Event.GET_BANNEDUSERS_FAIL, throwable);
+                    }
+                });
+    }
+
+    @Override
+    public void requestBannedIps() {
+        if (bannedIpsDisposable != null) {
+            bannedIpsDisposable.dispose();
+        }
+        String loginRoomId = getCurrentChatroomId();
+        bannedIpsDisposable = PLVChatApiRequestHelper.getBannedIps(loginRoomId)
+                .subscribe(new Consumer<List<String>>() {
+                    @Override
+                    public void accept(final List<String> bannedIps) throws Exception {
+                        callbackToView(new ViewRunnable() {
+                            @Override
+                            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                                view.onBannedIpsList(bannedIps == null ? Collections.<String>emptyList() : bannedIps);
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PLVCommonLog.exception(throwable);
+                        //发送错误日志，便于排查问题
+                        PLVELogSender.send(PolyvChatroomELog.class, PolyvChatroomELog.Event.GET_BANNEDIPS_FAIL, throwable);
+                    }
+                });
+    }
+
+    private String getCurrentChatroomId() {
+        String loginRoomId = PolyvSocketWrapper.getInstance().getLoginRoomId();//分房间开启，在获取到后为分房间id，其他情况为频道号
+        if (TextUtils.isEmpty(loginRoomId)) {
+            loginRoomId = getConfig().getChannelId();//socket未登录时，使用频道号
+        }
+        return loginRoomId;
     }
 
     @Override
@@ -966,6 +1044,12 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         if (kickUsersDisposable != null) {
             kickUsersDisposable.dispose();
+        }
+        if (bannedUsersDisposable != null) {
+            bannedUsersDisposable.dispose();
+        }
+        if (bannedIpsDisposable != null) {
+            bannedIpsDisposable.dispose();
         }
         if (observeChatMessageListMaxLengthDisposable != null) {
             observeChatMessageListMaxLengthDisposable.dispose();
@@ -1734,6 +1818,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             }
         });
         welfareLotteryManager.sendCommentForLottery(textMessage.getSpeakMessage());
+        luckyBagManager.sendCommentForLottery(textMessage.getSpeakMessage());
 
         chatroomData.postSpeakMessageData((CharSequence) textMessage.getObjects()[0], true);
     }

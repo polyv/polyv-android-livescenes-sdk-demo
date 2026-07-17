@@ -919,6 +919,21 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     @Override
+    public ImageView getLuckyBagEnterView() {
+        return mediaController.getLandscapeController().getLuckyBagEnterView();
+    }
+
+    @Override
+    public TextView getLuckyBagEnterCdView() {
+        return mediaController.getLandscapeController().getLuckyBagEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLuckyBagEnterTipsView() {
+        return mediaController.getLandscapeController().getLuckyBagEnterTipsView();
+    }
+
+    @Override
     public void setChatIsDisplayEnabled(boolean isDisplayEnabled) {
         mediaController.setChatIsDisplayEnabled(isDisplayEnabled);
     }
@@ -1043,6 +1058,11 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     @Override
     public void updateViewerCount(long viewerCount) {
         mediaController.updateViewerCount(viewerCount);
+    }
+
+    @Override
+    public void setViewerCountEnabled(boolean enabled) {
+        mediaController.setViewerCountEnabled(enabled);
     }
 
     @Override
@@ -1692,6 +1712,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
                 if (liveClassDetail == null || liveClassDetail.getData() == null) {
                     return;
                 }
+                mediaController.setViewerCountEnabled(liveClassDetail.getData().isPvShowEnabled());
                 //从接口获取到的当前是否正在直播状态，如果当前不在直播并且设置了倒计时则显示倒计时
                 if (!liveClassDetail.getData().isLiveStatus()) {
                     String startTime = liveClassDetail.getData().getStartTime();

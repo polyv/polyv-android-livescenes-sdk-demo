@@ -87,6 +87,11 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
     void updateViewerCount(long viewerCount);
 
     /**
+     * 设置观看热度是否显示
+     */
+    void setViewerCountEnabled(boolean enabled);
+
+    /**
      * 更新在线观看人数
      * @param onlineCount 观看人数
      */

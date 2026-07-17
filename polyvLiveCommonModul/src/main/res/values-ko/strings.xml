@@ -179,6 +179,11 @@
     <string name="plv_chat_kick_fail">퇴사 실패</string>
     <string name="plv_chat_kick_success_2">차단에 성공했습니다</string>
     <string name="plv_chat_kick_fail_2">차단 실패(%s)</string>
+    <string name="plv_chat_unkick">퇴장 취소</string>
+    <string name="plv_chat_unkick_success">퇴장 취소 성공</string>
+    <string name="plv_chat_unkick_fail">퇴장 취소 실패</string>
+    <string name="plv_chat_kick_platform_prohibited">전체 플랫폼에서 퇴장되었습니다</string>
+    <string name="plv_chat_ban_platform_prohibited">전체 플랫폼에서 차단되었습니다</string>
     <string name="plv_chat_unban_success">차단을 성공적으로 해제했습니다</string>
     <string name="plv_chat_unban_fail">차단 해제 실패</string>
     <string name="plv_chat_unban_fail_2">차단 해제 실패(%s)</string>
@@ -546,6 +551,7 @@
     <string name="plv_live_language_switch_hint">언어를 바꾸면 생방송 방에 다시 입장하게 됩니다. 전환하려면 \"확인\"을 클릭하세요</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">로그인</string>
+    <string name="plv_live_more_interact_lucky_bag">복주머니</string>
     <string name="plv_interact_open_weixin_buy">구매하려면 WeChat 보기 페이지로 이동하세요</string>
     <string name="plv_interact_open_weixin_but_fail">위챗을 열지 못했습니다! 위챗이 설치되어 있는지 확인해주세요</string>
     <string name="plv_interact_no_support_buy">구매는 아직 지원되지 않습니다</string>
@@ -617,6 +623,10 @@
 
     <!--条件抽奖 -->
     <string name="plv_welfare_lottery_will_start">복지 복권이 곧 시작됩니다</string>
+
+    <!--福袋-->
+    <string name="plv_lucky_bag_will_open">복주머니가 곧 열립니다</string>
+    <string name="plv_lucky_bag_opening">복주머니 여는 중</string>
 
     <!--通用-->
     <string name="plv_common_storage_permission_apply_tips">파일 읽기/쓰기 기능을 사용하려면 앱 설정에서 파일 액세스 권한을 활성화해야 합니다. 설정으로 이동하여 권한을 활성화하시겠습니까?</string>
@@ -756,5 +766,11 @@
     <string name="plv_streamer_check_voice_risk_tips">위험 알림</string>
     <string name="plv_streamer_check_voice_read_new_tips">새 알림 보기</string>
     <string name="plv_streamer_check_voice_read_remind_tips">이번 알림 보기%s</string>
+    <string name="plv_live_more_kick_banned_users">제한 사용자</string>
+    <string name="plv_kick_banned_users_kick_hint">퇴장된 사용자</string>
+    <string name="plv_kick_banned_users_banned_hint">채팅 금지 사용자</string>
+    <string name="plv_kick_banned_users_no_kick">퇴장된 사용자가 없습니다</string>
+    <string name="plv_kick_banned_users_no_banned">채팅 금지 사용자가 없습니다</string>
+    <string name="plv_kick_banned_users_user_id">ID: %s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">통화에 필요한 카메라 또는 마이크 또는 주변 장치 권한이 거부되었으므로 설정을 적용한 권한 관리에서 복원하십시오.</string>
 </resources>

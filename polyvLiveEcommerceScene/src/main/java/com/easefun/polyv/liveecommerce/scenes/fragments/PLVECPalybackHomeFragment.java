@@ -417,6 +417,11 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     }
 
     @Override
+    protected void updatePvShowEnabled(boolean enabled) {
+        watchInfoLy.setWatchCountEnabled(enabled);
+    }
+
+    @Override
     protected void acceptOpenCommodity() {
         commodityIv.setVisibility(View.VISIBLE);
     }

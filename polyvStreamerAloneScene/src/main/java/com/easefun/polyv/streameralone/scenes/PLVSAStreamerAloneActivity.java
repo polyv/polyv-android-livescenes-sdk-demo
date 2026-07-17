@@ -28,6 +28,7 @@ import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHe
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerIARLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
@@ -125,6 +126,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     // 互动布局
     private IPLVStreamerInteractLayout interactLayout;
+    private IPLVStreamerIARLayout iarLayout;
     private PLVSANetworkDisconnectMaskLayout networkDisconnectMaskLayout;
 
     // </editor-fold>
@@ -243,6 +245,12 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         if (settingLayout != null) {
             settingLayout.onActivityResult(requestCode, resultCode, data);
         }
+        if (interactLayout != null) {
+            interactLayout.onActivityResult(requestCode, resultCode, data);
+        }
+        if (iarLayout != null) {
+            iarLayout.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -266,6 +274,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         if (interactLayout != null) {
             interactLayout.destroy();
         }
+        if (iarLayout != null) {
+            iarLayout.destroy();
+        }
     }
 
     @Override
@@ -283,6 +294,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     @Override
     public void onBackPressed() {
+        if (iarLayout != null && iarLayout.onBackPress()) {
+            return;
+        }
         if (interactLayout != null && interactLayout.onBackPress()) {
             return;
         }
@@ -389,9 +403,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         fullscreenLayout = findViewById(R.id.plvsa_fullscreen_view);
         maskGroup = findViewById(R.id.plvsa_mask_group);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
+        iarLayout = findViewById(R.id.plvsa_iar_layout);
         networkDisconnectMaskLayout = findViewById(R.id.plvsa_network_disconnect_mask_layout);
 
         interactLayout.init(liveRoomDataManager);
+        iarLayout.init(liveRoomDataManager);
 
         //初始化推流和连麦布局
         streamerLayout.init(liveRoomDataManager);
@@ -430,11 +446,19 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private void observeMoreLayout() {
         PLVSAMoreLayout moreLayout = homeFragment.getMoreLayout();
         if (moreLayout != null) {
+            moreLayout.bindChatroomPresenter(homeFragment.getChatroomPresenter());
             moreLayout.setOnViewActionListener(new PLVSAMoreLayout.OnViewActionListener() {
                 @Override
                 public void onShowSignInAction() {
                     if (interactLayout != null) {
                         interactLayout.showSignIn();
+                    }
+                }
+
+                @Override
+                public void onShowLuckyBagAction() {
+                    if (iarLayout != null) {
+                        iarLayout.showLuckyBag();
                     }
                 }
 

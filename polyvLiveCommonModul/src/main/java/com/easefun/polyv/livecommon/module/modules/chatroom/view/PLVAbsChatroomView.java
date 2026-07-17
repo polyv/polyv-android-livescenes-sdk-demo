@@ -237,6 +237,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onBannedUsersList(List<PLVSocketUserBean> dataList) {
+
+    }
+
+    @Override
+    public void onBannedIpsList(List<String> dataList) {
+
+    }
+
+    @Override
     public void onCheckMessageMaxLength(int maxLength) {
 
     }

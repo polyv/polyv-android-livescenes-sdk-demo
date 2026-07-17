@@ -95,17 +95,20 @@ public class PLVMarqueeRollAdvanceAnimation extends PLVMarqueeRollAnimation {
 
     @Override
     public void onParentSizeChanged(final View parentView) {
+        final int oldScreenWidth = screenWidth;
+        final int oldScreenHeight = screenHeight;
         super.onParentSizeChanged(parentView);
-        if (secondView == null) {
+        if (secondView == null || !isParentSizeChanged(parentView, oldScreenWidth, oldScreenHeight)) {
             return;
         }
         secondView.clearAnimation();
         secondView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                screenWidth = parentView.getWidth();
-                screenHeight = parentView.getHeight();
                 secondView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (!updateParentSizeIfChanged(parentView, oldScreenWidth, oldScreenHeight)) {
+                    return;
+                }
                 setSecondActiveRect();
             }
         });

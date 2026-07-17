@@ -184,6 +184,8 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private boolean isFloatWindowEnable = true;
     // 是否显示在线人数
     private boolean isShowOnlineCount = false;
+    // 是否显示观看热度
+    private boolean isViewerCountEnabled = true;
     //投屏初始化结果
     private boolean isCastInitSuccess = false;
     //强制关闭投屏按钮显示
@@ -597,6 +599,11 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void updateViewerCount(long viewerCount) {
+        if (!isViewerCountEnabled) {
+            videoViewerCountPortTv.setVisibility(View.GONE);
+            videoViewerCountLandTv.setVisibility(View.GONE);
+            return;
+        }
         videoViewerCountPortTv.setVisibility(View.VISIBLE);
         videoViewerCountLandTv.setVisibility(View.VISIBLE);
 
@@ -605,6 +612,15 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
         videoViewerCountPortTv.setText(text);
         videoViewerCountLandTv.setText(text);
+    }
+
+    @Override
+    public void setViewerCountEnabled(boolean enabled) {
+        isViewerCountEnabled = enabled;
+        if (!enabled) {
+            videoViewerCountPortTv.setVisibility(View.GONE);
+            videoViewerCountLandTv.setVisibility(View.GONE);
+        }
     }
 
     @Override

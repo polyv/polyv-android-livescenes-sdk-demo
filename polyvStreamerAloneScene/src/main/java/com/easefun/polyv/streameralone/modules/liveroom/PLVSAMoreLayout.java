@@ -33,6 +33,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStrea
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.kickban.PLVKickBannedUsersLayout;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.template.PLVTemplateController;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVVirtualBackgroundLayout;
@@ -40,6 +41,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVConfirmDialog;
 import com.easefun.polyv.livecommon.ui.widget.PLVFlexboxLayoutExtKt;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.Position;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livescenes.chatroom.IPolyvChatroomManager;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatroomManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
@@ -147,12 +149,14 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private ImageView moreHangUpViewerLinkmicIv;
     private TextView moreHangUpViewerLinkmicTv;
     private LinearLayout moreInteractSigninLl;
+    private LinearLayout moreInteractLuckyBagLl;
     private LinearLayout moreGiftRewardLayout;
     private ImageView moreGiftRewardIv;
     private TextView moreGiftRewardTv;
     private LinearLayout moreGiftEffectLayout;
     private ImageView moreGiftEffectIv;
     private TextView moreGiftEffectTv;
+    private LinearLayout moreKickBannedUsersLayout;
     private ViewGroup moreWaterLayout;
     private ViewGroup moreVirtualBgLayout;
     private ViewGroup moreTemplateLayout;
@@ -177,6 +181,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private final PLVSAMoreLinkMicSettingLayout linkMicSettingLayout = new PLVSAMoreLinkMicSettingLayout(getContext());
     // 屏幕分享桌面消息
     private final PLVSAMoreScreenShareFloatMessageLayout screenShareFloatMessageLayout = new PLVSAMoreScreenShareFloatMessageLayout(getContext());
+    // 踢出/禁言用户列表
+    private final PLVKickBannedUsersLayout kickBannedUsersLayout = new PLVKickBannedUsersLayout(getContext());
 
     //布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -273,12 +279,14 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreHangUpViewerLinkmicIv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_iv);
         moreHangUpViewerLinkmicTv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_tv);
         moreInteractSigninLl = findViewById(R.id.plvsa_more_interact_signin_layout);
+        moreInteractLuckyBagLl = findViewById(R.id.plvsa_more_interact_lucky_bag_layout);
         moreGiftRewardLayout = findViewById(R.id.plvsa_more_gift_reward_layout);
         moreGiftRewardIv = findViewById(R.id.plvsa_more_gift_reward_iv);
         moreGiftRewardTv = findViewById(R.id.plvsa_more_gift_reward_tv);
         moreGiftEffectLayout = findViewById(R.id.plvsa_more_gift_effect_layout);
         moreGiftEffectIv = findViewById(R.id.plvsa_more_gift_effect_iv);
         moreGiftEffectTv = findViewById(R.id.plvsa_more_gift_effect_tv);
+        moreKickBannedUsersLayout = findViewById(R.id.plvsa_more_kick_banned_users_layout);
         moreWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
         moreVirtualBgLayout = findViewById(R.id.plvsa_setting_virtual_bg_layout);
         moreTemplateLayout = findViewById(R.id.plvsa_setting_template_layout);
@@ -313,8 +321,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreLinkmicSettingLayout.setOnClickListener(this);
         moreHangUpViewerLinkmicLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
+        moreInteractLuckyBagLl.setOnClickListener(this);
         moreGiftRewardLayout.setOnClickListener(this);
         moreGiftEffectLayout.setOnClickListener(this);
+        moreKickBannedUsersLayout.setOnClickListener(this);
         moreWaterLayout.setOnClickListener(this);
         moreVirtualBgLayout.setOnClickListener(this);
         moreTemplateLayout.setOnClickListener(this);
@@ -661,6 +671,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         this.onViewActionListener = listener;
     }
 
+    public void bindChatroomPresenter(IPLVChatroomContract.IChatroomPresenter chatroomPresenter) {
+        kickBannedUsersLayout.bindChatroomPresenter(chatroomPresenter);
+    }
+
     public IPLVStreamerContract.IStreamerView getStreamerView() {
         return PLVDynamicProxy.forClass(IPLVStreamerContract.IStreamerView.class)
                 .proxyAll(streamerView, linkMicSettingLayout.streamerView);
@@ -683,6 +697,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         if (shareLayout != null) {
             shareLayout.destroy();
         }
+        kickBannedUsersLayout.destroy();
         PolyvChatroomManager.getInstance().removeOnRoomStatusListener(roomStatusListener);
     }
     // </editor-fold>
@@ -981,6 +996,10 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             if (onViewActionListener != null) {
                 onViewActionListener.onShowSignInAction();
             }
+        } else if (id == moreInteractLuckyBagLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowLuckyBagAction();
+            }
         } else if (id == moreGiftRewardLayout.getId()) {
             moreGiftRewardLayout.setSelected(!moreGiftRewardLayout.isSelected());
             moreGiftRewardLayout.setEnabled(false);
@@ -1004,6 +1023,9 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             if (onViewActionListener != null) {
                 onViewActionListener.onGiftEffectSwitch(!moreGiftEffectLayout.isSelected());
             }
+        } else if (id == moreKickBannedUsersLayout.getId()) {
+            close();
+            kickBannedUsersLayout.open();
         } else if (id == moreWaterLayout.getId()) {
             close();
             PLVSAStickerLayout.tryShow();
@@ -1146,6 +1168,11 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
          * 显示签到
          */
         void onShowSignInAction();
+
+        /**
+         * 显示福袋
+         */
+        void onShowLuckyBagAction();
 
         /**
          * 礼物特效开关切换

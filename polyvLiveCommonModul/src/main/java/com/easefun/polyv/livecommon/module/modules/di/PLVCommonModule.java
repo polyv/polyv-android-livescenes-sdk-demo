@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.di;
 import com.easefun.polyv.livecommon.module.modules.beauty.di.PLVBeautyModule;
 import com.easefun.polyv.livecommon.module.modules.chapter.di.PLVPlaybackChapterModule;
 import com.easefun.polyv.livecommon.module.modules.commodity.di.PLVCommodityModule;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.di.PLVLuckyBagModule;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.di.PLVWelfareLotteryModule;
 import com.easefun.polyv.livecommon.module.modules.linkmic.di.PLVLinkMicModule;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.di.PLVMultiRoomTransmitModule;
@@ -30,6 +31,7 @@ public class PLVCommonModule extends PLVDependModule {
         include(PLVSipLinkMicModule.instance);
         include(PLVMultiVenueModule.instance);
         include(PLVWelfareLotteryModule.instance);
+        include(PLVLuckyBagModule.instance);
     }
 
 }

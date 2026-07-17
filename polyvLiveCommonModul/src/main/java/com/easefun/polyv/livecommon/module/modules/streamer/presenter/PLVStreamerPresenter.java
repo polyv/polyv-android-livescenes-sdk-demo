@@ -942,7 +942,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         PLVSocketUserBean socketUserBean = memberItemDataBean.getSocketUserBean();
         @Nullable final PLVLinkMicItemDataBean linkMicItemDataBean = memberItemDataBean.getLinkMicItemDataBean();
         if (action instanceof PLVStreamerControlLinkMicAction.AcceptRequestAction) {
-            if (rtcJoinMap.size() >= PLVStreamerInnerDataTransfer.getInstance().getInteractNumLimit()) {
+            if (streamerList.size() >= PLVStreamerInnerDataTransfer.getInstance().getInteractNumLimit() + 1) {
                 callbackToView(new ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
@@ -963,7 +963,7 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             });
         } else if (action instanceof PLVStreamerControlLinkMicAction.SendInvitationAction
                 && memberItemDataBean.getLinkMicStatus() != PLVLinkMicItemDataBean.LinkMicStatus.WAIT_ACCEPT_INVITATION) {
-            if (rtcJoinMap.size() >= PLVStreamerInnerDataTransfer.getInstance().getInteractNumLimit()) {
+            if (streamerList.size() >= PLVStreamerInnerDataTransfer.getInstance().getInteractNumLimit() + 1) {
                 callbackToView(new ViewRunnable() {
                     @Override
                     public void run(@NonNull IPLVStreamerContract.IStreamerView view) {

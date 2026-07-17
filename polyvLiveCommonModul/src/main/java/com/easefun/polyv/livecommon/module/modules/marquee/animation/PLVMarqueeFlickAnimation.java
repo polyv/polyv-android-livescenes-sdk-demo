@@ -138,13 +138,19 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         if (mainView == null) {
             return;
         }
+        if (!isParentSizeChanged(parentView)) {
+            return;
+        }
+        final int oldScreenWidth = screenWidth;
+        final int oldScreenHeight = screenHeight;
         mainView.clearAnimation();
         mainView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                screenWidth = parentView.getWidth();
-                screenHeight = parentView.getHeight();
                 mainView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (!updateParentSizeIfChanged(parentView, oldScreenWidth, oldScreenHeight)) {
+                    return;
+                }
                 if (animationStatus == STARTED) {
                     stop();
                     start();
