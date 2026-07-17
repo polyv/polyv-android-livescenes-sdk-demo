@@ -92,4 +92,39 @@ public abstract class PLVMarqueeAnimation {
      */
     public abstract void onParentSizeChanged(View parentView);
     // </editor-fold>
+
+    /**
+     * 更新父容器尺寸。
+     *
+     * @return true：尺寸发生变化；false：尺寸没有变化
+     */
+    protected boolean updateParentSizeIfChanged(View parentView) {
+        return updateParentSizeIfChanged(parentView, screenWidth, screenHeight);
+    }
+
+    /**
+     * 根据指定的旧尺寸检查并更新父容器尺寸。
+     */
+    protected boolean updateParentSizeIfChanged(View parentView, int oldWidth, int oldHeight) {
+        if (!isParentSizeChanged(parentView, oldWidth, oldHeight)) {
+            return false;
+        }
+        screenWidth = parentView.getWidth();
+        screenHeight = parentView.getHeight();
+        return true;
+    }
+
+    /**
+     * 判断父容器尺寸是否发生变化，但不更新已记录的尺寸。
+     */
+    protected boolean isParentSizeChanged(View parentView) {
+        return isParentSizeChanged(parentView, screenWidth, screenHeight);
+    }
+
+    /**
+     * 判断父容器尺寸是否与指定尺寸不同。
+     */
+    protected boolean isParentSizeChanged(View parentView, int oldWidth, int oldHeight) {
+        return parentView.getWidth() != oldWidth || parentView.getHeight() != oldHeight;
+    }
 }

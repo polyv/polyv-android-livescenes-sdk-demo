@@ -20,6 +20,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroo
 import com.easefun.polyv.livecommon.module.modules.chatroom.presenter.PLVChatroomPresenter;
 import com.easefun.polyv.livecommon.module.modules.commodity.viewmodel.PLVCommodityViewModel;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -71,6 +72,8 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
     protected PLVLotteryManager lotteryManager = new PLVLotteryManager();
     //有条件抽奖挂件管理器
     PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
+    //福袋挂件管理器
+    PLVLuckyBagManager luckyBagManager = PLVDependManager.getInstance().get(PLVLuckyBagManager.class);
     //截屏帮助类
     protected PLVScreenshotHelper screenshotHelper = new PLVScreenshotHelper();
     // </editor-fold>
@@ -151,6 +154,10 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //更新观看数量
     protected void updateWatchCount(long times) {
+    }
+
+    //更新观看热度显示开关
+    protected void updatePvShowEnabled(boolean enabled) {
     }
 
     //处理商品打开
@@ -406,6 +413,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                     if (classDetailVO != null && classDetailVO.getData() != null) {
                         PolyvLiveClassDetailVO.DataBean dataBean = classDetailVO.getData();
                         updateWatchInfo(dataBean.getCoverImage(), dataBean.getPublisher());
+                        updatePvShowEnabled(dataBean.isPvShowEnabled());
                         //根据商品列表开关来显示/隐藏商品库按钮
                         if (classDetailVO.isOpenCommodity()) {
                             PLVDependManager.getInstance().get(PLVCommodityViewModel.class).notifyHasProductLayout(true);

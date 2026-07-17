@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.easefun.polyv.livecommon.ui.widget.blurview.PLVBlurView
+        android:id="@+id/blur_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:plv_blurOverlayColor="#BF1B202D" />
+
+    <com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout
+        android:id="@+id/plv_kick_banned_users_ly"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="bottom"
+        android:background="#2c2c2c"
+        android:clickable="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp"
+        app:plv_mode="all"
+        app:plv_radius="10dp">
+
+        <LinearLayout
+            android:id="@+id/plv_kick_banned_users_tab_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/plv_kick_banned_users_kick_tab_tv"
+                android:layout_width="68dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/plv_chat_kick"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/plv_kick_banned_users_banned_tab_tv"
+                android:layout_width="68dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/plv_chat_ban"
+                android:textColor="#99FFFFFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/plv_kick_banned_users_tab_indicator"
+            android:layout_width="18dp"
+            android:layout_height="2dp"
+            android:layout_below="@+id/plv_kick_banned_users_tab_ly"
+            android:layout_centerHorizontal="true"
+            android:background="#3F76FF" />
+
+        <TextView
+            android:id="@+id/plv_kick_banned_users_hint_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_below="@+id/plv_kick_banned_users_tab_indicator"
+            android:layout_marginTop="18dp"
+            android:gravity="center_vertical"
+            android:text="@string/plv_kick_banned_users_kick_hint"
+            android:textColor="#99F0F1F5"
+            android:textSize="12sp" />
+
+        <FrameLayout
+            android:id="@+id/plv_kick_banned_users_content_ly"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/plv_kick_banned_users_hint_tv"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="8dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/plv_kick_banned_users_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/plv_kick_banned_users_loading_pb"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/plv_kick_banned_users_empty_ly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:alpha="0.45"
+                    android:src="@drawable/plv_empty_icon" />
+
+                <TextView
+                    android:id="@+id/plv_kick_banned_users_empty_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/plv_kick_banned_users_no_kick"
+                    android:textColor="#99F0F1F5"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout>
+</FrameLayout>

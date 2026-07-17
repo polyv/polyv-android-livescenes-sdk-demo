@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveScene;
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.plv.socket.event.interact.PLVShowLuckyBagEvent;
 
 /**
  * date: 2020/10/9
@@ -23,6 +24,11 @@ public interface IPLVIARLayout {
      * 显示我的奖励
      */
     void showLotteryRecord();
+
+    /**
+     * 显示福袋
+     */
+    void showLuckyBag(PLVShowLuckyBagEvent showLuckyBagEvent);
 
     /**
      * 销毁

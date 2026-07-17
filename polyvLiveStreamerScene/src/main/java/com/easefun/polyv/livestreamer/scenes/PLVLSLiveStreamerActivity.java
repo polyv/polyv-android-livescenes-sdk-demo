@@ -18,6 +18,7 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.modules.beauty.helper.PLVBeautyInitHelper;
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
+import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerIARLayout;
 import com.easefun.polyv.livecommon.module.modules.interact.IPLVStreamerInteractLayout;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
@@ -105,6 +106,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private PLVLSPushDowngradeAlertToastLayout pushDowngradeAlertToastLy;
     // 互动布局
     private IPLVStreamerInteractLayout interactLayout;
+    private IPLVStreamerIARLayout iarLayout;
     private PLVLSNetworkDisconnectMaskLayout networkDisconnectMaskLayout;
     // </editor-fold>
 
@@ -225,6 +227,12 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if (liveRoomDataManager != null) {
             liveRoomDataManager.destroy();
         }
+        if (interactLayout != null) {
+            interactLayout.destroy();
+        }
+        if (iarLayout != null) {
+            iarLayout.destroy();
+        }
     }
 
     @Override
@@ -241,10 +249,22 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         if (plvlsStatusBarLy != null) {
             plvlsStatusBarLy.onActivityResult(requestCode, resultCode, data);
         }
+        if (interactLayout != null) {
+            interactLayout.onActivityResult(requestCode, resultCode, data);
+        }
+        if (iarLayout != null) {
+            iarLayout.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
     public void onBackPressed() {
+        if (iarLayout != null && iarLayout.onBackPress()) {
+            return;
+        }
+        if (interactLayout != null && interactLayout.onBackPress()) {
+            return;
+        }
         if (plvlsStatusBarLy != null && plvlsStatusBarLy.onBackPressed()) {
             return;
         } else if (plvlsChatroomLy != null && plvlsChatroomLy.onBackPressed()) {
@@ -329,9 +349,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         checkVoiceWarningLayout = findViewById(R.id.plvls_check_voice_warning_ly);
         pushDowngradeAlertToastLy = findViewById(R.id.plvls_push_downgrade_alert_toast_ly);
         interactLayout = findViewById(R.id.plvsa_interact_layout);
+        iarLayout = findViewById(R.id.plvsa_iar_layout);
         networkDisconnectMaskLayout = findViewById(R.id.plvls_network_disconnect_mask_layout);
 
         interactLayout.init(liveRoomDataManager);
+        iarLayout.init(liveRoomDataManager);
 
         // 初始化推流和连麦布局
         plvlsStreamerLy.init(liveRoomDataManager);
@@ -377,6 +399,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         }
         plvlsChatroomLy.getChatroomPresenter().registerView(toTopView.getChatroomView());
         plvlsChatroomLy.getChatroomPresenter().registerView(checkVoiceWarningLayout.getChatroomView());
+        plvlsStatusBarLy.bindChatroomPresenter(plvlsChatroomLy.getChatroomPresenter());
     }
     // </editor-fold>
 
@@ -428,6 +451,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             @Override
             public void onShowSignInAction() {
                 interactLayout.showSignIn();
+            }
+
+            @Override
+            public void onShowLuckyBagAction() {
+                iarLayout.showLuckyBag();
             }
 
             @Override

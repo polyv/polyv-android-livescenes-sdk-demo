@@ -314,6 +314,20 @@ public interface IPLVChatroomContract {
         void onKickUsersList(List<PLVSocketUserBean> dataList);
 
         /**
+         * 用户禁言列表数据
+         *
+         * @param dataList 数据列表
+         */
+        void onBannedUsersList(List<PLVSocketUserBean> dataList);
+
+        /**
+         * IP禁言列表数据
+         *
+         * @param dataList 数据列表
+         */
+        void onBannedIpsList(List<String> dataList);
+
+        /**
          * 检查聊天消息最大数量
          *
          * @param maxLength 最大长度
@@ -448,6 +462,16 @@ public interface IPLVChatroomContract {
          * 请求被踢出的用户列表
          */
         void requestKickUsers();
+
+        /**
+         * 请求被禁言的用户列表
+         */
+        void requestBannedUsers();
+
+        /**
+         * 请求被禁言的IP列表
+         */
+        void requestBannedIps();
 
         /**
          * 获取历史记录成功的次数

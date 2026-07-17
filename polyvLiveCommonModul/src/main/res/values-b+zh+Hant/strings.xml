@@ -179,6 +179,11 @@
     <string name="plv_chat_kick_fail">移出失敗</string>
     <string name="plv_chat_kick_success_2">踢出成功</string>
     <string name="plv_chat_kick_fail_2">踢出失敗(%s)</string>
+    <string name="plv_chat_unkick">取消踢出</string>
+    <string name="plv_chat_unkick_success">取消踢出成功</string>
+    <string name="plv_chat_unkick_fail">取消踢出失敗</string>
+    <string name="plv_chat_kick_platform_prohibited">已被全平台踢出</string>
+    <string name="plv_chat_ban_platform_prohibited">已被全平台禁言</string>
     <string name="plv_chat_unban_success">解除禁言成功</string>
     <string name="plv_chat_unban_fail">解除禁言失敗</string>
     <string name="plv_chat_unban_fail_2">解除禁言失敗(%s)</string>
@@ -546,6 +551,7 @@
     <string name="plv_live_language_switch_hint">切換語言將為您重新進入直播間，請點擊\"確定\"後切換</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">簽到</string>
+    <string name="plv_live_more_interact_lucky_bag">福袋</string>
     <string name="plv_interact_open_weixin_buy">請前往微信觀看頁面購買</string>
     <string name="plv_interact_open_weixin_but_fail">開啟微信失敗！請檢查是否已安裝微信</string>
     <string name="plv_interact_no_support_buy">暫時不支援購買</string>
@@ -617,6 +623,10 @@
 
     <!--条件抽奖 -->
     <string name="plv_welfare_lottery_will_start">福利抽獎即將開始</string>
+
+    <!--福袋-->
+    <string name="plv_lucky_bag_will_open">福袋即將開啟</string>
+    <string name="plv_lucky_bag_opening">福袋開啟中</string>
 
     <!--通用-->
     <string name="plv_common_storage_permission_apply_tips">檔案讀寫功能需要在應用程式設定中開啟檔案存取權限，是否前往開啟權限？</string>
@@ -756,5 +766,11 @@
     <string name="plv_streamer_check_voice_risk_tips">風險提醒</string>
     <string name="plv_streamer_check_voice_read_new_tips">查看新提醒</string>
     <string name="plv_streamer_check_voice_read_remind_tips">查看本次提醒%s</string>
+    <string name="plv_live_more_kick_banned_users">封禁用戶</string>
+    <string name="plv_kick_banned_users_kick_hint">已被踢出的用戶</string>
+    <string name="plv_kick_banned_users_banned_hint">已被禁言的用戶</string>
+    <string name="plv_kick_banned_users_no_kick">暫無踢出任何用戶</string>
+    <string name="plv_kick_banned_users_no_banned">暫無禁言任何用戶</string>
+    <string name="plv_kick_banned_users_user_id">ID：%s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">通話所需的相機或麥克風或附近的設備許可權被拒絕，請到應用設定的許可權管理中恢復</string>
 </resources>

@@ -179,6 +179,11 @@
     <string name="plv_chat_kick_fail">退去に失敗しました</string>
     <string name="plv_chat_kick_success_2">キックに成功しました</string>
     <string name="plv_chat_kick_fail_2">キックに失敗しました (%s)</string>
+    <string name="plv_chat_unkick">キック解除</string>
+    <string name="plv_chat_unkick_success">キック解除に成功しました</string>
+    <string name="plv_chat_unkick_fail">キック解除に失敗しました</string>
+    <string name="plv_chat_kick_platform_prohibited">全プラットフォームでキックされています</string>
+    <string name="plv_chat_ban_platform_prohibited">全プラットフォームで発言禁止されています</string>
     <string name="plv_chat_unban_success">禁止解除が成功しました</string>
     <string name="plv_chat_unban_fail">禁止解除に失敗しました</string>
     <string name="plv_chat_unban_fail_2">禁止解除に失敗しました (%s)</string>
@@ -546,6 +551,7 @@
     <string name="plv_live_language_switch_hint">言語を切り替えると、ライブ ブロードキャスト ルームに再び入ります。切り替えるには「OK」をクリックしてください</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">サインイン</string>
+    <string name="plv_live_more_interact_lucky_bag">福袋</string>
     <string name="plv_interact_open_weixin_buy">購入するには WeChat 表示ページにアクセスしてください</string>
     <string name="plv_interact_open_weixin_but_fail">WeChat を開けませんでした! WeChat がインストールされているかどうかを確認してください</string>
     <string name="plv_interact_no_support_buy">購入はまだサポートされていません</string>
@@ -616,6 +622,10 @@
     <string name="plv_lottery_running">宝くじの開始</string>
     <!--条件抽奖 -->
     <string name="plv_welfare_lottery_will_start">福祉宝くじがまもなく始まります</string>
+
+    <!--福袋-->
+    <string name="plv_lucky_bag_will_open">福袋がまもなく開きます</string>
+    <string name="plv_lucky_bag_opening">福袋を開いています</string>
 
     <!--通用-->
     <string name="plv_common_storage_permission_apply_tips">ファイルの読み書き機能を利用するには、アプリ設定でファイルアクセス権限を有効にする必要があります。設定に移動して権限を有効にしますか？</string>
@@ -755,5 +765,11 @@
     <string name="plv_streamer_check_voice_risk_tips">リスク警告</string>
     <string name="plv_streamer_check_voice_read_new_tips">新規リマインダの表示</string>
     <string name="plv_streamer_check_voice_read_remind_tips">今回のリマインダ%sの表示</string>
+    <string name="plv_live_more_kick_banned_users">制限ユーザー</string>
+    <string name="plv_kick_banned_users_kick_hint">退出されたユーザー</string>
+    <string name="plv_kick_banned_users_banned_hint">ミュートされたユーザー</string>
+    <string name="plv_kick_banned_users_no_kick">退出ユーザーはいません</string>
+    <string name="plv_kick_banned_users_no_banned">ミュートユーザーはいません</string>
+    <string name="plv_kick_banned_users_user_id">ID：%s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">通話に必要なカメラまたはマイクまたは近くのデバイス権限は拒否されました。アプリケーション設定の権限管理に復元してください</string>
 </resources>

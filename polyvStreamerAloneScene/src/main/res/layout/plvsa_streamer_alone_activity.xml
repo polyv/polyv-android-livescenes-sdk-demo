@@ -116,6 +116,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <com.easefun.polyv.livecommon.module.modules.interact.PLVStreamerIARLayout
+            android:id="@+id/plvsa_iar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

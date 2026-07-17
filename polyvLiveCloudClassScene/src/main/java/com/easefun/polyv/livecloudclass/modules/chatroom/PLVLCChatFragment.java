@@ -63,6 +63,7 @@ import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatMessag
 import com.easefun.polyv.livecommon.module.modules.chatroom.view.PLVAbsChatroomView;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
 import com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.multiroom.transmit.model.vo.PLVMultiRoomTransmitVO;
@@ -149,6 +150,7 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     private final PLVMultiRoomTransmitViewModel multiRoomTransmitViewModel = PLVDependManager.getInstance().get(PLVMultiRoomTransmitViewModel.class);
     private final PLVRedpackViewModel redpackViewModel = PLVDependManager.getInstance().get(PLVRedpackViewModel.class);
     private final PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
+    private final PLVLuckyBagManager luckyBagManager = PLVDependManager.getInstance().get(PLVLuckyBagManager.class);
 
     //聊天信息列表
     private PLVLCChatCommonMessageList chatCommonMessageList;
@@ -555,6 +557,11 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         welfareLotteryEnterTipsView = findViewById(R.id.plvlc_live_welfare_lottery_enter_tips_view);
         if (welfareLotteryManager != null) {
             welfareLotteryManager.registerView(welfareLotteryEnterView, welfareLotteryCdVTv, welfareLotteryEnterTipsView);
+        }
+
+        // 福袋挂件
+        if (luckyBagManager != null) {
+            luckyBagManager.registerView((ImageView) findViewById(R.id.plvlc_live_lucky_bag_enter_view), (TextView) findViewById(R.id.plvlc_live_lucky_bag_enter_cd_tv), (PLVTriangleIndicateTextView) findViewById(R.id.plvlc_live_lucky_bag_enter_tips_view));
         }
 
         //互动入口

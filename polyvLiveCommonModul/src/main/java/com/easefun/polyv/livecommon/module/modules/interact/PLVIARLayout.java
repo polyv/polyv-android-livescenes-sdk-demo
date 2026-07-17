@@ -28,24 +28,33 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.interact.info.PLVInteractInfo;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagManager;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagVO;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
+import com.plv.foundationsdk.component.di.PLVDependManager;
 import com.plv.foundationsdk.log.PLVCommonLog;
+import com.plv.foundationsdk.utils.PLVAppUtils;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVJsonUtils;
 import com.plv.livescenes.feature.interact.PLVIARWebView;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.model.PLVLiveClassDetailVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
+import com.plv.socket.event.interact.PLVCheckLuckyBagCommentEvent;
 import com.plv.socket.event.interact.PLVOpenOtherAppEvent;
+import com.plv.socket.event.interact.PLVShowLuckyBagEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ActivityUtils;
 import com.plv.thirdpart.blankj.utilcode.util.ToastUtils;
 
 import net.plv.android.jsbridge.BridgeHandler;
 import net.plv.android.jsbridge.CallBackFunction;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -57,6 +66,7 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
     // <editor-fold defaultstate="collapsed" desc="变量">
     private static final String TAG = PLVIARLayout.class.getSimpleName();
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private final PLVLuckyBagManager luckyBagManager = PLVDependManager.getInstance().get(PLVLuckyBagManager.class);
 
     private PLVIARWebView iarWeb;
 
@@ -78,6 +88,8 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
             PLVInteractJSBridgeEventConst.V2_SHOW_PRODUCT_DETAIL,
             PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_COMMENT_SUCCESS,
             PLVInteractJSBridgeEventConst.V2_WELFARE_LOTTERY_ENTRANCE_CHANGE,
+            PLVInteractJSBridgeEventConst.V2_LUCKY_BAG_COMMENT_SUCCESS,
+            PLVInteractJSBridgeEventConst.V2_LUCKY_BAG_ENTRANCE_CHANGE,
             PLVInteractJSBridgeEventConst.V2_SIGN_IN_TIMEOUT_RECV
     );
     // </editor-fold >
@@ -142,6 +154,12 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
             case PLVInteractJSBridgeEventConst.V2_GET_INTERACT_INFO:
                 processGetInteractInfo(param, callBackFunction);
                 break;
+            case PLVInteractJSBridgeEventConst.V2_LUCKY_BAG_COMMENT_SUCCESS:
+                processLuckyBagComment(param);
+                break;
+            case PLVInteractJSBridgeEventConst.V2_LUCKY_BAG_ENTRANCE_CHANGE:
+                processLuckyBag(param);
+                break;
         }
     }
 
@@ -156,11 +174,23 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
         iarWeb.setWatchStatus(watchStatus);
         iarWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVInteractWebView2.LANG_EN : PLVInteractWebView2.LANG_ZH);
         observeLiveData();
+        initListener();
     }
 
     @Override
     public void showLotteryRecord() {
         String data = "{\"event\" : \"SHOW_LOTTERY_RECORD_POPUP\"}";
+        iarWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
+    public void showLuckyBag(PLVShowLuckyBagEvent event) {
+        String data = PLVGsonUtil.toJsonSimple(event);
         iarWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
             @Override
             public void onCallBack(String s) {
@@ -247,6 +277,25 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
     }
     // </editor-fold >
 
+    // <editor-fold defaultstate="collapsed" desc="监听注册">
+    void initListener() {
+        luckyBagManager.setOnLuckyBagEnterClickListener(new PLVLuckyBagManager.OnLuckyBagEnterClickListener() {
+            @Override
+            public void onClick(PLVShowLuckyBagEvent event) {
+                showLuckyBag(event);
+            }
+        });
+
+        luckyBagManager.setOnCheckCommendListener(new PLVLuckyBagManager.OnCheckCommendListener() {
+            @Override
+            public void onCommendMessage(PLVCheckLuckyBagCommentEvent event) {
+                checkLuckBagComment(event);
+            }
+        });
+
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="工具方法">
     private void processCallAppEvent(String param, CallBackFunction callBackFunction) {
         PLVCallAppEvent callAppEvent = PLVGsonUtil.fromJson(PLVCallAppEvent.class, param);
@@ -306,6 +355,40 @@ public class PLVIARLayout extends FrameLayout implements IPLVIARLayout {
         info.setLotteryData(lotteryData);
         String jsonInfo = PLVGsonUtil.toJsonSimple(info);
         return jsonInfo;
+    }
+
+    private void processLuckyBagComment(String param) {
+        String comment = "";
+        try {
+            JSONObject jsonObject = new JSONObject(param);
+            comment = PLVJsonUtils.getString(jsonObject, "comment", "");
+        } catch (Exception e) {
+
+        }
+        luckyBagManager.handleLuckyBagComment(comment);
+
+    }
+
+    private void processLuckyBag(String param) {
+        PLVLuckyBagVO luckyBagVO = PLVGsonUtil.fromJson(PLVLuckyBagVO.class, param);
+        luckyBagManager.acceptLuckyBagVO(luckyBagVO);
+    }
+
+    private void checkLuckBagComment(final PLVCheckLuckyBagCommentEvent event) {
+
+        PLVAppUtils.postToMainThread(new Runnable() {
+            @Override
+            public void run() {
+                String data = PLVGsonUtil.toJsonSimple(event);
+                iarWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+                    @Override
+                    public void onCallBack(String s) {
+                        PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+                    }
+                });
+            }
+        });
+
     }
 
     /**

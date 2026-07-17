@@ -42,6 +42,7 @@ import com.easefun.polyv.livecommon.module.modules.cast.manager.PLVCastBusinessM
 import com.easefun.polyv.livecommon.module.modules.di.PLVCommonModule;
 import com.easefun.polyv.livecommon.module.modules.interact.PLVInteractLayout2;
 import com.easefun.polyv.livecommon.module.modules.interact.cardpush.PLVCardPushManager;
+import com.easefun.polyv.livecommon.module.modules.interact.luckybag.PLVLuckyBagManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.PLVLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.interact.lottery.welfarelottery.PLVWelfareLotteryManager;
 import com.easefun.polyv.livecommon.module.modules.player.PLVPlayerState;
@@ -584,7 +585,12 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
         // 有条件抽奖挂件配置
         PLVWelfareLotteryManager welfareLotteryManager = PLVDependManager.getInstance().get(PLVWelfareLotteryManager.class);
         welfareLotteryManager.onCleared();
-        welfareLotteryManager.registerView(mediaLayout.getWelfareLotteryEnterView(), mediaLayout.getWelfareLotteryEnterCdView(), mediaLayout.getLotteryEnterTipsView());
+        welfareLotteryManager.registerView(mediaLayout.getWelfareLotteryEnterView(), mediaLayout.getWelfareLotteryEnterCdView(), mediaLayout.getWelfareLotteryEnterTipsView());
+
+        // 福袋挂件配置
+        PLVLuckyBagManager luckyBagManager = PLVDependManager.getInstance().get(PLVLuckyBagManager.class);
+        luckyBagManager.onCleared();
+        luckyBagManager.registerView(mediaLayout.getLuckyBagEnterView(), mediaLayout.getLuckyBagEnterCdView(), mediaLayout.getLuckyBagEnterTipsView());
 
         // 初始化横屏聊天室布局
         chatLandscapeLayout = mediaLayout.getChatLandscapeLayout();

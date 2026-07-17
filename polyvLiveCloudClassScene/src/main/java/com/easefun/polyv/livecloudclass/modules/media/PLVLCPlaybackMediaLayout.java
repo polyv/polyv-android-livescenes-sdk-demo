@@ -74,6 +74,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVToTopView;
 import com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
+import com.easefun.polyv.livescenes.model.PolyvLiveClassDetailVO;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
 import com.plv.business.api.common.ppt.IPLVPPTWebViewListener;
@@ -587,6 +588,11 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     @Override
+    public void setViewerCountEnabled(boolean enabled) {
+        mediaController.setViewerCountEnabled(enabled);
+    }
+
+    @Override
     public PLVSwitchViewAnchorLayout getPlayerSwitchView() {
         return switchAnchorPlayer;
     }
@@ -649,6 +655,21 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     @Override
     public PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView() {
         return mediaController.getWelfareLotteryEnterTipsView();
+    }
+
+    @Override
+    public ImageView getLuckyBagEnterView() {
+        return mediaController.getLuckyBagEnterView();
+    }
+
+    @Override
+    public TextView getLuckyBagEnterCdView() {
+        return mediaController.getLuckyBagEnterCdView();
+    }
+
+    @Override
+    public PLVTriangleIndicateTextView getLuckyBagEnterTipsView() {
+        return mediaController.getLuckyBagEnterTipsView();
     }
 
     @Override
@@ -1144,6 +1165,22 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听直播详情信息、功能开关数据">
     private void observeLiveRoomData() {
+        //监听 直播间数据管理器对象中的直播详情数据变化
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> liveClassDetailVO) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (liveClassDetailVO == null || !liveClassDetailVO.isSuccess()) {
+                    return;
+                }
+                PolyvLiveClassDetailVO liveClassDetail = liveClassDetailVO.getData();
+                if (liveClassDetail == null || liveClassDetail.getData() == null) {
+                    return;
+                }
+                mediaController.setViewerCountEnabled(liveClassDetail.getData().isPvShowEnabled());
+            }
+        });
+
         //监听 直播间数据管理器对象中的功能开关数据
         liveRoomDataManager.getFunctionSwitchVO().observe(((LifecycleOwner) getContext()), new Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>>() {
             @Override

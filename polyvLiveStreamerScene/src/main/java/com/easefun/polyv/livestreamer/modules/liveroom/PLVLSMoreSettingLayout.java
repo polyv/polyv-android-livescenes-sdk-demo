@@ -33,11 +33,13 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.PLVBeautyViewModel;
 import com.easefun.polyv.livecommon.module.modules.beauty.viewmodel.vo.PLVBeautyUiState;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemDataBean;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.modules.streamer.view.PLVAbsStreamerView;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
+import com.easefun.polyv.livecommon.module.utils.kickban.PLVKickBannedUsersLayout;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVColorPickerView;
 import com.easefun.polyv.livecommon.module.utils.virtualbg.PLVImageSelectorUtil;
@@ -100,7 +102,9 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private LinearLayout moreSettingMixItemLayout;
     private LinearLayout moreSettingShareItemLayout;
     private LinearLayout morePushDowngradeItemLayout;
+    private LinearLayout moreKickBannedUsersLayout;
     private LinearLayout moreInteractSigninLl;
+    private LinearLayout moreInteractLuckyBagLl;
     private LinearLayout moreVirtualBgItemLayout;
     private LinearLayout moreDenoiseItemLayout;
     private LinearLayout moreExternalAudioInputItemLayout;
@@ -119,6 +123,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
 
     // 分享布局
     private PLVLSShareLayout shareLayout;
+    // 踢出/禁言用户列表
+    private final PLVKickBannedUsersLayout kickBannedUsersLayout = new PLVKickBannedUsersLayout(getContext());
 
     // 布局弹层
     private PLVMenuDrawer menuDrawer;
@@ -189,11 +195,13 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingMixLayout = findViewById(R.id.plvls_more_setting_mix_layout);
         morePushDowngradeItemLayout = findViewById(R.id.plvls_more_push_downgrade_item_layout);
         morePushDowngradePreferenceLayout = findViewById(R.id.plvls_more_push_downgrade_preference_layout);
+        moreKickBannedUsersLayout = findViewById(R.id.plvls_more_kick_banned_users_layout);
         moreSettingShareItemLayout = findViewById(R.id.plvls_more_setting_share_item_layout);
         moreSettingExitSeparator = findViewById(R.id.plvls_more_setting_exit_separator);
         moreSettingExitTv = findViewById(R.id.plvls_more_setting_exit_tv);
         moreSettingExitGroup = findViewById(R.id.plvls_more_setting_exit_group);
         moreInteractSigninLl = findViewById(R.id.plvls_more_interact_signin_layout);
+        moreInteractLuckyBagLl = findViewById(R.id.plvls_more_interact_lucky_bag_layout);
         moreVirtualBgItemLayout = findViewById(R.id.plvls_more_setting_virtual_bg_layout);
         moreDenoiseItemLayout = findViewById(R.id.plvls_more_setting_denoise_layout);
         moreDenoisePreferenceLayout = findViewById(R.id.plvls_more_setting_denoise_preference_layout);
@@ -208,8 +216,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingBitrateItemLayout.setOnClickListener(this);
         moreSettingMixItemLayout.setOnClickListener(this);
         morePushDowngradeItemLayout.setOnClickListener(this);
+        moreKickBannedUsersLayout.setOnClickListener(this);
         moreSettingShareItemLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
+        moreInteractLuckyBagLl.setOnClickListener(this);
         moreVirtualBgItemLayout.setOnClickListener(this);
         moreDenoiseItemLayout.setOnClickListener(this);
         moreExternalAudioInputItemLayout.setOnClickListener(this);
@@ -624,6 +634,10 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         this.onViewActionListener = listener;
     }
 
+    public void bindChatroomPresenter(IPLVChatroomContract.IChatroomPresenter chatroomPresenter) {
+        kickBannedUsersLayout.bindChatroomPresenter(chatroomPresenter);
+    }
+
     public boolean onBackPressed() {
         if (shareLayout != null && shareLayout.onBackPressed()) {
             return true;
@@ -643,6 +657,7 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         if (shareLayout != null) {
             shareLayout.destroy();
         }
+        kickBannedUsersLayout.destroy();
     }
     // </editor-fold>
 
@@ -786,12 +801,19 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             showLayout(moreSettingMixLayout);
         } else if (id == morePushDowngradeItemLayout.getId()) {
             showLayout(morePushDowngradePreferenceLayout);
+        } else if (id == moreKickBannedUsersLayout.getId()) {
+            close();
+            kickBannedUsersLayout.open();
         } else if (id == moreSettingShareItemLayout.getId()) {
             close();
             shareLayout.open();
         } else if (id == moreInteractSigninLl.getId()) {
             if (onViewActionListener != null) {
                 onViewActionListener.onShowSignInAction();
+            }
+        } else if (id == moreInteractLuckyBagLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowLuckyBagAction();
             }
         } else if (id == moreVirtualBgItemLayout.getId()) {
             if (virtualBackgroundLayout != null) {
@@ -831,6 +853,11 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
          * 显示签到
          */
         void onShowSignInAction();
+
+        /**
+         * 显示福袋
+         */
+        void onShowLuckyBagAction();
     }
     // </editor-fold>
 }

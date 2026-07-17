@@ -179,6 +179,11 @@
     <string name="plv_chat_kick_fail">Kick out failed</string>
     <string name="plv_chat_kick_success_2">Kick out successful</string>
     <string name="plv_chat_kick_fail_2">Kick out failed (%s)</string>
+    <string name="plv_chat_unkick">Cancel kick</string>
+    <string name="plv_chat_unkick_success">Cancel kick successfully</string>
+    <string name="plv_chat_unkick_fail">Cancel kick failed</string>
+    <string name="plv_chat_kick_platform_prohibited">Kicked on the entire platform</string>
+    <string name="plv_chat_ban_platform_prohibited">Banned on the entire platform</string>
     <string name="plv_chat_unban_success">Unbanned successfully</string>
     <string name="plv_chat_unban_fail">Unbanning failed</string>
     <string name="plv_chat_unban_fail_2">Unbanning failed (%s)</string>
@@ -546,6 +551,7 @@
     <string name="plv_live_language_switch_hint">Change language to re-enter live stream, confirm to switch</string>
     <!--互动-->
     <string name="plv_live_more_interact_signin">Sign in</string>
+    <string name="plv_live_more_interact_lucky_bag">Lucky bag</string>
     <string name="plv_interact_open_weixin_buy">Buy in WeChat only.</string>
     <string name="plv_interact_open_weixin_but_fail">Open WeChat failed! Please check if WeChat is already installed</string>
     <string name="plv_interact_no_support_buy">Purchase not currently supported</string>
@@ -617,6 +623,10 @@
 
     <!--条件抽奖 -->
     <string name="plv_welfare_lottery_will_start">Lottery is about to begin</string>
+
+    <!--Lucky bag -->
+    <string name="plv_lucky_bag_will_open">Lucky bag is about to open</string>
+    <string name="plv_lucky_bag_opening">Opening</string>
 
     <!--通用-->
     <string name="plv_common_storage_permission_apply_tips">File read/write functionality requires file access permission to be enabled in app settings. Go to settings to enable it?</string>
@@ -756,5 +766,11 @@
     <string name="plv_streamer_check_voice_risk_tips">Risk Warning</string>
     <string name="plv_streamer_check_voice_read_new_tips">View new reminders</string>
     <string name="plv_streamer_check_voice_read_remind_tips">View this reminder%s</string>
+    <string name="plv_live_more_kick_banned_users">Blocked users</string>
+    <string name="plv_kick_banned_users_kick_hint">Kicked users</string>
+    <string name="plv_kick_banned_users_banned_hint">Muted users</string>
+    <string name="plv_kick_banned_users_no_kick">No kicked users</string>
+    <string name="plv_kick_banned_users_no_banned">No muted users</string>
+    <string name="plv_kick_banned_users_user_id">ID: %s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">The camera, microphone, or nearby device permissions required for the call have been denied. Please restore them in the permission management of the application settings</string>
 </resources>

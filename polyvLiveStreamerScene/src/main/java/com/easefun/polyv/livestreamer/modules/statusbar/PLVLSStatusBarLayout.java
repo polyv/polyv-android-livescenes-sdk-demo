@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
+import com.easefun.polyv.livecommon.module.modules.chatroom.contract.IPLVChatroomContract;
 import com.easefun.polyv.livecommon.module.modules.document.model.enums.PLVDocumentMode;
 import com.easefun.polyv.livecommon.module.modules.document.presenter.PLVDocumentPresenter;
 import com.easefun.polyv.livecommon.module.modules.document.view.PLVAbsDocumentView;
@@ -257,6 +258,11 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         });
     }
 
+    @Override
+    public void bindChatroomPresenter(IPLVChatroomContract.IChatroomPresenter chatroomPresenter) {
+        moreSettingLayout.bindChatroomPresenter(chatroomPresenter);
+    }
+
     private void initLinkMicControlView() {
         plvlsStatusBarLinkmicIv.setOnViewActionListener(new PLVLSLinkMicControlButton.OnViewActionListener() {
             @Override
@@ -341,6 +347,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             public void onShowSignInAction() {
                 if (onViewActionListener != null) {
                     onViewActionListener.onShowSignInAction();
+                }
+            }
+
+            @Override
+            public void onShowLuckyBagAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowLuckyBagAction();
                 }
             }
         });

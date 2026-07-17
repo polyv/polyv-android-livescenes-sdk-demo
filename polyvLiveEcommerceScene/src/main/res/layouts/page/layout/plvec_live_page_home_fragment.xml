@@ -390,6 +390,60 @@
                 tools:visibility="visible" />
         </android.support.constraint.ConstraintLayout>
 
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:id="@+id/plvec_live_lucky_bag_enter_view"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginEnd="15dp"
+                android:src="@drawable/plvec_interact_lucky_bag"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/plvec_live_lucky_bag_enter_cd_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="6dp"
+                android:text="00:00:00"
+                android:textColor="#ADADC0"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/plvec_live_lucky_bag_enter_view"
+                app:layout_constraintStart_toStartOf="@+id/plvec_live_lucky_bag_enter_view"
+                app:layout_constraintTop_toBottomOf="@+id/plvec_live_lucky_bag_enter_view"
+                tools:visibility="visible" />
+
+            <com.easefun.polyv.livecommon.ui.widget.PLVTriangleIndicateTextView
+                android:id="@+id/plvec_live_lucky_bag_enter_tips_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="@string/plv_lucky_bag_will_open"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/plvec_live_lucky_bag_enter_view"
+                app:layout_constraintEnd_toStartOf="@+id/plvec_live_lucky_bag_enter_view"
+                app:layout_constraintTop_toTopOf="@+id/plvec_live_lucky_bag_enter_view"
+                app:plv_indicateColor="#FF9D4D"
+                app:plv_indicateEndColor="#F65F49"
+                app:plv_rectRadius="4dp"
+                app:plv_triangleCenter="true"
+                app:plv_triangleHeight="6dp"
+                app:plv_trianglePosition="right"
+                app:plv_triangleWidth="10dp"
+                tools:visibility="visible" />
+        </android.support.constraint.ConstraintLayout>
+
     </LinearLayout>
 
     <!--点赞布局-->

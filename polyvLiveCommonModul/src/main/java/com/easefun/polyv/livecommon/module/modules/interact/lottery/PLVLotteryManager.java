@@ -239,7 +239,7 @@ public class PLVLotteryManager {
                         forView(new RunnableT<TextView>() {
                             @Override
                             public void run(@NonNull TextView textView) {
-                                textView.setText(PLVTimeUtils.generateTime(remainTime * 1000, true));
+                                textView.setText(PLVTimeUtils.generateTime(remainTime * 1000, false));
                             }
                         }, lotteryEnterCdTvs);
 

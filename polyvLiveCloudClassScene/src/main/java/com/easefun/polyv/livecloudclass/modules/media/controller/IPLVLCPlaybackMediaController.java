@@ -88,6 +88,21 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
     PLVTriangleIndicateTextView getWelfareLotteryEnterTipsView();
 
     /**
+     * 获取福袋入口按钮
+     */
+    ImageView getLuckyBagEnterView();
+
+    /**
+     * 获取福袋入口倒计时控件
+     */
+    TextView getLuckyBagEnterCdView();
+
+    /**
+     * 获取福袋入口提示控件
+     */
+    PLVTriangleIndicateTextView getLuckyBagEnterTipsView();
+
+    /**
      * 设置点赞是否开启/关闭
      *
      * @param isSwitchEnabled
@@ -155,6 +170,11 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * @param viewerCount 热度数
      */
     void updateViewerCount(long viewerCount);
+
+    /**
+     * 设置观看热度是否显示
+     */
+    void setViewerCountEnabled(boolean enabled);
 
     /**
      * 更新在线观看人数
