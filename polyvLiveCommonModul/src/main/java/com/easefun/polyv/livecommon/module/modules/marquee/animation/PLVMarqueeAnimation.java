@@ -1,5 +1,8 @@
 package com.easefun.polyv.livecommon.module.modules.marquee.animation;
 
+import android.animation.ValueAnimator;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.View;
 
 import java.util.HashMap;
@@ -126,5 +129,27 @@ public abstract class PLVMarqueeAnimation {
      */
     protected boolean isParentSizeChanged(View parentView, int oldWidth, int oldHeight) {
         return parentView.getWidth() != oldWidth || parentView.getHeight() != oldHeight;
+    }
+
+    /**
+     * 系统开启“移除动画/关闭动态效果”时，属性动画会被系统压缩为 0 时长。
+     * 跑马灯属于业务展示能力，需要在这种场景下切到手动帧驱动，避免 ObjectAnimator 反复 start/end 闪烁。
+     */
+    protected boolean shouldUseManualFrameAnimation(View view) {
+        if (view == null) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return !ValueAnimator.areAnimatorsEnabled();
+        }
+        try {
+            return Settings.Global.getFloat(
+                    view.getContext().getContentResolver(),
+                    Settings.Global.ANIMATOR_DURATION_SCALE,
+                    1F
+            ) == 0F;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
