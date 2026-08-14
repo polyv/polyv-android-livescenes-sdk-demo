@@ -38,6 +38,10 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
         if (mainView == null) {
             return;
         }
+        if (shouldUseManualFrameAnimation(mainView)) {
+            mainView.setAlpha(1F);
+            return;
+        }
         if (animationStatus == PAUSE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 if (flickObjectAnimation1 != null && flickObjectAnimation1.isPaused()) {
@@ -99,6 +103,12 @@ public class PLVMarqueeMergeRollFlickAnimation extends PLVMarqueeRollAnimation {
     @Override
     protected void setAnimation() {
         super.setAnimation();
+        if (mainView == null || shouldUseManualFrameAnimation(mainView)) {
+            if (mainView != null) {
+                mainView.setAlpha(1F);
+            }
+            return;
+        }
         final float minAlpha = isAlwaysShowWhenRun ? 0.1F : 0F;
         flickObjectAnimation1 = ObjectAnimator.ofFloat(mainView, "alpha", minAlpha, 1F);
         flickObjectAnimation1.setDuration(tweenTime);

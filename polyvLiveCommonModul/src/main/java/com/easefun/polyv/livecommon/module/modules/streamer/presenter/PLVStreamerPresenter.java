@@ -782,6 +782,21 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
             if (curCameraFront) {
                 streamerManager.setLocalPushMirror(isFrontMirror);
             }
+            //避免摄像头画面显示问题
+            if (!isLocalVideoEnabled() && PLVStreamerInnerDataTransfer.getInstance().isDirectStreamerMode()) {
+                PLVAppUtils.postToMainThread(500, new Runnable() {
+                    @Override
+                    public void run() {
+                        enableLocalVideo(true);
+                    }
+                });
+                PLVAppUtils.postToMainThread(1000, new Runnable() {
+                    @Override
+                    public void run() {
+                        enableLocalVideo(false);
+                    }
+                });
+            }
         }
     }
 

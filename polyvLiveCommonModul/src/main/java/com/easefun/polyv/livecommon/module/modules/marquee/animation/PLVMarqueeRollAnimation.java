@@ -3,7 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.marquee.animation;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.os.Build;
-import androidx.annotation.Nullable;
+import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
@@ -25,6 +26,13 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
 
     @Nullable
     protected ObjectAnimator mainAnimator;
+
+    @Nullable
+    private Runnable manualRollRunnable;
+    private long manualRollStartTimeMs;
+    private long manualRollPausedElapsedMs;
+    private float manualRollStartX;
+    private float manualRollEndX;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -35,6 +43,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         layoutParams = (RelativeLayout.LayoutParams) mainView.getLayoutParams();
+        mainView.setAlpha(1F);
         mainView.setVisibility(View.GONE);
     }
 
@@ -64,6 +73,14 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
         if (mainView == null) {
             return;
         }
+        if (shouldUseManualFrameAnimation(mainView)) {
+            if (animationStatus == PAUSE) {
+                startManualRoll(true);
+            } else {
+                startManualRoll(false);
+            }
+            return;
+        }
         if (animationStatus == PAUSE && mainAnimator != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mainAnimator.resume();
@@ -88,6 +105,10 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = PAUSE;
+        if (manualRollRunnable != null) {
+            manualRollPausedElapsedMs = Math.max(0, SystemClock.uptimeMillis() - manualRollStartTimeMs);
+            mainView.removeCallbacks(manualRollRunnable);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mainAnimator != null) {
             mainAnimator.pause();
         } else {
@@ -104,6 +125,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = STOP;
+        stopManualRoll();
         if (mainAnimator != null) {
             mainAnimator.cancel();
             mainAnimator.end();
@@ -112,6 +134,7 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
 
     @Override
     public void destroy() {
+        stopManualRoll();
         if (mainAnimator != null) {
             mainAnimator.removeAllListeners();
         }
@@ -160,6 +183,10 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
         if (mainView == null) {
             return;
         }
+        if (shouldUseManualFrameAnimation(mainView)) {
+            startManualRoll(false);
+            return;
+        }
         animationStatus = STARTED;
         final float startX = isAlwaysShowWhenRun && screenWidth / 2 > viewWidth ? screenWidth - viewWidth : screenWidth;
         final float endX = isAlwaysShowWhenRun && screenWidth > viewWidth ? 0 : -viewWidth;
@@ -202,6 +229,75 @@ public class PLVMarqueeRollAnimation extends PLVMarqueeAnimation {
             return;
         }
         layoutParams.topMargin = (int) (Math.random() * (screenHeight - Math.min(screenHeight, viewHeight)));
+    }
+
+    private void startManualRoll(boolean resume) {
+        if (mainView == null) {
+            return;
+        }
+        if (manualRollRunnable != null) {
+            mainView.removeCallbacks(manualRollRunnable);
+        }
+        animationStatus = STARTED;
+        manualRollStartX = isAlwaysShowWhenRun && screenWidth / 2 > viewWidth ? screenWidth - viewWidth : screenWidth;
+        manualRollEndX = isAlwaysShowWhenRun && screenWidth > viewWidth ? 0 : -viewWidth;
+        if (resume) {
+            manualRollStartTimeMs = SystemClock.uptimeMillis() - manualRollPausedElapsedMs;
+        } else {
+            startManualRollCycle();
+        }
+        ensureManualRollRunnable();
+        mainView.postOnAnimation(manualRollRunnable);
+    }
+
+    private void startManualRollCycle() {
+        if (mainView == null) {
+            return;
+        }
+        manualRollPausedElapsedMs = 0;
+        manualRollStartTimeMs = SystemClock.uptimeMillis();
+        mainView.setAlpha(1F);
+        mainView.setTranslationX(manualRollStartX);
+        mainView.setVisibility(View.VISIBLE);
+        setActiveRect();
+        mainView.setLayoutParams(layoutParams);
+    }
+
+    private void ensureManualRollRunnable() {
+        if (manualRollRunnable != null) {
+            return;
+        }
+        manualRollRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (mainView == null || animationStatus != STARTED) {
+                    return;
+                }
+                final long now = SystemClock.uptimeMillis();
+                final long safeDuration = Math.max(1, duration);
+                final long elapsed = Math.max(0, now - manualRollStartTimeMs);
+                if (elapsed <= safeDuration) {
+                    float fraction = Math.min(1F, elapsed * 1F / safeDuration);
+                    mainView.setVisibility(View.VISIBLE);
+                    mainView.setTranslationX(manualRollStartX + (manualRollEndX - manualRollStartX) * fraction);
+                } else {
+                    final long delayElapsed = elapsed - safeDuration;
+                    if (isAlwaysShowWhenRun || delayElapsed >= Math.max(0, interval)) {
+                        startManualRollCycle();
+                    } else {
+                        mainView.setVisibility(View.GONE);
+                    }
+                }
+                mainView.postOnAnimation(this);
+            }
+        };
+    }
+
+    private void stopManualRoll() {
+        if (mainView != null && manualRollRunnable != null) {
+            mainView.removeCallbacks(manualRollRunnable);
+        }
+        manualRollPausedElapsedMs = 0;
     }
     // </editor-fold>
 }

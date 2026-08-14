@@ -3,7 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.marquee.animation;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.os.Build;
-import androidx.annotation.Nullable;
+import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -34,6 +35,13 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
     protected ObjectAnimator flickObjectAnimator1;
     @Nullable
     protected ObjectAnimator flickObjectAnimator2;
+
+    @Nullable
+    private Runnable manualFlickRunnable;
+    private int manualFlickPhase;
+    private long manualFlickPhaseStartTimeMs;
+    private long manualFlickPausedPhaseElapsedMs;
+    private float manualFlickMinAlpha;
     // </editor-fold>
 
     // <editor-fold desc="对外API - 参数设置">
@@ -44,6 +52,9 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             return;
         }
         layoutParams = (RelativeLayout.LayoutParams) mainView.getLayoutParams();
+        mainView.setTranslationX(0F);
+        mainView.setTranslationY(0F);
+        mainView.setVisibility(View.VISIBLE);
         mainView.setAlpha(0);
     }
 
@@ -74,6 +85,14 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
         if (mainView == null) {
             return;
         }
+        if (shouldUseManualFrameAnimation(mainView)) {
+            if (animationStatus == PAUSE) {
+                startManualFlick(true);
+            } else {
+                startManualFlick(false);
+            }
+            return;
+        }
         if (animationStatus == PAUSE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 if (flickObjectAnimator1 != null && flickObjectAnimator1.isPaused()) {
@@ -102,6 +121,10 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = PAUSE;
+        if (manualFlickRunnable != null) {
+            manualFlickPausedPhaseElapsedMs = Math.max(0, SystemClock.uptimeMillis() - manualFlickPhaseStartTimeMs);
+            mainView.removeCallbacks(manualFlickRunnable);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (flickObjectAnimator1 != null && flickObjectAnimator1.isStarted()) {
                 flickObjectAnimator1.pause();
@@ -123,11 +146,13 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             return;
         }
         animationStatus = STOP;
+        stopManualFlick();
         stopAnimation();
     }
 
     @Override
     public void destroy() {
+        stopManualFlick();
         stopAnimation();
         flickObjectAnimator1 = null;
         flickObjectAnimator2 = null;
@@ -169,6 +194,10 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             return;
         }
         if (mainView == null) {
+            return;
+        }
+        if (shouldUseManualFrameAnimation(mainView)) {
+            startManualFlick(false);
             return;
         }
         animationStatus = STARTED;
@@ -263,6 +292,147 @@ public class PLVMarqueeFlickAnimation extends PLVMarqueeAnimation {
             flickObjectAnimator2.cancel();
             flickObjectAnimator2.end();
         }
+    }
+
+    private void startManualFlick(boolean resume) {
+        if (mainView == null) {
+            return;
+        }
+        if (manualFlickRunnable != null) {
+            mainView.removeCallbacks(manualFlickRunnable);
+        }
+        animationStatus = STARTED;
+        manualFlickMinAlpha = isAlwaysShowWhenRun ? 1F : 0F;
+        if (resume) {
+            manualFlickPhaseStartTimeMs = SystemClock.uptimeMillis() - manualFlickPausedPhaseElapsedMs;
+        } else {
+            if (isAlwaysShowWhenRun) {
+                startManualAlwaysShowFlickCycle();
+            } else {
+                startManualFlickPhase(0);
+            }
+        }
+        ensureManualFlickRunnable();
+        mainView.postOnAnimation(manualFlickRunnable);
+    }
+
+    private void startManualFlickPhase(int phase) {
+        if (mainView == null) {
+            return;
+        }
+        manualFlickPhase = phase;
+        manualFlickPausedPhaseElapsedMs = 0;
+        manualFlickPhaseStartTimeMs = SystemClock.uptimeMillis();
+        if (phase == 0) {
+            mainView.setTranslationX(0F);
+            mainView.setTranslationY(0F);
+            mainView.setVisibility(View.VISIBLE);
+            mainView.setAlpha(manualFlickMinAlpha);
+            setMainActiveRect();
+            mainView.setLayoutParams(layoutParams);
+        }
+    }
+
+    private void ensureManualFlickRunnable() {
+        if (manualFlickRunnable != null) {
+            return;
+        }
+        manualFlickRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (mainView == null || animationStatus != STARTED) {
+                    return;
+                }
+                final long now = SystemClock.uptimeMillis();
+                final long elapsed = Math.max(0, now - manualFlickPhaseStartTimeMs);
+                switch (manualFlickPhase) {
+                    case 0:
+                        updateFadeIn(elapsed);
+                        break;
+                    case 1:
+                        if (elapsed >= Math.max(0, lifeTime)) {
+                            if (isAlwaysShowWhenRun) {
+                                startManualAlwaysShowFlickCycle();
+                            } else {
+                                startManualFlickPhase(2);
+                            }
+                        } else {
+                            mainView.setAlpha(1F);
+                        }
+                        break;
+                    case 2:
+                        updateFadeOut(elapsed);
+                        break;
+                    case 3:
+                        if (elapsed >= Math.max(0, interval)) {
+                            if (isAlwaysShowWhenRun) {
+                                startManualAlwaysShowFlickCycle();
+                            } else {
+                                startManualFlickPhase(0);
+                            }
+                        } else {
+                            mainView.setAlpha(manualFlickMinAlpha);
+                        }
+                        break;
+                    default:
+                        startManualFlickPhase(0);
+                        break;
+                }
+                mainView.postOnAnimation(this);
+            }
+        };
+    }
+
+    private void startManualAlwaysShowFlickCycle() {
+        if (mainView == null) {
+            return;
+        }
+        manualFlickPhase = 1;
+        manualFlickPausedPhaseElapsedMs = 0;
+        manualFlickPhaseStartTimeMs = SystemClock.uptimeMillis();
+        mainView.setTranslationX(0F);
+        mainView.setTranslationY(0F);
+        mainView.setVisibility(View.VISIBLE);
+        mainView.setAlpha(1F);
+        setMainActiveRect();
+        mainView.setLayoutParams(layoutParams);
+    }
+
+    private void updateFadeIn(long elapsed) {
+        if (isAlwaysShowWhenRun) {
+            startManualAlwaysShowFlickCycle();
+            return;
+        }
+        final long safeTweenTime = Math.max(1, tweenTime);
+        if (elapsed >= safeTweenTime) {
+            mainView.setAlpha(1F);
+            startManualFlickPhase(1);
+            return;
+        }
+        float fraction = elapsed * 1F / safeTweenTime;
+        mainView.setAlpha(manualFlickMinAlpha + (1F - manualFlickMinAlpha) * fraction);
+    }
+
+    private void updateFadeOut(long elapsed) {
+        if (isAlwaysShowWhenRun) {
+            startManualAlwaysShowFlickCycle();
+            return;
+        }
+        final long safeTweenTime = Math.max(1, tweenTime);
+        if (elapsed >= safeTweenTime) {
+            mainView.setAlpha(manualFlickMinAlpha);
+            startManualFlickPhase(3);
+            return;
+        }
+        float fraction = elapsed * 1F / safeTweenTime;
+        mainView.setAlpha(1F - (1F - manualFlickMinAlpha) * fraction);
+    }
+
+    private void stopManualFlick() {
+        if (mainView != null && manualFlickRunnable != null) {
+            mainView.removeCallbacks(manualFlickRunnable);
+        }
+        manualFlickPausedPhaseElapsedMs = 0;
     }
 
     // </editor-fold>
