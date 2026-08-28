@@ -86,6 +86,11 @@ public interface IPLVLCLinkMicControlBar {
      * 设置是否允许请求连麦
      */
     void setRequestLinkMicEnable(boolean isEnabled);
+
+    /**
+     * 更新横屏连麦列表的展开状态。收起时以展开按钮替换设备控制按钮。
+     */
+    void setLandscapeLinkMicListVisible(boolean visible);
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="2. 需要外部响应的事件监听器">
@@ -120,6 +125,11 @@ public interface IPLVLCLinkMicControlBar {
          * @param toClose true表示关闭。false表示开启
          */
         void onClickMicroPhoneOpenOrClose(boolean toClose);
+
+        /**
+         * 点击横屏连麦列表展开按钮
+         */
+        void onClickExpandLandscapeLinkMicList();
 
     }
     // </editor-fold>

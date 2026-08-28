@@ -139,6 +139,9 @@ public interface IPLVLSStatusBarLayout {
          */
         boolean isStreamerStartSuccess();
 
+        /** 点击“上课”后的第一段业务逻辑，确认合规后执行 action。 */
+        void onBeforeStartClassAction(Runnable action);
+
         /**
          * 上下课控制
          *

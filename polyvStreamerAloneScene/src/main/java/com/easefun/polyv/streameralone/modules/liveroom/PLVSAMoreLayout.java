@@ -845,9 +845,7 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
                 }
             });
 
-            boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
-                    .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
-            if (streamerPresenter.isSmallClassAllowViewerRaiseHand() && isSmallClass) {
+            if (streamerPresenter.isAllowViewerRaiseHand()) {
                 moreAllowViewerLinkmicLayout.setActivated(true);
             }
         }

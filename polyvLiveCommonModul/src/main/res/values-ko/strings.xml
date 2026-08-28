@@ -773,4 +773,8 @@
     <string name="plv_kick_banned_users_no_banned">채팅 금지 사용자가 없습니다</string>
     <string name="plv_kick_banned_users_user_id">ID: %s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">통화에 필요한 카메라 또는 마이크 또는 주변 장치 권한이 거부되었으므로 설정을 적용한 권한 관리에서 복원하십시오.</string>
+    <string name="plv_streamer_compliance_disagree">동의하지 않음</string>
+    <string name="plv_streamer_compliance_agree">동의</string>
+    <string name="plv_streamer_compliance_disagree_tips">더 나은 방송 환경을 위해 라이브 방송을 시작하기 전에 약관에 동의해 주세요</string>
+    <string name="plv_streamer_compliance_back">돌아가기</string>
 </resources>

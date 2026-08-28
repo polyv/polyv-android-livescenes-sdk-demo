@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecommon.module.data;
 
+import android.text.TextUtils;
+
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
 import com.easefun.polyv.livescenes.chatroom.PolyvChatApiRequestHelper;
 import com.easefun.polyv.livescenes.config.PolyvLiveSDKClient;
@@ -64,6 +66,7 @@ public class PLVLiveRoomDataRequester {
     private Disposable lessonDetailDisposable;
     private Disposable playbackChannelDetail;
     private Disposable requestTemplateListDisposable;
+    private Disposable requestComplianceContentDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -487,6 +490,49 @@ public class PLVLiveRoomDataRequester {
     void disposeTemplateList() {
         if (requestTemplateListDisposable != null) {
             requestTemplateListDisposable.dispose();
+        }
+
+    }
+    // </editor-folder>
+
+    // <editor-folder defaultstate="collapsed" desc="请求主讲/嘉宾合规提醒">
+    void requestComplianceContent(final IPLVNetRequestListener<ResponseBody> listener) {
+        disposeComplianceContent();
+        String appId = getConfig().getAccount().getAppId();
+        String appSecret = getConfig().getAccount().getAppSecret();
+        String role = getConfig().getUser().getViewerType();
+        if (!TextUtils.isEmpty(role)) {
+            role = Character.toUpperCase(role.charAt(0)) + role.substring(1);
+        }
+        long timestamp = System.currentTimeMillis();
+        Map<String, String> map = new HashMap<>();
+        map.put("appId", appId);
+        map.put("timestamp", String.valueOf(timestamp));
+        map.put("channelId", getConfig().getChannelId());
+        map.put("role", role);
+        String sign = PLVSignCreator.createSign(appSecret, map);
+        requestComplianceContentDisposable = PLVApiManager.getPlvLiveStatusApi().getComplianceContent(appId, getConfig().getChannelId(), role, timestamp + "", sign, PLVSignCreator.getSignatureMethod())
+                .compose(new PLVRxBaseTransformer<ResponseBody, ResponseBody>())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Exception {
+                        if (listener != null) {
+                            listener.onSuccess(responseBody);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposeComplianceContent() {
+        if (requestComplianceContentDisposable != null) {
+            requestComplianceContentDisposable.dispose();
         }
     }
     // </editor-folder>

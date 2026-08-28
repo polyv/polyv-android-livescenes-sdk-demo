@@ -24,6 +24,7 @@ import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVMemberItemD
 import com.easefun.polyv.livecommon.module.modules.streamer.model.PLVStreamerControlLinkMicAction;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVComplianceReminderHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.document.PLVFileChooseUtils;
@@ -88,6 +89,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
 
     // 直播间数据管理器，每个业务初始化所需的参数
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVComplianceReminderHelper complianceReminderHelper;
 
     // 状态栏布局
     private IPLVLSStatusBarLayout plvlsStatusBarLy;
@@ -194,6 +196,7 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         setContentView(R.layout.plvls_live_streamer_activity);
         initParams();
         initLiveRoomManager();
+        initComplianceReminder();
         initView();
         initBeautyModule();
         initPushDowngradeAlertLayout();
@@ -337,6 +340,14 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
         // 进行网络请求，获取直播详情数据
         liveRoomDataManager.requestChannelDetail();
     }
+
+    private void initComplianceReminder() {
+        complianceReminderHelper = new PLVComplianceReminderHelper(this, liveRoomDataManager);
+        complianceReminderHelper.requestComplianceContent();
+        if (PLVSocketUserConstant.USERTYPE_GUEST.equals(liveRoomDataManager.getConfig().getUser().getViewerType())) {
+            complianceReminderHelper.showIfNeededWhenLoaded();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面UI">
@@ -423,6 +434,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
     private void observeStatusBarLayout() {
         //监听状态栏布局的UI交互事件
         plvlsStatusBarLy.setOnViewActionListener(new IPLVLSStatusBarLayout.OnViewActionListener() {
+            @Override
+            public void onBeforeStartClassAction(Runnable action) {
+                complianceReminderHelper.runAfterConfirmed(action);
+            }
+
             @Override
             public void onClassControl(boolean isStart) {
                 if (isStart) {

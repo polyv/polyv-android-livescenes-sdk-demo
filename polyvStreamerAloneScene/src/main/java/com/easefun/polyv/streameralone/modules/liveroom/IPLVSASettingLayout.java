@@ -70,6 +70,9 @@ public interface IPLVSASettingLayout {
      * view交互事件监听器
      */
     interface OnViewActionListener {
+        /** 在倒计时前检查合规提醒，确认后执行 action。 */
+        void onBeforeStartLiveAction(Runnable action);
+
         /**
          * 开始直播
          */

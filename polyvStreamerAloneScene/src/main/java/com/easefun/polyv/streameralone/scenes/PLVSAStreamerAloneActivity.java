@@ -35,6 +35,7 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocal
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVComplianceReminderHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -97,6 +98,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     // 直播间数据管理器，每个业务初始化所需的参数
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVComplianceReminderHelper complianceReminderHelper;
 
     // view
     // 根布局
@@ -216,6 +218,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
         initParams();
         initLiveRoomManager();
+        initComplianceReminder();
         initView();
         initBeautyModule();
 
@@ -390,6 +393,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
         // 进行网络请求，请求模版列表
         liveRoomDataManager.requestTemplateList();
     }
+
+    private void initComplianceReminder() {
+        complianceReminderHelper = new PLVComplianceReminderHelper(this, liveRoomDataManager);
+        complianceReminderHelper.requestComplianceContent();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化 - 页面UI">
@@ -513,6 +521,11 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     // <editor-fold defaultstate="collapsed" desc="设置布局回调 - 直播设置">
     private void observeSettingLayout() {
         settingLayout.setOnViewActionListener(new IPLVSASettingLayout.OnViewActionListener() {
+            @Override
+            public void onBeforeStartLiveAction(Runnable action) {
+                complianceReminderHelper.runAfterConfirmed(action);
+            }
+
             @Override
             public void onStartLiveAction() {
                 getIntent().putExtra(EXTRA_CHANNEL_NAME, liveRoomDataManager.getConfig().getChannelName());

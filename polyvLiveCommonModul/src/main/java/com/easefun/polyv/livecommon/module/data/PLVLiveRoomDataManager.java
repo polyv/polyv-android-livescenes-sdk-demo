@@ -17,6 +17,7 @@ import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
+import com.plv.livescenes.model.PLVComplianceContentVO;
 import com.plv.livescenes.model.PLVPlaybackChannelDetailVO;
 import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
@@ -89,6 +90,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<PLVRewardSettingVO>> rewardSettingVO = new MutableLiveData<>();
     //模版列表
     private MutableLiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> templateListVO = new MutableLiveData<>();
+    //主讲/嘉宾合规提醒
+    private MutableLiveData<PLVStatefulData<PLVComplianceContentVO>> complianceContentVO = new MutableLiveData<>();
     //直播场次Id
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
     //聊天室token
@@ -193,6 +196,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> getTemplateListData() {
         return templateListVO;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<PLVComplianceContentVO>> getComplianceContentVO() {
+        return complianceContentVO;
     }
 
     @Override
@@ -538,6 +546,45 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             public void onFailed(String msg, Throwable throwable) {
                 PLVCommonLog.warn(throwable);
                 templateListVO.postValue(PLVStatefulData.error(msg, throwable));
+            }
+        });
+    }
+
+    @Override
+    public void requestComplianceContent() {
+        complianceContentVO.postValue(PLVStatefulData.<PLVComplianceContentVO>loading());
+        liveRoomDataRequester.requestComplianceContent(new PLVLiveRoomDataRequester.IPLVNetRequestListener<ResponseBody>() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) {
+                try {
+                    JSONObject json = new JSONObject(responseBody.string());
+                    int code = json.optInt("code");
+                    if (code == 200) {
+                        JSONObject jsonData = json.optJSONObject("data");
+                        if (jsonData != null) {
+                            boolean remindEnabled = "Y".equals(jsonData.optString("remindEnabled"));
+                            String title = jsonData.optString("title");
+                            String content = jsonData.optString("content");
+                            long updateTime = jsonData.optLong("updateTime");
+                            complianceContentVO.postValue(PLVStatefulData.success(new PLVComplianceContentVO(title, content, remindEnabled, updateTime)));
+                        } else {
+                            complianceContentVO.postValue(PLVStatefulData.<PLVComplianceContentVO>error("compliance content is empty"));
+                        }
+                    } else {
+                        JSONObject jsonError = json.optJSONObject("error");
+                        String desc = jsonError == null ? "jsonError" : jsonError.optString("desc");
+                        complianceContentVO.postValue(PLVStatefulData.error(desc, new Throwable(desc)));
+                    }
+                } catch (IOException | JSONException e) {
+                    PLVCommonLog.warn(e);
+                    complianceContentVO.postValue(PLVStatefulData.error(e.getMessage(), e));
+                }
+            }
+
+            @Override
+            public void onFailed(String msg, Throwable throwable) {
+                PLVCommonLog.warn(throwable);
+                complianceContentVO.postValue(PLVStatefulData.error(msg, throwable));
             }
         });
     }
