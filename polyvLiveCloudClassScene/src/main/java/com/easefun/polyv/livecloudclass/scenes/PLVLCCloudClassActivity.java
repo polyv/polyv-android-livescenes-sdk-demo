@@ -1162,6 +1162,13 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onClickShowOrHideLandscapeLinkMicList() {
+                if (mediaLayout != null && mediaLayout.getLandscapeControllerView() != null) {
+                    mediaLayout.getLandscapeControllerView().getSwitchView().performClick();
+                }
+            }
+
+            @Override
             public void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality) {
                 mediaLayout.acceptNetworkQuality(quality);
             }

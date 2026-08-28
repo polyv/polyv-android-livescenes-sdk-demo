@@ -25,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -88,6 +89,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     private Button btnCameraOpenLandscape;
     private Button btnCameraFrontBackLandscape;
     private LinearLayout llFunctionBtnParentLand;
+    private ImageButton btnExpandLandscape;
     private Button btnRingActionLandscape;
     private TextView tvRequestTipLandscape;
 
@@ -169,6 +171,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         ll4BtnParent = findViewById(R.id.plvlc_linkmic_controlBar_ll_4_btn_parent);
         //横屏
         llFunctionBtnParentLand = findViewById(R.id.plvlc_linkmic_controlBar_ll_function_btn_parent);
+        btnExpandLandscape = findViewById(R.id.plvlc_linkmic_controlBar_btn_expand_landscape);
         btnMicrophoneOpenLandscape = findViewById(R.id.plvlc_linkmic_controlBar_btn_microphone_open_landscape);
         btnCameraOpenLandscape = findViewById(R.id.plvlc_linkmic_controlBar_btn_camera_open_landscape);
         btnCameraFrontBackLandscape = findViewById(R.id.plvlc_linkmic_controlBar_btn_camera_front_back_landscape);
@@ -284,6 +287,7 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
                 return;
             }
             state = PLVLCLinkMicControllerState.STATE_TEACHER_LINK_MIC_CLOSE;
+            setLandscapeLinkMicListVisible(true);
             llLandscapeRoot.setVisibility(GONE);
             stopAutoHideCountDown();
         }
@@ -368,6 +372,8 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
         isCameraOpen = false;
         isCameraFront = true;
         isMicrophoneOpen = true;
+        //展开按钮只在“已连麦且列表收起”时显示；下麦后恢复默认控制栏状态。
+        setLandscapeLinkMicListVisible(true);
 
         //更新竖屏UI
         tvRequestTip.setVisibility(VISIBLE);
@@ -443,6 +449,19 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
     public void hide() {
         PLVCommonLog.d(TAG, "hide");
         setVisibility(INVISIBLE);
+    }
+
+    @Override
+    public void setLandscapeLinkMicListVisible(boolean visible) {
+        final boolean isJoined = isJoinLinkMic();
+        //列表展开按钮只属于“已上麦且列表收起”状态。申请中、未上麦、下麦等状态
+        //即使收到滞后的列表隐藏事件，也必须继续显示正常的申请连麦控制栏。
+        final boolean showExpandButton = isJoined && !visible;
+        final boolean showNormalControls = !showExpandButton;
+        btnExpandLandscape.setVisibility(showExpandButton ? VISIBLE : GONE);
+        llFunctionBtnParentLand.setVisibility(showNormalControls && isJoined ? VISIBLE : GONE);
+        btnRingActionLandscape.setVisibility(showNormalControls ? VISIBLE : GONE);
+        tvRequestTipLandscape.setVisibility(showNormalControls && !isJoined ? VISIBLE : GONE);
     }
     // </editor-fold>
 
@@ -771,6 +790,14 @@ public class PLVLCLinkMicControlBar extends FrameLayout implements IPLVLCLinkMic
             @Override
             public void onClick(View v) {
                 btnRingActionPortrait.performClick();
+            }
+        });
+        btnExpandLandscape.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onPLCLinkMicControlBarListener != null) {
+                    onPLCLinkMicControlBarListener.onClickExpandLandscapeLinkMicList();
+                }
             }
         });
     }

@@ -24,6 +24,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,6 +106,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     private IPLVLCLinkMicControlBar linkMicControlBar;
     private FrameLayout flMediaLinkMicRoot;
     private RecyclerView rvLinkMicList;
+    private ImageButton btnCollapseLandscape;
     private LinearLayout llTryScrollTip;
     private LinearLayout llSpeakingUsers;
     private TextView tvSpeakingUsersText;
@@ -163,9 +165,18 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         LayoutInflater.from(getContext()).inflate(R.layout.plvlc_linkmic_media_layout, this, true);
         flMediaLinkMicRoot = findViewById(R.id.plvlc_linkmic_fl_media_linkmic_root);
         rvLinkMicList = findViewById(R.id.plvlc_link_mic_rv_linkmic_list);
+        btnCollapseLandscape = findViewById(R.id.plvlc_linkmic_btn_collapse_landscape);
         llTryScrollTip = findViewById(R.id.plvlc_link_mic_ll_try_scroll_tip);
         llSpeakingUsers = findViewById(R.id.plvlc_linkmic_ll_speaking_users);
         tvSpeakingUsersText = findViewById(R.id.plvlc_linkmic_tv_speaking_users_text);
+        btnCollapseLandscape.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (curIsLandscape && onPLVLinkMicLayoutListener != null) {
+                    onPLVLinkMicLayoutListener.onClickShowOrHideLandscapeLinkMicList();
+                }
+            }
+        });
 
         //init RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
@@ -250,6 +261,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         //init方向
         curIsLandscape = PLVScreenUtils.isLandscape(getContext());
+        btnCollapseLandscape.setVisibility(curIsLandscape ? VISIBLE : GONE);
     }
 
     private void setupMixStreamHandler() {
@@ -311,6 +323,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
             public void onClickMicroPhoneOpenOrClose(boolean toClose) {
                 linkMicPresenter.muteAudio(toClose);
             }
+
+            @Override
+            public void onClickExpandLandscapeLinkMicList() {
+                if (curIsLandscape && onPLVLinkMicLayoutListener != null) {
+                    onPLVLinkMicLayoutListener.onClickShowOrHideLandscapeLinkMicList();
+                }
+            }
         });
     }
 
@@ -367,6 +386,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     public void hideLinkMicList() {
         PLVCommonLog.d(TAG, "hideOnlyLinkMicList");
         linkMicListAdapter.hideAllRenderView();
+        if (curIsLandscape) {
+            linkMicControlBar.setLandscapeLinkMicListVisible(false);
+        }
         //在最后用post调用自身的隐藏，好让子View的一些布局操作能得到执行。
         post(new Runnable() {
             @Override
@@ -379,6 +401,9 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @Override
     public void showLinkMicList() {
         setVisibility(VISIBLE);
+        if (curIsLandscape) {
+            linkMicControlBar.setLandscapeLinkMicListVisible(true);
+        }
         linkMicListAdapter.showAllRenderView();
         //可能在隐藏连麦列表的时候，连麦列表的控件发生了UI改变，但是由于连麦列表不可见，所以没有做出布局改变，
         // 那么在显示连麦列表的时候，主动更新整个连麦列表的UI。
@@ -1077,11 +1102,13 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
 
         //rvRoot
         showOrHideLandscapeLayout(isShowLandscapeLayout);
+        btnCollapseLandscape.setVisibility(VISIBLE);
 
         //rv
         FrameLayout.LayoutParams lpOfRv = (LayoutParams) rvLinkMicList.getLayoutParams();
         lpOfRv.gravity = Gravity.LEFT;
         lpOfRv.leftMargin = PLVScreenUtils.dip2px(DP_LAND_LINK_MIC_LIST_MARGIN_LEFT);
+        lpOfRv.topMargin = PLVScreenUtils.dip2px(64);
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置vertical排列
         LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -1107,6 +1134,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
     @SuppressLint("RtlHardcoded")
     private void onPortrait() {
         updatePushResolution(false);
+        btnCollapseLandscape.setVisibility(GONE);
         //root
         ConstraintLayout.LayoutParams lpOfRoot = (ConstraintLayout.LayoutParams) getLayoutParams();
         lpOfRoot.width = LayoutParams.MATCH_PARENT;
@@ -1126,6 +1154,7 @@ public class PLVLCLinkMicLayout extends FrameLayout implements IPLVLinkMicContra
         //rv
         FrameLayout.LayoutParams lpOfRv = (LayoutParams) rvLinkMicList.getLayoutParams();
         lpOfRv.leftMargin = 0;
+        lpOfRv.topMargin = 0;
         rvLinkMicList.setLayoutParams(lpOfRv);
         //设置horizontal排列
         LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
