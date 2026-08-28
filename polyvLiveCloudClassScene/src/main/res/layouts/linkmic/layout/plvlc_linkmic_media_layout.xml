@@ -19,6 +19,19 @@
             android:layout_height="match_parent"
             android:background="@color/colorVulcan"
             android:overScrollMode="never" />
+
+        <ImageButton
+            android:id="@+id/plvlc_linkmic_btn_collapse_landscape"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="left|top"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/plvlc_linkmic_bg_list_switch"
+            android:padding="8dp"
+            android:src="@drawable/plvlc_linkmic_ic_arrow_right"
+            android:visibility="gone"
+            tools:visibility="visible" />
         <!--向左滑动试试，外层Layout有渐变背景-->
         <LinearLayout
             android:id="@+id/plvlc_link_mic_ll_try_scroll_tip"

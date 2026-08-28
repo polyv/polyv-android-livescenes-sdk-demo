@@ -773,4 +773,8 @@
     <string name="plv_kick_banned_users_no_banned">No muted users</string>
     <string name="plv_kick_banned_users_user_id">ID: %s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">The camera, microphone, or nearby device permissions required for the call have been denied. Please restore them in the permission management of the application settings</string>
+    <string name="plv_streamer_compliance_disagree">Disagree</string>
+    <string name="plv_streamer_compliance_agree">Agree</string>
+    <string name="plv_streamer_compliance_disagree_tips">For a better streaming experience, please agree to the terms before starting the live stream</string>
+    <string name="plv_streamer_compliance_back">Back</string>
 </resources>

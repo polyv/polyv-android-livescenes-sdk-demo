@@ -207,6 +207,11 @@ public interface IPLVLCLinkMicLayout {
         void onShowLandscapeRTCLayout(boolean show);
 
         /**
+         * 请求切换横屏连麦列表显隐，交由播放器原有开关统一更新状态。
+         */
+        void onClickShowOrHideLandscapeLinkMicList();
+
+        /**
          * rtc网络质量回调
          */
         void onNetworkQuality(PLVLinkMicConstant.NetworkQuality quality);

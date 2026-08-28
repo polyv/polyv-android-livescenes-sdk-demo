@@ -138,6 +138,16 @@
                 android:background="@drawable/plvlc_linkmic_iv_camera_front_back_enabled" />
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/plvlc_linkmic_controlBar_btn_expand_landscape"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/plvlc_linkmic_bg_list_switch"
+            android:padding="8dp"
+            android:src="@drawable/plvlc_linkmic_ic_arrow_left"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/plvlc_linkmic_controlBar_btn_setting_landscape"
             android:layout_width="32dp"

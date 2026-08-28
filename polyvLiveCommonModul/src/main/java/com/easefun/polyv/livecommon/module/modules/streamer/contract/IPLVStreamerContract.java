@@ -508,9 +508,9 @@ public interface IPLVStreamerContract {
         boolean disallowViewerRaiseHand(Ack ack);
 
         /**
-         * 小班课是否允许观众主动加入连麦
+         * 是否允许观众主动加入连麦
          */
-        boolean isSmallClassAllowViewerRaiseHand();
+        boolean isAllowViewerRaiseHand();
 
         /**
          * 更改连麦类型 音频/视频

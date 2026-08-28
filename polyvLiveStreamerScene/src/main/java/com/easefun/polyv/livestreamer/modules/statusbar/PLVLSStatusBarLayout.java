@@ -534,9 +534,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     }
                 }
             });
-            boolean isSmallClass = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
-                    .isFeatureSupport(PLVChannelFeature.SMALL_CLASS_TYPE);
-            if (streamerPresenter.isSmallClassAllowViewerRaiseHand() && isSmallClass) {
+            if (streamerPresenter.isAllowViewerRaiseHand()) {
                 statusBarAllowViewerLinkmicIv.setActivated(true);
             }
         }
@@ -701,16 +699,7 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
 
     private void toggleClassStates(boolean isWillStart) {
         if (isWillStart) {
-            if (onViewActionListener != null) {
-                PLVLinkMicConstant.NetworkQuality currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
-                if (currentNetworkQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
-                    //如果断网，则不上课，显示弹窗。
-                    showAlertDialogNoNetwork();
-                    return;
-                }
-            }
-            countDownView.startCountDown();
-            plvlsStatusBarClassControlTv.setEnabled(false);
+            startClassCountDown();
         } else {
             PLVLSConfirmDialog.Builder.context(getContext())
                     .setTitleVisibility(View.GONE)
@@ -727,6 +716,19 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     })
                     .show();
         }
+    }
+
+    private void startClassCountDown() {
+            if (onViewActionListener != null) {
+                PLVLinkMicConstant.NetworkQuality currentNetworkQuality = onViewActionListener.getCurrentNetworkQuality();
+                if (currentNetworkQuality == PLVLinkMicConstant.NetworkQuality.DISCONNECT) {
+                    //如果断网，则不上课，显示弹窗。
+                    showAlertDialogNoNetwork();
+                    return;
+                }
+            }
+            countDownView.startCountDown();
+            plvlsStatusBarClassControlTv.setEnabled(false);
     }
     // </editor-fold>
 
@@ -878,7 +880,18 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
         if (id == R.id.plvls_status_bar_channel_info_tv) {
             channelInfoLayout.open();
         } else if (id == R.id.plvls_status_bar_class_control_tv) {
-            toggleClassStates(!v.isSelected());
+            final boolean isWillStart = !v.isSelected();
+            if (isWillStart && onViewActionListener != null) {
+                // 点击“上课”后先处理合规，确认后再执行原点击逻辑。
+                onViewActionListener.onBeforeStartClassAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        toggleClassStates(true);
+                    }
+                });
+            } else {
+                toggleClassStates(isWillStart);
+            }
         } else if (id == R.id.plvls_status_bar_share_iv) {
             v.setSelected(!v.isSelected());
         } else if (id == R.id.plvls_status_bar_setting_iv) {

@@ -773,4 +773,8 @@
     <string name="plv_kick_banned_users_no_banned">暂无禁言任何用户</string>
     <string name="plv_kick_banned_users_user_id">ID：%s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">通话所需的相机或麦克风或附近的设备权限被拒绝，请到应用设置的权限管理中恢复</string>
+    <string name="plv_streamer_compliance_disagree">不同意</string>
+    <string name="plv_streamer_compliance_agree">同意</string>
+    <string name="plv_streamer_compliance_disagree_tips">为了您有更好的开播体验，请同意协议后再直播</string>
+    <string name="plv_streamer_compliance_back">返回</string>
 </resources>

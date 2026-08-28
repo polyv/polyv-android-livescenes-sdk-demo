@@ -1089,7 +1089,17 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         if (id == R.id.plvsa_setting_close_page_iv) {
             ((Activity) getContext()).onBackPressed();
         } else if (id == R.id.plvsa_setting_start_live_btn) {
-            liveStart();
+            // 点击“开始直播/进入直播间”后先处理合规，确认后再执行原点击逻辑。
+            if (onViewActionListener != null) {
+                onViewActionListener.onBeforeStartLiveAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        liveStart();
+                    }
+                });
+            } else {
+                liveStart();
+            }
         } else if (id == R.id.plvsa_setting_camera_orient_iv
                 || id == R.id.plvsa_setting_camera_orient_tv) {
             long currentTime = System.currentTimeMillis();

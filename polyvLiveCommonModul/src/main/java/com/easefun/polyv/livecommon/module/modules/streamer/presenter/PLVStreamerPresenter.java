@@ -257,7 +257,10 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
         curBitrate = loadBitrate();
         streamerLinkMicMsgHandler = PLVStreamerLinkMicMsgHandler.create(liveRoomDataManager.getConfig().getChannelId());
         streamerLinkMicMsgHandler.setStreamerPresenter(this);
-        if (isSmallClassType()) {
+        boolean isAllowViewerRaiseHand = PLVChannelFeatureManager.onChannel(liveRoomDataManager.getConfig().getChannelId())
+                .isFeatureSupport(PLVChannelFeature.LIVE_NEW_LINKMIC_AUDIENCE_ENABLED);
+        streamerLinkMicMsgHandler.isAllowViewerRaiseHand = isAllowViewerRaiseHand;
+        if (isSmallClassType() && !isAllowViewerRaiseHand) {
             streamerLinkMicMsgHandler.isAllowViewerRaiseHand = isSmallClassAllowLinkMic.getOrDefault(false);
         }
         initMixLayoutType();
@@ -927,8 +930,8 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
-    public boolean isSmallClassAllowViewerRaiseHand() {
-        return isSmallClassAllowLinkMic.getOrDefault(false);
+    public boolean isAllowViewerRaiseHand() {
+        return streamerLinkMicMsgHandler.isAllowViewerRaiseHand();
     }
 
     @Override

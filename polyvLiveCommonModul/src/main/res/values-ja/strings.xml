@@ -772,4 +772,8 @@
     <string name="plv_kick_banned_users_no_banned">ミュートユーザーはいません</string>
     <string name="plv_kick_banned_users_user_id">ID：%s</string>
     <string name="plv_linkmic_error_tip_permission_denied_2">通話に必要なカメラまたはマイクまたは近くのデバイス権限は拒否されました。アプリケーション設定の権限管理に復元してください</string>
+    <string name="plv_streamer_compliance_disagree">同意しない</string>
+    <string name="plv_streamer_compliance_agree">同意する</string>
+    <string name="plv_streamer_compliance_disagree_tips">より良い配信体験のため、ライブ配信を開始する前に規約に同意してください</string>
+    <string name="plv_streamer_compliance_back">戻る</string>
 </resources>
