@@ -2,12 +2,12 @@ package com.easefun.polyv.livecommon.module.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.webkit.WebView;
