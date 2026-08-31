@@ -541,13 +541,18 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             return;
         }
         this.hasPreviousPage = hasPreviousPage;
-        if (hasPreviousPage) {
-            moreVideoListIv.setOnClickListener(this);
-            moreVideoListIv.setVisibility(View.VISIBLE);
-            initPreviousView();
-        } else {
-            moreVideoListIv.setVisibility(View.GONE);
-        }
+        runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                if (hasPreviousPage) {
+                    moreVideoListIv.setOnClickListener(PLVECPalybackHomeFragment.this);
+                    moreVideoListIv.setVisibility(View.VISIBLE);
+                    initPreviousView();
+                } else {
+                    moreVideoListIv.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override
