@@ -136,6 +136,10 @@ public class PLVLCCommodityPushLayout extends FrameLayout implements View.OnClic
                             updateProduct(uiState.productContentBeanPushToShow);
                         }
                         isNeedShow = uiState.productContentBeanPushToShow != null;
+                        if (uiState.productContentBeanPushToShow != null) {
+                            // 推送大卡片时不要显示
+                            isNeedShow &= !uiState.productContentBeanPushToShow.isBigProduct();
+                        }
                         checkUpdateVisibility();
                     }
                 });

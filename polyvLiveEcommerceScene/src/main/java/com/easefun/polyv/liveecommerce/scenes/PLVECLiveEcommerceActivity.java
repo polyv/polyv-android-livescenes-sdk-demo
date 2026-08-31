@@ -53,6 +53,7 @@ import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.window.PLVBaseActivity;
 import com.easefun.polyv.liveecommerce.R;
+import com.easefun.polyv.liveecommerce.modules.commodity.PLVECCommodityDetailActivity;
 import com.easefun.polyv.liveecommerce.modules.linkmic.IPLVECLinkMicLayout;
 import com.easefun.polyv.liveecommerce.modules.linkmic.PLVECLinkMicControlBar;
 import com.easefun.polyv.liveecommerce.modules.linkmic.widget.PLVECSeparateLinkMicView;
@@ -744,6 +745,14 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity {
 
                 @Override
                 public void onClosed() {
+                }
+            });
+            popoverLayout.setOnClickProductListener(new PLVInteractLayout2.OnClickProductListener() {
+                @Override
+                public void onClickProduct(String link) {
+                    if (!TextUtils.isEmpty(link)) {
+                        PLVECCommodityDetailActivity.start(PLVECLiveEcommerceActivity.this, link);
+                    }
                 }
             });
             popoverLayout.getInteractLayout().updateOrientationLock(true);

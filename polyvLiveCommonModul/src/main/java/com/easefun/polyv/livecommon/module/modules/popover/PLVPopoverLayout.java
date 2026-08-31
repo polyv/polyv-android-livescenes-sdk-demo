@@ -56,6 +56,11 @@ public class PLVPopoverLayout extends RelativeLayout implements IPLVPopoverLayou
     }
 
     @Override
+    public void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener) {
+        plvLayoutInteract.setOnClickProductListener(listener);
+    }
+
+    @Override
     public boolean onBackPress() {
         if (plvLayoutInteract.onBackPress() || plvLayoutReward.onBackPress()) {
             return true;

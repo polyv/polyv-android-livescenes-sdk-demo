@@ -27,6 +27,7 @@ import com.easefun.polyv.livecloudclass.modules.media.IPLVLCMediaLayout;
 import com.easefun.polyv.livecloudclass.modules.media.controller.PLVLCLiveLandscapeChannelController;
 import com.easefun.polyv.livecloudclass.modules.media.floating.PLVLCFloatingWindowModule;
 import com.easefun.polyv.livecloudclass.modules.pagemenu.IPLVLCLivePageMenuLayout;
+import com.easefun.polyv.livecloudclass.modules.pagemenu.commodity.PLVLCCommodityDetailActivity;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCFloatingPPTLayout;
 import com.easefun.polyv.livecloudclass.modules.ppt.IPLVLCPPTView;
 import com.easefun.polyv.livecloudclass.modules.ppt.enums.PLVLCMarkToolEnums;
@@ -481,6 +482,16 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity {
                 if (needShowControllerOnClosed) {
                     mediaLayout.showController();
                     needShowControllerOnClosed = false;
+                }
+            }
+        });
+
+        popoverLayout.setOnClickProductListener(new PLVInteractLayout2.OnClickProductListener() {
+
+            @Override
+            public void onClickProduct(String link) {
+                if (!TextUtils.isEmpty(link)) {
+                    PLVLCCommodityDetailActivity.start(PLVLCCloudClassActivity.this, link);
                 }
             }
         });

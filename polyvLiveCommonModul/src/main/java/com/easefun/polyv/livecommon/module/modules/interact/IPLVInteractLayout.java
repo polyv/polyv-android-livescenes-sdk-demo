@@ -37,6 +37,11 @@ public interface IPLVInteractLayout {
     void setOnOpenInsideWebViewListener(PLVInteractLayout2.OnOpenInsideWebViewListener listener);
 
     /**
+     * 设置点击商品监听回调
+     */
+    void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener);
+
+    /**
      * 显示公告
      */
     void showBulletin();

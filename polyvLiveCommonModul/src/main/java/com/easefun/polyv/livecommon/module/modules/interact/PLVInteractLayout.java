@@ -136,6 +136,11 @@ public class PLVInteractLayout extends FrameLayout implements IPLVInteractLayout
     }
 
     @Override
+    public void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener) {
+
+    }
+
+    @Override
     public void showBulletin() {
         if (interactBulletin != null) {
             interactBulletin.showBulletin();

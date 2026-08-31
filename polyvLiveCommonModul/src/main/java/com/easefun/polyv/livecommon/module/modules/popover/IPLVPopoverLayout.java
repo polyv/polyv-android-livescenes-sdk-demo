@@ -39,6 +39,11 @@ public interface IPLVPopoverLayout {
     void setOnPointRewardListener(OnPointRewardListener listener);
 
     /**
+     * 设置点击商品回调监听
+     */
+    void setOnClickProductListener(PLVInteractLayout2.OnClickProductListener listener);
+
+    /**
      * 点击返回
      *
      * @return 返回true表示拦截事件

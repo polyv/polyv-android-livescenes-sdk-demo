@@ -3,6 +3,7 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.mapOf;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.pair;
+import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
@@ -27,7 +28,9 @@ import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
 import com.easefun.polyv.livecommon.module.data.PLVLiveRoomDataMapper;
 import com.easefun.polyv.livecommon.module.modules.redpack.viewmodel.PLVRedpackViewModel;
 import com.easefun.polyv.livecommon.module.data.PLVStatefulData;
+import com.easefun.polyv.livecommon.module.utils.PLVDebounceClicker;
 import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
+import com.easefun.polyv.livecommon.module.utils.PLVToast;
 import com.easefun.polyv.livecommon.module.utils.PLVWebUtils;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.widget.menudrawer.PLVMenuDrawer;
@@ -39,6 +42,7 @@ import com.plv.foundationsdk.utils.PLVGsonUtil;
 import com.plv.foundationsdk.utils.PLVScreenUtils;
 import com.plv.livescenes.feature.interact.PLVInteractWebView2;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
+import com.plv.livescenes.feature.pagemenu.product.vo.PLVInteractProductOnClickDataVO;
 import com.plv.livescenes.model.PLVChatFunctionSwitchVO;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.socket.event.interact.PLVCallAppEvent;
@@ -74,6 +78,7 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     private PLVLiveScene liveScene;
     private OnOpenInsideWebViewListener onOpenInsideWebViewListener;
     private PLVInsideWebViewLayout insideWebViewLayout;
+    private OnClickProductListener onClickProductListener;
 
     //是否锁定到竖屏
     private boolean isLockPortrait = false;
@@ -85,7 +90,8 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             PLVInteractJSBridgeEventConst.V2_WEB_VIEW_UPDATE_APP_STATUS,
             PLVInteractJSBridgeEventConst.V2_SHOW_WEB_VIEW,
             PLVInteractJSBridgeEventConst.V2_LOCK_TO_PORTRAIT,
-            PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT
+            PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT,
+            PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON
     );
     // </editor-fold >
 
@@ -162,7 +168,9 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
             case PLVInteractJSBridgeEventConst.V2_CALL_APP_EVENT:
                 processCallAppEvent(param, callBackFunction);
                 break;
-
+            case PLVInteractJSBridgeEventConst.V2_CLICK_PRODUCT_BUTTON:
+                processClickProductEvent(param, callBackFunction);
+                break;
         }
     }
 
@@ -193,6 +201,11 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
     @Override
     public void setOnOpenInsideWebViewListener(OnOpenInsideWebViewListener onOpenInsideWebViewListener) {
         this.onOpenInsideWebViewListener = onOpenInsideWebViewListener;
+    }
+
+    @Override
+    public void setOnClickProductListener(OnClickProductListener listener) {
+        this.onClickProductListener = listener;
     }
 
     @Override
@@ -419,6 +432,27 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         return "";
     }
 
+    private void processClickProductEvent(String param, final CallBackFunction callBackFunction) {
+        if (onClickProductListener != null) {
+            if (!PLVDebounceClicker.tryClick(this.getClass().getName(), seconds(1).toMillis())) {
+                return;
+            }
+            final PLVInteractProductOnClickDataVO onClickDataVO = PLVGsonUtil.fromJson(PLVInteractProductOnClickDataVO.class, param);
+            if (onClickDataVO == null || onClickDataVO.getData() == null || getContext() == null) {
+                return;
+            }
+            final String productLink = onClickDataVO.getData().getLinkByType();
+            if (TextUtils.isEmpty(productLink)) {
+                PLVToast.Builder.context(getContext())
+                        .setText(R.string.plv_commodity_toast_empty_link)
+                        .show();
+                return;
+            }
+            onClickProductListener.onClickProduct(productLink);
+
+        }
+    }
+
     /**
      * 锁定到竖屏
      */
@@ -478,6 +512,10 @@ public class PLVInteractLayout2 extends FrameLayout implements IPLVInteractLayou
         public void setContainerView(ViewGroup containerView) {
             this.containerView = containerView;
         }
+    }
+
+    public interface OnClickProductListener {
+        void onClickProduct(String link);
     }
     // </editor-fold>
 }
