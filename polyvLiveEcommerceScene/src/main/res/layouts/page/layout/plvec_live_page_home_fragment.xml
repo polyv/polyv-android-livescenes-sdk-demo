@@ -44,24 +44,33 @@
         android:src="@drawable/plvec_controller_back"
         android:visibility="gone" />
 
+    <!--互动入口布局（含直播状态）-->
+    <com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout
+        android:id="@+id/plvec_interact_entrance_ly"
+        android:layout_below="@id/watch_info_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--开播倒计时-->
+    <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECLiveCountDownLayout
+        android:id="@+id/plvec_live_count_down_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/plvec_interact_entrance_ly"
+        android:layout_marginLeft="@dimen/plvec_margin_common"
+        android:layout_marginRight="@dimen/plvec_margin_common" />
+
     <!--公告布局-->
     <com.easefun.polyv.liveecommerce.modules.chatroom.widget.PLVECBulletinView
         android:id="@+id/bulletin_ly"
         android:layout_width="match_parent"
         android:layout_height="24dp"
-        android:layout_below="@+id/watch_info_ly"
+        android:layout_below="@id/plvec_live_count_down_ly"
         android:layout_marginLeft="@dimen/plvec_margin_common"
         android:layout_marginTop="@dimen/plvec_margin_common"
         android:layout_marginRight="@dimen/plvec_margin_common"
         android:visibility="invisible"
         tools:visibility="visible" />
-
-    <!--互动入口布局-->
-    <com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVInteractEntranceLayout
-        android:id="@+id/plvec_interact_entrance_ly"
-        android:layout_below="@+id/bulletin_ly"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <!-- 评论上墙布局 -->
     <com.easefun.polyv.livecommon.ui.widget.PLVToTopView

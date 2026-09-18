@@ -259,6 +259,11 @@ public class PLVLCQuizFragment extends PLVInputFragment implements View.OnClickL
         }
 
         @Override
+        public void onLocalQuestionSystemMessage(@NonNull final String message) {
+            addQuizMessageToList(new PLVBaseViewData<>(message, PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE), true);
+        }
+
+        @Override
         public void onLocalQuestionMessage(@Nullable PolyvQuestionMessage questionMessage) {
             super.onLocalQuestionMessage(questionMessage);
             if (questionMessage == null) {

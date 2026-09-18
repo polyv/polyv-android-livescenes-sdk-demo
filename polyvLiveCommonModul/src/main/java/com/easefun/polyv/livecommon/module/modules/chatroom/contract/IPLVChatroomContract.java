@@ -221,6 +221,12 @@ public interface IPLVChatroomContract {
          */
         void onLocalSpeakMessage(@Nullable PolyvLocalMessage localMessage);
 
+        /** 本地系统提示，不作为用户发言发送。 */
+        void onLocalSystemMessage(@NonNull String message);
+
+        /** 提问列表中的本地系统提示。 */
+        void onLocalQuestionSystemMessage(@NonNull String message);
+
         /**
          * 自己本地发送的提问信息
          */

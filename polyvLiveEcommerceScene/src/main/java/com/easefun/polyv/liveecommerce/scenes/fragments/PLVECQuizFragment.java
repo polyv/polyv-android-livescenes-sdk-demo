@@ -203,6 +203,16 @@ public class PLVECQuizFragment extends PLVBaseFragment {
         }
 
         @Override
+        public void onLocalQuestionSystemMessage(@NonNull final String message) {
+            runAfterOnActivityCreated(new Runnable() {
+                @Override
+                public void run() {
+                    addQuizMessageToList(new PLVBaseViewData<>(message, PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE), true);
+                }
+            });
+        }
+
+        @Override
         public void onLocalQuestionMessage(@Nullable final PolyvQuestionMessage questionMessage) {
             super.onLocalQuestionMessage(questionMessage);
             runAfterOnActivityCreated(new Runnable() {

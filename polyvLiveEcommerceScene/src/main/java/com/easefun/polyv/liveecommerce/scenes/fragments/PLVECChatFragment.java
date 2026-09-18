@@ -257,6 +257,18 @@ public class PLVECChatFragment extends PLVBaseFragment {
         }
 
         @Override
+        public void onLocalSystemMessage(@NonNull final String message) {
+            runAfterOnActivityCreated(new Runnable() {
+                @Override
+                public void run() {
+                    List<PLVBaseViewData> dataList = new ArrayList<>();
+                    dataList.add(new PLVBaseViewData<>(message, PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE));
+                    addChatMessageToList(dataList, true);
+                }
+            });
+        }
+
+        @Override
         public void onLocalSpeakMessage(@Nullable final PolyvLocalMessage localMessage) {
             super.onLocalSpeakMessage(localMessage);
             runAfterOnActivityCreated(new Runnable() {

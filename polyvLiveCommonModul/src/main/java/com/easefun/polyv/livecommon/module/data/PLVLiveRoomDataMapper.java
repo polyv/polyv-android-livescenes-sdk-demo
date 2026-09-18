@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.plv.livescenes.access.PLVChannelFeature;
 import com.plv.livescenes.access.PLVChannelFeatureManager;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
+import com.plv.livescenes.socket.PLVSocketWrapper;
 
 /**
  * @author Hoshiiro
@@ -39,6 +40,7 @@ public class PLVLiveRoomDataMapper {
                 .setAppSecret(liveRoomDataManager.getConfig().getAccount().getAppSecret())
                 .setAccountId(liveRoomDataManager.getConfig().getAccount().getUserId())
                 .setSessionId(liveRoomDataManager.getSessionId())
+                .setSocketId(PLVSocketWrapper.getInstance().getSocketId())
                 .setChatToken(liveRoomDataManager.getChatToken())
                 .setLiveScene(PLVLiveScene.ECOMMERCE == liveScene ? PLVInteractNativeAppParams.LIVE_SCENE_LIVE_ECOMMERCE : PLVInteractNativeAppParams.LIVE_SCENE_CLOUD_CLASS)
                 .setPromotionInfo(promotionDataBean)

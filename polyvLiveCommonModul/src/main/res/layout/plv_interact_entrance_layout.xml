@@ -10,6 +10,39 @@
     tools:visibility="visible">
 
     <LinearLayout
+        android:id="@+id/plv_live_status_ly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="12dp"
+        android:background="@drawable/plv_interact_entrance_ly_bg_selector_lc"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.easefun.polyv.livecommon.module.modules.interact.entrance.PLVLiveSignalView
+            android:id="@+id/plv_live_signal_view"
+            android:layout_width="11dp"
+            android:layout_height="12dp"
+            android:layout_marginRight="4dp"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/plv_live_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            tools:text="直播中" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/plv_question_ly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

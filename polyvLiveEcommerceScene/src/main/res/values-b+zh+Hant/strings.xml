@@ -24,4 +24,5 @@
     <string name="plvec_playback_subtitle_translate">翻譯字幕</string>
     <string name="plvec_playback_subtitle_original">原聲字幕</string>
     <string name="plvec_playback_subtitle_title">重播字幕</string>
+    <string name="plvec_live_start_count_down">直播倒數計時 %s</string>
 </resources>

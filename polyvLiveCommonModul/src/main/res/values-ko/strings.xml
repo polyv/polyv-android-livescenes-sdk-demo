@@ -55,11 +55,11 @@
     <string name="plv_player_network_bad_4">네트워크 상태가 좋지 않으므로 더 많은 > 모드로 시도해 보십시오.<xliff:g>&#160;</xliff:g></string>
     <string name="plv_player_change_to_normal_latency">정상 지연으로 전환</string>
     <string name="plv_player_change_definition_2">(으) 로 전환됨%s</string>
-    <string name="plv_player_live_load_slow_hint">비디오 로드가 느리므로 회선을 전환하거나 재진입을 종료하십시오.</string>
-    <string name="plv_player_playback_load_slow_hint">비디오 로드가 느리므로 새로 고침 또는 재진입을 종료하십시오.</string>
-    <string name="plv_player_restrict_watch_hint">관람 제한이 있음, 입장 불가%s</string>
-    <string name="plv_player_suggest_exit_hint">비디오 로드에 실패했습니다. 재진입을 종료하십시오%s</string>
-    <string name="plv_player_suggest_refresh_hint">비디오 로드에 실패했습니다. 네트워크를 확인하거나 재진입을 종료하십시오%s</string>
+    <string name="plv_player_live_load_slow_hint">동영상 로딩이 느립니다. %1$s 또는 %2$s을(를) 시도해 주세요.</string>
+    <string name="plv_player_playback_load_slow_hint">동영상 로딩이 느립니다. %s을(를) 시도해 주세요.</string>
+    <string name="plv_player_restrict_watch_hint">시청할 수 없습니다: %s</string>
+    <string name="plv_player_suggest_exit_hint">동영상을 재생할 수 없습니다. 나갔다가 다시 시도해 주세요%s</string>
+    <string name="plv_player_suggest_refresh_hint">동영상을 로드할 수 없습니다%1$s. %2$s을(를) 시도해 주세요.</string>
     <string name="plv_player_error_code">(오류 코드:%s)</string>
     <string name="plv_player_marquee_verify_error">주마등 검증 실패</string>
     <string name="plv_player_stage_head_ad">헤드 광고</string>
@@ -552,6 +552,8 @@
     <!--互动-->
     <string name="plv_live_more_interact_signin">로그인</string>
     <string name="plv_live_more_interact_lucky_bag">복주머니</string>
+    <string name="plv_live_more_interact_answer_card">답안 카드</string>
+    <string name="plv_live_more_interact_quick_answer">빠른 답변</string>
     <string name="plv_interact_open_weixin_buy">구매하려면 WeChat 보기 페이지로 이동하세요</string>
     <string name="plv_interact_open_weixin_but_fail">위챗을 열지 못했습니다! 위챗이 설치되어 있는지 확인해주세요</string>
     <string name="plv_interact_no_support_buy">구매는 아직 지원되지 않습니다</string>
@@ -777,4 +779,6 @@
     <string name="plv_streamer_compliance_agree">동의</string>
     <string name="plv_streamer_compliance_disagree_tips">더 나은 방송 환경을 위해 라이브 방송을 시작하기 전에 약관에 동의해 주세요</string>
     <string name="plv_streamer_compliance_back">돌아가기</string>
+    <string name="plv_chat_system_message">시스템 메시지</string>
+    <string name="plv_chat_message_not_sent">메시지가 전송되지 않았습니다. 수정 후 다시 시도해 주세요.</string>
 </resources>

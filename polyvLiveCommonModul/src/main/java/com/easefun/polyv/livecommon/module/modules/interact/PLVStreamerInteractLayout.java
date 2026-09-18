@@ -3,6 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -105,6 +107,7 @@ public class PLVStreamerInteractLayout extends FrameLayout implements IPLVStream
         plvStreamerInteractWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVStreamerInteractWebView.LANG_EN : PLVStreamerInteractWebView.LANG_ZH);
         plvStreamerInteractWeb.loadWeb();
 
+        observeLiveData();
     }
 
     @Override
@@ -147,6 +150,25 @@ public class PLVStreamerInteractLayout extends FrameLayout implements IPLVStream
             plvStreamerInteractWeb.destroy();
             plvStreamerInteractWeb = null;
         }
+    }
+    // </editor-fold >
+
+    // <editor-fold defaultstate="collapsed" desc="订阅更新">
+    private void observeLiveData() {
+        //更新chatToken
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && plvStreamerInteractWeb != null) {
+                    plvStreamerInteractWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
     }
     // </editor-fold >
 

@@ -26,11 +26,14 @@ public class PLVPlayErrorMessageUtils {
     };
 
     private static String getTipsLiveLoadSlow() {
-        return PLVAppUtils.getString(R.string.plv_player_live_load_slow_hint);
+        return PLVAppUtils.formatString(R.string.plv_player_live_load_slow_hint,
+                PLVAppUtils.getString(R.string.plv_player_change_route),
+                PLVAppUtils.getString(R.string.plv_player_refresh));
     }
 
     private static String getTipsPlaybackLoadSlow() {
-        return PLVAppUtils.getString(R.string.plv_player_playback_load_slow_hint);
+        return PLVAppUtils.formatString(R.string.plv_player_playback_load_slow_hint,
+                PLVAppUtils.getString(R.string.plv_player_refresh));
     }
 
     private static String getTipsRestrictWatch() {
@@ -76,7 +79,8 @@ public class PLVPlayErrorMessageUtils {
                 isShowChangeLinesView = false;
                 isShowRefreshView = false;
             } else {
-                errorTips = String.format(getTipsSuggestRefresh(), errorCodeInfo);
+                errorTips = String.format(getTipsSuggestRefresh(), errorCodeInfo,
+                        PLVAppUtils.getString(R.string.plv_player_refresh));
                 isShowChangeLinesView = false;
                 isShowRefreshView = true;
             }

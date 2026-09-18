@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/plv_play_error_card"
+    android:layout_width="266dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="20dp"
+    android:background="@drawable/plv_player_play_error_card_bg"
+    android:clickable="true"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/plv_play_error_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="48dp"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        tools:text="视频加载缓慢，可尝试切换线路或刷新" />
+
+    <ImageView
+        android:id="@+id/plv_play_error_close"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
+        android:padding="8dp"
+        android:contentDescription="@string/plv_live_close"
+        android:src="@drawable/plv_ic_close"
+        android:tint="#FFFFFF" />
+</RelativeLayout>

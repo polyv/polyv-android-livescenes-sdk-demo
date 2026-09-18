@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.OnLifecycleEvent;
 import android.content.Context;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayErrorView;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -120,7 +121,7 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     //播放失败时显示的view
     private PLVPlaceHolderView noStreamView;
     //可自定义提示的播放失败/加载缓慢显示的占位View
-    private PLVPlaceHolderView playErrorView;
+    private PLVPlayErrorView playErrorView;
     //Switch View
     private FrameLayout flPlayerSwitchViewParent;
     private PLVSwitchViewAnchorLayout switchAnchorPlayer;
@@ -280,7 +281,6 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
     }
 
     private void initPlayErrorView() {
-        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
         playErrorView.setOnRefreshViewClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

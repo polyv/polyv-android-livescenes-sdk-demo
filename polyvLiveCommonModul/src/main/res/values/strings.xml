@@ -55,11 +55,11 @@
     <string name="plv_player_network_bad_4">Your network status is bad, you can try More>Mode<xliff:g>&#160;</xliff:g></string>
     <string name="plv_player_change_to_normal_latency">switch to normal latency</string>
     <string name="plv_player_change_definition_2">Switched to %s</string>
-    <string name="plv_player_live_load_slow_hint">The video is loading slowly, please switch the line or exit and re-enter</string>
-    <string name="plv_player_playback_load_slow_hint">The video is loading slowly, please refresh or exit and re-enter</string>
-    <string name="plv_player_restrict_watch_hint">Viewing restrictions exist, currently does not support access to %s</string>
-    <string name="plv_player_suggest_exit_hint">Video loading failed, please exit and re-enter %s</string>
-    <string name="plv_player_suggest_refresh_hint">The video failed to load, please check the network or exit and re-enter %s</string>
+    <string name="plv_player_live_load_slow_hint">Video is loading slowly. Try %1$s or %2$s.</string>
+    <string name="plv_player_playback_load_slow_hint">Video is loading slowly. Try %s.</string>
+    <string name="plv_player_restrict_watch_hint">Unable to watch: %s</string>
+    <string name="plv_player_suggest_exit_hint">Video is unavailable. Please exit and try again %s</string>
+    <string name="plv_player_suggest_refresh_hint">Unable to load video %1$s. Try %2$s.</string>
     <string name="plv_player_error_code">(Error code: %s)</string>
     <string name="plv_player_marquee_verify_error">Marquee verification failed</string>
     <string name="plv_player_stage_head_ad">Leader ad</string>
@@ -552,6 +552,8 @@
     <!--互动-->
     <string name="plv_live_more_interact_signin">Sign in</string>
     <string name="plv_live_more_interact_lucky_bag">Lucky bag</string>
+    <string name="plv_live_more_interact_answer_card">Answer card</string>
+    <string name="plv_live_more_interact_quick_answer">Quick answer</string>
     <string name="plv_interact_open_weixin_buy">Buy in WeChat only.</string>
     <string name="plv_interact_open_weixin_but_fail">Open WeChat failed! Please check if WeChat is already installed</string>
     <string name="plv_interact_no_support_buy">Purchase not currently supported</string>
@@ -777,4 +779,6 @@
     <string name="plv_streamer_compliance_agree">Agree</string>
     <string name="plv_streamer_compliance_disagree_tips">For a better streaming experience, please agree to the terms before starting the live stream</string>
     <string name="plv_streamer_compliance_back">Back</string>
+    <string name="plv_chat_system_message">System message</string>
+    <string name="plv_chat_message_not_sent">Message not sent. Please edit and try again.</string>
 </resources>
