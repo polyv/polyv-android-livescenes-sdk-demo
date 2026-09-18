@@ -3,8 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 import android.app.Activity;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
