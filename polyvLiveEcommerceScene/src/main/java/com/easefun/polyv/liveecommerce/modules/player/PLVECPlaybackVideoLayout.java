@@ -44,13 +44,13 @@ import com.easefun.polyv.livecommon.module.utils.PLVVideoSizeUtils;
 import com.easefun.polyv.livecommon.module.utils.listener.IPLVOnDataChangedListener;
 import com.easefun.polyv.livecommon.module.utils.rotaion.PLVOrientationManager;
 import com.easefun.polyv.livecommon.ui.util.PLVViewUtil;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayErrorView;
 import com.easefun.polyv.livecommon.ui.widget.PLVPlayerLogoView;
 import com.easefun.polyv.livecommon.ui.widget.PLVSwitchViewAnchorLayout;
 import com.easefun.polyv.livecommon.ui.widget.magicindicator.buildins.PLVUIUtil;
 import com.easefun.polyv.livecommon.ui.widget.roundview.PLVRoundRectLayout;
 import com.easefun.polyv.liveecommerce.R;
 import com.easefun.polyv.liveecommerce.modules.player.constant.PLVECFitMode;
-import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECLiveNoStreamView;
 import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECPlaybackSubtitleLayout;
 import com.easefun.polyv.livescenes.playback.video.PolyvPlaybackVideoView;
 import com.easefun.polyv.livescenes.video.api.IPolyvLiveListenerEvent;
@@ -113,7 +113,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     private PLVWatermarkView watermarkView;
 
     //播放失败/加载缓慢的View
-    private PLVECLiveNoStreamView playErrorView;
+    private PLVPlayErrorView playErrorView;
 
     private TextView playbackPlayerFloatingPlayingPlaceholderTv;
     private PLVRoundRectLayout playbackAutoContinueSeekTimeHintLayout;
@@ -185,7 +185,7 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     private void initPlayErrorView() {
-        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
+        playErrorView.setCenterLayout();
         playErrorView.setOnRefreshViewClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -669,10 +669,6 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
             super.onLoadSlow(loadedTime, isBufferEvent);
             PLVPlayErrorMessageUtils.showOnLoadSlow(playErrorView, liveRoomDataManager.getConfig().isLive());
-            if (isBufferEvent) {
-                // 铺满占位图
-                playErrorView.setFullLayout();
-            }
         }
 
         @Override
@@ -804,6 +800,9 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
     }
 
     private void setFullScreenIvPosition() {
+        if (videoView.getIjkVideoView() == null || videoView.getIjkVideoView().getRenderView() == null) {
+            return;
+        }
         View renderView = videoView.getIjkVideoView().getRenderView().getView();
         if (renderView != null) {
             int bottom = renderView.getBottom();

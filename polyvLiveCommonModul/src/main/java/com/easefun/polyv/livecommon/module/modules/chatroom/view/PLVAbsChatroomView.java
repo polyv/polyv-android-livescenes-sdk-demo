@@ -172,6 +172,16 @@ public abstract class PLVAbsChatroomView implements IPLVChatroomContract.IChatro
     }
 
     @Override
+    public void onLocalSystemMessage(@NonNull String message) {
+
+    }
+
+    @Override
+    public void onLocalQuestionSystemMessage(@NonNull String message) {
+
+    }
+
+    @Override
     public void onLocalQuestionMessage(@Nullable PolyvQuestionMessage questionMessage) {
 
     }

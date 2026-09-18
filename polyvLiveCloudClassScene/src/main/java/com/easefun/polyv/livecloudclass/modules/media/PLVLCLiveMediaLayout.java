@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayErrorView;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.CountDownTimer;
@@ -161,7 +162,7 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     //当前没有直播显示的view
     private PLVPlaceHolderView noStreamView;
     //播放失败/加载缓慢的占位View
-    private PLVPlaceHolderView playErrorView;
+    private PLVPlayErrorView playErrorView;
     //直播停止时显示的view
     private View stopStreamView;
     // 网络较差时提示view
@@ -335,7 +336,6 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
     }
 
     private void initPlayErrorView() {
-        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
         playErrorView.setOnChangeLinesViewClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -475,6 +475,16 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onShowAnswerCardAction() {
+                iarLayout.showAnswerCard();
+            }
+
+            @Override
+            public void onShowQuickAnswerAction() {
+                iarLayout.showQuickAnswer();
+            }
+
+            @Override
             public boolean isStreamerStartSuccess() {
                 return plvlsStreamerLy.isStreamerStartSuccess();
             }

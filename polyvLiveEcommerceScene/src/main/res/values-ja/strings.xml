@@ -24,4 +24,5 @@
     <string name="plvec_playback_subtitle_translate">翻訳字幕</string>
     <string name="plvec_playback_subtitle_original">オリジナル字幕</string>
     <string name="plvec_playback_subtitle_title">再生タイトル</string>
+    <string name="plvec_live_start_count_down">ライブ開始まで %s</string>
 </resources>

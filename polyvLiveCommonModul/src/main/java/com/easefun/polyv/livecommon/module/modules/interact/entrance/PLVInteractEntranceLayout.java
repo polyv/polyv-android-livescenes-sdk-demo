@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.R;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
 import java.util.List;
@@ -29,6 +30,11 @@ public class PLVInteractEntranceLayout extends FrameLayout {
     private LinearLayout plvAnswerSheetLy;
     private ImageView plvAnswerSheetIv;
     private TextView plvAnswerSheetTv;
+
+    private View liveStatusLy;
+    private TextView liveStatusTv;
+    private PLVLiveSignalView liveSignalView;
+    private boolean liveStatusEnabled;
 
     private OnViewActionListener onViewActionListener;
     // </editor-folder>
@@ -52,6 +58,10 @@ public class PLVInteractEntranceLayout extends FrameLayout {
 
     // <editor-folder defaultstate="collapsed" desc="初始化View">
     private void initView() {
+        liveStatusLy = findViewById(R.id.plv_live_status_ly);
+        liveStatusTv = findViewById(R.id.plv_live_status_tv);
+        liveSignalView = findViewById(R.id.plv_live_signal_view);
+        setLiveState(PLVLiveStateEnum.WAITING);
         plvQuestionLy = (LinearLayout) findViewById(R.id.plv_question_ly);
         plvQuestionIv = (ImageView) findViewById(R.id.plv_question_iv);
         plvQuestionTv = (TextView) findViewById(R.id.plv_question_tv);
@@ -86,10 +96,12 @@ public class PLVInteractEntranceLayout extends FrameLayout {
             setBackgroundColor(Color.parseColor("#1A1B1F"));
             plvQuestionLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_lc);
             plvAnswerSheetLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_lc);
+            liveStatusLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_lc);
         } else {
             setBackgroundColor(Color.parseColor("#00000000"));
             plvQuestionLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_ec);
             plvAnswerSheetLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_ec);
+            liveStatusLy.setBackgroundResource(R.drawable.plv_interact_entrance_ly_bg_selector_ec);
         }
     }
 
@@ -97,28 +109,42 @@ public class PLVInteractEntranceLayout extends FrameLayout {
         this.onViewActionListener = listener;
     }
 
+    /** 默认关闭，由带货直播首页显式开启。 */
+    public void setLiveStatusEnabled(boolean enabled) {
+        liveStatusEnabled = enabled;
+        liveStatusLy.setVisibility(enabled ? VISIBLE : GONE);
+        updateLayoutVisibility();
+    }
+
+    public void setLiveState(@NonNull PLVLiveStateEnum state) {
+        liveStatusTv.setText(state.getDescription());
+        boolean isLive = state == PLVLiveStateEnum.LIVE;
+        liveSignalView.setVisibility(isLive ? VISIBLE : GONE);
+        liveSignalView.setLive(isLive);
+    }
+
+    private void updateLayoutVisibility() {
+        setVisibility(liveStatusEnabled || plvQuestionLy.getVisibility() == VISIBLE
+                || plvAnswerSheetLy.getVisibility() == VISIBLE ? VISIBLE : GONE);
+    }
+
     public void acceptInteractEntranceData(List<PLVCallAppEvent.ValueBean.DataBean> dataBeans) {
         if (dataBeans == null || dataBeans.isEmpty()) {
-            setVisibility(View.GONE);
+            plvQuestionLy.setVisibility(GONE);
+            plvAnswerSheetLy.setVisibility(GONE);
+            updateLayoutVisibility();
             return;
         }
-        boolean isShowLayout = false;
         for (PLVCallAppEvent.ValueBean.DataBean dataBean : dataBeans) {
             if (dataBean.isShowQuestionnaireEvent()) {
                 plvQuestionLy.setVisibility(dataBean.isShow() ? View.VISIBLE : View.GONE);
                 plvQuestionTv.setText(dataBean.getTitle());
-                if (dataBean.isShow()) {
-                    isShowLayout = true;
-                }
             } else if (dataBean.isShowAnswerSheetEvent()) {
                 plvAnswerSheetLy.setVisibility(dataBean.isShow() ? View.VISIBLE : View.GONE);
                 plvAnswerSheetTv.setText(dataBean.getTitle());
-                if (dataBean.isShow()) {
-                    isShowLayout = true;
-                }
             }
         }
-        setVisibility(isShowLayout ? View.VISIBLE : View.GONE);
+        updateLayoutVisibility();
     }
     // </editor-folder>
 

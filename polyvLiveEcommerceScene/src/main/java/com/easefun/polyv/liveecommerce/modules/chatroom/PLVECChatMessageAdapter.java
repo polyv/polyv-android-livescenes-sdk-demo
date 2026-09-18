@@ -3,6 +3,8 @@ package com.easefun.polyv.liveecommerce.modules.chatroom;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+
+import com.easefun.polyv.livecommon.module.modules.chatroom.holder.PLVChatSystemMessageViewHolder;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -131,9 +133,11 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         int oldSize = dataList.size();
         fullDataList.addAll(list);
         for (PLVBaseViewData baseViewData : list) {
-            if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+            if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                    || baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(baseViewData);
-                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                        || !((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
                     focusModeDataList.add(baseViewData);
                 }
             }
@@ -148,9 +152,11 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     public boolean addDataChangedAtLast(PLVBaseViewData baseViewData) {
         int oldSize = dataList.size();
         fullDataList.add(baseViewData);
-        if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+        if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                    || baseViewData.getTag() instanceof PLVSpecialTypeTag) {
             specialDataList.add(baseViewData);
-            if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+            if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                        || !((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
                 focusModeDataList.add(baseViewData);
             }
         }
@@ -166,9 +172,11 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         fullDataList.addAll(0, list);
         for (int i = list.size() - 1; i >= 0; i--) {
             PLVBaseViewData baseViewData = list.get(i);
-            if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+            if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                    || baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(0, baseViewData);
-                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                        || !((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
                     focusModeDataList.add(0, baseViewData);
                 }
             }
@@ -185,9 +193,11 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
         fullDataList.addAll(0, list);
         for (int i = list.size() - 1; i >= 0; i--) {
             PLVBaseViewData baseViewData = list.get(i);
-            if (baseViewData.getTag() instanceof PLVSpecialTypeTag) {
+            if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                    || baseViewData.getTag() instanceof PLVSpecialTypeTag) {
                 specialDataList.add(0, baseViewData);
-                if (!((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
+                if (baseViewData.getItemType() == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE
+                        || !((PLVSpecialTypeTag) baseViewData.getTag()).isMySelf()) {
                     focusModeDataList.add(0, baseViewData);
                 }
             }
@@ -319,6 +329,9 @@ public class PLVECChatMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLV
     @NonNull
     @Override
     public PLVBaseViewHolder<PLVBaseViewData, PLVECChatMessageAdapter> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE) {
+            return new PLVChatSystemMessageViewHolder<>(parent, this, true);
+        }
         PLVECChatMessageCommonViewHolder<PLVBaseViewData, PLVECChatMessageAdapter> viewHolder;
         switch (viewType) {
             case PLVChatMessageItemType.ITEMTYPE_RECEIVE_SPEAK:

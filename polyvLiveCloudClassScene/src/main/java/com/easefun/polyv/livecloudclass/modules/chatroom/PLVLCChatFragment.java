@@ -1047,6 +1047,16 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
         }
 
         @Override
+        public void onLocalSystemMessage(@NonNull final String message) {
+            if (isChatPlaybackLayout || !isLiveType) {
+                return;
+            }
+            List<PLVBaseViewData> dataList = new ArrayList<>();
+            dataList.add(new PLVBaseViewData<>(message, PLVChatMessageItemType.ITEMTYPE_SYSTEM_MESSAGE));
+            addChatMessageToList(dataList, true);
+        }
+
+        @Override
         public void onLocalSpeakMessage(@Nullable PolyvLocalMessage localMessage) {
             super.onLocalSpeakMessage(localMessage);
             if (isChatPlaybackLayout || !isLiveType) {

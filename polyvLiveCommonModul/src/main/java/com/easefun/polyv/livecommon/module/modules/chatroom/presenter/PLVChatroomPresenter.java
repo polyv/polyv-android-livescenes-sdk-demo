@@ -219,6 +219,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // 只拉取指定场次的历史消息
     private String limitRequestChatHistorySessionId = null;
     private int requestHistoryPage = 1;
+    private PLVProductControlEvent pushProductVO;
 
     //分组Id
     private String groupId;
@@ -243,6 +244,8 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     private Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>> functionSwitchObserver;
     //直播详情数据观察者
     private Observer<PLVStatefulData<PolyvLiveClassDetailVO>> classDetailVOObserver;
+    //推送商品数据观察者
+    private Observer<PLVStatefulData<PLVProductControlEvent>> pushProductVOObserver;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -384,10 +387,17 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             @Override
             public void call(Object... args) {
                 PLVCommonLog.d(TAG, "chatroom sendTextMessage call: " + Arrays.toString(args));
-                if (args == null || args.length == 0 || args[0] == null) {
+                if (args == null || args.length == 0) {
                     return;
                 }
-                final String messageId = String.valueOf(args[0]);
+                final String messageId = args[0] == null || args[0] == JSONObject.NULL ? null : String.valueOf(args[0]);
+                if (TextUtils.isEmpty(messageId) && isBadwordForbidSendType()) {
+                    acceptLocalSystemMessage();
+                    return;
+                }
+                if (messageId == null) {
+                    return;
+                }
                 if (args.length == 1) {
                     acceptLocalChatMessage(textMessage, messageId);
                     return;
@@ -415,10 +425,17 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
             @Override
             public void call(Object... args) {
                 PLVCommonLog.d(TAG, "chatroom sendQuoteMessage call: " + Arrays.toString(args));
-                if (args == null || args.length == 0 || args[0] == null) {
+                if (args == null || args.length == 0) {
                     return;
                 }
-                final String messageId = String.valueOf(args[0]);
+                final String messageId = args[0] == null || args[0] == JSONObject.NULL ? null : String.valueOf(args[0]);
+                if (TextUtils.isEmpty(messageId) && isBadwordForbidSendType()) {
+                    acceptLocalSystemMessage();
+                    return;
+                }
+                if (messageId == null) {
+                    return;
+                }
                 if (args.length == 1) {
                     acceptLocalChatMessage(textMessage, messageId);
                     return;
@@ -441,17 +458,32 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
 
     @Override
     public int sendQuestionMessage(final PolyvQuestionMessage questionMessage) {
-        int sendValue = PolyvChatroomManager.getInstance().sendQuestionMessage(questionMessage);
-        if (sendValue > 0) {
-            //把带表情的信息解析保存下来
-            questionMessage.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(questionMessage.getQuestionMessage(), getQuizEmojiSizes(), Utils.getApp()));
-            callbackToView(new ViewRunnable() {
-                @Override
-                public void run(IPLVChatroomContract.IChatroomView view) {
-                    view.onLocalQuestionMessage(questionMessage);
+        int sendValue = PolyvChatroomManager.getInstance().sendQuestionMessage(questionMessage, true, new Ack() {
+            @Override
+            public void call(Object... args) {
+                PLVCommonLog.d(TAG, "chatroom sendQuestionMessage call: " + Arrays.toString(args));
+                if (args == null || args.length == 0) {
+                    return;
                 }
-            });
-        }
+                if (args.length > 1
+                        && (args[1] == null || args[1] == JSONObject.NULL || "".equals(args[1]))
+                        && isBadwordForbidSendType()) {
+                    acceptLocalQuestionSystemMessage();
+                    return;
+                }
+                if (args.length == 1) {
+                    acceptLocalQuestionMessage(questionMessage);
+                    return;
+                }
+
+                // 后台选择严禁词替换为*发出时，触发严禁词后会在args[1]返回实际发出内容
+                final JsonObject jsonObject = PLVGsonUtil.fromJson(JsonObject.class, String.valueOf(args[1]));
+                if (jsonObject != null && jsonObject.has("content")) {
+                    questionMessage.setQuestionMessage(jsonObject.get("content").getAsString());
+                }
+                acceptLocalQuestionMessage(questionMessage);
+            }
+        });
         PLVCommonLog.d(TAG, "chatroom sendQuestionMessage: " + questionMessage.getQuestionMessage() + ", sendValue: " + sendValue);
         return sendValue;
     }
@@ -1804,6 +1836,42 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         return result;
     }
 
+    private void acceptLocalQuestionMessage(final PolyvQuestionMessage questionMessage) {
+        questionMessage.setObjects((Object[]) PLVTextFaceLoader.messageToSpan(questionMessage.getQuestionMessage(), getQuizEmojiSizes(), Utils.getApp()));
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                view.onLocalQuestionMessage(questionMessage);
+            }
+        });
+    }
+
+    private void acceptLocalQuestionSystemMessage() {
+        final String message = PLVAppUtils.getString(R.string.plv_chat_message_not_sent);
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                view.onLocalQuestionSystemMessage(message);
+            }
+        });
+    }
+
+    private boolean isBadwordForbidSendType() {
+        PLVStatefulData<PolyvLiveClassDetailVO> detail = liveRoomDataManager.getClassDetailVO().getValue();
+        return detail != null && detail.getData() != null && detail.getData().getData() != null
+                && detail.getData().getData().isBadwordForbidSendType();
+    }
+
+    private void acceptLocalSystemMessage() {
+        final String message = PLVAppUtils.getString(R.string.plv_chat_message_not_sent);
+        callbackToView(new ViewRunnable() {
+            @Override
+            public void run(@NonNull IPLVChatroomContract.IChatroomView view) {
+                view.onLocalSystemMessage(message);
+            }
+        });
+    }
+
     private void acceptLocalChatMessage(final PolyvLocalMessage textMessage, String messageId) {
         //信息发送成功后，保存信息id
         textMessage.setId(messageId);
@@ -2000,9 +2068,29 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 chatroomData.postViewerCountData(viewerCount);
                 multiRoomTransmitRepo.updateChannelDetail(classDetailVO);
                 isEnableProductEffect = classDetailVO.getData().productEffectEnabled();
+                if (pushProductVO != null) {
+                    sendPushProductEvent(pushProductVO);
+                }
             }
         };
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);
+    }
+
+    private void sendPushProductEvent(PLVProductControlEvent pushProductVO) {
+        if (pushProductVO == null) {
+            return;
+        }
+        // 等H5加载后再发送
+        PLVAppUtils.postToMainThread(500, new Runnable() {
+            @Override
+            public void run() {
+                PLVSocketWrapper.getInstance().getSocketObserver().dispatchOnMessage(
+                        PLVProductControlEvent.LISTEN_EVENT,
+                        pushProductVO.getEVENT(),
+                        PLVGsonUtil.toJsonSimple(pushProductVO)
+                );
+            }
+        });
     }
     // </editor-fold>
 

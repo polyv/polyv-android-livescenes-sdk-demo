@@ -5,6 +5,7 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import com.easefun.polyv.livecommon.ui.widget.PLVPlayErrorView;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -111,7 +112,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     //当前没有直播显示的view
     private View nostreamView;
     //播放失败/加载失败显示的view
-    private PLVECLiveNoStreamView playErrorView;
+    private PLVPlayErrorView playErrorView;
     //浮窗关闭按钮
     private ImageView closeFloatingView;
     //播放器presenter
@@ -245,7 +246,7 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
     }
 
     private void initPlayErrorView() {
-        playErrorView.setPlaceHolderImg(R.drawable.plv_bg_player_error_ic);
+        playErrorView.setCenterLayout();
         playErrorView.setOnChangeLinesViewClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -776,10 +777,6 @@ public class PLVECLiveVideoLayout extends FrameLayout implements IPLVECVideoLayo
         public void onLoadSlow(int loadedTime, boolean isBufferEvent) {
             super.onLoadSlow(loadedTime, isBufferEvent);
             PLVPlayErrorMessageUtils.showOnLoadSlow(playErrorView, liveRoomDataManager.getConfig().isLive());
-            if (isBufferEvent) {
-                // 铺满占位图
-                playErrorView.setFullLayout();
-            }
         }
 
         @Override

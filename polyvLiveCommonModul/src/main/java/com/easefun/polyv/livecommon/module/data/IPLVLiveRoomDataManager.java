@@ -15,6 +15,7 @@ import com.plv.livescenes.model.commodity.saas.PLVCommodityVO2;
 import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
 import java.util.List;

@@ -67,6 +67,8 @@ public class PLVLiveRoomDataRequester {
     private Disposable playbackChannelDetail;
     private Disposable requestTemplateListDisposable;
     private Disposable requestComplianceContentDisposable;
+    private Disposable requestProductPushRuleDisposable;
+    private Disposable requestProductDetailDisposable;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="公共静态方法">
@@ -549,6 +551,7 @@ public class PLVLiveRoomDataRequester {
         disposePlayBackChannelDetail();
         disposeRewardSetting();
         disposeTemplateList();
+        disposeComplianceContent();
     }
     // </editor-fold>
 

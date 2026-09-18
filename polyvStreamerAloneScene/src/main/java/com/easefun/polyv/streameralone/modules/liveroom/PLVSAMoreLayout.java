@@ -150,6 +150,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private TextView moreHangUpViewerLinkmicTv;
     private LinearLayout moreInteractSigninLl;
     private LinearLayout moreInteractLuckyBagLl;
+    private LinearLayout moreInteractAnswerCardLl;
+    private LinearLayout moreInteractQuickAnswerLl;
     private LinearLayout moreGiftRewardLayout;
     private ImageView moreGiftRewardIv;
     private TextView moreGiftRewardTv;
@@ -280,6 +282,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreHangUpViewerLinkmicTv = findViewById(R.id.plvsa_more_hang_up_viewer_linkmic_tv);
         moreInteractSigninLl = findViewById(R.id.plvsa_more_interact_signin_layout);
         moreInteractLuckyBagLl = findViewById(R.id.plvsa_more_interact_lucky_bag_layout);
+        moreInteractAnswerCardLl = findViewById(R.id.plvsa_more_interact_answer_card_layout);
+        moreInteractQuickAnswerLl = findViewById(R.id.plvsa_more_interact_quick_answer_layout);
         moreGiftRewardLayout = findViewById(R.id.plvsa_more_gift_reward_layout);
         moreGiftRewardIv = findViewById(R.id.plvsa_more_gift_reward_iv);
         moreGiftRewardTv = findViewById(R.id.plvsa_more_gift_reward_tv);
@@ -322,6 +326,8 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         moreHangUpViewerLinkmicLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
         moreInteractLuckyBagLl.setOnClickListener(this);
+        moreInteractAnswerCardLl.setOnClickListener(this);
+        moreInteractQuickAnswerLl.setOnClickListener(this);
         moreGiftRewardLayout.setOnClickListener(this);
         moreGiftEffectLayout.setOnClickListener(this);
         moreKickBannedUsersLayout.setOnClickListener(this);
@@ -998,6 +1004,14 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
             if (onViewActionListener != null) {
                 onViewActionListener.onShowLuckyBagAction();
             }
+        } else if (id == moreInteractAnswerCardLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowAnswerCardAction();
+            }
+        } else if (id == moreInteractQuickAnswerLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowQuickAnswerAction();
+            }
         } else if (id == moreGiftRewardLayout.getId()) {
             moreGiftRewardLayout.setSelected(!moreGiftRewardLayout.isSelected());
             moreGiftRewardLayout.setEnabled(false);
@@ -1171,6 +1185,16 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
          * 显示福袋
          */
         void onShowLuckyBagAction();
+
+        /**
+         * 显示答题卡
+         */
+        void onShowAnswerCardAction();
+
+        /**
+         * 显示快速问答
+         */
+        void onShowQuickAnswerAction();
 
         /**
          * 礼物特效开关切换

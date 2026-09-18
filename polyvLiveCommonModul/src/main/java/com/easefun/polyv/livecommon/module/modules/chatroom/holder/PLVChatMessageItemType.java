@@ -28,6 +28,8 @@ public class PLVChatMessageItemType {
     // 商品点击提示
     public static final int ITEMTYPE_PRODUCT_CLICK_TIPS = 13;
 
+    public static final int ITEMTYPE_SYSTEM_MESSAGE = 14;//本地系统消息
+
     public static final int ITEMTYPE_TIPS_MSG = 99;//提示信息，例如聊天室开启/关闭
 
     public static final int ITEMTYPE_CUSTOM_GIFT = 100;//(自定义)打赏礼物信息

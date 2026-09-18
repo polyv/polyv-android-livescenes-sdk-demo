@@ -55,11 +55,11 @@
     <string name="plv_player_network_bad_4">您的網絡狀態糟糕，可嘗試在更多>模式<xliff:g>&#160;</xliff:g></string>
     <string name="plv_player_change_to_normal_latency">切換到正常延遲</string>
     <string name="plv_player_change_definition_2">已切換為%s</string>
-    <string name="plv_player_live_load_slow_hint">視頻加載緩慢，請切換線路或退出重進</string>
-    <string name="plv_player_playback_load_slow_hint">視頻加載緩慢，請刷新或退出重進</string>
-    <string name="plv_player_restrict_watch_hint">存在觀看限制，暫不支持進入%s</string>
-    <string name="plv_player_suggest_exit_hint">視頻加載失敗，請退出重進%s</string>
-    <string name="plv_player_suggest_refresh_hint">視頻加載失敗，請檢查網絡或退出重進%s</string>
+    <string name="plv_player_live_load_slow_hint">影片載入緩慢，可嘗試%1$s或%2$s</string>
+    <string name="plv_player_playback_load_slow_hint">影片載入緩慢，可嘗試%s</string>
+    <string name="plv_player_restrict_watch_hint">暫時無法觀看：%s</string>
+    <string name="plv_player_suggest_exit_hint">影片暫時無法播放，請退出後重試%s</string>
+    <string name="plv_player_suggest_refresh_hint">影片載入失敗%1$s，可嘗試%2$s</string>
     <string name="plv_player_error_code">(錯誤碼:%s)</string>
     <string name="plv_player_marquee_verify_error">跑馬燈驗證失敗</string>
     <string name="plv_player_stage_head_ad">片頭廣告</string>
@@ -552,6 +552,8 @@
     <!--互动-->
     <string name="plv_live_more_interact_signin">簽到</string>
     <string name="plv_live_more_interact_lucky_bag">福袋</string>
+    <string name="plv_live_more_interact_answer_card">答題卡</string>
+    <string name="plv_live_more_interact_quick_answer">快速問答</string>
     <string name="plv_interact_open_weixin_buy">請前往微信觀看頁面購買</string>
     <string name="plv_interact_open_weixin_but_fail">開啟微信失敗！請檢查是否已安裝微信</string>
     <string name="plv_interact_no_support_buy">暫時不支援購買</string>
@@ -777,4 +779,6 @@
     <string name="plv_streamer_compliance_agree">同意</string>
     <string name="plv_streamer_compliance_disagree_tips">為了您有更好的開播體驗，請同意協議後再直播</string>
     <string name="plv_streamer_compliance_back">返回</string>
+    <string name="plv_chat_system_message">系統訊息</string>
+    <string name="plv_chat_message_not_sent">訊息未傳送，請修改後重試</string>
 </resources>

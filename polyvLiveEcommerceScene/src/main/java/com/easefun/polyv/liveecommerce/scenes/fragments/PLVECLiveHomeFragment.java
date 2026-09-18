@@ -63,6 +63,8 @@ import com.easefun.polyv.liveecommerce.modules.player.widget.PLVECNetworkTipsVie
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECBlackTabLayout;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECMorePopupView;
 import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView;
+import com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECLiveCountDownLayout;
+import com.easefun.polyv.livecommon.module.modules.player.live.enums.PLVLiveStateEnum;
 import com.easefun.polyv.livescenes.chatroom.PolyvLocalMessage;
 import com.easefun.polyv.livescenes.chatroom.PolyvQuestionMessage;
 import com.easefun.polyv.livescenes.model.bulletin.PolyvBulletinVO;
@@ -111,6 +113,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // <editor-fold defaultstate="collapsed" desc="变量">
     //观看信息布局
     private PLVECWatchInfoView watchInfoLy;
+    private PLVECLiveCountDownLayout liveCountDownLayout;
     //公告布局
     private PLVECBulletinView bulletinLy;
     //欢迎语
@@ -224,6 +227,16 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     @Override
+    public void onDestroyView() {
+        if (liveCountDownLayout != null) {
+            liveCountDownLayout.setOnLiveStateChangedListener(null);
+            liveCountDownLayout.destroy();
+            liveCountDownLayout = null;
+        }
+        super.onDestroyView();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (isOpenPointReward) {
@@ -289,13 +302,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     // <editor-fold defaultstate="collapsed" desc="初始化view">
     private void initView() {
         watchInfoLy = findViewById(R.id.watch_info_ly);
+        liveCountDownLayout = findViewById(R.id.plvec_live_count_down_ly);
         bulletinLy = findViewById(R.id.bulletin_ly);
-        bulletinLy.setOnVisibilityChangedListener(new PLVECBulletinView.OnVisibilityChangedListener() {
-            @Override
-            public void onChanged(boolean isVisible) {
-                adjustInteractEntranceLyLocation(isVisible);
-            }
-        });
         greetLy = findViewById(R.id.greet_ly);
         signInTipsView = findViewById(R.id.sign_in_tips_ly);
         productClickTipsView = findViewById(R.id.product_click_tips_ly);
@@ -403,6 +411,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         interactEntranceView = findViewById(R.id.plvec_interact_entrance_ly);
         interactEntranceView.changeLayoutStyle(false);
+        interactEntranceView.setLiveStatusEnabled(true);
+        liveCountDownLayout.setOnLiveStateChangedListener(new PLVECLiveCountDownLayout.OnLiveStateChangedListener() {
+            @Override
+            public void onLiveStateChanged(PLVLiveStateEnum state) {
+                interactEntranceView.setLiveState(state);
+            }
+        });
         interactEntranceView.setOnViewActionListener(new PLVInteractEntranceLayout.OnViewActionListener() {
             @Override
             public void onShowQuestionnaire() {
@@ -453,7 +468,6 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         updateOnlineCount(0);
         initNetworkTipsLayout();
-        adjustInteractEntranceLyLocation(bulletinLy.getVisibility() == View.VISIBLE);
     }
 
     private void initNetworkTipsLayout() {
@@ -475,18 +489,6 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         });
     }
 
-    private void adjustInteractEntranceLyLocation(boolean isBulletinLyVisible) {
-        if (interactEntranceView == null) {
-            return;
-        }
-        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) interactEntranceView.getLayoutParams();
-        if (isBulletinLyVisible) {
-            rlp.addRule(RelativeLayout.BELOW, R.id.bulletin_ly);
-        } else {
-            rlp.addRule(RelativeLayout.BELOW, R.id.watch_info_ly);
-        }
-        interactEntranceView.setLayoutParams(rlp);
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="初始化数据">
@@ -498,6 +500,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             @Override
             public void run() {
                 commodityPopupLayout.init(liveRoomDataManager);
+                liveCountDownLayout.init(liveRoomDataManager, PLVECLiveHomeFragment.this);
             }
         });
     }
@@ -619,6 +622,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     //设置播放状态
     @Override
     public void setPlayerState(PLVPlayerState state) {
+        if (liveCountDownLayout != null) {
+            liveCountDownLayout.setPlayerState(state);
+        }
         if (state == PLVPlayerState.PREPARED) {
             morePopupView.updatePlayStateView(View.VISIBLE);
 

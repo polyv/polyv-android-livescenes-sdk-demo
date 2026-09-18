@@ -471,6 +471,20 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
                 }
 
                 @Override
+                public void onShowAnswerCardAction() {
+                    if (iarLayout != null) {
+                        iarLayout.showAnswerCard();
+                    }
+                }
+
+                @Override
+                public void onShowQuickAnswerAction() {
+                    if (iarLayout != null) {
+                        iarLayout.showQuickAnswer();
+                    }
+                }
+
+                @Override
                 public void onGiftEffectSwitch(boolean isOpen) {
                     if (homeFragment != null) {
                         homeFragment.changeGiftEffectSwitch(isOpen);

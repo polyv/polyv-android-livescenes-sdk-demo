@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.easefun.polyv.livecommon.ui.widget.PLVRoundRectGradientTextView
+        android:id="@+id/plvec_live_count_down_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="12dp"
+        android:paddingTop="7dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="7dp"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:plvGradientColors="#CC000000"
+        app:plvRadius="20dp"
+        tools:text="直播倒计时 01 天 23 时 57 分 47 秒"
+        tools:visibility="visible" />
+</merge>

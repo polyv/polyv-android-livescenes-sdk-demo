@@ -24,4 +24,5 @@
     <string name="plvec_playback_subtitle_translate">자막 번역</string>
     <string name="plvec_playback_subtitle_original">어쿠스틱 자막</string>
     <string name="plvec_playback_subtitle_title">자막 재생</string>
+    <string name="plvec_live_start_count_down">라이브 시작까지 %s</string>
 </resources>

@@ -55,11 +55,11 @@
     <string name="plv_player_network_bad_4">ネットワークの状態が悪く、より多くの>モードで試してみることができます<xliff:g>&#160;</xliff:g></string>
     <string name="plv_player_change_to_normal_latency">通常の遅延に切り替え</string>
     <string name="plv_player_change_definition_2">に切り替えました%s</string>
-    <string name="plv_player_live_load_slow_hint">ビデオのロードが遅いので、回線を切り替えるか、再入力を終了してください</string>
-    <string name="plv_player_playback_load_slow_hint">ビデオのロードが遅いので、再読み込みを更新または終了してください</string>
-    <string name="plv_player_restrict_watch_hint">アクセスをサポートしていない視聴制限があります%s</string>
-    <string name="plv_player_suggest_exit_hint">ビデオのロードに失敗しました。再読み込みを終了してください%s</string>
-    <string name="plv_player_suggest_refresh_hint">ビデオロードに失敗しました。ネットワークを確認するか、再読み込みを終了してください%s</string>
+    <string name="plv_player_live_load_slow_hint">動画の読み込みに時間がかかっています。%1$sまたは%2$sをお試しください。</string>
+    <string name="plv_player_playback_load_slow_hint">動画の読み込みに時間がかかっています。%sをお試しください。</string>
+    <string name="plv_player_restrict_watch_hint">視聴できません：%s</string>
+    <string name="plv_player_suggest_exit_hint">動画を再生できません。一度退出して再度お試しください%s</string>
+    <string name="plv_player_suggest_refresh_hint">動画を読み込めません%1$s。%2$sをお試しください。</string>
     <string name="plv_player_error_code">(エラーコード:%s)</string>
     <string name="plv_player_marquee_verify_error">走馬灯の検証に失敗しました</string>
     <string name="plv_player_stage_head_ad">オープニング広告</string>
@@ -552,6 +552,8 @@
     <!--互动-->
     <string name="plv_live_more_interact_signin">サインイン</string>
     <string name="plv_live_more_interact_lucky_bag">福袋</string>
+    <string name="plv_live_more_interact_answer_card">解答カード</string>
+    <string name="plv_live_more_interact_quick_answer">クイック回答</string>
     <string name="plv_interact_open_weixin_buy">購入するには WeChat 表示ページにアクセスしてください</string>
     <string name="plv_interact_open_weixin_but_fail">WeChat を開けませんでした! WeChat がインストールされているかどうかを確認してください</string>
     <string name="plv_interact_no_support_buy">購入はまだサポートされていません</string>
@@ -776,4 +778,6 @@
     <string name="plv_streamer_compliance_agree">同意する</string>
     <string name="plv_streamer_compliance_disagree_tips">より良い配信体験のため、ライブ配信を開始する前に規約に同意してください</string>
     <string name="plv_streamer_compliance_back">戻る</string>
+    <string name="plv_chat_system_message">システムメッセージ</string>
+    <string name="plv_chat_message_not_sent">メッセージを送信できませんでした。修正して再試行してください。</string>
 </resources>

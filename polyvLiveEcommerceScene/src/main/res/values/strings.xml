@@ -24,4 +24,5 @@
     <string name="plvec_playback_subtitle_translate">Translate subtitles</string>
     <string name="plvec_playback_subtitle_original">Original subtitles</string>
     <string name="plvec_playback_subtitle_title">Replay subtitles</string>
+    <string name="plvec_live_start_count_down">Live countdown %s</string>
 </resources>

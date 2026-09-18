@@ -356,6 +356,20 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
                     onViewActionListener.onShowLuckyBagAction();
                 }
             }
+
+            @Override
+            public void onShowAnswerCardAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowAnswerCardAction();
+                }
+            }
+
+            @Override
+            public void onShowQuickAnswerAction() {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onShowQuickAnswerAction();
+                }
+            }
         });
     }
 

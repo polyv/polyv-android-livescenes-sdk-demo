@@ -56,7 +56,7 @@ import java.util.List;
 public class PLVProductDetailLayout extends FrameLayout {
 
     // <editor-fold defaultstate="collapsed" desc="变量">
-    private static final String TAG = PLVIARLayout.class.getSimpleName();
+    private static final String TAG = PLVProductDetailLayout.class.getSimpleName();
     private IPLVLiveRoomDataManager liveRoomDataManager;
 
     private PLVProductDetailWebView productDetailWebView;

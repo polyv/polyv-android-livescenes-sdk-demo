@@ -3,6 +3,8 @@ package com.easefun.polyv.livecommon.module.modules.interact;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.listOf;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,6 +55,8 @@ public class PLVStreamerIARLayout extends FrameLayout implements IPLVStreamerIAR
 
     private static final String EVENT_DOWNLOADSIGNINRECORD = "downloadSignInRecord";
     private static final String EVENT_DOWNLOAD_LUCKY_BAG_RECORD = "downloadLuckyBagRecord";
+    private static final String EVENT_DOWNLOAD_ANSWER_CARD_RECORD = "downloadAnswerCardRecord";
+    private static final String EVENT_DOWNLOAD_QUICK_ANSWER_RECORD = "downloadQuickAnswerRecord";
 
     private static final List<String> JS_HANDLER = listOf(
             PLVInteractJSBridgeEventConst.V2_GET_NATIVE_APP_PARAMS_INFO,
@@ -106,11 +110,34 @@ public class PLVStreamerIARLayout extends FrameLayout implements IPLVStreamerIAR
         plvStreamerIARWeb.setLang(PLVLanguageUtil.isENLanguage() ? PLVStreamerInteractWebView.LANG_EN : PLVStreamerInteractWebView.LANG_ZH);
         plvStreamerIARWeb.loadWeb();
 
+        observeLiveData();
     }
 
     @Override
     public void showLuckyBag() {
         String data = "{\"event\" : \"SHOW_LUCKY_BAG\"}";
+        plvStreamerIARWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
+    public void showAnswerCard() {
+        String data = "{\"event\" : \"SHOW_ANSWER_CARD\"}";
+        plvStreamerIARWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
+            @Override
+            public void onCallBack(String s) {
+                PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT + " " + s);
+            }
+        });
+    }
+
+    @Override
+    public void showQuickAnswer() {
+        String data = "{\"event\" : \"SHOW_QUICK_ANSWER\"}";
         plvStreamerIARWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_APP_CALL_WEB_VIEW_EVENT, data, new CallBackFunction() {
             @Override
             public void onCallBack(String s) {
@@ -151,6 +178,25 @@ public class PLVStreamerIARLayout extends FrameLayout implements IPLVStreamerIAR
     }
     // </editor-fold >
 
+    // <editor-fold defaultstate="collapsed" desc="订阅更新">
+    private void observeLiveData() {
+        //更新chatToken
+        liveRoomDataManager.getChatTokenLiveData().observe((LifecycleOwner) getContext(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String chatToken) {
+                if (!TextUtils.isEmpty(chatToken) && plvStreamerIARWeb != null) {
+                    plvStreamerIARWeb.sendMsgToJs(PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO, getNativeAppPramsInfo(), new CallBackFunction() {
+                        @Override
+                        public void onCallBack(String s) {
+                            PLVCommonLog.d(TAG, PLVInteractJSBridgeEventConst.V2_UPDATE_NATIVE_APP_PARAMS_INFO + " " + s);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    // </editor-fold >
+
     // <editor-fold defaultstate="collapsed" desc="工具方法">
     private void processCallAppEvent(String param, CallBackFunction callBackFunction) {
         PLVCommonLog.d(TAG, "CallAppEvent param = " + param);
@@ -164,6 +210,12 @@ public class PLVStreamerIARLayout extends FrameLayout implements IPLVStreamerIAR
                     break;
                 case EVENT_DOWNLOAD_LUCKY_BAG_RECORD:
                     processorDownloadRecord(value, "PLVLuckyBagRecord", EVENT_DOWNLOAD_LUCKY_BAG_RECORD);
+                    break;
+                case EVENT_DOWNLOAD_ANSWER_CARD_RECORD:
+                    processorDownloadRecord(value, "PLVAnswerCardRecord", EVENT_DOWNLOAD_ANSWER_CARD_RECORD);
+                    break;
+                case EVENT_DOWNLOAD_QUICK_ANSWER_RECORD:
+                    processorDownloadRecord(value, "PLVQuickAnswerRecord", EVENT_DOWNLOAD_QUICK_ANSWER_RECORD);
                     break;
                 default:
             }

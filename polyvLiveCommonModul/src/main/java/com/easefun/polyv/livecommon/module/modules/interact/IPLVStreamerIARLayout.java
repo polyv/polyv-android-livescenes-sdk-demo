@@ -17,6 +17,16 @@ public interface IPLVStreamerIARLayout {
     void showLuckyBag();
 
     /**
+     * 显示答题卡
+     */
+    void showAnswerCard();
+
+    /**
+     * 显示快速问答
+     */
+    void showQuickAnswer();
+
+    /**
      * 销毁
      */
     void destroy();

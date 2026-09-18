@@ -105,6 +105,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
     private LinearLayout moreKickBannedUsersLayout;
     private LinearLayout moreInteractSigninLl;
     private LinearLayout moreInteractLuckyBagLl;
+    private LinearLayout moreInteractAnswerCardLl;
+    private LinearLayout moreInteractQuickAnswerLl;
     private LinearLayout moreVirtualBgItemLayout;
     private LinearLayout moreDenoiseItemLayout;
     private LinearLayout moreExternalAudioInputItemLayout;
@@ -202,6 +204,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingExitGroup = findViewById(R.id.plvls_more_setting_exit_group);
         moreInteractSigninLl = findViewById(R.id.plvls_more_interact_signin_layout);
         moreInteractLuckyBagLl = findViewById(R.id.plvls_more_interact_lucky_bag_layout);
+        moreInteractAnswerCardLl = findViewById(R.id.plvls_more_interact_answer_card_layout);
+        moreInteractQuickAnswerLl = findViewById(R.id.plvls_more_interact_quick_answer_layout);
         moreVirtualBgItemLayout = findViewById(R.id.plvls_more_setting_virtual_bg_layout);
         moreDenoiseItemLayout = findViewById(R.id.plvls_more_setting_denoise_layout);
         moreDenoisePreferenceLayout = findViewById(R.id.plvls_more_setting_denoise_preference_layout);
@@ -220,6 +224,8 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
         moreSettingShareItemLayout.setOnClickListener(this);
         moreInteractSigninLl.setOnClickListener(this);
         moreInteractLuckyBagLl.setOnClickListener(this);
+        moreInteractAnswerCardLl.setOnClickListener(this);
+        moreInteractQuickAnswerLl.setOnClickListener(this);
         moreVirtualBgItemLayout.setOnClickListener(this);
         moreDenoiseItemLayout.setOnClickListener(this);
         moreExternalAudioInputItemLayout.setOnClickListener(this);
@@ -815,6 +821,14 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
             if (onViewActionListener != null) {
                 onViewActionListener.onShowLuckyBagAction();
             }
+        } else if (id == moreInteractAnswerCardLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowAnswerCardAction();
+            }
+        } else if (id == moreInteractQuickAnswerLl.getId()) {
+            if (onViewActionListener != null) {
+                onViewActionListener.onShowQuickAnswerAction();
+            }
         } else if (id == moreVirtualBgItemLayout.getId()) {
             if (virtualBackgroundLayout != null) {
                 close();
@@ -858,6 +872,16 @@ public class PLVLSMoreSettingLayout extends FrameLayout implements View.OnClickL
          * 显示福袋
          */
         void onShowLuckyBagAction();
+
+        /**
+         * 显示答题卡
+         */
+        void onShowAnswerCardAction();
+
+        /**
+         * 显示快速问答
+         */
+        void onShowQuickAnswerAction();
     }
     // </editor-fold>
 }

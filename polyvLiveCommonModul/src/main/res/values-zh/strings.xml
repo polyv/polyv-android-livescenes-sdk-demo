@@ -55,11 +55,11 @@
     <string name="plv_player_network_bad_4">您的网络状态糟糕，可尝试在 更多>模式<xliff:g>&#160;</xliff:g></string>
     <string name="plv_player_change_to_normal_latency">切换到正常延迟</string>
     <string name="plv_player_change_definition_2">已切换为%s</string>
-    <string name="plv_player_live_load_slow_hint">视频加载缓慢，请切换线路或退出重进</string>
-    <string name="plv_player_playback_load_slow_hint">视频加载缓慢，请刷新或退出重进</string>
-    <string name="plv_player_restrict_watch_hint">存在观看限制，暂不支持进入%s</string>
-    <string name="plv_player_suggest_exit_hint">视频加载失败，请退出重进%s</string>
-    <string name="plv_player_suggest_refresh_hint">视频加载失败，请检查网络或退出重进%s</string>
+    <string name="plv_player_live_load_slow_hint">视频加载缓慢，可尝试%1$s或%2$s</string>
+    <string name="plv_player_playback_load_slow_hint">视频加载缓慢，可尝试%s</string>
+    <string name="plv_player_restrict_watch_hint">暂时无法观看：%s</string>
+    <string name="plv_player_suggest_exit_hint">视频暂时无法播放，请退出后重试%s</string>
+    <string name="plv_player_suggest_refresh_hint">视频加载失败%1$s，可尝试%2$s</string>
     <string name="plv_player_error_code">(错误码:%s)</string>
     <string name="plv_player_marquee_verify_error">跑马灯验证失败</string>
     <string name="plv_player_stage_head_ad">片头广告</string>
@@ -552,6 +552,8 @@
     <!--互动-->
     <string name="plv_live_more_interact_signin">签到</string>
     <string name="plv_live_more_interact_lucky_bag">福袋</string>
+    <string name="plv_live_more_interact_answer_card">答题卡</string>
+    <string name="plv_live_more_interact_quick_answer">快速问答</string>
     <string name="plv_interact_open_weixin_buy">请前往微信观看页购买</string>
     <string name="plv_interact_open_weixin_but_fail">打开微信失败！请检查是否已安装微信</string>
     <string name="plv_interact_no_support_buy">暂不支持购买</string>
@@ -777,4 +779,6 @@
     <string name="plv_streamer_compliance_agree">同意</string>
     <string name="plv_streamer_compliance_disagree_tips">为了您有更好的开播体验，请同意协议后再直播</string>
     <string name="plv_streamer_compliance_back">返回</string>
+    <string name="plv_chat_system_message">系统消息</string>
+    <string name="plv_chat_message_not_sent">消息未发送，请修改后重试</string>
 </resources>
