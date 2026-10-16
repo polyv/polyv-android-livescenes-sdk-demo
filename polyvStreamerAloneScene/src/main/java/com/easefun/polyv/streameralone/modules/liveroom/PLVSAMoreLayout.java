@@ -190,6 +190,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
     private PLVMenuDrawer menuDrawer;
     //listener
     private PLVMenuDrawer.OnDrawerStateChangeListener onDrawerStateChangeListener;
+    private Runnable onPublicScreenSettings;
+
+    public void setOnPublicScreenSettings(Runnable listener) {
+        onPublicScreenSettings = listener;
+    }
+
     private OnViewActionListener onViewActionListener;
     private IPLVChatroomManager.RoomStatusListener roomStatusListener;
 
@@ -242,6 +248,12 @@ public class PLVSAMoreLayout extends FrameLayout implements View.OnClickListener
         LayoutInflater.from(getContext()).inflate(R.layout.plvsa_live_room_more_layout, this);
 
         plvsaMoreLayout = (ConstraintLayout) findViewById(R.id.plvsa_more_layout);
+        findViewById(R.id.plvsa_more_public_screen_layout).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                close();
+                if (onPublicScreenSettings != null) onPublicScreenSettings.run();
+            }
+        });
         plvsaMoreSettingsSv = findViewById(R.id.plvsa_more_settings_sv);
         plvsaMoreSettingsLayout = (FlexboxLayout) findViewById(R.id.plvsa_more_settings_layout);
         plvsaMoreCameraIv = (ImageView) findViewById(R.id.plvsa_more_camera_iv);

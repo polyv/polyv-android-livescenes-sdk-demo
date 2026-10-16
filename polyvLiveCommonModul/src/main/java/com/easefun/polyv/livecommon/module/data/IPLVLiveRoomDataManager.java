@@ -150,6 +150,11 @@ public interface IPLVLiveRoomDataManager {
     LiveData<PLVStatefulData<PLVComplianceContentVO>> getComplianceContentVO();
 
     /**
+     * 获取已推的商品推送数据
+     */
+    LiveData<PLVStatefulData<PLVProductControlEvent>> getPushProductVO();
+
+    /**
      * 获取请求商品接口的rank
      */
     int getCommodityRank();
@@ -290,6 +295,11 @@ public interface IPLVLiveRoomDataManager {
      * 请求主讲/嘉宾的合规提醒
      */
     void requestComplianceContent();
+
+    /**
+     * 请求商品推送卡片
+     */
+    void requestProductPushRule();
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="4、销毁">

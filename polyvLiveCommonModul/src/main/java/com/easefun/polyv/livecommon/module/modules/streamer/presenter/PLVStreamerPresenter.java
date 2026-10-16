@@ -434,11 +434,11 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
                 streamerData.postEnableShareScreen(isShare);
                 Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithLinkMicId(streamerManager.getLinkMicUid());
                 Pair<Integer, PLVLinkMicItemDataBean> streamerItem = getLinkMicItemWithLinkMicId(streamerManager.getLinkMicUid());
-                if (memberItem != null) {
+                if (memberItem != null && memberItem.second.getLinkMicItemDataBean() != null) {
                     memberItem.second.getLinkMicItemDataBean().setScreenShare(isShare);
                     memberItem.second.getLinkMicItemDataBean().setScreenShareInScreenStream(shareInScreenStream);
                 }
-                if (streamerItem != null) {
+                if (streamerItem != null && streamerItem.second != null) {
                     streamerItem.second.setScreenShare(isShare);
                     streamerItem.second.setScreenShareInScreenStream(shareInScreenStream);
                 }

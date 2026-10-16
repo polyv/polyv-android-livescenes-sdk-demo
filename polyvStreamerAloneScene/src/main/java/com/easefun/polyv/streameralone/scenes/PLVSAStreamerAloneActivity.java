@@ -1,5 +1,8 @@
 package com.easefun.polyv.streameralone.scenes;
 
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSAPublicScreenSettingsLayout;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSASettingLayout;
+import android.view.ViewGroup;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
@@ -34,8 +37,8 @@ import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicItemD
 import com.easefun.polyv.livecommon.module.modules.linkmic.model.PLVLinkMicLocalShareData;
 import com.easefun.polyv.livecommon.module.modules.streamer.contract.IPLVStreamerContract;
 import com.easefun.polyv.livecommon.module.modules.streamer.model.enums.PLVStreamerMixBackground;
-import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVComplianceReminderHelper;
+import com.easefun.polyv.livecommon.module.utils.PLVLanguageUtil;
 import com.easefun.polyv.livecommon.module.utils.PLVLiveLocalActionHelper;
 import com.easefun.polyv.livecommon.module.utils.PLVViewInitUtils;
 import com.easefun.polyv.livecommon.module.utils.PLVViewSwitcher;
@@ -106,6 +109,16 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     // 推流和连麦布局
     private IPLVSAStreamerLayout streamerLayout;
     // 直播设置布局
+    private PLVSAPublicScreenSettingsLayout publicScreenSettings;
+
+    private void showPublicScreenSettings() {
+        if (publicScreenSettings == null) {
+            publicScreenSettings = new PLVSAPublicScreenSettingsLayout(this, plvsaRootLayout, (View) streamerLayout);
+            plvsaRootLayout.addView(publicScreenSettings, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+        publicScreenSettings.show();
+    }
+
     private IPLVSASettingLayout settingLayout;
     // 清屏指引布局
     @Nullable
@@ -258,6 +271,7 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     @Override
     protected void onDestroy() {
+        if (publicScreenSettings != null) publicScreenSettings.close();
         super.onDestroy();
         PLVLanguageUtil.detachLanguageActivity();
         PLVBeautyInitHelper.getInstance().destroy();
@@ -297,6 +311,10 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
     @Override
     public void onBackPressed() {
+        if (publicScreenSettings != null && publicScreenSettings.getVisibility() == View.VISIBLE) {
+            publicScreenSettings.close();
+            return;
+        }
         if (iarLayout != null && iarLayout.onBackPress()) {
             return;
         }
@@ -422,6 +440,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
 
         //初始化直播设置布局
         settingLayout.init(liveRoomDataManager);
+        ((PLVSASettingLayout) settingLayout).setOnPublicScreenSettings(new Runnable() {
+            @Override public void run() { showPublicScreenSettings(); }
+        });
 
         // 初始化需要添加的fragment
         homeFragment = new PLVSAStreamerHomeFragment();
@@ -454,6 +475,9 @@ public class PLVSAStreamerAloneActivity extends PLVBaseActivity {
     private void observeMoreLayout() {
         PLVSAMoreLayout moreLayout = homeFragment.getMoreLayout();
         if (moreLayout != null) {
+            moreLayout.setOnPublicScreenSettings(new Runnable() {
+                @Override public void run() { showPublicScreenSettings(); }
+            });
             moreLayout.bindChatroomPresenter(homeFragment.getChatroomPresenter());
             moreLayout.setOnViewActionListener(new PLVSAMoreLayout.OnViewActionListener() {
                 @Override

@@ -931,24 +931,29 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
     }
 
     private void updateViewByRoomStatusChanged(boolean isDisabled) {
-        boolean isEnabled = !isCloseRoomStatus && !isFocusModeStatus;
-        if (isDisabled) {
-            hideSoftInputAndPopupLayout();
-            if (recordInputMessage == null) {
-                recordInputMessage = inputEt.getText();
+        runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                boolean isEnabled = !isCloseRoomStatus && !isFocusModeStatus;
+                if (isDisabled) {
+                    hideSoftInputAndPopupLayout();
+                    if (recordInputMessage == null) {
+                        recordInputMessage = inputEt.getText();
+                    }
+                    inputEt.setText("");
+                } else {
+                    if (recordInputMessage != null && isEnabled) {
+                        inputEt.setText(recordInputMessage);
+                        recordInputMessage = null;
+                    }
+                }
+                String hint = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat_2));
+                inputEt.setHint(hint);
+                inputEt.setEnabled(isEnabled);
+                toggleEmojiIv.setEnabled(isEnabled);
+                toggleEmojiIv.setAlpha(isEnabled ? 1f : 0.5f);
             }
-            inputEt.setText("");
-        } else {
-            if (recordInputMessage != null && isEnabled) {
-                inputEt.setText(recordInputMessage);
-                recordInputMessage = null;
-            }
-        }
-        String hint = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat_2));
-        inputEt.setHint(hint);
-        inputEt.setEnabled(isEnabled);
-        toggleEmojiIv.setEnabled(isEnabled);
-        toggleEmojiIv.setAlpha(isEnabled ? 1f : 0.5f);
+        });
     }
     // </editor-fold>
 

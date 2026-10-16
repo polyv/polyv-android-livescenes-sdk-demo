@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -123,6 +124,10 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
     private OnViewActionListener onViewActionListener;
     //是否进入直播间，用于嘉宾正式进入直播间的判断
     private boolean isEnterLive;
+    private boolean guestPreviewRestarted;
+    private Runnable guestPreviewRestartTask;
+    private ViewTreeObserver.OnPreDrawListener guestPreviewReadyListener;
+    private PLVLinkMicItemDataBean localGuestPreviewUser;
     //更新连麦Layout的runnable
     private Runnable updateLinkmicLayoutRunnable;
     //连麦列表布局管理
@@ -556,6 +561,39 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         });
     }
 
+    private void scheduleGuestPreviewRestart() {
+        if (!isGuest() || !isEnterLive || localGuestPreviewUser == null || guestPreviewRestarted) {
+            return;
+        }
+        if (guestPreviewRestartTask != null) {
+            removeCallbacks(guestPreviewRestartTask);
+        }
+        guestPreviewRestartTask = new Runnable() {
+            @Override
+            public void run() {
+                guestPreviewRestartTask = null;
+                if (plvsaStreamerRvLayout.getCurrentMode() != PLVMultiModeRecyclerViewLayout.MODE_PLACEHOLDER
+                        || !streamerPresenter.isLocalVideoEnabled() || localGuestPreviewUser.isScreenShare()
+                        || PLVLinkMicItemDataBean.STATUS_RTC_JOIN.equals(localGuestPreviewUser.getStatus())) {
+                    return;
+                }
+                guestPreviewRestarted = true;
+                PLVCommonLog.d(TAG, "restart guest preview once after placeholder layout is drawn");
+                streamerPresenter.enableLocalVideo(false);
+                // Allow the mute payload to remove the old preview before creating its replacement.
+                guestPreviewRestartTask = new Runnable() {
+                    @Override
+                    public void run() {
+                        guestPreviewRestartTask = null;
+                        streamerPresenter.enableLocalVideo(true);
+                    }
+                };
+                postDelayed(guestPreviewRestartTask, 200L);
+            }
+        };
+        postDelayed(guestPreviewRestartTask, 100L);
+    }
+
     @Override
     public IPLVStreamerContract.IStreamerPresenter getStreamerPresenter() {
         return streamerPresenter;
@@ -593,6 +631,14 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
 
     @Override
     public void destroy() {
+        if (guestPreviewReadyListener != null) {
+            plvsaStreamerRvLayout.getRecyclerView().getViewTreeObserver().removeOnPreDrawListener(guestPreviewReadyListener);
+            guestPreviewReadyListener = null;
+        }
+        if (guestPreviewRestartTask != null) {
+            removeCallbacks(guestPreviewRestartTask);
+            guestPreviewRestartTask = null;
+        }
         mediaOverlayContainer.destroy();
         floatWindow.close();
         floatWindow.destroy();
@@ -613,11 +659,24 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
             streamerAdapter.setMyLinkMicId(linkMicUid);
             streamerAdapter.setDataList(linkMicList);
             updateLinkMicListLayout();
+            if (isGuest()) {
+                for (PLVLinkMicItemDataBean user : linkMicList) {
+                    if (TextUtils.equals(linkMicUid, user.getLinkMicId())) {
+                        localGuestPreviewUser = user;
+                        break;
+                    }
+                }
+            }
         }
 
         @Override
         public void onUserMuteVideo(String uid, boolean mute, int streamerListPos, int memberListPos) {
             super.onUserMuteVideo(uid, mute, streamerListPos, memberListPos);
+            // A subsequent camera command takes precedence over the pending automatic reopen.
+            if (guestPreviewRestarted && guestPreviewRestartTask != null && isMyselfUserId(uid)) {
+                removeCallbacks(guestPreviewRestartTask);
+                guestPreviewRestartTask = null;
+            }
             streamerAdapter.updateUserMuteVideo(streamerListPos);
         }
 
@@ -1089,6 +1148,23 @@ public class PLVSAStreamerLayout extends FrameLayout implements IPLVSAStreamerLa
         gridLayoutManager.setSpanCount(1);
         gridLayoutManager.requestLayout();
         plvsaStreamerRvLayout.getRecyclerView().setAdapter(streamerAdapter);
+        if (isGuest() && isEnterLive && !guestPreviewRestarted
+                && guestPreviewRestartTask == null && guestPreviewReadyListener == null) {
+            guestPreviewReadyListener = new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    final RecyclerView recyclerView = plvsaStreamerRvLayout.getRecyclerView();
+                    if (recyclerView.getWidth() <= 0 || recyclerView.getHeight() <= 0 || recyclerView.getChildCount() == 0) {
+                        return true;
+                    }
+                    recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    guestPreviewReadyListener = null;
+                    scheduleGuestPreviewRestart();
+                    return true;
+                }
+            };
+            plvsaStreamerRvLayout.getRecyclerView().getViewTreeObserver().addOnPreDrawListener(guestPreviewReadyListener);
+        }
     }
 
     /**

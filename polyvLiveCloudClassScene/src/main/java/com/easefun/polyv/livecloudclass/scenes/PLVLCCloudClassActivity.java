@@ -472,6 +472,9 @@ public class PLVLCCloudClassActivity extends PLVBaseActivity implements IPLVMenu
 
         // 进行网络请求，获取功能开关数据
         liveRoomDataManager.requestChannelSwitch();
+
+        // 进行网络请求，获取商品推送卡片
+        liveRoomDataManager.requestProductPushRule();
     }
     // </editor-fold>
 

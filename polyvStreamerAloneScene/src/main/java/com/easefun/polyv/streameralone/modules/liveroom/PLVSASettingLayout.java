@@ -160,6 +160,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
     private boolean switchBitrateByUser = false;
 
     //listener
+    private Runnable onPublicScreenSettings;
+
+    public void setOnPublicScreenSettings(Runnable listener) {
+        onPublicScreenSettings = listener;
+    }
+
     private OnViewActionListener onViewActionListener;
     private IPLVImageSegmenterManager.InitCallback imageSegmenterInitCallback = null;
 
@@ -227,6 +233,12 @@ public class PLVSASettingLayout extends FrameLayout implements IPLVSASettingLayo
         settingLiveReplaySwitchLayout = findViewById(R.id.plvsa_setting_live_replay_switch_layout);
         settingMoreLayout = findViewById(R.id.plvsa_setting_more_layout);
         settingMorePopupLayout = new PLVSASettingMoreLayout(this);
+        findViewById(R.id.plvsa_setting_public_screen_layout).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                settingMorePopupLayout.dismiss();
+                if (onPublicScreenSettings != null) onPublicScreenSettings.run();
+            }
+        });
         settingWaterLayout = findViewById(R.id.plvsa_setting_live_water_layout);
         settingTemplateLayout = findViewById(R.id.plvsa_setting_live_template_layout);
         settingMediaOverlayLayout = findViewById(R.id.plvsa_setting_media_overlay_layout);

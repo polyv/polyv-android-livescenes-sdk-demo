@@ -39,4 +39,30 @@
     <string name="plvsa_streamer_media_overlay_local_volume_title">로컬 볼륨</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">로컬 볼륨은 기본적으로 0이며 크게 조절하면 생방송 메아리가 발생할 수 있으므로 이어폰을 끼고 감청하는 것이 좋습니다.</string>
     <string name="plvsa_setting_splash_change_hint">표지 수정</string>
+
+    <!-- SA public screen settings -->
+    <string name="plvsa_public_screen_title">채팅 표시 설정</string>
+    <string name="plvsa_public_screen_height">높이</string>
+    <string name="plvsa_public_screen_font">글자 크기</string>
+    <string name="plvsa_public_screen_low">낮음</string>
+    <string name="plvsa_public_screen_middle">중간</string>
+    <string name="plvsa_public_screen_high">높음</string>
+    <string name="plvsa_public_screen_small">작게</string>
+    <string name="plvsa_public_screen_large">크게</string>
+    <string name="plvsa_public_screen_done">완료</string>
+    <string name="plvsa_public_screen_close">채팅 표시 설정 닫기</string>
+    <string name="plvsa_public_screen_preview_teacher">강사</string>
+    <string-array name="plvsa_public_screen_preview_names">
+        <item>민준</item>
+        <item>서연</item>
+        <item>선생님</item>
+    </string-array>
+    <string-array name="plvsa_public_screen_preview_messages">
+        <item>선생님 안녕하세요. 소리가 잘 들립니다!</item>
+        <item>이 내용을 다시 설명해 주실 수 있나요?</item>
+        <item>환영합니다! 질문은 채팅에 남겨 주세요.</item>
+        <item>이해했습니다. 감사합니다!</item>
+        <item>수업 내용이 유익해서 메모하고 있습니다.</item>
+        <item>수업 후 다시보기를 볼 수 있나요?</item>
+    </string-array>
 </resources>

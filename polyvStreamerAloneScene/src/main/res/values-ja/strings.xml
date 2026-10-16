@@ -39,4 +39,30 @@
     <string name="plvsa_streamer_media_overlay_local_volume_title">ローカルボリューム</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">ローカル音量のデフォルトは0で、大きくするとライブエコーが発生する可能性があり、イヤホンをつけて傍受することをお勧めします。</string>
     <string name="plvsa_setting_splash_change_hint">表紙の変更</string>
+
+    <!-- SA public screen settings -->
+    <string name="plvsa_public_screen_title">チャット表示設定</string>
+    <string name="plvsa_public_screen_height">高さ</string>
+    <string name="plvsa_public_screen_font">文字サイズ</string>
+    <string name="plvsa_public_screen_low">低</string>
+    <string name="plvsa_public_screen_middle">中</string>
+    <string name="plvsa_public_screen_high">高</string>
+    <string name="plvsa_public_screen_small">小</string>
+    <string name="plvsa_public_screen_large">大</string>
+    <string name="plvsa_public_screen_done">完了</string>
+    <string name="plvsa_public_screen_close">チャット表示設定を閉じる</string>
+    <string name="plvsa_public_screen_preview_teacher">講師</string>
+    <string-array name="plvsa_public_screen_preview_names">
+        <item>アレックス</item>
+        <item>ジェイミー</item>
+        <item>先生</item>
+    </string-array>
+    <string-array name="plvsa_public_screen_preview_messages">
+        <item>先生、こんにちは。音声はよく聞こえます！</item>
+        <item>そのポイントをもう一度説明していただけますか？</item>
+        <item>ようこそ！質問はチャットに投稿してください。</item>
+        <item>わかりました。ありがとうございます！</item>
+        <item>役立つ内容ですね。メモを取っています。</item>
+        <item>授業後に録画を視聴できますか？</item>
+    </string-array>
 </resources>

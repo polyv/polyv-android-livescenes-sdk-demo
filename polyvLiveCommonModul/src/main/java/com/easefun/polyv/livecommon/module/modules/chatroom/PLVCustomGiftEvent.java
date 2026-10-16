@@ -14,6 +14,7 @@ import com.plv.socket.event.chat.PLVRewardEvent;
  */
 public class PLVCustomGiftEvent extends PLVBaseEvent {
     private SpannableStringBuilder span;
+    private String nickName;
     private String giftImg;
     private int giftDrawableId;
     private Long time;
@@ -24,6 +25,10 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
 
     public SpannableStringBuilder getSpan() {
         return span;
+    }
+
+    public String getNickName() {
+        return nickName;
     }
 
     public String getGiftImg() {
@@ -56,6 +61,7 @@ public class PLVCustomGiftEvent extends PLVBaseEvent {
         }
         SpannableStringBuilder span = new SpannableStringBuilder(uNick + (isGift ? PLVAppUtils.getString(R.string.plv_reward_give_2) : PLVAppUtils.getString(R.string.plv_reward_text_2)) + rewardContent + " ");
         PLVCustomGiftEvent customGiftEvent = new PLVCustomGiftEvent(span);
+        customGiftEvent.nickName = uNick;
         customGiftEvent.setGiftImg(gImg);
         customGiftEvent.setTime(System.currentTimeMillis());
         if (!isGift) {

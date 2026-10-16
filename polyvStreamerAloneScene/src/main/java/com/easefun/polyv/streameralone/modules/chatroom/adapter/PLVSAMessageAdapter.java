@@ -46,6 +46,14 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     private int displayDataType = DISPLAY_DATA_TYPE_FULL;//显示数据类型
 
+    private int messageTextSizeSp = 12;
+
+    public void setMessageTextSizeSp(int sizeSp) {
+        if (messageTextSizeSp == sizeSp) return;
+        messageTextSizeSp = sizeSp;
+        notifyDataSetChanged();
+    }
+
     private int msgIndex;
     // </editor-fold>
 
@@ -96,6 +104,11 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
 
     @Override
     public void onBindViewHolder(@NonNull PLVBaseViewHolder<PLVBaseViewData, PLVSAMessageAdapter> holder, int position) {
+        if (holder instanceof PLVSAMessageViewHolder) {
+            ((PLVSAMessageViewHolder) holder).setMessageTextSizeSp(messageTextSizeSp);
+        } else if (holder instanceof PLVSAMessageRewardViewHolder) {
+            ((PLVSAMessageRewardViewHolder) holder).setMessageTextSizeSp(messageTextSizeSp);
+        }
         holder.processData(dataList.get(position), position);
     }
 
@@ -106,7 +119,10 @@ public class PLVSAMessageAdapter extends PLVBaseAdapter<PLVBaseViewData, PLVBase
             return;
         }
         if (holder instanceof PLVSAMessageViewHolder) {
+            ((PLVSAMessageViewHolder) holder).setMessageTextSizeSp(messageTextSizeSp);
             ((PLVSAMessageViewHolder) holder).processData(dataList.get(position), position, payloads);
+        } else if (holder instanceof PLVSAMessageRewardViewHolder) {
+            onBindViewHolder(holder, position);
         }
     }
 
