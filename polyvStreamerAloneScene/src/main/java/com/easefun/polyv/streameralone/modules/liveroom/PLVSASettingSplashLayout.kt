@@ -50,6 +50,7 @@ class PLVSASettingSplashLayout @JvmOverloads constructor(
     private val settingSplashHintTv by lazy { findViewById<TextView>(R.id.plvsa_setting_splash_hint_tv) }
 
     private val splashImage = mutableStateOf("")
+    private var splashObserverGeneration = 0
 
     private var liveRoomDataManager: IPLVLiveRoomDataManager? = null
     private var streamerPresenter: IPLVStreamerContract.IStreamerPresenter? = null
@@ -84,9 +85,18 @@ class PLVSASettingSplashLayout @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (isInEditMode) return
+        val generation = ++splashObserverGeneration
         splashImage.observe {
-            settingSplashIv.loadImage(it)
+            // 已入主线程队列的回调可能晚于 detach，重新 attach 后也不能执行旧回调。
+            if (generation == splashObserverGeneration && isAttachedToWindow) {
+                settingSplashIv.loadImage(it)
+            }
         }.disposeOnDetached(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        ++splashObserverGeneration
+        super.onDetachedFromWindow()
     }
 
     override fun onClick(v: View?) {

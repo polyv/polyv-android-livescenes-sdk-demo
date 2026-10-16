@@ -58,13 +58,16 @@ final class BlockingBlurController implements BlurController {
             // If the bitmap was drawn on HW accelerated canvas, it holds a reference to it and on next
             // drawing pass the updated content of the bitmap will be rendered on the screen
 
-            updateBlur();
+            if (blurView.isShown()) {
+                updateBlur();
+            }
             return true;
         }
     };
 
     private boolean blurEnabled = true;
     private boolean initialized;
+    private boolean updatingBlur;
 
     @Nullable
     private Drawable frameClearDrawable;
@@ -117,7 +120,7 @@ final class BlockingBlurController implements BlurController {
 
         blurView.setWillNotDraw(false);
         allocateBitmap(measuredWidth, measuredHeight);
-        internalCanvas = new Canvas(internalBitmap);
+        internalCanvas = new BlurCanvas(internalBitmap);
         initialized = true;
 
         if (hasFixedTransformationMatrix) {
@@ -131,26 +134,30 @@ final class BlockingBlurController implements BlurController {
 
     @SuppressWarnings("WeakerAccess")
     void updateBlur() {
-        if (!blurEnabled || !initialized) {
+        if (!blurEnabled || !initialized || updatingBlur) {
             return;
         }
 
-        if (frameClearDrawable == null) {
-            internalBitmap.eraseColor(Color.TRANSPARENT);
-        } else {
-            frameClearDrawable.draw(internalCanvas);
+        updatingBlur = true;
+        try {
+            int saveCount = internalCanvas.save();
+            try {
+                if (frameClearDrawable == null) {
+                    internalBitmap.eraseColor(Color.TRANSPARENT);
+                } else {
+                    frameClearDrawable.draw(internalCanvas);
+                }
+                if (!hasFixedTransformationMatrix) {
+                    setupInternalCanvasMatrix();
+                }
+                rootView.draw(internalCanvas);
+            } finally {
+                internalCanvas.restoreToCount(saveCount);
+            }
+            blurAndSave();
+        } finally {
+            updatingBlur = false;
         }
-
-        if (hasFixedTransformationMatrix) {
-            rootView.draw(internalCanvas);
-        } else {
-            internalCanvas.save();
-            setupInternalCanvasMatrix();
-            rootView.draw(internalCanvas);
-            internalCanvas.restore();
-        }
-
-        blurAndSave();
     }
 
     /**
@@ -214,15 +221,12 @@ final class BlockingBlurController implements BlurController {
 
     @Override
     public boolean draw(Canvas canvas) {
+        if (canvas instanceof BlurCanvas) {
+            return false;
+        }
         if (!blurEnabled || !initialized) {
             return true;
         }
-        // Not blurring own children
-        if (canvas == internalCanvas) {
-            return false;
-        }
-
-        updateBlur();
 
         canvas.save();
         canvas.scale(scaleFactor * roundingWidthScaleFactor, scaleFactor * roundingHeightScaleFactor);

@@ -453,6 +453,29 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/plvsa_setting_public_screen_layout"
+                android:layout_width="62dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="6dp"
+                    android:src="@drawable/plvsa_live_setting_public_screen" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plvsa_public_screen_title"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
             <!--1、确保定义时其他可动态调整状态的item默认为隐藏，
                 2、确保放到更多里的item的可见状态在初始化(init)之后不可再调整
                 3、其他item放在此item之前-->

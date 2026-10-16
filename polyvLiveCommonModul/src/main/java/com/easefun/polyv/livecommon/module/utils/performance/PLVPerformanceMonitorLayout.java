@@ -12,6 +12,7 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Debug;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Process;
@@ -42,20 +43,35 @@ import java.util.Locale;
 public class PLVPerformanceMonitorLayout extends TextView {
 
     private static final String TAG = "PLVPerformanceMonitor";
-    private static final long SAMPLE_INTERVAL_MS = 2000L;
+    private static final long SAMPLE_INTERVAL_MS = 10000L;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ActivityManager activityManager;
+    private HandlerThread sampleThread;
+    private Handler sampleHandler;
     private final Runnable refreshRunnable = new Runnable() {
         @Override
         public void run() {
-            refresh();
-            mainHandler.postDelayed(this, SAMPLE_INTERVAL_MS);
+            if (released) {
+                return;
+            }
+            try {
+                refresh();
+            } catch (Exception e) {
+                Log.w(TAG, "Performance sample failed", e);
+            } finally {
+                // Schedule after completion so slow device queries never build a backlog.
+                if (!released) {
+                    sampleHandler.postDelayed(this, SAMPLE_INTERVAL_MS);
+                }
+            }
         }
     };
 
-    private boolean released;
+    private volatile boolean released;
     private boolean compactMode;
+    private String compactText;
+    private String detailText;
     @Nullable
     private CpuSnapshot lastCpuSnapshot;
     private long lastTxBytes = TrafficStats.UNSUPPORTED;
@@ -88,25 +104,48 @@ public class PLVPerformanceMonitorLayout extends TextView {
     }
 
     public void start() {
-        released = false;
-        resetStats();
-        mainHandler.removeCallbacks(refreshRunnable);
-        refreshRunnable.run();
+        if (released || sampleThread != null) {
+            return;
+        }
+        sampleThread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
+        sampleThread.start();
+        sampleHandler = new Handler(sampleThread.getLooper());
+        sampleHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (released) {
+                    return;
+                }
+                resetStats();
+                // Let CPU/traffic deltas accumulate before the first sample.
+                sampleHandler.postDelayed(refreshRunnable, 1000L);
+            }
+        });
     }
 
     public void release() {
-        released = true;
-        mainHandler.removeCallbacks(refreshRunnable);
+        stopSampling();
         final ViewGroup parent = (ViewGroup) getParent();
         if (parent != null) {
             parent.removeView(this);
         }
     }
 
+    private void stopSampling() {
+        released = true;
+        mainHandler.removeCallbacksAndMessages(null);
+        if (sampleHandler != null) {
+            sampleHandler.removeCallbacksAndMessages(null);
+        }
+        if (sampleThread != null) {
+            sampleThread.quit();
+        }
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mainHandler.removeCallbacks(refreshRunnable);
+        stopSampling();
     }
 
     private void initView() {
@@ -123,14 +162,14 @@ public class PLVPerformanceMonitorLayout extends TextView {
             @Override
             public void onClick(View v) {
                 compactMode = !compactMode;
-                refresh();
+                renderCachedText();
             }
         });
     }
 
     private void resetStats() {
         lastCpuSnapshot = new CpuSnapshot(SystemClock.elapsedRealtime(), Process.getElapsedCpuTime());
-        lastTrafficTimeMs = System.currentTimeMillis();
+        lastTrafficTimeMs = SystemClock.elapsedRealtime();
         lastTxBytes = TrafficStats.getUidTxBytes(Process.myUid());
         lastRxBytes = TrafficStats.getUidRxBytes(Process.myUid());
     }
@@ -149,8 +188,7 @@ public class PLVPerformanceMonitorLayout extends TextView {
 
         logPerformance(cpuInfo, memoryInfo, networkInfo, batteryInfo, thermalInfo, cpuFreqInfo, threadCount);
 
-        if (compactMode) {
-            setText(String.format(Locale.US,
+        final String newCompactText = String.format(Locale.US,
                     "CPU %.0f%%/%.0f%%  PSS %dM  RSS %dM  可用 %dM  热 %s",
                     cpuInfo.processCpuTotalPercent,
                     cpuInfo.processCpuAvgPercent,
@@ -158,9 +196,8 @@ public class PLVPerformanceMonitorLayout extends TextView {
                     memoryInfo.rssMb,
                     memoryInfo.systemAvailMb,
                     thermalInfo.maxTemperatureText
-            ));
-        } else {
-            setText(String.format(Locale.US,
+            );
+        final String newDetailText = String.format(Locale.US,
                     "性能监控  CPU %.0f%%/%.0f%%  线程 %d\nApp PSS %dM(D%d/N%d/O%d)  RSS %dM\nJava %d/%dM  NativeHeap %dM\n系统可用 %d/%dM  阈值 %dM  %s\nNet ↑%s/s ↓%s/s\n电池 %d%% %.1f℃ %dmV  %s\n热状态 %s  Max %s\n%s\n%s",
                     cpuInfo.processCpuTotalPercent,
                     cpuInfo.processCpuAvgPercent,
@@ -187,7 +224,26 @@ public class PLVPerformanceMonitorLayout extends TextView {
                     thermalInfo.maxTemperatureText,
                     thermalInfo.detailText,
                     cpuFreqInfo.displayText
-            ));
+            );
+        if (!released) {
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (released) {
+                        return;
+                    }
+                    compactText = newCompactText;
+                    detailText = newDetailText;
+                    renderCachedText();
+                }
+            });
+        }
+    }
+
+    private void renderCachedText() {
+        final String text = compactMode ? compactText : detailText;
+        if (!released && text != null && !TextUtils.equals(getText(), text)) {
+            setText(text);
         }
     }
 
@@ -275,8 +331,9 @@ public class PLVPerformanceMonitorLayout extends TextView {
         long systemThresholdMb = 0;
         boolean lowMemory = false;
         if (activityManager != null) {
-            final Debug.MemoryInfo[] memoryInfos = activityManager.getProcessMemoryInfo(new int[]{Process.myPid()});
-            if (totalPssMb <= 0 && memoryInfos != null && memoryInfos.length > 0) {
+            final Debug.MemoryInfo[] memoryInfos = totalPssMb <= 0
+                    ? activityManager.getProcessMemoryInfo(new int[]{Process.myPid()}) : null;
+            if (memoryInfos != null && memoryInfos.length > 0) {
                 totalPssMb = memoryInfos[0].getTotalPss() / 1024;
                 dalvikPssMb = memoryInfos[0].dalvikPss / 1024;
                 nativePssMb = memoryInfos[0].nativePss / 1024;
@@ -296,7 +353,7 @@ public class PLVPerformanceMonitorLayout extends TextView {
 
     @NonNull
     private NetworkInfo readNetworkInfo() {
-        final long now = System.currentTimeMillis();
+        final long now = SystemClock.elapsedRealtime();
         final long txBytes = TrafficStats.getUidTxBytes(Process.myUid());
         final long rxBytes = TrafficStats.getUidRxBytes(Process.myUid());
         long txBytesPerSecond = 0;

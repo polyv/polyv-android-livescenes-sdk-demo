@@ -1,8 +1,10 @@
 package com.easefun.polyv.livecommon.module.data;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.annotation.NonNull;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.easefun.polyv.livecommon.module.config.PLVLiveChannelConfig;
@@ -15,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.plv.foundationsdk.log.PLVCommonLog;
 import com.plv.foundationsdk.utils.PLVGsonUtil;
+import com.plv.foundationsdk.utils.PLVUtils;
 import com.plv.livescenes.feature.interact.vo.PLVInteractNativeAppParams;
 import com.plv.livescenes.hiclass.PLVHiClassDataBean;
 import com.plv.livescenes.model.PLVComplianceContentVO;
@@ -24,6 +27,8 @@ import com.plv.livescenes.model.interact.PLVWebviewUpdateAppStatusVO;
 import com.plv.livescenes.model.pointreward.PLVRewardSettingVO;
 import com.plv.livescenes.streamer.transfer.PLVStreamerInnerDataTransfer;
 import com.plv.socket.event.chat.PLVRewardEvent;
+import com.plv.socket.event.commodity.PLVProductContentBean;
+import com.plv.socket.event.commodity.PLVProductControlEvent;
 import com.plv.socket.event.interact.PLVCallAppEvent;
 
 import org.json.JSONArray;
@@ -92,6 +97,8 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private MutableLiveData<PLVStatefulData<List<PLVWaterTemplateVO>>> templateListVO = new MutableLiveData<>();
     //主讲/嘉宾合规提醒
     private MutableLiveData<PLVStatefulData<PLVComplianceContentVO>> complianceContentVO = new MutableLiveData<>();
+    //已推的商品推送数据
+    private MutableLiveData<PLVStatefulData<PLVProductControlEvent>> pushProductVO = new MutableLiveData<>();
     //直播场次Id
     private MutableLiveData<String> sessionIdLiveData = new MutableLiveData<>();
     //聊天室token
@@ -104,6 +111,7 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     private String chatToken;
     //是否支持RTC(不同推流客户端对RTC的支持不一样，不支持RTC时无法获取到讲师RTC的流，因此不支持RTC连麦时使用CDN流来显示)
     private boolean isSupportRTC;
+    private Observer<PLVStatefulData<PolyvLiveClassDetailVO>> classDetailVOObserver;
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="构造器">
@@ -201,6 +209,11 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
     @Override
     public MutableLiveData<PLVStatefulData<PLVComplianceContentVO>> getComplianceContentVO() {
         return complianceContentVO;
+    }
+
+    @Override
+    public MutableLiveData<PLVStatefulData<PLVProductControlEvent>> getPushProductVO() {
+        return pushProductVO;
     }
 
     @Override
@@ -588,11 +601,67 @@ public class PLVLiveRoomDataManager implements IPLVLiveRoomDataManager {
             }
         });
     }
+
+    @Override
+    public void requestProductPushRule() {
+        classDetailVO.observeForever(classDetailVOObserver = new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> liveClassDetailVOPLVStatefulData) {
+                classDetailVO.removeObserver(this);
+                if (liveClassDetailVOPLVStatefulData == null || !liveClassDetailVOPLVStatefulData.isSuccess()) {
+                    return;
+                }
+                PolyvLiveClassDetailVO classDetailVO = liveClassDetailVOPLVStatefulData.getData();
+                if (classDetailVO == null || classDetailVO.getData() == null) {
+                    return;
+                }
+                if (classDetailVO.getData().getChannelProductPushingStatusVO() != null) {
+                    int productId = classDetailVO.getData().getChannelProductPushingStatusVO().getProductId();
+                    String productPushRule = classDetailVO.getData().getChannelProductPushingStatusVO().getPushRule();
+                    liveRoomDataRequester.requestProductDetail(productId, new PLVLiveRoomDataRequester.IPLVNetRequestListener<ResponseBody>() {
+                        @Override
+                        public void onSuccess(ResponseBody responseBody) {
+                            acceptProductDetail(productPushRule, responseBody);
+                        }
+
+                        @Override
+                        public void onFailed(String msg, Throwable throwable) {
+                            PLVCommonLog.warn(throwable);
+                        }
+                    });
+                }
+            }
+
+            private void acceptProductDetail(String productPushRule, ResponseBody responseBody) {
+                try {
+                    JSONObject json = new JSONObject(responseBody.string());
+                    int code = json.optInt("code");
+                    if (code == 200) {
+                        String dataString = json.optString("data");
+                        if (!TextUtils.isEmpty(dataString)) {
+                            String parseData = PLVUtils.parseProductEncryptData(dataString);
+                            PLVProductContentBean productContentBean = PLVGsonUtil.fromJson(PLVProductContentBean.class, parseData);
+                            if (productContentBean != null) {
+                                productContentBean.setProductPushRule(productPushRule);
+                                PLVProductControlEvent productControlEvent = new PLVProductControlEvent();
+                                productControlEvent.setContent(productContentBean);
+                                productControlEvent.setStatus("9");
+                                pushProductVO.postValue(PLVStatefulData.success(productControlEvent));
+                            }
+                        }
+                    }
+                } catch (IOException | JSONException e) {
+                    PLVCommonLog.warn(e);
+                }
+            }
+        });
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API - 4、销毁">
     @Override
     public void destroy() {
+        classDetailVO.removeObserver(classDetailVOObserver);
         liveRoomDataRequester.destroy();
     }
     // </editor-fold>

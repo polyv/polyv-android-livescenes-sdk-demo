@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -499,8 +500,17 @@ public class PLVECFloatingWindow implements IPLVFloatingWindow {
                             alertDialog = null;
                         }
                     })
-                    .show();
-
+                    .create();
+            try {
+                alertDialog.show();
+            } catch (WindowManager.BadTokenException e) {
+                PLVCommonLog.w(TAG, "Skip floating permission dialog: invalid window token " + e);
+                resetStatus();
+                alertDialog = null;
+                if (onBackPressedRunnable != null) {
+                    onBackPressedRunnable.run(null);
+                }
+            }
         }
     }
 

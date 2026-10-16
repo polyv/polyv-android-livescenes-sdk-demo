@@ -40,6 +40,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, String url, ImageView imageView) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .into(imageView);
@@ -47,6 +50,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, String url, ImageView imageView, int radius) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .apply(new RequestOptions().transform(new PLVBlurTransformation(context, radius)))
@@ -55,6 +61,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, String url, ViewTarget<ImageView, Drawable> viewTarget) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .into(viewTarget);
@@ -62,11 +71,17 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, int resId, ImageView imageView) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context).load(resId).into(imageView);
     }
 
     @Override
     public void loadImage(Context context, int resId, ViewTarget<ImageView, Drawable> viewTarget) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context).load(resId).into(viewTarget);
     }
 
@@ -92,6 +107,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, final String moduleTag, @NonNull final Object urlTag, @DrawableRes int errorRes, @NonNull PLVAbsProgressListener listener, final ImageView view) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         final String url = listener.getUrl();
         PLVCommonLog.i(TAG, "moduleTag：" + moduleTag + "**urlTag：" + urlTag + "**url：" + url);
         PLVMyProgressManager.addListener(moduleTag, urlTag, new PLVOnProgressListener(listener.getUrl()) {
@@ -170,6 +188,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImageNoDiskCache(Context context, String url, @DrawableRes int placeHolder, @DrawableRes int error, ImageView imageView) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .apply(new RequestOptions()
@@ -181,6 +202,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, String url, int placeHolder, int error, ImageView imageView) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .apply(new RequestOptions()
@@ -191,6 +215,9 @@ public class PLVGlideImageLoadEngine implements IPLVImageLoadEngine {
 
     @Override
     public void loadImage(Context context, String url, int placeHolder, int error, ImageView imageView, int radius) {
+        if (!PLVImageLoadContext.canLoad(context)) {
+            return;
+        }
         Glide.with(context)
                 .load(url)
                 .apply(new RequestOptions()

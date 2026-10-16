@@ -219,7 +219,6 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
     // 只拉取指定场次的历史消息
     private String limitRequestChatHistorySessionId = null;
     private int requestHistoryPage = 1;
-    private PLVProductControlEvent pushProductVO;
 
     //分组Id
     private String groupId;
@@ -1088,6 +1087,7 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
         }
         liveRoomDataManager.getFunctionSwitchVO().removeObserver(functionSwitchObserver);
         liveRoomDataManager.getClassDetailVO().removeObserver(classDetailVOObserver);
+        liveRoomDataManager.getPushProductVO().removeObserver(pushProductVOObserver);
         PolyvChatroomManager.getInstance().destroy();//销毁，会移除实例及所有的监听器
     }
     // </editor-fold>
@@ -2068,12 +2068,21 @@ public class PLVChatroomPresenter implements IPLVChatroomContract.IChatroomPrese
                 chatroomData.postViewerCountData(viewerCount);
                 multiRoomTransmitRepo.updateChannelDetail(classDetailVO);
                 isEnableProductEffect = classDetailVO.getData().productEffectEnabled();
-                if (pushProductVO != null) {
-                    sendPushProductEvent(pushProductVO);
-                }
             }
         };
         liveRoomDataManager.getClassDetailVO().observeForever(classDetailVOObserver);
+        //观看直播间的推送商品数据
+        pushProductVOObserver = new Observer<PLVStatefulData<PLVProductControlEvent>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PLVProductControlEvent> pushProductVOStatefulData) {
+                liveRoomDataManager.getPushProductVO().removeObserver(this);
+                if (pushProductVOStatefulData == null || !pushProductVOStatefulData.isSuccess() || pushProductVOStatefulData.getData() == null) {
+                    return;
+                }
+                sendPushProductEvent(pushProductVOStatefulData.getData());
+            }
+        };
+        liveRoomDataManager.getPushProductVO().observeForever(pushProductVOObserver);
     }
 
     private void sendPushProductEvent(PLVProductControlEvent pushProductVO) {

@@ -3,6 +3,9 @@ package com.easefun.polyv.streameralone.modules.chatroom;
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import com.easefun.polyv.streameralone.modules.liveroom.PLVSAPublicScreenConfig;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -65,7 +68,6 @@ import com.plv.socket.event.login.PLVLogoutEvent;
 import com.plv.socket.event.login.PLVReloginEvent;
 import com.plv.socket.event.streamer.PLVRoomPushStatusEvent;
 import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
-import com.plv.thirdpart.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,55 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
     // <editor-fold defaultstate="collapsed" desc="变量">
     //直播间数据管理器
     private IPLVLiveRoomDataManager liveRoomDataManager;
+
+    private View publicScreenSizeParent;
+    private final View.OnLayoutChangeListener publicScreenParentSizeListener = new View.OnLayoutChangeListener() {
+        @Override
+        public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                   int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
+                initLayoutSize();
+            }
+        }
+    };
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener publicScreenListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                    applyPublicScreenConfig();
+                }
+            };
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        publicScreenSizeParent = getParent() instanceof View ? (View) getParent() : null;
+        if (publicScreenSizeParent != null) {
+            publicScreenSizeParent.addOnLayoutChangeListener(publicScreenParentSizeListener);
+        }
+        PLVSAPublicScreenConfig.preferences(getContext()).registerOnSharedPreferenceChangeListener(publicScreenListener);
+        applyPublicScreenConfig();
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        if (publicScreenSizeParent != null) {
+            publicScreenSizeParent.removeOnLayoutChangeListener(publicScreenParentSizeListener);
+            publicScreenSizeParent = null;
+        }
+        PLVSAPublicScreenConfig.preferences(getContext()).unregisterOnSharedPreferenceChangeListener(publicScreenListener);
+        super.onDetachedFromWindow();
+    }
+
+    @Override protected void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        initLayoutSize();
+    }
+
+    private void applyPublicScreenConfig() {
+        if (chatMessageAdapter != null) {
+            chatMessageAdapter.setMessageTextSizeSp(PLVSAPublicScreenConfig.textSizeSp(getContext()));
+        }
+        initLayoutSize();
+    }
 
     //socket登录管理器
     private IPLVSocketLoginManager socketLoginManager;
@@ -221,17 +272,24 @@ public class PLVSAChatroomLayout extends FrameLayout implements IPLVSAChatroomLa
         post(new Runnable() {
             @Override
             public void run() {
-                int portraitHeight = Math.max(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
-                int portraitWidth = Math.min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight());
                 //聊天室布局在竖屏下的高度
-                int chatroomLayoutHeight = (int) (portraitHeight * 0.25f);
+                boolean portrait = getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE;
+                View parent = getParent() instanceof View ? (View) getParent() : null;
+                // 首次进入横屏时，attach/post 可能早于父布局最终测量。
+                // 等待实际尺寸，后续由父布局尺寸监听重新应用已保存的档位。
+                if (parent == null || parent.getHeight() <= 0 || parent.getWidth() <= 0) return;
+                int availableHeight = parent.getHeight();
+                int availableWidth = parent.getWidth();
+                int chatroomLayoutHeight = (int) (availableHeight * PLVSAPublicScreenConfig.heightRatio(getContext()));
                 //聊天室布局在竖屏下的宽度
-                int chatroomLayoutWidth = (int) (portraitWidth * 0.65f);
+                int chatroomLayoutWidth = (int) (availableWidth * (portrait ? 0.65f : 0.40f));
                 //调整聊天室布局的大小
                 ViewGroup.LayoutParams vlp = getLayoutParams();
-                vlp.width = chatroomLayoutWidth;
-                vlp.height = chatroomLayoutHeight;
-                setLayoutParams(vlp);
+                if (vlp.width != chatroomLayoutWidth || vlp.height != chatroomLayoutHeight) {
+                    vlp.width = chatroomLayoutWidth;
+                    vlp.height = chatroomLayoutHeight;
+                    setLayoutParams(vlp);
+                }
             }
         });
     }

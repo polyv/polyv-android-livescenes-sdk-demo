@@ -143,6 +143,13 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
         });
     }
 
+    public void setMessageTextSizeSp(int sizeSp) {
+        chatMsgTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sizeSp);
+        chatNickTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sizeSp);
+        quoteChatMsgTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sizeSp);
+        quoteChatNickTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sizeSp);
+    }
+
     public void recycle() {
         PolyvChatroomManager.getInstance().removeSendChatImageListener(sendChatImageListener);
     }
@@ -746,7 +753,9 @@ public class PLVSAMessageViewHolder extends PLVChatMessageBaseViewHolder<PLVBase
     // <editor-fold defaultstate="collapsed" desc="内部方法">
     private SpannableStringBuilder generateNickSpan(String nickName) {
         SpannableStringBuilder nickSpan = new SpannableStringBuilder(nickName);
-        if (PolyvSocketWrapper.getInstance().getLoginVO().getUserId().equals(userId)) {
+        // 开播前的设置预览也复用此 holder，此时聊天室可能尚未登录。
+        if (PolyvSocketWrapper.getInstance().getLoginVO() != null
+                && TextUtils.equals(PolyvSocketWrapper.getInstance().getLoginVO().getUserId(), userId)) {
             nickSpan.append(PLVAppUtils.getString(R.string.plv_chat_me_2));
         }
         nickSpan.append(": ");

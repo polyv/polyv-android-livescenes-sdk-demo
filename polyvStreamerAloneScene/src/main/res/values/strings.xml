@@ -40,4 +40,30 @@
     <string name="plvsa_streamer_media_overlay_local_volume_title">Local volume</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">Turning up volume may bring echo, recommend headphones</string>
     <string name="plvsa_setting_splash_change_hint">Modify the cover</string>
+
+    <!-- SA public screen settings -->
+    <string name="plvsa_public_screen_title">Chat display settings</string>
+    <string name="plvsa_public_screen_height">Height</string>
+    <string name="plvsa_public_screen_font">Font size</string>
+    <string name="plvsa_public_screen_low">Low</string>
+    <string name="plvsa_public_screen_middle">Medium</string>
+    <string name="plvsa_public_screen_high">High</string>
+    <string name="plvsa_public_screen_small">Small</string>
+    <string name="plvsa_public_screen_large">Large</string>
+    <string name="plvsa_public_screen_done">Done</string>
+    <string name="plvsa_public_screen_close">Close chat display settings</string>
+    <string name="plvsa_public_screen_preview_teacher">Teacher</string>
+    <string-array name="plvsa_public_screen_preview_names">
+        <item>Alex</item>
+        <item>Jamie</item>
+        <item>Teacher</item>
+    </string-array>
+    <string-array name="plvsa_public_screen_preview_messages">
+        <item>Hello! The audio is clear.</item>
+        <item>Could you explain that point again?</item>
+        <item>Welcome! Feel free to ask questions in the chat.</item>
+        <item>I understand now. Thank you!</item>
+        <item>This lesson is helpful. I am taking notes.</item>
+        <item>Can we watch a replay after class?</item>
+    </string-array>
 </resources>

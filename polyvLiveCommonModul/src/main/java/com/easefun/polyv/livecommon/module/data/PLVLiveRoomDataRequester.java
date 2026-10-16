@@ -539,6 +539,44 @@ public class PLVLiveRoomDataRequester {
     }
     // </editor-folder>
 
+    // <editor-folder defaultstate="collapsed" desc="请求商品详情">
+    void requestProductDetail(int productId, final IPLVNetRequestListener<ResponseBody> listener) {
+        disposeProductDetail();
+        String appId = getConfig().getAccount().getAppId();
+        String appSecret = getConfig().getAccount().getAppSecret();
+        long timestamp = System.currentTimeMillis();
+        Map<String, String> map = new HashMap<>();
+        map.put("appId", appId);
+        map.put("timestamp", String.valueOf(timestamp));
+        map.put("channelId", getConfig().getChannelId());
+        map.put("productId", String.valueOf(productId));
+        String[] signWithSignatureNonce = PLVSignCreator.createSignWithSignatureNonce(appSecret, map);
+        requestProductDetailDisposable = PLVApiManager.getPlvLiveStatusApi().getProductById(productId, timestamp, getConfig().getChannelId(), appId, signWithSignatureNonce[0], PLVSignCreator.getSignatureMethod(), signWithSignatureNonce[1])
+                .compose(new PLVRxBaseTransformer<ResponseBody, ResponseBody>())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Exception {
+                        if (listener != null) {
+                            listener.onSuccess(responseBody);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (listener != null) {
+                            listener.onFailed(getErrorMessage(throwable), throwable);
+                        }
+                    }
+                });
+    }
+
+    void disposeProductDetail() {
+        if (requestProductDetailDisposable != null) {
+            requestProductDetailDisposable.dispose();
+        }
+    }
+    // </editor-folder>
+
     // <editor-fold defaultstate="collapsed" desc="销毁">
     void destroy() {
         disposablePageViewer();
@@ -552,6 +590,7 @@ public class PLVLiveRoomDataRequester {
         disposeRewardSetting();
         disposeTemplateList();
         disposeComplianceContent();
+        disposeProductDetail();
     }
     // </editor-fold>
 

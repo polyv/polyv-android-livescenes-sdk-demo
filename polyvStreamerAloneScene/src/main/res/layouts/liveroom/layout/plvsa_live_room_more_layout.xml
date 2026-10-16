@@ -607,6 +607,34 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/plvsa_more_public_screen_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center|top"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:padding="8dp"
+                            android:src="@drawable/plvsa_live_setting_public_screen" />
+
+                        <TextView
+                            android:layout_width="52dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|top"
+                            android:text="@string/plvsa_public_screen_title"
+                            android:textColor="#99F0F1F5"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
                 </com.google.android.flexbox.FlexboxLayout>
             <TextView
                 android:id="@+id/plvsa_more_settings_interact_tv"

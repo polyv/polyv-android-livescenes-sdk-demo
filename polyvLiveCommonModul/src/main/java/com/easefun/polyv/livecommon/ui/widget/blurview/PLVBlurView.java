@@ -50,6 +50,10 @@ public class PLVBlurView extends FrameLayout {
 
     @Override
     public void draw(Canvas canvas) {
+        // Also exclude uninitialized/disabled blur views from another view's capture.
+        if (canvas instanceof BlurCanvas) {
+            return;
+        }
         boolean shouldDraw = blurController.draw(canvas);
         if (shouldDraw) {
             super.draw(canvas);
@@ -88,6 +92,8 @@ public class PLVBlurView extends FrameLayout {
         BlurController blurController = new BlockingBlurController(this, rootView, overlayColor);
         this.blurController.destroy();
         this.blurController = blurController;
+        // setupWith may run after onAttachedToWindow; draw() only displays the snapshot.
+        blurController.setBlurAutoUpdate(true);
 
         return blurController;
     }

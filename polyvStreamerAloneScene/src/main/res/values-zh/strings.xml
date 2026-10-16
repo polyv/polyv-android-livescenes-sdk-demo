@@ -39,4 +39,30 @@
     <string name="plvsa_streamer_media_overlay_local_volume_title">本地音量</string>
     <string name="plvsa_streamer_media_overlay_default_mute_local_hint">本地音量默认为 0，调大可能引发直播回音，建议戴耳机监听。</string>
     <string name="plvsa_setting_splash_change_hint">修改封面</string>
+
+    <!-- SA public screen settings -->
+    <string name="plvsa_public_screen_title">公屏设置</string>
+    <string name="plvsa_public_screen_height">高度</string>
+    <string name="plvsa_public_screen_font">字号</string>
+    <string name="plvsa_public_screen_low">低</string>
+    <string name="plvsa_public_screen_middle">中</string>
+    <string name="plvsa_public_screen_high">高</string>
+    <string name="plvsa_public_screen_small">小</string>
+    <string name="plvsa_public_screen_large">大</string>
+    <string name="plvsa_public_screen_done">完成</string>
+    <string name="plvsa_public_screen_close">关闭公屏设置</string>
+    <string name="plvsa_public_screen_preview_teacher">讲师</string>
+    <string-array name="plvsa_public_screen_preview_names">
+        <item>小明</item>
+        <item>小雨</item>
+        <item>老师</item>
+    </string-array>
+    <string-array name="plvsa_public_screen_preview_messages">
+        <item>老师好，声音很清楚！</item>
+        <item>这个知识点可以再讲一遍吗？</item>
+        <item>欢迎大家，有问题可以在公屏留言。</item>
+        <item>已经听懂了，谢谢老师</item>
+        <item>这节课内容很实用，我正在做笔记。</item>
+        <item>请问课后可以观看回放吗？</item>
+    </string-array>
 </resources>

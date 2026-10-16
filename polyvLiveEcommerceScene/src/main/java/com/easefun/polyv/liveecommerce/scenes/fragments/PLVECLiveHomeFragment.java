@@ -769,10 +769,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             @Override
             public void run() {
                 updateViewByRoomStatusChanged(isFocusModeStatus);
-                if (isFocusModeStatus) {
-                    chatFragment.changeDisplayType(PLVECChatMessageAdapter.DISPLAY_DATA_TYPE_FOCUS_MODE);
-                } else {
-                    chatFragment.changeDisplayType(PLVECChatMessageAdapter.DISPLAY_DATA_TYPE_FULL);
+                if (chatFragment != null) {
+                    if (isFocusModeStatus) {
+                        chatFragment.changeDisplayType(PLVECChatMessageAdapter.DISPLAY_DATA_TYPE_FOCUS_MODE);
+                    } else {
+                        chatFragment.changeDisplayType(PLVECChatMessageAdapter.DISPLAY_DATA_TYPE_FULL);
+                    }
                 }
                 ToastUtils.showLong(isFocusModeStatus ? R.string.plv_chat_toast_focus_mode_open : R.string.plv_chat_toast_focus_mode_close);
             }
@@ -793,20 +795,25 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     private void updateViewByRoomStatusChanged(boolean isDisabled) {
-        boolean isEnabled = enabledToSendMsg();
-        if (isDisabled && !isSelectedQuizStatus) {
-            if (chatInputWindow != null) {
-                chatInputWindow.requestClose();
+        runAfterOnActivityCreated(new Runnable() {
+            @Override
+            public void run() {
+                boolean isEnabled = enabledToSendMsg();
+                if (isDisabled && !isSelectedQuizStatus) {
+                    if (chatInputWindow != null) {
+                        chatInputWindow.requestClose();
+                    }
+                }
+                sendMsgTv.setText(isSelectedQuizStatus ? R.string.plv_chat_input_tips_quiz
+                        : (isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2
+                        : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus_2
+                        : R.string.plv_chat_input_tips_chat_6)));
+                sendMsgTv.setOnClickListener(isEnabled ? PLVECLiveHomeFragment.this : null);
+                if (chatInputWindow != null) {
+                    chatInputWindow.updateHintPair(sendMsgTv.getText().toString(), isEnabled);
+                }
             }
-        }
-        sendMsgTv.setText(isSelectedQuizStatus ? R.string.plv_chat_input_tips_quiz
-                : (isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2
-                : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus_2
-                : R.string.plv_chat_input_tips_chat_6)));
-        sendMsgTv.setOnClickListener(isEnabled ? this : null);
-        if (chatInputWindow != null) {
-            chatInputWindow.updateHintPair(sendMsgTv.getText().toString(), isEnabled);
-        }
+        });
     }
 
     private boolean enabledToSendMsg() {
