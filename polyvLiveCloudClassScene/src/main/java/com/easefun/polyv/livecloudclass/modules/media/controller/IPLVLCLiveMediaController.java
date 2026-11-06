@@ -1,7 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
-import android.support.annotation.Nullable;
-import android.support.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
