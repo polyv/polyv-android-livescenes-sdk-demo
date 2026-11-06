@@ -24,6 +24,9 @@ public interface IPLVLCLandscapeMessageSender {
      */
     void openMessageSender();
 
+    /** 更新默认提示，不改变已输入的内容。 */
+    void setInputHint(String hint);
+
 
     /**
      * 隐藏消息发送器

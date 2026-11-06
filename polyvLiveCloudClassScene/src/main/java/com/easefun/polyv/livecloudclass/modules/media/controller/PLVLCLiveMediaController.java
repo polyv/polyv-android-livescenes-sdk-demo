@@ -114,6 +114,9 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
     private ImageView liveControlFloatingLandIv;
     //打开信息发送器的按钮
     private TextView startSendMessageLandIv;
+    private String chatInputPlaceholder;
+    private boolean isChatroomClosed;
+    private boolean isChatroomFocusMode;
     //横屏弹幕开关(后台开启弹幕时)
     private ImageView danmuSwitchLandIv;
     //打开公告
@@ -461,6 +464,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoPptSwitchLandIv = landscapeController.getSwitchView();
         liveControlFloatingLandIv = landscapeController.getFloatingControlView();
         startSendMessageLandIv = landscapeController.getMessageSender();
+        setChatInputPlaceholder(chatInputPlaceholder);
         danmuSwitchLandIv = landscapeController.getDanmuSwitchView();
         bulletinLandIv = landscapeController.getBulletinView();
         likesLandIv = landscapeController.getLikesView();
@@ -478,6 +482,7 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
         videoPptSwitchLandIv.setOnClickListener(this);
         liveControlFloatingLandIv.setOnClickListener(this);
         startSendMessageLandIv.setOnClickListener(this);
+        notifyChatroomStatusChanged(isChatroomClosed, isChatroomFocusMode);
         bulletinLandIv.setOnClickListener(this);
         likesLandIv.setOnButtonClickListener(this);
         moreLandIv.setOnClickListener(this);
@@ -736,11 +741,25 @@ public class PLVLCLiveMediaController extends FrameLayout implements IPLVLCLiveM
 
     @Override
     public void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus) {
+        isChatroomClosed = isCloseRoomStatus;
+        isChatroomFocusMode = isFocusModeStatus;
         if (startSendMessageLandIv != null) {
-            String text = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat));
+            String text = isCloseRoomStatus ? PLVAppUtils.getString(R.string.plv_chat_input_tips_chatroom_close_2)
+                    : (isFocusModeStatus ? PLVAppUtils.getString(R.string.plv_chat_input_tips_focus)
+                    : (chatInputPlaceholder == null ? PLVAppUtils.getString(R.string.plv_chat_input_tips_chat) : chatInputPlaceholder));
             startSendMessageLandIv.setText(text);
             startSendMessageLandIv.setOnClickListener((!isCloseRoomStatus && !isFocusModeStatus) ? this : null);
         }
+    }
+
+    @Override
+    public void setChatInputPlaceholder(@Nullable String placeholder) {
+        chatInputPlaceholder = placeholder;
+        if (startSendMessageLandIv != null) {
+            startSendMessageLandIv.setSingleLine(true);
+            startSendMessageLandIv.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        }
+        notifyChatroomStatusChanged(isChatroomClosed, isChatroomFocusMode);
     }
 
     @Override

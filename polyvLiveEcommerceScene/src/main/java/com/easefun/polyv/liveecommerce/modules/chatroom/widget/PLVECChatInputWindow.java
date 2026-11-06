@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.modules.chatroom.widget;
 
+import com.easefun.polyv.livecommon.module.utils.PLVChatInputUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -68,7 +69,7 @@ public class PLVECChatInputWindow extends PLVInputWindow {
     // <editor-folder defaultstate="collapsed" desc="对外API">
     public void updateHintPair(String text, boolean enabled) {
         if (inputView != null) {
-            inputView.setHint(text);
+            PLVChatInputUtils.setHint(inputView, text);
             inputView.setEnabled(enabled);
             if (!enabled) {
                 lastInputText = new SpannableStringBuilder(inputView.getText());//Spannable避免内存泄漏

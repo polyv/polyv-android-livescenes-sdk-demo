@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
+import com.easefun.polyv.livecommon.module.utils.PLVChatInputUtils;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 
 import android.annotation.SuppressLint;
@@ -1699,6 +1700,20 @@ public class PLVLCLiveMediaLayout extends FrameLayout implements IPLVLCMediaLayo
 
     // <editor-fold defaultstate="collapsed" desc="数据监听 - 监听直播详情信息、功能开关数据">
     private void observeLiveRoomData() {
+        liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvLiveClassDetailVO> state) {
+                liveRoomDataManager.getClassDetailVO().removeObserver(this);
+                if (state == null || !state.isSuccess() || state.getData() == null) {
+                    return;
+                }
+                String placeholder = PLVChatInputUtils.getPlaceholder(state.getData());
+                mediaController.setChatInputPlaceholder(placeholder);
+                landscapeMessageSender.setInputHint(placeholder == null
+                        ? getResources().getString(R.string.plv_chat_input_tips_chat) : placeholder);
+            }
+        });
+
         //监听 直播间数据管理器对象中的直播详情数据变化
         liveRoomDataManager.getClassDetailVO().observe((LifecycleOwner) getContext(), new Observer<PLVStatefulData<PolyvLiveClassDetailVO>>() {
             @SuppressLint("SetTextI18n")
