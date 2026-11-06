@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.chatroom;
 
+import com.easefun.polyv.livecommon.module.utils.PLVChatInputUtils;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
@@ -710,6 +711,9 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                     if (liveClassDetail == null || liveClassDetail.getData() == null) {
                         return;
                     }
+                    if (!isChatPlaybackLayout) {
+                        updateViewByRoomStatusChanged(false);
+                    }
                     productClickTipsView.setEnableEffect(liveClassDetail.getData().productEffectEnabled(), liveClassDetail);
                     signInTipsView.setEnableEffect(liveClassDetail.getData().interactionEffectEnabled(), liveClassDetail);
                     greetingTv.setClassDetailVO(liveClassDetail);
@@ -947,8 +951,10 @@ public class PLVLCChatFragment extends PLVInputFragment implements View.OnClickL
                         recordInputMessage = null;
                     }
                 }
-                String hint = PLVAppUtils.getString(isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2 : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus : R.string.plv_chat_input_tips_chat_2));
-                inputEt.setHint(hint);
+                String hint = isCloseRoomStatus ? PLVAppUtils.getString(R.string.plv_chat_input_tips_chatroom_close_2)
+                        : (isFocusModeStatus ? PLVAppUtils.getString(R.string.plv_chat_input_tips_focus)
+                        : PLVChatInputUtils.getHint(liveRoomDataManager, PLVAppUtils.getString(R.string.plv_chat_input_tips_chat_2)));
+                PLVChatInputUtils.setHint(inputEt, hint);
                 inputEt.setEnabled(isEnabled);
                 toggleEmojiIv.setEnabled(isEnabled);
                 toggleEmojiIv.setAlpha(isEnabled ? 1f : 0.5f);

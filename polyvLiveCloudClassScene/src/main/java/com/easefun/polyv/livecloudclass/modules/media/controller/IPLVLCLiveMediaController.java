@@ -1,6 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.easefun.polyv.businesssdk.api.common.meidacontrol.IPolyvMediaController;
@@ -173,6 +174,9 @@ public interface IPLVLCLiveMediaController extends IPolyvMediaController<PolyvLi
      * @param isFocusModeStatus 是否专注模式状态
      */
     void notifyChatroomStatusChanged(boolean isCloseRoomStatus, boolean isFocusModeStatus);
+
+    /** 设置聊天菜单配置的默认输入提示，null时使用原有文案。 */
+    void setChatInputPlaceholder(@Nullable String placeholder);
 
     /**
      * 更新实时字幕显示状态

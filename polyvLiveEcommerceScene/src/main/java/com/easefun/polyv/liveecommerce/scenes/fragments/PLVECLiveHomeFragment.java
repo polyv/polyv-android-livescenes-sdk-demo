@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import com.easefun.polyv.livecommon.module.utils.PLVChatInputUtils;
 import static com.plv.foundationsdk.utils.PLVAppUtils.postToMainThread;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.firstNotNull;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.format;
@@ -132,6 +133,13 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     @Nullable
     private PLVECChatOverLengthMessageLayout chatOverLengthMessageLayout;
     //点赞区域
+    private boolean isChatEnabled;
+    private boolean isQuizEnabled;
+    private boolean isLikesEnabled;
+    private boolean chatPagesInitialized;
+    private boolean displayedChat;
+    private boolean displayedQuiz;
+
     private PLVECLikeIconView likeBt;
     private TextView likeCountTv;
     //更多
@@ -220,7 +228,6 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             onViewActionListener.onViewCreated();
         }
         calculateLiveVideoViewRect();
-        startLikeAnimationTask(5000);
 
         //订阅是否打开积分打赏
         observeRewardData();
@@ -228,6 +235,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     @Override
     public void onDestroyView() {
+        isLikesEnabled = false;
+        chatPagesInitialized = false;
+        handler.removeCallbacks(likeAnimationTask);
         if (liveCountDownLayout != null) {
             liveCountDownLayout.setOnLiveStateChangedListener(null);
             liveCountDownLayout.destroy();
@@ -317,7 +327,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public void onPageSelected(int position) {
-                isSelectedQuizStatus = position == 1;
+                isSelectedQuizStatus = isQuizEnabled && (!isChatEnabled || position == 1);
                 sendMsgTv.setSelected(isSelectedQuizStatus);
                 updateViewByRoomStatusChanged(false);
                 quizNewMsgTipsTv.setVisibility(View.GONE);
@@ -339,9 +349,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         sendMsgTv.setDrawableRightListener(new PLVDrawableListenerTextView.DrawableRightListener() {
             @Override
             public void onDrawableRightClick(View view) {
+                if (!isChatEnabled || !isQuizEnabled) {
+                    return;
+                }
                 isSelectedQuizStatus = !sendMsgTv.isSelected();
                 sendMsgTv.setSelected(isSelectedQuizStatus);
-                chatViewPager.setCurrentItem(isSelectedQuizStatus ? 1 : 0);
+                chatViewPager.setCurrentItem(isSelectedQuizStatus && isChatEnabled ? 1 : 0);
             }
         });
         quizNewMsgTipsTv = findViewById(R.id.quiz_new_msg_tips_tv);
@@ -350,7 +363,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             public void onClick(View v) {
                 isSelectedQuizStatus = true;
                 sendMsgTv.setSelected(true);
-                chatViewPager.setCurrentItem(1);
+                if (isQuizEnabled) {
+                    chatViewPager.setCurrentItem(isChatEnabled ? 1 : 0);
+                }
             }
         });
         blackTabLayout = findViewById(R.id.black_tab_ly);
@@ -358,6 +373,8 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         likeBt = findViewById(R.id.like_bt);
         likeBt.setOnButtonClickListener(this);
         likeCountTv = findViewById(R.id.like_count_tv);
+        likeBt.setVisibility(View.INVISIBLE);
+        likeCountTv.setVisibility(View.INVISIBLE);
         moreIv = findViewById(R.id.more_iv);
         moreIv.setOnClickListener(this);
         commodityIv = findViewById(R.id.commodity_iv);
@@ -550,22 +567,74 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     @Override
-    protected void acceptOpenQuiz(@NonNull PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
-        chatViewPager.setNoOverScroll(true);
-        quizFragment.setTips(channelMenusBean.getContent());
-        Drawable rightDrawable = getContext() == null ? null : ContextCompat.getDrawable(getContext(), R.drawable.plvec_chatroom_quiz_sel);
-        if (rightDrawable != null) {
-            rightDrawable.setBounds(0, 0, rightDrawable.getIntrinsicWidth(), rightDrawable.getIntrinsicHeight());
-        }
-        sendMsgTv.setCompoundDrawables(sendMsgTv.getCompoundDrawables()[0], sendMsgTv.getCompoundDrawables()[1], rightDrawable, sendMsgTv.getCompoundDrawables()[3]);
-        blackTabLayout.setVisibility(View.VISIBLE);
-        PLVViewInitUtils.initViewPager(getChildFragmentManager(), chatViewPager, 0, chatFragment, quizFragment);
+    protected void acceptOpenQuiz(@NonNull PLVLiveClassDetailVO.DataBean.ChannelMenusBean menu) {
+        isQuizEnabled = true;
+        quizFragment.setTips(menu.getContent());
     }
 
     @Override
     protected void acceptCloseQuiz() {
-        chatViewPager.setNoOverScroll(false);
-        PLVViewInitUtils.initViewPager(getChildFragmentManager(), chatViewPager, 0, chatFragment);
+        isQuizEnabled = false;
+    }
+
+    @Override
+    protected void acceptChatMenuData(PLVLiveClassDetailVO.DataBean data) {
+        boolean wasChatEnabled = isChatEnabled;
+        isChatEnabled = false;
+        if (data.getChannelMenus() != null) {
+            for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean menu : data.getChannelMenus()) {
+                if (menu != null && PLVLiveClassDetailVO.MENUTYPE_CHAT.equals(menu.getMenuType())) {
+                    isChatEnabled = menu.isDisplayEnabled();
+                    break;
+                }
+            }
+        }
+        if (!isChatEnabled) {
+            chatQuoteVO = null;
+            if (wasChatEnabled && chatInputWindow != null) {
+                chatInputWindow.requestClose();
+            }
+        }
+        isSelectedQuizStatus = isQuizEnabled && (!isChatEnabled || isSelectedQuizStatus);
+        if (!chatPagesInitialized || displayedChat != isChatEnabled || displayedQuiz != isQuizEnabled) {
+            chatPagesInitialized = true;
+            displayedChat = isChatEnabled;
+            displayedQuiz = isQuizEnabled;
+            if (isChatEnabled && isQuizEnabled) {
+                PLVViewInitUtils.initViewPager(getChildFragmentManager(), chatViewPager, isSelectedQuizStatus ? 1 : 0, chatFragment, quizFragment);
+            } else if (isChatEnabled || isQuizEnabled) {
+                PLVViewInitUtils.initViewPager(getChildFragmentManager(), chatViewPager, 0, isChatEnabled ? chatFragment : quizFragment);
+            } else {
+                chatViewPager.setAdapter(null);
+            }
+        }
+        chatViewPager.setVisibility(isChatEnabled || isQuizEnabled ? View.VISIBLE : View.INVISIBLE);
+        chatViewPager.setNoOverScroll(isChatEnabled && isQuizEnabled);
+        blackTabLayout.setVisibility(isChatEnabled && isQuizEnabled ? View.VISIBLE : View.GONE);
+        quizNewMsgTipsTv.setVisibility(View.GONE);
+        Drawable toggle = isChatEnabled && isQuizEnabled && getContext() != null
+                ? ContextCompat.getDrawable(getContext(), R.drawable.plvec_chatroom_quiz_sel) : null;
+        if (toggle != null) {
+            toggle.setBounds(0, 0, toggle.getIntrinsicWidth(), toggle.getIntrinsicHeight());
+        }
+        Drawable left = isChatEnabled || isQuizEnabled ? ContextCompat.getDrawable(getContext(), R.drawable.plvec_chat_msg) : null;
+        if (left != null) {
+            left.setBounds(0, 0, left.getIntrinsicWidth(), left.getIntrinsicHeight());
+        }
+        sendMsgTv.setSelected(isSelectedQuizStatus);
+        sendMsgTv.setCompoundDrawables(left, null, toggle, null);
+        updateViewByRoomStatusChanged(!enabledToSendMsg());
+    }
+
+    @Override
+    protected void acceptLikesSwitch(boolean enabled) {
+        isLikesEnabled = enabled;
+        likeBt.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+        likeCountTv.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+        handler.removeCallbacks(likeAnimationTask);
+        if (enabled) {
+            handler.postDelayed(likeAnimationTask, 5000);
+        }
     }
 
     @Override
@@ -804,10 +873,11 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
                         chatInputWindow.requestClose();
                     }
                 }
-                sendMsgTv.setText(isSelectedQuizStatus ? R.string.plv_chat_input_tips_quiz
-                        : (isCloseRoomStatus ? R.string.plv_chat_input_tips_chatroom_close_2
-                        : (isFocusModeStatus ? R.string.plv_chat_input_tips_focus_2
-                        : R.string.plv_chat_input_tips_chat_6)));
+                String hint = isSelectedQuizStatus ? getString(R.string.plv_chat_input_tips_quiz)
+                        : (!isChatEnabled || isCloseRoomStatus ? getString(R.string.plv_chat_input_tips_chatroom_close_2)
+                        : (isFocusModeStatus ? getString(R.string.plv_chat_input_tips_focus_2)
+                        : PLVChatInputUtils.getHint(liveRoomDataManager, getString(R.string.plv_chat_input_tips_chat_6))));
+                sendMsgTv.setText(hint);
                 sendMsgTv.setOnClickListener(isEnabled ? PLVECLiveHomeFragment.this : null);
                 if (chatInputWindow != null) {
                     chatInputWindow.updateHintPair(sendMsgTv.getText().toString(), isEnabled);
@@ -817,7 +887,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
     }
 
     private boolean enabledToSendMsg() {
-        return (!isCloseRoomStatus && !isFocusModeStatus) || isSelectedQuizStatus;
+        return isSelectedQuizStatus ? isQuizEnabled : (isChatEnabled && !isCloseRoomStatus && !isFocusModeStatus);
     }
     // </editor-fold>
 
@@ -941,7 +1011,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
             postToMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (chatViewPager != null && chatViewPager.getChildCount() > 1 && chatViewPager.getCurrentItem() == 0) {
+                    if (isChatEnabled && isQuizEnabled && !isSelectedQuizStatus) {
                         if (quizNewMsgTipsTv != null) {
                             quizNewMsgTipsTv.setVisibility(View.VISIBLE);
                         }
@@ -961,6 +1031,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
         @Override
         public void callOnReplyMessage(PLVChatQuoteVO chatQuoteVO) {
+            if (!isChatEnabled) {
+                return;
+            }
             PLVECLiveHomeFragment.this.chatQuoteVO = chatQuoteVO;
             showInputWindow();
         }
@@ -990,6 +1063,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 输入窗口显示，信息发送">
     private void showInputWindow() {
+        if (!enabledToSendMsg()) {
+            return;
+        }
         PLVECChatInputWindow.show(getActivity(), PLVECChatInputWindow.class, new PLVECChatInputWindow.MessageSendListener() {
             private void setViewBottomParam(View view, int bottom) {
                 ViewGroup.MarginLayoutParams viewVp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
@@ -1020,7 +1096,7 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public boolean hasQuiz() {
-                return chatViewPager != null && chatViewPager.getChildCount() > 1;
+                return isChatEnabled && isQuizEnabled;
             }
 
             @Override
@@ -1030,9 +1106,12 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public void onQuizToggle(boolean isSelectedQuiz) {
+                if (!isChatEnabled || !isQuizEnabled) {
+                    return;
+                }
                 isSelectedQuizStatus = isSelectedQuiz;
                 sendMsgTv.setSelected(isSelectedQuizStatus);
-                chatViewPager.setCurrentItem(isSelectedQuizStatus ? 1 : 0);
+                chatViewPager.setCurrentItem(isSelectedQuizStatus && isChatEnabled ? 1 : 0);
             }
 
             @Override
@@ -1052,6 +1131,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
             @Override
             public boolean onSendMsg(String message) {
+                if (!enabledToSendMsg()) {
+                    return false;
+                }
                 PolyvLocalMessage localMessage = new PolyvLocalMessage(message);
                 Pair<Boolean, Integer> sendResult;
                 if (isSelectedQuizStatus) {
@@ -1080,6 +1162,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
 
     // <editor-fold defaultstate="collapsed" desc="聊天室 - 点赞数据处理，定时显示飘心任务">
     private void acceptLikesMessage(final int likesCount) {
+        if (!isLikesEnabled) {
+            return;
+        }
         handler.post(new Runnable() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -1089,22 +1174,25 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         });
     }
 
-    private void startLikeAnimationTask(long ts) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int randomLikeCount = new Random().nextInt(5) + 1;
-                startAddLoveIconTask(200, randomLikeCount);
-                startLikeAnimationTask((new Random().nextInt(6) + 5) * 1000L);
+    private final Runnable likeAnimationTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!isLikesEnabled) {
+                return;
             }
-        }, ts);
-    }
+            startAddLoveIconTask(200, new Random().nextInt(5) + 1);
+            handler.postDelayed(this, (new Random().nextInt(6) + 5) * 1000L);
+        }
+    };
 
     private void startAddLoveIconTask(final long ts, final int count) {
-        if (count >= 1) {
+        if (isLikesEnabled && count >= 1) {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if (!isLikesEnabled) {
+                        return;
+                    }
                     likeBt.addLoveIcon(1);
                     startAddLoveIconTask(ts, count - 1);
                 }
@@ -1275,6 +1363,9 @@ public class PLVECLiveHomeFragment extends PLVECCommonHomeFragment implements Vi
         } else if (id == R.id.more_iv) {
             showMorePopupWindow(v);
         } else if (id == R.id.like_bt) {
+            if (!isLikesEnabled) {
+                return;
+            }
             chatroomPresenter.sendLikeMessage();
             acceptLikesMessage(1);
         } else if (id == R.id.commodity_iv) {

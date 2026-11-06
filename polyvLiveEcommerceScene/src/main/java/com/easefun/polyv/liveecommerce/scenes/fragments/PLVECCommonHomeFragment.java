@@ -1,5 +1,6 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import com.easefun.polyv.livescenes.model.PolyvChatFunctionSwitchVO;
 import static net.polyv.android.common.libs.lang.concurrent.ThreadsKt.postToMainThread;
 
 import android.annotation.SuppressLint;
@@ -97,6 +98,7 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
         initSocketLoginManager();
 
         observeChatroomData();
+        observeFunctionSwitch();
         observeClassDetailVO();
         observeInteractEntranceData();
         observeInteractStatusData();
@@ -166,6 +168,13 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
 
     //处理咨询提问菜单打开
     protected void acceptOpenQuiz(@NonNull PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean) {
+    }
+
+    // 处理聊天菜单显示及自定义输入提示，独立于聊天室关闭/专注模式。
+    protected void acceptChatMenuData(PLVLiveClassDetailVO.DataBean data) {
+    }
+
+    protected void acceptLikesSwitch(boolean enabled) {
     }
 
     //处理咨询提问菜单关闭
@@ -427,24 +436,48 @@ public class PLVECCommonHomeFragment extends PLVBaseFragment {
                         //频道菜单
                         List<PLVLiveClassDetailVO.DataBean.ChannelMenusBean> channelMenusBeans = dataBean.getChannelMenus();
                         boolean isOpenQuiz = false;
-                        for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
-                            if (channelMenusBean == null) {
-                                continue;
-                            }
-                            //咨询提问菜单
-                            if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
-                                isOpenQuiz = true;
-                                acceptOpenQuiz(channelMenusBean);
-                                break;
+                        if (channelMenusBeans != null) {
+                            for (PLVLiveClassDetailVO.DataBean.ChannelMenusBean channelMenusBean : channelMenusBeans) {
+                                if (channelMenusBean == null) {
+                                    continue;
+                                }
+                                //咨询提问菜单
+                                if (PLVLiveClassDetailVO.MENUTYPE_QUIZ.equals(channelMenusBean.getMenuType())) {
+                                    isOpenQuiz = true;
+                                    acceptOpenQuiz(channelMenusBean);
+                                    break;
+                                }
                             }
                         }
                         if (!isOpenQuiz) {
                             acceptCloseQuiz();
                         }
+                        acceptChatMenuData(dataBean);
                         acceptMyRewardFunctionShow(classDetailVO.getData().isMyRewardsEnabled());
                         acceptProductEffectEnable(classDetailVO.getData().productEffectEnabled(), classDetailVO);
                         acceptInteractEffectEnable(classDetailVO.getData().interactionEffectEnabled(), classDetailVO);
                         acceptVisitEffectEnabled(classDetailVO.getData().visitEffectEnabled(), classDetailVO);
+                    }
+                }
+            }
+        });
+    }
+
+    private void observeFunctionSwitch() {
+        if (isPlaybackFragment()) {
+            return;
+        }
+        liveRoomDataManager.getFunctionSwitchVO().observe(this, new Observer<PLVStatefulData<PolyvChatFunctionSwitchVO>>() {
+            @Override
+            public void onChanged(@Nullable PLVStatefulData<PolyvChatFunctionSwitchVO> state) {
+                liveRoomDataManager.getFunctionSwitchVO().removeObserver(this);
+                if (state == null || !state.isSuccess() || state.getData() == null || state.getData().getData() == null) {
+                    return;
+                }
+                for (PolyvChatFunctionSwitchVO.DataBean item : state.getData().getData()) {
+                    if (item != null && PolyvChatFunctionSwitchVO.TYPE_SEND_FLOWERS_ENABLED.equals(item.getType())) {
+                        acceptLikesSwitch(item.isEnabled());
+                        break;
                     }
                 }
             }

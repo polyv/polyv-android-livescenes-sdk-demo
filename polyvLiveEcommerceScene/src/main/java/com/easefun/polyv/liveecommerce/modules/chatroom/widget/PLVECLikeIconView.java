@@ -211,7 +211,7 @@ public class PLVECLikeIconView extends RelativeLayout {
     }
 
     private void startAnimator(ImageView view) {
-        if (height <= 0 || width <= 0)
+        if (getVisibility() != View.VISIBLE || height <= 0 || width <= 0)
             return;
         PointF pointF1, pointF2, pointStart, pointEnd;
         if (avoidTopView) {
@@ -253,11 +253,14 @@ public class PLVECLikeIconView extends RelativeLayout {
     private Random randomColor = new Random();
 
     public void addLoveIcon(final int count) {
-        if (height <= 0 || width <= 0)
+        if (getVisibility() != View.VISIBLE || height <= 0 || width <= 0)
             return;
         post(new Runnable() {
             @Override
             public void run() {
+                if (getVisibility() != View.VISIBLE) {
+                    return;
+                }
                 ImageView view = new ImageView(getContext());
                 view.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 view.setImageResource(imageId[random.nextInt(imageId.length)]);

@@ -1,5 +1,6 @@
 package com.easefun.polyv.livecloudclass.modules.media.danmu;
 
+import com.easefun.polyv.livecommon.module.utils.PLVChatInputUtils;
 import android.graphics.Rect;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -185,6 +186,11 @@ public class PLVLCLandscapeMessageSendPanel implements IPLVLCLandscapeMessageSen
                 PLVLCLandscapeMessageSendPanel.this.hide();
             }
         });
+    }
+
+    @Override
+    public void setInputHint(String hint) {
+        PLVChatInputUtils.setHint(etSendMessage, hint);
     }
 
     private void updateChatQuote() {
