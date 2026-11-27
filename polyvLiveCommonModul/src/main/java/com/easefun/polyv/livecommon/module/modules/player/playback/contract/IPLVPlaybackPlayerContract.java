@@ -322,6 +322,14 @@ public interface IPLVPlaybackPlayerContract {
          */
         void seekTo(int duration);
 
+        /** 根据后台开关、SDK 覆盖和进度条策略判断是否显示快进快退按钮。 */
+        boolean isPlaybackSeekButtonsEnabled();
+
+        int getPlaybackSeekStepSeconds();
+
+        /** 快进/快退，连续点击累加；暂停时预览目标，恢复播放时提交跳转。 */
+        void stepPlayback(boolean forward);
+
         /**
          * 根据progress占max的百分比，跳转到视频总时间的该百分比进度。并且如果视频是播放完成状态，则会开始播放。
          *

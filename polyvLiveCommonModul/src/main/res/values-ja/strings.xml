@@ -780,4 +780,8 @@
     <string name="plv_streamer_compliance_back">戻る</string>
     <string name="plv_chat_system_message">システムメッセージ</string>
     <string name="plv_chat_message_not_sent">メッセージを送信できませんでした。修正して再試行してください。</string>
+    <string name="plv_playback_seek_backward_seconds">%1$d秒戻る</string>
+    <string name="plv_playback_seek_forward_seconds">%1$d秒進む</string>
+    <string name="plv_playback_seek_play">再生</string>
+    <string name="plv_playback_seek_pause">一時停止</string>
 </resources>

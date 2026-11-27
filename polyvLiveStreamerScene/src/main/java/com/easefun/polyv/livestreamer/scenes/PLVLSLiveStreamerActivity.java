@@ -582,6 +582,11 @@ public class PLVLSLiveStreamerActivity extends PLVBaseActivity {
             }
 
             @Override
+            public void onGrantPaintPermission(int position, String userId, boolean isGrant) {
+                plvlsStreamerLy.getStreamerPresenter().setUserPermissionPaint(userId, isGrant, null);
+            }
+
+            @Override
             public int getPosition(PLVMemberItemDataBean memberItemDataBean) {
                 return plvlsStreamerLy.getPositionByMemberItem(memberItemDataBean);
             }

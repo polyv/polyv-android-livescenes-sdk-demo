@@ -163,6 +163,16 @@
                     android:visibility="gone" />
 
                 <ImageView
+                    android:id="@+id/plvls_member_more_iv"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/plvls_member_iv_bg_shape"
+                    android:contentDescription="@string/plv_live_more"
+                    android:src="@drawable/plvls_member_more_icon"
+                    android:visibility="gone" />
+
+                <ImageView
                     android:id="@+id/plvls_member_linkmic_connecting_iv"
                     android:layout_width="28dp"
                     android:layout_height="28dp"

@@ -79,6 +79,28 @@ public class PLVLiveChannelConfig {
      */
     private boolean isLiveStreamingWhenLogin = false;
     private boolean isMaterialLibraryEnabled = false;
+    // null 跟随频道后台；true/false 显式覆盖频道开关。
+    private Boolean playbackSeekButtonsEnabled;
+    private int playbackSeekStepSeconds = 15;
+
+    /** 进入观看页前设置；null 恢复跟随后台频道开关。 */
+    public void setPlaybackSeekButtonsEnabled(Boolean enabled) {
+        playbackSeekButtonsEnabled = enabled;
+    }
+
+    public Boolean getPlaybackSeekButtonsEnabled() {
+        return playbackSeekButtonsEnabled;
+    }
+
+    /** 步长只接受 5–60 的整数秒，非法值回落 15 秒。 */
+    public void setPlaybackSeekStepSeconds(double seconds) {
+        playbackSeekStepSeconds = seconds >= 5 && seconds <= 60 && seconds == Math.floor(seconds)
+                ? (int) seconds : 15;
+    }
+
+    public int getPlaybackSeekStepSeconds() {
+        return playbackSeekStepSeconds;
+    }
 
     public static void setParam4(String param4) {
         PLVLiveChannelConfig.param4 = param4;
@@ -116,6 +138,8 @@ public class PLVLiveChannelConfig {
         hiClassConfig = new HiClassConfig(old.hiClassConfig);
         isLiveStreamingWhenLogin = old.isLiveStreamingWhenLogin;
         isMaterialLibraryEnabled = old.isMaterialLibraryEnabled;
+        playbackSeekButtonsEnabled = old.playbackSeekButtonsEnabled;
+        playbackSeekStepSeconds = old.playbackSeekStepSeconds;
     }
 
     // <editor-fold defaultstate="collapsed" desc="set">

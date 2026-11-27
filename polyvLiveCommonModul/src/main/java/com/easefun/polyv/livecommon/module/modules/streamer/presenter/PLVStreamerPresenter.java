@@ -1230,6 +1230,25 @@ public class PLVStreamerPresenter implements IPLVStreamerContract.IStreamerPrese
     }
 
     @Override
+    public void setUserPermissionPaint(String userId, boolean isSetPermission, Ack ack) {
+        if (!PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)) {
+            return;
+        }
+        Pair<Integer, PLVMemberItemDataBean> memberItem = getMemberItemWithUserId(userId);
+        if (memberItem == null || memberItem.second.getSocketUserBean() == null) {
+            return;
+        }
+        PLVMemberItemDataBean member = memberItem.second;
+        if (member.getLinkMicItemDataBean() == null
+                || member.getLinkMicStatus() != PLVLinkMicItemDataBean.LinkMicStatus.RTC_JOIN
+                || PLVEventHelper.isSpecialType(member.getSocketUserBean().getUserType())) {
+            return;
+        }
+        PLVLinkMicEventSender.getInstance().setPaintPermission(
+                member.getSocketUserBean(), liveRoomDataManager.getSessionId(), isSetPermission, ack);
+    }
+
+    @Override
     public void setUserPermissionSpeaker(final String userId, final boolean isSetPermission, final Ack ack) {
         if (!PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER) &&
                 !PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_GRANTED_SPEAKER_USER)) {

@@ -7,6 +7,7 @@ import android.arch.lifecycle.Observer;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.easefun.polyv.livecommon.module.data.IPLVLiveRoomDataManager;
@@ -44,6 +46,7 @@ import com.plv.livescenes.socket.PLVSocketWrapper;
 import com.plv.socket.event.PLVEventHelper;
 import com.plv.socket.user.PLVSocketUserBean;
 import com.plv.socket.user.PLVSocketUserConstant;
+import com.plv.thirdpart.blankj.utilcode.util.ConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +90,9 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     private boolean isOnlyShowAudioUI = false;
     // 是否允许嘉宾相互移交主讲权限
     private boolean allowGuestTransferSpeaker;
+
+    private PopupWindow memberMorePopup;
+    private View memberMoreAnchor;
 
     //listener
     private OnViewActionListener onViewActionListener;
@@ -180,6 +186,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         updatePermissionStatus(holder, linkMicItemDataBean);
         // 第一画面
         updateFirstViewStatus(holder, linkMicItemDataBean);
+        updateMoreStatus(holder, memberItemDataBean);
         //滑动view的设置
         if (isMe || isSpecialType || isGuest) {
             holder.plvlsMemberSwipeMenu.enabledSwipe(false);
@@ -381,6 +388,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     break;
                 case PAYLOAD_UPDATE_LINK_MIC_CONTROL:
                     updateMicControlStatus(holder, position);
+                    updateMoreStatus(holder, memberItemDataBean);
                     break;
                 case PAYLOAD_UPDATE_SCREEN_SHARED:
                     if (isMe) {
@@ -399,6 +407,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
                     break;
                 case PAYLOAD_UPDATE_PERMISSION_CHANGE:
                     updatePermissionStatus(holder, linkMicItemDataBean);
+                    updateMoreStatus(holder, memberItemDataBean);
                     break;
                 case PAYLOAD_UPDATE_FIRST_VIEW:
                     updateFirstViewStatus(holder, linkMicItemDataBean);
@@ -413,11 +422,20 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     public int getItemCount() {
         return dataList == null ? 0 : dataList.size();
     }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull MemberViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        if (memberMoreAnchor == holder.memberMoreIv) {
+            dismissMoreMenu();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="对外API">
     //更新所有数据
     public void update(List<PLVMemberItemDataBean> dataList) {
+        dismissMoreMenu();
         this.srcDataList = dataList;
         this.dataList = new ArrayList<>(dataList);
         notifyDataSetChanged();
@@ -500,7 +518,16 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
     }
 
     public void updatePermissionChange(){
+        dismissMoreMenu();
         notifyItemRangeChanged(0, getItemCount(), PAYLOAD_UPDATE_PERMISSION_CHANGE);
+    }
+
+    public void dismissMoreMenu() {
+        if (memberMorePopup != null) {
+            memberMorePopup.dismiss();
+            memberMorePopup = null;
+        }
+        memberMoreAnchor = null;
     }
 
     public void onFirstViewUpdated() {
@@ -514,11 +541,13 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
 
     //移除用户数据
     public void removeUserData(int pos) {
+        dismissMoreMenu();
         notifyItemRemoved(pos);
     }
 
     //设置推流状态
     public void setStreamerStatus(boolean isStartedStatus) {
+        dismissMoreMenu();
         this.isStartedStatus = isStartedStatus;
         notifyDataSetChanged();
     }
@@ -679,6 +708,63 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             holder.memberSetFirstViewIv.setSelected(false);
         }
     }
+
+    private boolean canControlPaint(@Nullable PLVMemberItemDataBean member) {
+        return isStartedStatus
+                && PLVUserAbilityManager.myAbility().hasRole(PLVUserRole.STREAMER_TEACHER)
+                && member != null
+                && member.getSocketUserBean() != null
+                && !PLVEventHelper.isSpecialType(member.getSocketUserBean().getUserType())
+                && member.getLinkMicItemDataBean() != null
+                && member.getLinkMicStatus() == PLVLinkMicItemDataBean.LinkMicStatus.RTC_JOIN;
+    }
+
+    private void updateMoreStatus(MemberViewHolder holder, PLVMemberItemDataBean member) {
+        boolean canControl = canControlPaint(member);
+        holder.memberMoreIv.setVisibility(canControl ? View.VISIBLE : View.GONE);
+        if (!canControl && memberMoreAnchor == holder.memberMoreIv) {
+            dismissMoreMenu();
+        }
+    }
+
+    private void showMoreMenu(final MemberViewHolder holder) {
+        final PLVMemberItemDataBean member = holder.currentMemberItemDataBean;
+        if (!canControlPaint(member)) {
+            return;
+        }
+        dismissMoreMenu();
+        final boolean grantPaint = !member.getLinkMicItemDataBean().isHasPaint();
+        TextView paintAction = (TextView) LayoutInflater.from(holder.itemView.getContext())
+                .inflate(R.layout.plvls_member_more_menu, null);
+        paintAction.setText(grantPaint ? R.string.plvls_member_grant_paint : R.string.plvls_member_revoke_paint);
+        final PopupWindow popup = new PopupWindow(paintAction,
+                ViewGroup.LayoutParams.WRAP_CONTENT, ConvertUtils.dp2px(44), true);
+        popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popup.setOutsideTouchable(true);
+        paintAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = holder.getAdapterPosition();
+                if (pos < 0 || pos >= getItemCount() || dataList.get(pos) != member || !canControlPaint(member)) {
+                    dismissMoreMenu();
+                    return;
+                }
+                int memberListPos = getPositionFromMemberList(pos);
+                if (memberListPos >= 0 && onViewActionListener != null
+                        && grantPaint != member.getLinkMicItemDataBean().isHasPaint()
+                        && PLVDebounceClicker.tryClick(this, 1000)) {
+                    onViewActionListener.onGrantPaintPermission(memberListPos,
+                            member.getSocketUserBean().getUserId(), grantPaint);
+                }
+                dismissMoreMenu();
+            }
+        });
+        paintAction.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        memberMorePopup = popup;
+        memberMoreAnchor = holder.memberMoreIv;
+        popup.showAsDropDown(holder.memberMoreIv,
+                holder.memberMoreIv.getWidth() - paintAction.getMeasuredWidth(), ConvertUtils.dp2px(6));
+    }
     // </editor-fold >
 
     // <editor-fold defaultstate="collapsed" desc="工具方法">
@@ -745,6 +831,7 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
         private ImageView plvlsMemberLinkmicConnectingIv;
         private ImageView plvlsMemberGrantSpeakerIv;
         private ImageView memberSetFirstViewIv;
+        private ImageView memberMoreIv;
         private TextView plvlsMemberDoBanTv;
         private TextView plvlsMemberKickTv;
         private TextView plvlsMemberBanConfirmTv;
@@ -774,6 +861,13 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
             plvlsMemberKickConfirmTv = findViewById(R.id.plvls_member_kick_confirm_tv);
             plvlsMemberGrantSpeakerIv = findViewById(R.id.plvls_member_grant_speaker_iv);
             memberSetFirstViewIv = findViewById(R.id.plvls_member_set_first_view_iv);
+            memberMoreIv = findViewById(R.id.plvls_member_more_iv);
+            memberMoreIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showMoreMenu(MemberViewHolder.this);
+                }
+            });
 
             AnimationDrawable animationDrawable = (AnimationDrawable) plvlsMemberLinkmicConnectingIv.getDrawable();
             animationDrawable.start();
@@ -984,6 +1078,11 @@ public class PLVLSMemberAdapter extends RecyclerView.Adapter<PLVLSMemberAdapter.
          * 赋予主讲权限
          */
         void onGrantSpeakerPermission(int position, String userId, boolean isGrant);
+
+        /**
+         * 授予或收回连麦学员画笔权限
+         */
+        void onGrantPaintPermission(int position, String userId, boolean isGrant);
 
         /**
          * 设置第一画面

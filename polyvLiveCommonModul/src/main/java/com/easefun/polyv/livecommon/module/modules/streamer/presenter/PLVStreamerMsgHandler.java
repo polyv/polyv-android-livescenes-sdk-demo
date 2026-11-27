@@ -538,6 +538,24 @@ public class PLVStreamerMsgHandler {
                 streamerItem.second.setHasSpeaker(!authentic.hasNoAthuentic());
             }
             streamerPresenter.onCurrentSpeakerChanged(authentic.getType(), !authentic.hasNoAthuentic(), isCurrentUser, bean);
+        } else if (PLVPPTAuthentic.TYPE_PAINT.equals(authentic.getType())) {
+            if (!PLVPPTAuthentic.PermissionStatus.OK.equals(authentic.getStatus())
+                    && !PLVPPTAuthentic.PermissionStatus.NO.equals(authentic.getStatus())) {
+                return;
+            }
+            final boolean hasPaint = PLVPPTAuthentic.PermissionStatus.OK.equals(authentic.getStatus());
+            if (memberItem != null) {
+                memberItem.second.setHasPaint(hasPaint);
+            }
+            if (streamerItem != null) {
+                streamerItem.second.setHasPaint(hasPaint);
+            }
+            streamerPresenter.callbackToView(new PLVStreamerPresenter.ViewRunnable() {
+                @Override
+                public void run(@NonNull IPLVStreamerContract.IStreamerView view) {
+                    view.onSetPermissionChange(PLVPPTAuthentic.TYPE_PAINT, hasPaint, isCurrentUser, bean);
+                }
+            });
         } else if (PLVPPTAuthentic.PermissionType.SCREEN_SHARE.equals(authentic.getType())) {
             final boolean isScreenShare = !authentic.hasNoAthuentic();
             if (memberItem != null && memberItem.second != null && memberItem.second.getLinkMicItemDataBean() != null) {

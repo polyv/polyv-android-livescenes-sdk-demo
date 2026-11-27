@@ -781,4 +781,8 @@
     <string name="plv_streamer_compliance_back">Back</string>
     <string name="plv_chat_system_message">System message</string>
     <string name="plv_chat_message_not_sent">Message not sent. Please edit and try again.</string>
+    <string name="plv_playback_seek_backward_seconds">Rewind %1$d seconds</string>
+    <string name="plv_playback_seek_forward_seconds">Forward %1$d seconds</string>
+    <string name="plv_playback_seek_play">Play</string>
+    <string name="plv_playback_seek_pause">Pause</string>
 </resources>

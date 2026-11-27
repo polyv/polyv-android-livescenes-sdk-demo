@@ -781,4 +781,8 @@
     <string name="plv_streamer_compliance_back">返回</string>
     <string name="plv_chat_system_message">系統訊息</string>
     <string name="plv_chat_message_not_sent">訊息未傳送，請修改後重試</string>
+    <string name="plv_playback_seek_backward_seconds">後退%1$d秒</string>
+    <string name="plv_playback_seek_forward_seconds">快進%1$d秒</string>
+    <string name="plv_playback_seek_play">播放</string>
+    <string name="plv_playback_seek_pause">暫停</string>
 </resources>

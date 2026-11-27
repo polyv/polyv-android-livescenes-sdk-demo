@@ -29,6 +29,8 @@ import com.easefun.polyv.livecommon.module.modules.marquee.PLVMarqueeCommonContr
 import com.easefun.polyv.livecommon.module.modules.marquee.model.PLVMarqueeModel;
 import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.PLVPlaybackPlayerRepo;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.PLVPlaybackStepSeekState;
+import com.easefun.polyv.livecommon.module.modules.player.playback.model.PLVPlaybackSeekPolicy;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.datasource.database.entity.PLVPlaybackCacheVideoVO;
 import com.easefun.polyv.livecommon.module.modules.player.playback.model.enums.PLVPlaybackCacheDownloadStatusEnum;
 import com.easefun.polyv.livecommon.module.modules.player.playback.prsenter.data.PLVPlayInfoVO;
@@ -105,6 +107,34 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     private boolean isAllowWatermarkShow = true;
     //手势滑动进度
     private int fastForwardPos;
+    private final PLVPlaybackStepSeekState stepSeekState = new PLVPlaybackStepSeekState();
+    private final Handler stepSeekHandler = new Handler(Looper.getMainLooper());
+    private boolean stepSeekDeferred;
+    private final Runnable clearStepSeekPreview = new Runnable() {
+        @Override
+        public void run() {
+            stepSeekState.reset();
+            stepSeekDeferred = false;
+            if (videoView != null) {
+                updatePlayInfo();
+            }
+        }
+    };
+    private final Runnable submitStepSeek = new Runnable() {
+        @Override
+        public void run() {
+            if (videoView == null || !stepSeekState.isPending() || stepSeekDeferred) {
+                return;
+            }
+            int target = stepSeekState.takeTargetForSeek();
+            if (target < 0) {
+                return;
+            }
+            stepSeekHandler.removeCallbacks(clearStepSeekPreview);
+            stepSeekHandler.postDelayed(clearStepSeekPreview, 30000);
+            videoView.seekPlaybackByStep(target);
+        }
+    };
 
     @Nullable
     private PLVPlaybackDataVO playbackDataVO;
@@ -155,6 +185,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void startPlay() {
+        resetStepSeek();
         resetErrorViewStatus();
         PLVPlaybackVideoParams playbackVideoParams = new PLVPlaybackVideoParams(
                 getConfig().getVid(),
@@ -181,6 +212,11 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     @Override
     public void pause() {
         if (videoView != null) {
+            if (stepSeekState.isPending()) {
+                stepSeekHandler.removeCallbacks(submitStepSeek);
+                stepSeekHandler.removeCallbacks(clearStepSeekPreview);
+                stepSeekDeferred = true;
+            }
             videoView.pause();
             updatePlayInfo();
         }
@@ -189,6 +225,11 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     @Override
     public void resume() {
         if (videoView != null) {
+            if (stepSeekDeferred && stepSeekState.isPending()) {
+                stepSeekDeferred = false;
+                stepSeekHandler.removeCallbacks(submitStepSeek);
+                submitStepSeek.run();
+            }
             videoView.start();
             updatePlayInfo();
         }
@@ -198,6 +239,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void stop() {
+        resetStepSeek();
         if (videoView != null) {
             videoView.stopPlay();
         }
@@ -262,8 +304,55 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
     @Override
     public void seekTo(int duration) {
         if (videoView != null && checkCanSeekTo(duration)) {
+            resetStepSeek();
             videoView.seekTo(duration);
         }
+    }
+
+    @Override
+    public boolean isPlaybackSeekButtonsEnabled() {
+        return PLVPlaybackSeekPolicy.isEnabled(getConfig().isLive(), getConfig().getPlaybackSeekButtonsEnabled(),
+                PLVChannelFeatureManager.onChannel(getConfig().getChannelId())
+                        .isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_FAST_FORWARD_BACKWARD_ENABLED),
+                getSeekBarStrategy());
+    }
+
+    @Override
+    public int getPlaybackSeekStepSeconds() {
+        return getConfig().getPlaybackSeekStepSeconds();
+    }
+
+    @Override
+    public void stepPlayback(boolean forward) {
+        if (!isPlaybackSeekButtonsEnabled() || videoView == null || isSubVideoViewShow()
+                || !videoView.isInPlaybackStateEx() || getDuration() <= 0) {
+            return;
+        }
+        int maximumPosition = getDuration();
+        if (getSeekBarStrategy() == PLVLivePlaybackSeekBarStrategy.ALLOW_SEEK_PLAYED) {
+            int watched = Nullables.of(new PLVSugarUtil.Supplier<Integer>() {
+                @Override
+                public Integer get() {
+                    return playbackPlayerRepo.getPlaybackProgress(playbackDataVO).getPosition();
+                }
+            }).getOrDefault(0);
+            maximumPosition = Math.min(maximumPosition, Math.max(watched, getVideoCurrentPosition()));
+        }
+        stepSeekState.step(getVideoCurrentPosition(), getDuration(), maximumPosition,
+                (forward ? 1 : -1) * getPlaybackSeekStepSeconds() * 1000);
+        stepSeekHandler.removeCallbacks(submitStepSeek);
+        stepSeekHandler.removeCallbacks(clearStepSeekPreview);
+        stepSeekDeferred = !videoView.isPlaying();
+        if (!stepSeekDeferred) {
+            stepSeekHandler.postDelayed(submitStepSeek, 150);
+        }
+        updatePlayInfo();
+    }
+
+    private void resetStepSeek() {
+        stepSeekHandler.removeCallbacksAndMessages(null);
+        stepSeekState.reset();
+        stepSeekDeferred = false;
     }
 
     @Override
@@ -425,6 +514,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     @Override
     public void destroy() {
+        resetStepSeek();
         stopMarqueeView();
         removeWatermark();
         unregisterView();
@@ -604,6 +694,7 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnCompletionListener(new IPolyvVideoViewListenerEvent.OnCompletionListener() {
                 @Override
                 public void onCompletion() {
+                    resetStepSeek();
                     IPLVPlaybackPlayerContract.IPlaybackPlayerView view = getView();
                     if (view != null) {
                         view.onCompletion();
@@ -615,6 +706,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
             videoView.setOnSeekCompleteListener(new IPLVVideoViewListenerEvent.OnSeekCompleteListener() {
                 @Override
                 public void onSeekComplete() {
+                    stepSeekState.onSeekComplete();
+                    if (!stepSeekState.isPending()) {
+                        stepSeekHandler.removeCallbacks(clearStepSeekPreview);
+                    } else if (!stepSeekDeferred) {
+                        // 上一次完成后再提交连点累加的最新目标，旧回调不会清掉新目标。
+                        stepSeekHandler.removeCallbacks(submitStepSeek);
+                        stepSeekHandler.post(submitStepSeek);
+                    }
                     playbackPlayerData.postSeekComplete(videoView.getCurrentPosition());
                 }
             });
@@ -1060,6 +1159,14 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
     // <editor-fold defaultstate="collapsed" desc="播放器 - 获取播放信息">
     private PLVPlayInfoVO updatePlayInfo() {
+        // 内核恢复播放时结束暂停预览，避免已在播放却一直显示固定目标。
+        if (stepSeekDeferred && videoView.isPlaying()) {
+            stepSeekDeferred = false;
+            if (stepSeekState.isPending()) {
+                stepSeekHandler.removeCallbacks(submitStepSeek);
+                stepSeekHandler.post(submitStepSeek);
+            }
+        }
         // 单位：毫秒
         int position = videoView.getCurrentPosition();
         int totalTime = videoView.getDuration() / 1000 * 1000;
@@ -1071,6 +1178,8 @@ public class PLVPlaybackPlayerPresenter implements IPLVPlaybackPlayerContract.IP
 
         final PLVPlayInfoVO playInfoVO = new PLVPlayInfoVO.Builder()
                 .position(position)
+                // 播放中始终展示实际进度，目标预览仅用于暂停后尚未提交的跳转。
+                .displayPosition(stepSeekDeferred && stepSeekState.isPending() ? stepSeekState.getTarget() : position)
                 .totalTime(totalTime)
                 .bufPercent(bufPercent)
                 .isPlaying(videoView.isPlaying())

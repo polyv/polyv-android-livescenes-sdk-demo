@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class PLVPlayInfoVO {
     private int position;
+    private int displayPosition;
     private int totalTime;
     private transient int bufPercent;
     private transient boolean isPlaying;
@@ -19,6 +20,7 @@ public class PLVPlayInfoVO {
 
     private PLVPlayInfoVO(Builder builder) {
         position = builder.position;
+        displayPosition = builder.displayPosition < 0 ? position : builder.displayPosition;
         totalTime = builder.totalTime;
         bufPercent = builder.bufPercent;
         isPlaying = builder.isPlaying;
@@ -28,6 +30,11 @@ public class PLVPlayInfoVO {
 
     public int getPosition() {
         return position;
+    }
+
+    /** UI 预览进度；观看统计仍使用 getPosition()。 */
+    public int getDisplayPosition() {
+        return displayPosition;
     }
 
     public int getTotalTime() {
@@ -53,6 +60,7 @@ public class PLVPlayInfoVO {
 
     public static final class Builder {
         private int position;
+        private int displayPosition = -1;
         private int totalTime;
         private int bufPercent;
         private boolean isPlaying;
@@ -65,6 +73,11 @@ public class PLVPlayInfoVO {
 
         public Builder position(int val) {
             position = val;
+            return this;
+        }
+
+        public Builder displayPosition(int val) {
+            displayPosition = val;
             return this;
         }
 

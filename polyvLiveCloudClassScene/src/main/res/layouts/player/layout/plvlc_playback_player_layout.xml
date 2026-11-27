@@ -75,6 +75,17 @@
     <!-- 播放失败/加载缓慢的占位View -->
     <include layout="@layout/plvlc_live_player_error_layout" />
 
+    <!-- 在弹幕、评论、打赏等浮层下方，仅三个按钮占用触摸区域。 -->
+    <com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls
+        android:id="@+id/plvlc_playback_seek_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <!-- 横屏聊天区 -->
     <com.easefun.polyv.livecloudclass.modules.chatroom.chatlandscape.PLVLCChatLandscapeLayout
         android:id="@+id/plvlc_chat_landscape_ly"

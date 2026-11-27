@@ -1,5 +1,9 @@
 package com.easefun.polyv.liveecommerce.scenes.fragments;
 
+import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
+
+import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls;
+
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -102,6 +106,87 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     private PLVECBulletinView bulletinLy;
     //播放控制
     private ImageView playControlIv;
+    private PLVPlaybackSeekControls playbackSeekControls;
+    private View playbackControlBar;
+    private boolean playbackControlsVisible = true;
+    private boolean playbackSeekControlsBound;
+    private final Runnable hidePlaybackControls = new Runnable() {
+        @Override
+        public void run() {
+            playbackControlsVisible = false;
+            if (playbackSeekControls != null) {
+                playbackSeekControls.setControlsVisible(false);
+                playbackControlBar.setVisibility(View.INVISIBLE);
+            }
+        }
+    };
+
+    /** 保留功能关闭时原有单击行为；启用时单击唤出/收起回放控制栏。 */
+    public boolean togglePlaybackSeekControls() {
+        if (!isPlaybackSeekControlsEnabled()) {
+            return false;
+        }
+        if (playbackControlsVisible) {
+            playbackSeekControls.removeCallbacks(hidePlaybackControls);
+            hidePlaybackControls.run();
+        } else {
+            showPlaybackSeekControls();
+        }
+        return true;
+    }
+
+    private boolean isPlaybackSeekControlsEnabled() {
+        return onViewActionListener != null && onViewActionListener.getPlaybackPlayerPresenter() != null
+                && onViewActionListener.getPlaybackPlayerPresenter().isPlaybackSeekButtonsEnabled();
+    }
+
+    private void showPlaybackSeekControls() {
+        if (!isPlaybackSeekControlsEnabled() || playbackSeekControls == null) {
+            return;
+        }
+        playbackControlsVisible = true;
+        playbackControlBar.setVisibility(View.VISIBLE);
+        playbackSeekControls.setControlsVisible(true);
+        playbackSeekControls.removeCallbacks(hidePlaybackControls);
+        playbackSeekControls.postDelayed(hidePlaybackControls, 3000);
+    }
+
+    private void bindPlaybackSeekControls() {
+        if (!playbackSeekControlsBound && playbackSeekControls != null && onViewActionListener != null
+                && onViewActionListener.getPlaybackPlayerPresenter() != null && liveRoomDataManager != null) {
+            playbackSeekControls.bind(onViewActionListener.getPlaybackPlayerPresenter(), liveRoomDataManager.getConfig().getChannelId());
+            playbackSeekControls.setOnControlAction(new Runnable() {
+                @Override
+                public void run() {
+                    showPlaybackSeekControls();
+                }
+            });
+            playbackSeekControlsBound = true;
+            showPlaybackSeekControls();
+        }
+    }
+
+    private void layoutPlaybackSeekControls() {
+        if (playbackSeekControls == null || onViewActionListener == null) {
+            return;
+        }
+        Rect content = onViewActionListener.getPlaybackContentRect();
+        if (content == null || content.isEmpty()) {
+            return;
+        }
+        View parent = (View) playbackSeekControls.getParent();
+        int[] origin = new int[2];
+        parent.getLocationOnScreen(origin);
+        int height = playbackSeekControls.getHeight() > 0 ? playbackSeekControls.getHeight() : ConvertUtils.dp2px(48);
+        int top = Math.max(0, content.centerY() - origin[1] - height / 2);
+        android.widget.RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) playbackSeekControls.getLayoutParams();
+        if (params.topMargin != top || params.getRules()[android.widget.RelativeLayout.CENTER_IN_PARENT] != 0) {
+            params.addRule(android.widget.RelativeLayout.CENTER_IN_PARENT, 0);
+            params.addRule(android.widget.RelativeLayout.CENTER_HORIZONTAL);
+            params.topMargin = top;
+            playbackSeekControls.setLayoutParams(params);
+        }
+    }
     private TextView playTimeTv;
     private SeekBar playProgressSb;
     private TextView totalTimeTv;
@@ -189,6 +274,9 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (playbackSeekControls != null) {
+            playbackSeekControls.removeCallbacks(hidePlaybackControls);
+        }
         if (chatPlaybackManager != null) {
             chatPlaybackManager.destroy();
         }
@@ -239,6 +327,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         watchInfoLy = findViewById(R.id.watch_info_ly);
         bulletinLy = findViewById(R.id.bulletin_ly);
         playControlIv = findViewById(R.id.play_control_iv);
+        playbackControlBar = findViewById(R.id.play_control_ly);
+        playbackSeekControls = findViewById(R.id.plvec_playback_seek_controls);
         playControlIv.setOnClickListener(this);
         playTimeTv = findViewById(R.id.play_time_tv);
         playProgressSb = findViewById(R.id.play_progress_sb);
@@ -380,6 +470,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
             @Override
             public void run() {
                 updateControlVisibility();
+                bindPlaybackSeekControls();
                 commodityPopupLayout.init(liveRoomDataManager);
             }
         });
@@ -548,7 +639,12 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         if (playInfoVO == null) {
             return;
         }
-        int position = playInfoVO.getPosition();
+        bindPlaybackSeekControls();
+        if (playbackSeekControls != null) {
+            playbackSeekControls.refresh();
+            layoutPlaybackSeekControls();
+        }
+        int position = playInfoVO.getDisplayPosition();
         int totalTime = playInfoVO.getTotalTime();
         int bufPercent = playInfoVO.getBufPercent();
         boolean isPlaying = playInfoVO.isPlaying();
@@ -576,7 +672,7 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         }
 
         //判断是否播放完成，播放完成通知
-        if (position >= totalTime && totalTime > 0) {
+        if (playInfoVO.getPosition() >= totalTime && totalTime > 0) {
             if (previousPresenter != null) {
                 previousPresenter.onPlayComplete();
             }
@@ -939,11 +1035,15 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             seekBar.setSelected(true);
+            if (playbackSeekControls != null) {
+                playbackSeekControls.removeCallbacks(hidePlaybackControls);
+            }
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             seekBar.setSelected(false);
+            showPlaybackSeekControls();
             isPlaySbDragging = false;
             if (onViewActionListener != null) {
                 onViewActionListener.onSeekToAction(seekBar.getProgress(), seekBar.getMax());
@@ -1070,6 +1170,8 @@ public class PLVECPalybackHomeFragment extends PLVECCommonHomeFragment implement
 
     // <editor-fold defaultstate="collapsed" desc="内部类 - view交互事件监听器">
     public interface OnViewActionListener extends PLVECCommonHomeFragment.OnViewActionListener {
+        Rect getPlaybackContentRect();
+        IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter getPlaybackPlayerPresenter();
         //暂停/播放，true: doResume, false: doPause
         boolean onPauseOrResumeClick(View view);
 
