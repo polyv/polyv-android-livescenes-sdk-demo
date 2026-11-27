@@ -282,6 +282,22 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
         playbackSubtitleLayout.initData(playbackPlayerPresenter);
     }
 
+    public IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter getPlaybackPlayerPresenter() {
+        return playbackPlayerPresenter;
+    }
+
+    /** 主视频实际画面在屏幕中的区域，用于定位中央播放控制组。 */
+    public Rect getPlaybackContentRect() {
+        Rect rect = new Rect();
+        if (videoView.getIjkVideoView() != null && videoView.getIjkVideoView().getRenderView() != null) {
+            videoView.getIjkVideoView().getRenderView().getView().getGlobalVisibleRect(rect);
+        }
+        if (rect.isEmpty()) {
+            videoView.getGlobalVisibleRect(rect);
+        }
+        return rect;
+    }
+
     @Override
     public void startPlay() {
         playbackPlayerPresenter.startPlay();
@@ -733,6 +749,10 @@ public class PLVECPlaybackVideoLayout extends FrameLayout implements IPLVECVideo
 
     @Override
     public void updatePlayCenterView() {
+        if (playbackPlayerPresenter != null && playbackPlayerPresenter.isPlaybackSeekButtonsEnabled()) {
+            hidePlayCenterView();
+            return;
+        }
         if (playInfoVO != null && isInPlaybackState()
                 && !playInfoVO.isPlaying()) {
             showPlayCenterView();

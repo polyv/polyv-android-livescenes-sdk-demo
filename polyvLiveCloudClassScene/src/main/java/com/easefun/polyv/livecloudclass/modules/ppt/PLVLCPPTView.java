@@ -258,6 +258,10 @@ public class PLVLCPPTView extends FrameLayout implements IPLVPPTContract.IPLVPPT
             userType = "";
         }
         sendWebMessage(PLVLivePPTProcessor.AUTHORIZATION_PPT_PAINT, "{\"userType\":\"" + userType + "\"}");
+        // 进出画笔模式只切换编辑状态，避免撤销权限销毁 H5 绘制监听后无法再次进入。
+        // close 会锁定编辑，open 会解锁；空 userType 本身不会关闭画笔。
+        sendWebMessage(PLVLivePPTProcessor.PPT_PAINT_STATUS,
+                "{\"status\":\"" + (isInPaintMode ? "open" : "close") + "\"}");
     }
 
     @Override

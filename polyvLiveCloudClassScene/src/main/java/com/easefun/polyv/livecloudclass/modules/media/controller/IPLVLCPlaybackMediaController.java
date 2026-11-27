@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
+import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,6 +27,8 @@ public interface IPLVLCPlaybackMediaController extends IPolyvMediaController<Pol
      * @param playerPresenter 回放播放器presenter
      */
     void setPlaybackPlayerPresenter(IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter);
+
+    void setPlaybackSeekControls(PLVPlaybackSeekControls controls);
 
     /**
      * 初始化数据

@@ -412,6 +412,13 @@ public class PLVLSStatusBarLayout extends FrameLayout implements IPLVLSStatusBar
             }
 
             @Override
+            public void onGrantPaintPermission(int position, String userId, boolean isGrant) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onGrantPaintPermission(position, userId, isGrant);
+                }
+            }
+
+            @Override
             public void onSetFirstView(int position, String userId, boolean isSetFirstView) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onSetFirstView(position, userId, isSetFirstView);

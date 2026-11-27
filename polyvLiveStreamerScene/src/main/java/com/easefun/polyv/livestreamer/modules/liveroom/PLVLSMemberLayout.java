@@ -192,6 +192,13 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
             }
 
             @Override
+            public void onGrantPaintPermission(int position, String userId, boolean isGrant) {
+                if (onViewActionListener != null) {
+                    onViewActionListener.onGrantPaintPermission(position, userId, isGrant);
+                }
+            }
+
+            @Override
             public void onSetFirstView(int position, String userId, boolean isSetFirstView) {
                 if (onViewActionListener != null) {
                     onViewActionListener.onSetFirstView(position, userId, isSetFirstView);
@@ -409,6 +416,12 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
     }
 
     public void close() {
+        if (memberAdapter != null) {
+            memberAdapter.dismissMoreMenu();
+        }
+        if (memberSearchAdapter != null) {
+            memberSearchAdapter.dismissMoreMenu();
+        }
         if (menuDrawer != null) {
             menuDrawer.closeMenu();
         }
@@ -582,7 +595,8 @@ public class PLVLSMemberLayout extends FrameLayout implements View.OnClickListen
         @Override
         public void onSetPermissionChange(String type, boolean isGranted, boolean isCurrentUser, PLVSocketUserBean user) {
             super.onSetPermissionChange(type, isGranted, isCurrentUser, user);
-            if(type.equals(PLVPPTAuthentic.PermissionType.TEACHER)) {
+            if (PLVPPTAuthentic.PermissionType.TEACHER.equals(type)
+                    || PLVPPTAuthentic.PermissionType.PAINT.equals(type)) {
                 memberAdapter.updatePermissionChange();
                 memberSearchAdapter.updatePermissionChange();
             }

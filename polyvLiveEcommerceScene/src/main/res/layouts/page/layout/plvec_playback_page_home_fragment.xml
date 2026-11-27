@@ -7,6 +7,14 @@
     android:paddingBottom="8dp"
     android:paddingTop="2dp">
 
+    <!-- 中央播放控制组放在已有互动浮层下方。 -->
+    <com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls
+        android:id="@+id/plvec_playback_seek_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <!--观看信息布局-->
     <com.easefun.polyv.liveecommerce.scenes.fragments.widget.PLVECWatchInfoView
         android:id="@+id/watch_info_ly"

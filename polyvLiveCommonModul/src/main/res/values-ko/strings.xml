@@ -781,4 +781,8 @@
     <string name="plv_streamer_compliance_back">돌아가기</string>
     <string name="plv_chat_system_message">시스템 메시지</string>
     <string name="plv_chat_message_not_sent">메시지가 전송되지 않았습니다. 수정 후 다시 시도해 주세요.</string>
+    <string name="plv_playback_seek_backward_seconds">%1$d초 뒤로</string>
+    <string name="plv_playback_seek_forward_seconds">%1$d초 앞으로</string>
+    <string name="plv_playback_seek_play">재생</string>
+    <string name="plv_playback_seek_pause">일시 정지</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.easefun.polyv.liveecommerce.scenes;
 
+import com.easefun.polyv.livecommon.module.modules.player.playback.contract.IPLVPlaybackPlayerContract;
+
 import static com.plv.foundationsdk.utils.PLVSugarUtil.nullable;
 import static com.plv.foundationsdk.utils.PLVSugarUtil.transformList;
 
@@ -609,6 +611,10 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
         gestureScanner.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
+                if (commonHomeFragment instanceof PLVECPalybackHomeFragment
+                        && ((PLVECPalybackHomeFragment) commonHomeFragment).togglePlaybackSeekControls()) {
+                    return true;
+                }
                 if (videoLayout.isSubVideoViewShow()) {
                     if (!videoLayout.getSubVideoViewHerf().isEmpty()) {
                         PLVWebUtils.openWebLink(videoLayout.getSubVideoViewHerf(), PLVECLiveEcommerceActivity.this);
@@ -1349,6 +1355,18 @@ public class PLVECLiveEcommerceActivity extends PLVBaseActivity implements IPLVM
     };
 
     private PLVECPalybackHomeFragment.OnViewActionListener playbackHomeViewActionListener = new PLVECPalybackHomeFragment.OnViewActionListener() {
+        @Override
+        public Rect getPlaybackContentRect() {
+            return videoLayout instanceof PLVECPlaybackVideoLayout
+                    ? ((PLVECPlaybackVideoLayout) videoLayout).getPlaybackContentRect() : null;
+        }
+
+        @Override
+        public IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter getPlaybackPlayerPresenter() {
+            return videoLayout instanceof PLVECPlaybackVideoLayout
+                    ? ((PLVECPlaybackVideoLayout) videoLayout).getPlaybackPlayerPresenter() : null;
+        }
+
         @Override
         public boolean onPauseOrResumeClick(View view) {
             if (!videoLayout.isSubVideoViewShow()) {

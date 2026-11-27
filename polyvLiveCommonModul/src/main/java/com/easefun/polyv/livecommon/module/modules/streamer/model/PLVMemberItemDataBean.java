@@ -74,6 +74,23 @@ public class PLVMemberItemDataBean {
         return this;
     }
 
+    /**
+     * 同步 Socket 画笔授权，避免重新绑定连麦信息时被旧的 classStatus 覆盖。
+     */
+    public void setHasPaint(boolean hasPaint) {
+        if (linkMicItemDataBean != null) {
+            linkMicItemDataBean.setHasPaint(hasPaint);
+        }
+        if (socketUserBean != null) {
+            PLVClassStatusBean classStatus = socketUserBean.getClassStatus();
+            if (classStatus == null) {
+                classStatus = new PLVClassStatusBean();
+                socketUserBean.setClassStatus(classStatus);
+            }
+            classStatus.setPaint(hasPaint ? PLVClassStatusBean.STATUS_ON : PLVClassStatusBean.STATUS_OFF);
+        }
+    }
+
     public void updateBaseLinkMicBean(PLVLinkMicItemDataBean linkMicItemDataBean) {
         if (this.linkMicItemDataBean == null || linkMicItemDataBean == null) {
             return;

@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media.controller;
 
+import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls;
+
 import android.app.Activity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -135,6 +137,18 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     private IPLVPlaybackPlayerContract.IPlaybackPlayerPresenter playerPresenter;
 
     private IPLVLiveRoomDataManager liveRoomDataManager;
+    private PLVPlaybackSeekControls playbackSeekControls;
+
+    @Override
+    public void setPlaybackSeekControls(PLVPlaybackSeekControls controls) {
+        playbackSeekControls = controls;
+        controls.setOnControlAction(new Runnable() {
+            @Override
+            public void run() {
+                show();
+            }
+        });
+    }
 
     //服务端的PPT开关
     private boolean isServerEnablePPT;
@@ -338,6 +352,9 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public void hide() {
         setVisibility(GONE);
+        if (playbackSeekControls != null) {
+            playbackSeekControls.setControlsVisible(false);
+        }
     }
 
     @Override
@@ -363,6 +380,9 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     @Override
     public void show() {
         setVisibility(VISIBLE);
+        if (playbackSeekControls != null) {
+            playbackSeekControls.setControlsVisible(true);
+        }
         resetHideControllerBarDelay();
     }
     // </editor-fold>
@@ -382,6 +402,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
     public void initData(IPLVLiveRoomDataManager liveRoomDataManager) {
         this.liveRoomDataManager = liveRoomDataManager;
         String channelId = liveRoomDataManager.getConfig().getChannelId();
+        if (playbackSeekControls != null) {
+            playbackSeekControls.bind(playerPresenter, channelId);
+            playbackSeekControls.setControlsVisible(isShowing());
+        }
         boolean enableSpeedControl = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_SPEED_CONTROL_ENABLE);
         boolean enablePlayButton = PLVChannelFeatureManager.onChannel(channelId).isFeatureSupport(PLVChannelFeature.LIVE_PLAYBACK_PLAY_BUTTON_ENABLE);
         PLVLivePlaybackSeekBarStrategy seekBarStrategy = PLVChannelFeatureManager.onChannel(channelId)
@@ -714,7 +738,10 @@ public class PLVLCPlaybackMediaController extends FrameLayout implements IPLVLCP
                 if (playInfoVO == null) {
                     return;
                 }
-                int position = playInfoVO.getPosition();
+                int position = playInfoVO.getDisplayPosition();
+                if (playbackSeekControls != null) {
+                    playbackSeekControls.refresh();
+                }
                 int totalTime = playInfoVO.getTotalTime();
                 int bufPercent = playInfoVO.getBufPercent();
                 boolean isPlaying = playInfoVO.isPlaying();

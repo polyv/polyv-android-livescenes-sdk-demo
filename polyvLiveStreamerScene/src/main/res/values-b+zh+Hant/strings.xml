@@ -82,4 +82,6 @@
     <string name="plvls_streamer_screenshare_stop_confirm">確定結束荧幕共亯嗎？</string>
     <string name="plvls_float_window_permission_need">為保證後台運行，需要您授權浮窗權限</string>
     <string name="plvls_float_window_permission_denied_and_not_show">權限受限，將不開啟懸浮窗</string>
+    <string name="plvls_member_grant_paint">授予畫筆</string>
+    <string name="plvls_member_revoke_paint">收回畫筆</string>
 </resources>

@@ -117,6 +117,16 @@ public class PLVLiveChannelConfigFiller {
         channelConfig.setupVideoListType(videoListType);
     }
 
+    /** 进入观看页前设置：null 跟随频道后台，true/false 覆盖按钮开关。 */
+    public static void setPlaybackSeekButtonsEnabled(Boolean enabled) {
+        channelConfig.setPlaybackSeekButtonsEnabled(enabled);
+    }
+
+    /** 设置快进快退步长，5–60 整数秒，非法值回落 15 秒。 */
+    public static void setPlaybackSeekStepSeconds(double seconds) {
+        channelConfig.setPlaybackSeekStepSeconds(seconds);
+    }
+
     /**
      * 设置是否是直播
      *

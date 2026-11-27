@@ -1,5 +1,7 @@
 package com.easefun.polyv.livecloudclass.modules.media;
 
+import com.easefun.polyv.livecommon.module.modules.player.playback.view.PLVPlaybackSeekControls;
+
 import static com.plv.foundationsdk.utils.PLVTimeUnit.seconds;
 
 import android.app.Activity;
@@ -526,6 +528,8 @@ public class PLVLCPlaybackMediaLayout extends FrameLayout implements IPLVLCMedia
         playbackPlayerPresenter.registerView(playbackPlayerView);
         playbackPlayerPresenter.init();
         mediaController.setPlaybackPlayerPresenter(playbackPlayerPresenter);
+        mediaController.setPlaybackSeekControls((PLVPlaybackSeekControls)
+                findViewById(R.id.plvlc_playback_seek_controls));
         mediaController.initData(liveRoomDataManager);
 
         if(danmuSettingLayout != null){

@@ -81,4 +81,6 @@
     <string name="plvls_streamer_screenshare_stop_confirm">화면 공유를 종료하시겠습니까?</string>
     <string name="plvls_float_window_permission_need">백그라운드 작업을 보장하려면 플로팅 창 권한을 승인해야 합니다</string>
     <string name="plvls_float_window_permission_denied_and_not_show">권한이 제한되어 있어 플로팅 창이 열리지 않습니다</string>
+    <string name="plvls_member_grant_paint">그리기 권한 부여</string>
+    <string name="plvls_member_revoke_paint">그리기 권한 회수</string>
 </resources>

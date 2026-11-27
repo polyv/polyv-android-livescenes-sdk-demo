@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="44dp"
+    android:minWidth="112dp"
+    android:background="@drawable/plvls_member_more_menu_bg"
+    android:drawableStart="@drawable/plvls_member_paint_icon"
+    android:drawablePadding="10dp"
+    android:gravity="center_vertical"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:singleLine="true"
+    android:text="@string/plvls_member_grant_paint"
+    android:textColor="#F0F1F5"
+    android:textSize="12sp" />

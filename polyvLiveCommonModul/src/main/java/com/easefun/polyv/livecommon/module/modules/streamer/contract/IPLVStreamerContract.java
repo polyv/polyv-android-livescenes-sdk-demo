@@ -612,6 +612,11 @@ public interface IPLVStreamerContract {
         void setUserPermissionSpeaker(String userId, boolean isSetPermission, Ack ack);
 
         /**
+         * 设置连麦学员画笔权限，通过 Socket 通知同步权限状态
+         */
+        void setUserPermissionPaint(String userId, boolean isSetPermission, Ack ack);
+
+        /**
          * 设置用户第一画面
          */
         void setUserFirstView(String userId, boolean isSetFirstView, Ack ack);
